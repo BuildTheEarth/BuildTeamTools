@@ -1,0 +1,115 @@
+package net.buildtheearth.buildteam;
+
+import net.buildtheearth.buildteam.commands.buildteam_command;
+import net.buildtheearth.buildteam.commands.generator_command;
+import net.buildtheearth.buildteam.components.BTENetwork;
+import net.buildtheearth.buildteam.components.generator.Inventories;
+import net.buildtheearth.buildteam.components.stats.StatsPlayerType;
+import net.buildtheearth.buildteam.components.stats.StatsServerType;
+import net.buildtheearth.buildteam.listeners.CancelledEvents;
+import net.buildtheearth.buildteam.components.ConfigManager;
+import net.buildtheearth.buildteam.listeners.Join_Listener;
+import net.buildtheearth.buildteam.listeners.Stats_Listener;
+import org.bukkit.Bukkit;
+
+import net.buildtheearth.Main;
+import org.bukkit.entity.Player;
+
+public class BuildTeam {
+		
+	private long time;
+	private BTENetwork bteNetwork;
+	
+	public BuildTeam() {}
+	
+	public void start() {
+		registerCommands();
+		registerListeners();
+		startTimer();
+		
+		ConfigManager.setStandard();
+		ConfigManager.readData();
+
+		Main.instance.getServer().getMessenger().registerOutgoingPluginChannel(Main.instance, "BuildTeam");
+		Main.instance.getServer().getMessenger().registerIncomingPluginChannel(Main.instance, "BuildTeam", Main.instance);
+
+
+
+		bteNetwork = new BTENetwork();
+	}
+	
+	
+	
+	/** This method is called every second.
+	 *  It contains all systems that have to run once a second.
+	 */
+	private void tickSeconds() {
+
+	}
+	
+	
+	/** The main Timer of the plugin that runs once a second.
+	 *  It calls the tick() function.
+	 */
+	private void startTimer() {
+		Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.instance, new Runnable() {
+			
+			@Override
+			public void run() {
+				time++;
+
+				// Jede Stunde
+				if(time%(20*60*60) == 0){
+				}
+
+				// Jede 10 Minuten (+1 Sekunde)
+				if(time%(20*60*10 + 20) == 0) {
+					Main.buildTeam.getBTENetwork().update();
+				}
+
+				// Jede Minute
+				if(time%(20*60) == 0) {
+					Main.buildTeam.getBTENetwork().getStatsManager().getStatsServer().addValue(StatsServerType.UPTIME, 1);
+
+					for (Player p : Bukkit.getOnlinePlayers()) {
+						Main.buildTeam.getBTENetwork().getStatsManager().getStatsServer().addValue(StatsServerType.PLAYTIME, 1);
+						Main.buildTeam.getBTENetwork().getStatsManager().getStatsPlayer(p.getUniqueId()).addValue(StatsPlayerType.PLAYTIME, 1);
+					}
+				}
+
+				// Alle 5 Sekunden
+				if(time%100 == 0){
+				}
+
+				// Jede Sekunde
+				if(time%20 == 0){
+					tickSeconds();
+				}
+
+				// Jede viertel Sekunde
+				if(time%5 == 0){
+				}
+			}
+		},0,0);
+	}
+
+	
+	/** Registers all Commands of the plugin. */
+	private void registerCommands() {
+		Main.instance.getCommand("buildteam").setExecutor(new buildteam_command());
+		Main.instance.getCommand("generator").setExecutor(new generator_command());
+
+	}
+
+	/** Registers all Listeners of the plugin. */
+	private void registerListeners() {
+		Bukkit.getPluginManager().registerEvents(new CancelledEvents(), Main.instance);
+		Bukkit.getPluginManager().registerEvents(new Join_Listener(), Main.instance);
+		Bukkit.getPluginManager().registerEvents(new Stats_Listener(), Main.instance);
+		Bukkit.getPluginManager().registerEvents(new Inventories(), Main.instance);
+	}
+
+	public BTENetwork getBTENetwork() {
+		return bteNetwork;
+	}
+}

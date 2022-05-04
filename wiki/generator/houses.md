@@ -12,7 +12,7 @@ To change the wall color of the building, add the -w flag:
 ```
 /gen house -w <id>
 ```
-**Default:** A random wall block
+**Default:** A random wall block <br>
 To find the correct ID of the block you want to use, click [here](https://www.digminecraft.com/lists/item_id_list_pc_1_12.php)
 
 

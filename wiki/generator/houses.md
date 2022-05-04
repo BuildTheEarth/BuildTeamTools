@@ -33,7 +33,8 @@ To change the roof type of floors of the building, add the -rt flag:
 
 **Roof Types**:
 - FLAT
-- SLOPE
+- SLABS
+- STAIRS
 
 
 ## Floor Count

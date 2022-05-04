@@ -6,7 +6,9 @@ To generate a simple random house, enter:
 /gen house
 ```
 
-## Wall Color [-w]
+## Parameters
+
+### Wall Color [-w]
 
 To change the wall color of the building, add the -w flag:
 ```
@@ -16,7 +18,7 @@ To change the wall color of the building, add the -w flag:
 To find the correct ID of the block you want to use, click [here](https://www.digminecraft.com/lists/item_id_list_pc_1_12.php)
 
 
-## Roof Color [-r]
+### Roof Color [-r]
 
 To change the wall color of the building, add the -r flag:
 ```
@@ -25,7 +27,7 @@ To change the wall color of the building, add the -r flag:
 To find the correct ID of the block you want to use, click [here](https://www.digminecraft.com/lists/item_id_list_pc_1_12.php)
 
 
-## Roof Type [-rt]
+### Roof Type [-rt]
 
 To change the roof type of floors of the building, add the -rt flag:
 ```
@@ -38,7 +40,7 @@ To change the roof type of floors of the building, add the -rt flag:
 - STAIRS
 
 
-## Floor Count [-f]
+### Floor Count [-f]
 
 To change the numbers of floors of the building, add the -f flag:
 ```

@@ -1,7 +1,8 @@
 package net.buildtheearth.buildteam;
 
+import com.sk89q.worldedit.WorldEdit;
 import net.buildtheearth.buildteam.commands.buildteam_command;
-import net.buildtheearth.buildteam.commands.generator_command;
+import net.buildtheearth.buildteam.commands.generate_command;
 import net.buildtheearth.buildteam.components.BTENetwork;
 import net.buildtheearth.buildteam.components.generator.Inventories;
 import net.buildtheearth.buildteam.components.stats.StatsPlayerType;
@@ -14,6 +15,10 @@ import org.bukkit.Bukkit;
 
 import net.buildtheearth.Main;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BuildTeam {
 		
@@ -97,7 +102,7 @@ public class BuildTeam {
 	/** Registers all Commands of the plugin. */
 	private void registerCommands() {
 		Main.instance.getCommand("buildteam").setExecutor(new buildteam_command());
-		Main.instance.getCommand("generator").setExecutor(new generator_command());
+		Main.instance.getCommand("generate").setExecutor(new generate_command());
 
 	}
 
@@ -109,7 +114,44 @@ public class BuildTeam {
 		Bukkit.getPluginManager().registerEvents(new Inventories(), Main.instance);
 	}
 
+
+	public static class DependencyManager {
+
+		// List with all missing dependencies
+		private final static List<String> missingDependencies = new ArrayList<>();
+
+		/**
+		 * Check for all required dependencies and inform in console about missing dependencies
+		 * @return True if all dependencies are present
+		 */
+		private static boolean checkForRequiredDependencies() {
+			PluginManager pluginManager = Main.instance.getServer().getPluginManager();
+
+			if (!pluginManager.isPluginEnabled("WorldEdit")) {
+				missingDependencies.add("WorldEdit (V6.1.9)");
+			}
+
+			return missingDependencies.isEmpty();
+		}
+
+		/**
+		 * @return True if WorldEdit is present
+		 */
+		public static boolean isWorldEditEnabled() {
+			return Main.instance.getServer().getPluginManager().isPluginEnabled("WorldEdit");
+		}
+
+		/**
+		 * @return World Edit instance
+		 */
+		public static WorldEdit getWorldEdit() {
+			return WorldEdit.getInstance();
+		}
+	}
+
 	public BTENetwork getBTENetwork() {
 		return bteNetwork;
 	}
+
+
 }

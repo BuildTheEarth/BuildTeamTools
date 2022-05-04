@@ -8,5 +8,7 @@ commands:
   buildteam:
     description: Main command of the Build Team plugin
     usage: /buildteam
-  generator:
-    usage: /generator
+  generate:
+    description: Generator tool of BuildTheEarth
+    usage: /generate
+    aliases: [gen, g]

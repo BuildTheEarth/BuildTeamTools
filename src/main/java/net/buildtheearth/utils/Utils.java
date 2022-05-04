@@ -2,7 +2,10 @@ package net.buildtheearth.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
+import net.buildtheearth.Main;
+import net.buildtheearth.buildteam.BuildTeam;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -168,6 +171,116 @@ public class Utils {
 		Item.create(Material.WOOD)
 	};
 
+	public static ItemStack[] WALL_BLOCKS = {
+			Item.create(Material.CONCRETE, null, (short)15, null),
+			Item.create(Material.COAL_BLOCK),
+			Item.create(Material.CONCRETE_POWDER, null, (short)15, null),
+			Item.create(Material.WOOL, null, (short)15, null),
+			Item.create(Material.OBSIDIAN),
+			Item.create(Material.CONCRETE, null, (short)7, null),
+			Item.create(Material.CONCRETE_POWDER, null, (short)7, null),
+			Item.create(Material.STAINED_CLAY, null, (short)9, null),
+			Item.create(Material.CONCRETE, null, (short)8, null),
+			Item.create(Material.COBBLESTONE),
+			Item.create(Material.SMOOTH_BRICK, null, (short)2, null),
+			Item.create(Material.SMOOTH_BRICK),
+			Item.create(Material.STONE, null, (short)6, null),
+			Item.create(Material.STONE),
+			Item.create(Material.STONE, null, (short)5, null),
+			Item.create(Material.WOOL, null, (short)8, null),
+			Item.create(Material.CONCRETE_POWDER, null, (short)8, null),
+			Item.create(Material.CLAY),
+			Item.create(Material.BONE_BLOCK),
+			Item.create(Material.STONE, null, (short)3, null),
+			Item.create(Material.STONE, null, (short)4, null),
+			Item.create(Material.CONCRETE, null, (short)0, null),
+			Item.create(Material.QUARTZ_BLOCK, null, (short)1, null),
+			Item.create(Material.QUARTZ_BLOCK, null, (short)2, null),
+			Item.create(Material.QUARTZ_BLOCK, null, (short)0, null),
+			Item.create(Material.LOG, null, (short)2, null),
+			Item.create(Material.IRON_BLOCK),
+			Item.create(Material.CONCRETE_POWDER, null, (short)0, null),
+			Item.create(Material.WOOL),
+			Item.create(Material.SNOW_BLOCK),
+			Item.create(Material.CONCRETE_POWDER, null, (short)6, null),
+			Item.create(Material.WOOL, null, (short)6, null),
+			Item.create(Material.WOOL, null, (short)2, null),
+			Item.create(Material.CONCRETE_POWDER, null, (short)2, null),
+			Item.create(Material.CONCRETE_POWDER, null, (short)10, null),
+			Item.create(Material.WOOL, null, (short)10, null),
+			Item.create(Material.CONCRETE, null, (short)10, null),
+			Item.create(Material.STAINED_CLAY, null, (short)11, null),
+			Item.create(Material.STAINED_CLAY, null, (short)3, null),
+			Item.create(Material.CONCRETE, null, (short)11, null),
+			Item.create(Material.LAPIS_BLOCK),
+			Item.create(Material.WOOL, null, (short)11, null),
+			Item.create(Material.CONCRETE_POWDER, null, (short)11, null),
+			Item.create(Material.PRISMARINE, null, (short)2, null),
+			Item.create(Material.WOOL, null, (short)9, null),
+			Item.create(Material.PRISMARINE),
+			Item.create(Material.PRISMARINE, null, (short)1, null),
+			Item.create(Material.PACKED_ICE),
+			Item.create(Material.CONCRETE, null, (short)3, null),
+			Item.create(Material.WOOL, null, (short)3, null),
+			Item.create(Material.CONCRETE_POWDER, null, (short)3, null),
+			Item.create(Material.CONCRETE_POWDER, null, (short)5, null),
+			Item.create(Material.WOOL, null, (short)5, null),
+			Item.create(Material.CONCRETE, null, (short)5, null),
+			Item.create(Material.CONCRETE_POWDER, null, (short)13, null),
+			Item.create(Material.WOOL, null, (short)13, null),
+			Item.create(Material.CONCRETE, null, (short)13, null),
+			Item.create(Material.STAINED_CLAY, null, (short)5, null),
+			Item.create(Material.STAINED_CLAY, null, (short)13, null),
+			Item.create(Material.LOG_2),
+			Item.create(Material.HARD_CLAY),
+			Item.create(Material.STONE, null, (short)2, null),
+			Item.create(Material.STONE, null, (short)1, null),
+			Item.create(Material.WOOD, null, (short)3, null),
+			Item.create(Material.WOOD, null, (short)2, null),
+			Item.create(Material.END_BRICKS),
+			Item.create(Material.ENDER_STONE),
+			Item.create(Material.SANDSTONE),
+			Item.create(Material.SANDSTONE, null, (short)1, null),
+			Item.create(Material.SANDSTONE, null, (short)2, null),
+			Item.create(Material.SAND),
+			Item.create(Material.CONCRETE_POWDER, null, (short)4, null),
+			Item.create(Material.CONCRETE, null, (short)4, null),
+			Item.create(Material.STAINED_CLAY, null, (short)4, null),
+			Item.create(Material.CONCRETE_POWDER, null, (short)1, null),
+			Item.create(Material.WOOL, null, (short)1, null),
+			Item.create(Material.CONCRETE, null, (short)1, null),
+			Item.create(Material.SAND, null, (short)1, null),
+			Item.create(Material.RED_SANDSTONE),
+			Item.create(Material.RED_SANDSTONE, null, (short)1, null),
+			Item.create(Material.RED_SANDSTONE, null, (short)2, null),
+			Item.create(Material.PUMPKIN),
+			Item.create(Material.WOOD, null, (short)4, null),
+			Item.create(Material.BRICK),
+			Item.create(Material.STAINED_CLAY, null, (short)1, null),
+			Item.create(Material.HUGE_MUSHROOM_2),
+			Item.create(Material.WOOL, null, (short)14, null),
+			Item.create(Material.STAINED_CLAY, null, (short)14, null),
+			Item.create(Material.CONCRETE, null, (short)14, null),
+			Item.create(Material.RED_NETHER_BRICK),
+			Item.create(Material.NETHERRACK),
+			Item.create(Material.NETHER_BRICK),
+			Item.create(Material.STAINED_CLAY, null, (short)15, null),
+			Item.create(Material.LOG, null, (short)1, null),
+			Item.create(Material.WOOD, null, (short)5, null),
+			Item.create(Material.LOG_2, null, (short)1, null),
+			Item.create(Material.STAINED_CLAY, null, (short)7, null),
+			Item.create(Material.LOG, null, (short)3, null),
+			Item.create(Material.STAINED_CLAY, null, (short)12, null),
+			Item.create(Material.SOUL_SAND),
+			Item.create(Material.NOTE_BLOCK),
+			Item.create(Material.LOG, null, (short)0, null),
+			Item.create(Material.CONCRETE, null, (short)12, null),
+			Item.create(Material.WOOD, null, (short)1, null),
+			Item.create(Material.WOOL, null, (short)12, null),
+			Item.create(Material.CONCRETE_POWDER, null, (short)12, null),
+			Item.create(Material.WOOD)
+	};
+
 	public static ItemStack[] SLABS = {
 		Item.create(Material.STEP, null, (short) 0, null),
 		Item.create(Material.STEP, null, (short) 1, null),
@@ -262,6 +375,16 @@ public class Utils {
 		return Item.createCustomHeadBase64(b64, headName, lore);
 	}
 
+	public static String getBlockID(ItemStack item){
+		String blockID = "" + item.getType().getId();
+
+		if(item.getDurability() != 0)
+			blockID += ":" + item.getDurability();
+
+		return blockID;
+	}
+
+
 	public static boolean containsStringFromList(String string, List<String> list) {
 		for(String s : list)
 		if(string.contains(s))
@@ -280,10 +403,24 @@ public class Utils {
 	    return y;
 	}
 
+	public static int[] range(int start, int stop)
+	{
+		int[] result = new int[stop-start];
+
+		for(int i=0;i<stop-start;i++)
+			result[i] = start+i;
+
+		return result;
+	}
+
 	public static Player getRandomPlayer(){
 		for(Player player : Bukkit.getOnlinePlayers())
 			return player;
 
 		return null;
+	}
+
+	public static Object pickRandom(Object[] array){
+		return array[(int) (Math.random() * array.length)];
 	}
 }

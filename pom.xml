@@ -60,6 +60,12 @@
             <id>papermc-repo</id>
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
+
+        <!-- World Edit -->
+        <repository>
+            <id>nachwahl-repo</id>
+            <url>https://maven.nachwahl.dev/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -70,6 +76,16 @@
             <version>1.12.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- World Edit -->
+        <dependency>
+            <groupId>com.sk89q.worldedit</groupId>
+            <artifactId>worldedit-bukkit</artifactId>
+            <version>6.1.9</version>
+            <scope>provided</scope>
+        </dependency>
+
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

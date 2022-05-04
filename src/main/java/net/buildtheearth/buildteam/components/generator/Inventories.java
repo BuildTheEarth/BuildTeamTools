@@ -156,6 +156,10 @@ public class Inventories implements Listener {
 
 
 
+
+
+
+
     public static void openWallBlockInventory(Player p){
         if(colorInvSelectedItems.containsKey(p.getUniqueId()))
             openColoredInventory(p, WALL_BLOCK_INV_NAME, 1, colorInvSelectedItems.get(p.getUniqueId()));

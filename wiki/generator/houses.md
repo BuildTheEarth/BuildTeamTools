@@ -1,4 +1,4 @@
-# Houses
+# Generate Houses with Commands
 
 To generate a simple random house, enter:
 

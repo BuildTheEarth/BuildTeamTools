@@ -8,7 +8,7 @@ To generate a simple random house, enter:
 
 ## Block Parameters
 
-The Block Parameters define the blocks of different parts of the building.
+The Block Parameters define the blocks of different parts of the building. If you don't enter them it will choose a random block from a custom block palette.
 
 ### Wall Block [-w]
 
@@ -51,7 +51,7 @@ To change the Window color of the building, add the `-wd` flag:
 ```
 /gen house -wd <id>
 ```
-**Default:** 95:15 (minecraft:black_stained_glass) <br>
+**Default:** 95:15 (*minecraft:black_stained_glass*) <br>
 To find the correct ID of the block you want to use, click [here](https://www.digminecraft.com/lists/item_id_list_pc_1_12.php)
 <br>
 <br>

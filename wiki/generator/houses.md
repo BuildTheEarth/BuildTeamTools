@@ -29,7 +29,7 @@ To find the correct ID of the block you want to use, click [here](https://www.di
 
 ### Roof Type [-rt]
 
-To change the roof type of floors of the building, add the -rt flag:
+To change the roof type of the building, add the -rt flag:
 ```
 /gen house -rt <type>
 ```

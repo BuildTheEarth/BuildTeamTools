@@ -8,6 +8,8 @@ To generate a simple random house, enter:
 
 ## Block Parameters
 
+The Block Parameters define the blocks of different parts of the building.
+
 ### Wall Block [-w]
 
 The Wall Block defines the main color of the facade of the building.

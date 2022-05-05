@@ -34,12 +34,22 @@ To find the correct ID of the block you want to use, click [here](https://www.di
 
 ### Base Block [-b]
 
-The Base Block defines the Base at the bottom of the Building.
+The Base Block defines the base at the bottom of the building.
 To change the base color of the building, add the `-b` flag:
 ```
 /gen house -b <id>
 ```
 **Default:** A random base block <br>
+To find the correct ID of the block you want to use, click [here](https://www.digminecraft.com/lists/item_id_list_pc_1_12.php)
+
+### Window Block [-wd]
+
+The Window Block defines the block that is used for the windows of the building.
+To change the Window color of the building, add the `-wd` flag:
+```
+/gen house -wd <id>
+```
+**Default:** 95:15 (minecraft:black_stained_glass) <br>
 To find the correct ID of the block you want to use, click [here](https://www.digminecraft.com/lists/item_id_list_pc_1_12.php)
 <br>
 <br>
@@ -49,52 +59,66 @@ To find the correct ID of the block you want to use, click [here](https://www.di
 
 ### Floor Count [-fc]
 
-To change the numbers of floors of the building, add the `-fc` flag:
+The Floor Count Parameter defines the numbers of floors of the building.
+To change the floor count, add the `-fc` flag:
 ```
 /gen house -fc <amount>
 ```
 
 ### Floor Height [-fh]
 
-To change the height of each floor of the building, add the `-fh` flag:
+The Floor Height Parameter defines the height of each floor of the building.
+To change the floor height of the building, add the `-fh` flag:
 ```
 /gen house -fh <height>
 ```
+**Default:** 3
 
 ### Base Height [-bh]
 
+The Base Height Parameter defines the height of the base at the bottom of the building.
 To change the height of the base of the building, add the `-bh` flag:
 ```
 /gen house -bh <height>
 ```
+**Default:** 1
 
 ### Window Height [-wdh]
 
-To change the height of the windows of the building, add the `-wdh` flag:
+The Window Height Parameter defines the height of the windows of the building.
+To change the window height of the building, add the `-wdh` flag:
 ```
 /gen house -wdh <height>
 ```
+**Default:** 2
 
-### Window Height [-wdw]
+### Window Width [-wdw]
 
-To change the width of the windows of the building, add the `-wdw` flag:
+The Window Width Parameter defines the width of the windows of the building.
+To change the window width of the building, add the `-wdw` flag:
 ```
 /gen house -wdw <width>
 ```
+**Default:** 2
 
 ### Window Distance [-wdd]
 
-To change the spacing between the windows of the building, add the `-wdd` flag:
+The Window Distance Parameter defines the spacing between the windows of the building.
+To change the window distance of the building, add the `-wdd` flag:
 ```
 /gen house -wdd <distance>
 ```
+**Default:** 2
 
 ### Max Roof Height [-mrh]
 
-To change the spacing between the windows of the building, add the `-mrh` flag:
+The Max Roof Height Parameter defines the maximum height of the roof of the building.
+This can be useful for large buildings with a gable roof that should not extend a certain height.
+To change the maximum roof height of the building, add the `-mrh` flag:
 ```
 /gen house -mrh <distance>
 ```
+**Default:** 10
 
 
 ## Other Parameters

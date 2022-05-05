@@ -15,14 +15,14 @@ Just by entering a few parameters you can quickly generate a buildings, roads, r
 
 For each generator you can either use it with an interactive **UI** or via **Command**.
 
-The UI lets you to select one of the generators and set the necessary parameters by clicking through the inventories.<br>
+The **UI** lets you to select one of the generators and set the necessary parameters by clicking through the inventories.<br>
 Especially for new builders this is an easy way to click together the building you need without much background knowledge.
 To open up the UI, just enter the command:
 ```
 /gen
 ```
 
-To further customize the parameters and for a quicker workflow you can also generate structures via Command.
+To further customize the parameters and for a quicker workflow you can also generate structures via **Command**.
 The general structure of the command looks like this:
 ```
 /gen <component> -parameters

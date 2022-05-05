@@ -6,7 +6,7 @@ Especially in villages where all buildings are rectangle boxes and the roads are
 Just by entering a few parameters you can quickly generate a buildings, roads, railways and more.
 
 ### Components
-- [House Generator](/houses/house.md)
+- [House Generator](houses/house.md)
 - Road Generator (TODO)
 - Railway Generator (TODO)
 - Tree Generator (TODO)

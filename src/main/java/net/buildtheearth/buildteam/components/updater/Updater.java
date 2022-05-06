@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
 import java.io.*;
@@ -14,7 +15,7 @@ import java.util.logging.Level;
 
 public class Updater
 {
-    private static final String USER_AGENT = "Updater by Stipess1";
+    private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36";
     // Direct download link
     private String downloadLink;
     // Provided plugin
@@ -175,9 +176,9 @@ public class Updater
             else if(jsonArray.size() < 10)
             {
                 element = jsonArray.get(jsonArray.size()-1);
-
                 JsonObject object = element.getAsJsonObject();
                 element = object.get("name");
+
                 version = element.toString().replaceAll("\"", "").replace("v","");
                 if(logger)
                     plugin.getLogger().info("Checking for update...");
@@ -243,7 +244,12 @@ public class Updater
         try
         {
             URL url = new URL(downloadLink);
-            in = new BufferedInputStream(url.openStream());
+
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.addRequestProperty("User-Agent", USER_AGENT);
+            InputStream inputStream = connection.getInputStream();
+
+            in = new BufferedInputStream(inputStream);
             fout = new FileOutputStream(new File(updateFolder, file.getName()));
 
             final byte[] data = new byte[4096];
@@ -254,6 +260,7 @@ public class Updater
         }
         catch (Exception e)
         {
+            e.printStackTrace();
             if(logger)
                 plugin.getLogger().log(Level.SEVERE, "Updater tried to download the update, but was unsuccessful.");
             result = Result.FAILED;

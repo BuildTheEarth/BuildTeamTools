@@ -25,7 +25,7 @@ public class Main extends JavaPlugin implements PluginMessageListener{
 		buildTeam = new BuildTeam();
 		buildTeam.start();
 
-		Updater updater = new Updater(this, BuildTeam.SPIGOT_PROJECT_ID, this.getFile(), Updater.UpdateType.CHECK_DOWNLOAD, false);
+		Updater updater = new Updater(this, BuildTeam.SPIGOT_PROJECT_ID, this.getFile(), Updater.UpdateType.CHECK_DOWNLOAD, true);
 		String version = updater.getVersion();
 		Updater.Result result = updater.getResult();
 

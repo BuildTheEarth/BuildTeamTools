@@ -6,6 +6,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.meta.BookMeta;
 
 import java.util.UUID;
 
@@ -33,6 +34,7 @@ public class buildteam_command implements CommandExecutor{
 						status = "§6§lSTANDBY";
 
 					sender.sendMessage("§eStatus: " + status);
+					sender.sendMessage("§eVersion: §7" + Main.instance.getDescription().getVersion());
 					sender.sendMessage("§eBuildTeam ID: §7" + buildTeam);
 					sender.sendMessage("§eServer ID: §7" + serverID);
 					sender.sendMessage("");
@@ -69,9 +71,22 @@ public class buildteam_command implements CommandExecutor{
 					sender.sendMessage(Main.buildTeam.getBTENetwork().getStatsManager().getCurrentCache().toJSONString());
 				}
 			});
-		}else if(args[0].equalsIgnoreCase("update")){
+		}else if(args[0].equalsIgnoreCase("uploadCache")){
 			Main.buildTeam.getBTENetwork().update();
-			sender.sendMessage("Cache uploaded to the network.");
+			sender.sendMessage("§7Cache uploaded to the network.");
+		}else if(args[0].equalsIgnoreCase("checkForUpdates")){
+			boolean wasDebug = Main.buildTeam.isDebug();
+
+			Main.buildTeam.setDebug(true);
+			Main.instance.checkForUpdates();
+			Main.buildTeam.setDebug(wasDebug);
+			sender.sendMessage("§7Checked for updates. Please take a look at the console for details.");
+
+		}else if(args[0].equalsIgnoreCase("debug")){
+			boolean debug = Boolean.parseBoolean(args[1]);
+
+			Main.buildTeam.setDebug(debug);
+			sender.sendMessage("§7Debug Mode was set to: " + debug);
 		}
 
 

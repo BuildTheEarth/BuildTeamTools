@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import net.buildtheearth.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
@@ -175,11 +176,17 @@ public class Updater
             }
             else if(jsonArray.size() < 10)
             {
+                if(logger)
+                    plugin.getLogger().info("Found " + jsonArray.size() + " versions.");
                 element = jsonArray.get(jsonArray.size()-1);
                 JsonObject object = element.getAsJsonObject();
                 element = object.get("name");
 
                 version = element.toString().replaceAll("\"", "").replace("v","");
+                if(logger) {
+                    plugin.getLogger().info("Current version on this server: " + plugin.getDescription().getVersion());
+                    plugin.getLogger().info("Latest version available: " + version);
+                }
                 if(logger)
                     plugin.getLogger().info("Checking for update...");
                 if(shouldUpdate(version, plugin.getDescription().getVersion()) && updateType == UpdateType.VERSION_CHECK)
@@ -205,7 +212,7 @@ public class Updater
                     else
                     {
                         if(logger)
-                            plugin.getLogger().info("Update not found");
+                            plugin.getLogger().info("Update not necessary. Plugin is at the latest version.");
                         result = Result.NO_UPDATE;
                     }
                 }
@@ -250,6 +257,8 @@ public class Updater
             InputStream inputStream = connection.getInputStream();
 
             in = new BufferedInputStream(inputStream);
+            if (!updateFolder.exists())
+                updateFolder.mkdirs();
             fout = new FileOutputStream(new File(updateFolder, file.getName()));
 
             final byte[] data = new byte[4096];
@@ -282,6 +291,8 @@ public class Updater
                 e.printStackTrace();
                 this.plugin.getLogger().log(Level.SEVERE, null, e);
             }
+
+            Main.buildTeam.setUpdateInstalled(version);
         }
     }
 

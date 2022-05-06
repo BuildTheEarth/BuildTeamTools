@@ -16,6 +16,9 @@ public class Join_Listener implements Listener {
 
         //Send ping to the proxy to add player to the communicators list if response on ping is received
         Main.getBuildTeam().getBTENetwork().ping(p);
+
+        //Notify the admins if a new update got installed automatically
+        Main.buildTeam.notifyUpdate(p);
     }
 
     @EventHandler

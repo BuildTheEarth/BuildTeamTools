@@ -9,10 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 
 public class Main extends JavaPlugin implements PluginMessageListener{
 	
@@ -25,21 +21,8 @@ public class Main extends JavaPlugin implements PluginMessageListener{
 		buildTeam = new BuildTeam();
 		buildTeam.start();
 
-		Updater updater = new Updater(this, BuildTeam.SPIGOT_PROJECT_ID, this.getFile(), Updater.UpdateType.CHECK_DOWNLOAD, true);
-		String version = updater.getVersion();
-		Updater.Result result = updater.getResult();
-
-		String resultMessage = "";
-		switch (result){
-			case BAD_ID: resultMessage = "Failed to update the plugin: Wrong Spigot ID."; break;
-			case FAILED: resultMessage = "Failed to update the plugin."; break;
-			case NO_UPDATE: resultMessage = "No update found."; break;
-			case SUCCESS: resultMessage = "Plugin successfully updated."; break;
-			case UPDATE_FOUND: resultMessage = "Found an update for the plugin."; break;
-			default: resultMessage = "No result for update search"; break;
-		}
-
-		System.out.println("[BuildTeam] Plugin with version " + version + " started. " + resultMessage);
+		String resultMessage = startUpdateChecker();
+		System.out.println("[BuildTeam] Plugin with version " + getDescription().getVersion() + " started. " + resultMessage);
 	}
 	
 	@Override
@@ -78,6 +61,34 @@ public class Main extends JavaPlugin implements PluginMessageListener{
 
 	}
 
+	private String startUpdateChecker(){
+		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+			@Override
+			public void run() {
+				checkForUpdates();
+			}
+		}, 20*60*60);
+
+		return checkForUpdates();
+	}
+
+	public String checkForUpdates(){
+		Updater updater = new Updater(this, BuildTeam.SPIGOT_PROJECT_ID, this.getFile(), Updater.UpdateType.CHECK_DOWNLOAD, buildTeam.isDebug());
+		Updater.Result result = updater.getResult();
+
+		String resultMessage = "";
+		switch (result){
+			case BAD_ID: resultMessage = "Failed to update the plugin: Wrong Spigot ID."; break;
+			case FAILED: resultMessage = "Failed to update the plugin."; break;
+			case NO_UPDATE: resultMessage = "The plugin is up to date."; break;
+			case SUCCESS: resultMessage = "Plugin successfully updated."; break;
+			case UPDATE_FOUND: resultMessage = "Found an update for the plugin."; break;
+			default: resultMessage = "No result for update search"; break;
+		}
+
+		return resultMessage;
+	}
+
 	public static BuildTeam getBuildTeam() {
 		return buildTeam;
 	}
@@ -85,4 +96,6 @@ public class Main extends JavaPlugin implements PluginMessageListener{
 	public static void setBuildTeam(BuildTeam buildTeam) {
 		Main.buildTeam = buildTeam;
 	}
+
+
 }

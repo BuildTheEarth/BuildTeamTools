@@ -15,6 +15,7 @@ import net.buildtheearth.buildteam.listeners.Stats_Listener;
 import org.bukkit.Bukkit;
 
 import net.buildtheearth.Main;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 
@@ -24,6 +25,10 @@ import java.util.List;
 public class BuildTeam {
 
 	public static int SPIGOT_PROJECT_ID = 101854;
+
+	private boolean debug;
+	private boolean updateInstalled;
+	private String newVersion;
 
 	private long time;
 	private BTENetwork bteNetwork;
@@ -99,6 +104,18 @@ public class BuildTeam {
 		},0,0);
 	}
 
+	public void notifyUpdate(Player p){
+		if(!updateInstalled)
+			return;
+
+		if(p.hasPermission("buildteam.notifyUpdate")) {
+			p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
+			p.sendMessage("");
+			p.sendMessage("§6§l[BuildTeam Plugin] §eThe server automatically installed a new update (v" + newVersion + ").");
+			p.sendMessage("§6>> §ePlease restart or reload the server to activate it.");
+			p.sendMessage("");
+		}
+	}
 	
 	/** Registers all Commands of the plugin. */
 	private void registerCommands() {
@@ -114,6 +131,7 @@ public class BuildTeam {
 		Bukkit.getPluginManager().registerEvents(new Stats_Listener(), Main.instance);
 		Bukkit.getPluginManager().registerEvents(new Inventories(), Main.instance);
 	}
+
 
 
 	public static class DependencyManager {
@@ -154,5 +172,19 @@ public class BuildTeam {
 		return bteNetwork;
 	}
 
+	public boolean isDebug() {
+		return debug;
+	}
 
+	public void setDebug(boolean debug) {
+		this.debug = debug;
+	}
+
+	public void setUpdateInstalled(String newVersion) {
+		this.newVersion = newVersion;
+		this.updateInstalled = true;
+
+		for(Player p : Bukkit.getOnlinePlayers())
+			notifyUpdate(p);
+	}
 }

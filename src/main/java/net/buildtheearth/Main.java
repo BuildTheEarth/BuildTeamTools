@@ -3,6 +3,7 @@ package net.buildtheearth;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.buildteam.BuildTeam;
+import net.buildtheearth.buildteam.components.updater.Updater;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -24,7 +25,21 @@ public class Main extends JavaPlugin implements PluginMessageListener{
 		buildTeam = new BuildTeam();
 		buildTeam.start();
 
-		System.out.println("[BuildTeam] Plugin started.");
+		Updater updater = new Updater(this, BuildTeam.SPIGOT_PROJECT_ID, this.getFile(), Updater.UpdateType.CHECK_DOWNLOAD, false);
+		String version = updater.getVersion();
+		Updater.Result result = updater.getResult();
+
+		String resultMessage = "";
+		switch (result){
+			case BAD_ID: resultMessage = "Failed to update the plugin: Wrong Spigot ID."; break;
+			case FAILED: resultMessage = "Failed to update the plugin."; break;
+			case NO_UPDATE: resultMessage = "No update found."; break;
+			case SUCCESS: resultMessage = "Plugin successfully updated."; break;
+			case UPDATE_FOUND: resultMessage = "Found an update for the plugin."; break;
+			default: resultMessage = "No result for update search"; break;
+		}
+
+		System.out.println("[BuildTeam] Plugin with version " + version + " started. " + resultMessage);
 	}
 	
 	@Override

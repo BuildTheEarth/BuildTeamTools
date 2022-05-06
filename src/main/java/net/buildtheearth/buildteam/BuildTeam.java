@@ -7,6 +7,7 @@ import net.buildtheearth.buildteam.components.BTENetwork;
 import net.buildtheearth.buildteam.components.generator.Inventories;
 import net.buildtheearth.buildteam.components.stats.StatsPlayerType;
 import net.buildtheearth.buildteam.components.stats.StatsServerType;
+import net.buildtheearth.buildteam.components.updater.Updater;
 import net.buildtheearth.buildteam.listeners.CancelledEvents;
 import net.buildtheearth.buildteam.components.ConfigManager;
 import net.buildtheearth.buildteam.listeners.Join_Listener;
@@ -21,7 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BuildTeam {
-		
+
+	public static int SPIGOT_PROJECT_ID = 101854;
+
 	private long time;
 	private BTENetwork bteNetwork;
 	
@@ -37,8 +40,6 @@ public class BuildTeam {
 
 		Main.instance.getServer().getMessenger().registerOutgoingPluginChannel(Main.instance, "BuildTeam");
 		Main.instance.getServer().getMessenger().registerIncomingPluginChannel(Main.instance, "BuildTeam", Main.instance);
-
-
 
 		bteNetwork = new BTENetwork();
 	}

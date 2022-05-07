@@ -51,6 +51,7 @@ public class BTENetwork {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Ping");
         out.writeUTF(p.getUniqueId().toString());
+        out.writeUTF("Version: " + Main.instance.getDescription().getVersion());
         p.sendPluginMessage(Main.instance, "BuildTeam", out.toByteArray());
     }
 

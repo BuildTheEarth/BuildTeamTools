@@ -59,6 +59,8 @@ To find the correct ID of the block you want to use, click [here](https://www.di
 
 ## Size Parameters
 
+![Building Height Parameters](https://user-images.githubusercontent.com/66020920/167268603-7e77fd58-4f5f-4b04-893a-df8a1d51fe4b.png)
+
 ### Floor Count [-fc]
 
 The Floor Count Parameter defines the numbers of floors of the building.

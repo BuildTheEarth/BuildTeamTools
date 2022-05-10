@@ -29,8 +29,6 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-**An easy to use set of tools for BuildTeams of the BuildTheEarth project.**
-
 The BuildTeamTools Plugin is an essential part of any BuildTheEarth BuildTeam server, meant to provide a large set of tools to use for builders of the teams to use. The system is designed to make it easier for unexperienced people, casual players and applicants to start building in BTE and to massively shorten the building process by eliminating any repetetive and boring tasks that come up while creating any structure in BuildTheEarth.
 
 The plugin was programmed by the BTE Team and is meant for everyone to use and help contribute. For any questions regarding setup or contribution feel free to contact us.

@@ -21,10 +21,10 @@
 </p>
 <p align="center">
   <a href="https://jenkins.alps-bte.com/job/PlotSystem/"><img src="https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fjenkins.alps-bte.com%2Fjob%2FPlotSystem%2F"></a>
-    <a href="https://github.com/AlpsBTE/Plot-System"><img src="https://img.shields.io/codacy/grade/d5fad560dea64722887044e492b05ea9"></a>
-    <a href="https://github.com/AlpsBTE/Plot-System/releases"><img src="https://img.shields.io/github/v/release/AlpsBTE/Plot-System"></a>
-    <a href="https://github.com/AlpsBTE/Plot-System"><img src="https://img.shields.io/tokei/lines/github/AlpsBTE/Plot-System"></a>
-    <a href="https://github.com/AlpsBTE/Plot-System"><img src="https://img.shields.io/github/repo-size/AlpsBTE/Plot-System"></a>
+    <a href="https://github.com/BuildTheEarth/BuildTeamTools"><img src="https://img.shields.io/codacy/grade/d5fad560dea64722887044e492b05ea9"></a>
+    <a href="https://github.com/BuildTheEarth/BuildTeamTools/releases"><img src="https://img.shields.io/github/v/release/AlpsBTE/Plot-System"></a>
+    <a href="https://github.com/BuildTheEarth/BuildTeamTools"><img src="https://img.shields.io/tokei/lines/github/AlpsBTE/Plot-System"></a>
+    <a href="https://github.com/BuildTheEarth/BuildTeamTools"><img src="https://img.shields.io/github/repo-size/AlpsBTE/Plot-System"></a>
 </p>  
 
 

@@ -40,5 +40,19 @@ All used Libraries and APIs are listed below.
 
 - [Generator](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Generator)
 - [Sledgehammer](https://github.com/noahhusby/Sledgehammer) (PLANNED)
-- BuildTeam Stats (PLANNED)
-- BuildTeam Security (PLANNED)
+- Build Team Stats (PLANNED)
+- Build Team Security (PLANNED)
+
+## Features
+✔️ **User-friendly menus** and **commands**<br/>
+✔️ **Multi-Language** Support (PLANNED)<br/>
+✔️ Automatic **updates**<br/>
+✔️ **Easy configuration** and **setup**<br/>
+
+<!-- INSTALLATION -->
+## Installation
+💻 Requirements: A server with Minecaft Version 1.12.</br>
+
+To install the plugin just drag it into the **/plugins** folder, restart the server and you are done.</br>
+
+**For more information check out the [Wiki](https://github.com/AlpsBTE/Plot-System/wiki/Installation)**!

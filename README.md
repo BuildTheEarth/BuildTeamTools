@@ -17,13 +17,12 @@
 
 <p align="center">
     <a href="https://github.com/BuildTheEarth"><img src="https://img.shields.io/badge/project-community-orange.svg?colorA=3c3c3c&label=BuildTheEarth"></a>
-    <a href="https://www.discord.gg/buildtheearth"><img src="https://img.shields.io/discord/690908396404080650?label=discord"></a>
+    <a href="https://www.discord.gg/buildtheearth"><img src="https://img.shields.io/discord/690908396404080650?label=Discord"></a>
 </p>
 <p align="center">
-  <a href="https://jenkins.alps-bte.com/job/PlotSystem/"><img src="https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fjenkins.alps-bte.com%2Fjob%2FPlotSystem%2F"></a>
-    <a href="https://github.com/BuildTheEarth/BuildTeamTools/releases"><img src="https://img.shields.io/github/v/release/AlpsBTE/Plot-System"></a>
-    <a href="https://github.com/BuildTheEarth/BuildTeamTools"><img src="https://img.shields.io/tokei/lines/github/AlpsBTE/Plot-System"></a>
-    <a href="https://github.com/BuildTheEarth/BuildTeamTools"><img src="https://img.shields.io/github/repo-size/AlpsBTE/Plot-System"></a>
+    <a href="https://www.spigotmc.org/resources/buildteamtools.101854/"><img src="https://img.shields.io/spiget/version/101854?label=Version"></a>
+    <a href="https://github.com/BuildTheEarth/BuildTeamTools"><img src="https://img.shields.io/tokei/lines/github/BuildTheEarth/BuildTeamTools"></a>
+    <a href="https://github.com/BuildTheEarth/BuildTeamTools"><img src="https://img.shields.io/github/repo-size/BuildTheEarth/BuildTeamTools"></a>
 </p>  
 
 

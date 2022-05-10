@@ -11,7 +11,7 @@
 <p align="center">
   <b>An easy to use toolset for BuildTeams of the BuildTheEarth project.</b>
   <br/>
-  <a href="ttps://github.com/BuildTheEarth/BuildTeamTools"><strong>WIKI »</strong></a>
+  <a href="https://github.com/BuildTheEarth/BuildTeamTools"><strong>WIKI »</strong></a>
   <br/><br/>
 </p>
 

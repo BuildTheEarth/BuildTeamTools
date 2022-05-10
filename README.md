@@ -36,3 +36,9 @@ The plugin was programmed by the BTE Team and is meant for everyone to use and h
 
 All used Libraries and APIs are listed below.
 
+## Modules
+
+- [Generator](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Generator)
+- [Sledgehammer](https://github.com/noahhusby/Sledgehammer) (PLANNED)
+- BuildTeam Stats (PLANNED)
+- BuildTeam Security (PLANNED)

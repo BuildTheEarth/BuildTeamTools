@@ -55,7 +55,7 @@ All used Libraries and APIs are listed below.
 
 <!-- INSTALLATION -->
 ## Installation
-💻 Requirements: A server with Minecaft Version 1.12.</br>
+💻 Requirements: A Minecraft Server with version 1.12.2</br>
 
 To install the plugin just drag it into the **/plugins** folder, restart the server and you are done.</br>
 

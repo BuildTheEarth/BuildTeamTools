@@ -39,10 +39,10 @@ All used Libraries and APIs are listed below.
 ## Modules
 
 - [Generator](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Generator)
-  - [Houses](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Generate-Houses-with-Commands)
+  - [Houses](https://github.com/BuildTheEarth/BuildTeamTools/wiki/House-Command)
   - Roads
   - Railways
-  - Trees
+  - [Trees](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Tree-Command)
 - Build Team Stats (PLANNED)
 - Build Team Security (PLANNED)
 - [Sledgehammer](https://github.com/noahhusby/Sledgehammer) (PLANNED)

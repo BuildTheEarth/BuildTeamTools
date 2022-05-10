@@ -2,7 +2,7 @@
 
 <p align="Center">
   <a href="https://github.com/BuildTheEarth/BuildTeamTools">
-    <img src="https://cdn.discordapp.com/attachments/406907194228080652/881142301831888936/PlotSystemLogo.gif" alt="Logo" width="150" height="150">
+    <img src="https://user-images.githubusercontent.com/66020920/167615506-89e56374-327e-413f-85d9-0179e4a7a3c9.png" alt="Logo" width="150" height="150">
   </a>
 </p>
 

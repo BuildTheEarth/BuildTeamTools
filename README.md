@@ -43,8 +43,6 @@ All used Libraries and APIs are listed below.
 - Build Team Stats (PLANNED)
 - Build Team Security (PLANNED)
 
-**For more information check out the [Wiki](https://github.com/BuildTheEarth/BuildTeamTools/wiki)**!
-
 ## Features
 ✔️ **User-friendly menus** and **commands**<br/>
 ✔️ **Multi-Language** Support (PLANNED)<br/>

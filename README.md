@@ -17,7 +17,7 @@
 
 <p align="center">
     <a href="https://github.com/BuildTheEarth"><img src="https://img.shields.io/badge/project-community-orange.svg?colorA=3c3c3c&label=BuildTheEarth"></a>
-    <a href="https://discord.com/invite/vgkspay"><img src="https://img.shields.io/discord/696795397376442440?label=discord"></a>
+    <a href="https://www.discord.gg/buildtheearth"><img src="https://img.shields.io/discord/690908396404080650?label=discord"></a>
 </p>
 <p align="center">
   <a href="https://jenkins.alps-bte.com/job/PlotSystem/"><img src="https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fjenkins.alps-bte.com%2Fjob%2FPlotSystem%2F"></a>

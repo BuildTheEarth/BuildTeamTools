@@ -39,9 +39,9 @@ All used Libraries and APIs are listed below.
 ## Modules
 
 - [Generator](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Generator)
-- [Sledgehammer](https://github.com/noahhusby/Sledgehammer) (PLANNED)
 - Build Team Stats (PLANNED)
 - Build Team Security (PLANNED)
+- [Sledgehammer](https://github.com/noahhusby/Sledgehammer) (PLANNED)
 
 ## Features
 ✔️ **User-friendly menus** and **commands**<br/>

@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-    <a href="https://github.com/BuildTheEarth"><img src="https://img.shields.io/badge/project-community-orange.svg?colorA=3c3c3c&label=BuildTheEarth"></a>
+    <a href="https://github.com/BuildTheEarth"><img src="https://go.buildtheearth.net/official-shield"></a>
     <a href="https://www.discord.gg/buildtheearth"><img src="https://img.shields.io/discord/690908396404080650?label=Discord"></a>
 </p>
 <p align="center">

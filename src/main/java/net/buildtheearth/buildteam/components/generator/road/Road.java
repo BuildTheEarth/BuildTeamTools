@@ -99,7 +99,7 @@ public class Road {
         }
 
         // Get WorldEdit selection of player
-        Region plotRegion = Generator.getWorldEditSelction(p);
+        Region plotRegion = Generator.getWorldEditSelection(p);
 
         if(plotRegion == null){
             p.sendMessage("§cPlease make a WorldEdit Selection first.");

@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class Generator {
 
-    public static Region getWorldEditSelction(Player p){
+    public static Region getWorldEditSelection(Player p){
         Region plotRegion;
 
         try {

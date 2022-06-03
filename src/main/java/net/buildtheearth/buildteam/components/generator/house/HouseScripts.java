@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 public class HouseScripts {
 
-    public static void houseScript_v_1_2(Player p,
+    public static void buildscript_v_1_2(Player p,
                                          String wallColor,
                                          String roofColor,
                                          String baseColor,

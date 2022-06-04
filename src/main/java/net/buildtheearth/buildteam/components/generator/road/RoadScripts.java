@@ -63,12 +63,12 @@ public class RoadScripts {
         int xPos = p.getLocation().getBlockX();
         int zPos = p.getLocation().getBlockZ();
         int markingSum = markingsLength + markingsDistance;
-        p.chat("//gmask \"=(sqrt((x-" + xPos + ")^2+(z-" + zPos + ")^2)%" + markingSum + ")-" + markingsDistance + "35:3\"");
+        p.chat("//gmask \"=(sqrt((x-(" + xPos + "))^2+(z-(" + zPos + "))^2)%" + markingSum + ")-" + markingsDistance + " 35:3\"");
         int roadWidth = ((laneWidth+1)*laneCount)+sidewalkWidth+1+separationRadius;
 
 
         p.chat("//curve " + markingsMaterial + " " + roadWidth);
-        p.chat("//gmask 35:2, 35:3");
+        p.chat("//gmask 35:2,35:3");
         p.chat("//curve " + roadMaterial + " " + roadWidth);
         p.chat("//gmask 35:1");
         p.chat("//curve " + sidewalkMaterial + " " + roadWidth);

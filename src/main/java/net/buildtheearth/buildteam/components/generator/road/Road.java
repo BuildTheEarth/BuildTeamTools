@@ -24,7 +24,7 @@ public class Road {
     private final static String def_marking_gap = "5";
     private final static String def_marking_material = "251";
     private final static String def_sidewalk_width = "1";
-    private final static String def_sidewalk_material = "42";
+    private final static String def_sidewalk_material = "43";
 
     public static void analyzeCommand(Player p, String[] args){
 

@@ -28,7 +28,7 @@ public class Road {
 
     public static void analyzeCommand(Player p, String[] args){
 
-        if(args.length == 2)
+        if(args.length >= 2)
             if(args[1].equals("info") || args[1].equals("help") || args[1].equals("?")) {
                 sendHelp(p);
                 return;

@@ -34,7 +34,7 @@ public class RoadScripts {
         p.chat("//gmask <0");
         p.chat("//curve 43:0 " + current_width);
 
-        //TODO: fix excessively wide sidewalk bug
+
         current_width -=(isSidewalk ? 1 : 0);
         p.chat("//curve 35:1 " + current_width);
         current_width -= sidewalkWidth;

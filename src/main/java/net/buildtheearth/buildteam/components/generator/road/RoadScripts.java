@@ -72,7 +72,7 @@ public class RoadScripts {
         p.chat("//curve " + roadMaterial + " " + roadWidth);
         p.chat("//gmask 35:1");
         p.chat("//curve " + sidewalkMaterial + " " + roadWidth);
-
+        p.chat("//gmask");
 
     }
 }

@@ -95,7 +95,9 @@ public class Road {
         // Check if WorldEdit is enabled
         if(!BuildTeam.DependencyManager.isWorldEditEnabled()){
             p.sendMessage("§cPlease install WorldEdit to use this tool.");
-            sendMoreInfo(p);
+            p.sendMessage(" ");
+            p.sendMessage("§cFor more installation help take a look at the wiki:");
+            p.sendMessage("§c" + INSTALL_WIKI);
         }
 
         // Get WorldEdit selection of player

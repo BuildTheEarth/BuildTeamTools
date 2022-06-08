@@ -2,6 +2,8 @@ package net.buildtheearth.buildteam.commands;
 
 import net.buildtheearth.buildteam.components.generator.house.House;
 import net.buildtheearth.buildteam.components.generator.Inventories;
+import net.buildtheearth.buildteam.components.generator.rail.Rail;
+import net.buildtheearth.buildteam.components.generator.rail.RailScripts;
 import net.buildtheearth.buildteam.components.generator.road.Road;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -35,6 +37,11 @@ public class generate_command implements CommandExecutor {
         // Command Usage: /gen road ...
         if(args[0].equals("road")){
             Road.analyzeCommand(p, args);
+            return true;
+        }
+
+        if(args[0].equals("rail")) {
+            Rail.analyzeCommand(p, args);
             return true;
         }
 

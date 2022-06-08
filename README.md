@@ -9,9 +9,9 @@
 <h1 align="Center">BuildTeamTools</h1>
 
 <p align="center">
-  <b>An easy to use toolset for BuildTeams of the BuildTheEarth project.</b>
+  <b>An easy to use toolset for Build Teams in the BuildTheEarth project.</b>
   <br/>
-  <a href="https://github.com/BuildTheEarth/BuildTeamTools"><strong>WIKI »</strong></a>
+  <a href="https://github.com/BuildTheEarth/BuildTeamTools/wiki/"><strong>WIKI »</strong></a>
   <br/><br/>
 </p>
 
@@ -28,15 +28,53 @@
 
 
 <!-- ABOUT THE PROJECT -->
-## About The Project
+## About The Plugin
 
-The BuildTeamTools Plugin is an essential part of any BuildTheEarth BuildTeam server, meant to provide a large set of tools to use for builders of the teams to use. The system is designed to make it easier for unexperienced people, casual players and applicants to start building in BTE and to massively shorten the building process by eliminating any repetetive and boring tasks that come up while creating any structure in BuildTheEarth.
+BuildTeamTools provides a large set of tools for builders which improve the building process in BTE. The plugin is designed for both casual and experienced builders, with features including  shell generation, road generation, railway generation and tree generation. 
 
-The plugin was programmed by the BTE Team and is meant for everyone to use and help contribute. For any questions regarding setup or contribution feel free to contact us.
+The goal of the plugin is to massively accelerate the building process by eliminating many of the repetitive tasks that come with building in BuildTheEarth, while simultaneously providing an easy way for people to get started in the project.
 
-All used Libraries and APIs are listed below.
+## Features
+🔨 **Easy-to-use** tools for structure generation including:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- **Building shells**<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- **Roads**<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- **Railways**<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- **Trees**<br/>
+✔️ **User-friendly** GUIs and commands<br/>
+💬 **Multi-Language** Support (PLANNED)<br/>
+📆 **Automatic** updates<br/>
+🔌 **Easy setup** and configuration<br/>
+📡 **BTE Network** improvements (PLANNED).
 
-## Modules
+
+<!-- INSTALLATION -->
+## Installation
+💻 Requirements:
+- A server running Minecraft 1.12.2.
+- The WorldEdit Plugin.
+- (OPTIONAL) Be connected to the BuildTheEarth network.
+
+🚩 How to install:
+1. Install [WorldEdit](https://dev.bukkit.org/projects/worldedit/files/2597538).
+2. Download BuildTeamTools [here](https://www.spigotmc.org/resources/buildteamtools.101854/).
+3. Place the downloaded plugin in your server's **../plugins** folder.
+4. Restart your server.
+5. Done!
+
+**For more help, please see the [wiki](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Installation).**
+
+## Contributors
+Thank you to the following developers for contributing towards the plugin:
+
+- **MineFact**
+- **Brigart**
+- **y4siv**
+- **Adam**
+- **Noah Husby**
+
+
+## Index
+Click the links below for more information, or see the [wiki](https://github.com/BuildTheEarth/BuildTeamTools).
 
 - [Generator](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Generator)
   - [Houses](https://github.com/BuildTheEarth/BuildTeamTools/wiki/House-Command)
@@ -45,18 +83,5 @@ All used Libraries and APIs are listed below.
   - [Trees](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Tree-Command)
 - Build Team Stats (PLANNED)
 - Build Team Security (PLANNED)
-- [Sledgehammer](https://github.com/noahhusby/Sledgehammer) (PLANNED)
+- [Sledgehammer](https://github.com/noahhusby/Sledgehammer)
 
-## Features
-✔️ **User-friendly menus** and **commands**<br/>
-✔️ **Multi-Language** Support (PLANNED)<br/>
-✔️ Automatic **updates**<br/>
-✔️ **Easy configuration** and **setup**<br/>
-
-<!-- INSTALLATION -->
-## Installation
-💻 Requirements: A Minecraft Server with version 1.12.2</br>
-
-To install the plugin just drag it into the **/plugins** folder, restart the server and you are done.</br>
-
-**For more information check out the [Wiki](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Installation)**!

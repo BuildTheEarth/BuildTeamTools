@@ -16,7 +16,7 @@ public class buildteam_command implements CommandExecutor{
 
 		if(args.length == 0){
 
-			ChatUtil.sendMessageBox(sender, "Build Team Plugin", new Runnable() {
+			ChatUtil.sendMessageBox(sender, "BuildTeamTools", new Runnable() {
 				@Override
 				public void run() {
 					String buildTeam = "-";

@@ -1,11 +1,15 @@
 package net.buildtheearth.utils;
 
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
 
 public class ChatUtil {
+
+    @Getter
+    private static String prefixMessage = "§8[§2BuildTeamTools§8]§7 ";
 
     public static void sendMessageBox(CommandSender sender, String title, Runnable runnable) {
         sender.sendMessage("");
@@ -21,4 +25,6 @@ public class ChatUtil {
         sender.sendMessage("");
         sender.sendMessage("§7§m" + bottom);
     }
+
+
 }

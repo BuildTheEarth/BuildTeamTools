@@ -74,7 +74,7 @@ Thank you to the following developers for contributing towards the plugin:
 
 
 ## Index
-Click the links below for more information, or see the [wiki](https://github.com/BuildTheEarth/BuildTeamTools).
+Click the links below for more information, or see the [wiki](https://github.com/BuildTheEarth/BuildTeamTools/wiki).
 
 - [Generator](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Generator)
   - [Houses](https://github.com/BuildTheEarth/BuildTeamTools/wiki/House-Command)

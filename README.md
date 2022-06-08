@@ -49,12 +49,12 @@ The goal of the plugin is to massively accelerate the building process by elimin
 
 <!-- INSTALLATION -->
 ## Installation
-💻 Requirements:
+💻 **Requirements:**
 - A server running Minecraft 1.12.2.
 - The WorldEdit Plugin.
 - (OPTIONAL) Be connected to the BuildTheEarth network.
 
-🚩 How to install:
+🚩 **How to install:**
 1. Install [WorldEdit](https://dev.bukkit.org/projects/worldedit/files/2597538).
 2. Download BuildTeamTools [here](https://www.spigotmc.org/resources/buildteamtools.101854/).
 3. Place the downloaded plugin in your server's **../plugins** folder.

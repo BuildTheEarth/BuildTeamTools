@@ -3,6 +3,7 @@ package net.buildtheearth.buildteam.components.generator.road;
 import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.buildteam.BuildTeam;
 import net.buildtheearth.buildteam.components.generator.Generator;
+import net.buildtheearth.utils.ChatUtil;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.entity.Player;
 
@@ -59,7 +60,7 @@ public class Road {
             RoadFlag roadFlag = RoadFlag.byString(flagName);
 
             if(roadFlag == null) {
-                p.sendMessage("§cInvalid flag: -" + flagName);
+                p.sendMessage(ChatUtil.getPrefixMessage() + "§cInvalid flag: -" + flagName);
                 sendMoreInfo(p);
                 return;
             }
@@ -83,28 +84,24 @@ public class Road {
 
     public static void sendMoreInfo(Player p){
         p.sendMessage(" ");
-        p.sendMessage("§cFor more information take a look at the wiki:");
-        p.sendMessage("§c" + ROAD_WIKI);
-    }
-
-    public static void sendError(Player p){
-        p.sendMessage("§cThere was an error while generating the road. Please contact the admins");
+        p.sendMessage(ChatUtil.getPrefixMessage() + "For more help, take a look at the wiki:");
+        p.sendMessage(ChatUtil.getPrefixMessage() + "§e§n" + ROAD_WIKI);
     }
 
     public static void generate(Player p, HashMap<RoadFlag, String> flags){
         // Check if WorldEdit is enabled
         if(!BuildTeam.DependencyManager.isWorldEditEnabled()){
-            p.sendMessage("§cPlease install WorldEdit to use this tool.");
+            p.sendMessage(ChatUtil.getPrefixMessage() + "§cPlease install WorldEdit to use this tool.");
             p.sendMessage(" ");
-            p.sendMessage("§cFor more installation help take a look at the wiki:");
-            p.sendMessage("§c" + INSTALL_WIKI);
+            p.sendMessage(ChatUtil.getPrefixMessage() + "For installation help, take a look at the wiki:");
+            p.sendMessage(ChatUtil.getPrefixMessage() +  "§e§n" + INSTALL_WIKI);
         }
 
         // Get WorldEdit selection of player
         Region plotRegion = Generator.getWorldEditSelection(p);
 
         if(plotRegion == null){
-            p.sendMessage("§cPlease make a WorldEdit Selection first.");
+            p.sendMessage(ChatUtil.getPrefixMessage() + "§cPlease make a WorldEdit Selection first.");
             sendMoreInfo(p);
         }
 

@@ -3,6 +3,7 @@ package net.buildtheearth.buildteam.components.generator.rail;
 import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.buildteam.BuildTeam;
 import net.buildtheearth.buildteam.components.generator.Generator;
+import net.buildtheearth.utils.ChatUtil;
 import org.bukkit.entity.Player;
 
 
@@ -30,24 +31,24 @@ public class Rail {
 
     public static void sendMoreInfo(Player p){
         p.sendMessage(" ");
-        p.sendMessage("§cFor more information, check out the wiki:");
-        p.sendMessage("§c" + RAIL_WIKI);
+        p.sendMessage(ChatUtil.getPrefixMessage() + "§cFor more information, check out the wiki:");
+        p.sendMessage(ChatUtil.getPrefixMessage() + "§e§n" + RAIL_WIKI);
     }
 
     public static void generate(Player p) {
         // Check if WorldEdit is enabled
         if (!BuildTeam.DependencyManager.isWorldEditEnabled()) {
-            p.sendMessage("§cPlease install WorldEdit to use this tool.");
+            p.sendMessage(ChatUtil.getPrefixMessage() + "§cPlease install WorldEdit to use this tool.");
             p.sendMessage(" ");
-            p.sendMessage("§cFor more installation help, please see the wiki:");
-            p.sendMessage("§c" + INSTALL_WIKI);
+            p.sendMessage(ChatUtil.getPrefixMessage() + "§cFor more installation help, please see the wiki:");
+            p.sendMessage(ChatUtil.getPrefixMessage() + "§e§n" + INSTALL_WIKI);
             return;
         }
 
         // Get WorldEdit selection of player
         Region plotRegion = Generator.getWorldEditSelection(p);
         if (plotRegion == null) {
-            p.sendMessage("§cPlease make a WorldEdit Selection first.");
+            p.sendMessage(ChatUtil.getPrefixMessage() + "§cPlease make a WorldEdit Selection first.");
             sendMoreInfo(p);
         }
 

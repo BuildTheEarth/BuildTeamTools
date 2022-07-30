@@ -5,6 +5,7 @@ import net.buildtheearth.buildteam.components.generator.Inventories;
 import net.buildtheearth.buildteam.components.generator.rail.Rail;
 import net.buildtheearth.buildteam.components.generator.rail.RailScripts;
 import net.buildtheearth.buildteam.components.generator.road.Road;
+import net.buildtheearth.buildteam.components.generator.tree.Tree;
 import net.buildtheearth.utils.ChatUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -44,6 +45,10 @@ public class generate_command implements CommandExecutor {
         if(args[0].equals("rail")) {
             Rail.analyzeCommand(p, args);
             return true;
+        }
+
+        if(args[0].equals("tree")) {
+            Tree.analyzeCommand(p, args);
         }
 
         sendHelp(p);

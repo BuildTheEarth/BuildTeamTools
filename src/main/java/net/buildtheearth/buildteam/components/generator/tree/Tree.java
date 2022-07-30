@@ -5,21 +5,62 @@ import org.bukkit.entity.Player;
 
 public class Tree {
 
-    private static String TREE_WIKI
+    private static String TREE_WIKI = "placeholder";
 
 
     public static void analyzeCommand(Player p, String[] args) {
 
 
-        if(args.length >= 2)
-            if(args[1].equals("info") || args[1].equals("help") || args[1].equals("?")) {
+        if(args.length >= 2) {
+            if (args[1].equals("info") || args[1].equals("help") || args[1].equals("?")) {
                 sendHelp(p);
                 return;
             }
+            if(args.length > 4) {
+                sendHelp(p);
+                return;
+            }
+        }
 
-        if
+        if(args.length >= 2) {
+            String type = args[1];
 
+            if(args.length == 2) {
+                if(type.equalsIgnoreCase("any")) {
+                    p.chat("//schbr newtrees/*@** -place:bottom -yoff:2");
+                } else {
+                    p.chat("//schbr newtrees/%"+ type + "%*@** -place:bottom -yoff:2");
+                }
 
+            }
+            else if(args.length == 3) {
+                String scale = args[2];
+                if(type.equalsIgnoreCase("any")) {
+                    p.chat("//schbr newtrees/*/%" + scale + "%/*@** -place:bottom -yoff:2");
+                } else {
+                    p.chat("//schbr newtrees/%"+ type + "%/%" + scale + "%/*@** -place:bottom -yoff:2");
+                }
+
+            }
+            else if(args.length == 4) {
+                String scale = args[2];
+                String option = args[3];
+                if(type.equalsIgnoreCase("any")) {
+                    if(scale.equalsIgnoreCase("any")) {
+                        p.chat("//schbr newtrees/*/*/*%"+ option +"%/*@** -place:bottom -yoff:2");
+                    } else {
+                        p.chat("//schbr newtrees/*/%" + scale + "%/*%" + option + "%/*@** -place:bottom -yoff:2");
+                    }
+                } else {
+                    if(scale.equalsIgnoreCase("any")) {
+                        p.chat("//schbr newtrees/%" + type + "%/*/*%" + option + "%/*@** -place:bottom -yoff:2");
+                    } else {
+                        p.chat("//schbr newtrees/%" + type + "%/%" + scale + "%/*%" + option +" %/*@** -place:bottom -yoff:2");
+                    }
+                }
+            }
+
+        }
 
     }
 

@@ -1,5 +1,6 @@
 package net.buildtheearth.buildteam.components.generator.house;
 
+import net.buildtheearth.buildteam.BuildTeam;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -195,6 +196,7 @@ public class HouseScripts {
         p.chat("//replace 23 " + rm3);
 
 
+        /*
         Bukkit.broadcastMessage("wallColor: " + wallColor);
         Bukkit.broadcastMessage("roofColor: " + roofColor);
         Bukkit.broadcastMessage("baseColor: " + baseColor);
@@ -209,6 +211,6 @@ public class HouseScripts {
         Bukkit.broadcastMessage("maxRoofHeight: " + maxRoofHeight);
         Bukkit.broadcastMessage(rm1);
         Bukkit.broadcastMessage(rm2);
-        Bukkit.broadcastMessage(rm3);
+        Bukkit.broadcastMessage(rm3);*/
     }
 }

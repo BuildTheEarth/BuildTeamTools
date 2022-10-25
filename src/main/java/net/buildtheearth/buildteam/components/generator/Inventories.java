@@ -2,6 +2,7 @@ package net.buildtheearth.buildteam.components.generator;
 
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.Liste;
+import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -65,6 +66,7 @@ public class Inventories implements Listener {
             e.setCancelled(true);
             return;
         }
+
 
         if(Arrays.asList(colorPalateInvNames).contains(inventoryName)){
             e.setCancelled(true);
@@ -145,6 +147,7 @@ public class Inventories implements Listener {
 
             if(itemName != null && itemName.equals("§eNext"))
                 ;
+
         }
     }
 
@@ -167,7 +170,7 @@ public class Inventories implements Listener {
             openColoredInventory(p, WALL_BLOCK_INV_NAME, 1, new ArrayList<>());
     }
 
-    public static void opeColorPaletteInventory(Player p){
+    public static void openColorPaletteInventory(Player p){
         openColoredInventory(p, COLOR_PALETTE_INV_NAME, 1,null);
     }
 
@@ -178,6 +181,8 @@ public class Inventories implements Listener {
      *  - Emtpy list, if you want to make it selectable
      *  - Filled list, if you want to make some blocks to appear selected
      */
+
+
     private static void openColoredInventory(Player p, String invName, int page, List<ItemStack> selectedBlocks){
         Inventory inv = createNewInventory(p, invName, COLORED_INV_SIZE);
 
@@ -188,31 +193,31 @@ public class Inventories implements Listener {
         int blocksSize = COLORED_INV_SIZE - 9;
 
         for(int i = (page-1)*blocksSize; i < page*blocksSize; i++)
-            if(Utils.BLOCKS_BY_COLOR_1_12.length > i) {
+            if(MenuItems.BLOCKS_BY_COLOR_1_12.length > i) {
                 int index = (i % 3) * 9 + i / 3 - (page - 1) * 9;
 
-                if(contains(Utils.BLOCKS_BY_COLOR_1_12[i], selectedBlocks)) {
-                    inv.setItem(index, new Item(Utils.BLOCKS_BY_COLOR_1_12[i]).setAmount(1).addEnchantment(Enchantment.LUCK, 1).hideEnchantments(true).build());
+                if(contains(MenuItems.BLOCKS_BY_COLOR_1_12[i], selectedBlocks)) {
+                    inv.setItem(index, new Item(MenuItems.BLOCKS_BY_COLOR_1_12[i]).setAmount(1).addEnchantment(Enchantment.LUCK, 1).hideEnchantments(true).build());
                 }else
-                    inv.setItem(index, Utils.BLOCKS_BY_COLOR_1_12[i]);
+                    inv.setItem(index, MenuItems.BLOCKS_BY_COLOR_1_12[i]);
             }
 
 
         if(page > 1)
-            inv.setItem(COLORED_INV_SIZE - 6, Item.createCustomHeadBase64(Utils.WHITE_ARROW_LEFT, "§ePrevious Page §7- §f" + (page - 1) , null));
+            inv.setItem(COLORED_INV_SIZE - 6, Item.createCustomHeadBase64(MenuItems.WHITE_ARROW_LEFT, "§ePrevious Page §7- §f" + (page - 1) , null));
         else
-            inv.setItem(COLORED_INV_SIZE - 6, Item.createCustomHeadBase64(Utils.WHITE_BLANK, "§8Previous Page", null));
+            inv.setItem(COLORED_INV_SIZE - 6, Item.createCustomHeadBase64(MenuItems.WHITE_BLANK, "§8Previous Page", null));
 
 
-        inv.setItem(COLORED_INV_SIZE - 5,  Utils.getWhiteNumberHead(page,  "§eCurrent Page §7- §f" + (page), null));
+        inv.setItem(COLORED_INV_SIZE - 5,  MenuItems.getWhiteNumberHead(page,  "§eCurrent Page §7- §f" + (page), null));
 
-        if(page <= Utils.BLOCKS_BY_COLOR_1_12.length/27)
-            inv.setItem(COLORED_INV_SIZE - 4, Item.createCustomHeadBase64(Utils.WHITE_ARROW_RIGHT, "§eNext Page §7- §f" + (page + 1) , null));
+        if(page <= MenuItems.BLOCKS_BY_COLOR_1_12.length/27)
+            inv.setItem(COLORED_INV_SIZE - 4, Item.createCustomHeadBase64(MenuItems.WHITE_ARROW_RIGHT, "§eNext Page §7- §f" + (page + 1) , null));
         else
-            inv.setItem(COLORED_INV_SIZE - 4, Item.createCustomHeadBase64(Utils.WHITE_BLANK, "§8Next Page", null));
+            inv.setItem(COLORED_INV_SIZE - 4, Item.createCustomHeadBase64(MenuItems.WHITE_BLANK, "§8Next Page", null));
 
         if(selectedBlocks != null && selectedBlocks.size() > 0)
-        inv.setItem(COLORED_INV_SIZE - 1, Item.createCustomHeadBase64(Utils.CHECKMARK, "§eNext", null));
+        inv.setItem(COLORED_INV_SIZE - 1, Item.createCustomHeadBase64(MenuItems.CHECKMARK, "§eNext", null));
 
         updateInv(p, inv, invName);
     }
@@ -253,7 +258,7 @@ public class Inventories implements Listener {
             x++;
         }
 
-        for(ItemStack item : Utils.SLABS) {
+        for(ItemStack item : MenuItems.SLABS) {
             if (contains(item, roofInvSelectedItems.get(p.getUniqueId())))
                 inv.setItem(x, new Item(item).addEnchantment(Enchantment.LUCK, 1).hideEnchantments(true).build());
             else
@@ -262,7 +267,7 @@ public class Inventories implements Listener {
         }
 
         if(roofInvSelectedItems.get(p.getUniqueId()).size() > 0)
-        inv.setItem(FLAT_ROOF_INV_SIZE - 1, Item.createCustomHeadBase64(Utils.CHECKMARK, "§eNext", null));
+        inv.setItem(FLAT_ROOF_INV_SIZE - 1, Item.createCustomHeadBase64(MenuItems.CHECKMARK, "§eNext", null));
 
 
         updateInv(p, inv, FLAT_ROOF_COLOR_INV_NAME);
@@ -275,7 +280,7 @@ public class Inventories implements Listener {
             roofInvSelectedItems.put(p.getUniqueId(), new ArrayList<>());
 
         int x = 0;
-        for(ItemStack item : Utils.SLABS) {
+        for(ItemStack item : MenuItems.SLABS) {
             if (contains(item, roofInvSelectedItems.get(p.getUniqueId())))
                 inv.setItem(x, new Item(item).addEnchantment(Enchantment.LUCK, 1).hideEnchantments(true).build());
             else
@@ -283,8 +288,10 @@ public class Inventories implements Listener {
             x++;
         }
 
+
+
         if(roofInvSelectedItems.get(p.getUniqueId()).size() > 0)
-        inv.setItem(FLAT_GABLE_ROOF_INV_SIZE - 1, Item.createCustomHeadBase64(Utils.CHECKMARK, "§eNext", null));
+        inv.setItem(FLAT_GABLE_ROOF_INV_SIZE - 1, Item.createCustomHeadBase64(MenuItems.CHECKMARK, "§eNext", null));
 
         updateInv(p, inv, FLAT_GABLE_ROOF_COLOR_INV_NAME);
     }
@@ -296,7 +303,7 @@ public class Inventories implements Listener {
             roofInvSelectedItems.put(p.getUniqueId(), new ArrayList<>());
 
         int x = 0;
-        for(ItemStack item : Utils.STAIRS) {
+        for(ItemStack item : MenuItems.STAIRS) {
             if (contains(item, roofInvSelectedItems.get(p.getUniqueId())))
                 inv.setItem(x, new Item(item).addEnchantment(Enchantment.LUCK, 1).hideEnchantments(true).build());
             else
@@ -305,9 +312,17 @@ public class Inventories implements Listener {
         }
 
         if(roofInvSelectedItems.get(p.getUniqueId()).size() > 0)
-        inv.setItem(GABLE_ROOF_INV_SIZE - 1, Item.createCustomHeadBase64(Utils.CHECKMARK, "§eNext", null));
+        inv.setItem(GABLE_ROOF_INV_SIZE - 1, Item.createCustomHeadBase64(MenuItems.CHECKMARK, "§eNext", null));
 
         updateInv(p, inv, GABLE_ROOF_COLOR_INV_NAME);
+    }
+
+
+
+
+
+    public static void finishHouseUI(){
+
     }
 
 

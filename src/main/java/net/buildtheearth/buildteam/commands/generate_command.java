@@ -1,7 +1,7 @@
 package net.buildtheearth.buildteam.commands;
 
+import net.buildtheearth.buildteam.components.generator.GeneratorMenu;
 import net.buildtheearth.buildteam.components.generator.house.House;
-import net.buildtheearth.buildteam.components.generator.Inventories;
 import net.buildtheearth.buildteam.components.generator.road.Road;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -21,7 +21,7 @@ public class generate_command implements CommandExecutor {
 
         // Command Usage: /gen
         if(args.length == 0){
-            Inventories.openGeneratorInventory(p);
+            new GeneratorMenu(p);
             return true;
         }
 

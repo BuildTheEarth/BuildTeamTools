@@ -18,6 +18,7 @@ import net.buildtheearth.Main;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
+import org.ipvp.canvas.MenuFunctionListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.List;
 public class BuildTeam {
 
 	public static int SPIGOT_PROJECT_ID = 101854;
+	public static String PREFIX = "§9§lBTE §8> §7";
 
 	private boolean debug;
 	private boolean updateInstalled;
@@ -126,10 +128,10 @@ public class BuildTeam {
 
 	/** Registers all Listeners of the plugin. */
 	private void registerListeners() {
+		Bukkit.getPluginManager().registerEvents(new MenuFunctionListener(), Main.instance);
 		Bukkit.getPluginManager().registerEvents(new CancelledEvents(), Main.instance);
 		Bukkit.getPluginManager().registerEvents(new Join_Listener(), Main.instance);
 		Bukkit.getPluginManager().registerEvents(new Stats_Listener(), Main.instance);
-		Bukkit.getPluginManager().registerEvents(new Inventories(), Main.instance);
 	}
 
 

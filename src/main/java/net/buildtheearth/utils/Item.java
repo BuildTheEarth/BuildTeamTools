@@ -357,6 +357,10 @@ public class Item {
 		return head;
 	}
 
+	public static String getUniqueMaterialString(ItemStack item){
+		return item.getType().name() + item.getDurability() + item.getAmount() + item.getItemMeta().getDisplayName();
+	}
+
 	private static void mutateItemMeta(SkullMeta meta, String b64) {
 		Method metaSetProfileMethod = null;
 		Field metaProfileField = null;

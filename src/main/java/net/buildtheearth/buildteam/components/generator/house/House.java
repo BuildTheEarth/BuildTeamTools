@@ -5,6 +5,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionOperationException;
 import net.buildtheearth.buildteam.BuildTeam;
 import net.buildtheearth.buildteam.components.generator.Generator;
+import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -14,12 +15,14 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 public class House {
 
     public static String WIKI_PAGE = "https://github.com/MineFact/BuildTeamPlugin/blob/master/wiki/generator/houses.md";
 
+    public static HashMap<UUID, HouseSettings> playerHouseSettings = new HashMap<>();
 
 
     public static void analyzeCommand(Player p, String[] args){
@@ -109,20 +112,20 @@ public class House {
             flags.put(HouseFlag.ROOF_TYPE, roofType.getType());
         }
         if(!flags.containsKey(HouseFlag.WALL_COLOR)){
-            ItemStack block = (ItemStack) Utils.pickRandom(Utils.WALL_BLOCKS);
+            ItemStack block = (ItemStack) Utils.pickRandom(MenuItems.WALL_BLOCKS);
             flags.put(HouseFlag.WALL_COLOR, Utils.getBlockID(block));
         }
         if(!flags.containsKey(HouseFlag.BASE_COLOR)){
-            ItemStack block = (ItemStack) Utils.pickRandom(Utils.WALL_BLOCKS);
+            ItemStack block = (ItemStack) Utils.pickRandom(MenuItems.WALL_BLOCKS);
             flags.put(HouseFlag.BASE_COLOR, Utils.getBlockID(block));
         }
         if(!flags.containsKey(HouseFlag.ROOF_COLOR)){
-            ItemStack block = (ItemStack) Utils.pickRandom(Utils.STAIRS);
+            ItemStack block = (ItemStack) Utils.pickRandom(MenuItems.STAIRS);
 
             if(flags.get(HouseFlag.ROOF_TYPE).equalsIgnoreCase(RoofType.SLABS.getType()))
-                block = (ItemStack) Utils.pickRandom(Utils.SLABS);
+                block = (ItemStack) Utils.pickRandom(MenuItems.SLABS);
             else if(flags.get(HouseFlag.ROOF_TYPE).equalsIgnoreCase(RoofType.FLAT.getType()))
-                block = (ItemStack) Utils.pickRandom(Utils.SLABS);
+                block = (ItemStack) Utils.pickRandom(MenuItems.SLABS);
 
             flags.put(HouseFlag.ROOF_COLOR, Utils.getBlockID(block));
         }
@@ -166,6 +169,8 @@ public class House {
 
 
         HouseScripts.buildscript_v_1_2(p,wallColor,roofColor,baseColor,windowColor,roofType,floorCount,floorHeight,baseHeight,windowHeight,windowWidth,windowDistance,maxRoofHeight);
+
+        p.sendMessage(BuildTeam.PREFIX + "Building §asuccessfully §7generated.");
     }
 
 

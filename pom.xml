@@ -61,11 +61,51 @@
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
 
-        <!-- World Edit -->
+
+
+
+        <!-- Spigot & Bukkit -->
         <repository>
-            <id>nachwahl-repo</id>
-            <url>https://maven.nachwahl.dev/</url>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
+
+        <!-- AlpsBTE Repo (WorldEdit, WorldGuard, FAWE) -->
+        <repository>
+            <id>alpsbte-repo</id>
+            <url>https://mvn.alps-bte.com/repository/alps-bte/</url>
+        </repository>
+
+        <!-- Multiverse Core -->
+        <repository>
+            <id>OnARandomBox</id>
+            <url>https://repo.onarandombox.com/content/groups/public/</url>
+        </repository>
+
+        <!-- Anvil GUI -->
+        <repository>
+            <id>codemc-snapshots</id>
+            <url>https://repo.codemc.io/repository/maven-snapshots/</url>
+        </repository>
+
+        <!-- Holographic Displays -->
+        <repository>
+            <id>codemc-repo</id>
+            <url>https://repo.codemc.io/repository/maven-public/</url>
+        </repository>
+
+        <!-- JitPack -->
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+
+        <!-- Protocol Lib -->
+        <repository>
+            <id>dmulloy2-repo</id>
+            <url>https://repo.dmulloy2.net/repository/public/</url>
+        </repository>
+
     </repositories>
 
     <dependencies>
@@ -85,6 +125,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Canvas Menu Builder -->
+        <dependency>
+            <groupId>com.github.IPVP-MC</groupId>
+            <artifactId>canvas</artifactId>
+            <version>master-2047a9372b-1</version>
+            <scope>compile</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>

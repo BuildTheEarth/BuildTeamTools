@@ -50,11 +50,12 @@ public class RoofColorMenu extends AbstractPaginatedMenu {
         // Set click event for next item
         if(canProceed())
             getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
-                House.playerHouseSettings.get(clickPlayer.getUniqueId()).setRoofColor(selectedMaterials);
+                House.playerHouseSettings.get(clickPlayer.getUniqueId()).setValue(HouseFlag.ROOF_COLOR, Item.createStringFromItemList(selectedMaterials));
 
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
-                //new WallColorMenu(clickPlayer);
+
+                House.generate(clickPlayer);
             });
     }
 
@@ -71,7 +72,7 @@ public class RoofColorMenu extends AbstractPaginatedMenu {
 
     @Override
     protected List<?> getSource() {
-        RoofType roofType = House.playerHouseSettings.get(getMenuPlayer().getUniqueId()).getRoofType();
+        RoofType roofType = RoofType.byString(House.playerHouseSettings.get(getMenuPlayer().getUniqueId()).getValues().get(HouseFlag.ROOF_TYPE));
 
         if(roofType == null)
             return new ArrayList<>();

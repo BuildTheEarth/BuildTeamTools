@@ -53,7 +53,7 @@ public class WallColorMenu extends AbstractPaginatedMenu {
         // Set click event for next item
         if(canProceed())
             getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
-                House.playerHouseSettings.get(clickPlayer.getUniqueId()).setWallColor(selectedMaterials);
+                House.playerHouseSettings.get(clickPlayer.getUniqueId()).setValue(HouseFlag.WALL_COLOR, Item.createStringFromItemList(selectedMaterials));
 
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);

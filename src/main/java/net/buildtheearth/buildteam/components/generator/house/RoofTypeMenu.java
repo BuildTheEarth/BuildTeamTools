@@ -12,7 +12,7 @@ import org.ipvp.canvas.mask.Mask;
 
 public class RoofTypeMenu extends AbstractMenu {
 
-    public static String ROOF_COLOR_INV_NAME = "Choose a Roof Color";
+    public static String ROOF_COLOR_INV_NAME = "Choose a Roof Type";
 
     public static int FLAT_ROOF_ITEM_SLOT = 11;
     public static int GABLE_ROOF_ITEM_SLOT = 13;
@@ -45,7 +45,7 @@ public class RoofTypeMenu extends AbstractMenu {
     protected void setItemClickEventsAsync() {
         // Set click events items
         getMenu().getSlot(FLAT_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            House.playerHouseSettings.get(clickPlayer.getUniqueId()).setRoofType(RoofType.FLAT);
+            House.playerHouseSettings.get(clickPlayer.getUniqueId()).setValue(HouseFlag.ROOF_TYPE, RoofType.FLAT.getType());
 
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
@@ -53,7 +53,7 @@ public class RoofTypeMenu extends AbstractMenu {
         }));
 
         getMenu().getSlot(GABLE_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            House.playerHouseSettings.get(clickPlayer.getUniqueId()).setRoofType(RoofType.STAIRS);
+            House.playerHouseSettings.get(clickPlayer.getUniqueId()).setValue(HouseFlag.ROOF_TYPE, RoofType.STAIRS.getType());
 
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
@@ -61,7 +61,7 @@ public class RoofTypeMenu extends AbstractMenu {
         }));
 
         getMenu().getSlot(FLAT_GABLE_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            House.playerHouseSettings.get(clickPlayer.getUniqueId()).setRoofType(RoofType.SLABS);
+            House.playerHouseSettings.get(clickPlayer.getUniqueId()).setValue(HouseFlag.ROOF_TYPE, RoofType.SLABS.getType());
 
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);

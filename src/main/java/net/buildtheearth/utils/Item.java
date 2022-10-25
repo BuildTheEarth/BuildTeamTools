@@ -358,7 +358,17 @@ public class Item {
 	}
 
 	public static String getUniqueMaterialString(ItemStack item){
-		return item.getType().name() + item.getDurability() + item.getAmount() + item.getItemMeta().getDisplayName();
+
+		return item.getTypeId() + ":" + item.getDurability();
+	}
+
+	public static String createStringFromItemList(ArrayList<String> items){
+		String s = items.get(0);
+
+		for(int i = 1; i < items.size(); i++)
+			s += "," + items.get(i);
+
+		return s;
 	}
 
 	private static void mutateItemMeta(SkullMeta meta, String b64) {

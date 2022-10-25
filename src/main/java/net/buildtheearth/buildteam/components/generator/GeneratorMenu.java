@@ -60,7 +60,7 @@ public class GeneratorMenu extends AbstractMenu {
         // Set click event for house item
         getMenu().getSlot(HOUSE_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
             House.playerHouseSettings.remove(clickPlayer.getUniqueId());
-            House.playerHouseSettings.put(clickPlayer.getUniqueId(), new HouseSettings());
+            House.playerHouseSettings.put(clickPlayer.getUniqueId(), new HouseSettings(clickPlayer));
 
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);

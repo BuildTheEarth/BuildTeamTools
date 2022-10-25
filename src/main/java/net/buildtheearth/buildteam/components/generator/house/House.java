@@ -43,7 +43,7 @@ public class House {
          *  ROOF_TYPE:  456:78
          */
 
-        HashMap<HouseFlag, String> flags = new HashMap<>();
+        playerHouseSettings.put(p.getUniqueId(), new HouseSettings(p));
 
         String argsString = " " + StringUtils.join(Arrays.copyOfRange(args, 1, args.length), " ");
         String[] argsArray = argsString.split(" -");
@@ -60,15 +60,15 @@ public class House {
             if(houseFlag == null)
                 continue;
 
-            flags.put(houseFlag, flagValue);
+            playerHouseSettings.get(p).setValue(houseFlag, flagValue);
         }
 
-        if(flags.size() == 0 && args.length > 1){
+        if(playerHouseSettings.get(p).getValues().size() == 0 && args.length > 1){
             sendHelp(p);
             return;
         }
 
-        generate(p, flags);
+        generate(p);
     }
 
     public static void sendHelp(Player p){
@@ -86,7 +86,9 @@ public class House {
         p.sendMessage("§cThere was an error while generating the house. Please contact the admins");
     }
 
-    public static void generate(Player p, HashMap<HouseFlag, String> flags){
+    public static void generate(Player p){
+        HashMap<HouseFlag, String> flags = playerHouseSettings.get(p.getUniqueId()).getValues();
+
         // Check if WorldEdit is enabled
         if(!BuildTeam.DependencyManager.isWorldEditEnabled()){
             p.sendMessage("§cPlease install WorldEdit to use this tool.");
@@ -100,55 +102,6 @@ public class House {
             p.sendMessage("§cPlease make a WorldEdit Selection first.");
             sendMoreInfo(p);
         }
-
-
-
-
-        // Read the flags and convert the values
-
-        // Random values if not set
-        if(!flags.containsKey(HouseFlag.ROOF_TYPE)){
-            RoofType roofType = (RoofType) Utils.pickRandom(RoofType.values());
-            flags.put(HouseFlag.ROOF_TYPE, roofType.getType());
-        }
-        if(!flags.containsKey(HouseFlag.WALL_COLOR)){
-            ItemStack block = (ItemStack) Utils.pickRandom(MenuItems.WALL_BLOCKS);
-            flags.put(HouseFlag.WALL_COLOR, Utils.getBlockID(block));
-        }
-        if(!flags.containsKey(HouseFlag.BASE_COLOR)){
-            ItemStack block = (ItemStack) Utils.pickRandom(MenuItems.WALL_BLOCKS);
-            flags.put(HouseFlag.BASE_COLOR, Utils.getBlockID(block));
-        }
-        if(!flags.containsKey(HouseFlag.ROOF_COLOR)){
-            ItemStack block = (ItemStack) Utils.pickRandom(MenuItems.STAIRS);
-
-            if(flags.get(HouseFlag.ROOF_TYPE).equalsIgnoreCase(RoofType.SLABS.getType()))
-                block = (ItemStack) Utils.pickRandom(MenuItems.SLABS);
-            else if(flags.get(HouseFlag.ROOF_TYPE).equalsIgnoreCase(RoofType.FLAT.getType()))
-                block = (ItemStack) Utils.pickRandom(MenuItems.SLABS);
-
-            flags.put(HouseFlag.ROOF_COLOR, Utils.getBlockID(block));
-        }
-        if(!flags.containsKey(HouseFlag.FLOOR_COUNT)){
-            flags.put(HouseFlag.FLOOR_COUNT, "" + ((int)(Math.random()*3.0) + 1));
-        }
-
-        // Fixed values if not set
-        if(!flags.containsKey(HouseFlag.WINDOW_COLOR))
-            flags.put(HouseFlag.WINDOW_COLOR, "95:15");
-        if(!flags.containsKey(HouseFlag.FLOOR_HEIGHT))
-            flags.put(HouseFlag.FLOOR_HEIGHT, "3");
-        if(!flags.containsKey(HouseFlag.BASE_HEIGHT))
-            flags.put(HouseFlag.BASE_HEIGHT, "1");
-        if(!flags.containsKey(HouseFlag.WINDOW_HEIGHT))
-            flags.put(HouseFlag.WINDOW_HEIGHT, "2");
-        if(!flags.containsKey(HouseFlag.WINDOW_WIDTH))
-            flags.put(HouseFlag.WINDOW_WIDTH, "2");
-        if(!flags.containsKey(HouseFlag.WINDOW_DISTANCE))
-            flags.put(HouseFlag.WINDOW_DISTANCE, "2");
-        if(!flags.containsKey(HouseFlag.MAX_ROOF_HEIGHT))
-            flags.put(HouseFlag.MAX_ROOF_HEIGHT, "10");
-
 
 
         String wallColor = flags.get(HouseFlag.WALL_COLOR);

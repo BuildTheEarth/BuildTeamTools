@@ -1,13 +1,12 @@
 package net.buildtheearth.buildteam;
 
+import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import net.buildtheearth.buildteam.commands.buildteam_command;
 import net.buildtheearth.buildteam.commands.generate_command;
 import net.buildtheearth.buildteam.components.BTENetwork;
-import net.buildtheearth.buildteam.components.generator.Inventories;
 import net.buildtheearth.buildteam.components.stats.StatsPlayerType;
 import net.buildtheearth.buildteam.components.stats.StatsServerType;
-import net.buildtheearth.buildteam.components.updater.Updater;
 import net.buildtheearth.buildteam.listeners.CancelledEvents;
 import net.buildtheearth.buildteam.components.ConfigManager;
 import net.buildtheearth.buildteam.listeners.Join_Listener;
@@ -34,14 +33,14 @@ public class BuildTeam {
 
 	private long time;
 	private BTENetwork bteNetwork;
-	
+
 	public BuildTeam() {}
 	
 	public void start() {
 		registerCommands();
 		registerListeners();
 		startTimer();
-		
+
 		ConfigManager.setStandard();
 		ConfigManager.readData();
 
@@ -49,6 +48,10 @@ public class BuildTeam {
 		Main.instance.getServer().getMessenger().registerIncomingPluginChannel(Main.instance, "BuildTeam", Main.instance);
 
 		bteNetwork = new BTENetwork();
+		LocalSession.MAX_HISTORY_SIZE = 500;
+	}
+
+	public void stop(){
 	}
 	
 	

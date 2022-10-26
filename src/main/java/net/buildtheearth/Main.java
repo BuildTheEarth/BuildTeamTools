@@ -26,7 +26,9 @@ public class Main extends JavaPlugin implements PluginMessageListener{
 	}
 	
 	@Override
-	public void onDisable(){	
+	public void onDisable(){
+		buildTeam.stop();
+
 		System.out.println("[BuildTeam] Plugin stopped.");
 	}
 	

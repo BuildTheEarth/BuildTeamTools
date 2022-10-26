@@ -1,6 +1,8 @@
 package net.buildtheearth.buildteam.components.generator.house;
 
-import net.buildtheearth.utils.*;
+import net.buildtheearth.utils.AbstractPaginatedMenu;
+import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.MenuItems;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
@@ -14,9 +16,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class RoofColorMenu extends AbstractPaginatedMenu {
+public class BaseColorMenu extends AbstractPaginatedMenu {
 
-    public static String ROOF_TYPE_INV_NAME = "Choose a Roof Color";
+    public static String BASE_TYPE_INV_NAME = "Choose a Base Floor Color";
 
     public static int SWITCH_PAGE_ITEM_SLOT = 31;
     public static int NEXT_ITEM_SLOT = 35;
@@ -24,8 +26,8 @@ public class RoofColorMenu extends AbstractPaginatedMenu {
 
     public ArrayList<String> selectedMaterials;
 
-    public RoofColorMenu(Player player) {
-        super(4, 3, ROOF_TYPE_INV_NAME, player);
+    public BaseColorMenu(Player player) {
+        super(4, 3, BASE_TYPE_INV_NAME, player);
     }
 
     @Override
@@ -50,12 +52,12 @@ public class RoofColorMenu extends AbstractPaginatedMenu {
         // Set click event for next item
         if(canProceed())
             getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
-                House.playerHouseSettings.get(clickPlayer.getUniqueId()).setValue(HouseFlag.ROOF_COLOR, Item.createStringFromItemList(selectedMaterials));
+                House.playerHouseSettings.get(clickPlayer.getUniqueId()).setValue(HouseFlag.BASE_COLOR, Item.createStringFromItemList(selectedMaterials));
 
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
 
-                new BaseColorMenu(clickPlayer);
+                new AdvancedSettingsMenu(clickPlayer);
             });
     }
 
@@ -72,29 +74,7 @@ public class RoofColorMenu extends AbstractPaginatedMenu {
 
     @Override
     protected List<?> getSource() {
-        RoofType roofType = RoofType.byString(House.playerHouseSettings.get(getMenuPlayer().getUniqueId()).getValues().get(HouseFlag.ROOF_TYPE));
-
-        if(roofType == null)
-            return new ArrayList<>();
-
-        switch (roofType){
-            case SLABS:
-                return Arrays.asList(MenuItems.SLABS);
-
-            case STAIRS:
-                return Arrays.asList(MenuItems.STAIRS);
-
-            case FLAT:
-                ArrayList<ItemStack> items = new ArrayList<>();
-                for(int i = 0; i <= 15; i++)
-                    items.add(Item.create(Material.CARPET,null, (short) i, null));
-
-                items.addAll(Arrays.asList(MenuItems.SLABS));
-
-                return items;
-
-            default: return new ArrayList<>();
-        }
+        return new ArrayList<>(Arrays.asList(MenuItems.BLOCKS_BY_COLOR_1_12));
     }
 
     @Override

@@ -79,4 +79,15 @@ public abstract class AbstractMenu {
     protected Player getMenuPlayer() {
         return menuPlayer;
     }
+
+    protected void setSliderItems(MenuItems.SliderColor sliderColor, int sliderItemSlot, String sliderName, int value, int minValue, int maxValue, String valueType){
+        // Set previous page item
+        getMenu().getSlot(sliderItemSlot - 1).setItem(MenuItems.getMinusSliderItem(sliderColor, sliderName, value, minValue));
+
+        // Set current page item
+        getMenu().getSlot(sliderItemSlot).setItem(MenuItems.getCurrentSliderItem(sliderColor, sliderName, value, valueType));
+
+        // Set next page item
+        getMenu().getSlot(sliderItemSlot + 1).setItem(MenuItems.getPlusSliderItem(sliderColor, sliderName, value, maxValue));
+    }
 }

@@ -61,4 +61,71 @@ public class Utils {
 	public static Object pickRandom(Object[] array){
 		return array[(int) (Math.random() * array.length)];
 	}
+
+	/** Converts the given Time to a time string
+	 *
+	 * @param p player for translation
+	 * @param time time in Milliseconds
+	 * @return
+	 */
+	public static String toDate(Player p, long time){
+		String s = "";
+		int days = 0;
+		int hours = 0;
+		int minutes = 0;
+		int seconds = 0;
+
+		if(time > 86400000){					//Tage
+			days = (int) (time/86400000);
+			time = time - (86400000 * days);
+		}
+
+		if(time > 3600000){						//Stunden
+			hours = (int) (time/3600000);
+			time = time - (3600000  * hours);
+		}
+
+		if(time > 60000){						//Minuten
+			minutes = (int) (time/60000);
+			time = time - (60000 * minutes);
+		}
+
+		if(time > 1000){						//Sekunden
+			seconds = (int) (time/1000);
+			time = time - (1000 * seconds);
+		}
+
+		if(days > 0){
+			if(days == 1)
+				s = s + days + " Day, ";
+			else
+				s = s + days + " Days, ";
+		}
+		if(hours > 0 | days > 0){
+			if(hours == 1)
+				s = s + hours + " Hour";
+			else
+				s = s + hours + " Hours";
+		}
+		if((minutes > 0 | hours > 0)& days == 0){
+			if(hours > 0)
+				s = s + ", ";
+
+			if(minutes == 1)
+				s = s + minutes + " Minute";
+			else
+				s = s + minutes + " Minutes";
+		}
+		if((seconds > 0 | minutes > 0) &  hours == 0 & days == 0){
+			if(minutes > 0)
+				s = s + ", ";
+
+			if(seconds == 1)
+				s = s + seconds + " Second";
+			else
+				s = s + seconds + " Seconds";
+		}
+
+		return s;
+	}
 }

@@ -1,14 +1,23 @@
 package net.buildtheearth.buildteam.components.generator.house;
 
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionOperationException;
 import net.buildtheearth.buildteam.BuildTeam;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.Utils;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -20,7 +29,7 @@ import java.util.stream.IntStream;
 
 public class House {
 
-    public static String WIKI_PAGE = "https://github.com/MineFact/BuildTeamPlugin/blob/master/wiki/generator/houses.md";
+    public static String WIKI_PAGE = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/House-Command";
 
     public static HashMap<UUID, HouseSettings> playerHouseSettings = new HashMap<>();
 
@@ -60,10 +69,10 @@ public class House {
             if(houseFlag == null)
                 continue;
 
-            playerHouseSettings.get(p).setValue(houseFlag, flagValue);
+            playerHouseSettings.get(p.getUniqueId()).setValue(houseFlag, flagValue);
         }
 
-        if(playerHouseSettings.get(p).getValues().size() == 0 && args.length > 1){
+        if(playerHouseSettings.get(p.getUniqueId()).getValues().size() == 0 && args.length > 1){
             sendHelp(p);
             return;
         }
@@ -84,6 +93,27 @@ public class House {
 
     public static void sendError(Player p){
         p.sendMessage("§cThere was an error while generating the house. Please contact the admins");
+    }
+
+    /**
+     * Checks if polygon region contains a sign and update sign text
+     * @param polyRegion WorldEdit region
+     * @param world Region world
+     * @return true if polygon region contains a sign, false otherwise
+     */
+    public static boolean containsBlock(Region polyRegion, World world, Material blockType, byte data) {
+        boolean hasBlock = false;
+        for (int i = polyRegion.getMinimumPoint().getBlockX(); i <= polyRegion.getMaximumPoint().getBlockX(); i++)
+        for (int j = polyRegion.getMinimumPoint().getBlockY(); j <= polyRegion.getMaximumPoint().getBlockY(); j++)
+        for (int k = polyRegion.getMinimumPoint().getBlockZ(); k <= polyRegion.getMaximumPoint().getBlockZ(); k++)
+            if (polyRegion.contains(new Vector(i, j, k))) {
+                Block block = world.getBlockAt(i, j, k);
+                if(block.getType() == blockType && (data == 0 || block.getData() == data)) {
+                    hasBlock = true;
+                }
+            }
+
+        return hasBlock;
     }
 
     public static void generate(Player p){
@@ -123,7 +153,26 @@ public class House {
 
         HouseScripts.buildscript_v_1_2(p,wallColor,roofColor,baseColor,windowColor,roofType,floorCount,floorHeight,baseHeight,windowHeight,windowWidth,windowDistance,maxRoofHeight);
 
-        p.sendMessage(BuildTeam.PREFIX + "Building §asuccessfully §7generated.");
+        String command = "/gen house";
+        for(HouseFlag houseFlag : flags.keySet())
+            command += " -" + houseFlag.getFlag() + " " + flags.get(houseFlag);
+
+
+        p.sendMessage(" ");
+        p.sendMessage(" ");
+        p.sendMessage(" ");
+
+        TextComponent tc = new TextComponent(BuildTeam.PREFIX + "Building §asuccessfully §7generated. §e[Copy Command]");
+        tc.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, command));
+        tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§7Click to copy command").create()));
+
+        p.spigot().sendMessage(tc);
+
+        p.sendMessage(" ");
+        p.sendMessage("§cNote: You can undo the edit with /gen undo.");
+
+
+
     }
 
 

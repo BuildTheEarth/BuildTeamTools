@@ -1,5 +1,6 @@
 package net.buildtheearth.buildteam.components.stats;
 
+import net.buildtheearth.buildteam.components.BTENetwork;
 import org.bukkit.entity.Player;
 import org.json.JSONArray;
 import org.json.simple.JSONObject;
@@ -10,6 +11,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class StatsManager {
+
+    public static int RATE_LIMIT = BTENetwork.CACHE_UPLOAD_SPEED / 20;
 
     private StatsServer statsServer;
     private HashMap<UUID, StatsPlayer> statsPlayerList;

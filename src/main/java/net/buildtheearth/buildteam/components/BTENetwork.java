@@ -15,6 +15,8 @@ import java.util.UUID;
 
 public class BTENetwork {
 
+    public static int CACHE_UPLOAD_SPEED = 20*60*10 + 20;
+
     @Setter @Getter
     private String buildTeamID;
     @Setter @Getter

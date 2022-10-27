@@ -1,6 +1,7 @@
 package net.buildtheearth.buildteam.components.stats;
 
 import lombok.Getter;
+import net.buildtheearth.buildteam.components.BTENetwork;
 import org.json.simple.JSONObject;
 
 import java.util.HashMap;
@@ -18,16 +19,29 @@ public class StatsServer {
 
         if(object == null)
             object = value;
-        else if(object instanceof Integer && value instanceof Integer)
+        else if(object instanceof Integer && value instanceof Integer) {
+            if((Integer) object > StatsManager.RATE_LIMIT)
+                return;
+
             object = (Integer) object + (Integer) value;
-        else if(object instanceof Double && value instanceof Double)
+        }else if(object instanceof Double && value instanceof Double) {
+            if((Double) object > StatsManager.RATE_LIMIT)
+                return;
+
             object = (Double) object + (Double) value;
-        else if(object instanceof Float && value instanceof Float)
+        }else if(object instanceof Float && value instanceof Float) {
+            if((Float) object > StatsManager.RATE_LIMIT)
+                return;
+
             object = (Float) object + (Float) value;
-        else if(object instanceof Long && value instanceof Long)
+        }else if(object instanceof Long && value instanceof Long) {
+            if((Long) object > StatsManager.RATE_LIMIT)
+                return;
+
             object = (Long) object + (Long) value;
-        else
+        }else {
             object = value;
+        }
 
         stats.remove(statsServerType);
         stats.put(statsServerType, object);

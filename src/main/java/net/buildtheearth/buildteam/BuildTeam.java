@@ -79,7 +79,7 @@ public class BuildTeam {
 				}
 
 				// Jede 10 Minuten (+1 Sekunde)
-				if(time%(20*60*10 + 20) == 0) {
+				if(time%(BTENetwork.CACHE_UPLOAD_SPEED) == 0) {
 					Main.buildTeam.getBTENetwork().update();
 				}
 

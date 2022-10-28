@@ -4,6 +4,7 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.buildteam.BuildTeamTools;
 import net.buildtheearth.buildteam.components.generator.Generator;
+import net.buildtheearth.utils.ChatUtil;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -53,7 +54,14 @@ public class House {
         for(String flagAndValue : flagsArray){
             String[] values = flagAndValue.split(" ");
             String flagName = values[0];
-            String flagValue = StringUtils.join(Arrays.copyOfRange(values, 1, values.length), " ");
+            String flagValue;
+
+            try {
+                flagValue = StringUtils.join(Arrays.copyOfRange(values, 1, values.length), " ");
+            } catch (ArrayIndexOutOfBoundsException e) {
+                p.sendMessage("§cInvalid flag value: -" + flagName + "§n§c ???");
+                return;
+            }
 
             HouseFlag houseFlag = HouseFlag.byString(flagName);
 

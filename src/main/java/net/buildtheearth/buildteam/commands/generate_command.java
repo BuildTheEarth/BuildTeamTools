@@ -7,6 +7,7 @@ import net.buildtheearth.buildteam.components.generator.History;
 import net.buildtheearth.buildteam.components.generator.house.House;
 import net.buildtheearth.buildteam.components.generator.rail.Rail;
 import net.buildtheearth.buildteam.components.generator.road.Road;
+import net.buildtheearth.buildteam.components.generator.tree.Tree;
 import net.buildtheearth.utils.ChatUtil;
 import net.buildtheearth.utils.Utils;
 import org.bukkit.Sound;
@@ -41,12 +42,13 @@ public class generate_command implements CommandExecutor {
             return true;
         }
 
+
+
         // Command Usage: /gen house ...
         if(args[0].equals("house")){
             House.analyzeCommand(p, args);
             return true;
         }
-
 
         // Command Usage: /gen road ...
         if(args[0].equals("road")){
@@ -59,6 +61,14 @@ public class generate_command implements CommandExecutor {
             Rail.analyzeCommand(p, args);
             return true;
         }
+
+        // Command Usage: /gen tree ...
+        if(args[0].equals("tree")) {
+            Tree.analyzeCommand(p, args);
+        }
+
+
+
 
         // Command Usage: /gen history
         if(args[0].equals("history")){
@@ -92,9 +102,16 @@ public class generate_command implements CommandExecutor {
         return true;
     }
 
-    public static void sendHelp(Player p){
-        // TODO make help pretty
-        p.sendMessage("TODO create help message");
+    public static void sendHelp(CommandSender sender){
+        ChatUtil.sendMessageBox(sender, "Generator Command", new Runnable() {
+            @Override
+            public void run() {
+                sender.sendMessage("§eHouse Generator:§7 /gen house help");
+                sender.sendMessage("§eRoad Generator:§7 /gen road help");
+                sender.sendMessage("§eRail Generator:§7 /gen rail help");
+                sender.sendMessage("§eTree Generator:§7 /gen tree help");
+            }
+        });
     }
 
 

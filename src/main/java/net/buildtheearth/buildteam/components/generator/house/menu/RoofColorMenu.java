@@ -1,5 +1,9 @@
-package net.buildtheearth.buildteam.components.generator.house;
+package net.buildtheearth.buildteam.components.generator.house.menu;
 
+import net.buildtheearth.buildteam.components.generator.house.House;
+import net.buildtheearth.buildteam.components.generator.house.HouseFlag;
+import net.buildtheearth.buildteam.components.generator.house.RoofType;
+import net.buildtheearth.buildteam.components.generator.house.menu.BaseColorMenu;
 import net.buildtheearth.utils.*;
 import org.bukkit.Material;
 import org.bukkit.Sound;

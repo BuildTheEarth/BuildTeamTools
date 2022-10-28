@@ -1,13 +1,14 @@
-package net.buildtheearth.buildteam.components.generator.house;
+package net.buildtheearth.buildteam.components.generator.house.menu;
 
+import net.buildtheearth.buildteam.components.generator.house.House;
+import net.buildtheearth.buildteam.components.generator.house.HouseFlag;
+import net.buildtheearth.buildteam.components.generator.house.menu.RoofTypeMenu;
 import net.buildtheearth.utils.*;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.ipvp.canvas.Menu;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
 

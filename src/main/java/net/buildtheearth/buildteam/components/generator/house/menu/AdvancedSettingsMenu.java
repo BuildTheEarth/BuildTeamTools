@@ -1,5 +1,7 @@
-package net.buildtheearth.buildteam.components.generator.house;
+package net.buildtheearth.buildteam.components.generator.house.menu;
 
+import net.buildtheearth.buildteam.components.generator.house.House;
+import net.buildtheearth.buildteam.components.generator.house.HouseFlag;
 import net.buildtheearth.utils.AbstractMenu;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.Liste;

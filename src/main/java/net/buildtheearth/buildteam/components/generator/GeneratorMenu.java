@@ -3,7 +3,7 @@ package net.buildtheearth.buildteam.components.generator;
 import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.buildteam.components.generator.house.House;
 import net.buildtheearth.buildteam.components.generator.house.HouseSettings;
-import net.buildtheearth.buildteam.components.generator.house.WallColorMenu;
+import net.buildtheearth.buildteam.components.generator.house.menu.WallColorMenu;
 import net.buildtheearth.utils.AbstractMenu;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.Liste;

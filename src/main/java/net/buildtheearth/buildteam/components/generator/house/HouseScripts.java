@@ -8,8 +8,22 @@ import org.bukkit.entity.Player;
 
 public class HouseScripts {
 
-    public static void buildscript_v_1_2(Player p, String wallColor, String roofColor, String baseColor, String windowColor, RoofType roofType,
-                                         int floorCount, int floorHeight, int baseHeight, int windowHeight, int windowWidth, int windowDistance, int maxRoofHeight){
+    public static void buildscript_v_1_2(Player p,
+                                         String wallColor,
+                                         String roofColor,
+                                         String baseColor,
+                                         String windowColor,
+                                         RoofType roofType,
+                                         int floorCount,
+                                         int floorHeight,
+                                         int baseHeight,
+                                         int windowHeight,
+                                         int windowWidth,
+                                         int windowDistance,
+                                         int maxRoofHeight){
+
+
+
         int operations = 0;
         p.chat("/clearhistory");
 

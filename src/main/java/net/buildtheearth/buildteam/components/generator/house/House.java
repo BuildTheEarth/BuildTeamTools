@@ -5,15 +5,18 @@ import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.buildteam.BuildTeamTools;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.utils.ChatUtil;
+import net.buildtheearth.utils.Item;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,7 +42,7 @@ public class House {
          *
          * Command: /gen house -w 123:12 -r 456:78
          * args: ["-w", "123:12", "-r", "456:78"]
-         * HashMap:
+         * HouseSettings:
          *  WALL_COLOR: 123:12
          *  ROOF_TYPE:  456:78
          */
@@ -115,22 +118,51 @@ public class House {
         return hasBlock;
     }
 
-    public static void generate(Player p){
-        HashMap<HouseFlag, String> flags = playerHouseSettings.get(p.getUniqueId()).getValues();
-
-        // Check if WorldEdit is enabled
-        if(!BuildTeamTools.DependencyManager.isWorldEditEnabled()){
-            p.sendMessage("§cPlease install WorldEdit to use this tool.");
-            sendMoreInfo(p);
-        }
-
+    public static boolean checkPlayer(Player p){
         // Get WorldEdit selection of player
         Region plotRegion = Generator.getWorldEditSelection(p);
 
         if(plotRegion == null){
             p.sendMessage("§cPlease make a WorldEdit Selection first.");
-            sendMoreInfo(p);
+            p.closeInventory();
+            p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+            House.sendMoreInfo(p);
+            return false;
         }
+
+        if(!House.containsBlock(plotRegion, p.getWorld(), Material.BRICK, (byte) 0)){
+            p.sendMessage("§cPlease make a selection around an outline.");
+            p.closeInventory();
+            p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+            House.sendMoreInfo(p);
+
+            return false;
+        }
+
+        if(!House.containsBlock(plotRegion, p.getWorld(), Material.WOOL, (byte) 4)){
+            p.sendMessage("§cPlease place a yellow wool block inside the outline.");
+            p.closeInventory();
+            p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+            House.sendMoreInfo(p);
+
+            ItemStack yellowWool = Item.create(Material.WOOL, null, (short) 4, null);
+            if(!p.getInventory().contains(yellowWool)) {
+                p.getInventory().setItem(4, yellowWool);
+                p.playSound(p.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1.0F, 1.0F);
+            }
+
+            return false;
+        }
+
+
+        return true;
+    }
+
+    public static void generate(Player p){
+        HashMap<HouseFlag, String> flags = playerHouseSettings.get(p.getUniqueId()).getValues();
+
+        if(!House.checkPlayer(p))
+            return;
 
 
         String wallColor = flags.get(HouseFlag.WALL_COLOR);
@@ -169,10 +201,5 @@ public class House {
 
         p.sendMessage(" ");
         p.sendMessage("§cNote: You can undo the edit with /gen undo.");
-
-
-
     }
-
-
 }

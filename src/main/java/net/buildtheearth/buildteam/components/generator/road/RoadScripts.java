@@ -1,6 +1,9 @@
 package net.buildtheearth.buildteam.components.generator.road;
 
 
+import net.buildtheearth.buildteam.components.generator.Generator;
+import net.buildtheearth.buildteam.components.generator.GeneratorType;
+import net.buildtheearth.buildteam.components.generator.History;
 import org.bukkit.entity.Player;
 
 public class RoadScripts {
@@ -16,6 +19,10 @@ public class RoadScripts {
                                         int markingsDistance,
                                         int sidewalkWidth) {
 
+
+        int operations = 0;
+        p.chat("/clearhistory");
+
         // Is there a sidewalk?
         boolean isSidewalk = false;
         if(sidewalkWidth>0)
@@ -27,35 +34,50 @@ public class RoadScripts {
         // Clear the surrounding area
         p.chat("//gmask 31,32,37,38,39,40,83,86,175");
         p.chat("//curve 0 " + current_width);
+        operations++;
 
 
         // Draw sidewalk
         p.chat("//gmask <0");
         p.chat("//curve 43:0 " + current_width);
+        operations++;
+
 
         //TODO: fix excessively wide sidewalk bug
         current_width -=(isSidewalk ? 1 : 0);
         p.chat("//curve 35:1 " + current_width);
+        operations++;
+
         current_width -= sidewalkWidth;
         p.chat("//curve 43:0 " + current_width);
+        operations++;
 
 
         // Draw road
         for(int i=0;i<laneCount;i++) {
             current_width--;
             p.chat("//curve 35:2 " + current_width);
+            operations++;
+
             current_width -= laneWidth;
             p.chat("//curve 35:3 " + current_width);
+            operations++;
+
         }
 
-        if(laneCount>1)
+        if(laneCount>1) {
             p.chat("//curve " + markingsMaterial);
+            operations++;
+        }
 
         // Separation
         if(separationRadius > 0) {
             p.chat("//curve 43:8 " + current_width);
+            operations++;
+
             current_width--;
             p.chat("//curve 2 " + current_width);
+            operations++;
         }
 
         // Markings
@@ -67,12 +89,20 @@ public class RoadScripts {
 
 
         p.chat("//curve " + markingsMaterial + " " + roadWidth);
+        operations++;
+
         p.chat("//gmask 35:2,35:3");
         p.chat("//curve " + roadMaterial + " " + roadWidth);
+        operations++;
+
         p.chat("//gmask 35:1");
         p.chat("//curve " + sidewalkMaterial + " " + roadWidth);
+        operations++;
+
         p.chat("//gmask");
 
 
+
+        Generator.getPlayerHistory(p).addHistoryEntry(new History.HistoryEntry(GeneratorType.ROAD, operations));
     }
 }

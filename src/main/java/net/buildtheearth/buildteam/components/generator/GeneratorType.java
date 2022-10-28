@@ -3,7 +3,7 @@ package net.buildtheearth.buildteam.components.generator;
 public enum GeneratorType {
 
     HOUSE("House"),
-    STREET("Street"),
+    ROAD("Road"),
     RAILWAY("Railway"),
     TREE("Tree");
 

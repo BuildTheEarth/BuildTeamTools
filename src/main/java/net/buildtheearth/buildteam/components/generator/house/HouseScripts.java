@@ -1,16 +1,10 @@
 package net.buildtheearth.buildteam.components.generator.house;
 
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.internal.expression.lexer.tokens.CharacterToken;
-import net.buildtheearth.buildteam.BuildTeam;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.generator.GeneratorType;
 import net.buildtheearth.buildteam.components.generator.History;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-
-import java.util.Arrays;
 
 public class HouseScripts {
 

@@ -2,7 +2,7 @@ package net.buildtheearth.buildteam;
 
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
-import net.buildtheearth.buildteam.commands.buildteam_command;
+import net.buildtheearth.buildteam.commands.buildteamtools_command;
 import net.buildtheearth.buildteam.commands.generate_command;
 import net.buildtheearth.buildteam.components.BTENetwork;
 import net.buildtheearth.buildteam.components.stats.StatsPlayerType;
@@ -22,7 +22,7 @@ import org.ipvp.canvas.MenuFunctionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BuildTeam {
+public class BuildTeamTools {
 
 	public static int SPIGOT_PROJECT_ID = 101854;
 	public static String PREFIX = "§9§lBTE §8> §7";
@@ -34,7 +34,7 @@ public class BuildTeam {
 	private long time;
 	private BTENetwork bteNetwork;
 
-	public BuildTeam() {}
+	public BuildTeamTools() {}
 	
 	public void start() {
 		registerCommands();
@@ -52,6 +52,7 @@ public class BuildTeam {
 	}
 
 	public void stop(){
+		Main.buildTeamTools.getBTENetwork().update();
 	}
 	
 	
@@ -80,16 +81,16 @@ public class BuildTeam {
 
 				// Jede 10 Minuten (+1 Sekunde)
 				if(time%(BTENetwork.CACHE_UPLOAD_SPEED) == 0) {
-					Main.buildTeam.getBTENetwork().update();
+					Main.buildTeamTools.getBTENetwork().update();
 				}
 
 				// Jede Minute
 				if(time%(20*60) == 0) {
-					Main.buildTeam.getBTENetwork().getStatsManager().getStatsServer().addValue(StatsServerType.UPTIME, 1);
+					Main.buildTeamTools.getBTENetwork().getStatsManager().getStatsServer().addValue(StatsServerType.UPTIME, 1);
 
 					for (Player p : Bukkit.getOnlinePlayers()) {
-						Main.buildTeam.getBTENetwork().getStatsManager().getStatsServer().addValue(StatsServerType.PLAYTIME, 1);
-						Main.buildTeam.getBTENetwork().getStatsManager().getStatsPlayer(p.getUniqueId()).addValue(StatsPlayerType.PLAYTIME, 1);
+						Main.buildTeamTools.getBTENetwork().getStatsManager().getStatsServer().addValue(StatsServerType.PLAYTIME, 1);
+						Main.buildTeamTools.getBTENetwork().getStatsManager().getStatsPlayer(p.getUniqueId()).addValue(StatsPlayerType.PLAYTIME, 1);
 					}
 				}
 
@@ -124,7 +125,7 @@ public class BuildTeam {
 	
 	/** Registers all Commands of the plugin. */
 	private void registerCommands() {
-		Main.instance.getCommand("buildteam").setExecutor(new buildteam_command());
+		Main.instance.getCommand("buildteam").setExecutor(new buildteamtools_command());
 		Main.instance.getCommand("generate").setExecutor(new generate_command());
 
 	}

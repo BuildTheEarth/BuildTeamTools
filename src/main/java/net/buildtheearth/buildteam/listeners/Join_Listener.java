@@ -1,7 +1,6 @@
 package net.buildtheearth.buildteam.listeners;
 
 import net.buildtheearth.Main;
-import net.buildtheearth.buildteam.components.BTENetwork;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,7 +17,7 @@ public class Join_Listener implements Listener {
         Main.getBuildTeam().getBTENetwork().ping(p);
 
         //Notify the admins if a new update got installed automatically
-        Main.buildTeam.notifyUpdate(p);
+        Main.buildTeamTools.notifyUpdate(p);
     }
 
     @EventHandler

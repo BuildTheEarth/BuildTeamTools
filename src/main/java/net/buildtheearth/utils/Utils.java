@@ -1,11 +1,7 @@
 package net.buildtheearth.utils;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
-import net.buildtheearth.Main;
-import net.buildtheearth.buildteam.BuildTeam;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;

@@ -5,7 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.buildtheearth.Main;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
 import java.io.*;
@@ -292,7 +291,7 @@ public class Updater
                 this.plugin.getLogger().log(Level.SEVERE, null, e);
             }
 
-            Main.buildTeam.setUpdateInstalled(version);
+            Main.buildTeamTools.setUpdateInstalled(version);
         }
     }
 

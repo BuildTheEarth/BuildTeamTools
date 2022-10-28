@@ -2,7 +2,7 @@ package net.buildtheearth;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
-import net.buildtheearth.buildteam.BuildTeam;
+import net.buildtheearth.buildteam.BuildTeamTools;
 import net.buildtheearth.buildteam.components.updater.Updater;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -13,13 +13,13 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 public class Main extends JavaPlugin implements PluginMessageListener{
 	
 	public static Main instance;
-	public static BuildTeam buildTeam;
+	public static BuildTeamTools buildTeamTools;
 
 	@Override
 	public void onEnable(){
 		instance = this;
-		buildTeam = new BuildTeam();
-		buildTeam.start();
+		buildTeamTools = new BuildTeamTools();
+		buildTeamTools.start();
 
 		String resultMessage = startUpdateChecker();
 		System.out.println("[BuildTeam] Plugin with version " + getDescription().getVersion() + " started. " + resultMessage);
@@ -27,7 +27,7 @@ public class Main extends JavaPlugin implements PluginMessageListener{
 	
 	@Override
 	public void onDisable(){
-		buildTeam.stop();
+		buildTeamTools.stop();
 
 		System.out.println("[BuildTeam] Plugin stopped.");
 	}
@@ -57,7 +57,7 @@ public class Main extends JavaPlugin implements PluginMessageListener{
 			String status = in.readUTF();
 
 			if(status.equals("OK"))
-				Main.buildTeam.getBTENetwork().getStatsManager().resetCache();
+				Main.buildTeamTools.getBTENetwork().getStatsManager().resetCache();
 		}
 
 
@@ -75,7 +75,7 @@ public class Main extends JavaPlugin implements PluginMessageListener{
 	}
 
 	public String checkForUpdates(){
-		Updater updater = new Updater(this, BuildTeam.SPIGOT_PROJECT_ID, this.getFile(), Updater.UpdateType.CHECK_DOWNLOAD, buildTeam.isDebug());
+		Updater updater = new Updater(this, BuildTeamTools.SPIGOT_PROJECT_ID, this.getFile(), Updater.UpdateType.CHECK_DOWNLOAD, buildTeamTools.isDebug());
 		Updater.Result result = updater.getResult();
 
 		String resultMessage = "";
@@ -91,12 +91,12 @@ public class Main extends JavaPlugin implements PluginMessageListener{
 		return resultMessage;
 	}
 
-	public static BuildTeam getBuildTeam() {
-		return buildTeam;
+	public static BuildTeamTools getBuildTeam() {
+		return buildTeamTools;
 	}
 
-	public static void setBuildTeam(BuildTeam buildTeam) {
-		Main.buildTeam = buildTeam;
+	public static void setBuildTeam(BuildTeamTools buildTeamTools) {
+		Main.buildTeamTools = buildTeamTools;
 	}
 
 

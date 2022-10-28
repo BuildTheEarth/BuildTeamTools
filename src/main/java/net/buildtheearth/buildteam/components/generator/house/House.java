@@ -1,31 +1,22 @@
 package net.buildtheearth.buildteam.components.generator.house;
 
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.regions.RegionOperationException;
-import net.buildtheearth.buildteam.BuildTeam;
+import net.buildtheearth.buildteam.BuildTeamTools;
 import net.buildtheearth.buildteam.components.generator.Generator;
-import net.buildtheearth.utils.MenuItems;
-import net.buildtheearth.utils.Utils;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Random;
 import java.util.UUID;
-import java.util.stream.IntStream;
 
 public class House {
 
@@ -120,13 +111,13 @@ public class House {
         HashMap<HouseFlag, String> flags = playerHouseSettings.get(p.getUniqueId()).getValues();
 
         // Check if WorldEdit is enabled
-        if(!BuildTeam.DependencyManager.isWorldEditEnabled()){
+        if(!BuildTeamTools.DependencyManager.isWorldEditEnabled()){
             p.sendMessage("§cPlease install WorldEdit to use this tool.");
             sendMoreInfo(p);
         }
 
         // Get WorldEdit selection of player
-        Region plotRegion = Generator.getWorldEditSelction(p);
+        Region plotRegion = Generator.getWorldEditSelection(p);
 
         if(plotRegion == null){
             p.sendMessage("§cPlease make a WorldEdit Selection first.");
@@ -162,7 +153,7 @@ public class House {
         p.sendMessage(" ");
         p.sendMessage(" ");
 
-        TextComponent tc = new TextComponent(BuildTeam.PREFIX + "Building §asuccessfully §7generated. §e[Copy Command]");
+        TextComponent tc = new TextComponent(BuildTeamTools.PREFIX + "Building §asuccessfully §7generated. §e[Copy Command]");
         tc.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, command));
         tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§7Click to copy command").create()));
 

@@ -16,7 +16,7 @@ public class Generator {
 
     private static HashMap<UUID, History> playerHistory = new HashMap<>();
 
-    public static Region getWorldEditSelction(Player p){
+    public static Region getWorldEditSelection(Player p){
         Region plotRegion;
 
         try {

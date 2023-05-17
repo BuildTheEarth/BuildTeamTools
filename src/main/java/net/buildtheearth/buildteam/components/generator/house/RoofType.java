@@ -3,7 +3,12 @@ package net.buildtheearth.buildteam.components.generator.house;
 public enum RoofType {
 
     FLAT("FLAT"),
-    SLABS("SLABS"),
+
+    FLATTER_SLABS("FLATTER_SLABS"),
+
+    MEDIUM_SLABS("MEDIUM_SLABS"),
+
+    STEEP_SLABS("STEEP_SLABS"),
     STAIRS("STAIRS");
 
     private String type;

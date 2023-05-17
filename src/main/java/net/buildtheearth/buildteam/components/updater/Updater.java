@@ -236,7 +236,34 @@ public class Updater
      */
     private boolean shouldUpdate(String newVersion, String oldVersion)
     {
-        return !newVersion.equalsIgnoreCase(oldVersion);
+        // If version has format 1.0.0
+        if(newVersion.contains(".")){
+            String[] newVersionSplit = newVersion.split("\\.");
+            String[] oldVersionSplit = oldVersion.split("\\.");
+
+            for(int i = 0; i < newVersionSplit.length; i++) {
+                try {
+                    if(Integer.parseInt(newVersionSplit[i]) > Integer.parseInt(oldVersionSplit[i]))
+                        return true;
+                    else if(Integer.parseInt(newVersionSplit[i]) < Integer.parseInt(oldVersionSplit[i]))
+                        return false;
+                } catch (NumberFormatException e) {
+                    return !newVersion.equalsIgnoreCase(oldVersion);
+                }
+            }
+
+            return false;
+
+        // If version is an integer
+        } else if(newVersion.matches("[0-9]+")) {
+            if(Integer.parseInt(newVersion) > Integer.parseInt(oldVersion))
+                return true;
+            else
+                return false;
+
+        // If version has a different format
+        }else
+            return !newVersion.equalsIgnoreCase(oldVersion);
     }
 
     /**

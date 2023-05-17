@@ -1,45 +1,140 @@
 package net.buildtheearth.buildteam.components.generator.house;
 
+import com.sk89q.worldedit.BlockVector2D;
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.Vector2D;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Polygonal2DRegion;
+import com.sk89q.worldedit.regions.Region;
+import jdk.nashorn.internal.ir.Block;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.generator.GeneratorType;
 import net.buildtheearth.buildteam.components.generator.History;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class HouseScripts {
 
-    public static void buildscript_v_1_2(Player p,
-                                         String wallColor,
-                                         String roofColor,
-                                         String baseColor,
-                                         String windowColor,
-                                         RoofType roofType,
-                                         int floorCount,
-                                         int floorHeight,
-                                         int baseHeight,
-                                         int windowHeight,
-                                         int windowWidth,
-                                         int windowDistance,
-                                         int maxRoofHeight){
+    public static void buildscript_v_1_2(Player p, HouseSettings houseSettings, Region region){
+        HashMap<HouseFlag, String> flags = houseSettings.getValues();
 
+        String wallColor = flags.get(HouseFlag.WALL_COLOR);
+        String roofColor = flags.get(HouseFlag.ROOF_COLOR);
+        String baseColor = flags.get(HouseFlag.BASE_COLOR);
+        String windowColor = flags.get(HouseFlag.WINDOW_COLOR);
+        RoofType roofType = RoofType.byString(flags.get(HouseFlag.ROOF_TYPE));
+
+        int floorCount = Integer.parseInt(flags.get(HouseFlag.FLOOR_COUNT));
+        int floorHeight = Integer.parseInt(flags.get(HouseFlag.FLOOR_HEIGHT));
+        int baseHeight = Integer.parseInt(flags.get(HouseFlag.BASE_HEIGHT));
+        int windowHeight = Integer.parseInt(flags.get(HouseFlag.WINDOW_HEIGHT));
+        int windowWidth = Integer.parseInt(flags.get(HouseFlag.WINDOW_WIDTH));
+        int windowDistance = Integer.parseInt(flags.get(HouseFlag.WINDOW_DISTANCE));
+        int maxRoofHeight = Integer.parseInt(flags.get(HouseFlag.MAX_ROOF_HEIGHT));
+
+        int highestBlock = House.getMaxHeight(houseSettings.getBlocks(), Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2);
+
+        List<BlockVector2D> selectionPoints = new ArrayList<>();
+        int minY = region.getMinimumPoint().getBlockY();
+        int maxY = region.getMaximumPoint().getBlockY();
+
+
+        if(region instanceof Polygonal2DRegion){
+            Polygonal2DRegion polyRegion = (Polygonal2DRegion) region;
+            selectionPoints.addAll(polyRegion.getPoints());
+
+        }else if(region instanceof CuboidRegion){
+            CuboidRegion cuboidRegion = (CuboidRegion) region;
+            Vector min = cuboidRegion.getMinimumPoint();
+            Vector max = cuboidRegion.getMaximumPoint();
+
+            selectionPoints.add(new BlockVector2D(min.getBlockX(), min.getBlockZ()));
+            selectionPoints.add(new BlockVector2D(max.getBlockX(), max.getBlockZ()));
+        }else{
+            p.sendMessage("§c§lERROR: §cRegion type not supported!");
+            return;
+        }
 
 
         int operations = 0;
         p.chat("/clearhistory");
 
-
-        // ----------- PREPARATION ----------
-
         // Disable the current global mask
         p.chat("//gmask");
 
-        // Expand the current selection down by 10 blocks
+
+        // ----------- PREPARATION 01 ----------
+        // Replace all non-solid blocks with air
+
+        p.chat("//expand 10 up");
         p.chat("//expand 10 down");
 
-        int up_expand = 5 + maxRoofHeight + baseHeight + (floorCount * floorHeight);
+        p.chat("//gmask !#solid");
+        p.chat("//replace 0");
+        operations++;
 
-        // Expand the current selection up by "up_expand" blocks
-        p.chat("//expand " + up_expand + " up");
+
+        // ----------- PREPARATION 02 ----------
+        // Bring the outline on the same height
+
+        // Set pos1 and pos2
+        p.chat("//pos1 " + selectionPoints.get(0).getBlockX() + "," + highestBlock + "," + selectionPoints.get(0).getBlockZ());
+        for(int i = 1; i < selectionPoints.size(); i++)
+            p.chat("//pos2 " + selectionPoints.get(i).getBlockX() + "," + minY + "," + selectionPoints.get(i).getBlockZ());
+
+        p.chat("//expand 10 down");
+
+        // Replace air with sponge
+        p.chat("//replace 0 19");
+        operations++;
+
+        // Replace all sponges with bricks that have bricks below them
+        p.chat("//gmask >45");
+
+        for(int i = 0; i < 20; i++) {
+            p.chat("//replace 19 45");
+            operations++;
+        }
+
+        // Replace all left sponges with air
+        p.chat("//gmask");
+        p.chat("//replace 19 0");
+        operations++;
+
+
+        // ----------- PREPARATION 03 ----------
+        // Bring the yellow wool blocks to the same height
+
+        // Replace all blocks above yellow wool
+        p.chat("//gmask >35:4");
+        for(int i = 0; i < 20; i++){
+            p.chat("//replace 0 35:4");
+            operations++;
+        }
+
+        // Select highest yellow wool block and replace it with sponge
+        p.chat("//gmask <0");
+        p.chat("//replace 35:4 19");
+        operations++;
+
+        // Replace yellow wool with air
+        p.chat("//gmask");
+        p.chat("//replace 35:4 0");
+        operations++;
+
+        // Replace all sponges with yellow wool
+        p.chat("//replace 19 35:4");
+        operations++;
+
+
+        // ----------- PREPARATION 04 ----------
+        // Replace all bricks underground with grass
 
         // Replace all bricks with sponge
         p.chat("//replace 45 19");
@@ -59,9 +154,20 @@ public class HouseScripts {
 
 
 
-
-
         // ----------- GROUND ----------
+
+        // Set pos1 and pos2
+        p.chat("//pos1 " + selectionPoints.get(0).getBlockX() + "," + maxY + "," + selectionPoints.get(0).getBlockZ());
+        for(int i = 1; i < selectionPoints.size(); i++)
+            p.chat("//pos2 " + selectionPoints.get(i).getBlockX() + "," + minY + "," + selectionPoints.get(i).getBlockZ());
+
+        // Expand the current selection down by 10 blocks
+        p.chat("//expand 10 down");
+
+        int up_expand = 5 + maxRoofHeight + baseHeight + (floorCount * floorHeight);
+
+        // Expand the current selection up by "up_expand" blocks
+        p.chat("//expand " + up_expand + " up");
 
         // Select all blocks around the yellow wool block
         p.chat("//gmask =queryRel(-1,0,0,35,4)||queryRel(1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4)");
@@ -223,14 +329,15 @@ public class HouseScripts {
         operations++;
 
 
-        //roof
+        // ----------- ROOF ----------
+
         String rm1 = roofColor;
         String rm2 = roofColor;
         String rm3 = roofColor;
 
 
 
-        if(roofType == RoofType.SLABS){
+        if(roofType == RoofType.FLATTER_SLABS || roofType == RoofType.STEEP_SLABS|| roofType == RoofType.MEDIUM_SLABS){
             // (One more yellow wool layer) Replace everything above yellow wool with one layer yellow wool
             p.chat("//replace >35:4 35:4");
             operations++;
@@ -262,10 +369,19 @@ public class HouseScripts {
             if(maxRoofHeight > 0)
             for(int i = 0; i < maxRoofHeight; i++) {
                 //Only select air block that have stone slabs below them which are surrounded by other stone slabs
-                p.chat("//gmask =!(queryRel(1,-1,0,44,-1)||queryRel(-1,-1,0,44,-1)||queryRel(0,-1,1,44,-1)||queryRel(0,-1,-1,4,-1)||(queryRel(-1,-1,1,44,-1)||queryRel(1,-1,-1,44,-1)||queryRel(1,-1,1,44,-1)||queryRel(-1,-1,-1,4,-1)))");
+                if(roofType == RoofType.FLATTER_SLABS || roofType == RoofType.MEDIUM_SLABS)
+                    p.chat("//gmask =!(queryRel(1,-1,0,44,-1)||queryRel(-1,-1,0,44,-1)||queryRel(0,-1,1,44,-1)||queryRel(0,-1,-1,44,-1)||(queryRel(-1,-1,1,44,-1)||queryRel(1,-1,-1,44,-1)||queryRel(1,-1,1,44,-1)||queryRel(-1,-1,-1,44,-1)))");
+                else if(roofType == RoofType.STEEP_SLABS)
+                    p.chat("//gmask =!(queryRel(1,-1,0,44,-1)||queryRel(-1,-1,0,44,-1)||queryRel(0,-1,1,44,-1)||queryRel(0,-1,-1,44,-1))");
+
                 p.chat("//replace >43 44");
                 operations++;
-                p.chat("//gmask =!(queryRel(1,0,0,0,-1)||queryRel(-1,0,0,0,-1)||queryRel(0,0,1,0,-1)||queryRel(0,0,-1,0,-1))");
+
+                if(roofType == RoofType.FLATTER_SLABS)
+                    p.chat("//gmask =!(queryRel(1,0,0,0,-1)||queryRel(-1,0,0,0,-1)||queryRel(0,0,1,0,-1)||queryRel(0,0,-1,0,-1)||queryRel(-1,0,1,0,-1)||queryRel(1,0,-1,0,-1)||queryRel(1,0,1,0,-1)||queryRel(-1,0,-1,0,-1))");
+                else if(roofType == RoofType.MEDIUM_SLABS || roofType == RoofType.STEEP_SLABS)
+                    p.chat("//gmask =!(queryRel(1,0,0,0,-1)||queryRel(-1,0,0,0,-1)||queryRel(0,0,1,0,-1)||queryRel(0,0,-1,0,-1))");
+
                 p.chat("//replace 44 43");
                 operations++;
             }
@@ -290,16 +406,60 @@ public class HouseScripts {
             rm1 = StringUtils.join(roofColors, ",");
             rm2 = StringUtils.join(roofColors2, ",");
             rm3 = StringUtils.join(roofColors3, ",");
-        }
 
-        if(roofType == RoofType.FLAT){
+        } else if(roofType == RoofType.FLAT){
             p.chat("//gmask 0");
             p.chat("//replace >21 171:7");
             operations++;
             p.chat("//gmask <0");
             p.chat("//replace 35:4 23");
             operations++;
+
+        } else if(roofType == RoofType.STAIRS){
+
+            // (One more yellow wool layer) Replace everything above yellow wool with one layer yellow wool
+            p.chat("//replace >35:4 35:4");
+            operations++;
+
+            // (First Roof Layer) Select only air blocks that are next to yellow wool in any direction and above lapizlazuli ore. Then replace them with stone bricks
+            p.chat("//gmask =queryRel(0,0,0,0,0)&&(queryRel(1,0,0,35,4)||queryRel(1,0,0,35,4)||queryRel(-1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4))");
+            p.chat("//replace >21 98");
+            operations++;
+
+            // (Fix First Roof Layer) Select only air blocks that are next to stone slabs in any direction and above lapizlazuli ore. Then replace them with stone bricks
+            p.chat("//gmask =queryRel(0,0,0,0,0)&&(queryRel(1,0,0,98,0)||queryRel(1,0,0,98,0)||queryRel(-1,0,0,98,0)||queryRel(0,0,1,98,0)||queryRel(0,0,-1,98,0))");
+            p.chat("//replace >21 98");
+            p.chat("//replace >21 98");
+            operations++;
+            operations++;
+
+            // (Overhang Roof Layer) Select all air blocks next to lapizlazuli ores that have a stone slab above them. Then replace them with stone bricks
+            p.chat("//gmask =(queryRel(1,0,0,21,-1)&&queryRel(1,1,0,98,0))||(queryRel(-1,0,0,21,-1)&&queryRel(-1,1,0,98,0))||(queryRel(0,0,1,21,-1)&&queryRel(0,1,1,98,0))||(queryRel(0,0,-1,21,-1)&&queryRel(0,1,-1,98,0))");
+            p.chat("//replace 0 98:8");
+            operations++;
+
+            maxRoofHeight = maxRoofHeight - 1;
+
+            if(maxRoofHeight > 0)
+                for(int i = 0; i < maxRoofHeight; i++) {
+                    //Only select air block that have yellow wool below them which are surrounded by other stone bricks
+                    p.chat("//gmask =(queryRel(1,-1,0,98,-1)||queryRel(-1,-1,0,98,-1)||queryRel(0,-1,1,98,-1)||queryRel(0,-1,-1,98,-1))");
+                    p.chat("//replace >35:4 98");
+                    operations++;
+
+                    //Only select yellow wool with air blocks above them and put yellow wool above them
+                    p.chat("//gmask air");
+                    p.chat("//replace >35:4 35:4");
+                    operations++;
+                }
+
+
         }
+
+        if(1==1)
+            return;
+
+        // ----------- FINAL FINISH ----------
 
         p.chat("//gmask 0,45,31,37,38,39,40,175");
 
@@ -330,6 +490,11 @@ public class HouseScripts {
         p.chat("//replace 23 " + rm3);
         operations++;
 
+
+        // Reset pos1 and pos2
+        p.chat("//pos1 " + selectionPoints.get(0).getBlockX() + "," + maxY + "," + selectionPoints.get(0).getBlockZ());
+        for(int i = 1; i < selectionPoints.size(); i++)
+            p.chat("//pos2 " + selectionPoints.get(i).getBlockX() + "," + minY + "," + selectionPoints.get(i).getBlockZ());
 
         Generator.getPlayerHistory(p).addHistoryEntry(new History.HistoryEntry(GeneratorType.HOUSE, operations));
 

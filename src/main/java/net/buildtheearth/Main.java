@@ -85,7 +85,7 @@ public class Main extends JavaPlugin implements PluginMessageListener{
 			case NO_UPDATE: resultMessage = "The plugin is up to date."; break;
 			case SUCCESS: resultMessage = "Plugin successfully updated."; break;
 			case UPDATE_FOUND: resultMessage = "Found an update for the plugin."; break;
-			default: resultMessage = "No result for update search"; break;
+			default: resultMessage = "No result for update search."; break;
 		}
 
 		return resultMessage;

@@ -76,9 +76,9 @@ public class buildteamtools_command implements CommandExecutor{
 			boolean wasDebug = Main.buildTeamTools.isDebug();
 
 			Main.buildTeamTools.setDebug(true);
-			Main.instance.checkForUpdates();
+			String result = Main.instance.checkForUpdates();
 			Main.buildTeamTools.setDebug(wasDebug);
-			sender.sendMessage("§7Checked for updates. Please take a look at the console for details.");
+			sender.sendMessage("§7Checked for updates. " + result + " Please take a look at the console for details.");
 
 		}else if(args[0].equalsIgnoreCase("debug")){
 			boolean debug = Boolean.parseBoolean(args[1]);

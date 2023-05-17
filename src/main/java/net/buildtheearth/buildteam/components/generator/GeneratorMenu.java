@@ -3,6 +3,7 @@ package net.buildtheearth.buildteam.components.generator;
 import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.buildteam.components.generator.house.House;
 import net.buildtheearth.buildteam.components.generator.house.HouseSettings;
+import net.buildtheearth.buildteam.components.generator.house.RoofType;
 import net.buildtheearth.buildteam.components.generator.house.menu.WallColorMenu;
 import net.buildtheearth.utils.AbstractMenu;
 import net.buildtheearth.utils.Item;
@@ -37,10 +38,9 @@ public class GeneratorMenu extends AbstractMenu {
                 "generator",
                 "",
                 "§eFeatures:",
-                "- 4 House Types",
-                "- 3 Roof Types",
-                "- Custom Wall Color",
-                "- Custom Windows",
+                "- " + RoofType.values().length + " Roof Types",
+                "- Custom Wall, Base and Roof Color",
+                "- Custom Floor and Window Sizes",
                 "",
                 "§8Leftclick to generate",
                 "§8Rightclick for Tutorial");
@@ -60,11 +60,10 @@ public class GeneratorMenu extends AbstractMenu {
     protected void setItemClickEventsAsync() {
         // Set click event for house item
         getMenu().getSlot(HOUSE_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
+            House.playerHouseSettings.put(clickPlayer.getUniqueId(), new HouseSettings(clickPlayer));
+
             if(!House.checkPlayer(clickPlayer))
                 return;
-
-            House.playerHouseSettings.remove(clickPlayer.getUniqueId());
-            House.playerHouseSettings.put(clickPlayer.getUniqueId(), new HouseSettings(clickPlayer));
 
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);

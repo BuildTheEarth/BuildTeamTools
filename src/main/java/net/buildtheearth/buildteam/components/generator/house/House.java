@@ -11,6 +11,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -20,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public class House {
@@ -97,32 +99,60 @@ public class House {
         p.sendMessage("§cThere was an error while generating the house. Please contact the admins");
     }
 
-    /**
-     * Checks if polygon region contains a sign and update sign text
-     * @param polyRegion WorldEdit region
-     * @param world Region world
-     * @return true if polygon region contains a sign, false otherwise
-     */
-    public static boolean containsBlock(Region polyRegion, World world, Material blockType, byte data) {
-        boolean hasBlock = false;
+    public static Block[][][] analyzeRegion(Region polyRegion, World world) {
+        Block[][][] blocks = new Block[polyRegion.getWidth()][polyRegion.getHeight()][polyRegion.getLength()];
+
         for (int i = polyRegion.getMinimumPoint().getBlockX(); i <= polyRegion.getMaximumPoint().getBlockX(); i++)
         for (int j = polyRegion.getMinimumPoint().getBlockY(); j <= polyRegion.getMaximumPoint().getBlockY(); j++)
         for (int k = polyRegion.getMinimumPoint().getBlockZ(); k <= polyRegion.getMaximumPoint().getBlockZ(); k++)
             if (polyRegion.contains(new Vector(i, j, k))) {
                 Block block = world.getBlockAt(i, j, k);
-                if(block.getType() == blockType && (data == 0 || block.getData() == data)) {
-                    hasBlock = true;
-                }
+                blocks[i - polyRegion.getMinimumPoint().getBlockX()][j - polyRegion.getMinimumPoint().getBlockY()][k - polyRegion.getMinimumPoint().getBlockZ()] = block;
             }
 
-        return hasBlock;
+        return blocks;
+    }
+
+    /**
+     * Checks if polygon region contains a block of a certain type
+     * @param blocks List of blocks in polygon region
+     * @param material Material to check for (e.g. Material.WALL_SIGN)
+     * @param data Data value of material to check for (0-15)
+     * @return true if polygon region contains a sign, false otherwise
+     */
+    public static boolean containsBlock(Block[][][] blocks, Material material, byte data){
+        for (Block[][] block2D : blocks)
+            for (Block[] block1D : block2D)
+                for (Block block : block1D)
+                    if (block != null && block.getType() == material && block.getData() == data)
+                        return true;
+
+        return false;
+    }
+
+    /**
+     * Checks the maximum height of a polygon region
+     * @param blocks List of blocks in polygon region
+     * @return Maximum height of polygon region
+     */
+    public static int getMaxHeight(Block[][][] blocks, Material... ignoreMaterials){
+        int maxHeight = 0;
+        List<Material> ignoreMaterialsList = Arrays.asList(ignoreMaterials);
+
+        for (Block[][] block2D : blocks)
+            for (Block[] block1D : block2D)
+                for (Block block : block1D)
+                    if (block != null &&! ignoreMaterialsList.contains(block.getType()) && block.getType().isSolid() && block.getY() > maxHeight)
+                        maxHeight = block.getY();
+
+        return maxHeight;
     }
 
     public static boolean checkPlayer(Player p){
         // Get WorldEdit selection of player
-        Region plotRegion = Generator.getWorldEditSelection(p);
+        Region polyRegion = Generator.getWorldEditSelection(p);
 
-        if(plotRegion == null){
+        if(polyRegion == null){
             p.sendMessage("§cPlease make a WorldEdit Selection first.");
             p.closeInventory();
             p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
@@ -130,7 +160,12 @@ public class House {
             return false;
         }
 
-        if(!House.containsBlock(plotRegion, p.getWorld(), Material.BRICK, (byte) 0)){
+        if(playerHouseSettings.get(p.getUniqueId()).getBlocks() == null)
+            playerHouseSettings.get(p.getUniqueId()).setBlocks(analyzeRegion(polyRegion, p.getWorld()));
+
+        Block[][][] blocks = playerHouseSettings.get(p.getUniqueId()).getBlocks();
+
+        if(!House.containsBlock(blocks, Material.BRICK, (byte) 0)){
             p.sendMessage("§cPlease make a selection around an outline.");
             p.closeInventory();
             p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
@@ -139,7 +174,7 @@ public class House {
             return false;
         }
 
-        if(!House.containsBlock(plotRegion, p.getWorld(), Material.WOOL, (byte) 4)){
+        if(!House.containsBlock(blocks, Material.WOOL, (byte) 4)){
             p.sendMessage("§cPlease place a yellow wool block inside the outline.");
             p.closeInventory();
             p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
@@ -159,31 +194,14 @@ public class House {
     }
 
     public static void generate(Player p){
-        HashMap<HouseFlag, String> flags = playerHouseSettings.get(p.getUniqueId()).getValues();
-
         if(!House.checkPlayer(p))
             return;
 
+        Region polyRegion = Generator.getWorldEditSelection(p);
 
-        String wallColor = flags.get(HouseFlag.WALL_COLOR);
-        String roofColor = flags.get(HouseFlag.ROOF_COLOR);
-        String baseColor = flags.get(HouseFlag.BASE_COLOR);
-        String windowColor = flags.get(HouseFlag.WINDOW_COLOR);
-        RoofType roofType = RoofType.byString(flags.get(HouseFlag.ROOF_TYPE));
+        HouseScripts.buildscript_v_1_2(p, playerHouseSettings.get(p.getUniqueId()), polyRegion);
 
-        int floorCount = Integer.parseInt(flags.get(HouseFlag.FLOOR_COUNT));
-        int floorHeight = Integer.parseInt(flags.get(HouseFlag.FLOOR_HEIGHT));
-        int baseHeight = Integer.parseInt(flags.get(HouseFlag.BASE_HEIGHT));
-        int windowHeight = Integer.parseInt(flags.get(HouseFlag.WINDOW_HEIGHT));
-        int windowWidth = Integer.parseInt(flags.get(HouseFlag.WINDOW_WIDTH));
-        int windowDistance = Integer.parseInt(flags.get(HouseFlag.WINDOW_DISTANCE));
-        int maxRoofHeight = Integer.parseInt(flags.get(HouseFlag.MAX_ROOF_HEIGHT));
-
-
-
-
-        HouseScripts.buildscript_v_1_2(p,wallColor,roofColor,baseColor,windowColor,roofType,floorCount,floorHeight,baseHeight,windowHeight,windowWidth,windowDistance,maxRoofHeight);
-
+        HashMap<HouseFlag, String> flags = playerHouseSettings.get(p.getUniqueId()).getValues();
         String command = "/gen house";
         for(HouseFlag houseFlag : flags.keySet())
             command += " -" + houseFlag.getFlag() + " " + flags.get(houseFlag);

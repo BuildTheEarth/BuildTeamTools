@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.Utils;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -18,6 +19,8 @@ public class HouseSettings {
     @Getter
     private HashMap<HouseFlag, String> values;
 
+    private Block[][][] blocks;
+
 
     public HouseSettings(Player player){
         this.player = player;
@@ -28,6 +31,13 @@ public class HouseSettings {
 
     public void setValue(HouseFlag houseFlag, String value){
         values.put(houseFlag, value);
+    }
+
+    public void setBlocks(Block[][][] blocks){
+        this.blocks = blocks;
+    }
+    public Block[][][] getBlocks(){
+        return blocks;
     }
 
     public void setDefaultValues(){
@@ -46,7 +56,9 @@ public class HouseSettings {
        // Roof Color (Default: Random)
         block = (ItemStack) Utils.pickRandom(MenuItems.STAIRS);
 
-        if(values.get(HouseFlag.ROOF_TYPE).equalsIgnoreCase(RoofType.SLABS.getType()))
+        if( values.get(HouseFlag.ROOF_TYPE).equalsIgnoreCase(RoofType.FLATTER_SLABS.getType()) ||
+            values.get(HouseFlag.ROOF_TYPE).equalsIgnoreCase(RoofType.MEDIUM_SLABS.getType()) ||
+            values.get(HouseFlag.ROOF_TYPE).equalsIgnoreCase(RoofType.STEEP_SLABS.getType()))
             block = (ItemStack) Utils.pickRandom(MenuItems.SLABS);
         else if(values.get(HouseFlag.ROOF_TYPE).equalsIgnoreCase(RoofType.FLAT.getType()))
             block = (ItemStack) Utils.pickRandom(MenuItems.SLABS);

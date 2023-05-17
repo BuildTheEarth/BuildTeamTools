@@ -82,7 +82,9 @@ public class RoofColorMenu extends AbstractPaginatedMenu {
             return new ArrayList<>();
 
         switch (roofType){
-            case SLABS:
+            case FLATTER_SLABS:
+            case MEDIUM_SLABS:
+            case STEEP_SLABS:
                 return Arrays.asList(MenuItems.SLABS);
 
             case STAIRS:

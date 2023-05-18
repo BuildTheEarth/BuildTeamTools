@@ -10,11 +10,13 @@ import jdk.nashorn.internal.ir.Block;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.generator.GeneratorType;
 import net.buildtheearth.buildteam.components.generator.History;
+import net.buildtheearth.utils.MenuItems;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -453,11 +455,78 @@ public class HouseScripts {
                     operations++;
                 }
 
+            // (Normal Stair Roof Layer) Replace all air blocks that have a stone brick on one side, 3 air sides and one stone brick below them with stairs
+            p.chat("//gmask =(queryRel(1,0,0,98,-1)&&queryRel(-1,0,0,0,-1)&&queryRel(0,0,1,0,-1)&&queryRel(0,0,-1,0,-1))");
+            p.chat("//replace >98 109:0");
+            operations++;
+            p.chat("//gmask =(queryRel(1,0,0,0,-1)&&queryRel(-1,0,0,98,-1)&&queryRel(0,0,1,0,-1)&&queryRel(0,0,-1,0,-1))");
+            p.chat("//replace >98 109:1");
+            operations++;
+            p.chat("//gmask =(queryRel(1,0,0,0,-1)&&queryRel(-1,0,0,0,-1)&&queryRel(0,0,1,98,-1)&&queryRel(0,0,-1,0,-1))");
+            p.chat("//replace >98 109:2");
+            operations++;
+            p.chat("//gmask =(queryRel(1,0,0,0,-1)&&queryRel(-1,0,0,0,-1)&&queryRel(0,0,1,0,-1)&&queryRel(0,0,-1,98,-1))");
+            p.chat("//replace >98 109:3");
+            operations++;
 
+            // (Corner Stair Roof Layer) Replace all air blocks that have stone bricks on 2 sides, 2 air or stair sides and one stone brick below them with stairs
+            p.chat("//gmask =(queryRel(1,0,0,98,-1)&&queryRel(0,0,1,98,-1)&&(queryRel(-1,0,0,0,-1)||queryRel(-1,0,0,109,-1))&&(queryRel(0,0,-1,0,-1)||queryRel(0,0,-1,109,-1)))");
+            p.chat("//replace >98 109:8");
+            operations++;
+            p.chat("//gmask =(queryRel(1,0,0,98,-1)&&queryRel(0,0,-1,98,-1)&&(queryRel(-1,0,0,0,-1)||queryRel(-1,0,0,109,-1))&&(queryRel(0,0,1,0,-1)||queryRel(0,0,1,109,-1)))");
+            p.chat("//replace >98 109:11");
+            operations++;
+            p.chat("//gmask =(queryRel(-1,0,0,98,-1)&&queryRel(0,0,1,98,-1)&&(queryRel(1,0,0,0,-1)||queryRel(1,0,0,109,-1))&&(queryRel(0,0,-1,0,-1)||queryRel(0,0,-1,109,-1)))");
+            p.chat("//replace >98 109:10");
+            operations++;
+            p.chat("//gmask =(queryRel(-1,0,0,98,-1)&&queryRel(0,0,-1,98,-1)&&(queryRel(1,0,0,0,-1)||queryRel(1,0,0,109,-1))&&(queryRel(0,0,1,0,-1)||queryRel(0,0,1,109,-1)))");
+            p.chat("//replace >98 109:9");
+            operations++;
+
+
+            // (Corner Stair 2 Roof Layer) Replace all air blocks that have stairs on 2 sides, 2 air sides and one stone brick below them with stairs
+            p.chat("//gmask =(queryRel(1,0,0,109,-1)&&queryRel(0,0,1,109,-1)&&queryRel(-1,0,0,0,-1)&&queryRel(0,0,-1,0,-1))");
+            p.chat("//replace >98 109:10");
+            operations++;
+            p.chat("//gmask =(queryRel(1,0,0,109,-1)&&queryRel(0,0,-1,109,-1)&&queryRel(-1,0,0,0,-1)&&queryRel(0,0,1,0,-1))");
+            p.chat("//replace >98 109:11");
+            operations++;
+            p.chat("//gmask =(queryRel(-1,0,0,109,-1)&&queryRel(0,0,1,109,-1)&&queryRel(1,0,0,0,-1)&&queryRel(0,0,-1,0,-1))");
+            p.chat("//replace >98 109:9");
+            operations++;
+            p.chat("//gmask =(queryRel(-1,0,0,109,-1)&&queryRel(0,0,-1,109,-1)&&queryRel(1,0,0,0,-1)&&queryRel(0,0,1,0,-1))");
+            p.chat("//replace >98 109:9");
+            operations++;
+
+            // Disable the gmask
+            p.chat("//gmask");
+
+            String[] colors = roofColor.split(",");
+
+            // Remove :X from colors
+            for(int i = 0; i < colors.length; i++)
+                colors[i] = colors[i].split(":")[0];
+
+            String[] blockColors = new String[colors.length];
+            for(int i = 0; i < colors.length; i++)
+                blockColors[i] = MenuItems.convertStairToBlock(colors[i]);
+
+
+            // Replace stone bricks with the correct color
+            p.chat("//replace 98 " + StringUtils.join(blockColors, ","));
+            operations++;
+
+
+            // Replace all stairs with the correct color
+            for(int i = 0; i < 12; i++) {
+                if(colors.length == 1)
+                    p.chat("//replace 109:" + i + " " + colors[0] + ":" + i);
+                else
+                    p.chat("//replace 109:" + i + " " + StringUtils.join(colors, ":" + i + ","));
+
+                operations++;
+            }
         }
-
-        if(1==1)
-            return;
 
         // ----------- FINAL FINISH ----------
 

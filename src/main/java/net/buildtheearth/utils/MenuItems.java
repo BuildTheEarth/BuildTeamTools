@@ -498,6 +498,56 @@ public class MenuItems {
         return Item.createCustomHeadBase64(b64, headName, lore);
     }
 
+    public static String convertStairToBlock(String stair){
+        stair = stair.split(":")[0];
+
+        switch (stair){
+            //COBBLESTONE_STAIRS
+            case "67": return "4";
+
+            //SANDSTONE_STAIRS
+            case "128": return "24";
+
+            //SMOOTH_STAIRS
+            case "109": return "98";
+
+            //SPRUCE_WOOD_STAIRS
+            case "134": return "5:1";
+
+            //ACACIA_STAIRS
+            case "163": return "5:4";
+
+            //BIRCH_WOOD_STAIRS
+            case "135": return "5:2";
+
+            //BRICK_STAIRS
+            case "108": return "45";
+
+            //DARK_OAK_STAIRS
+            case "164": return "5:5";
+
+            //JUNGLE_WOOD_STAIRS
+            case "136": return "5:3";
+
+            //NETHER_BRICK_STAIRS
+            case "114": return "112";
+
+            //PURPUR_STAIRS
+            case "203": return "201";
+
+            //QUARTZ_STAIRS
+            case "156": return "155";
+
+            //RED_SANDSTONE_STAIRS
+            case "180": return "179";
+
+            //WOOD_STAIRS
+            case "53": return "5";
+        }
+
+        return "67";
+    }
+
 
     public enum SliderColor{
         WHITE, LIGHT_GRAY;

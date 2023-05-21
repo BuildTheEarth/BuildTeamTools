@@ -6,7 +6,6 @@ import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
-import jdk.nashorn.internal.ir.Block;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.generator.GeneratorType;
 import net.buildtheearth.buildteam.components.generator.History;
@@ -14,6 +13,7 @@ import net.buildtheearth.utils.MenuItems;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.awt.*;
@@ -40,8 +40,6 @@ public class HouseScripts {
         int windowDistance = Integer.parseInt(flags.get(HouseFlag.WINDOW_DISTANCE));
         int maxRoofHeight = Integer.parseInt(flags.get(HouseFlag.MAX_ROOF_HEIGHT));
 
-        int highestBlock = House.getMaxHeight(houseSettings.getBlocks(), Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2);
-
         List<BlockVector2D> selectionPoints = new ArrayList<>();
         int minY = region.getMinimumPoint().getBlockY();
         int maxY = region.getMaximumPoint().getBlockY();
@@ -64,6 +62,8 @@ public class HouseScripts {
         }
 
 
+
+
         int operations = 0;
         p.chat("/clearhistory");
 
@@ -80,6 +80,11 @@ public class HouseScripts {
         p.chat("//gmask !#solid");
         p.chat("//replace 0");
         operations++;
+
+        Block[][][] blocks = House.analyzeRegion(region, p.getWorld());
+
+        int highestBlock = House.getMaxHeight(blocks, Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL);
+        boolean containsRedWool = House.containsBlock(blocks, Material.WOOL, (byte) 14);
 
 
         // ----------- PREPARATION 02 ----------
@@ -111,39 +116,68 @@ public class HouseScripts {
 
 
         // ----------- PREPARATION 03 ----------
-        // Bring the yellow wool blocks to the same height
+        // Bring the yellow, green, blue and red wool blocks to the same height
 
-        // Replace all blocks above yellow wool
-        p.chat("//gmask >35:4");
-        for(int i = 0; i < 20; i++){
-            p.chat("//replace 0 35:4");
+        String[] woolColors = {"35:4", "35:11", "35:14", "35:5"};
+
+        for(String wool : woolColors){
+            // Replace all blocks above the wool
+            p.chat("//gmask >" + wool);
+            for(int i = 0; i < 20; i++){
+                p.chat("//replace 0 " + wool);
+                operations++;
+            }
+
+            // Select highest yellow wool block and replace it with sponge
+            p.chat("//gmask <0");
+            p.chat("//replace " + wool + " 19");
+            operations++;
+
+            // Replace yellow wool with brick
+            p.chat("//gmask");
+            p.chat("//replace " + wool + " 45");
+            operations++;
+
+            // Replace all sponges with yellow wool
+            p.chat("//replace 19 " + wool);
             operations++;
         }
 
-        // Select highest yellow wool block and replace it with sponge
-        p.chat("//gmask <0");
-        p.chat("//replace 35:4 19");
-        operations++;
+        // ----------- PREPARATION 05 ----------
+        // Move blue wool one block up and replace block below with brick
 
-        // Replace yellow wool with air
-        p.chat("//gmask");
-        p.chat("//replace 35:4 0");
-        operations++;
+        p.chat("//expand 1 up");
 
-        // Replace all sponges with yellow wool
-        p.chat("//replace 19 35:4");
-        operations++;
+        String[] woolColorsNoYellow = {"35:11", "35:14", "35:5"};
+        for(String wool : woolColorsNoYellow) {
+            p.chat("//gmask =queryRel(1,0,0,45,0)||queryRel(-1,0,0,45,0)||queryRel(0,0,1,45,0)||queryRel(0,0,-1,45,0)||queryRel(1,0,1,45,0)||queryRel(-1,0,1,45,0)||queryRel(1,0,-1,45,0)||queryRel(-1,0,-1,45,0)");
+            p.chat("//replace " + wool + " 19");
+            operations++;
+
+            for(int i = 0; i < 10; i++){
+                p.chat("//gmask =queryRel(1,0,0,19,0)||queryRel(-1,0,0,19,0)||queryRel(0,0,1,19,0)||queryRel(0,0,-1,19,0)||queryRel(1,0,1,19,0)||queryRel(-1,0,1,19,0)||queryRel(1,0,-1,19,0)||queryRel(-1,0,-1,19,0)");
+                p.chat("//replace " + wool + " 19");
+                operations++;
+            }
+
+            p.chat("//gmask");
+            p.chat("//replace >19 " + wool);
+            operations++;
+            p.chat("//replace 19 45");
+            operations++;
+        }
 
 
-        // ----------- PREPARATION 04 ----------
+
+        // ----------- PREPARATION 06 ----------
         // Replace all bricks underground with grass
 
         // Replace all bricks with sponge
         p.chat("//replace 45 19");
         operations++;
 
-        // Replace all sponges with bricks that have air above them
-        p.chat("//gmask <0");
+        // Replace all sponges with bricks that have air or red wool or blue wool or green wool above them
+        p.chat("//gmask =(queryRel(0,1,0,0,0)||queryRel(0,1,0,35,11)||queryRel(0,1,0,35,14)||queryRel(0,1,0,35,5))");
         p.chat("//replace 19 45");
         operations++;
 
@@ -154,6 +188,23 @@ public class HouseScripts {
         p.chat("//replace 19 2");
         operations++;
 
+
+        // ----------- PREPARATION 07 ----------
+        // Expand the blue wool until it reaches the green wool
+
+        // Select all blocks that are next to blue wool
+        p.chat("//gmask =(queryRel(1,0,0,35,11)||queryRel(-1,0,0,35,11)||queryRel(0,0,1,35,11)||queryRel(0,0,-1,35,11)||queryRel(1,0,1,35,11)||queryRel(-1,0,-1,35,11)||queryRel(-1,0,1,35,11)||queryRel(1,0,-1,35,11))&&!(queryRel(1,0,0,35,5)||queryRel(-1,0,0,35,5)||queryRel(0,0,1,35,5)||queryRel(0,0,-1,35,5)||queryRel(1,0,1,35,5)||queryRel(-1,0,-1,35,5)||queryRel(-1,0,1,35,5)||queryRel(1,0,-1,35,5))");
+
+        for(int i = 0; i < 20; i++) {
+            // Replace all blocks above lapis with blue wool
+            p.chat("//replace >45 35:11");
+            operations++;
+        }
+
+        // Place the last blue wool between the green and the blue wool
+        p.chat("//gmask =queryRel(1,0,0,35,11)||queryRel(-1,0,0,35,11)||queryRel(0,0,1,35,11)||queryRel(0,0,-1,35,11)||queryRel(1,0,1,35,11)||queryRel(-1,0,-1,35,11)||queryRel(-1,0,1,35,11)||queryRel(1,0,-1,35,11)");
+        p.chat("//replace >45 35:11");
+        operations++;
 
 
         // ----------- GROUND ----------
@@ -179,7 +230,6 @@ public class HouseScripts {
             p.chat("//replace !45 35:4");
             operations++;
         }
-
 
 
         // Make the outline as thin as possible and fill all inner corners with yellow wool that are too thick
@@ -211,6 +261,7 @@ public class HouseScripts {
         }
 
 
+
         // ----------- BASE ----------
         int currentheight = 0;
 
@@ -218,17 +269,16 @@ public class HouseScripts {
         for(int i = 0; i < baseHeight; i++) {
             currentheight++;
 
+            // Move wool one block up
+            operations = moveWoolUp(p, operations);
+
             // Select everything x blocks above bricks. Then replace that with lapizlazuli
             p.chat("//gmask =queryRel(0," + (-currentheight) + ",0,45,-1)");
             p.chat("//set 22");
             operations++;
 
-            // Disable the global mask
-            p.chat("//gmask");
-
             // Raise the yellow wool layer by one block
-            p.chat("//replace >35:4 35:4");
-            operations++;
+            operations = raiseYellowWoolFloor(p, operations);
         }
 
 
@@ -238,28 +288,39 @@ public class HouseScripts {
         for(int i = 0; i < floorCount; i++) {
             currentheight++;
 
+            // Move wool one block up
+            operations = moveWoolUp(p, operations);
+
             // Select everything x blocks above bricks. Then replace that with lapizlazuli ore
             p.chat("//gmask =queryRel(0," + (-currentheight) + ",0,45,-1)");
             p.chat("//set 21");
             operations++;
 
             // Raise the yellow wool layer by one block
-            p.chat("//gmask");
-            p.chat("//replace >35:4 35:4");
-            operations++;
+            operations = raiseYellowWoolFloor(p, operations);
 
             for(int i2 = 0; i2 < windowHeight; i2++) {
                 currentheight++;
 
+                // Move wool one block up
+                operations = moveWoolUp(p, operations);
+
                 // Select everything x blocks above bricks. Then replace that with white glass
                 p.chat("//gmask =queryRel(0," + (-currentheight) + ",0,45,-1)");
-                p.chat("//set 95:0");
-                operations++;
+
+                if (!containsRedWool) {
+                    p.chat("//set 95:0");
+                    operations++;
+                }else {
+                    p.chat("//replace 35:14 95:7");
+                    operations++;
+                    p.chat("//replace 0 21");
+                    operations++;
+                }
+
 
                 // Raise the yellow wool layer by one block
-                p.chat("//gmask");
-                p.chat("//replace >35:4 35:4");
-                operations++;
+                operations = raiseYellowWoolFloor(p, operations);
             }
 
             heightdifference = floorHeight - (windowHeight + 1);
@@ -268,29 +329,37 @@ public class HouseScripts {
             for(int i2 = 0; i2 < heightdifference; i2++) {
                 currentheight++;
 
+                // Move wool one block up
+                operations = moveWoolUp(p, operations);
+
                 // Select everything x blocks above bricks. Then replace that with lapizlazuli ore
                 p.chat("//gmask =queryRel(0," + (-currentheight) + ",0,45,-1)");
                 p.chat("//set 21");
                 operations++;
 
-                // Disable the global mask, raise the yellow wool layer by one block
-                p.chat("//gmask");
-                p.chat("//replace >35:4 35:4");
-                operations++;
+                // Raise the yellow wool layer by one block
+                operations = raiseYellowWoolFloor(p, operations);
             }
         }
         if(heightdifference == 0){
             currentheight++;
-            // Select everything x blocks above bricks. Then replace that with white glass
+
+            // Move wool one block up
+            operations = moveWoolUp(p, operations);
+
+            // Select everything x blocks above bricks. Then replace that with lapiz ore
             p.chat("//gmask =queryRel(0," + (-currentheight) + ",0,45,-1)");
             p.chat("//set 21");
             operations++;
 
-            // Disable the global mask, raise the yellow wool layer by one block
-            p.chat("//gmask");
-            p.chat("//replace >35:4 35:4");
-            operations++;
+            // Raise the yellow wool layer by one block
+            operations = raiseYellowWoolFloor(p, operations);
         }
+
+        // Remove the red wool
+        p.chat("//gmask");
+        p.chat("//replace 35:14 0");
+        operations++;
 
 
 
@@ -329,6 +398,9 @@ public class HouseScripts {
         // Replace any gray glass with the window color
         p.chat("//replace 95:7 " + windowColor);
         operations++;
+
+
+
 
 
         // ----------- ROOF ----------
@@ -419,6 +491,19 @@ public class HouseScripts {
 
         } else if(roofType == RoofType.STAIRS){
 
+            // Create the roof house wall staircase
+            for(int i = 0; i < maxRoofHeight; i++){
+                // Select all air blocks that are above blue wool and next to green wool
+                p.chat("//gmask =queryRel(1,-1,0,35,5)||queryRel(-1,-1,0,35,5)||queryRel(0,-1,1,35,5)||queryRel(0,-1,-1,35,5)||queryRel(1,-1,1,35,5)||queryRel(-1,-1,-1,35,5)||queryRel(-1,-1,1,35,5)||queryRel(1,-1,-1,35,5)");
+                p.chat("//replace >35:11 35:5");
+                operations++;
+
+                // Select all air blocks that are above blue wool and replace them with blue wool
+                p.chat("//gmask 0");
+                p.chat("//replace >35:11 35:11");
+                operations++;
+            }
+
             // (One more yellow wool layer) Replace everything above yellow wool with one layer yellow wool
             p.chat("//replace >35:4 35:4");
             operations++;
@@ -444,16 +529,109 @@ public class HouseScripts {
 
             if(maxRoofHeight > 0)
                 for(int i = 0; i < maxRoofHeight; i++) {
-                    //Only select air block that have yellow wool below them which are surrounded by other stone bricks
-                    p.chat("//gmask =(queryRel(1,-1,0,98,-1)||queryRel(-1,-1,0,98,-1)||queryRel(0,-1,1,98,-1)||queryRel(0,-1,-1,98,-1))");
-                    p.chat("//replace >35:4 98");
-                    operations++;
+                    // Every 2nd layer
+                    if(i % 2 == 0){
+                        //Only select air block that have yellow wool below them which are surrounded by other stone bricks
+                        p.chat("//gmask =(queryRel(1,-1,0,98,-1)||queryRel(-1,-1,0,98,-1)||queryRel(0,-1,1,98,-1)||queryRel(0,-1,-1,98,-1))");
+                        p.chat("//replace >35:4 98");
+                        operations++;
+                    }else{
+                        // Only select air block that have yellow wool below them which are completely surrounded by other stone bricks
+                        p.chat("//gmask =(queryRel(1,-1,0,98,-1)||queryRel(-1,-1,0,98,-1)||queryRel(0,-1,1,98,-1)||queryRel(0,-1,-1,98,-1)||queryRel(1,-1,1,98,-1)||queryRel(-1,-1,1,98,-1)||queryRel(-1,-1,-1,98,-1)||queryRel(1,-1,-1,98,-1))");
+                        p.chat("//replace >35:4 98");
+                        operations++;
+                    }
 
                     //Only select yellow wool with air blocks above them and put yellow wool above them
                     p.chat("//gmask air");
                     p.chat("//replace >35:4 35:4");
                     operations++;
                 }
+
+            // ROOF OVERHANG
+
+            // Replace everything above green wool with temporary purple wool
+            p.chat("//gmask");
+            p.chat("//replace >35:5 35:10");
+            operations++;
+
+            // Replace air next to purple wool with purple wool
+            p.chat("//gmask =queryRel(1,0,0,35,10)||queryRel(-1,0,0,35,10)||queryRel(0,0,1,35,10)||queryRel(0,0,-1,35,10)");
+            p.chat("//replace 0 35:10");
+            operations++;
+
+            // Replace air next to green wool with green wool
+            p.chat("//gmask =queryRel(1,0,0,35,5)||queryRel(-1,0,0,35,5)||queryRel(0,0,1,35,5)||queryRel(0,0,-1,35,5)");
+            p.chat("//replace 0 35:5");
+            operations++;
+
+            // Replace purple wool with air
+            p.chat("//gmask");
+            p.chat("//replace 35:10 0");
+
+
+            // Replace green wool with stone bricks
+            p.chat("//gmask");
+            p.chat("//replace 35:5 98");
+            operations++;
+
+            // Replace blue wool with lapizlazuli ore
+            p.chat("//replace 35:11 21");
+            operations++;
+
+            // Fill up air blocks surrounded by 3 stone bricks with stone bricks
+            p.chat("//gmask =queryRel(1,0,0,98,0)&&queryRel(-1,0,0,98,0)&&queryRel(0,0,1,98,0)&&queryRel(0,0,-1,0,0)");
+            p.chat("//replace 0 98");
+            operations++;
+            p.chat("//gmask =queryRel(1,0,0,98,0)&&queryRel(-1,0,0,98,0)&&queryRel(0,0,1,0,0)&&queryRel(0,0,-1,98,0)");
+            p.chat("//replace 0 98");
+            operations++;
+            p.chat("//gmask =queryRel(1,0,0,98,0)&&queryRel(-1,0,0,0,0)&&queryRel(0,0,1,98,0)&&queryRel(0,0,-1,98,0)");
+            p.chat("//replace 0 98");
+            operations++;
+            p.chat("//gmask =queryRel(1,0,0,0,0)&&queryRel(-1,0,0,98,0)&&queryRel(0,0,1,98,0)&&queryRel(0,0,-1,98,0)");
+            p.chat("//replace 0 98");
+            operations++;
+
+
+            // ROOF STAIRS
+
+            // Fill the top roof gable that is surrounded by 2 stone bricks and one stone brick on top with stone bricks
+            p.chat("//gmask =queryRel(0,1,0,98,0)&&(queryRel(-1,0,0,98,0)||queryRel(-1,0,1,98,0)||queryRel(-1,0,-1,98,0))&&(queryRel(1,0,0,98,0)||queryRel(1,0,1,98,0)||queryRel(1,0,-1,98,0))");
+            p.chat("//replace 0 98");
+            operations++;
+            p.chat("//gmask =queryRel(0,1,0,98,0)&&(queryRel(0,0,-1,98,0)||queryRel(1,0,-1,98,0)||queryRel(-1,0,-1,98,0))&&(queryRel(0,0,1,98,0)||queryRel(1,0,1,98,0)||queryRel(-1,0,1,98,0))");
+            p.chat("//replace 0 98");
+            operations++;
+
+            // Fill the overhang with upside-down stairs which are surrounded by 1 stone brick and one stone brick above them
+            p.chat("//gmask =queryRel(0,1,0,98,0)&&queryRel(-1,0,0,98,0)");
+            p.chat("//replace 0 109:5");
+            operations++;
+            p.chat("//gmask =queryRel(0,1,0,98,0)&&queryRel(1,0,0,98,0)");
+            p.chat("//replace 0 109:4");
+            operations++;
+            p.chat("//gmask =queryRel(0,1,0,98,0)&&queryRel(0,0,1,98,0)");
+            p.chat("//replace 0 109:6");
+            operations++;
+            p.chat("//gmask =queryRel(0,1,0,98,0)&&queryRel(0,0,-1,98,0)");
+            p.chat("//replace 0 109:7");
+            operations++;
+
+            // Fill the raimaining overhang with upside-down stairs which are surrounded by 1 stone brick and one stone brick above them
+            p.chat("//gmask =queryRel(0,1,0,98,0)&&(queryRel(-1,0,0,98,0)||queryRel(-1,0,1,98,0)||queryRel(-1,0,-1,98,0))");
+            p.chat("//replace 0 109:5");
+            operations++;
+            p.chat("//gmask =queryRel(0,1,0,98,0)&&(queryRel(1,0,0,98,0)||queryRel(1,0,1,98,0)||queryRel(1,0,-1,98,0))");
+            p.chat("//replace 0 109:4");
+            operations++;
+            p.chat("//gmask =queryRel(0,1,0,98,0)&&(queryRel(0,0,1,98,0)||queryRel(1,0,1,98,0)||queryRel(-1,0,1,98,0))");
+            p.chat("//replace 0 109:6");
+            operations++;
+            p.chat("//gmask =queryRel(0,1,0,98,0)&&(queryRel(0,0,-1,98,0)||queryRel(1,0,-1,98,0)||queryRel(-1,0,-1,98,0))");
+            p.chat("//replace 0 109:7");
+            operations++;
+
 
             // (Normal Stair Roof Layer) Replace all air blocks that have a stone brick on one side, 3 air sides and one stone brick below them with stairs
             p.chat("//gmask =(queryRel(1,0,0,98,-1)&&queryRel(-1,0,0,0,-1)&&queryRel(0,0,1,0,-1)&&queryRel(0,0,-1,0,-1))");
@@ -496,6 +674,11 @@ public class HouseScripts {
             operations++;
             p.chat("//gmask =(queryRel(-1,0,0,109,-1)&&queryRel(0,0,-1,109,-1)&&queryRel(1,0,0,0,-1)&&queryRel(0,0,1,0,-1))");
             p.chat("//replace >98 109:9");
+            operations++;
+
+            // Cover leaking yellow wool blocks with stone bricks
+            p.chat("//gmask =queryRel(1,0,0,35,4)||queryRel(-1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4)");
+            p.chat("//replace 0 98");
             operations++;
 
             // Disable the gmask
@@ -566,22 +749,25 @@ public class HouseScripts {
             p.chat("//pos2 " + selectionPoints.get(i).getBlockX() + "," + minY + "," + selectionPoints.get(i).getBlockZ());
 
         Generator.getPlayerHistory(p).addHistoryEntry(new History.HistoryEntry(GeneratorType.HOUSE, operations));
+    }
 
-        /*
-        Bukkit.broadcastMessage("wallColor: " + wallColor);
-        Bukkit.broadcastMessage("roofColor: " + roofColor);
-        Bukkit.broadcastMessage("baseColor: " + baseColor);
-        Bukkit.broadcastMessage("windowColor: " + windowColor);
-        Bukkit.broadcastMessage("roofType: " + roofType);
-        Bukkit.broadcastMessage("floorCount: " + floorCount);
-        Bukkit.broadcastMessage("floorHeight: " + floorHeight);
-        Bukkit.broadcastMessage("baseHeight: " + baseHeight);
-        Bukkit.broadcastMessage("windowHeight: " + windowHeight);
-        Bukkit.broadcastMessage("windowWidth: " + windowWidth);
-        Bukkit.broadcastMessage("windowDistance: " + windowDistance);
-        Bukkit.broadcastMessage("maxRoofHeight: " + maxRoofHeight);
-        Bukkit.broadcastMessage(rm1);
-        Bukkit.broadcastMessage(rm2);
-        Bukkit.broadcastMessage(rm3);*/
+    // Move blue, green and red wool one block up
+    public static int moveWoolUp(Player p, int operations){
+        p.chat("//gmask");
+        p.chat("//replace >35:11 35:11");
+        operations++;
+        p.chat("//replace >35:14 35:14");
+        operations++;
+        p.chat("//replace >35:5 35:5");
+        operations++;
+
+        return operations;
+    }
+
+    public static int raiseYellowWoolFloor(Player p, int operations){
+        p.chat("//gmask");
+        p.chat("//replace >35:4 35:4");
+        operations++;
+        return operations;
     }
 }

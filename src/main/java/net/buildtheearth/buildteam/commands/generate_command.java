@@ -1,5 +1,6 @@
 package net.buildtheearth.buildteam.commands;
 
+import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.BuildTeamTools;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.generator.GeneratorMenu;
@@ -46,19 +47,19 @@ public class generate_command implements CommandExecutor {
 
         // Command Usage: /gen house ...
         if(args[0].equals("house")){
-            House.analyzeCommand(p, args);
+            Main.buildTeamTools.getGenerator().getHouse().analyzeCommand(p, args);
             return true;
         }
 
         // Command Usage: /gen road ...
         if(args[0].equals("road")){
-            Road.analyzeCommand(p, args);
+            Main.buildTeamTools.getGenerator().getRoad().analyzeCommand(p, args);
             return true;
         }
 
         // Command Usage: /gen rail ...
         if(args[0].equals("rail")) {
-            Rail.analyzeCommand(p, args);
+            Main.getBuildTeam().getGenerator().getRail().analyzeCommand(p, args);
             return true;
         }
 

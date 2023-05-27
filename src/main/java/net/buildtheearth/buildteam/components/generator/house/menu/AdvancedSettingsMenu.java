@@ -1,15 +1,16 @@
 package net.buildtheearth.buildteam.components.generator.house.menu;
 
+import net.buildtheearth.Main;
+import net.buildtheearth.buildteam.components.generator.Settings;
 import net.buildtheearth.buildteam.components.generator.house.House;
 import net.buildtheearth.buildteam.components.generator.house.HouseFlag;
+import net.buildtheearth.buildteam.components.generator.house.HouseSettings;
 import net.buildtheearth.utils.AbstractMenu;
 import net.buildtheearth.utils.Item;
-import net.buildtheearth.utils.Liste;
 import net.buildtheearth.utils.MenuItems;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
 
@@ -36,14 +37,15 @@ public class AdvancedSettingsMenu extends AbstractMenu {
 
     @Override
     protected void setPreviewItems() {
+        House house = Main.getBuildTeam().getGenerator().getHouse();
         UUID uuid = getMenuPlayer().getUniqueId();
 
-        this.floorCount = Integer.parseInt(House.playerHouseSettings.get(uuid).getValues().get(HouseFlag.FLOOR_COUNT));
-        this.floorHeight = Integer.parseInt(House.playerHouseSettings.get(uuid).getValues().get(HouseFlag.FLOOR_HEIGHT));
-        this.baseHeight = Integer.parseInt(House.playerHouseSettings.get(uuid).getValues().get(HouseFlag.BASE_HEIGHT));
-        this.windowWidth = Integer.parseInt(House.playerHouseSettings.get(uuid).getValues().get(HouseFlag.WINDOW_WIDTH));
-        this.windowHeight = Integer.parseInt(House.playerHouseSettings.get(uuid).getValues().get(HouseFlag.WINDOW_HEIGHT));
-        this.windowDistance = Integer.parseInt(House.playerHouseSettings.get(uuid).getValues().get(HouseFlag.WINDOW_DISTANCE));
+        this.floorCount = Integer.parseInt(house.getPlayerSettings().get(uuid).getValues().get(HouseFlag.FLOOR_COUNT));
+        this.floorHeight = Integer.parseInt(house.getPlayerSettings().get(uuid).getValues().get(HouseFlag.FLOOR_HEIGHT));
+        this.baseHeight = Integer.parseInt(house.getPlayerSettings().get(uuid).getValues().get(HouseFlag.BASE_HEIGHT));
+        this.windowWidth = Integer.parseInt(house.getPlayerSettings().get(uuid).getValues().get(HouseFlag.WINDOW_WIDTH));
+        this.windowHeight = Integer.parseInt(house.getPlayerSettings().get(uuid).getValues().get(HouseFlag.WINDOW_HEIGHT));
+        this.windowDistance = Integer.parseInt(house.getPlayerSettings().get(uuid).getValues().get(HouseFlag.WINDOW_DISTANCE));
 
         setSliderItems(MenuItems.SliderColor.WHITE, FLOOR_COUNT_SLOT, "Number of Floors", floorCount, 1, 10, "Floors");
         setSliderItems(MenuItems.SliderColor.LIGHT_GRAY, FLOOR_HEIGHT_SLOT, "Floors Height", floorHeight, 1, 10, "Blocks");
@@ -76,7 +78,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
 
-            House.generate(clickPlayer);
+            Main.getBuildTeam().getGenerator().getHouse().generate(clickPlayer);
         });
     }
 
@@ -93,12 +95,20 @@ public class AdvancedSettingsMenu extends AbstractMenu {
     }
 
     protected void setSliderClickEvents(HouseFlag houseFlag, int slot, int minValue, int maxValue){
+        House house = Main.getBuildTeam().getGenerator().getHouse();
+
         // Set click event for previous page item
         getMenu().getSlot(slot - 1).setClickHandler((clickPlayer, clickInformation) -> {
-            int value = Integer.parseInt(House.playerHouseSettings.get(clickPlayer.getUniqueId()).getValues().get(houseFlag));
+            int value = Integer.parseInt(house.getPlayerSettings().get(clickPlayer.getUniqueId()).getValues().get(houseFlag));
 
             if (value > minValue) {
-                House.playerHouseSettings.get(clickPlayer.getUniqueId()).setValue(houseFlag, "" + (value - 1));
+                Settings settings = house.getPlayerSettings().get(clickPlayer.getUniqueId());
+
+                if(!(settings instanceof HouseSettings))
+                    return;
+
+                HouseSettings houseSettings = (HouseSettings) settings;
+                houseSettings.setValue(houseFlag, "" + (value - 1));
 
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
                 reloadMenuAsync();
@@ -109,10 +119,16 @@ public class AdvancedSettingsMenu extends AbstractMenu {
 
         // Set click event for next page item
         getMenu().getSlot(slot + 1).setClickHandler((clickPlayer, clickInformation) -> {
-            int value = Integer.parseInt(House.playerHouseSettings.get(clickPlayer.getUniqueId()).getValues().get(houseFlag));
+            int value = Integer.parseInt(house.getPlayerSettings().get(clickPlayer.getUniqueId()).getValues().get(houseFlag));
 
             if (value < maxValue) {
-                House.playerHouseSettings.get(clickPlayer.getUniqueId()).setValue(houseFlag, "" + (value + 1));
+                Settings settings = house.getPlayerSettings().get(clickPlayer.getUniqueId());
+
+                if(!(settings instanceof HouseSettings))
+                    return;
+
+                HouseSettings houseSettings = (HouseSettings) settings;
+                houseSettings.setValue(houseFlag, "" + (value + 1));
 
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
                 reloadMenuAsync();

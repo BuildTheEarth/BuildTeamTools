@@ -1,9 +1,11 @@
 package net.buildtheearth.buildteam.components.generator.house.menu;
 
+import net.buildtheearth.Main;
+import net.buildtheearth.buildteam.components.generator.Settings;
 import net.buildtheearth.buildteam.components.generator.house.House;
 import net.buildtheearth.buildteam.components.generator.house.HouseFlag;
+import net.buildtheearth.buildteam.components.generator.house.HouseSettings;
 import net.buildtheearth.buildteam.components.generator.house.RoofType;
-import net.buildtheearth.buildteam.components.generator.house.menu.RoofColorMenu;
 import net.buildtheearth.utils.AbstractMenu;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.Liste;
@@ -55,7 +57,13 @@ public class RoofTypeMenu extends AbstractMenu {
         boolean clicked = false;
         // Set click events items
         getMenu().getSlot(FLAT_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            House.playerHouseSettings.get(clickPlayer.getUniqueId()).setValue(HouseFlag.ROOF_TYPE, RoofType.FLAT.getType());
+            Settings settings = Main.buildTeamTools.getGenerator().getHouse().getPlayerSettings().get(clickPlayer.getUniqueId());
+
+            if(!(settings instanceof HouseSettings))
+                return;
+
+            HouseSettings houseSettings = (HouseSettings) settings;
+            houseSettings.setValue(HouseFlag.ROOF_TYPE, RoofType.FLAT.getType());
 
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
@@ -63,7 +71,13 @@ public class RoofTypeMenu extends AbstractMenu {
         }));
 
         getMenu().getSlot(GABLE_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            House.playerHouseSettings.get(clickPlayer.getUniqueId()).setValue(HouseFlag.ROOF_TYPE, RoofType.STAIRS.getType());
+            Settings settings = Main.buildTeamTools.getGenerator().getHouse().getPlayerSettings().get(clickPlayer.getUniqueId());
+
+            if(!(settings instanceof HouseSettings))
+                return;
+
+            HouseSettings houseSettings = (HouseSettings) settings;
+            houseSettings.setValue(HouseFlag.ROOF_TYPE, RoofType.STAIRS.getType());
 
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
@@ -71,7 +85,13 @@ public class RoofTypeMenu extends AbstractMenu {
         }));
 
         getMenu().getSlot(STEEP_SLAB_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            House.playerHouseSettings.get(clickPlayer.getUniqueId()).setValue(HouseFlag.ROOF_TYPE, RoofType.STEEP_SLABS.getType());
+            Settings settings = Main.buildTeamTools.getGenerator().getHouse().getPlayerSettings().get(clickPlayer.getUniqueId());
+
+            if(!(settings instanceof HouseSettings))
+                return;
+
+            HouseSettings houseSettings = (HouseSettings) settings;
+            houseSettings.setValue(HouseFlag.ROOF_TYPE, RoofType.STEEP_SLABS.getType());
 
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
@@ -79,7 +99,13 @@ public class RoofTypeMenu extends AbstractMenu {
         }));
 
         getMenu().getSlot(MEDIUM_SLAB_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            House.playerHouseSettings.get(clickPlayer.getUniqueId()).setValue(HouseFlag.ROOF_TYPE, RoofType.MEDIUM_SLABS.getType());
+            Settings settings = Main.buildTeamTools.getGenerator().getHouse().getPlayerSettings().get(clickPlayer.getUniqueId());
+
+            if(!(settings instanceof HouseSettings))
+                return;
+
+            HouseSettings houseSettings = (HouseSettings) settings;
+            houseSettings.setValue(HouseFlag.ROOF_TYPE, RoofType.MEDIUM_SLABS.getType());
 
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
@@ -87,7 +113,13 @@ public class RoofTypeMenu extends AbstractMenu {
         }));
 
         getMenu().getSlot(FLATTER_SLAB_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            House.playerHouseSettings.get(clickPlayer.getUniqueId()).setValue(HouseFlag.ROOF_TYPE, RoofType.FLATTER_SLABS.getType());
+            Settings settings = Main.buildTeamTools.getGenerator().getHouse().getPlayerSettings().get(clickPlayer.getUniqueId());
+
+            if(!(settings instanceof HouseSettings))
+                return;
+
+            HouseSettings houseSettings = (HouseSettings) settings;
+            houseSettings.setValue(HouseFlag.ROOF_TYPE, RoofType.FLATTER_SLABS.getType());
 
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);

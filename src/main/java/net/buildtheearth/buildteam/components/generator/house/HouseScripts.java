@@ -23,8 +23,8 @@ import java.util.List;
 
 public class HouseScripts {
 
-    public static void buildscript_v_1_2(Player p, HouseSettings houseSettings, Region region){
-        HashMap<HouseFlag, String> flags = houseSettings.getValues();
+    public static void buildscript_v_1_2(Player p, House house, Region region){
+        HashMap<Object, String> flags = house.getPlayerSettings().get(p.getUniqueId()).getValues();
 
         String wallColor = flags.get(HouseFlag.WALL_COLOR);
         String roofColor = flags.get(HouseFlag.ROOF_COLOR);
@@ -81,10 +81,10 @@ public class HouseScripts {
         p.chat("//replace 0");
         operations++;
 
-        Block[][][] blocks = House.analyzeRegion(region, p.getWorld());
+        Block[][][] blocks = Generator.analyzeRegion(p, p.getWorld());
 
-        int highestBlock = House.getMaxHeight(blocks, Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL);
-        boolean containsRedWool = House.containsBlock(blocks, Material.WOOL, (byte) 14);
+        int highestBlock = Generator.getMaxHeight(blocks, Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL);
+        boolean containsRedWool = Generator.containsBlock(blocks, Material.WOOL, (byte) 14);
 
 
         // ----------- PREPARATION 02 ----------

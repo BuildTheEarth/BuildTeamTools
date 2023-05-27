@@ -5,6 +5,7 @@ import com.sk89q.worldedit.WorldEdit;
 import net.buildtheearth.buildteam.commands.buildteamtools_command;
 import net.buildtheearth.buildteam.commands.generate_command;
 import net.buildtheearth.buildteam.components.BTENetwork;
+import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.stats.StatsPlayerType;
 import net.buildtheearth.buildteam.components.stats.StatsServerType;
 import net.buildtheearth.buildteam.listeners.CancelledEvents;
@@ -33,6 +34,7 @@ public class BuildTeamTools {
 
 	private long time;
 	private BTENetwork bteNetwork;
+	private Generator generator;
 
 	public BuildTeamTools() {}
 	
@@ -48,6 +50,8 @@ public class BuildTeamTools {
 		Main.instance.getServer().getMessenger().registerIncomingPluginChannel(Main.instance, "BuildTeam", Main.instance);
 
 		bteNetwork = new BTENetwork();
+		generator = new Generator();
+
 		LocalSession.MAX_HISTORY_SIZE = 500;
 	}
 
@@ -176,6 +180,10 @@ public class BuildTeamTools {
 
 	public BTENetwork getBTENetwork() {
 		return bteNetwork;
+	}
+
+	public Generator getGenerator() {
+		return generator;
 	}
 
 	public boolean isDebug() {

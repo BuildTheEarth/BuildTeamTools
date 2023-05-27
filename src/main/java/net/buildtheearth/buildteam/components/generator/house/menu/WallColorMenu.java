@@ -1,8 +1,10 @@
 package net.buildtheearth.buildteam.components.generator.house.menu;
 
+import net.buildtheearth.Main;
+import net.buildtheearth.buildteam.components.generator.Settings;
 import net.buildtheearth.buildteam.components.generator.house.House;
 import net.buildtheearth.buildteam.components.generator.house.HouseFlag;
-import net.buildtheearth.buildteam.components.generator.house.menu.RoofTypeMenu;
+import net.buildtheearth.buildteam.components.generator.house.HouseSettings;
 import net.buildtheearth.utils.*;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -54,7 +56,13 @@ public class WallColorMenu extends AbstractPaginatedMenu {
         // Set click event for next item
         if(canProceed())
             getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
-                House.playerHouseSettings.get(clickPlayer.getUniqueId()).setValue(HouseFlag.WALL_COLOR, Item.createStringFromItemList(selectedMaterials));
+                Settings settings = Main.buildTeamTools.getGenerator().getHouse().getPlayerSettings().get(clickPlayer.getUniqueId());
+
+                if(!(settings instanceof HouseSettings))
+                    return;
+
+                HouseSettings houseSettings = (HouseSettings) settings;
+                houseSettings.setValue(HouseFlag.WALL_COLOR, Item.createStringFromItemList(selectedMaterials));
 
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);

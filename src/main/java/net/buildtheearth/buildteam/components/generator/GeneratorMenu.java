@@ -1,6 +1,6 @@
 package net.buildtheearth.buildteam.components.generator;
 
-import com.sk89q.worldedit.regions.Region;
+import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.components.generator.house.House;
 import net.buildtheearth.buildteam.components.generator.house.HouseSettings;
 import net.buildtheearth.buildteam.components.generator.house.RoofType;
@@ -147,9 +147,10 @@ public class GeneratorMenu extends AbstractMenu {
     protected void setItemClickEventsAsync() {
         // Set click event for house item
         getMenu().getSlot(HOUSE_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            House.playerHouseSettings.put(clickPlayer.getUniqueId(), new HouseSettings(clickPlayer));
+            House house = Main.buildTeamTools.getGenerator().getHouse();
+            house.getPlayerSettings().put(clickPlayer.getUniqueId(), new HouseSettings(clickPlayer));
 
-            if(!House.checkPlayer(clickPlayer))
+            if(!house.checkPlayer(clickPlayer))
                 return;
 
             clickPlayer.closeInventory();

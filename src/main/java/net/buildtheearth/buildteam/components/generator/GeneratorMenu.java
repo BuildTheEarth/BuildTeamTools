@@ -20,7 +20,15 @@ public class GeneratorMenu extends AbstractMenu {
 
     public static String GENERATOR_INV_NAME = "What do you want to generate?";
 
-    public static int HOUSE_ITEM_SLOT = 13;
+    public static int HOUSE_ITEM_SLOT = 9;
+
+    public static int ROAD_ITEM_SLOT = 11;
+
+    public static int RAILWAY_ITEM_SLOT = 13;
+
+    public static int TREE_ITEM_SLOT = 15;
+
+    public static int FIELD_SLOT = 17;
 
 
 
@@ -31,11 +39,11 @@ public class GeneratorMenu extends AbstractMenu {
     @Override
     protected void setPreviewItems() {
 
+        // HOUSE ITEM
         ArrayList<String> houseLore = Liste.createList("",
                 "§eDescription:",
-                "Create building shells",
-                "automatically with this",
-                "generator",
+                "Generate basic building shells",
+                "with multiple floors, windows and roofs",
                 "",
                 "§eFeatures:",
                 "- " + RoofType.values().length + " Roof Types",
@@ -49,6 +57,85 @@ public class GeneratorMenu extends AbstractMenu {
 
         // Set navigator item
         getMenu().getSlot(HOUSE_ITEM_SLOT).setItem(houseItem);
+
+
+        // ROAD ITEM
+        ArrayList<String> roadLore = Liste.createList("",
+                "§eDescription:",
+                "Generate roads and highways",
+                "with multiple lanes and sidewalks",
+                "",
+                "§eFeatures:",
+                "- Custom Road Width and Color",
+                "- Custom Sidewalk Width and Color",
+                "- Custom Lane Count",
+                "",
+                "§8Leftclick to generate",
+                "§8Rightclick for Tutorial");
+
+
+        ItemStack roadItem =  Item.create(Material.STEP, "§bGenerate Road", (short) 0, roadLore);
+
+        // Set navigator item
+        getMenu().getSlot(ROAD_ITEM_SLOT).setItem(roadItem);
+
+
+        // RAILWAY ITEM
+        ArrayList<String> railwayLore = Liste.createList("",
+                "§eDescription:",
+                "Generate railways with multiple tracks",
+                "and many different designs",
+                "",
+                "§eFeatures:",
+                "- Custom Railway Width and Color (TODO)",
+                "- Custom Track Count (TODO)",
+                "",
+                "§8Leftclick to generate",
+                "§8Rightclick for Tutorial");
+
+        ItemStack railwayItem = Item.create(Material.RAILS, "§9Generate Railway", railwayLore);
+
+        // Set navigator item
+        getMenu().getSlot(RAILWAY_ITEM_SLOT).setItem(railwayItem);
+
+
+        // TREE ITEM
+        ArrayList<String> treeLore = Liste.createList("",
+                "§eDescription:",
+                "Generate trees from a set of",
+                "hundreds of different types",
+                "",
+                "§eFeatures:",
+                "- Custom Tree Type",
+                "",
+                "§8Leftclick to generate",
+                "§8Rightclick for Tutorial");
+
+        ItemStack treeItem = Item.create(Material.SAPLING, "§aGenerate Tree", treeLore);
+
+        // Set navigator item
+        getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
+
+
+        // FIELD ITEM
+        ArrayList<String> fieldLore = Liste.createList("",
+                "§eDescription:",
+                "Generate fields with different",
+                "crops and plants",
+                "",
+                "§eFeatures:",
+                "- Custom Crop Type",
+                "- Custom Crop Size",
+                "",
+                "§8Leftclick to generate",
+                "§8Rightclick for Tutorial");
+
+        ItemStack fieldItem = Item.create(Material.WHEAT, "§6Generate Field §c(TODO)", fieldLore);
+
+        // Set navigator item
+        getMenu().getSlot(FIELD_SLOT).setItem(fieldItem);
+
+
 
         super.setPreviewItems();
     }
@@ -76,7 +163,7 @@ public class GeneratorMenu extends AbstractMenu {
         return BinaryMask.builder(getMenu())
                 .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short)15, null))
                 .pattern("111111111")
-                .pattern("111101111")
+                .pattern("010101010")
                 .pattern("111111111")
                 .build();
     }

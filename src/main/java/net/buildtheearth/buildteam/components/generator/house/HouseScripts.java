@@ -309,13 +309,20 @@ public class HouseScripts {
                 p.chat("//gmask =queryRel(0," + (-currentheight) + ",0,45,-1)");
 
                 if (!containsRedWool) {
+                    // Replace everything with white glass
                     p.chat("//set 95:0");
                     operations++;
                 }else {
+                    // Replace red wool with gray glass
                     p.chat("//replace 35:14 95:7");
                     operations++;
+
+                    // Replace air with lapizlazuli ore
                     p.chat("//replace 0 21");
                     operations++;
+
+                    // Replace blue and green wool with lapizlazuli ore
+                    p.chat("//replace 35:11,35:5 21");
                 }
 
 

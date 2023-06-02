@@ -3,6 +3,7 @@ package net.buildtheearth.buildteam.components.generator;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.Region;
 import lombok.Getter;
 import net.buildtheearth.buildteam.BuildTeamTools;
@@ -126,6 +127,24 @@ public class Generator {
     }
 
     /**
+     * Checks the max height of a polygon region given a certain x and z coordinate
+     * @param blocks List of blocks in polygon region
+     * @return Maximum height of polygon region
+     */
+    public static int getMaxHeight(Block[][][] blocks, int x, int z, Material... ignoreMaterials){
+        int maxHeight = 0;
+        List<Material> ignoreMaterialsList = Arrays.asList(ignoreMaterials);
+
+        for (Block[][] block2D : blocks)
+            for (Block[] block1D : block2D)
+                for (Block block : block1D)
+                    if (block != null && block.getX() == x && block.getZ() == z && block.getY() > maxHeight &&! ignoreMaterialsList.contains(block.getType()) && block.getType().isSolid())
+                        maxHeight = block.getY();
+
+        return maxHeight;
+    }
+
+    /**
      * Checks if polygon region contains a block of a certain type
      * @param blocks List of blocks in polygon region
      * @param material Material to check for (e.g. Material.WALL_SIGN)
@@ -161,6 +180,21 @@ public class Generator {
 
         if(polyRegion == null){
             p.sendMessage("§cPlease make a WorldEdit Selection first.");
+            p.closeInventory();
+            p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+            sendMoreInfo(p);
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean checkForConvexSelection(Player p){
+        // Get WorldEdit selection of player
+        Region polyRegion = Generator.getWorldEditSelection(p);
+
+        if(!(polyRegion instanceof ConvexPolyhedralRegion)){
+            p.sendMessage("§cPlease make a WorldEdit Convex Selection first (//sel convex).");
             p.closeInventory();
             p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
             sendMoreInfo(p);

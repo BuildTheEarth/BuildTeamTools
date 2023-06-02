@@ -1,5 +1,6 @@
 package net.buildtheearth.buildteam.components.generator.road;
 
+import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.BuildTeamTools;
@@ -86,6 +87,9 @@ public class Road extends GeneratorModule {
         if(!Generator.checkForWorldEditSelection(p))
             return false;
 
+        if(!Generator.checkForConvexSelection(p))
+            return false;
+
         if(getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
             getPlayerSettings().get(p.getUniqueId()).setBlocks(Generator.analyzeRegion(p, p.getWorld()));
 
@@ -97,23 +101,18 @@ public class Road extends GeneratorModule {
         if(!Main.getBuildTeam().getGenerator().getRoad().checkPlayer(p))
             return;
 
+        Region region = Generator.getWorldEditSelection(p);
+
+        if(region == null || !(region instanceof ConvexPolyhedralRegion))
+            return;
+
+        ConvexPolyhedralRegion convexRegion = (ConvexPolyhedralRegion) region;
+
+
+        RoadScripts.roadscript_v_2_0(p, this, convexRegion);
+
+
         HashMap<Object, String> flags = getPlayerSettings().get(p.getUniqueId()).getValues();
-
-        String roadMaterial = flags.get(RoadFlag.ROAD_MATERIAL);
-        String markingMaterial = flags.get(RoadFlag.MARKING_MATERIAL);
-        String sidewalkMaterial = flags.get(RoadFlag.SIDEWALK_MATERIAL);
-
-        int laneCount = Integer.parseInt(flags.get(RoadFlag.LANE_COUNT));
-        int laneWidth = Integer.parseInt(flags.get(RoadFlag.LANE_WIDTH));
-        int laneGap = Integer.parseInt(flags.get(RoadFlag.LANE_GAP));
-        int markingLength = Integer.parseInt(flags.get(RoadFlag.MARKING_LENGTH));
-        int markingGap = Integer.parseInt(flags.get(RoadFlag.MARKING_GAP));
-        int sidewalkWidth = Integer.parseInt(flags.get(RoadFlag.SIDEWALK_WIDTH));
-
-
-        RoadScripts.roadscript_v_1_3(p, roadMaterial, markingMaterial, sidewalkMaterial, laneCount, laneWidth, laneGap,markingLength, markingGap, sidewalkWidth);
-
-
         String command = "/gen road";
         for(Object object : flags.keySet()) {
             if (!(object instanceof RoadFlag))

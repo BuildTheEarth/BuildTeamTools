@@ -61,8 +61,12 @@
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
 
-
-
+        <!-- BuildTheEarth -->
+        <repository>
+            <id>reposilite-repository-releases</id>
+            <name>BuildTheEarth</name>
+            <url>https://maven.buildtheearth.net/releases</url>
+        </repository>
 
         <!-- Spigot & Bukkit -->
         <repository>
@@ -133,12 +137,23 @@
             <scope>compile</scope>
         </dependency>
 
+        <!-- Clipper2 -->
+        <dependency>
+            <groupId>micycle</groupId>
+            <artifactId>clipper2</artifactId>
+            <version>1.2.2</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>RELEASE</version>
             <scope>compile</scope>
         </dependency>
+
+        <!-- JSON -->
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>

@@ -29,6 +29,9 @@ public class Generator {
     private static HashMap<UUID, History> playerHistory = new HashMap<>();
 
     @Getter
+    private List<Command> commands = new ArrayList<>();
+
+    @Getter
     private House house;
     @Getter
     private Road road;
@@ -39,6 +42,18 @@ public class Generator {
         house = new House();
         road = new Road();
         rail = new Rail();
+    }
+
+    public void tick(){
+        if(commands.size() == 0)
+            return;
+
+        if(commands.get(0).getCommands().size() == 0){
+            commands.remove(0);
+            return;
+        }
+
+        commands.get(0).tick();
     }
 
 
@@ -120,7 +135,7 @@ public class Generator {
         for (Block[][] block2D : blocks)
             for (Block[] block1D : block2D)
                 for (Block block : block1D)
-                    if (block != null &&! ignoreMaterialsList.contains(block.getType()) && block.getType().isSolid() && block.getY() > maxHeight)
+                    if (block != null &&! ignoreMaterialsList.contains(block.getType()) && block.getType().isSolid() &&! block.isLiquid() && block.getY() > maxHeight)
                         maxHeight = block.getY();
 
         return maxHeight;
@@ -138,7 +153,7 @@ public class Generator {
         for (Block[][] block2D : blocks)
             for (Block[] block1D : block2D)
                 for (Block block : block1D)
-                    if (block != null && block.getX() == x && block.getZ() == z && block.getY() > maxHeight &&! ignoreMaterialsList.contains(block.getType()) && block.getType().isSolid())
+                    if (block != null && block.getX() == x && block.getZ() == z && block.getY() > maxHeight &&! ignoreMaterialsList.contains(block.getType()) && block.getType().isSolid() &&! block.isLiquid())
                         maxHeight = block.getY();
 
         return maxHeight;

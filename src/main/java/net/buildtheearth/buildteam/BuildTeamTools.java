@@ -110,6 +110,8 @@ public class BuildTeamTools {
 				// Jede viertel Sekunde
 				if(time%5 == 0){
 				}
+
+				generator.tick();
 			}
 		},0,0);
 	}

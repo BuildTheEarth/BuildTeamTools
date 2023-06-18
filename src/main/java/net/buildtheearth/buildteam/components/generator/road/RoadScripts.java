@@ -152,6 +152,7 @@ public class RoadScripts {
             for(List<Vector> path : sidewalkPointsMid)
                 operations += createPolyLine(commands, path, "35:1", true, regionBlocks);
 
+            commands.add("//gmask !" + roadMaterial + "," + markingMaterial);
             // Create the outer sidewalk edge lines
             for(List<Vector> path : sidewalkPointsOut)
                 operations += createPolyLine(commands, path, "35:3", true, regionBlocks);
@@ -213,7 +214,7 @@ public class RoadScripts {
         createPolySelection(commands, polyRegionPoints);
         commands.add("//expand 10 up");
         commands.add("//expand 10 down");
-        commands.add("//gmask !air");
+        commands.add("//gmask !air,35:3,35:11");
 
         // Bring all lines to the top
         for(int i = 0; i < road_height + 5; i++) {
@@ -221,9 +222,15 @@ public class RoadScripts {
             operations++;
             commands.add("//replace >35:2 35:2");
             operations++;
-            commands.add("//replace >35:3 35:3");
-            operations++;
             commands.add("//replace >35:4 35:4");
+            operations++;
+        }
+
+        commands.add("//gmask !air");
+
+        // Bring the light blue and blue wool to the top at last to prevent the others from creating leaks
+        for(int i = 0; i < road_height + 5; i++) {
+            commands.add("//replace >35:3 35:3");
             operations++;
             commands.add("//replace >35:11 35:11");
             operations++;

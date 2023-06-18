@@ -25,12 +25,18 @@ public class Command {
     @Getter
     private int operations;
 
+    private int totalCommands;
+
+    @Getter
+    private long percentage;
+
     public Command(Player player, GeneratorModule module, List<String> commands, int operations, Block[][][] blocks){
         this.player = player;
         this.module = module;
         this.commands = commands;
         this.operations = operations;
         this.blocks = blocks;
+        this.totalCommands = commands.size();
     }
 
     public void tick(){
@@ -41,6 +47,9 @@ public class Command {
             return;
 
         player.getInventory().setItem(INVENTORY_SLOT, Item.create(Material.BARRIER, "§c§lGenerator processing commands..."));
+
+        percentage = (int) Math.round((double) (totalCommands - commands.size()) / (double) totalCommands * 100);
+        player.sendActionBar("§a§lGenerator Progress: §e" + percentage + "%");
 
         for(int i = 0; i < MAX_COMMANDS_PER_SERVER_TICK;){
             if(commands.size() == 0){

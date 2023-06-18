@@ -53,6 +53,22 @@ public class Generator {
             return;
         }
 
+        for(int i = 1; i < commands.size(); i++) {
+            boolean isInQueue = false;
+
+            for(int j = i-1; j > 0; j--)
+                if(commands.get(i).getPlayer().getUniqueId().equals(commands.get(j).getPlayer().getUniqueId()))
+                    isInQueue = true;
+
+            if(commands.get(0).getPlayer().getUniqueId().equals(commands.get(i).getPlayer().getUniqueId()))
+               isInQueue = true;
+
+            if(isInQueue)
+                continue;
+
+            commands.get(i).getPlayer().sendActionBar("§c§lOther Generation in Progress. Position: §e" + i + "/" + commands.size() + " (" + commands.get(0).getPercentage() + "%)");
+        }
+
         commands.get(0).tick();
     }
 

@@ -13,6 +13,9 @@ import java.util.HashMap;
 
 public class RoadSettings extends Settings {
 
+    public static String DISABLED = "OFF";
+    public static String ENABLED = "ON";
+
     public RoadSettings(Player player){
         super(player);
     }
@@ -24,7 +27,7 @@ public class RoadSettings extends Settings {
     public void setDefaultValues(){
 
         // Lane Count (Default: Fixed Value)
-        getValues().put(RoadFlag.LANE_COUNT, "1");
+        getValues().put(RoadFlag.LANE_COUNT, "2");
 
         // Lane Width (Default: Fixed Value)
         getValues().put(RoadFlag.LANE_WIDTH, "4");
@@ -42,12 +45,21 @@ public class RoadSettings extends Settings {
         getValues().put(RoadFlag.MARKING_GAP, "5");
 
         // Marking Material (Default: Fixed Value)
-        getValues().put(RoadFlag.MARKING_MATERIAL, "251");
+        getValues().put(RoadFlag.MARKING_MATERIAL, "251:0");
 
         // Sidewalk Width (Default: Fixed Value)
         getValues().put(RoadFlag.SIDEWALK_WIDTH, "1");
 
         // Sidewalk Material (Default: Fixed Value)
         getValues().put(RoadFlag.SIDEWALK_MATERIAL, "43");
+
+        // Sidewalk Slab Material (Default: Fixed Value)
+        getValues().put(RoadFlag.SIDEWALK_SLAB_COLOR, "44:0");
+
+        // Road Slab Material (Default: Fixed Value)
+        getValues().put(RoadFlag.ROAD_SLAB_COLOR, DISABLED);
+
+        // Crosswalk (Default: Fixed Value)
+        getValues().put(RoadFlag.CROSSWALK, ENABLED);
     }
 }

@@ -5,10 +5,10 @@ import net.buildtheearth.utils.Utils;
 public enum HouseFlag {
 
 
-    WALL_COLOR("w"),            // String "123:24, 21:3, 3, ..."
-    ROOF_COLOR("r"),            // String "123:24, 21:3, 3, ..."
-    BASE_COLOR("b"),            // String "123:24, 21:3, 3, ..."
-    WINDOW_COLOR("wd"),         // String "123:24, 21:3, 3, ..."
+    WALL_COLOR("w"),            // String "123:24,21:3,3,..."
+    ROOF_COLOR("r"),            // String "123:24,21:3,3,..."
+    BASE_COLOR("b"),            // String "123:24,21:3,3,..."
+    WINDOW_COLOR("wd"),         // String "123:24,21:3,3,..."
 
     ROOF_TYPE("rt"),            // RoofType
     FLOOR_COUNT("fc"),          // Integer

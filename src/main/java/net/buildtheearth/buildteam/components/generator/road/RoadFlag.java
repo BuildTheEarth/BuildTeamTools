@@ -12,7 +12,13 @@ public enum RoadFlag {
     MARKING_MATERIAL("lm"),
 
     SIDEWALK_WIDTH("sw"),
-    SIDEWALK_MATERIAL("sm");
+    SIDEWALK_MATERIAL("sm"),
+
+    SIDEWALK_SLAB_COLOR("ss"),      // String "123:24,21:3,3,..."
+
+    ROAD_SLAB_COLOR("rs"),          // String "123:24,21:3,3,..."
+
+    CROSSWALK("cw");                // boolean (ON/OFF)
 
     private String flag;
 

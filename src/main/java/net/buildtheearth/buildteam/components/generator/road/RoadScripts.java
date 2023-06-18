@@ -30,6 +30,8 @@ public class RoadScripts {
         String roadMaterial = flags.get(RoadFlag.ROAD_MATERIAL);
         String markingMaterial = flags.get(RoadFlag.MARKING_MATERIAL);
         String sidewalkMaterial = flags.get(RoadFlag.SIDEWALK_MATERIAL);
+        String sidewalkSlabMaterial = flags.get(RoadFlag.SIDEWALK_SLAB_COLOR);
+        String roadSlabMaterial = flags.get(RoadFlag.ROAD_SLAB_COLOR);
 
         int laneCount = Integer.parseInt(flags.get(RoadFlag.LANE_COUNT));
         int laneWidth = Integer.parseInt(flags.get(RoadFlag.LANE_WIDTH));
@@ -37,6 +39,9 @@ public class RoadScripts {
         int markingLength = Integer.parseInt(flags.get(RoadFlag.MARKING_LENGTH));
         int markingGap = Integer.parseInt(flags.get(RoadFlag.MARKING_GAP));
         int sidewalkWidth = Integer.parseInt(flags.get(RoadFlag.SIDEWALK_WIDTH));
+
+        boolean crosswalk = flags.get(RoadFlag.CROSSWALK).equals(RoadSettings.ENABLED);
+
 
         int operations = 0;
         p.chat("/clearhistory");
@@ -53,7 +58,13 @@ public class RoadScripts {
 
         // Get the points of the region
         List<Vector> points = new ArrayList<>(region.getVertices());
-        points = populatePoints(points, road_width);
+        points = populatePoints(points, laneWidth);
+
+        List<Vector> oneMeterPoints = new ArrayList<>(points);
+        oneMeterPoints = populatePoints(oneMeterPoints, 1);
+
+        List<Vector> roadMarkingPoints = new ArrayList<>(oneMeterPoints);
+        roadMarkingPoints = reducePoints(roadMarkingPoints, markingGap + 1, markingLength - 1);
 
 
         // ----------- PREPARATION 01 ----------
@@ -62,6 +73,7 @@ public class RoadScripts {
         List<Vector> polyRegionLine = new ArrayList<>(points);
         polyRegionLine = extendPolyLine(polyRegionLine);
         List<Vector> polyRegionPoints = shiftPoints(polyRegionLine, max_width + 2, true);
+        List<Vector> polyRegionPointsExact = shiftPoints(polyRegionLine, max_width, true);
 
         // Create a region from the points
         createPolySelection(p, polyRegionPoints, null);
@@ -74,9 +86,9 @@ public class RoadScripts {
         p.chat("//replace 0");
         operations++;
 
-        // Remove all trees
+        // Remove all trees and pumpkins
         p.chat("//gmask");
-        p.chat("//replace leaves,log 0");
+        p.chat("//replace leaves,log,pumpkin 0");
         operations++;
 
         p.chat("//gmask");
@@ -92,15 +104,15 @@ public class RoadScripts {
         // ----------- ROAD ----------
 
         // Draw the road
+
         createConvexSelection(commands, points, regionBlocks);
-        commands.add("//gmask");
+        commands.add("//gmask !solid," + roadMaterial + "," + markingMaterial + "," + sidewalkMaterial + "," + sidewalkSlabMaterial + "," + roadSlabMaterial);
         commands.add("//curve 35:4");
 
         // Add additional yellow wool markings to spread the road material faster and everywhere on the road.
         for(int i = 2; i < laneCount; i+=2){
             List<List<Vector>> yellowWoolLine = shiftPointsAll(innerPoints, (laneWidth*(i-1)));
 
-            commands.add("//gmask !solid");
             for(List<Vector> path : yellowWoolLine) {
                 createConvexSelection(commands, path, regionBlocks);
                 commands.add("//curve 35:4");
@@ -113,7 +125,6 @@ public class RoadScripts {
                 commands.add("//line 35:4");
                 operations++;
             }
-            commands.add("//gmask");
         }
 
         // Draw another yellow line close to the sidewalk to spread the yellow wool faster and everywhere on the road.
@@ -122,6 +133,9 @@ public class RoadScripts {
             for (List<Vector> path : yellowWoolLineNearSidewalk)
                 operations += createPolyLine(commands, path, "35:4", true, regionBlocks);
         }
+
+        commands.add("//gmask");
+
 
 
         // ----------- SIDEWALK ----------
@@ -134,37 +148,84 @@ public class RoadScripts {
 
 
             // Draw the sidewalk middle lines
-            commands.add("//gmask !solid");
+            commands.add("//gmask !solid," + roadMaterial + "," + markingMaterial);
             for(List<Vector> path : sidewalkPointsMid)
                 operations += createPolyLine(commands, path, "35:1", true, regionBlocks);
-            commands.add("//gmask");
 
             // Create the outer sidewalk edge lines
             for(List<Vector> path : sidewalkPointsOut)
                 operations += createPolyLine(commands, path, "35:3", true, regionBlocks);
 
-
             // Create the inner sidewalk edge lines
             for(List<Vector> path : sidewalkPointsIn)
                 operations += createPolyLine(commands, path, "35:3", true, regionBlocks);
+            commands.add("//gmask");
+
+            if(crosswalk){
+                // Draw the sidewalk middle lines
+                commands.add("//gmask " + roadMaterial + "," + markingMaterial);
+                for(List<Vector> path : sidewalkPointsMid)
+                    operations += createPolyLine(commands, path, "35:2", true, regionBlocks);
+
+                // Create the outer sidewalk edge lines
+                for(List<Vector> path : sidewalkPointsOut)
+                    operations += createPolyLine(commands, path, "35:11", true, regionBlocks);
+
+                // Create the inner sidewalk edge lines
+                for(List<Vector> path : sidewalkPointsIn)
+                    operations += createPolyLine(commands, path, "35:11", true, regionBlocks);
+                commands.add("//gmask");
+            }
         }
 
 
-        // ----------- FILLINGS ----------
+        // ----------- OLD ROAD REPLACEMENTS ----------
+        // Replace the existing road material with wool
 
-        // Bring all lines to the top
-        createPolySelection(commands, polyRegionPoints);
-        commands.add("//gmask");
+        // Create the poly selection
+        createPolySelection(commands, polyRegionPointsExact);
         commands.add("//expand 10 up");
         commands.add("//expand 10 down");
         commands.add("//gmask !air");
 
+        // Replace the current road material with light green wool
+        commands.add("//replace " + roadMaterial + " 35:5");
+        operations++;
+        if(!roadSlabMaterial.equals(RoadSettings.DISABLED)) {
+            commands.add("//replace " + roadSlabMaterial + " 35:5");
+            operations++;
+        }
+        commands.add("//replace " + markingMaterial + " 35:5");
+        operations++;
+
+        // Replace the current sidewalk material with pink wool
+        commands.add("//replace " + sidewalkMaterial + " 35:6");
+        operations++;
+        if(!sidewalkSlabMaterial.equals(RoadSettings.DISABLED)) {
+            commands.add("//replace " + sidewalkSlabMaterial + " 35:6");
+            operations++;
+        }
+
+
+        // ----------- FILLINGS ----------
+        // Fill the road with the materials
+
+        createPolySelection(commands, polyRegionPoints);
+        commands.add("//expand 10 up");
+        commands.add("//expand 10 down");
+        commands.add("//gmask !air");
+
+        // Bring all lines to the top
         for(int i = 0; i < road_height + 5; i++) {
             commands.add("//replace >35:1 35:1");
+            operations++;
+            commands.add("//replace >35:2 35:2");
             operations++;
             commands.add("//replace >35:3 35:3");
             operations++;
             commands.add("//replace >35:4 35:4");
+            operations++;
+            commands.add("//replace >35:11 35:11");
             operations++;
         }
 
@@ -174,26 +235,47 @@ public class RoadScripts {
             commands.add("//set 35:3");
             operations++;
         }
+        commands.add("//gmask =queryRel(0,1,0,35,11)");
+        for(int i = 0; i < 3; i++){
+            commands.add("//set 35:11");
+            operations++;
+        }
 
         // Spread the yellow wool
         commands.add("//gmask =(queryRel(1,0,0,35,4)||queryRel(-1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4)||queryRel(0,-1,0,35,4)||queryRel(0,1,0,35,4))&&queryRel(0,3,0,0,0)");
         for(int i = 0; i < laneWidth*2; i++){
             // Replace all blocks around yellow wool with yellow wool until it reaches the light blue wool
-            commands.add("//replace !35:3,solid 35:4");
+            commands.add("//replace !35:3,35:5,35:6,solid 35:4");
             operations++;
         }
 
         // Spread the orange wool
         commands.add("//gmask =(queryRel(1,0,0,35,1)||queryRel(-1,0,0,35,1)||queryRel(0,0,1,35,1)||queryRel(0,0,-1,35,1)||queryRel(0,-1,0,35,1)||queryRel(0,1,0,35,1))&&queryRel(0,3,0,0,0)");
-        for(int i = 0; i < road_width; i++){
+        for(int i = 0; i < laneWidth*2; i++){
             // Replace all blocks around orange wool with orange wool until it reaches the light blue wool
-            commands.add("//replace !35:3,solid 35:1");
+            commands.add("//replace !35:3,35:2,35:11,35:5,solid 35:1");
             operations++;
         }
 
         // Replace all orange wool with light blue wool
         commands.add("//gmask");
         commands.add("//replace 35:1 35:3");
+
+
+        // Spread the magenta wool
+        commands.add("//gmask =(queryRel(1,0,0,35,2)||queryRel(-1,0,0,35,2)||queryRel(0,0,1,35,2)||queryRel(0,0,-1,35,2)||queryRel(0,-1,0,35,2)||queryRel(0,1,0,35,2))&&queryRel(0,3,0,0,0)");
+        for(int i = 0; i < laneWidth*2; i++){
+            // Replace all blocks around orange wool with orange wool until it reaches the light blue wool
+            commands.add("//replace !35:11,35:3,solid 35:2");
+            operations++;
+        }
+
+        // Replace all magenta wool with pink wool
+        commands.add("//gmask");
+        commands.add("//replace 35:2 35:6");
+        operations++;
+        commands.add("//replace 35:11 35:6");
+        operations++;
 
         // In case there are some un-replaced blocks left, replace everything above light blue wool that is not air or yellow wool with light blue wool
         for(int i = 0; i < road_height; i++) {
@@ -202,20 +284,106 @@ public class RoadScripts {
         }
 
 
+        // ----------- CROSSWALK ----------
+        // Draw the crosswalk
+
+        if(crosswalk){
+            commands.add("//gmask =queryRel(1,0,0,35,3)||queryRel(-1,0,0,35,3)||queryRel(0,0,1,35,3)||queryRel(0,0,-1,35,3)");
+            commands.add("//replace 35:6 35:9");
+            operations++;
+
+            for(int i = 0; i < road_width; i++) {
+                commands.add("//gmask =queryRel(1,0,0,35,9)||queryRel(-1,0,0,35,9)||queryRel(0,0,1,35,9)||queryRel(0,0,-1,35,9)");
+                commands.add("//replace 35:6 35:10");
+                operations++;
+
+                commands.add("//gmask =queryRel(1,0,0,35,10)||queryRel(-1,0,0,35,10)||queryRel(0,0,1,35,10)||queryRel(0,0,-1,35,10)");
+                commands.add("//replace 35:6 35:9");
+                operations++;
+            }
+        }else{
+            commands.add("//replace 35:6 35:4");
+            operations++;
+        }
+
+        commands.add("//gmask");
+
+
+
+        // ----------- ROAD AND SIDEWALK SLABS ----------
+        // Create the road and sidewalk slabs
+
+        // Create the road slabs
+        if(!roadSlabMaterial.equals(RoadSettings.DISABLED)){
+            commands.add("//gmask =queryRel(0,-1,0,35,4)&&queryRel(0,0,0,0,0)&&(queryRel(1,0,0,35,4)||queryRel(-1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4))");
+            commands.add("//set " + roadSlabMaterial);
+            operations++;
+        }
+
+
+        // Create the sidewalk slabs
+        if(!sidewalkSlabMaterial.equals(RoadSettings.DISABLED)){
+            commands.add("//gmask =queryRel(0,-1,0,35,3)&&queryRel(0,0,0,0,0)&&(queryRel(1,0,0,35,3)||queryRel(-1,0,0,35,3)||queryRel(0,0,1,35,3)||queryRel(0,0,-1,35,3))");
+            commands.add("//set " + sidewalkSlabMaterial);
+            operations++;
+        }
+
+
+        // ----------- ROAD MARKINGS ----------
+        // Draw the road markings
+
+        if(laneCount > 1) {
+
+            commands.add("//gmask 35:4");
+
+            // Check if langeCount is even or odd
+            boolean isEven = laneCount % 2 == 0;
+
+            // Create the road markings in the middle of the road
+            if(isEven)
+                operations += createRoadMarkingLine(commands, roadMarkingPoints, markingMaterial, regionBlocks);
+
+
+            // Create the road markings for the other lanes
+            if(laneCount >= 3)
+            for(int i = 0; i < (laneCount-1)/2; i++) {
+                int distance = (i+1) * laneWidth * 2 - (!isEven ? laneWidth : 0);
+
+                List<List<Vector>> roadMarkingPointsList = shiftPointsAll(points, distance);
+                for(List<Vector> path : roadMarkingPointsList) {
+
+                    List<Vector> markingsOneMeterPoints = new ArrayList<>(path);
+                    markingsOneMeterPoints = populatePoints(markingsOneMeterPoints, 1);
+
+                    List<Vector> shiftedRoadMarkingPoints = new ArrayList<>(markingsOneMeterPoints);
+                    shiftedRoadMarkingPoints = reducePoints(shiftedRoadMarkingPoints, markingGap + 1, markingLength - 1);
+
+                    operations += createRoadMarkingLine(commands, shiftedRoadMarkingPoints, markingMaterial, regionBlocks);
+                }
+            }
+
+            commands.add("//gmask");
+        }
+
+
         // ----------- MATERIAL ----------
         // Replace all light blue wool with the sidwalk material
+        createPolySelection(commands, polyRegionPoints);
         commands.add("//replace 35:3 " + sidewalkMaterial);
         operations++;
 
-        // Replace all yellow wool with the road material
-        commands.add("//replace 35:4 " + roadMaterial);
+        // Replace all yellow,lime and cyan wool with the road material
+        commands.add("//replace 35:4,35:5,35:9 " + roadMaterial);
+        operations++;
+
+        // Replace all purple wool with the marking material
+        commands.add("//replace 35:10 " + markingMaterial);
         operations++;
 
         commands.add("//gmask");
         createConvexSelection(commands, points, null);
 
-        Command command = new Command(p, road, commands, operations, regionBlocks);
-        Main.buildTeamTools.getGenerator().getCommands().add(command);
+        Main.buildTeamTools.getGenerator().getCommands().add(new Command(p, road, commands, operations, regionBlocks));
         Generator.getPlayerHistory(p).addHistoryEntry(new History.HistoryEntry(GeneratorType.ROAD, operations));
     }
 
@@ -414,6 +582,27 @@ public class RoadScripts {
         return operations;
     }
 
+    public static int createRoadMarkingLine(List<String> commands, List<Vector> points, String lineMaterial, Block[][][] blocks) {
+        commands.add("//sel cuboid");
+        int operations = 0;
+
+        List<String> positions = new ArrayList<>();
+        for(int i = 0; i < points.size(); i++)
+            positions.add(getXYZ(points.get(i), blocks));
+
+        for(int i = 0; i < points.size(); i++){
+            if(i%2 == 0)
+                commands.add("//pos1 " + positions.get(i));
+            else {
+                commands.add("//pos2 " + positions.get(i));
+                commands.add("//line " + lineMaterial);
+                operations++;
+            }
+        }
+
+        return operations;
+    }
+
     public static String getXYZ(Vector vector){
         return "%%XYZ/" + vector.getBlockX() + "," + vector.getBlockY() + "," + vector.getBlockZ() + "/%%";
     }
@@ -463,6 +652,39 @@ public class RoadScripts {
             result.add(points.get(points.size()-1));
             points = result;
             result = new ArrayList<>();
+        }
+
+        return points;
+    }
+
+    /** As long as two neighboring vectors are closer than a given distance of blocks apart, remove the second point. The distances switches between distance1 and distance2
+     *
+     * @param points
+     * @return
+     */
+    public static List<Vector> reducePoints(List<Vector> points, int distance1, int distance2){
+        points = new ArrayList<>(points);
+
+        // Go through all points
+        boolean found = true;
+        while(found){
+            found = false;
+            for(int i = 0; i < points.size()-1; i++){
+                Vector p1 = points.get(i);
+                Vector p2 = points.get(i+1);
+
+                int distance = distance1;
+                // Switch between distance1 and distance2
+                if(i%2 == 0)
+                    distance = distance2;
+
+                // If the distance between the two points is less than the given distance, remove the second point
+                if(p1.distance(p2) < distance){
+                    points.remove(p2);
+                    found = true;
+                    break;
+                }
+            }
         }
 
         return points;

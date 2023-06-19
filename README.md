@@ -2,9 +2,12 @@
 
 <p align="Center">
   <a href="https://github.com/BuildTheEarth/BuildTeamTools">
-    <img src="https://user-images.githubusercontent.com/66020920/167615506-89e56374-327e-413f-85d9-0179e4a7a3c9.png" alt="Logo" width="150" height="150">
+    <img src="https://user-images.githubusercontent.com/66020920/167615506-89e56374-327e-413f-85d9-0179e4a7a3c9.png" alt="Logo" width="100" height="100">
+    <br><br>
+    <img src="https://github-production-user-asset-6210df.s3.amazonaws.com/66020920/246818007-8386d484-d998-4c61-81a1-2a8b3c6f2029.png" alt="Logo" width="612" height="101">
   </a>
 </p>
+<br>
 
 <h1 align="Center">BuildTeamTools</h1>
 

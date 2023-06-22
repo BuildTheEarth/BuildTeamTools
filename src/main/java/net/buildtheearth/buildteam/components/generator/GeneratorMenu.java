@@ -5,7 +5,10 @@ import net.buildtheearth.buildteam.components.generator.house.House;
 import net.buildtheearth.buildteam.components.generator.house.HouseSettings;
 import net.buildtheearth.buildteam.components.generator.house.RoofType;
 import net.buildtheearth.buildteam.components.generator.house.menu.WallColorMenu;
-import net.buildtheearth.utils.AbstractMenu;
+import net.buildtheearth.buildteam.components.generator.road.Road;
+import net.buildtheearth.buildteam.components.generator.road.RoadSettings;
+import net.buildtheearth.buildteam.components.generator.road.menu.RoadColorMenu;
+import net.buildtheearth.utils.menus.AbstractMenu;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.Liste;
 import org.bukkit.Material;
@@ -156,6 +159,19 @@ public class GeneratorMenu extends AbstractMenu {
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
             new WallColorMenu(clickPlayer);
+        }));
+
+        // Set click event for road item
+        getMenu().getSlot(ROAD_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
+            Road road = Main.buildTeamTools.getGenerator().getRoad();
+            road.getPlayerSettings().put(clickPlayer.getUniqueId(), new RoadSettings(clickPlayer));
+
+            if(!road.checkPlayer(clickPlayer))
+                return;
+
+            clickPlayer.closeInventory();
+            clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
+            new RoadColorMenu(clickPlayer);
         }));
     }
 

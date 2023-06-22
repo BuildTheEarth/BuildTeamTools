@@ -2,11 +2,12 @@ package net.buildtheearth.buildteam.components.generator.house.menu;
 
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.components.generator.Settings;
-import net.buildtheearth.buildteam.components.generator.house.House;
 import net.buildtheearth.buildteam.components.generator.house.HouseFlag;
 import net.buildtheearth.buildteam.components.generator.house.HouseSettings;
 import net.buildtheearth.buildteam.components.generator.house.RoofType;
 import net.buildtheearth.utils.*;
+import net.buildtheearth.utils.menus.AbstractPaginatedMenu;
+import net.buildtheearth.utils.menus.BlockListMenu;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
@@ -20,34 +21,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class RoofColorMenu extends AbstractPaginatedMenu {
+public class RoofColorMenu extends BlockListMenu {
 
     public static String ROOF_TYPE_INV_NAME = "Choose a Roof Color";
 
-    public static int SWITCH_PAGE_ITEM_SLOT = 31;
-    public static int NEXT_ITEM_SLOT = 35;
-
-
-    public ArrayList<String> selectedMaterials;
-
     public RoofColorMenu(Player player) {
-        super(4, 3, ROOF_TYPE_INV_NAME, player);
+        super(player, ROOF_TYPE_INV_NAME, getRoofBlocks(player));
     }
-
-    @Override
-    protected void setPreviewItems() {
-        setSwitchPageItems(SWITCH_PAGE_ITEM_SLOT);
-
-        if(canProceed())
-            getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.getNextItem());
-        else
-            getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.ITEM_BACKGROUND);
-
-        super.setPreviewItems();
-    }
-
-    @Override
-    protected void setMenuItemsAsync() {}
 
     @Override
     protected void setItemClickEventsAsync() {
@@ -71,20 +51,9 @@ public class RoofColorMenu extends AbstractPaginatedMenu {
             });
     }
 
-    @Override
-    protected Mask getMask() {
-        return BinaryMask.builder(getMenu())
-                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short)15, null))
-                .pattern("000000000")
-                .pattern("000000000")
-                .pattern("000000000")
-                .pattern("111000110")
-                .build();
-    }
 
-    @Override
-    protected List<?> getSource() {
-        RoofType roofType = RoofType.byString(Main.buildTeamTools.getGenerator().getHouse().getPlayerSettings().get(getMenuPlayer().getUniqueId()).getValues().get(HouseFlag.ROOF_TYPE));
+    private static List<ItemStack> getRoofBlocks(Player player) {
+        RoofType roofType = RoofType.byString(Main.buildTeamTools.getGenerator().getHouse().getPlayerSettings().get(player.getUniqueId()).getValues().get(HouseFlag.ROOF_TYPE));
 
         if(roofType == null)
             return new ArrayList<>();
@@ -109,50 +78,5 @@ public class RoofColorMenu extends AbstractPaginatedMenu {
 
             default: return new ArrayList<>();
         }
-    }
-
-    @Override
-    protected void setPaginatedPreviewItems(List<?> source) {
-        if(selectedMaterials == null)
-            selectedMaterials = new ArrayList<>();
-
-        // Set pagignated items
-        List<ItemStack> items = source.stream().map(l -> (ItemStack) l).collect(Collectors.toList());
-        int slot = 0;
-        for (ItemStack item : items) {
-            if(selectedMaterials.contains(Item.getUniqueMaterialString(item)))
-                item = new Item(item).setAmount(1).addEnchantment(Enchantment.LUCK, 1).hideEnchantments(true).build();
-
-            getMenu().getSlot(slot).setItem(item);
-            slot++;
-        }
-    }
-
-    @Override
-    protected void setPaginatedMenuItemsAsync(List<?> source) {
-    }
-
-    @Override
-    protected void setPaginatedItemClickEventsAsync(List<?> source) {
-        List<ItemStack> items = source.stream().map(l -> (ItemStack) l).collect(Collectors.toList());
-        int slot = 0;
-        for (ItemStack item : items) {
-            final int _slot = slot;
-            getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
-                String type = Item.getUniqueMaterialString(getMenu().getSlot(_slot).getItem(getMenuPlayer()));
-
-                if(selectedMaterials.contains(type))
-                    selectedMaterials.remove(type);
-                else
-                    selectedMaterials.add(type);
-
-                reloadMenuAsync();
-            });
-            slot++;
-        }
-    }
-
-    private boolean canProceed(){
-        return selectedMaterials.size() > 0;
     }
 }

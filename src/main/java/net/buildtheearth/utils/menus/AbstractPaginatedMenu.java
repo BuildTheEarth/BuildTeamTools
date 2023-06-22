@@ -1,6 +1,7 @@
-package net.buildtheearth.utils;
+package net.buildtheearth.utils.menus;
 
 import net.buildtheearth.Main;
+import net.buildtheearth.utils.MenuItems;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;

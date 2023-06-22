@@ -5,6 +5,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class MenuItems {
 
@@ -234,6 +236,10 @@ public class MenuItems {
             Item.create(Material.MYCEL),
             Item.create(Material.WOOD)
     };
+
+    public static List<ItemStack> getBlocksByColor(){
+        return Arrays.asList(BLOCKS_BY_COLOR_1_12);
+    }
 
     public static ItemStack[] WALL_BLOCKS = {
             Item.create(Material.CONCRETE, null, (short)15, null),

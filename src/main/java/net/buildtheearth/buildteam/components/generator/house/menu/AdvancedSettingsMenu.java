@@ -5,7 +5,7 @@ import net.buildtheearth.buildteam.components.generator.Settings;
 import net.buildtheearth.buildteam.components.generator.house.House;
 import net.buildtheearth.buildteam.components.generator.house.HouseFlag;
 import net.buildtheearth.buildteam.components.generator.house.HouseSettings;
-import net.buildtheearth.utils.AbstractMenu;
+import net.buildtheearth.utils.menus.AbstractMenu;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
 import org.bukkit.Material;

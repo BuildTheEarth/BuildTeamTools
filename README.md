@@ -2,9 +2,12 @@
 
 <p align="Center">
   <a href="https://github.com/BuildTheEarth/BuildTeamTools">
-    <img src="https://user-images.githubusercontent.com/66020920/167615506-89e56374-327e-413f-85d9-0179e4a7a3c9.png" alt="Logo" width="150" height="150">
+    <img src="https://user-images.githubusercontent.com/66020920/167615506-89e56374-327e-413f-85d9-0179e4a7a3c9.png" alt="Logo" width="100" height="100">
+    <br><br>
+    <img src="https://github-production-user-asset-6210df.s3.amazonaws.com/66020920/246825255-a75aa4e7-0cf5-40d3-af56-5c25d2a097b4.png" alt="Logo" width="612" height="101">
   </a>
 </p>
+<br>
 
 <h1 align="Center">BuildTeamTools</h1>
 
@@ -26,6 +29,7 @@
     <a href="https://github.com/BuildTheEarth/BuildTeamTools"><img src="https://img.shields.io/github/repo-size/BuildTheEarth/BuildTeamTools"></a>
 </p>  
 
+<br>
 
 <!-- ABOUT THE PROJECT -->
 ## About The Plugin

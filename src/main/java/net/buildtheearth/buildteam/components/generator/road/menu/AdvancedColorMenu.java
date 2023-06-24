@@ -9,13 +9,18 @@ import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.BlockListMenu;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
-public class RoadColorMenu extends BlockListMenu {
+import java.util.List;
 
-    public static String ROAD_COLOR_INV_NAME = "Choose a Road Block";
+public class AdvancedColorMenu extends BlockListMenu {
 
-    public RoadColorMenu(Player player) {
-        super(player, ROAD_COLOR_INV_NAME, MenuItems.getBlocksByColor());
+    private RoadFlag roadFlag;
+
+    public AdvancedColorMenu(Player player, RoadFlag roadFlag, String invName, List<ItemStack> items) {
+        super(player, invName, items);
+
+        this.roadFlag = roadFlag;
     }
 
     @Override
@@ -31,12 +36,12 @@ public class RoadColorMenu extends BlockListMenu {
                     return;
 
                 RoadSettings roadSettings = (RoadSettings) settings;
-                roadSettings.setValue(RoadFlag.ROAD_MATERIAL, Item.createStringFromItemList(selectedMaterials));
+                roadSettings.setValue(roadFlag, Item.createStringFromItemList(selectedMaterials));
 
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
 
-                new SidewalkColorMenu(clickPlayer);
+                new AdvancedSettingsMenu(clickPlayer);
             });
     }
 }

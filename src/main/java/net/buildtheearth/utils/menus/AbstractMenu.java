@@ -1,12 +1,18 @@
 package net.buildtheearth.utils.menus;
 
 import net.buildtheearth.Main;
+import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.ipvp.canvas.Menu;
 import org.ipvp.canvas.mask.Mask;
 import org.ipvp.canvas.type.ChestMenu;
+
+import java.util.List;
 
 public abstract class AbstractMenu {
 
@@ -90,5 +96,33 @@ public abstract class AbstractMenu {
 
         // Set next page item
         getMenu().getSlot(sliderItemSlot + 1).setItem(MenuItems.getPlusSliderItem(sliderColor, sliderName, value, maxValue));
+    }
+
+    protected void setColorChoiceItems(MenuItems.SliderColor sliderColor, int sliderItemSlot, String sliderName, ItemStack current){
+        sliderName = "§e" + sliderName;
+
+        if(current == null) {
+            // Set previous page item
+            getMenu().getSlot(sliderItemSlot - 1).setItem(MenuItems.getBlankItem(sliderColor, sliderName + ": §c§lOFF"));
+
+            // Set current page item
+            getMenu().getSlot(sliderItemSlot).setItem(Item.create(Material.BARRIER, sliderName + ": §c§lOFF"));
+
+            // Set next page item
+            getMenu().getSlot(sliderItemSlot + 1).setItem(MenuItems.getBlankItem(sliderColor, sliderName + ": §c§lOFF"));
+        }else{
+            ItemMeta meta = current.getItemMeta();
+            meta.setDisplayName(sliderName);
+            current.setItemMeta(meta);
+
+            // Set previous page item
+            getMenu().getSlot(sliderItemSlot - 1).setItem(MenuItems.getXItem(sliderColor, "§cDisable " + sliderName));
+
+            // Set current page item
+            getMenu().getSlot(sliderItemSlot).setItem(current);
+
+            // Set next page item
+            getMenu().getSlot(sliderItemSlot + 1).setItem(MenuItems.getXItem(sliderColor, "§cDisable " + sliderName));
+        }
     }
 }

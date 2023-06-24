@@ -74,6 +74,22 @@ public class MenuItems {
         }
     }
 
+    public static ItemStack getXItem(SliderColor sliderColor, String name) {
+        switch (sliderColor) {
+            default:
+            case WHITE: return Item.createCustomHeadBase64(MenuItems.WHITE_X,  name, null);
+            case LIGHT_GRAY: return Item.createCustomHeadBase64(MenuItems.LIGHT_GRAY_X, name, null);
+        }
+    }
+
+    public static ItemStack getBlankItem(SliderColor sliderColor, String name) {
+        switch (sliderColor) {
+            default:
+            case WHITE: return Item.createCustomHeadBase64(MenuItems.WHITE_BLANK,  name, null);
+            case LIGHT_GRAY: return Item.createCustomHeadBase64(MenuItems.LIGHT_GRAY_BLANK, name, null);
+        }
+    }
+
 
     public static ItemStack getNextItem(){
         return Item.createCustomHeadBase64(MenuItems.CHECKMARK, "§eNext", null);
@@ -369,6 +385,10 @@ public class MenuItems {
             Item.create(Material.WOOD_STEP, null, (short) 5, null),
     };
 
+    public static List<ItemStack> getSlabs(){
+        return Arrays.asList(SLABS);
+    }
+
     public static ItemStack[] STAIRS = {
             Item.create(Material.COBBLESTONE_STAIRS),
             Item.create(Material.SANDSTONE_STAIRS),
@@ -386,10 +406,18 @@ public class MenuItems {
             Item.create(Material.WOOD_STAIRS)
     };
 
+    public static List<ItemStack> getStairs(){
+        return Arrays.asList(STAIRS);
+    }
+
     public static String WHITE_PLUS = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjBiNTVmNzQ2ODFjNjgyODNhMWMxY2U1MWYxYzgzYjUyZTI5NzFjOTFlZTM0ZWZjYjU5OGRmMzk5MGE3ZTcifX19";
     public static String WHITE_MINUS = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzNlNGI1MzNlNGJhMmRmZjdjMGZhOTBmNjdlOGJlZjM2NDI4YjZjYjA2YzQ1MjYyNjMxYjBiMjVkYjg1YiJ9fX0=";
     public static String WHITE_BLANK = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTdjMjE0NGZkY2I1NWMzZmMxYmYxZGU1MWNhYmRmNTJjMzg4M2JjYjU3ODkyMzIyNmJlYjBkODVjYjJkOTgwIn19fQ==";
 
+    public static String WHITE_X = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWQxYTNjOTY1NjIzNDg1MjdkNTc5OGYyOTE2MDkyODFmNzJlMTZkNjExZjFhNzZjMGZhN2FiZTA0MzY2NSJ9fX0=";
+
+
+    public static String WHITE_0_B64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2YwOTAxOGY0NmYzNDllNTUzNDQ2OTQ2YTM4NjQ5ZmNmY2Y5ZmRmZDYyOTE2YWVjMzNlYmNhOTZiYjIxYjUifX19";
     public static String WHITE_1_B64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2E1MTZmYmFlMTYwNThmMjUxYWVmOWE2OGQzMDc4NTQ5ZjQ4ZjZkNWI2ODNmMTljZjVhMTc0NTIxN2Q3MmNjIn19fQ==";
     public static String WHITE_2_B64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDY5OGFkZDM5Y2Y5ZTRlYTkyZDQyZmFkZWZkZWMzYmU4YTdkYWZhMTFmYjM1OWRlNzUyZTlmNTRhZWNlZGM5YSJ9fX0=";
     public static String WHITE_3_B64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmQ5ZTRjZDVlMWI5ZjNjOGQ2Y2E1YTFiZjQ1ZDg2ZWRkMWQ1MWU1MzVkYmY4NTVmZTlkMmY1ZDRjZmZjZDIifX19";
@@ -419,6 +447,8 @@ public class MenuItems {
     public static String LIGHT_GRAY_MINUS = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGE1NmRhYjUzZDRlYTFhNzlhOGU1ZWQ2MzIyYzJkNTZjYjcxNGRkMzVlZGY0Nzg3NjNhZDFhODRhODMxMCJ9fX0=";
     public static String LIGHT_GRAY_BLANK = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODFmYjhjZTY0MDhhNTg1MTM4NGUxYzJlZjc1Mzg1MWVhYzE4YmE0MDE4MjY2Y2RkNjY5ZGM5NDQ4NzNkNDIifX19";
 
+    public static String LIGHT_GRAY_X = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjVmM2VhN2M3YjI2YTA1NGE5ZmJiYjI4Yjk3YTYwODk5OWMyYzczZGY3NWJmNmIyMzQ4ZDdmYjFlNTllODU1In19fQ==";
+    public static String LIGHT_GRAY_0_B64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmZhNDU5MTFiMTYyOThjZmNhNGIyMjkxZWVkYTY2NjExM2JjNmYyYTM3ZGNiMmVjZDhjMjc1NGQyNGVmNiJ9fX0=";
     public static String LIGHT_GRAY_1_B64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2FmMWIyODBjYWI1OWY0NDY5ZGFiOWYxYTJhZjc5MjdlZDk2YTgxZGYxZTI0ZDUwYThlMzk4NGFiZmU0MDQ0In19fQ==";
     public static String LIGHT_GRAY_2_B64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTRiMWUxZDQyNjEyM2NlNDBjZDZhNTRiMGY4NzZhZDMwYzA4NTM5Y2Y1YTZlYTYzZTg0N2RjNTA3OTUwZmYifX19";
     public static String LIGHT_GRAY_3_B64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTA0Y2NmOGI1MzMyYzE5NmM5ZWEwMmIyMmIzOWI5OWZhY2QxY2M4MmJmZTNmN2Q3YWVlZGMzYzMzMjkwMzkifX19";
@@ -449,6 +479,7 @@ public class MenuItems {
     public static ItemStack getWhiteNumberHead(int number, String headName, ArrayList<String> lore){
         String b64;
         switch (number){
+            case 0: b64 = WHITE_0_B64; break;
             case 1: b64 = WHITE_1_B64; break;
             case 2: b64 = WHITE_2_B64; break;
             case 3: b64 = WHITE_3_B64; break;
@@ -478,6 +509,7 @@ public class MenuItems {
     public static ItemStack getLightGrayNumberHead(int number, String headName, ArrayList<String> lore){
         String b64;
         switch (number){
+            case 0: b64 = LIGHT_GRAY_0_B64; break;
             case 1: b64 = LIGHT_GRAY_1_B64; break;
             case 2: b64 = LIGHT_GRAY_2_B64; break;
             case 3: b64 = LIGHT_GRAY_3_B64; break;

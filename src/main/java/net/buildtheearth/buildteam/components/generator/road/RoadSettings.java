@@ -48,7 +48,7 @@ public class RoadSettings extends Settings {
         getValues().put(RoadFlag.MARKING_MATERIAL, "251:0");
 
         // Sidewalk Width (Default: Fixed Value)
-        getValues().put(RoadFlag.SIDEWALK_WIDTH, "1");
+        getValues().put(RoadFlag.SIDEWALK_WIDTH, "5");
 
         // Sidewalk Material (Default: Fixed Value)
         getValues().put(RoadFlag.SIDEWALK_MATERIAL, "43");

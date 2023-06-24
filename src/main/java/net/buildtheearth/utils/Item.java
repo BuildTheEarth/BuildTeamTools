@@ -358,9 +358,18 @@ public class Item {
 	}
 
 	public static String getUniqueMaterialString(ItemStack item){
-
 		return item.getTypeId() + ":" + item.getDurability();
 	}
+
+	public static ItemStack fromUniqueMaterialString(String s){
+		try{
+			String[] split = s.split(":");
+			return new ItemStack(Integer.parseInt(split[0]), 1, Short.parseShort(split[1]));
+		}catch(Exception e){
+			return null;
+		}
+	}
+
 
 	public static String createStringFromItemList(ArrayList<String> items){
 		String s = items.get(0);

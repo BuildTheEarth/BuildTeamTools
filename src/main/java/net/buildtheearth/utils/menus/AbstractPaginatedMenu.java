@@ -19,7 +19,9 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
 
         this.maxItemsPerPage = pagedRows * 9;
 
-        reloadMenuAsync();
+        Bukkit.getScheduler().scheduleSyncDelayedTask(Main.instance, () -> {
+            reloadMenuAsync();
+        });
     }
 
     /**

@@ -27,7 +27,7 @@ public class SidewalkColorMenu extends BlockListMenu {
         // Set click event for next item
         if(canProceed())
             getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
-                Settings settings = Main.buildTeamTools.getGenerator().getHouse().getPlayerSettings().get(clickPlayer.getUniqueId());
+                Settings settings = Main.buildTeamTools.getGenerator().getRoad().getPlayerSettings().get(clickPlayer.getUniqueId());
 
                 if(!(settings instanceof RoadSettings))
                     return;
@@ -37,7 +37,7 @@ public class SidewalkColorMenu extends BlockListMenu {
 
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
-                new RoofTypeMenu(clickPlayer);
+                new AdvancedSettingsMenu(clickPlayer);
             });
     }
 }

@@ -32,7 +32,7 @@ public class Road extends GeneratorModule {
         WIKI_PAGE = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Road-Command";
     }
 
-
+    @Override
     public void analyzeCommand(Player p, String[] args){
 
         if(args.length == 2)
@@ -79,6 +79,7 @@ public class Road extends GeneratorModule {
         generate(p);
     }
 
+    @Override
     public boolean checkPlayer(Player p){
 
         if(!Generator.checkIfWorldEditIsInstalled(p))
@@ -96,7 +97,7 @@ public class Road extends GeneratorModule {
         return true;
     }
 
-
+    @Override
     public void generate(Player p){
         if(!Main.getBuildTeam().getGenerator().getRoad().checkPlayer(p))
             return;
@@ -111,17 +112,6 @@ public class Road extends GeneratorModule {
 
         RoadScripts.roadscript_v_2_0(p, this, convexRegion);
 
-
-        HashMap<Object, String> flags = getPlayerSettings().get(p.getUniqueId()).getValues();
-        String command = "/gen road";
-        for(Object object : flags.keySet()) {
-            if (!(object instanceof RoadFlag))
-                continue;
-
-            RoadFlag roadFlag = (RoadFlag) object;
-            command += " -" + roadFlag.getFlag() + " " + flags.get(roadFlag);
-        }
-
-        sendSuccessMessage(p, command);
+        sendSuccessMessage(p);
     }
 }

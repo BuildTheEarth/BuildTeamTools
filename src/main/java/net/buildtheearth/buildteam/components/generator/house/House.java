@@ -28,6 +28,7 @@ public class House extends GeneratorModule {
         WIKI_PAGE = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/House-Command";
     }
 
+    @Override
     public void analyzeCommand(Player p, String[] args){
 
         if(args.length == 2)
@@ -76,7 +77,7 @@ public class House extends GeneratorModule {
         generate(p);
     }
 
-
+    @Override
     public boolean checkPlayer(Player p){
         if(!Generator.checkForWorldEditSelection(p))
             return false;
@@ -94,6 +95,7 @@ public class House extends GeneratorModule {
         return true;
     }
 
+    @Override
     public void generate(Player p){
         if(!checkPlayer(p))
             return;
@@ -102,15 +104,6 @@ public class House extends GeneratorModule {
 
         HouseScripts.buildscript_v_1_2(p, this, polyRegion);
 
-        HashMap<Object, String> flags = getPlayerSettings().get(p.getUniqueId()).getValues();
-        String command = "/gen house";
-        for(Object object : flags.keySet()) {
-            if (!(object instanceof HouseFlag))
-                continue;
-
-            HouseFlag houseFlag = (HouseFlag) object;
-            command += " -" + houseFlag.getFlag() + " " + flags.get(houseFlag);
-        }
-        sendSuccessMessage(p, command);
+        sendSuccessMessage(p);
     }
 }

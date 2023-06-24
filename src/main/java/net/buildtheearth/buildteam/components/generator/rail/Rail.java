@@ -1,5 +1,6 @@
 package net.buildtheearth.buildteam.components.generator.rail;
 
+import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.BuildTeamTools;
@@ -12,7 +13,6 @@ import net.buildtheearth.buildteam.components.generator.road.RoadSettings;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
-
 
 public class Rail extends GeneratorModule {
 
@@ -77,6 +77,9 @@ public class Rail extends GeneratorModule {
         if(!Generator.checkForWorldEditSelection(p))
             return false;
 
+        if(!Generator.checkForConvexSelection(p))
+            return false;
+
         if(getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
             getPlayerSettings().get(p.getUniqueId()).setBlocks(Generator.analyzeRegion(p, p.getWorld()));
 
@@ -88,22 +91,15 @@ public class Rail extends GeneratorModule {
         if(!Main.getBuildTeam().getGenerator().getRail().checkPlayer(p))
             return;
 
-        HashMap<Object, String> flags = getPlayerSettings().get(p.getUniqueId()).getValues();
+        Region region = Generator.getWorldEditSelection(p);
 
-        int laneCount = Integer.parseInt(flags.get(RailFlag.LANE_COUNT));
+        if(region == null || !(region instanceof ConvexPolyhedralRegion))
+            return;
 
-        RailScripts.railscript_1_2_beta(p);
+        ConvexPolyhedralRegion convexRegion = (ConvexPolyhedralRegion) region;
 
+        RailScripts.railscript_v_1_3(p, this, convexRegion);
 
-        String command = "/gen rail";
-        for(Object object : flags.keySet()) {
-            if (!(object instanceof RailFlag))
-                continue;
-
-            RailFlag railFlag = (RailFlag) object;
-            command += " -" + railFlag.getFlag() + " " + flags.get(railFlag);
-        }
-
-        sendSuccessMessage(p, command);
+        sendSuccessMessage(p);
     }
 }

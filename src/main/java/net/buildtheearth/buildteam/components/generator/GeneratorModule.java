@@ -3,6 +3,7 @@ package net.buildtheearth.buildteam.components.generator;
 import lombok.Getter;
 import net.buildtheearth.buildteam.BuildTeamTools;
 import net.buildtheearth.buildteam.components.generator.house.HouseSettings;
+import net.buildtheearth.buildteam.components.generator.road.RoadFlag;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -44,7 +45,39 @@ public abstract class GeneratorModule {
         p.sendMessage("§cThere was an error while generating the house. Please contact the admins");
     }
 
-    public void sendSuccessMessage(Player p, String command){
+    public String getCommand(Player p){
+        HashMap<Object, String> flags = getPlayerSettings().get(p.getUniqueId()).getValues();
+
+        String type = "house";
+
+        switch (GENERATOR_TYPE){
+            case HOUSE:
+                type = "house";
+                break;
+            case ROAD:
+                type = "road";
+                break;
+            case RAILWAY:
+                type = "railway";
+                break;
+            case TREE:
+                type = "tree";
+                break;
+        }
+
+        String command = "/gen " + type;
+        for(Object object : flags.keySet()) {
+            if (!(object instanceof RoadFlag))
+                continue;
+
+            RoadFlag roadFlag = (RoadFlag) object;
+            command += " -" + roadFlag.getFlag() + " " + flags.get(roadFlag);
+        }
+
+        return command;
+    }
+
+    public void sendSuccessMessage(Player p){
         p.sendMessage(" ");
         p.sendMessage(" ");
         p.sendMessage(" ");
@@ -67,7 +100,7 @@ public abstract class GeneratorModule {
         }
 
         TextComponent tc = new TextComponent(BuildTeamTools.PREFIX + type + " §asuccessfully §7generated. §e[Copy Command]");
-        tc.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, command));
+        tc.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, getCommand(p)));
         tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§7Click to copy command").create()));
 
         p.spigot().sendMessage(tc);

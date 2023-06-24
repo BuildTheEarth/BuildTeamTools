@@ -103,5 +103,6 @@ public class Command {
     }
 
     public void finish(){
+        module.sendSuccessMessage(player);
     }
 }

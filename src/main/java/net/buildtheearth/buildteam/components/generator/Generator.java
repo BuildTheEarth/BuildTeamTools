@@ -1,5 +1,11 @@
 package net.buildtheearth.buildteam.components.generator;
 
+import clipper2.Clipper;
+import clipper2.core.Path64;
+import clipper2.core.Paths64;
+import clipper2.core.Point64;
+import clipper2.offset.EndType;
+import clipper2.offset.JoinType;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
@@ -190,6 +196,299 @@ public class Generator {
                         return true;
 
         return false;
+    }
+
+    public static List<Vector> adjustHeight(List<Vector> points, Block[][][] blocks){
+
+        for(int i = 0; i < points.size(); i++) {
+            Vector point = points.get(i);
+            point = point.setY(Generator.getMaxHeight(blocks, point.getBlockX(), point.getBlockZ(), Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.SNOW));
+            points.set(i, point);
+        }
+
+        return points;
+    }
+
+    /** As long as two neighboring vectors are further than a given distance of blocks apart, add a new vector in between them
+     *
+     * @param points
+     * @return
+     */
+    public static List<Vector> populatePoints(List<Vector> points, int distance){
+        List<Vector> result = new ArrayList<>();
+
+        // Go through all points
+        boolean found = true;
+        while(found){
+            found = false;
+            for(int i = 0; i < points.size()-1; i++){
+                Vector p1 = points.get(i);
+                Vector p2 = points.get(i+1);
+
+                // Add the first point
+                result.add(p1);
+
+                // If the distance between the two points is greater than the given distance, add a new point in between them
+                if(p1.distance(p2) > distance){
+                    Vector v1 = p2.subtract(p1);
+                    Vector v2 = v1.multiply(0.5);
+                    Vector v3 = p1.add(v2);
+
+                    // Add the new point
+                    result.add(v3);
+                    found = true;
+                }
+            }
+
+            result.add(points.get(points.size()-1));
+            points = result;
+            result = new ArrayList<>();
+        }
+
+        return points;
+    }
+
+    /** As long as two neighboring vectors are closer than a given distance of blocks apart, remove the second point. The distances switches between distance1 and distance2
+     *
+     * @param points
+     * @return
+     */
+    public static List<Vector> reducePoints(List<Vector> points, int distance1, int distance2){
+        points = new ArrayList<>(points);
+
+        // Go through all points
+        boolean found = true;
+        while(found){
+            found = false;
+            for(int i = 0; i < points.size()-1; i++){
+                Vector p1 = points.get(i);
+                Vector p2 = points.get(i+1);
+
+                int distance = distance1;
+                // Switch between distance1 and distance2
+                if(i%2 == 0)
+                    distance = distance2;
+
+                // If the distance between the two points is less than the given distance, remove the second point
+                if(p1.distance(p2) < distance){
+                    points.remove(p2);
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        return points;
+    }
+
+    /** Extends a polyline by taking the first two points and the last two points of the polyline and extending them
+     *
+     * @param vectors:  The polyline to extend
+     * @return:         The extended polyline
+     */
+    public static List<Vector> extendPolyLine(List<Vector> vectors){
+        List<Vector> result = new ArrayList<>();
+
+        // Get the first two points
+        Vector p1 = vectors.get(0);
+        Vector p2 = vectors.get(1);
+
+        // Get the last two points
+        Vector p3 = vectors.get(vectors.size()-2);
+        Vector p4 = vectors.get(vectors.size()-1);
+
+        // Get the vectors between the points
+        Vector v1 = p1.subtract(p2);
+        Vector v2 = p4.subtract(p3);
+
+        result.add(p1.add(v1));
+        result.addAll(vectors);
+        result.add(p4.add(v2));
+
+        return result;
+    }
+
+    /** Shortens a polyline by taking the first two points and the last two points of the polyline and shortening them
+     *
+     * @param vectors:  The polyline to shorten
+     * @return:         The shortened polyline
+     */
+    public static List<Vector> shortenPolyLine(List<Vector> vectors, int distance){
+        List<Vector> result = new ArrayList<>();
+
+        if(vectors.size() < 4)
+            return vectors;
+
+        // Get the first two points
+        Vector p1 = vectors.get(0);
+        Vector p2 = vectors.get(1);
+
+        // Get the last two points
+        Vector p3 = vectors.get(vectors.size()-2);
+        Vector p4 = vectors.get(vectors.size()-1);
+
+        // Get the vectors between the points
+        Vector v1 = p2.subtract(p1);
+        Vector v2 = p3.subtract(p4);
+
+        // Shorten the vectors
+        v1 = v1.normalize().multiply(distance);
+        v2 = v2.normalize().multiply(distance);
+
+        // Remove the first and last points
+        vectors.remove(0);
+        vectors.remove(vectors.size() - 1);
+
+        // Add the shortened vectors
+        result.add(p1.add(v1));
+        result.addAll(vectors);
+        result.add(p4.add(v2));
+
+        return result;
+    }
+
+    public static String getXYZ(Vector vector){
+        return "%%XYZ/" + vector.getBlockX() + "," + vector.getBlockY() + "," + vector.getBlockZ() + "/%%";
+    }
+
+    public static String getXYZ(Vector vector, Block[][][] blocks){
+        int maxHeight = vector.getBlockY();
+
+        if(blocks != null)
+            maxHeight = Generator.getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL, Material.SNOW);
+        if(maxHeight == 0)
+            maxHeight = vector.getBlockY();
+
+        return vector.getBlockX() + "," + maxHeight + "," + vector.getBlockZ();
+    }
+
+    public static List<Vector> shiftPoints(List<Vector> vectors, double shift, boolean useLongestPathOnly) {
+        List<List<Vector>> resultVectors = shiftPointsAll(vectors, shift);
+
+        // If we only want the longest path, find it and return it
+        if(useLongestPathOnly){
+            int longestPathIndex = 0;
+            int longestPathLength = 0;
+            for(int i = 0; i < resultVectors.size(); i++){
+                if(resultVectors.get(i).size() > longestPathLength){
+                    longestPathIndex = i;
+                    longestPathLength = resultVectors.get(i).size();
+                }
+            }
+
+            return resultVectors.get(longestPathIndex);
+
+            // Otherwise, return all paths
+        }else{
+            List<Vector> result = new ArrayList<>();
+            for(List<Vector> vectorList : resultVectors)
+                result.addAll(vectorList);
+
+            return result;
+        }
+    }
+
+    public static Path64 convertVectorListToPath64(List<Vector> vectors, Vector reference){
+        List<Point64> points = new ArrayList<>();
+        for(Vector vector : vectors)
+            points.add(new Point64(vector.getBlockX() - reference.getBlockX(), vector.getBlockZ() - reference.getBlockZ()));
+
+        return new Path64(points);
+    }
+
+    public static List<List<Vector>> convertPathsToVectorList(Paths64 pathsD, Vector reference, int minHeight, int maxHeight){
+        List<List<Vector>> vectors = new ArrayList<>();
+
+        for(Path64 path : new ArrayList<>(pathsD)) {
+            List<Vector> vectorList = new ArrayList<>();
+
+            for(Point64 point : new ArrayList<>(path))
+                vectorList.add(new Vector(point.x + reference.getX(), minHeight, point.y + reference.getZ()));
+
+            Vector vector = vectorList.get(vectorList.size() - 1).setY(maxHeight);
+            vectorList.set(vectorList.size() - 1, vector);
+
+            vectors.add(vectorList);
+        }
+
+        return vectors;
+    }
+
+    public static List<List<Vector>> shiftPointsAll(List<Vector> vectors, double shift) {
+        Vector reference = vectors.get(0);
+        int minHeight = getMinHeight(vectors);
+        int maxHeight = getMaxHeight(vectors);
+        Paths64 paths = new Paths64();
+        paths.add(convertVectorListToPath64(vectors, reference));
+        Paths64 inflatedPath = Clipper.InflatePaths(paths, shift, JoinType.Round, EndType.Butt, 2);
+
+        return convertPathsToVectorList(inflatedPath, reference, minHeight, maxHeight);
+    }
+
+    public static void createConvexSelection(List<String> commands, List<Vector> points, Block[][][] blocks){
+        commands.add("//sel convex");
+        commands.add("//pos1 " + getXYZ(points.get(0)));
+
+        for(int i = 1; i < points.size(); i++)
+            commands.add("//pos2 " + getXYZ(points.get(i)));
+    }
+
+    public static int getMinHeight(List<Vector> vectors){
+        int minHeight = Integer.MAX_VALUE;
+        for(Vector vector : vectors)
+            minHeight = Math.min(minHeight, vector.getBlockY());
+
+        return minHeight;
+    }
+
+    public static int getMaxHeight(List<Vector> vectors){
+        int maxHeight = Integer.MIN_VALUE;
+        for(Vector vector : vectors)
+            maxHeight = Math.max(maxHeight, vector.getBlockY());
+
+        return maxHeight;
+    }
+
+    public static void createPolySelection(List<String> commands, List<Vector> points){
+        commands.add("//sel poly");
+        commands.add("//pos1 " + getXYZ(points.get(0)));
+
+        for(int i = 1; i < points.size(); i++)
+            commands.add("//pos2 " + getXYZ(points.get(i)));
+    }
+
+    public static void createPolySelection(Player p, List<Vector> points, Block[][][] blocks){
+        p.chat("//sel poly");
+        p.chat("//pos1 " + getXYZ(points.get(0), blocks));
+
+        for(int i = 1; i < points.size(); i++)
+            p.chat("//pos2 " + getXYZ(points.get(i), blocks));
+    }
+
+    public static int createPolyLine(List<String> commands, List<Vector> points, String lineMaterial, boolean connectLineEnds, Block[][][] blocks){
+        commands.add("//sel cuboid");
+        commands.add("//pos1 " + getXYZ(points.get(0)));
+        int operations = 0;
+
+        List<String> positions = new ArrayList<>();
+        for(int i = 1; i < points.size(); i++)
+            positions.add(getXYZ(points.get(i), blocks));
+        String pos2 = getXYZ(points.get(0), blocks);
+
+        for(int i = 1; i < points.size(); i++){
+            commands.add("//pos2 " + positions.get(i-1));
+            commands.add("//line " + lineMaterial);
+            operations++;
+            commands.add("//pos1 " + positions.get(i-1));
+        }
+
+        if(connectLineEnds){
+            commands.add("//pos2 " + pos2);
+            commands.add("//line " + lineMaterial);
+            operations++;
+        }
+
+        return operations;
     }
 
     public static boolean checkIfWorldEditIsInstalled(Player p){

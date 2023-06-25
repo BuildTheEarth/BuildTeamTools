@@ -41,7 +41,6 @@ public class RailScripts {
         List<Vector> polyRegionLine = new ArrayList<>(points);
         polyRegionLine = Generator.extendPolyLine(polyRegionLine);
         List<Vector> polyRegionPoints = Generator.shiftPoints(polyRegionLine, railWidth + 2, true);
-        List<Vector> polyRegionPointsExact = Generator.shiftPoints(polyRegionLine, railWidth, true);
 
         // Create a region from the points
         Generator.createPolySelection(p, polyRegionPoints, null);

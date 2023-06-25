@@ -5,6 +5,8 @@ import net.buildtheearth.buildteam.components.generator.house.House;
 import net.buildtheearth.buildteam.components.generator.house.HouseSettings;
 import net.buildtheearth.buildteam.components.generator.house.RoofType;
 import net.buildtheearth.buildteam.components.generator.house.menu.WallColorMenu;
+import net.buildtheearth.buildteam.components.generator.rail.Rail;
+import net.buildtheearth.buildteam.components.generator.rail.RailSettings;
 import net.buildtheearth.buildteam.components.generator.road.Road;
 import net.buildtheearth.buildteam.components.generator.road.RoadSettings;
 import net.buildtheearth.buildteam.components.generator.road.menu.RoadColorMenu;
@@ -172,6 +174,20 @@ public class GeneratorMenu extends AbstractMenu {
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
             new RoadColorMenu(clickPlayer);
+        }));
+
+        // Set click event for railway item
+        getMenu().getSlot(RAILWAY_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
+            Rail rail = Main.buildTeamTools.getGenerator().getRail();
+            rail.getPlayerSettings().put(clickPlayer.getUniqueId(), new RailSettings(clickPlayer));
+
+            if(!rail.checkPlayer(clickPlayer))
+                return;
+
+            clickPlayer.closeInventory();
+            clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
+
+            Main.getBuildTeam().getGenerator().getRail().generate(clickPlayer);
         }));
     }
 

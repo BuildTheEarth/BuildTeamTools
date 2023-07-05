@@ -59,11 +59,12 @@ The goal of the plugin is to massively accelerate the building process by elimin
 - (OPTIONAL) Be connected to the BuildTheEarth network.
 
 🚩 **How to install:**
-1. Install [WorldEdit](https://dev.bukkit.org/projects/worldedit/files/2597538) and [SchematicBrush](https://dev.bukkit.org/projects/schematicbrush).
-2. Download BuildTeamTools [here](https://www.spigotmc.org/resources/buildteamtools.101854/).
-3. Place the downloaded plugin in your server's **../plugins** folder.
-4. Restart your server.
-5. Done!
+1. Download BuildTeamTools [here](https://www.spigotmc.org/resources/buildteamtools.101854/).
+2. Place the downloaded plugin in your server's **../plugins** folder.
+3. To activate the **Generators**, please install [WorldEdit](https://dev.bukkit.org/projects/worldedit/files/2597538) 
+4. To activate the **Tree Generator**, please follow the [installation instructions](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Installation).
+5. Restart your server.
+6. Done!
 
 **For more help, please see the [wiki](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Installation).**
 

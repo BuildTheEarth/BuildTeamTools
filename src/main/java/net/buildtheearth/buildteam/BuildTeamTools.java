@@ -173,6 +173,13 @@ public class BuildTeamTools {
 		}
 
 		/**
+		 * @return True if SchematicBrush is present
+		 */
+		public static boolean isSchematicBrushEnabled() {
+			return Main.instance.getServer().getPluginManager().isPluginEnabled("SchematicBrush");
+		}
+
+		/**
 		 * @return World Edit instance
 		 */
 		public static WorldEdit getWorldEdit() {

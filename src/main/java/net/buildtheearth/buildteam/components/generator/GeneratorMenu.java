@@ -1,6 +1,7 @@
 package net.buildtheearth.buildteam.components.generator;
 
 import net.buildtheearth.Main;
+import net.buildtheearth.buildteam.BuildTeamTools;
 import net.buildtheearth.buildteam.components.generator.house.House;
 import net.buildtheearth.buildteam.components.generator.house.HouseSettings;
 import net.buildtheearth.buildteam.components.generator.house.RoofType;
@@ -10,6 +11,7 @@ import net.buildtheearth.buildteam.components.generator.rail.RailSettings;
 import net.buildtheearth.buildteam.components.generator.road.Road;
 import net.buildtheearth.buildteam.components.generator.road.RoadSettings;
 import net.buildtheearth.buildteam.components.generator.road.menu.RoadColorMenu;
+import net.buildtheearth.buildteam.components.generator.tree.Tree;
 import net.buildtheearth.utils.menus.AbstractMenu;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.Liste;
@@ -104,22 +106,42 @@ public class GeneratorMenu extends AbstractMenu {
         getMenu().getSlot(RAILWAY_ITEM_SLOT).setItem(railwayItem);
 
 
-        // TREE ITEM
-        ArrayList<String> treeLore = Liste.createList("",
-                "§eDescription:",
-                "Generate trees from a set of",
-                "hundreds of different types",
-                "",
-                "§eFeatures:",
-                "- Custom Tree Type",
-                "",
-                "§8Leftclick to generate",
-                "§8Rightclick for Tutorial");
+        if(!BuildTeamTools.DependencyManager.isSchematicBrushEnabled()){
+            // TREE ITEM
+            ArrayList<String> treeLore = Liste.createList("", "§cPlugin §eSchematicBrush §cis not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
 
-        ItemStack treeItem = Item.create(Material.SAPLING, "§aGenerate Tree", treeLore);
+            ItemStack treeItem = Item.create(Material.SAPLING, "§aGenerate Tree & Forest §c(DISABLED)", treeLore);
 
-        // Set navigator item
-        getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
+            // Set navigator item
+            getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
+        }else if(!Generator.checkIfTreePackIsInstalled(getMenuPlayer(), false)){
+            // TREE ITEM
+            ArrayList<String> treeLore = Liste.createList("", "§cThe §eTree Pack " + Tree.TREE_PACK_VERSION + " §cis not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
+
+            ItemStack treeItem = Item.create(Material.SAPLING, "§aGenerate Tree & Forest §c(DISABLED)", treeLore);
+
+            // Set navigator item
+            getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
+        }else{
+            // TREE ITEM
+            ArrayList<String> treeLore = Liste.createList("",
+                    "§eDescription:",
+                    "Generate trees from a set of",
+                    "hundreds of different types",
+                    "",
+                    "§eFeatures:",
+                    "- Custom Tree Type",
+                    "",
+                    "§8Leftclick to generate",
+                    "§8Rightclick for Tutorial");
+
+            ItemStack treeItem = Item.create(Material.SAPLING, "§aGenerate Tree & Forest", treeLore);
+
+            // Set navigator item
+            getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
+        }
+
+
 
 
         // FIELD ITEM

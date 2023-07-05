@@ -39,6 +39,9 @@ public class generate_command implements CommandExecutor {
 
         // Command Usage: /gen
         if(args.length == 0){
+            if(!Generator.checkIfWorldEditIsInstalled(p))
+                return true;
+
             new GeneratorMenu(p);
             return true;
         }
@@ -66,6 +69,7 @@ public class generate_command implements CommandExecutor {
         // Command Usage: /gen tree ...
         if(args[0].equals("tree")) {
             Tree.analyzeCommand(p, args);
+            return true;
         }
 
 

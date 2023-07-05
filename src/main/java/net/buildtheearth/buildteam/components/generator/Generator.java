@@ -9,13 +9,19 @@ import clipper2.offset.JoinType;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.Region;
 import lombok.Getter;
+import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.BuildTeamTools;
 import net.buildtheearth.buildteam.components.generator.house.House;
 import net.buildtheearth.buildteam.components.generator.rail.Rail;
 import net.buildtheearth.buildteam.components.generator.road.Road;
+import net.buildtheearth.buildteam.components.generator.tree.Tree;
 import net.buildtheearth.utils.Item;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
@@ -25,6 +31,8 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.*;
 
 public class Generator {
@@ -502,6 +510,58 @@ public class Generator {
             return false;
         }
         return true;
+    }
+
+    public static boolean checkIfSchematicBrushIsInstalled(Player p){
+        // Check if WorldEdit is enabled
+        if(!BuildTeamTools.DependencyManager.isSchematicBrushEnabled()){
+            p.sendMessage("§cPlease install Schematic Brush to use this tool. You can ask the server administrator to install it.");
+            p.sendMessage(" ");
+            p.sendMessage("§cFor more installation help, please see the wiki:");
+            p.sendMessage("§c" + INSTALL_WIKI);
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean checkIfTreePackIsInstalled(Player p, boolean sendError){
+        // Load the schematic file
+        try {
+            String filepath = "newtrees/oak41.schematic";
+            File myfile = new File(Main.instance.getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/" + filepath);
+
+            if(!myfile.exists()) {
+                if(sendError)
+                    sendTreePackError(p);
+                return false;
+            }
+
+            ClipboardFormat format = ClipboardFormat.findByFile(myfile);
+            ClipboardReader reader = format.getReader(new FileInputStream(myfile));
+            BukkitWorld bukkitWorld = new BukkitWorld(p.getWorld());
+            Clipboard clipboard = reader.read(bukkitWorld.getWorldData());
+
+            if(clipboard == null) {
+                if(sendError)
+                    sendTreePackError(p);
+
+                return false;
+            }else
+                return true;
+
+        } catch (Exception e) {
+            if(sendError)
+                sendTreePackError(p);
+
+            return false;
+        }
+    }
+
+    public static void sendTreePackError(Player p){
+        p.sendMessage("§cPlease install the Tree Pack " + Tree.TREE_PACK_VERSION +" to use this tool. You can ask the server administrator to install it.");
+        p.sendMessage(" ");
+        p.sendMessage("§cFor more installation help, please see the wiki:");
+        p.sendMessage("§c" + INSTALL_WIKI);
     }
 
     public static boolean checkForWorldEditSelection(Player p){

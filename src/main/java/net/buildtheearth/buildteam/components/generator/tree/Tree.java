@@ -46,7 +46,7 @@ public class Tree {
         }
 
         // In case the player is holding no item, give him a diamond sword
-        if(p.getItemOnCursor() == null || p.getItemOnCursor().getType() == Material.AIR)
+        if(p.getItemOnCursor() == null || p.getInventory().getItemInMainHand().getType() == Material.AIR)
             p.getInventory().setItem(p.getInventory().getHeldItemSlot(), Item.create(Material.DIAMOND_SWORD));
 
 

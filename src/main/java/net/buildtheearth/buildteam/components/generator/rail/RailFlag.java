@@ -1,8 +1,8 @@
 package net.buildtheearth.buildteam.components.generator.rail;
 
-import net.buildtheearth.buildteam.components.generator.road.RoadFlag;
+import net.buildtheearth.buildteam.components.generator.Flag;
 
-public enum RailFlag {
+public enum RailFlag implements Flag {
     LANE_COUNT("c");
 
     private String flag;

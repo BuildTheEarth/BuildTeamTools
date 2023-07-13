@@ -68,7 +68,7 @@ public class generate_command implements CommandExecutor {
 
         // Command Usage: /gen tree ...
         if(args[0].equals("tree")) {
-            Tree.analyzeCommand(p, args);
+            Main.getBuildTeam().getGenerator().getTree().analyzeCommand(p, args);
             return true;
         }
 

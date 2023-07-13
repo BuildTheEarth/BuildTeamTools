@@ -10,10 +10,6 @@ public class RailSettings extends Settings {
         super(player);
     }
 
-    public void setValue(RailFlag railFlag, String value){
-        getValues().put(railFlag, value);
-    }
-
     public void setDefaultValues(){
 
         // Lane Count (Default: Fixed Value)

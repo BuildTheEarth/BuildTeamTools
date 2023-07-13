@@ -1,10 +1,7 @@
 package net.buildtheearth.buildteam.components.generator.house;
 
-import net.buildtheearth.utils.Utils;
-
-public enum HouseFlag {
-
-
+import net.buildtheearth.buildteam.components.generator.Flag;
+public enum HouseFlag implements Flag {
     WALL_COLOR("w"),            // String "123:24,21:3,3,..."
     ROOF_COLOR("r"),            // String "123:24,21:3,3,..."
     BASE_COLOR("b"),            // String "123:24,21:3,3,..."

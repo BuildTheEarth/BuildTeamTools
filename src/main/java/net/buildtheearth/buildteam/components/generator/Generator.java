@@ -52,10 +52,14 @@ public class Generator {
     @Getter
     private Rail rail;
 
+    @Getter
+    private Tree tree;
+
     public Generator(){
         house = new House();
         road = new Road();
         rail = new Rail();
+        tree = new Tree();
     }
 
     public void tick(){

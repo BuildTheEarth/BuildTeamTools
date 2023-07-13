@@ -1,7 +1,9 @@
 package net.buildtheearth.buildteam.components.generator.road;
 
 
-public enum RoadFlag {
+import net.buildtheearth.buildteam.components.generator.Flag;
+
+public enum RoadFlag implements Flag {
     LANE_COUNT("c"),
     LANE_WIDTH("w"),
     ROAD_MATERIAL("m"),

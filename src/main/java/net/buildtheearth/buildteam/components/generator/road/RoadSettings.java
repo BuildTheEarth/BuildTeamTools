@@ -20,10 +20,6 @@ public class RoadSettings extends Settings {
         super(player);
     }
 
-    public void setValue(RoadFlag roadFlag, String value){
-        getValues().put(roadFlag, value);
-    }
-
     public void setDefaultValues(){
 
         // Lane Count (Default: Fixed Value)

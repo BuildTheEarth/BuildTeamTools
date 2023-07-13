@@ -1,8 +1,8 @@
 package net.buildtheearth.buildteam.components.generator.tree;
 
-import net.buildtheearth.buildteam.components.generator.road.RoadFlag;
+import net.buildtheearth.buildteam.components.generator.Flag;
 
-public enum TreeFlag {
+public enum TreeFlag implements Flag {
 
     TYPE("t"),
     WIDTH("w"),
@@ -18,10 +18,10 @@ public enum TreeFlag {
         return flag;
     }
 
-    public static RoadFlag byString(String flag){
-        for(RoadFlag roadFlag : RoadFlag.values())
-            if(roadFlag.getFlag().equalsIgnoreCase(flag))
-                return roadFlag;
+    public static TreeFlag byString(String flag){
+        for(TreeFlag treeFlag : TreeFlag.values())
+            if(treeFlag.getFlag().equalsIgnoreCase(flag))
+                return treeFlag;
 
         return null;
     }

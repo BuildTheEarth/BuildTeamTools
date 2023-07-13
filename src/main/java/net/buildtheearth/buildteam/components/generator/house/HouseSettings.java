@@ -19,11 +19,6 @@ public class HouseSettings extends Settings {
         super(player);
     }
 
-    public void setValue(HouseFlag houseFlag, String value){
-        getValues().put(houseFlag, value);
-    }
-
-
     public void setDefaultValues(){
         // Roof Type (Default: Random)
         RoofType roofType = (RoofType) Utils.pickRandom(RoofType.values());

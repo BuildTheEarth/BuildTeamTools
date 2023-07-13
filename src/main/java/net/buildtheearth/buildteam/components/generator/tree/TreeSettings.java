@@ -6,13 +6,8 @@ import org.bukkit.entity.Player;
 
 public class TreeSettings extends Settings {
 
-
     public TreeSettings(Player player){
         super(player);
-    }
-
-    public void setValue(TreeFlag treeFlag, String value){
-        getValues().put(treeFlag, value);
     }
 
     public void setDefaultValues(){

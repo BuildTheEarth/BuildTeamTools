@@ -25,6 +25,9 @@ public class Tree extends GeneratorModule {
         if(!Generator.checkIfTreePackIsInstalled(p,true))
             return false;
 
+        if(!Generator.checkIfSchematicBrushIsInstalled(p))
+            return false;
+
         if(getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
             getPlayerSettings().get(p.getUniqueId()).setBlocks(Generator.analyzeRegion(p, p.getWorld()));
 

@@ -5,7 +5,6 @@ import net.buildtheearth.buildteam.components.generator.Settings;
 import net.buildtheearth.buildteam.components.generator.road.RoadFlag;
 import net.buildtheearth.buildteam.components.generator.road.RoadSettings;
 import net.buildtheearth.buildteam.components.generator.road.menu.SidewalkColorMenu;
-import net.buildtheearth.buildteam.components.generator.tree.TreeType;
 import net.buildtheearth.buildteam.components.generator.tree.TreeWidth;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.menus.BlockListMenu;
@@ -23,10 +22,11 @@ public class TreeWidthMenu extends BlockListMenu {
     public static String TREE_TYPE_INV_NAME = "Choose a Tree Width";
 
     public TreeWidthMenu(Player player) {
-        super(player, TREE_TYPE_INV_NAME, getTreeTypes());
+        super(player, TREE_TYPE_INV_NAME, getTreeWidths());
     }
 
-    private static List<ItemStack> getTreeTypes() {
+    /** Get a list of all tree widths */
+    private static List<ItemStack> getTreeWidths() {
         List<ItemStack> treeTypes = new ArrayList<>();
 
         treeTypes.add(Item.create(Material.CONCRETE, "Any", (byte) 5));

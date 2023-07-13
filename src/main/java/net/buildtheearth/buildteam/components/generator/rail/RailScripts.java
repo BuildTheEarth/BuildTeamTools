@@ -69,7 +69,7 @@ public class RailScripts {
 
         // Draw the railway curve
 
-        Generator.createConvexSelection(commands, points, regionBlocks);
+        Generator.createConvexSelection(commands, points);
         commands.add("//gmask !solid");
         commands.add("//curve 42");
         operations++;
@@ -94,7 +94,7 @@ public class RailScripts {
         operations++;
 
         commands.add("//gmask");
-        Generator.createConvexSelection(commands, points, null);
+        Generator.createConvexSelection(commands, points);
 
         Main.buildTeamTools.getGenerator().getCommands().add(new Command(p, rail, commands, operations, regionBlocks));
         Generator.getPlayerHistory(p).addHistoryEntry(new History.HistoryEntry(GeneratorType.RAILWAY, operations));

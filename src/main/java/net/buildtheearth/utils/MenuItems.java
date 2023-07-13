@@ -1,7 +1,6 @@
 package net.buildtheearth.utils;
 
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ public class MenuItems {
 
 
 
-    public static ItemStack getCurrentSliderItem(SliderColor sliderColor, String name, int value, String valueType) {
+    public static ItemStack getCounterCurrentValueItem(SliderColor sliderColor, String name, int value, String valueType) {
         String sliderName = "§e" + name + ": §7§l" + value;
         if(valueType != null)
             sliderName += " " + valueType;
@@ -46,7 +45,7 @@ public class MenuItems {
         }
     }
 
-    public static ItemStack getPlusSliderItem(SliderColor sliderColor, String name, int value, int maxValue) {
+    public static ItemStack getCounterPlusItem(SliderColor sliderColor, String name, int value, int maxValue) {
         if(value >= maxValue)
         switch (sliderColor) {
             case WHITE: return Item.createCustomHeadBase64(WHITE_BLANK, " ", null);
@@ -60,7 +59,7 @@ public class MenuItems {
         }
     }
 
-    public static ItemStack getMinusSliderItem(SliderColor sliderColor, String name, int value, int minValue) {
+    public static ItemStack getCounterMinusItem(SliderColor sliderColor, String name, int value, int minValue) {
         if(value <= minValue)
         switch (sliderColor) {
             case WHITE: return Item.createCustomHeadBase64(WHITE_BLANK, " ", null);

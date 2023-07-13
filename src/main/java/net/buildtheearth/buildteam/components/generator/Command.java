@@ -39,10 +39,14 @@ public class Command {
         this.totalCommands = commands.size();
     }
 
+    /** Proecesses the commands from the command queue to prevent the server from freezing. */
     public void tick(){
         if(commands.size() == 0)
             return;
 
+        // As long as the player has the barrier in their inventory, we know that the command queue is still processing so we can skip this tick.
+        // Reason for using the inventory is that the server can only remove the item if its not frozen. That way we can ensure that the server is ready for more commands once the item is removed.
+        // TODO: This is a bit of a hacky way to do this, but it works for the beta. We should find a better way to find out if the command queue is still processing without letting the server freeze because of too many commands.
         if(player.getInventory().getItem(INVENTORY_SLOT) != null && player.getInventory().getItem(INVENTORY_SLOT).getType() == Material.BARRIER)
             return;
 
@@ -51,6 +55,7 @@ public class Command {
         percentage = (int) Math.round((double) (totalCommands - commands.size()) / (double) totalCommands * 100);
         player.sendActionBar("§a§lGenerator Progress: §e" + percentage + "%");
 
+        // Process commands in batches of MAX_COMMANDS_PER_SERVER_TICK
         for(int i = 0; i < MAX_COMMANDS_PER_SERVER_TICK;){
             if(commands.size() == 0){
                 finish();
@@ -73,6 +78,7 @@ public class Command {
         player.getInventory().setItem(INVENTORY_SLOT, null);
     }
 
+    /** Processes a single command. */
     public void processCommand(Player p, String command){
         if(command.contains("%%XYZ/"))
             command = convertXYZ(command);
@@ -80,6 +86,7 @@ public class Command {
         player.chat(command);
     }
 
+    /** Converts the XYZ coordinates in a command to the highest block at that location while skipping certain blocks. */
     public String convertXYZ(String command){
         String xyz = command.split("%%XYZ/")[1].split("/%%")[0];
 
@@ -102,6 +109,7 @@ public class Command {
         return command.split("%%XYZ/")[0] + x + "," + maxHeight + "," + z + commandSuffix;
     }
 
+    /** Called when the command queue is finished. */
     public void finish(){
         module.sendSuccessMessage(player);
     }

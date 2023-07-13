@@ -62,6 +62,12 @@ public class Generator {
         tree = new Tree();
     }
 
+    /** Processes the command queues one after another and lets the waiting players know their position in the queue and the percentage of the current generation.
+     *
+     * Relations:
+     * @see Command
+     * @see Command#tick()
+     */
     public void tick(){
         if(commands.size() == 0)
             return;
@@ -91,19 +97,12 @@ public class Generator {
     }
 
 
-    public static Region getWorldEditSelection(Player p){
-        Region plotRegion;
 
-        try {
-            plotRegion = Objects.requireNonNull(WorldEdit.getInstance().getSessionManager().findByName(p.getName())).getSelection(
-                    Objects.requireNonNull(WorldEdit.getInstance().getSessionManager().findByName(p.getName())).getSelectionWorld());
-        } catch (NullPointerException | IncompleteRegionException ex) {
-            return null;
-        }
-
-        return plotRegion;
-    }
-
+    /** Returns the Generator History of a player.
+     *
+     * @param p The player whose history should be returned.
+     * @return The Generator History of the player.
+     */
     public static History getPlayerHistory(Player p){
         if(!playerHistory.containsKey(p.getUniqueId()))
             playerHistory.put(p.getUniqueId(), new History(p));
@@ -111,12 +110,22 @@ public class Generator {
         return playerHistory.get(p.getUniqueId());
     }
 
+    /** Sends more information about the generator to a player.
+     *  The WIKI_PAGE varies depending on the generator.
+     *
+     * @param p The player who should receive the information.
+     */
     public static void sendMoreInfo(Player p){
         p.sendMessage(" ");
         p.sendMessage("§cFor more information take a look here:");
         p.sendMessage("§c" + WIKI_PAGE);
     }
 
+    /** Converts a String[] of arguments to a String[] of flags.
+     *
+     * @param args The arguments to be converted.
+     * @return The converted flags.
+     */
     public static String[] convertArgsToFlags(String[] args){
         String argsString = " " + StringUtils.join(Arrays.copyOfRange(args, 1, args.length), " ");
         String[] argsArray = argsString.split(" -");
@@ -125,6 +134,12 @@ public class Generator {
         return flagsArray;
     }
 
+    /** Converts a string with all flags and values to a string array with the flag name and the flag value.
+     *
+     * @param flagAndValue The string with all flags and values. Example is a command like /gen house -w 10 -h 10
+     * @param p The player who should receive an error message if the flag value is invalid.
+     * @return The string array with the flag name and the flag value.
+     */
     public static String[] convertToFlagAndValue(String flagAndValue, Player p){
         String[] values = flagAndValue.split(" ");
         String flagName = values[0];
@@ -140,6 +155,14 @@ public class Generator {
         return new String[]{flagName, flagValue};
     }
 
+    /** Analyzes a region and returns a three-dimensional array of all blocks in the region.
+     * The size of the array is defined by the width, height and length of the region from WorldEdit of the player.
+     * By saving the blocks in an array, the generation can be done much faster later once the region blocks need to be inspected.
+     *
+     * @param p The player whose selection should be analyzed.
+     * @param world The world in which the region is located.
+     * @return A three-dimensional array of all blocks in the region.
+     */
     public static Block[][][] analyzeRegion(Player p, World world) {
         // Get WorldEdit selection of player
         Region polyRegion = Generator.getWorldEditSelection(p);
@@ -210,6 +233,12 @@ public class Generator {
         return false;
     }
 
+    /**
+     * Adjusts the height of a list of vectors so that they are on the surface of the terrain.
+     * @param points - List of vectors to adjust
+     * @param blocks - List of blocks in polygon region
+     * @return List of vectors with adjusted height
+     */
     public static List<Vector> adjustHeight(List<Vector> points, Block[][][] blocks){
 
         for(int i = 0; i < points.size(); i++) {
@@ -359,10 +388,23 @@ public class Generator {
         return result;
     }
 
+    /**
+     * Returns a temporary XYZ String that indicates that the height of the point should be inspected later to match the surface of the terrain.
+     *
+     * @param vector - The vector to get the XYZ String from
+     * @return The temporary XYZ String
+     */
     public static String getXYZ(Vector vector){
         return "%%XYZ/" + vector.getBlockX() + "," + vector.getBlockY() + "," + vector.getBlockZ() + "/%%";
     }
 
+    /**
+     * Returns a XYZ String with the height of the point matching the surface of the terrain.
+     *
+     * @param vector - The vector to get the XYZ String from
+     * @param blocks - The dataset to get the height from
+     * @return The XYZ String
+     */
     public static String getXYZ(Vector vector, Block[][][] blocks){
         int maxHeight = vector.getBlockY();
 
@@ -374,31 +416,7 @@ public class Generator {
         return vector.getBlockX() + "," + maxHeight + "," + vector.getBlockZ();
     }
 
-    public static List<Vector> shiftPoints(List<Vector> vectors, double shift, boolean useLongestPathOnly) {
-        List<List<Vector>> resultVectors = shiftPointsAll(vectors, shift);
 
-        // If we only want the longest path, find it and return it
-        if(useLongestPathOnly){
-            int longestPathIndex = 0;
-            int longestPathLength = 0;
-            for(int i = 0; i < resultVectors.size(); i++){
-                if(resultVectors.get(i).size() > longestPathLength){
-                    longestPathIndex = i;
-                    longestPathLength = resultVectors.get(i).size();
-                }
-            }
-
-            return resultVectors.get(longestPathIndex);
-
-            // Otherwise, return all paths
-        }else{
-            List<Vector> result = new ArrayList<>();
-            for(List<Vector> vectorList : resultVectors)
-                result.addAll(vectorList);
-
-            return result;
-        }
-    }
 
     public static Path64 convertVectorListToPath64(List<Vector> vectors, Vector reference){
         List<Point64> points = new ArrayList<>();
@@ -426,6 +444,57 @@ public class Generator {
         return vectors;
     }
 
+    /**
+     * Shifts the points in a polyline by a given amount.
+     * Sometimes during shifting there are multiple paths created.
+     * For example, if you have a polyline that intersects itself, there is an inner and outer path.
+     * This method can either return all the paths or just the longest one.
+     *
+     * @see #shiftPointsAll(List, double)
+     *
+     * @param vectors - The polyline to shift
+     * @param shift - The amount to shift the points by
+     * @param useLongestPathOnly - Whether to only return the longest path
+     * @return The shifted polyline
+     */
+    public static List<Vector> shiftPoints(List<Vector> vectors, double shift, boolean useLongestPathOnly) {
+        List<List<Vector>> resultVectors = shiftPointsAll(vectors, shift);
+
+        // If we only want the longest path, find it and return it
+        if(useLongestPathOnly){
+            int longestPathIndex = 0;
+            int longestPathLength = 0;
+            for(int i = 0; i < resultVectors.size(); i++){
+                if(resultVectors.get(i).size() > longestPathLength){
+                    longestPathIndex = i;
+                    longestPathLength = resultVectors.get(i).size();
+                }
+            }
+
+            return resultVectors.get(longestPathIndex);
+
+        // Otherwise, return all paths combined into one
+        }else{
+            List<Vector> result = new ArrayList<>();
+            for(List<Vector> vectorList : resultVectors)
+                result.addAll(vectorList);
+
+            return result;
+        }
+    }
+
+    /**
+     * Shifts the points in a polyline by a given amount.
+     * Sometimes during shifting there are multiple paths created.
+     * For example, if you have a polyline that intersects itself, there is an inner and outer path.
+     * This method returns a list of all the paths.
+     *
+     * @see #shiftPoints(List, double, boolean)
+     *
+     * @param vectors - The polyline to shift
+     * @param shift - The amount to shift the points by
+     * @return The shifted polyline
+     */
     public static List<List<Vector>> shiftPointsAll(List<Vector> vectors, double shift) {
         Vector reference = vectors.get(0);
         int minHeight = getMinHeight(vectors);
@@ -437,14 +506,12 @@ public class Generator {
         return convertPathsToVectorList(inflatedPath, reference, minHeight, maxHeight);
     }
 
-    public static void createConvexSelection(List<String> commands, List<Vector> points, Block[][][] blocks){
-        commands.add("//sel convex");
-        commands.add("//pos1 " + getXYZ(points.get(0)));
-
-        for(int i = 1; i < points.size(); i++)
-            commands.add("//pos2 " + getXYZ(points.get(i)));
-    }
-
+    /**
+     * Gets the minimum height of a list of vectors
+     *
+     * @param vectors - The list of vectors to get the minimum height of
+     * @return The minimum height
+     */
     public static int getMinHeight(List<Vector> vectors){
         int minHeight = Integer.MAX_VALUE;
         for(Vector vector : vectors)
@@ -453,6 +520,12 @@ public class Generator {
         return minHeight;
     }
 
+    /**
+     * Gets the maximum height of a list of vectors
+     *
+     * @param vectors - The list of vectors to get the maximum height of
+     * @return The maximum height
+     */
     public static int getMaxHeight(List<Vector> vectors){
         int maxHeight = Integer.MIN_VALUE;
         for(Vector vector : vectors)
@@ -461,6 +534,27 @@ public class Generator {
         return maxHeight;
     }
 
+
+    /** Creates a Convex WorldEdit selection from a list of points and adds it to the list of commands to execute.
+     *
+     * @param commands - The list of commands to add the selection to
+     * @param points - The list of points to create the selection from
+     */
+    public static void createConvexSelection(List<String> commands, List<Vector> points){
+        commands.add("//sel convex");
+        commands.add("//pos1 " + getXYZ(points.get(0)));
+
+        for(int i = 1; i < points.size(); i++)
+            commands.add("//pos2 " + getXYZ(points.get(i)));
+    }
+
+    /**
+     * Creates a Poly WorldEdit selection from a list of points and adds it to the list of commands to execute.
+     * This functions determines the surface height of each location later once it's processed by the command queue.
+     *
+     * @param commands - The list of commands to add the selection to
+     * @param points - The list of points to create the selection from
+     */
     public static void createPolySelection(List<String> commands, List<Vector> points){
         commands.add("//sel poly");
         commands.add("//pos1 " + getXYZ(points.get(0)));
@@ -469,6 +563,14 @@ public class Generator {
             commands.add("//pos2 " + getXYZ(points.get(i)));
     }
 
+    /**
+     * Creates a Poly WorldEdit selection from a list of points and adds it to the list of commands to execute.
+     * This functions determines the surface height of each location directly.
+     *
+     * @param p - The player to create the selection for
+     * @param points - The list of points to create the selection from
+     * @param blocks - The blocks to get the surface height from
+     */
     public static void createPolySelection(Player p, List<Vector> points, Block[][][] blocks){
         p.chat("//sel poly");
         p.chat("//pos1 " + getXYZ(points.get(0), blocks));
@@ -477,6 +579,17 @@ public class Generator {
             p.chat("//pos2 " + getXYZ(points.get(i), blocks));
     }
 
+    /**
+     * Draws a curved poly line from a list of points and adds it to the list of commands to execute.
+     * It draws the curve by drawing a straight line between each of the points.
+     *
+     * @param commands - The list of commands to add the selection to
+     * @param points - The list of points to create the selection from
+     * @param lineMaterial - The material to draw the line with
+     * @param connectLineEnds - Whether to connect the line ends in case the line is a circle
+     * @param blocks - The blocks to get the surface height from
+     * @return
+     */
     public static int createPolyLine(List<String> commands, List<Vector> points, String lineMaterial, boolean connectLineEnds, Block[][][] blocks){
         commands.add("//sel cuboid");
         commands.add("//pos1 " + getXYZ(points.get(0)));
@@ -503,6 +616,33 @@ public class Generator {
         return operations;
     }
 
+
+
+    /**
+     * Returns the current WorldEdit selection of a player.
+     *
+     * @param p The player whose selection should be returned.
+     * @return The current WorldEdit selection of the player.
+     */
+    public static Region getWorldEditSelection(Player p){
+        Region plotRegion;
+
+        try {
+            plotRegion = Objects.requireNonNull(WorldEdit.getInstance().getSessionManager().findByName(p.getName())).getSelection(
+                    Objects.requireNonNull(WorldEdit.getInstance().getSessionManager().findByName(p.getName())).getSelectionWorld());
+        } catch (NullPointerException | IncompleteRegionException ex) {
+            return null;
+        }
+
+        return plotRegion;
+    }
+
+    /**
+     * Checks if WorldEdit is installed and sends the player a message if it isn't.
+     *
+     * @param p - The player to check for
+     * @return Whether WorldEdit is installed
+     */
     public static boolean checkIfWorldEditIsInstalled(Player p){
         // Check if WorldEdit is enabled
         if(!BuildTeamTools.DependencyManager.isWorldEditEnabled()){
@@ -516,6 +656,12 @@ public class Generator {
         return true;
     }
 
+    /**
+     * Checks if Schematic Brush is installed and sends the player a message if it isn't.
+     *
+     * @param p - The player to check for
+     * @return Whether Schematic Brush is installed
+     */
     public static boolean checkIfSchematicBrushIsInstalled(Player p){
         // Check if WorldEdit is enabled
         if(!BuildTeamTools.DependencyManager.isSchematicBrushEnabled()){
@@ -528,6 +674,12 @@ public class Generator {
         return true;
     }
 
+    /**
+     * Checks if the TreePack is installed and sends the player a message if it isn't.
+     *
+     * @param p - The player to check for
+     * @return Whether the TreePack is installed
+     */
     public static boolean checkIfTreePackIsInstalled(Player p, boolean sendError){
         // Load the schematic file
         try {
@@ -561,6 +713,13 @@ public class Generator {
         }
     }
 
+    /**
+     * Sends the player a message with more information about the tree pack in case it isn't installed.
+     *
+     * @see #checkIfTreePackIsInstalled(Player, boolean)
+     *
+     * @param p - The player to send the message to
+     */
     public static void sendTreePackError(Player p){
         p.sendMessage("§cPlease install the Tree Pack " + Tree.TREE_PACK_VERSION +" to use this tool. You can ask the server administrator to install it.");
         p.sendMessage(" ");
@@ -568,6 +727,13 @@ public class Generator {
         p.sendMessage("§c" + INSTALL_WIKI);
     }
 
+
+    /**
+     * Checks if the player has a WorldEdit selection and sends them a message if they don't.
+     *
+     * @param p - The player to check for
+     * @return Whether the player has a WorldEdit selection
+     */
     public static boolean checkForWorldEditSelection(Player p){
         // Get WorldEdit selection of player
         Region polyRegion = Generator.getWorldEditSelection(p);
@@ -583,6 +749,12 @@ public class Generator {
         return true;
     }
 
+    /**
+     * Checks if the player has a WorldEdit Convex selection and sends them a message if they don't.
+     *
+     * @param p - The player to check for
+     * @return Whether the player has a WorldEdit Convex selection
+     */
     public static boolean checkForConvexSelection(Player p){
         // Get WorldEdit selection of player
         Region polyRegion = Generator.getWorldEditSelection(p);
@@ -598,6 +770,12 @@ public class Generator {
         return true;
     }
 
+    /**
+     * Checks if the player has a brick block in their selection and sends them a message if they don't.
+     *
+     * @param p - The player to check for
+     * @return Whether the player has a brick block in their selection
+     */
     public static boolean checkForBrickOutline(Block[][][] blocks, Player p){
         if(!containsBlock(blocks, Material.BRICK, (byte) 0)){
             p.sendMessage("§cPlease make a selection around an outline.");
@@ -611,6 +789,12 @@ public class Generator {
         return true;
     }
 
+    /**
+     * Checks if the player has a yellow wool block in their selection and sends them a message if they don't.
+     *
+     * @param p - The player to check for
+     * @return Whether the player has a yellow wool block in their selection
+     */
     public static boolean checkForWoolBlock(Block[][][] blocks, Player p){
         if(!containsBlock(blocks, Material.WOOL, (byte) 4)){
             p.sendMessage("§cPlease place a yellow wool block inside the outline.");

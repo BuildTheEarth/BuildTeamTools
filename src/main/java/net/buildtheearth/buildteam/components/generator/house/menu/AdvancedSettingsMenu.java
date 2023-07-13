@@ -47,12 +47,12 @@ public class AdvancedSettingsMenu extends AbstractMenu {
         this.windowHeight = Integer.parseInt(house.getPlayerSettings().get(uuid).getValues().get(HouseFlag.WINDOW_HEIGHT));
         this.windowDistance = Integer.parseInt(house.getPlayerSettings().get(uuid).getValues().get(HouseFlag.WINDOW_DISTANCE));
 
-        setSliderItems(MenuItems.SliderColor.WHITE, FLOOR_COUNT_SLOT, "Number of Floors", floorCount, 1, 10, "Floors");
-        setSliderItems(MenuItems.SliderColor.LIGHT_GRAY, FLOOR_HEIGHT_SLOT, "Floors Height", floorHeight, 1, 10, "Blocks");
-        setSliderItems(MenuItems.SliderColor.WHITE, BASE_HEIGHT_SLOT, "Basement Height", baseHeight, 0, 10, "Blocks");
-        setSliderItems(MenuItems.SliderColor.WHITE, WINDOW_WIDTH_SLOT, "Window Width", windowWidth, 1, 5, "Blocks");
-        setSliderItems(MenuItems.SliderColor.LIGHT_GRAY, WINDOW_HEIGHT_SLOT, "Window Height", windowHeight, 1, 5, "Blocks");
-        setSliderItems(MenuItems.SliderColor.WHITE, WINDOW_DISTANCE_SLOT, "Window Distance", windowDistance, 1, 6, "Blocks");
+        createCounter(MenuItems.SliderColor.WHITE, FLOOR_COUNT_SLOT, "Number of Floors", floorCount, 1, 10, "Floors");
+        createCounter(MenuItems.SliderColor.LIGHT_GRAY, FLOOR_HEIGHT_SLOT, "Floors Height", floorHeight, 1, 10, "Blocks");
+        createCounter(MenuItems.SliderColor.WHITE, BASE_HEIGHT_SLOT, "Basement Height", baseHeight, 0, 10, "Blocks");
+        createCounter(MenuItems.SliderColor.WHITE, WINDOW_WIDTH_SLOT, "Window Width", windowWidth, 1, 5, "Blocks");
+        createCounter(MenuItems.SliderColor.LIGHT_GRAY, WINDOW_HEIGHT_SLOT, "Window Height", windowHeight, 1, 5, "Blocks");
+        createCounter(MenuItems.SliderColor.WHITE, WINDOW_DISTANCE_SLOT, "Window Distance", windowDistance, 1, 6, "Blocks");
 
 
         getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.getNextItem());

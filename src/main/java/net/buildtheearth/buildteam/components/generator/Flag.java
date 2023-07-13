@@ -9,6 +9,7 @@ public interface Flag {
 
     String getFlag();
 
+    /** @return the flag by the given string and generator type */
     static Flag byString(GeneratorType generatorType, String flag) {
         switch (generatorType) {
             case HOUSE:

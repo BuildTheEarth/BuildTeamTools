@@ -53,77 +53,36 @@ public class RoofTypeMenu extends AbstractMenu {
 
     @Override
     protected void setItemClickEventsAsync() {
-        boolean clicked = false;
-        // Set click events items
+        // Set click events for the roof type items
         getMenu().getSlot(FLAT_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            Settings settings = Main.buildTeamTools.getGenerator().getHouse().getPlayerSettings().get(clickPlayer.getUniqueId());
-
-            if(!(settings instanceof HouseSettings))
-                return;
-
-            HouseSettings houseSettings = (HouseSettings) settings;
-            houseSettings.setValue(HouseFlag.ROOF_TYPE, RoofType.FLAT.getType());
-
-            clickPlayer.closeInventory();
-            clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
-            new RoofColorMenu(clickPlayer);
+            performClickAction(clickPlayer, RoofType.FLAT);
         }));
-
         getMenu().getSlot(GABLE_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            Settings settings = Main.buildTeamTools.getGenerator().getHouse().getPlayerSettings().get(clickPlayer.getUniqueId());
-
-            if(!(settings instanceof HouseSettings))
-                return;
-
-            HouseSettings houseSettings = (HouseSettings) settings;
-            houseSettings.setValue(HouseFlag.ROOF_TYPE, RoofType.STAIRS.getType());
-
-            clickPlayer.closeInventory();
-            clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
-            new RoofColorMenu(clickPlayer);
+            performClickAction(clickPlayer, RoofType.STAIRS);
         }));
-
         getMenu().getSlot(STEEP_SLAB_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            Settings settings = Main.buildTeamTools.getGenerator().getHouse().getPlayerSettings().get(clickPlayer.getUniqueId());
-
-            if(!(settings instanceof HouseSettings))
-                return;
-
-            HouseSettings houseSettings = (HouseSettings) settings;
-            houseSettings.setValue(HouseFlag.ROOF_TYPE, RoofType.STEEP_SLABS.getType());
-
-            clickPlayer.closeInventory();
-            clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
-            new RoofColorMenu(clickPlayer);
+            performClickAction(clickPlayer, RoofType.STEEP_SLABS);
         }));
-
         getMenu().getSlot(MEDIUM_SLAB_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            Settings settings = Main.buildTeamTools.getGenerator().getHouse().getPlayerSettings().get(clickPlayer.getUniqueId());
-
-            if(!(settings instanceof HouseSettings))
-                return;
-
-            HouseSettings houseSettings = (HouseSettings) settings;
-            houseSettings.setValue(HouseFlag.ROOF_TYPE, RoofType.MEDIUM_SLABS.getType());
-
-            clickPlayer.closeInventory();
-            clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
-            new RoofColorMenu(clickPlayer);
+            performClickAction(clickPlayer, RoofType.MEDIUM_SLABS);
         }));
-
         getMenu().getSlot(FLATTER_SLAB_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            Settings settings = Main.buildTeamTools.getGenerator().getHouse().getPlayerSettings().get(clickPlayer.getUniqueId());
-
-            if(!(settings instanceof HouseSettings))
-                return;
-
-            HouseSettings houseSettings = (HouseSettings) settings;
-            houseSettings.setValue(HouseFlag.ROOF_TYPE, RoofType.FLATTER_SLABS.getType());
-
-            clickPlayer.closeInventory();
-            clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
-            new RoofColorMenu(clickPlayer);
+            performClickAction(clickPlayer, RoofType.FLATTER_SLABS);
         }));
+    }
+
+    private void performClickAction(Player p, RoofType roofType){
+        Settings settings = Main.buildTeamTools.getGenerator().getHouse().getPlayerSettings().get(p.getUniqueId());
+
+        if(!(settings instanceof HouseSettings))
+            return;
+
+        HouseSettings houseSettings = (HouseSettings) settings;
+        houseSettings.setValue(HouseFlag.ROOF_TYPE, roofType.getType());
+
+        p.closeInventory();
+        p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
+        new RoofColorMenu(p);
     }
 
     @Override

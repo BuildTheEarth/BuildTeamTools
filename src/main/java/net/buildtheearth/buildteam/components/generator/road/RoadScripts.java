@@ -105,7 +105,7 @@ public class RoadScripts {
 
         // Draw the road
 
-        Generator.createConvexSelection(commands, points, regionBlocks);
+        Generator.createConvexSelection(commands, points);
         commands.add("//gmask !solid," + roadMaterial + "," + markingMaterial + "," + sidewalkMaterial + "," + sidewalkSlabMaterial + "," + roadSlabMaterial);
         commands.add("//curve 35:4");
 
@@ -114,7 +114,7 @@ public class RoadScripts {
             List<List<Vector>> yellowWoolLine = Generator.shiftPointsAll(innerPoints, (laneWidth*(i-1)));
 
             for(List<Vector> path : yellowWoolLine) {
-                Generator.createConvexSelection(commands, path, regionBlocks);
+                Generator.createConvexSelection(commands, path);
                 commands.add("//curve 35:4");
                 operations++;
 
@@ -389,7 +389,7 @@ public class RoadScripts {
         operations++;
 
         commands.add("//gmask");
-        Generator.createConvexSelection(commands, points, null);
+        Generator.createConvexSelection(commands, points);
 
         Main.buildTeamTools.getGenerator().getCommands().add(new Command(p, road, commands, operations, regionBlocks));
         Generator.getPlayerHistory(p).addHistoryEntry(new History.HistoryEntry(GeneratorType.ROAD, operations));

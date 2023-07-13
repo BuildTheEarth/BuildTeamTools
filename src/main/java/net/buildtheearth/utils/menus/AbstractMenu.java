@@ -12,14 +12,7 @@ import org.ipvp.canvas.Menu;
 import org.ipvp.canvas.mask.Mask;
 import org.ipvp.canvas.type.ChestMenu;
 
-import java.util.List;
-
 public abstract class AbstractMenu {
-
-    public static int MAX_CHARS_PER_LINE = 30;
-    public static char LINE_BAKER = '\n';
-
-
 
     private final Menu menu;
     private final Player menuPlayer;
@@ -87,17 +80,41 @@ public abstract class AbstractMenu {
         return menuPlayer;
     }
 
-    protected void setSliderItems(MenuItems.SliderColor sliderColor, int sliderItemSlot, String sliderName, int value, int minValue, int maxValue, String valueType){
+    /**
+     * Creates a horizontal counter with 3 items, a plus, a minus and a current value item.
+     * This counter allows the player to increase or decrease the value of the item from minValue to maxValue.
+     * It places the items in the open inventory of the player with the given slot as the current value item as a reference.
+     * The plus and minus items are placed to the left and right of the current value item.
+     *
+     * @param sliderColor - Color of the slider
+     * @param sliderItemSlot - Slot of the current value item in the center
+     * @param sliderName - Name of the slider
+     * @param value - Current value of the slider
+     * @param minValue - Minimum value of the slider
+     * @param maxValue - Maximum value of the slider
+     * @param valueType - Type of the value (e.g. "m", "°C", "°F", "blocks", "chunks", "seconds", "minutes", "hours", "days", "weeks", "months", "years", ...)
+     */
+    protected void createCounter(MenuItems.SliderColor sliderColor, int sliderItemSlot, String sliderName, int value, int minValue, int maxValue, String valueType){
         // Set previous page item
-        getMenu().getSlot(sliderItemSlot - 1).setItem(MenuItems.getMinusSliderItem(sliderColor, sliderName, value, minValue));
+        getMenu().getSlot(sliderItemSlot - 1).setItem(MenuItems.getCounterMinusItem(sliderColor, sliderName, value, minValue));
 
         // Set current page item
-        getMenu().getSlot(sliderItemSlot).setItem(MenuItems.getCurrentSliderItem(sliderColor, sliderName, value, valueType));
+        getMenu().getSlot(sliderItemSlot).setItem(MenuItems.getCounterCurrentValueItem(sliderColor, sliderName, value, valueType));
 
         // Set next page item
-        getMenu().getSlot(sliderItemSlot + 1).setItem(MenuItems.getPlusSliderItem(sliderColor, sliderName, value, maxValue));
+        getMenu().getSlot(sliderItemSlot + 1).setItem(MenuItems.getCounterPlusItem(sliderColor, sliderName, value, maxValue));
     }
 
+    /**
+     * Creates an item that lets you select the right block from a list of blocks.
+     * It places the items in the open inventory of the player with the given slot as the current block item as a reference.
+     * To the left and right of the block item are toggle off items that let the player disable that feature if he doesn't want to use it.
+     *
+     * @param sliderColor - Color of the slider
+     * @param sliderItemSlot - Slot of the current block item in the center
+     * @param sliderName - Name of the slider
+     * @param current - Current block item
+     */
     protected void setColorChoiceItems(MenuItems.SliderColor sliderColor, int sliderItemSlot, String sliderName, ItemStack current){
         sliderName = "§e" + sliderName;
 

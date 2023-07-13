@@ -52,6 +52,13 @@ public class RoofColorMenu extends BlockListMenu {
     }
 
 
+    /**
+     * Get the roof blocks for the menu.
+     * Depending on the roof type, the blocks will be different.
+     *
+     * @param player - the player to get the roof blocks for
+     * @return the roof blocks
+     */
     private static List<ItemStack> getRoofBlocks(Player player) {
         RoofType roofType = RoofType.byString(Main.buildTeamTools.getGenerator().getHouse().getPlayerSettings().get(player.getUniqueId()).getValues().get(HouseFlag.ROOF_TYPE));
 

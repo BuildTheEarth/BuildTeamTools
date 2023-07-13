@@ -26,6 +26,7 @@ public class TreeTypeMenu extends BlockListMenu {
         super(player, TREE_TYPE_INV_NAME, getTreeTypes());
     }
 
+    /** Get a list of all tree types */
     private static List<ItemStack> getTreeTypes() {
         List<ItemStack> treeTypes = new ArrayList<>();
 

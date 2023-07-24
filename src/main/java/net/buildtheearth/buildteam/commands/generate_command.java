@@ -72,6 +72,12 @@ public class generate_command implements CommandExecutor {
             return true;
         }
 
+        // Command Usage: /gen field ...
+        if(args[0].equals("field")) {
+            Main.getBuildTeam().getGenerator().getField().analyzeCommand(p, args);
+            return true;
+        }
+
 
 
 
@@ -115,6 +121,7 @@ public class generate_command implements CommandExecutor {
                 sender.sendMessage("§eRoad Generator:§7 /gen road help");
                 sender.sendMessage("§eRail Generator:§7 /gen rail help");
                 sender.sendMessage("§eTree Generator:§7 /gen tree help");
+                sender.sendMessage("§eField Generator:§7 /gen field help");
             }
         });
     }

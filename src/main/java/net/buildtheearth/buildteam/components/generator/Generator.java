@@ -14,10 +14,12 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
+import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import lombok.Getter;
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.BuildTeamTools;
+import net.buildtheearth.buildteam.components.generator.field.Field;
 import net.buildtheearth.buildteam.components.generator.house.House;
 import net.buildtheearth.buildteam.components.generator.rail.Rail;
 import net.buildtheearth.buildteam.components.generator.road.Road;
@@ -54,12 +56,15 @@ public class Generator {
 
     @Getter
     private Tree tree;
+    @Getter
+    private Field field;
 
     public Generator(){
         house = new House();
         road = new Road();
         rail = new Rail();
         tree = new Tree();
+        field = new Field();
     }
 
     /** Processes the command queues one after another and lets the waiting players know their position in the queue and the percentage of the current generation.
@@ -746,6 +751,25 @@ public class Generator {
             return false;
         }
 
+        return true;
+    }
+
+    /**
+     * Checks if the player has a WorldEdit 2D Polygonal selection and sends them a message if they don't.
+     *
+     * @param p - The player to check for
+     * @return Whether the player has a WorldEdit Poly selection
+     */
+    public static boolean checkForPolySelection(Player p){
+
+        Region polyRegion = Generator.getWorldEditSelection(p);
+
+        if(!(polyRegion instanceof Polygonal2DRegion)){
+            p.sendMessage("§cPlease make a WorldEdit 2D Polygonal Selection first (//sel poly).");
+            p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+            sendMoreInfo(p);
+            return false;
+        }
         return true;
     }
 

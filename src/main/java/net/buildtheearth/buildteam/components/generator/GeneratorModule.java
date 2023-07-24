@@ -2,6 +2,7 @@ package net.buildtheearth.buildteam.components.generator;
 
 import lombok.Getter;
 import net.buildtheearth.buildteam.BuildTeamTools;
+import net.buildtheearth.buildteam.components.generator.field.FieldSettings;
 import net.buildtheearth.buildteam.components.generator.house.HouseSettings;
 import net.buildtheearth.buildteam.components.generator.rail.RailSettings;
 import net.buildtheearth.buildteam.components.generator.road.RoadFlag;
@@ -58,6 +59,9 @@ public abstract class GeneratorModule {
                 break;
             case TREE:
                 addPlayerSetting(p.getUniqueId(), new TreeSettings(p));
+                break;
+            case FIELD:
+                addPlayerSetting(p.getUniqueId(), new FieldSettings(p));
                 break;
         }
     }

@@ -4,11 +4,13 @@ import net.buildtheearth.buildteam.components.generator.Flag;
 
 public enum FieldFlag implements Flag {
 
-    //TODO CHANGE THESE TO FIELD FLAGS
+    CROP("c"), //Crop
+    TYPE("t"), //CropStage
+    DIRECTION("d"), // String lr (left-right) rl(right-left)
+    FENCE("f"); // String block
 
-    BLOCK("b");            // String "123:24,21:3,3,..."
 
-    private String flag;
+    private final String flag;
 
 
     FieldFlag(String flag){
@@ -17,7 +19,7 @@ public enum FieldFlag implements Flag {
 
     @Override
     public String getFlag() {
-        return null;
+        return flag;
     }
 
     public static FieldFlag byString(String flag){

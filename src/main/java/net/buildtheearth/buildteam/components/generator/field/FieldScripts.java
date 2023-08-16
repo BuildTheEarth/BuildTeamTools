@@ -263,6 +263,22 @@ public class FieldScripts {
             }
         }
 
+        if(crop == Crop.HARVESTED) {
+            if(type == CropStage.DRY) {
+                commands.add("//replace 35:4 5%208,95%5");
+                operations++;
+                commands.add("//replace 35:1 95%208,5%5");
+                operations++;
+
+            } else {
+                commands.add("//replace 35:4 47%5:1,47%3:1,5%60");
+                operations++;
+                commands.add("//replace 35:1 95%60,2%3:1,2%5:1");
+                operations++;
+
+            }
+        }
+
 
 
 

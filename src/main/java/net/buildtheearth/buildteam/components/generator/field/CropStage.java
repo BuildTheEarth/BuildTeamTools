@@ -2,6 +2,7 @@ package net.buildtheearth.buildteam.components.generator.field;
 
 public enum CropStage {
 
+    FALLBACK("FALLBACK", false),
     LOW("LOW", false),
     TALL("TALL", false),
     HARVESTED("HARVESTED", false),
@@ -30,6 +31,6 @@ public enum CropStage {
             if(cropStage.getIdentifier().equalsIgnoreCase(identifier))
                 return cropStage;
 
-        return null;
+        return FALLBACK;
     }
 }

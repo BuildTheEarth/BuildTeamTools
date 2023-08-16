@@ -36,6 +36,6 @@ public enum Crop {
             if(crop.getIdentifier().equalsIgnoreCase(identifier))
                 return crop;
 
-        return null;
+        return POTATO;
     }
 }

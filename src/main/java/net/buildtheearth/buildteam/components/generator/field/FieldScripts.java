@@ -1,12 +1,15 @@
 package net.buildtheearth.buildteam.components.generator.field;
 
+import com.sk89q.worldedit.BlockVector2D;
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.components.generator.Command;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.generator.GeneratorType;
 import net.buildtheearth.buildteam.components.generator.History;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -23,27 +26,43 @@ public class FieldScripts {
         List<String> commands = new ArrayList<>();
         HashMap<Object, String> flags = field.getPlayerSettings().get(p.getUniqueId()).getValues();
 
+        // Settings
         Crop crop = Crop.getByIdentifier(flags.get(FieldFlag.CROP));
         CropStage type = CropStage.getByIdentifier(flags.get(FieldFlag.TYPE));
-        String direction = flags.get(FieldFlag.DIRECTION);
         String fence = flags.get(FieldFlag.FENCE);
 
+        // Information for later restoring original selection
+        List<BlockVector2D> selectionPoints = new ArrayList<>();
+        int minY = region.getMinimumPoint().getBlockY();
+        int maxY = region.getMaximumPoint().getBlockY();
 
 
+        if(region instanceof Polygonal2DRegion){
+            Polygonal2DRegion polyRegion = (Polygonal2DRegion) region;
+            selectionPoints.addAll(polyRegion.getPoints());
 
+        }else if(region instanceof CuboidRegion){
+            CuboidRegion cuboidRegion = (CuboidRegion) region;
+            Vector min = cuboidRegion.getMinimumPoint();
+            Vector max = cuboidRegion.getMaximumPoint();
 
+            selectionPoints.add(new BlockVector2D(min.getBlockX(), min.getBlockZ()));
+            selectionPoints.add(new BlockVector2D(max.getBlockX(), max.getBlockZ()));
+        }else{
+            p.sendMessage("§c§lERROR: §cRegion type not supported!");
+            return;
+        }
 
+        // ----------- FIELD GENERATOR SCRIPT ----------
+        // Used to generate fields
 
         int operations = 0;
-
-        if(crop == null) return; //TODO TEMPORARY NULL SAFETY
-        if(type == null) return; //TODO EVEN MORE TEMPORARY NULL SAFETY
 
         commands.add("/clearhistory");
         commands.add("//gmask");
 
         // ----------- PREPARATION 01 ----------
-        // Replace all non-solid blocks with air
+        // Preparing the field area
 
         commands.add("//expand 10 up");
         commands.add("//expand 10 down");
@@ -61,6 +80,7 @@ public class FieldScripts {
         Block[][][] blocks = Generator.analyzeRegion(p, p.getWorld());
         int maxHeight = Generator.getMaxHeight(blocks);
 
+        //In case the player placed yellow wool for a crop which doesn't require it
         if(!crop.isLinesRequired()) {
             commands.add("//replace 35:4 0");
         }
@@ -74,6 +94,8 @@ public class FieldScripts {
         commands.add("//gmask =queryRel(0,5,0,35,5)");
         commands.add("//set 7");
         operations++;
+
+
 
         // ----------- PREPARATION 02 ----------
         // Drawing lines if the crop requires it
@@ -176,10 +198,69 @@ public class FieldScripts {
             operations++;
 
             // Remove original yellow wool blocks
-            //TODO FIX THESE 2 LINES
+
             commands.add("//gmask =queryRel(0,-6,0,7,0)");
             commands.add("//replace 2 0");
             operations++;
+        }
+
+
+
+        // ----------- PLACING CROPS ----------
+        // Placing the crops
+
+        commands.add("//gmask");
+
+        // First reselect the original poly region
+
+        commands.add("//sel poly");
+
+        commands.add("//pos1 " + selectionPoints.get(0).getBlockX() + "," + maxY + "," + selectionPoints.get(0).getBlockZ());
+        for(int i = 1; i < selectionPoints.size(); i++) {
+            commands.add("//pos2 " + selectionPoints.get(i).getBlockX() + "," + minY + "," + selectionPoints.get(i).getBlockZ());
+        }
+
+        // Fill with potato crop
+        if(crop == Crop.POTATO) {
+            if(type == CropStage.TALL) {
+                commands.add("//replace 35:4 24%3,24%3:1,1%17:4,1%5:1");
+                operations++;
+                commands.add("//replace 35:1 1%3,1%3:1,24%17:4,24%5:1");
+                operations++;
+
+                commands.add("//shift 1 up");
+                commands.add("//gmask 0");
+
+                commands.add("//replace >3 35:1,35:2,31:1,31:2");
+                operations++;
+
+                commands.add("//gmask");
+
+                commands.add("//replace 35:1 175:3");
+                operations++;
+                commands.add("//replace 35:2 175:2");
+                operations++;
+
+                commands.add("//shift 1 up");
+
+                commands.add("//replace >175:3 175:15");
+                operations++;
+                commands.add("//replace >175:2 175:14");
+                operations++;
+
+            } else {
+                commands.add("//replace 35:4 208,5");
+                operations++;
+                commands.add("//replace 35:1 252:13,2");
+                operations++;
+
+                commands.add("//shift 1 up");
+                commands.add("//gmask 0");
+
+                commands.add("//replace >2 31:1,31:2");
+                operations++;
+
+            }
         }
 
 

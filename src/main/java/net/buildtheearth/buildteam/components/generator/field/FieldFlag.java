@@ -6,8 +6,7 @@ public enum FieldFlag implements Flag {
 
     CROP("c"), //Crop
     TYPE("t"), //CropStage
-    DIRECTION("d"), // String lr (left-right) rl(right-left)
-    FENCE("f"); // String block
+    FENCE("f"); // String blocks
 
 
     private final String flag;

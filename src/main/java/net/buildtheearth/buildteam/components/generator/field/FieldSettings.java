@@ -24,9 +24,8 @@ public class FieldSettings extends Settings {
         if(crop.equals(Crop.WHEAT)) cropStage = (CropStage) Utils.pickRandom(new CropStage[]{CropStage.LIGHT, CropStage.DARK});
         if(crop.equals(Crop.HARVESTED)) cropStage = (CropStage) Utils.pickRandom(new CropStage[]{CropStage.DRY, CropStage.MUD});
         if(crop.equals(Crop.OTHER)) cropStage = (CropStage) Utils.pickRandom(new CropStage[]{CropStage.DRIED_OUT, CropStage.OVERGROWN});
-        getValues().put(FieldFlag.TYPE, cropStage.getIdentifier()); //TODO FIX NULLPOINTER
-
-        getValues().put(FieldFlag.DIRECTION, "lr");
+        if(cropStage == null) cropStage = CropStage.FALLBACK;
+        getValues().put(FieldFlag.TYPE, cropStage.getIdentifier());
 
         getValues().put(FieldFlag.FENCE, null);
     }

@@ -7,6 +7,7 @@ import clipper2.core.Point64;
 import clipper2.offset.EndType;
 import clipper2.offset.JoinType;
 import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
@@ -16,6 +17,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.RegionSelector;
 import lombok.Getter;
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.BuildTeamTools;
@@ -226,7 +228,7 @@ public class Generator {
      * @param blocks List of blocks in polygon region
      * @param material Material to check for (e.g. Material.WALL_SIGN)
      * @param data Data value of material to check for (0-15)
-     * @return true if polygon region contains a sign, false otherwise
+     * @return true if polygon region contains the block, false otherwise
      */
     public static boolean containsBlock(Block[][][] blocks, Material material, byte data){
         for (Block[][] block2D : blocks)
@@ -236,6 +238,43 @@ public class Generator {
                         return true;
 
         return false;
+    }
+
+    /**
+     * Checks if polygon region contains a minimum amount of blocks of a certain type
+     * @param blocks List of blocks in polygon region
+     * @param material Material to check for (e.g. Material.WALL_SIGN)
+     * @param data Data value of material to check for (0-15)
+     * @param requiredAmount The minimum amount required to return true
+     * @return true if polygon region contains the required amount of the block, false otherwise
+     */
+    public static boolean containsBlock(Block[][][] blocks, Material material, byte data, int requiredAmount){
+        int amountFound = 0;
+        for (Block[][] block2D : blocks)
+            for (Block[] block1D : block2D)
+                for (Block block : block1D)
+                    if (block != null && block.getType() == material && block.getData() == data)
+                        amountFound++;
+
+        if(amountFound >= requiredAmount) return true;
+        return false;
+    }
+
+    /**
+     *
+     * @param blocks List of blocks to check
+     * @param material Material to check for (e.g. Material.WALL_SIGN)
+     * @param data Data value of material to check for (0-15)
+     * @return All the blocks in @param blocks that have the specified materials
+     */
+    public static List<Block> getBlocksOfMaterial(Block[][][] blocks, Material material, byte data){
+        List<Block> foundBlocks = new ArrayList<>();
+        for (Block[][] block2D : blocks)
+            for (Block[] block1D : block2D)
+                for (Block block : block1D)
+                    if (block != null && block.getType() == material && block.getData() == data)
+                        foundBlocks.add(block);
+        return foundBlocks;
     }
 
     /**

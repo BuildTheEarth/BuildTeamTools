@@ -355,6 +355,54 @@ public class FieldScripts {
 
         }
 
+        if(crop == Crop.CORN) {
+            if(type == CropStage.HARVESTED) {
+                commands.add("//replace 35:5 60,3,5:1");
+                operations++;
+
+                commands.add("//fast");
+                commands.add("//replace >60,3,5:1 104:6,104:7");
+                operations++;
+
+                commands.add("//fast");
+
+            } else {
+                commands.add("//replace 35:5 60,3,5:1");
+                operations++;
+
+                commands.add("//fast");
+                commands.add("//replace >60,3,5:1 175");
+                operations++;
+
+                commands.add("//replace >175 175");
+                operations++;
+
+                commands.add("//fast");
+
+            }
+        }
+
+        if(crop == Crop.WHEAT) {
+            if(type == CropStage.LIGHT) {
+                commands.add("//replace 35:5 3,3:1");
+                operations++;
+
+                commands.add("//replace >3,3:1 107:4,107:5,107:6,107:7,184:4,184:5,184:6,184:7");
+                operations++;
+
+            } else {
+                commands.add("//replace 35:5 3,3:1,5,5:3");
+                operations++;
+
+                commands.add("//fast");
+
+                commands.add("//replace >3,3:1 31:1,175");
+                operations++;
+
+                commands.add("//fast");
+            }
+        }
+
 
 
 

@@ -90,6 +90,10 @@ public class FieldScripts {
             commands.add("//replace 35:4 0");
         }
 
+        commands.add("//gmask !<0");
+        commands.add("//replace 35:4 2");
+        operations++;
+
         // Replace the field area by lime wool
         commands.add("//gmask <0,35:4");
         commands.add("//replace !35:4 35:5");
@@ -99,6 +103,8 @@ public class FieldScripts {
         commands.add("//gmask =queryRel(0,5,0,35,5)");
         commands.add("//set 7");
         operations++;
+
+        commands.add("//expand 10 down");
 
 
 
@@ -199,7 +205,7 @@ public class FieldScripts {
                 }
                 //Yellow wool
                 commands.add("//gmask =queryRel(0,0,-1,35,1)||queryRel(-1,0,-1,35,1)||queryRel(0,0,+1,35,1)||queryRel(+1,1,+1,35,1)||queryRel(0,0,+1,35,1)||queryRel(+1,0,+1,35,1)||queryRel(+1,-1,+1,35,1)||queryRel(-1,1,-1,35,1)||queryRel(-1,-1,-1,35,1)||queryRel(0,0,-1,35,2)||queryRel(-1,0,-1,35,2)||queryRel(0,0,+1,35,2)||queryRel(+1,1,+1,35,2)||queryRel(0,0,+1,35,2)||queryRel(+1,0,+1,35,2)||queryRel(+1,-1,+1,35,2)||queryRel(-1,1,-1,35,2)||queryRel(-1,-1,-1,35,2)");
-                commands.add("//replace !35:1,0 35:4");
+                commands.add("//replace !35:1,35:2,0 35:4");
                 operations++;
             }
 
@@ -230,6 +236,8 @@ public class FieldScripts {
         for(int i = 1; i < selectionPoints.size(); i++) {
             commands.add("//pos2 " + selectionPoints.get(i).getBlockX() + "," + minY + "," + selectionPoints.get(i).getBlockZ());
         }
+
+        commands.add("//expand 10 up");
 
         if(crop == Crop.POTATO) {
             if(type == CropStage.TALL) {

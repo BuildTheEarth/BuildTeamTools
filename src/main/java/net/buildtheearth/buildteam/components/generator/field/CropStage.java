@@ -8,7 +8,7 @@ public enum CropStage {
     HARVESTED("HARVESTED", false),
     LIGHT("LIGHT", false),
     DARK("DARK", false),
-    DRIED_OUT("DRIED OUT", true),
+    DRIED_OUT("DRIED_OUT", true),
     OVERGROWN("OVERGROWN", true),
     DRY("DRY", false), //For harvested fields
     MUD("WET", false); //For harvested fields

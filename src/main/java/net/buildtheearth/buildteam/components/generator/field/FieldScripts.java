@@ -2,15 +2,20 @@ package net.buildtheearth.buildteam.components.generator.field;
 
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.biome.BaseBiome;
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.components.generator.Command;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.generator.GeneratorType;
 import net.buildtheearth.buildteam.components.generator.History;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -220,7 +225,6 @@ public class FieldScripts {
             commands.add("//pos2 " + selectionPoints.get(i).getBlockX() + "," + minY + "," + selectionPoints.get(i).getBlockZ());
         }
 
-        // Fill with potato crop
         if(crop == Crop.POTATO) {
             if(type == CropStage.TALL) {
                 commands.add("//replace 35:4 24%3,24%3:1,1%17:4,1%5:1");
@@ -274,6 +278,52 @@ public class FieldScripts {
                 commands.add("//replace 35:4 47%5:1,47%3:1,5%60");
                 operations++;
                 commands.add("//replace 35:1 95%60,2%3:1,2%5:1");
+                operations++;
+
+            }
+        }
+
+        if(crop == Crop.OTHER) {
+            if(type == CropStage.DRIED_OUT) {
+                commands.add("//setbiome MESA");
+
+                commands.add("//replace 35:4 208,5");
+                operations++;
+                commands.add("//replace 35:1 252:13,2");
+                operations++;
+
+                commands.add("//shift 1 up");
+                commands.add("//gmask 0");
+
+                commands.add("//replace >2 31:1,31:2");
+                operations++;
+
+            } else {
+                commands.add("//setbiome SWAMPLAND");
+
+                commands.add("//replace 35:4 24%3,24%3:1,1%17:4,1%5:1");
+                operations++;
+                commands.add("//replace 35:1 1%3,1%3:1,24%17:4,24%5:1");
+                operations++;
+
+                commands.add("//shift 1 up");
+                commands.add("//gmask 0");
+
+                commands.add("//replace >3 35:1,35:2,31:1,31:2");
+                operations++;
+
+                commands.add("//gmask");
+
+                commands.add("//replace 35:1 175:3");
+                operations++;
+                commands.add("//replace 35:2 175:2");
+                operations++;
+
+                commands.add("//shift 1 up");
+
+                commands.add("//replace >175:3 175:15");
+                operations++;
+                commands.add("//replace >175:2 175:14");
                 operations++;
 
             }

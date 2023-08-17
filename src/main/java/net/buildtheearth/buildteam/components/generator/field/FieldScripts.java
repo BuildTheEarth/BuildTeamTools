@@ -187,12 +187,18 @@ public class FieldScripts {
 
             //Make the line pattern extend over the field
             for(int i = 0; i <= requiredRepetitions; i++) {
-                //Orange wool
-                commands.add("//gmask =queryRel(0,0,-1,35,4)||queryRel(0,0,+1,35,4)||queryRel(0,1,-1,35,4)||queryRel(0,1,+1,35,4)||queryRel(0,-1,-1,35,4)||queryRel(0,-1,+1,35,4)");
-                commands.add("//replace !35:4,0 35:1");
-                operations++;
+                if(i%2==0 || (crop != Crop.VINEYARD && crop != Crop.PEAR)) {
+                    //Orange wool
+                    commands.add("//gmask =queryRel(0,0,-1,35,4)||queryRel(0,0,+1,35,4)||queryRel(0,1,-1,35,4)||queryRel(0,1,+1,35,4)||queryRel(0,-1,-1,35,4)||queryRel(0,-1,+1,35,4)");
+                    commands.add("//replace !35:4,35:2,0 35:1");
+                    operations++;
+                } else {
+                    //Magenta wool
+                    commands.add("//gmask =queryRel(0,0,-1,35,4)||queryRel(0,0,+1,35,4)||queryRel(0,1,-1,35,4)||queryRel(0,1,+1,35,4)||queryRel(0,-1,-1,35,4)||queryRel(0,-1,+1,35,4)");
+                    commands.add("//replace !35:4,35:1,0 35:2");
+                }
                 //Yellow wool
-                commands.add("//gmask =queryRel(0,0,-1,35,1)||queryRel(-1,0,-1,35,1)||queryRel(0,0,+1,35,1)||queryRel(+1,1,+1,35,1)||queryRel(0,0,+1,35,1)||queryRel(+1,0,+1,35,1)||queryRel(+1,-1,+1,35,1)||queryRel(-1,1,-1,35,1)||queryRel(-1,-1,-1,35,1)");
+                commands.add("//gmask =queryRel(0,0,-1,35,1)||queryRel(-1,0,-1,35,1)||queryRel(0,0,+1,35,1)||queryRel(+1,1,+1,35,1)||queryRel(0,0,+1,35,1)||queryRel(+1,0,+1,35,1)||queryRel(+1,-1,+1,35,1)||queryRel(-1,1,-1,35,1)||queryRel(-1,-1,-1,35,1)||queryRel(0,0,-1,35,2)||queryRel(-1,0,-1,35,2)||queryRel(0,0,+1,35,2)||queryRel(+1,1,+1,35,2)||queryRel(0,0,+1,35,2)||queryRel(+1,0,+1,35,2)||queryRel(+1,-1,+1,35,2)||queryRel(-1,1,-1,35,2)||queryRel(-1,-1,-1,35,2)");
                 commands.add("//replace !35:1,0 35:4");
                 operations++;
             }
@@ -327,6 +333,26 @@ public class FieldScripts {
                 operations++;
 
             }
+        }
+
+        if(crop == Crop.VINEYARD || crop == Crop.PEAR) {
+            commands.add("//replace >35:2 15%188,85%22");
+            operations++;
+            commands.add("//replace >188,22 251:13");
+            operations++;
+
+            commands.add("//replace 35:1 5,208:0");
+            operations++;
+            commands.add("//replace 35:4 208:0,5,3,3:1");
+            operations++;
+            commands.add("//replace 35:2 3,3:1");
+            operations++;
+
+            commands.add("//replace 22 0");
+            operations++;
+            commands.add("//replace 251:13 18,18:2");
+            operations++;
+
         }
 
 

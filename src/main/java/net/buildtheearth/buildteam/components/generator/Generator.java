@@ -592,7 +592,7 @@ public class Generator {
      */
     public static int createPolyLine(List<String> commands, List<Vector> points, String lineMaterial, boolean connectLineEnds, Block[][][] blocks){
         commands.add("//sel cuboid");
-        commands.add("//pos1 " + getXYZ(points.get(0)));
+        commands.add("//pos1 " + getXYZ(points.get(0), blocks));
         int operations = 0;
 
         List<String> positions = new ArrayList<>();

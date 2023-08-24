@@ -6,7 +6,8 @@ public enum FieldFlag implements Flag {
 
     CROP("c"), //Crop
     TYPE("t"), //CropStage
-    FENCE("f"); // String blocks
+    FENCE("f"), // String blocks
+    FENCE_DISTANCE("fd"); // Byte Distance
 
 
     private final String flag;

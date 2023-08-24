@@ -4,8 +4,6 @@ import net.buildtheearth.buildteam.components.generator.Settings;
 import net.buildtheearth.utils.Utils;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.Array;
-
 public class FieldSettings extends Settings {
 
     public FieldSettings(Player player) {
@@ -28,5 +26,6 @@ public class FieldSettings extends Settings {
         getValues().put(FieldFlag.TYPE, cropStage.getIdentifier());
 
         getValues().put(FieldFlag.FENCE, null);
+        getValues().put(FieldFlag.FENCE_DISTANCE, "4");
     }
 }

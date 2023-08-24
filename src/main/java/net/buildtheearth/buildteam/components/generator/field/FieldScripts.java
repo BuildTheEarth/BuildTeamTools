@@ -7,11 +7,13 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sun.tools.javac.jvm.Gen;
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.components.generator.Command;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.generator.GeneratorType;
 import net.buildtheearth.buildteam.components.generator.History;
+import net.buildtheearth.buildteam.components.generator.road.RoadScripts;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -35,9 +37,11 @@ public class FieldScripts {
         Crop crop = Crop.getByIdentifier(flags.get(FieldFlag.CROP));
         CropStage type = CropStage.getByIdentifier(flags.get(FieldFlag.TYPE));
         String fence = flags.get(FieldFlag.FENCE);
+        byte fenceDistance = Byte.parseByte(flags.get(FieldFlag.FENCE_DISTANCE));
 
         // Information for later restoring original selection
         List<BlockVector2D> selectionPoints = new ArrayList<>();
+
         int minY = region.getMinimumPoint().getBlockY();
         int maxY = region.getMaximumPoint().getBlockY();
 
@@ -411,7 +415,91 @@ public class FieldScripts {
             }
         }
 
+        if(crop == Crop.CATTLE) {
+            commands.add("//gmask 0");
 
+            List<Vector> points = new ArrayList<>();
+            for(BlockVector2D blockVector2D : selectionPoints) points.add(blockVector2D.toVector());
+
+            operations += Generator.createPolyLine(commands, points, "41", true, blocks, 1);
+            commands.add("//gmask");
+
+            Generator.createPolySelection(commands, points);
+
+            List<Vector> oneMeterPoints = new ArrayList<>(points);
+            oneMeterPoints = Generator.populatePoints(oneMeterPoints, 1);
+
+            List<Vector> fencePoints = new ArrayList<>(oneMeterPoints);
+            fencePoints = Generator.reducePoints(fencePoints, fenceDistance + 1,  fenceDistance - 1);
+
+            commands.add("//sel cuboid");
+            commands.add("//expand 10 10 west");
+            commands.add("//expand 10 10 north");
+            for(Vector vector : fencePoints) {
+                commands.add("//pos1 " + Generator.getXYZWithVerticalOffset(vector, blocks, 1));
+                commands.add("//pos2 " + Generator.getXYZWithVerticalOffset(vector, blocks, 1));
+                commands.add("//set 188");
+            }
+
+            commands.add("//sel poly");
+
+            /*commands.add("//pos1 " + selectionPoints.get(0).getBlockX() + "," + maxY + "," + selectionPoints.get(0).getBlockZ());
+            for(int i = 1; i < selectionPoints.size(); i++) {
+                commands.add("//pos2 " + selectionPoints.get(i).getBlockX() + "," + minY + "," + selectionPoints.get(i).getBlockZ());
+            }*/
+            Generator.createPolySelection(commands, points);
+
+            commands.add("//sel cuboid");
+            commands.add("//gmask");
+            commands.add("//expand 10 10 up");
+
+            commands.add("//replace >41 77:5");
+            operations++;
+            commands.add("//replace 41 166");
+            operations++;
+
+            commands.add("//gmask !188,77,166");
+            commands.add("//replace >35:5 70%0,30%31:1");
+            operations++;
+            commands.add("//replace 35:5 60%3,10%2,30%3:1");
+            operations++;
+
+        }
+
+        if(crop == Crop.MEADOW) {
+            commands.add("//gmask 0");
+
+            ArrayList<Vector> points = new ArrayList<>();
+
+            for (BlockVector2D blockVector2D : selectionPoints) {
+                points.add(new Vector(blockVector2D.getBlockX(), p.getWorld().getHighestBlockYAt(blockVector2D.getBlockX(), blockVector2D.getBlockZ()), blockVector2D.getBlockZ()));
+            }
+
+            operations += Generator.createPolyLine(commands, points, "41", true, blocks, 1);
+
+            commands.add("//sel poly");
+
+            commands.add("//pos1 " + selectionPoints.get(0).getBlockX() + "," + maxY + "," + selectionPoints.get(0).getBlockZ());
+            for(int i = 1; i < selectionPoints.size(); i++) {
+                commands.add("//pos2 " + selectionPoints.get(i).getBlockX() + "," + minY + "," + selectionPoints.get(i).getBlockZ());
+            }
+
+            commands.add("//replace 41 30%" + fence + ",70%41");
+            operations++;
+
+            commands.add("//overlay 41 77");
+            operations++;
+            commands.add("//replace 41 416");
+            operations++;
+
+            commands.add("//replace 35:5 60%2,20%3,20%3:1");
+            operations++;
+
+            commands.add("//gmask 60");
+            commands.add("//overlay 70%0,30%31:1");
+            operations++;
+
+        }
 
 
         Main.buildTeamTools.getGenerator().getCommands().add(new Command(p, field, commands, operations, blocks));
@@ -425,7 +513,7 @@ public class FieldScripts {
             return z1;
         }
 
-        // Calculate the proportional distance between c1 and c2 for the target X value
+        // Calculate the proportional distance between x1 and x2 for the target X value
         double t = (targetX - x1) / (x2 - x1);
 
         // Interpolate the coordinate based on the target X value

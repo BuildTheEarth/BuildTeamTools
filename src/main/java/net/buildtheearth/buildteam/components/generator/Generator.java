@@ -6,6 +6,7 @@ import clipper2.core.Paths64;
 import clipper2.core.Point64;
 import clipper2.offset.EndType;
 import clipper2.offset.JoinType;
+import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.Vector;
@@ -460,7 +461,23 @@ public class Generator {
         return vector.getBlockX() + "," + maxHeight + "," + vector.getBlockZ();
     }
 
+    /**
+     * Returns a XYZ String with the height of the point matching the surface of the terrain.
+     *
+     * @param vector - The vector to get the XYZ String from
+     * @param blocks - The dataset to get the height from
+     * @return The XYZ String
+     */
+    public static String getXYZWithVerticalOffset(Vector vector, Block[][][] blocks, int offset){
+        int maxHeight = vector.getBlockY();
 
+        if(blocks != null)
+            maxHeight = Generator.getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL, Material.SNOW) + offset;
+        if(maxHeight == 0)
+            maxHeight = vector.getBlockY();
+
+        return vector.getBlockX() + "," + maxHeight + "," + vector.getBlockZ();
+    }
 
     public static Path64 convertVectorListToPath64(List<Vector> vectors, Vector reference){
         List<Point64> points = new ArrayList<>();
@@ -632,17 +649,18 @@ public class Generator {
      * @param lineMaterial - The material to draw the line with
      * @param connectLineEnds - Whether to connect the line ends in case the line is a circle
      * @param blocks - The blocks to get the surface height from
-     * @return
+     * @param offset - The vertical offset you want the PolyLine to be created at
+     * @return The amount of operations used to accomplish this
      */
-    public static int createPolyLine(List<String> commands, List<Vector> points, String lineMaterial, boolean connectLineEnds, Block[][][] blocks){
+    public static int createPolyLine(List<String> commands, List<Vector> points, String lineMaterial, boolean connectLineEnds, Block[][][] blocks, int offset){
         commands.add("//sel cuboid");
-        commands.add("//pos1 " + getXYZ(points.get(0)));
+        commands.add("//pos1 " + getXYZWithVerticalOffset(points.get(0), blocks, offset));
         int operations = 0;
 
         List<String> positions = new ArrayList<>();
         for(int i = 1; i < points.size(); i++)
-            positions.add(getXYZ(points.get(i), blocks));
-        String pos2 = getXYZ(points.get(0), blocks);
+            positions.add(getXYZWithVerticalOffset(points.get(i), blocks, offset));
+        String pos2 = getXYZWithVerticalOffset(points.get(0), blocks, offset);
 
         for(int i = 1; i < points.size(); i++){
             commands.add("//pos2 " + positions.get(i-1));
@@ -659,8 +677,6 @@ public class Generator {
 
         return operations;
     }
-
-
 
     /**
      * Returns the current WorldEdit selection of a player.

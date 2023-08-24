@@ -1,8 +1,5 @@
 package net.buildtheearth.buildteam.components.generator.field;
 
-import net.buildtheearth.buildteam.components.generator.house.HouseFlag;
-import net.buildtheearth.buildteam.components.generator.house.RoofType;
-
 public enum Crop {
 
     POTATO("POTATO", true),
@@ -23,19 +20,19 @@ public enum Crop {
         this.linesRequired = linesRequired;
     }
 
+    public static Crop getByIdentifier(String identifier) {
+        for (Crop crop : Crop.values())
+            if (crop.getIdentifier().equalsIgnoreCase(identifier))
+                return crop;
+
+        return POTATO;
+    }
+
     public String getIdentifier() {
         return identifier;
     }
 
     public boolean isLinesRequired() {
         return linesRequired;
-    }
-
-    public static Crop getByIdentifier(String identifier) {
-        for(Crop crop : Crop.values())
-            if(crop.getIdentifier().equalsIgnoreCase(identifier))
-                return crop;
-
-        return POTATO;
     }
 }

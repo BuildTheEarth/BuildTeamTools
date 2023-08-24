@@ -2,22 +2,15 @@ package net.buildtheearth.buildteam.components.generator.field;
 
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.biome.BaseBiome;
-import com.sun.tools.javac.jvm.Gen;
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.components.generator.Command;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.generator.GeneratorType;
 import net.buildtheearth.buildteam.components.generator.History;
-import net.buildtheearth.buildteam.components.generator.road.RoadScripts;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -46,18 +39,18 @@ public class FieldScripts {
         int maxY = region.getMaximumPoint().getBlockY();
 
 
-        if(region instanceof Polygonal2DRegion){
+        if (region instanceof Polygonal2DRegion) {
             Polygonal2DRegion polyRegion = (Polygonal2DRegion) region;
             selectionPoints.addAll(polyRegion.getPoints());
 
-        }else if(region instanceof CuboidRegion){
+        } else if (region instanceof CuboidRegion) {
             CuboidRegion cuboidRegion = (CuboidRegion) region;
             Vector min = cuboidRegion.getMinimumPoint();
             Vector max = cuboidRegion.getMaximumPoint();
 
             selectionPoints.add(new BlockVector2D(min.getBlockX(), min.getBlockZ()));
             selectionPoints.add(new BlockVector2D(max.getBlockX(), max.getBlockZ()));
-        }else{
+        } else {
             p.sendMessage("§c§lERROR: §cRegion type not supported!");
             return;
         }
@@ -90,7 +83,7 @@ public class FieldScripts {
         int maxHeight = Generator.getMaxHeight(blocks);
 
         //In case the player placed yellow wool for a crop which doesn't require it
-        if(!crop.isLinesRequired()) {
+        if (!crop.isLinesRequired()) {
             commands.add("//replace 35:4 0");
         }
 
@@ -111,13 +104,12 @@ public class FieldScripts {
         commands.add("//expand 10 down");
 
 
-
         // ----------- PREPARATION 02 ----------
         // Drawing lines if the crop requires it
 
-        if(crop.isLinesRequired()){
+        if (crop.isLinesRequired()) {
             // Return if there aren't at least 2 yellow wool blocks inside the selection
-            if(!Generator.containsBlock(blocks, Material.WOOL, (byte) 4, 2)) {
+            if (!Generator.containsBlock(blocks, Material.WOOL, (byte) 4, 2)) {
                 p.sendMessage("§cYou need to place at least 2 yellow wool blocks inside your selection!");
                 p.sendMessage(" ");
                 p.sendMessage("§cFor more information, please see the wiki:");
@@ -132,21 +124,21 @@ public class FieldScripts {
             double currentLowest = Double.MAX_VALUE;
             double currentHighest = Double.MIN_VALUE;
 
-            for(Block yellowWoolBlock : yellowWoolBlocks) {
-                if(yellowWoolBlock.getLocation().getBlockX() < currentLowest) {
+            for (Block yellowWoolBlock : yellowWoolBlocks) {
+                if (yellowWoolBlock.getLocation().getBlockX() < currentLowest) {
                     currentLowest = yellowWoolBlock.getLocation().getBlockX();
                     westernMost = yellowWoolBlock;
                 }
             }
 
-            for(Block yellowWoolBlock : yellowWoolBlocks) {
-                if(yellowWoolBlock.getLocation().getBlockX() > currentHighest) {
+            for (Block yellowWoolBlock : yellowWoolBlocks) {
+                if (yellowWoolBlock.getLocation().getBlockX() > currentHighest) {
                     currentHighest = yellowWoolBlock.getLocation().getBlockX();
                     easternMost = yellowWoolBlock;
                 }
             }
 
-            if(westernMost == null || easternMost == null) {
+            if (westernMost == null || easternMost == null) {
                 p.sendMessage("§cSomething went wrong while processing line data!");
                 p.sendMessage(" ");
                 p.sendMessage("§cPlease contact one of the developers!");
@@ -173,7 +165,7 @@ public class FieldScripts {
             commands.add("//expand 10 down");
 
             commands.add("//gmask !7,0");
-            for(int i = maxHeight; i < maxHeight + 5; i++) {
+            for (int i = maxHeight; i < maxHeight + 5; i++) {
                 commands.add("//replace >35:4 35:4");
                 commands.add("//replace <35:4 35:4");
                 operations++;
@@ -196,8 +188,8 @@ public class FieldScripts {
             operations++;
 
             //Make the line pattern extend over the field
-            for(int i = 0; i <= requiredRepetitions; i++) {
-                if(i%2==0 || (crop != Crop.VINEYARD && crop != Crop.PEAR)) {
+            for (int i = 0; i <= requiredRepetitions; i++) {
+                if (i % 2 == 0 || (crop != Crop.VINEYARD && crop != Crop.PEAR)) {
                     //Orange wool
                     commands.add("//gmask =queryRel(0,0,-1,35,4)||queryRel(0,0,+1,35,4)||queryRel(0,1,-1,35,4)||queryRel(0,1,+1,35,4)||queryRel(0,-1,-1,35,4)||queryRel(0,-1,+1,35,4)");
                     commands.add("//replace !35:4,35:2,0 35:1");
@@ -226,7 +218,6 @@ public class FieldScripts {
         }
 
 
-
         // ----------- PLACING CROPS ----------
         // Placing the crops
 
@@ -237,14 +228,14 @@ public class FieldScripts {
         commands.add("//sel poly");
 
         commands.add("//pos1 " + selectionPoints.get(0).getBlockX() + "," + maxY + "," + selectionPoints.get(0).getBlockZ());
-        for(int i = 1; i < selectionPoints.size(); i++) {
+        for (int i = 1; i < selectionPoints.size(); i++) {
             commands.add("//pos2 " + selectionPoints.get(i).getBlockX() + "," + minY + "," + selectionPoints.get(i).getBlockZ());
         }
 
         commands.add("//expand 10 up");
 
-        if(crop == Crop.POTATO) {
-            if(type == CropStage.TALL) {
+        if (crop == Crop.POTATO) {
+            if (type == CropStage.TALL) {
                 commands.add("//replace 35:4 24%3,24%3:1,1%17:4,1%5:1");
                 operations++;
                 commands.add("//replace 35:1 1%3,1%3:1,24%17:4,24%5:1");
@@ -285,8 +276,8 @@ public class FieldScripts {
             }
         }
 
-        if(crop == Crop.HARVESTED) {
-            if(type == CropStage.DRY) {
+        if (crop == Crop.HARVESTED) {
+            if (type == CropStage.DRY) {
                 commands.add("//replace 35:4 5%208,95%5");
                 operations++;
                 commands.add("//replace 35:1 95%208,5%5");
@@ -301,8 +292,8 @@ public class FieldScripts {
             }
         }
 
-        if(crop == Crop.OTHER) {
-            if(type == CropStage.DRIED_OUT) {
+        if (crop == Crop.OTHER) {
+            if (type == CropStage.DRIED_OUT) {
                 commands.add("//setbiome MESA");
 
                 commands.add("//replace 35:4 208,5");
@@ -347,7 +338,7 @@ public class FieldScripts {
             }
         }
 
-        if(crop == Crop.VINEYARD || crop == Crop.PEAR) {
+        if (crop == Crop.VINEYARD || crop == Crop.PEAR) {
             commands.add("//replace >35:2 15%188,85%22");
             operations++;
             commands.add("//replace >188,22 251:13");
@@ -367,8 +358,8 @@ public class FieldScripts {
 
         }
 
-        if(crop == Crop.CORN) {
-            if(type == CropStage.HARVESTED) {
+        if (crop == Crop.CORN) {
+            if (type == CropStage.HARVESTED) {
                 commands.add("//replace 35:5 60,3,5:1");
                 operations++;
 
@@ -394,8 +385,8 @@ public class FieldScripts {
             }
         }
 
-        if(crop == Crop.WHEAT) {
-            if(type == CropStage.LIGHT) {
+        if (crop == Crop.WHEAT) {
+            if (type == CropStage.LIGHT) {
                 commands.add("//replace 35:5 3,3:1");
                 operations++;
 
@@ -415,11 +406,11 @@ public class FieldScripts {
             }
         }
 
-        if(crop == Crop.CATTLE || crop == Crop.MEADOW) {
+        if (crop == Crop.CATTLE || crop == Crop.MEADOW) {
             commands.add("//gmask 0");
 
             List<Vector> points = new ArrayList<>();
-            for(BlockVector2D blockVector2D : selectionPoints) points.add(blockVector2D.toVector());
+            for (BlockVector2D blockVector2D : selectionPoints) points.add(blockVector2D.toVector());
             operations += Generator.createPolyLine(commands, points, "41", true, blocks, 1);
             commands.add("//gmask");
 
@@ -428,13 +419,13 @@ public class FieldScripts {
             List<Vector> oneMeterPoints = new ArrayList<>(points);
             oneMeterPoints = Generator.populatePoints(oneMeterPoints, 1);
             List<Vector> fencePoints = new ArrayList<>(oneMeterPoints);
-            fencePoints = Generator.reducePoints(fencePoints, fenceDistance + 1,  fenceDistance - 1);
+            fencePoints = Generator.reducePoints(fencePoints, fenceDistance + 1, fenceDistance - 1);
 
             commands.add("//sel cuboid");
             commands.add("//expand 10 10 west");
             commands.add("//expand 10 10 north");
 
-            for(Vector vector : fencePoints) {
+            for (Vector vector : fencePoints) {
                 commands.add("//pos1 " + Generator.getXYZWithVerticalOffset(vector, blocks, 1));
                 commands.add("//pos2 " + Generator.getXYZWithVerticalOffset(vector, blocks, 1));
                 commands.add("//set " + fence);
@@ -458,8 +449,8 @@ public class FieldScripts {
             commands.add("//replace >35:5 70%0,30%31:1");
             operations++;
 
-            if(crop == Crop.CATTLE) commands.add("//replace 35:5 60%3,20%2,20%3:1");
-            if(crop == Crop.MEADOW) commands.add("//replace 35:5 70%2,20%3,10%3:1");
+            if (crop == Crop.CATTLE) commands.add("//replace 35:5 60%3,20%2,20%3:1");
+            if (crop == Crop.MEADOW) commands.add("//replace 35:5 70%2,20%3,10%3:1");
             operations++;
 
         }

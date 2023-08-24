@@ -22,15 +22,15 @@ public enum CropStage {
         this.biomeRequired = biomeRequired;
     }
 
-    public String getIdentifier() {
-        return identifier;
-    }
-
     public static CropStage getByIdentifier(String identifier) {
-        for(CropStage cropStage : CropStage.values())
-            if(cropStage.getIdentifier().equalsIgnoreCase(identifier))
+        for (CropStage cropStage : CropStage.values())
+            if (cropStage.getIdentifier().equalsIgnoreCase(identifier))
                 return cropStage;
 
         return FALLBACK;
+    }
+
+    public String getIdentifier() {
+        return identifier;
     }
 }

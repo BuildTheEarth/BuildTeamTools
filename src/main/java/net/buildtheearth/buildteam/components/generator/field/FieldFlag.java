@@ -13,20 +13,20 @@ public enum FieldFlag implements Flag {
     private final String flag;
 
 
-    FieldFlag(String flag){
+    FieldFlag(String flag) {
         this.flag = flag;
+    }
+
+    public static FieldFlag byString(String flag) {
+        for (FieldFlag fieldFlag : FieldFlag.values())
+            if (fieldFlag.getFlag().equalsIgnoreCase(flag))
+                return fieldFlag;
+        return null;
+
     }
 
     @Override
     public String getFlag() {
         return flag;
-    }
-
-    public static FieldFlag byString(String flag){
-        for(FieldFlag fieldFlag : FieldFlag.values())
-            if(fieldFlag.getFlag().equalsIgnoreCase(flag))
-                return fieldFlag;
-        return null;
-
     }
 }

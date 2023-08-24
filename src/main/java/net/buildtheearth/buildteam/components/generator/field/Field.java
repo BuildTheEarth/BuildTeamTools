@@ -15,13 +15,13 @@ public class Field extends GeneratorModule {
 
     @Override
     public boolean checkPlayer(Player p) {
-        if(!Generator.checkIfWorldEditIsInstalled(p))
+        if (!Generator.checkIfWorldEditIsInstalled(p))
             return false;
 
-        if(!Generator.checkForWorldEditSelection(p) && !Generator.checkForPolySelection(p))
+        if (!Generator.checkForWorldEditSelection(p) && !Generator.checkForPolySelection(p))
             return false;
 
-        if(getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
+        if (getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
             getPlayerSettings().get(p.getUniqueId()).setBlocks(Generator.analyzeRegion(p, p.getWorld()));
 
         return true;
@@ -29,7 +29,7 @@ public class Field extends GeneratorModule {
 
     @Override
     public void generate(Player p) {
-        if(!checkPlayer(p)) return;
+        if (!checkPlayer(p)) return;
 
         Region polyRegion = Generator.getWorldEditSelection(p);
 

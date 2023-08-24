@@ -415,12 +415,11 @@ public class FieldScripts {
             }
         }
 
-        if(crop == Crop.CATTLE) {
+        if(crop == Crop.CATTLE || crop == Crop.MEADOW) {
             commands.add("//gmask 0");
 
             List<Vector> points = new ArrayList<>();
             for(BlockVector2D blockVector2D : selectionPoints) points.add(blockVector2D.toVector());
-
             operations += Generator.createPolyLine(commands, points, "41", true, blocks, 1);
             commands.add("//gmask");
 
@@ -428,30 +427,27 @@ public class FieldScripts {
 
             List<Vector> oneMeterPoints = new ArrayList<>(points);
             oneMeterPoints = Generator.populatePoints(oneMeterPoints, 1);
-
             List<Vector> fencePoints = new ArrayList<>(oneMeterPoints);
             fencePoints = Generator.reducePoints(fencePoints, fenceDistance + 1,  fenceDistance - 1);
 
             commands.add("//sel cuboid");
             commands.add("//expand 10 10 west");
             commands.add("//expand 10 10 north");
+
             for(Vector vector : fencePoints) {
                 commands.add("//pos1 " + Generator.getXYZWithVerticalOffset(vector, blocks, 1));
                 commands.add("//pos2 " + Generator.getXYZWithVerticalOffset(vector, blocks, 1));
-                commands.add("//set 188");
+                commands.add("//set " + fence);
             }
 
-            commands.add("//sel poly");
-
-            /*commands.add("//pos1 " + selectionPoints.get(0).getBlockX() + "," + maxY + "," + selectionPoints.get(0).getBlockZ());
-            for(int i = 1; i < selectionPoints.size(); i++) {
-                commands.add("//pos2 " + selectionPoints.get(i).getBlockX() + "," + minY + "," + selectionPoints.get(i).getBlockZ());
-            }*/
             Generator.createPolySelection(commands, points);
 
             commands.add("//sel cuboid");
             commands.add("//gmask");
+
             commands.add("//expand 10 10 up");
+            commands.add("//expand 10 10 west");
+            commands.add("//expand 10 10 north");
 
             commands.add("//replace >41 77:5");
             operations++;
@@ -461,42 +457,9 @@ public class FieldScripts {
             commands.add("//gmask !188,77,166");
             commands.add("//replace >35:5 70%0,30%31:1");
             operations++;
-            commands.add("//replace 35:5 60%3,10%2,30%3:1");
-            operations++;
 
-        }
-
-        if(crop == Crop.MEADOW) {
-            commands.add("//gmask 0");
-
-            ArrayList<Vector> points = new ArrayList<>();
-
-            for (BlockVector2D blockVector2D : selectionPoints) {
-                points.add(new Vector(blockVector2D.getBlockX(), p.getWorld().getHighestBlockYAt(blockVector2D.getBlockX(), blockVector2D.getBlockZ()), blockVector2D.getBlockZ()));
-            }
-
-            operations += Generator.createPolyLine(commands, points, "41", true, blocks, 1);
-
-            commands.add("//sel poly");
-
-            commands.add("//pos1 " + selectionPoints.get(0).getBlockX() + "," + maxY + "," + selectionPoints.get(0).getBlockZ());
-            for(int i = 1; i < selectionPoints.size(); i++) {
-                commands.add("//pos2 " + selectionPoints.get(i).getBlockX() + "," + minY + "," + selectionPoints.get(i).getBlockZ());
-            }
-
-            commands.add("//replace 41 30%" + fence + ",70%41");
-            operations++;
-
-            commands.add("//overlay 41 77");
-            operations++;
-            commands.add("//replace 41 416");
-            operations++;
-
-            commands.add("//replace 35:5 60%2,20%3,20%3:1");
-            operations++;
-
-            commands.add("//gmask 60");
-            commands.add("//overlay 70%0,30%31:1");
+            if(crop == Crop.CATTLE) commands.add("//replace 35:5 60%3,20%2,20%3:1");
+            if(crop == Crop.MEADOW) commands.add("//replace 35:5 70%2,20%3,10%3:1");
             operations++;
 
         }

@@ -2,22 +2,24 @@ package net.buildtheearth.buildteam.components.generator.field;
 
 public enum Crop {
 
-    POTATO("POTATO", true),
-    CORN("CORN", false),
-    WHEAT("WHEAT", false),
-    VINEYARD("VINEYARD", true), //NOTE: special lines
-    PEAR("PEAR", true), //NOTE: special lines
-    CATTLE("CATTLE", false),
-    MEADOW("MEADOW", false),
-    HARVESTED("HARVESTED", true),
-    OTHER("OTHER", true);
+    POTATO("POTATO", true, true),
+    CORN("CORN", false, true),
+    WHEAT("WHEAT", false, true),
+    VINEYARD("VINEYARD", true,false), //NOTE: special lines
+    PEAR("PEAR", true, false), //NOTE: special lines
+    CATTLE("CATTLE", false, false),
+    MEADOW("MEADOW", false, false),
+    HARVESTED("HARVESTED", true, true),
+    OTHER("OTHER", true, true);
 
     private final String identifier;
     private final boolean linesRequired;
+    private final boolean hasStages;
 
-    Crop(String identifier, boolean linesRequired) {
+    Crop(String identifier, boolean linesRequired, boolean hasStages) {
         this.identifier = identifier;
         this.linesRequired = linesRequired;
+        this.hasStages = hasStages;
     }
 
     public static Crop getByIdentifier(String identifier) {
@@ -34,5 +36,9 @@ public enum Crop {
 
     public boolean isLinesRequired() {
         return linesRequired;
+    }
+
+    public boolean hasStages() {
+        return hasStages;
     }
 }

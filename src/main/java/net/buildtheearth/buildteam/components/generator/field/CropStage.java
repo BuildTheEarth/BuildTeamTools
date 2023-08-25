@@ -2,24 +2,20 @@ package net.buildtheearth.buildteam.components.generator.field;
 
 public enum CropStage {
 
-    FALLBACK("FALLBACK", false),
-    LOW("LOW", false),
-    TALL("TALL", false),
-    HARVESTED("HARVESTED", false),
-    LIGHT("LIGHT", false),
-    DARK("DARK", false),
-    DRIED_OUT("DRIED_OUT", true),
-    OVERGROWN("OVERGROWN", true),
-    DRY("DRY", false), //For harvested fields
-    MUD("WET", false); //For harvested fields
+    FALLBACK("FALLBACK"),
+    LOW("LOW"),
+    TALL("TALL"),
+    HARVESTED("HARVESTED"),
+    LIGHT("LIGHT"),
+    DARK("DARK"),
+    DRY("DRY"), //For harvested fields
+    WET("WET"); //For harvested fields
 
 
     private final String identifier;
-    private final boolean biomeRequired; //Indicates if the biome needs to be changed
 
-    CropStage(String identifier, boolean biomeRequired) {
+    CropStage(String identifier) {
         this.identifier = identifier;
-        this.biomeRequired = biomeRequired;
     }
 
     public static CropStage getByIdentifier(String identifier) {

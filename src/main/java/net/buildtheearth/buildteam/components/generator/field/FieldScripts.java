@@ -30,7 +30,6 @@ public class FieldScripts {
         Crop crop = Crop.getByIdentifier(flags.get(FieldFlag.CROP));
         CropStage type = CropStage.getByIdentifier(flags.get(FieldFlag.TYPE));
         String fence = flags.get(FieldFlag.FENCE);
-        byte fenceDistance = Byte.parseByte(flags.get(FieldFlag.FENCE_DISTANCE));
 
         // Information for later restoring original selection
         List<BlockVector2D> selectionPoints = new ArrayList<>();
@@ -293,7 +292,7 @@ public class FieldScripts {
         }
 
         if (crop == Crop.OTHER) {
-            if (type == CropStage.DRIED_OUT) {
+            if (type == CropStage.DRY) {
                 commands.add("//setbiome MESA");
 
                 commands.add("//replace 35:4 208,5");
@@ -419,7 +418,7 @@ public class FieldScripts {
             List<Vector> oneMeterPoints = new ArrayList<>(points);
             oneMeterPoints = Generator.populatePoints(oneMeterPoints, 1);
             List<Vector> fencePoints = new ArrayList<>(oneMeterPoints);
-            fencePoints = Generator.reducePoints(fencePoints, fenceDistance + 1, fenceDistance - 1);
+            fencePoints = Generator.reducePoints(fencePoints, 3 + 1, 3 - 1);
 
             commands.add("//sel cuboid");
             commands.add("//expand 10 10 west");

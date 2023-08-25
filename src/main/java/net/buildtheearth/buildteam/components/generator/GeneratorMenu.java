@@ -2,6 +2,9 @@ package net.buildtheearth.buildteam.components.generator;
 
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.BuildTeamTools;
+import net.buildtheearth.buildteam.components.generator.field.Field;
+import net.buildtheearth.buildteam.components.generator.field.FieldSettings;
+import net.buildtheearth.buildteam.components.generator.field.menu.CropTypeMenu;
 import net.buildtheearth.buildteam.components.generator.house.House;
 import net.buildtheearth.buildteam.components.generator.house.HouseSettings;
 import net.buildtheearth.buildteam.components.generator.house.RoofType;
@@ -35,7 +38,7 @@ public class GeneratorMenu extends AbstractMenu {
 
     public static int TREE_ITEM_SLOT = 15;
 
-    public static int FIELD_SLOT = 17;
+    public static int FIELD_ITEM_SLOT = 17;
 
 
 
@@ -157,10 +160,10 @@ public class GeneratorMenu extends AbstractMenu {
                 "§8Leftclick to generate",
                 "§8Rightclick for Tutorial");
 
-        ItemStack fieldItem = Item.create(Material.WHEAT, "§6Generate Field §c(TODO)", fieldLore);
+        ItemStack fieldItem = Item.create(Material.WHEAT, "§6Generate Field", fieldLore);
 
         // Set navigator item
-        getMenu().getSlot(FIELD_SLOT).setItem(fieldItem);
+        getMenu().getSlot(FIELD_ITEM_SLOT).setItem(fieldItem);
 
 
 
@@ -210,6 +213,19 @@ public class GeneratorMenu extends AbstractMenu {
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
 
             Main.getBuildTeam().getGenerator().getRail().generate(clickPlayer);
+        }));
+
+        // Set click event for field item
+        getMenu().getSlot(FIELD_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
+            Field field = Main.buildTeamTools.getGenerator().getField();
+            field.getPlayerSettings().put(clickPlayer.getUniqueId(), new FieldSettings(clickPlayer));
+
+            if(!field.checkPlayer(clickPlayer))
+                return;
+
+            clickPlayer.closeInventory();
+            clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
+            new CropTypeMenu(clickPlayer);
         }));
     }
 

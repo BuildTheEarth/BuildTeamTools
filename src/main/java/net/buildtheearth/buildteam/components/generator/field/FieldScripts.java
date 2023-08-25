@@ -444,7 +444,7 @@ public class FieldScripts {
             commands.add("//replace 41 166");
             operations++;
 
-            commands.add("//gmask !188,77,166");
+            commands.add("//gmask !" + fence + ",77,166");
             commands.add("//replace >35:5 70%0,30%31:1");
             operations++;
 

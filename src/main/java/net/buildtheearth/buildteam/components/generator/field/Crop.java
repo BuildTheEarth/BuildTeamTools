@@ -3,8 +3,8 @@ package net.buildtheearth.buildteam.components.generator.field;
 public enum Crop {
 
     POTATO("POTATO", true, true),
-    CORN("CORN", false, true),
     WHEAT("WHEAT", false, true),
+    CORN("CORN", false, true),
     VINEYARD("VINEYARD", true,false), //NOTE: special lines
     PEAR("PEAR", true, false), //NOTE: special lines
     CATTLE("CATTLE", false, false),

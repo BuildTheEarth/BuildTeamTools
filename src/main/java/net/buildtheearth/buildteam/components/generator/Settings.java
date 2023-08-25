@@ -33,4 +33,5 @@ public abstract class Settings {
     public void setValue(Flag flag, String value){
         getValues().put(flag, value);
     }
+
 }

@@ -4,8 +4,11 @@ import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.components.generator.Settings;
 import net.buildtheearth.buildteam.components.generator.field.Crop;
 import net.buildtheearth.buildteam.components.generator.field.CropStage;
+import net.buildtheearth.buildteam.components.generator.field.Field;
 import net.buildtheearth.buildteam.components.generator.field.FieldFlag;
 import net.buildtheearth.buildteam.components.generator.field.FieldSettings;
+import net.buildtheearth.buildteam.components.generator.house.House;
+import net.buildtheearth.buildteam.components.generator.house.HouseSettings;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.Liste;
 import net.buildtheearth.utils.menus.AbstractMenu;
@@ -23,8 +26,8 @@ public class CropStageMenu extends AbstractMenu {
 
 
     private final Crop crop;
-    private final byte STAGE_ONE_SLOT = 9;
-    private final byte STAGE_TWO_SLOT = 10;
+    private final byte STAGE_ONE_SLOT = 11;
+    private final byte STAGE_TWO_SLOT = 15;
 
     public CropStageMenu(Player player, Crop crop) {
         super(3, CROP_TYPE_INV_NAME, player);
@@ -35,27 +38,29 @@ public class CropStageMenu extends AbstractMenu {
 
     @Override
     protected void setPreviewItems() {
+        Field field = Main.buildTeamTools.getGenerator().getField();
+        Crop crop = Crop.getByIdentifier(field.getPlayerSettings().get(getMenuPlayer().getUniqueId()).getValues().get(FieldFlag.CROP));
 
         ItemStack itemOne = Item.create(Material.BARRIER);
         ItemStack itemTwo = Item.create(Material.BARRIER);;
 
         switch (crop) {
             case POTATO:
-                itemOne = Item.create(Material.STONE_PLATE, "&bLow", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-                itemTwo = Item.create(Material.STONE, "&bTall", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+                itemOne = Item.create(Material.STONE_PLATE, "§bLow", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+                itemTwo = Item.create(Material.STONE, "§bTall", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
                 break;
             case WHEAT:
-                itemOne = Item.create(Material.BIRCH_FENCE, "&bLight", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-                itemTwo = Item.create(Material.DARK_OAK_FENCE, "&bDark", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+                itemOne = Item.create(Material.BIRCH_FENCE, "§bLight", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+                itemTwo = Item.create(Material.DARK_OAK_FENCE, "§bDark", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
                 break;
             case CORN:
-                itemOne = Item.create(Material.STONE_PLATE, "&bHarvested", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-                itemTwo = Item.create(Material.STONE, "&bTall", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+                itemOne = Item.create(Material.STONE_PLATE, "§bHarvested", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+                itemTwo = Item.create(Material.STONE, "§bTall", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
                 break;
             case HARVESTED:
             case OTHER:
-                itemOne = Item.create(Material.DEAD_BUSH, "&bDry", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-                itemTwo = Item.create(Material.WATER_BUCKET, "&bWet", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+                itemOne = Item.create(Material.DEAD_BUSH, "§bDry", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+                itemTwo = Item.create(Material.WATER_BUCKET, "§bWet", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
                 break;
         }
 
@@ -148,7 +153,7 @@ public class CropStageMenu extends AbstractMenu {
         return BinaryMask.builder(getMenu())
                 .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short)15, null))
                 .pattern("111111111")
-                .pattern("010101010")
+                .pattern("110111011")
                 .pattern("111111111")
                 .build();
     }

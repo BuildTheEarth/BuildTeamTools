@@ -5,7 +5,6 @@ import net.buildtheearth.buildteam.components.generator.Settings;
 import net.buildtheearth.buildteam.components.generator.field.Crop;
 import net.buildtheearth.buildteam.components.generator.field.FieldFlag;
 import net.buildtheearth.buildteam.components.generator.field.FieldSettings;
-import net.buildtheearth.buildteam.components.generator.house.menu.RoofColorMenu;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.Liste;
 import net.buildtheearth.utils.menus.AbstractMenu;
@@ -39,15 +38,15 @@ public class CropTypeMenu extends AbstractMenu {
     @Override
     protected void setPreviewItems() {
 
-        ItemStack potatoItem = Item.create(Material.POTATO, "&bPotato", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-        ItemStack wheatItem = Item.create(Material.WHEAT, "&bWheat", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-        ItemStack cornItem = Item.create(Material.PUMPKIN_STEM, "&bCorn", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-        ItemStack vineyardItem = Item.create(Material.VINE, "&bVineyard", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-        ItemStack pearItem = Item.create(Material.SLIME_BALL, "&bPear", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-        ItemStack cattleItem = Item.create(Material.SPRUCE_FENCE, "&bWheat", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-        ItemStack meadowItem = Item.create(Material.GRASS, "&bMeadow", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-        ItemStack harvestedItem = Item.create(Material.HAY_BLOCK, "&bHarvested", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-        ItemStack otherItem = Item.create(Material.DEAD_BUSH, "&bOther", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+        ItemStack potatoItem = Item.create(Material.POTATO, "§bPotato", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+        ItemStack wheatItem = Item.create(Material.WHEAT, "§bWheat", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+        ItemStack cornItem = Item.create(Material.PUMPKIN_STEM, "§bCorn", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+        ItemStack vineyardItem = Item.create(Material.VINE, "§bVineyard", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+        ItemStack pearItem = Item.create(Material.SLIME_BALL, "§bPear", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+        ItemStack cattleItem = Item.create(Material.SPRUCE_FENCE, "§bWheat", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+        ItemStack meadowItem = Item.create(Material.GRASS, "§bMeadow", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+        ItemStack harvestedItem = Item.create(Material.HAY_BLOCK, "§bHarvested", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+        ItemStack otherItem = Item.create(Material.DEAD_BUSH, "§bOther", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
 
         // Set items
         getMenu().getSlot(POTATO_CROP_SLOT).setItem(potatoItem);
@@ -176,7 +175,7 @@ public class CropTypeMenu extends AbstractMenu {
         return BinaryMask.builder(getMenu())
                 .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short)15, null))
                 .pattern("111111111")
-                .pattern("010101010")
+                .pattern("000000000")
                 .pattern("111111111")
                 .build();
     }

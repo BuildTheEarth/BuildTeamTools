@@ -4,7 +4,6 @@ import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.components.generator.Settings;
 import net.buildtheearth.buildteam.components.generator.field.FieldFlag;
 import net.buildtheearth.buildteam.components.generator.field.FieldSettings;
-import net.buildtheearth.buildteam.components.generator.house.menu.RoofTypeMenu;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.BlockListMenu;

@@ -18,7 +18,7 @@ public class Field extends GeneratorModule {
         if (!Generator.checkIfWorldEditIsInstalled(p))
             return false;
 
-        if (!Generator.checkForWorldEditSelection(p) && !Generator.checkForPolySelection(p))
+        if (!Generator.checkForPolySelection(p))
             return false;
 
         if (getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)

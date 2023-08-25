@@ -231,7 +231,7 @@ public class FieldScripts {
             commands.add("//pos2 " + selectionPoints.get(i).getBlockX() + "," + minY + "," + selectionPoints.get(i).getBlockZ());
         }
 
-        commands.add("//expand 10 up");
+        commands.add("//expand 20 20 up");
 
         if (crop == Crop.POTATO) {
             if (type == CropStage.TALL) {

@@ -28,6 +28,7 @@ public class CropStageMenu extends AbstractMenu {
 
     public CropStageMenu(Player player, Crop crop) {
         super(3, CROP_TYPE_INV_NAME, player);
+        player.sendMessage("TEST " + crop.toString());
         this.crop = crop;
     }
 
@@ -83,13 +84,17 @@ public class CropStageMenu extends AbstractMenu {
             switch (crop) {
                 case POTATO:
                     cropstage = CropStage.LOW;
+                    break;
                 case WHEAT:
                     cropstage = CropStage.LIGHT;
+                    break;
                 case CORN:
                     cropstage = CropStage.HARVESTED;
+                    break;
                 case HARVESTED:
                 case OTHER:
                     cropstage = CropStage.DRY;
+                    break;
             }
 
             performClickAction(clickPlayer, cropstage);
@@ -104,14 +109,16 @@ public class CropStageMenu extends AbstractMenu {
             CropStage cropstage = CropStage.FALLBACK;
             switch (crop) {
                 case POTATO:
-                    cropstage = CropStage.TALL;
-                case WHEAT:
-                    cropstage = CropStage.DARK;
                 case CORN:
                     cropstage = CropStage.TALL;
+                    break;
+                case WHEAT:
+                    cropstage = CropStage.DARK;
+                    break;
                 case HARVESTED:
                 case OTHER:
                     cropstage = CropStage.WET;
+                    break;
             }
 
             performClickAction(clickPlayer, cropstage);

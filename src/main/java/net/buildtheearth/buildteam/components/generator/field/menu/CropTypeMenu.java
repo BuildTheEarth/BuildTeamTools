@@ -8,6 +8,7 @@ import net.buildtheearth.buildteam.components.generator.field.FieldSettings;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.Liste;
 import net.buildtheearth.utils.menus.AbstractMenu;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -167,7 +168,35 @@ public class CropTypeMenu extends AbstractMenu {
     }
 
     private void sendMoreInformation(Player p, Crop crop) {
-
+        switch (crop) {
+            case POTATO:
+                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#potato-requires-lines");
+                break;
+            case CORN:
+                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#corn");
+                break;
+            case WHEAT:
+                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#wheat");
+                break;
+            case HARVESTED:
+                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#harvested-requires-lines");
+                break;
+            case OTHER:
+                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#other-requires-lines");
+                break;
+            case VINEYARD:
+                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#vineyard-requires-lines");
+                break;
+            case PEAR:
+                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#pear-requires-lines");
+                break;
+            case CATTLE:
+                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#cattle");
+                break;
+            case MEADOW:
+                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#meadow");
+                break;
+        }
     }
 
     @Override

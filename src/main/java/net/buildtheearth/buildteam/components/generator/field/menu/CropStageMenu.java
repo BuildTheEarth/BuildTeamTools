@@ -12,6 +12,7 @@ import net.buildtheearth.buildteam.components.generator.house.HouseSettings;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.Liste;
 import net.buildtheearth.utils.menus.AbstractMenu;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -145,7 +146,26 @@ public class CropStageMenu extends AbstractMenu {
     }
 
     private void sendMoreInformation(Player p, Crop crop) {
+        switch (crop) {
+            case POTATO:
+                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#potato-requires-lines");
+                break;
+            case CORN:
+                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#corn");
+                break;
+            case WHEAT:
+                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#wheat");
+                break;
+            case HARVESTED:
+                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#harvested-requires-lines");
+                break;
+            case OTHER:
+                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#other-requires-lines");
+                break;
+        }
 
+        p.closeInventory();
+        p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
     }
 
     @Override

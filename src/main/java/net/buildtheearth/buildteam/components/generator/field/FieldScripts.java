@@ -10,6 +10,7 @@ import net.buildtheearth.buildteam.components.generator.Command;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.generator.GeneratorType;
 import net.buildtheearth.buildteam.components.generator.History;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -100,20 +101,35 @@ public class FieldScripts {
         commands.add("//set 7");
         operations++;
 
-        commands.add("//expand 10 down");
+        commands.add("//expand 10 10 up");
 
 
         // ----------- PREPARATION 02 ----------
         // Drawing lines if the crop requires it
 
         if (crop.isLinesRequired()) {
-            // Return if there aren't at least 2 yellow wool blocks inside the selection
+            // Make sure there are at least 2 yellow wool blocks inside the selection
             if (!Generator.containsBlock(blocks, Material.WOOL, (byte) 4, 2)) {
-                p.sendMessage("§cYou need to place at least 2 yellow wool blocks inside your selection!");
-                p.sendMessage(" ");
-                p.sendMessage("§cFor more information, please see the wiki:");
-                p.sendMessage("§c" + LINE_WIKI);
-                return;
+                for(Block[][] block2D : blocks) {
+                    for(Block[] block1D : block2D) {
+                        int max = block1D.length;
+                        int random1 = (int) ((Math.random() * (max)) + 1);
+                        int random2 = (int) ((Math.random() * (max)) + 1);
+
+                        Location location1 = block1D[random1].getLocation();
+                        location1.setY(p.getWorld().getHighestBlockYAt(location1));
+
+                        Location location2 = block1D[random2].getLocation();
+                        location2.setY(p.getWorld().getHighestBlockYAt(location2));
+
+                        location1.getBlock().setType(Material.WOOL);
+                        location1.getBlock().setData((byte) 4);
+
+                        location2.getBlock().setType(Material.WOOL);
+                        location2.getBlock().setData((byte) 4);
+
+                    }
+                }
             }
 
             // Get the most west and most east yellow block to draw a line.

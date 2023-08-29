@@ -22,7 +22,7 @@ public class Road extends GeneratorModule {
         if(!Generator.checkIfWorldEditIsInstalled(p))
             return false;
 
-        if(!Generator.checkForWorldEditSelection(p))
+        if(!Generator.checkForWorldEditSelection(p, true))
             return false;
 
         if(!Generator.checkForConvexSelection(p))

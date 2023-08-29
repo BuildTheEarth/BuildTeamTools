@@ -10,6 +10,7 @@ import net.buildtheearth.buildteam.components.generator.Command;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.generator.GeneratorType;
 import net.buildtheearth.buildteam.components.generator.History;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -137,16 +138,14 @@ public class FieldScripts {
             Block westernMost = null;
             Block easternMost = null;
             double currentLowest = Double.MAX_VALUE;
-            double currentHighest = Double.MIN_VALUE;
+            double currentHighest = -Double.MAX_VALUE;
 
             for (Block yellowWoolBlock : yellowWoolBlocks) {
                 if (yellowWoolBlock.getLocation().getBlockX() < currentLowest) {
                     currentLowest = yellowWoolBlock.getLocation().getBlockX();
                     westernMost = yellowWoolBlock;
                 }
-            }
 
-            for (Block yellowWoolBlock : yellowWoolBlocks) {
                 if (yellowWoolBlock.getLocation().getBlockX() > currentHighest) {
                     currentHighest = yellowWoolBlock.getLocation().getBlockX();
                     easternMost = yellowWoolBlock;
@@ -160,21 +159,35 @@ public class FieldScripts {
                 return;
             }
 
-            int xTargetLeft = region.getMinimumPoint().getBlockX();
-            int xTargetRight = region.getMaximumPoint().getBlockX();
 
-            int zLeft = (int) interpolateCoordinates(westernMost.getX(), westernMost.getZ(), easternMost.getX(), easternMost.getZ(), xTargetLeft);
-            int zRight = (int) interpolateCoordinates(westernMost.getX(), westernMost.getZ(), easternMost.getX(), easternMost.getZ(), xTargetRight);
+            // Get the target length of the new line
+            double targetLength = 1;
+
+            double diagonal1 = region.getMaximumPoint().subtract(region.getMinimumPoint()).length();
+            Vector boundingBoxPoint3 = new Vector(region.getMinimumPoint().getX(), region.getMaximumPoint().getY(), region.getMaximumPoint().getZ());
+            Vector boundingBoxPoint4 = new Vector(region.getMaximumPoint().getX(), region.getMinimumPoint().getY(), region.getMinimumPoint().getZ());
+            double diagonal2 = boundingBoxPoint4.subtract(boundingBoxPoint3).length();
+
+            targetLength = Math.max(diagonal1, diagonal2);
+
+
+            // Get two new points of the extended line
+            Vector point1 = new Vector(westernMost.getX(), westernMost.getY(), westernMost.getZ());
+            Vector point2 = new Vector(easternMost.getX(), easternMost.getY(), easternMost.getZ());
+
+            Vector[] extendedVectors = interpolateVectors(point1, point2, targetLength);
+            Vector extendedPoint1 = extendedVectors[0];
+            Vector extendedPoint2 = extendedVectors[1];
+
 
             //Draw the first line
             commands.add("//sel cuboid");
             commands.add("//gmask !air"); // Else the line height can't be properly adjusted
 
-            commands.add("//pos1 " + xTargetLeft + "," + (westernMost.getY() - 2) + "," + zLeft); // New western most
-            commands.add("//pos2 " + xTargetRight + "," + (easternMost.getY() - 2) + "," + zRight); // New eastern most
+            commands.add("//pos1 " + extendedPoint1.getBlockX() + "," + (extendedPoint1.getBlockY() - 1) + "," + extendedPoint1.getBlockZ());
+            commands.add("//pos2 " + extendedPoint2.getBlockX() + "," + (extendedPoint2.getBlockY() - 1) + "," + extendedPoint2.getBlockZ());
             commands.add("//line 35:4");
             operations++;
-
 
             commands.add("//expand 10 up");
             commands.add("//expand 10 down");
@@ -487,5 +500,31 @@ public class FieldScripts {
 
         // Interpolate the coordinate based on the target X value
         return z1 + (z2 - z1) * t;
+    }
+
+    /** Extends the length of a line between two vectors.
+     *
+     * @param point1
+     * @param point2
+     * @param targetLength - Define how long the new line should be
+     * @return - Two new points of the new line
+     */
+    public static Vector[] interpolateVectors(Vector point1, Vector point2, double targetLength){
+        // Distance Vector between point1 and point2
+        Vector distanceVector = point2.subtract(point1);
+        double distanceVectorSize = distanceVector.length();
+
+        // Middle Vector between point1 and point2
+        Vector middle = point1.add(distanceVector.multiply(0.5));
+
+        // Factor how much the distance Vector has to be multiplied in order to create the new line
+        double multiplicationFactor = targetLength / distanceVectorSize / 2;
+        Vector extendedDistanceVector = distanceVector.multiply(multiplicationFactor);
+
+        // Extended points by adding and subtracting the extended Distance Vector to the Middle Vector
+        Vector point1Extended = middle.add(extendedDistanceVector);
+        Vector point2Extended = middle.subtract(extendedDistanceVector);
+
+        return new Vector[]{ point1Extended, point2Extended };
     }
 }

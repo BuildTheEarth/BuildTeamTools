@@ -39,9 +39,9 @@ public class CropTypeMenu extends AbstractMenu {
     @Override
     protected void setPreviewItems() {
 
-        ItemStack potatoItem = Item.create(Material.POTATO, "§bPotato", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+        ItemStack potatoItem = Item.create(Material.POTATO_ITEM, "§bPotato", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
         ItemStack wheatItem = Item.create(Material.WHEAT, "§bWheat", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-        ItemStack cornItem = Item.create(Material.PUMPKIN_STEM, "§bCorn", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+        ItemStack cornItem = Item.create(Material.PUMPKIN_SEEDS, "§bCorn", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
         ItemStack vineyardItem = Item.create(Material.VINE, "§bVineyard", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
         ItemStack pearItem = Item.create(Material.SLIME_BALL, "§bPear", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
         ItemStack cattleItem = Item.create(Material.SPRUCE_FENCE, "§bWheat", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));

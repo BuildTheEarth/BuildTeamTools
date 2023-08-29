@@ -4,8 +4,8 @@ import net.buildtheearth.buildteam.components.generator.Flag;
 
 public enum FieldFlag implements Flag {
 
-    CROP("c"), //Crop
-    TYPE("t"), //CropStage
+    CROP("c"), // Crop
+    TYPE("t"), // CropStage
     FENCE("f"); // String blocks
 
 

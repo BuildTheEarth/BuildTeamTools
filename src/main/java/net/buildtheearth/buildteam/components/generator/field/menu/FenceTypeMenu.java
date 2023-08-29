@@ -12,11 +12,11 @@ import org.bukkit.entity.Player;
 
 public class FenceTypeMenu extends BlockListMenu {
 
-    public static String WALL_COLOR_INV_NAME = "Choose a Wall Block";
+    public static String FENCE_TYPE_INV_NAME = "Choose a Fence Type";
 
 
     public FenceTypeMenu(Player player) {
-        super(player, WALL_COLOR_INV_NAME, MenuItems.getFences());
+        super(player, FENCE_TYPE_INV_NAME, MenuItems.getFences());
     }
 
     @Override
@@ -24,11 +24,11 @@ public class FenceTypeMenu extends BlockListMenu {
         super.setItemClickEventsAsync();
 
         // Set click event for next item
-        if(canProceed())
+        if (canProceed())
             getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
                 Settings settings = Main.buildTeamTools.getGenerator().getField().getPlayerSettings().get(clickPlayer.getUniqueId());
 
-                if(!(settings instanceof FieldSettings))
+                if (!(settings instanceof FieldSettings))
                     return;
 
                 FieldSettings fieldSettings = (FieldSettings) settings;

@@ -18,11 +18,16 @@ public class Field extends GeneratorModule {
         if (!Generator.checkIfWorldEditIsInstalled(p))
             return false;
 
-        if (!Generator.checkForPolySelection(p))
+        if (!Generator.checkForWorldEditSelection(p, true)) {
+            return false;
+        }
+
+        if (!Generator.checkForPolySelection(p, false))
             return false;
 
-        if (getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
+        if (getPlayerSettings().get(p.getUniqueId()).getBlocks() == null) {
             getPlayerSettings().get(p.getUniqueId()).setBlocks(Generator.analyzeRegion(p, p.getWorld()));
+        }
 
         return true;
     }

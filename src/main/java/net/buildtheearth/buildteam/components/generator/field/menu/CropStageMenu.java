@@ -7,8 +7,6 @@ import net.buildtheearth.buildteam.components.generator.field.CropStage;
 import net.buildtheearth.buildteam.components.generator.field.Field;
 import net.buildtheearth.buildteam.components.generator.field.FieldFlag;
 import net.buildtheearth.buildteam.components.generator.field.FieldSettings;
-import net.buildtheearth.buildteam.components.generator.house.House;
-import net.buildtheearth.buildteam.components.generator.house.HouseSettings;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.Liste;
 import net.buildtheearth.utils.menus.AbstractMenu;
@@ -43,7 +41,7 @@ public class CropStageMenu extends AbstractMenu {
         Crop crop = Crop.getByIdentifier(field.getPlayerSettings().get(getMenuPlayer().getUniqueId()).getValues().get(FieldFlag.CROP));
 
         ItemStack itemOne = Item.create(Material.BARRIER);
-        ItemStack itemTwo = Item.create(Material.BARRIER);;
+        ItemStack itemTwo = Item.create(Material.BARRIER);
 
         switch (crop) {
             case POTATO:
@@ -75,13 +73,14 @@ public class CropStageMenu extends AbstractMenu {
     }
 
     @Override
-    protected void setMenuItemsAsync() {}
+    protected void setMenuItemsAsync() {
+    }
 
     @Override
     protected void setItemClickEventsAsync() {
         // Set click events for the crop type items
         getMenu().getSlot(STAGE_ONE_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            if(clickInformation.getClickType().equals(ClickType.RIGHT)) {
+            if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
                 sendMoreInformation(clickPlayer, Crop.POTATO);
                 return;
             }
@@ -107,7 +106,7 @@ public class CropStageMenu extends AbstractMenu {
         }));
 
         getMenu().getSlot(STAGE_TWO_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            if(clickInformation.getClickType().equals(ClickType.RIGHT)) {
+            if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
                 sendMoreInformation(clickPlayer, Crop.WHEAT);
                 return;
             }
@@ -131,10 +130,10 @@ public class CropStageMenu extends AbstractMenu {
         }));
     }
 
-    private void performClickAction(Player p, CropStage cropStage){
+    private void performClickAction(Player p, CropStage cropStage) {
         Settings settings = Main.buildTeamTools.getGenerator().getField().getPlayerSettings().get(p.getUniqueId());
 
-        if(!(settings instanceof FieldSettings))
+        if (!(settings instanceof FieldSettings))
             return;
 
         FieldSettings fieldSettings = (FieldSettings) settings;
@@ -171,7 +170,7 @@ public class CropStageMenu extends AbstractMenu {
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short)15, null))
+                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null))
                 .pattern("111111111")
                 .pattern("110111011")
                 .pattern("111111111")

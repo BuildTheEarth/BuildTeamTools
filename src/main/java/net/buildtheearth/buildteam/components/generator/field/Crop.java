@@ -5,8 +5,8 @@ public enum Crop {
     POTATO("POTATO", true, true),
     WHEAT("WHEAT", false, true),
     CORN("CORN", false, true),
-    VINEYARD("VINEYARD", true,false), //NOTE: special lines
-    PEAR("PEAR", true, false), //NOTE: special lines
+    VINEYARD("VINEYARD", true, false), //NOTE: alternating lines
+    PEAR("PEAR", true, false), //NOTE: alternating lines
     CATTLE("CATTLE", false, false),
     MEADOW("MEADOW", false, false),
     HARVESTED("HARVESTED", true, true),
@@ -23,10 +23,11 @@ public enum Crop {
     }
 
     public static Crop getByIdentifier(String identifier) {
-        for (Crop crop : Crop.values())
-            if (crop.getIdentifier().equalsIgnoreCase(identifier))
+        for (Crop crop : Crop.values()) {
+            if (crop.getIdentifier().equalsIgnoreCase(identifier)) {
                 return crop;
-
+            }
+        }
         return POTATO;
     }
 

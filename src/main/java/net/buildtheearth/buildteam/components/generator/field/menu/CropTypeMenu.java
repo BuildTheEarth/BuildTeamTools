@@ -65,13 +65,14 @@ public class CropTypeMenu extends AbstractMenu {
     }
 
     @Override
-    protected void setMenuItemsAsync() {}
+    protected void setMenuItemsAsync() {
+    }
 
     @Override
     protected void setItemClickEventsAsync() {
         // Set click events for the crop type items
         getMenu().getSlot(POTATO_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            if(clickInformation.getClickType().equals(ClickType.RIGHT)) {
+            if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
                 sendMoreInformation(clickPlayer, Crop.POTATO);
                 return;
             }
@@ -79,7 +80,7 @@ public class CropTypeMenu extends AbstractMenu {
         }));
 
         getMenu().getSlot(WHEAT_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            if(clickInformation.getClickType().equals(ClickType.RIGHT)) {
+            if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
                 sendMoreInformation(clickPlayer, Crop.WHEAT);
                 return;
             }
@@ -87,7 +88,7 @@ public class CropTypeMenu extends AbstractMenu {
         }));
 
         getMenu().getSlot(CORN_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            if(clickInformation.getClickType().equals(ClickType.RIGHT)) {
+            if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
                 sendMoreInformation(clickPlayer, Crop.CORN);
                 return;
             }
@@ -95,7 +96,7 @@ public class CropTypeMenu extends AbstractMenu {
         }));
 
         getMenu().getSlot(VINEYARD_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            if(clickInformation.getClickType().equals(ClickType.RIGHT)) {
+            if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
                 sendMoreInformation(clickPlayer, Crop.VINEYARD);
                 return;
             }
@@ -103,7 +104,7 @@ public class CropTypeMenu extends AbstractMenu {
         }));
 
         getMenu().getSlot(PEAR_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            if(clickInformation.getClickType().equals(ClickType.RIGHT)) {
+            if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
                 sendMoreInformation(clickPlayer, Crop.PEAR);
                 return;
             }
@@ -111,7 +112,7 @@ public class CropTypeMenu extends AbstractMenu {
         }));
 
         getMenu().getSlot(CATTLE_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            if(clickInformation.getClickType().equals(ClickType.RIGHT)) {
+            if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
                 sendMoreInformation(clickPlayer, Crop.CATTLE);
                 return;
             }
@@ -119,7 +120,7 @@ public class CropTypeMenu extends AbstractMenu {
         }));
 
         getMenu().getSlot(MEADOW_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            if(clickInformation.getClickType().equals(ClickType.RIGHT)) {
+            if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
                 sendMoreInformation(clickPlayer, Crop.MEADOW);
                 return;
             }
@@ -127,7 +128,7 @@ public class CropTypeMenu extends AbstractMenu {
         }));
 
         getMenu().getSlot(HARVESTED_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            if(clickInformation.getClickType().equals(ClickType.RIGHT)) {
+            if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
                 sendMoreInformation(clickPlayer, Crop.HARVESTED);
                 return;
             }
@@ -135,7 +136,7 @@ public class CropTypeMenu extends AbstractMenu {
         }));
 
         getMenu().getSlot(OTHER_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            if(clickInformation.getClickType().equals(ClickType.RIGHT)) {
+            if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
                 sendMoreInformation(clickPlayer, Crop.OTHER);
                 return;
             }
@@ -143,10 +144,10 @@ public class CropTypeMenu extends AbstractMenu {
         }));
     }
 
-    private void performClickAction(Player p, Crop crop){
+    private void performClickAction(Player p, Crop crop) {
         Settings settings = Main.buildTeamTools.getGenerator().getField().getPlayerSettings().get(p.getUniqueId());
 
-        if(!(settings instanceof FieldSettings))
+        if (!(settings instanceof FieldSettings))
             return;
 
         FieldSettings fieldSettings = (FieldSettings) settings;
@@ -154,12 +155,12 @@ public class CropTypeMenu extends AbstractMenu {
 
         p.closeInventory();
         p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
-        if(crop.hasStages()) {
+        if (crop.hasStages()) {
             p.sendMessage(crop.toString());
             new CropStageMenu(p, crop);
             return;
         }
-        if(crop.equals(Crop.CATTLE) || crop.equals(Crop.MEADOW)) {
+        if (crop.equals(Crop.CATTLE) || crop.equals(Crop.MEADOW)) {
             new FenceTypeMenu(p);
             return;
         }
@@ -202,7 +203,7 @@ public class CropTypeMenu extends AbstractMenu {
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short)15, null))
+                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null))
                 .pattern("111111111")
                 .pattern("000000000")
                 .pattern("111111111")

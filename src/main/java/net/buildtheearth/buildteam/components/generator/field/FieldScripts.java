@@ -10,7 +10,6 @@ import net.buildtheearth.buildteam.components.generator.Command;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.generator.GeneratorType;
 import net.buildtheearth.buildteam.components.generator.History;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -22,8 +21,6 @@ import java.util.List;
 
 public class FieldScripts {
 
-    public static final String LINE_WIKI = "a"; //TODO ADD WIKI PAGE
-
     public static void fieldscript_v_1_0(Player p, Field field, Region region) {
         List<String> commands = new ArrayList<>();
         HashMap<Object, String> flags = field.getPlayerSettings().get(p.getUniqueId()).getValues();
@@ -34,7 +31,7 @@ public class FieldScripts {
         String fence = flags.get(FieldFlag.FENCE);
 
         // Information for later restoring original selection
-        List<BlockVector2D> selectionPoints = new ArrayList<>();
+        List<Vector> points = new ArrayList<>();
 
         int minY = region.getMinimumPoint().getBlockY();
         int maxY = region.getMaximumPoint().getBlockY();
@@ -42,15 +39,14 @@ public class FieldScripts {
 
         if (region instanceof Polygonal2DRegion) {
             Polygonal2DRegion polyRegion = (Polygonal2DRegion) region;
-            selectionPoints.addAll(polyRegion.getPoints());
+
+            for (BlockVector2D blockVector2D : polyRegion.getPoints()) points.add(blockVector2D.toVector());
 
         } else if (region instanceof CuboidRegion) {
             CuboidRegion cuboidRegion = (CuboidRegion) region;
-            Vector min = cuboidRegion.getMinimumPoint();
-            Vector max = cuboidRegion.getMaximumPoint();
 
-            selectionPoints.add(new BlockVector2D(min.getBlockX(), min.getBlockZ()));
-            selectionPoints.add(new BlockVector2D(max.getBlockX(), max.getBlockZ()));
+            points.add(cuboidRegion.getMinimumPoint());
+            points.add(cuboidRegion.getMaximumPoint());
         } else {
             p.sendMessage("§c§lERROR: §cRegion type not supported!");
             return;
@@ -80,14 +76,17 @@ public class FieldScripts {
         commands.add("//replace leaves,log,pumpkin 0");
         operations++;
 
+        p.sendMessage("//expand 2 2 up"); // IMPORTANT! Doing it this way to fix yellow wool detection
         Block[][][] blocks = Generator.analyzeRegion(p, p.getWorld());
         int maxHeight = Generator.getMaxHeight(blocks);
 
-        //In case the player placed yellow wool for a crop which doesn't require it
+        // In case the player placed yellow wool for a crop which doesn't require it
         if (!crop.isLinesRequired()) {
             commands.add("//replace 35:4 0");
+            operations++;
         }
 
+        // Replaces all underground yellow wool blocks with grass
         commands.add("//gmask !<0");
         commands.add("//replace 35:4 2");
         operations++;
@@ -97,7 +96,7 @@ public class FieldScripts {
         commands.add("//replace !35:4 35:5");
         operations++;
 
-        // Set remembering blocks 5 blocks below lime blocks
+        // Set remembering blocks (bedrock) 5 blocks below lime blocks
         commands.add("//gmask =queryRel(0,5,0,35,5)");
         commands.add("//set 7");
         operations++;
@@ -111,8 +110,8 @@ public class FieldScripts {
         if (crop.isLinesRequired()) {
             // Make sure there are at least 2 yellow wool blocks inside the selection
             if (!Generator.containsBlock(blocks, Material.WOOL, (byte) 4, 2)) {
-                for(Block[][] block2D : blocks) {
-                    for(Block[] block1D : block2D) {
+                for (Block[][] block2D : blocks) {
+                    for (Block[] block1D : block2D) {
                         int max = block1D.length;
                         int random1 = (int) ((Math.random() * (max)) + 1);
                         int random2 = (int) ((Math.random() * (max)) + 1);
@@ -129,11 +128,17 @@ public class FieldScripts {
                         location2.getBlock().setType(Material.WOOL);
                         location2.getBlock().setData((byte) 4);
 
+                        //TODO REMOVE THESE DEBUGS
+                        p.sendMessage(location1.toString());
+                        p.sendMessage(location1.getBlock().getType().toString());
+
+                        p.sendMessage(location2.toString());
+                        p.sendMessage(location2.getBlock().getType().toString());
                     }
                 }
             }
 
-            // Get the most west and most east yellow block to draw a line.
+            // Get the most Western and most Eastern yellow block.
             List<Block> yellowWoolBlocks = Generator.getBlocksOfMaterial(blocks, Material.WOOL, (byte) 4);
             Block westernMost = null;
             Block easternMost = null;
@@ -152,6 +157,7 @@ public class FieldScripts {
                 }
             }
 
+            // Check to make sure 2 yellow wool blocks were correctly found
             if (westernMost == null || easternMost == null) {
                 p.sendMessage("§cSomething went wrong while processing line data!");
                 p.sendMessage(" ");
@@ -180,9 +186,9 @@ public class FieldScripts {
             Vector extendedPoint2 = extendedVectors[1];
 
 
-            //Draw the first line
+            // Draw the first line
             commands.add("//sel cuboid");
-            commands.add("//gmask !air"); // Else the line height can't be properly adjusted
+            commands.add("//gmask !air");
 
             commands.add("//pos1 " + extendedPoint1.getBlockX() + "," + (extendedPoint1.getBlockY() - 1) + "," + extendedPoint1.getBlockZ());
             commands.add("//pos2 " + extendedPoint2.getBlockX() + "," + (extendedPoint2.getBlockY() - 1) + "," + extendedPoint2.getBlockZ());
@@ -192,6 +198,7 @@ public class FieldScripts {
             commands.add("//expand 10 up");
             commands.add("//expand 10 down");
 
+            // Make sure the line completely covers the required surface
             commands.add("//gmask !7,0");
             for (int i = maxHeight; i < maxHeight + 5; i++) {
                 commands.add("//replace >35:4 35:4");
@@ -199,24 +206,20 @@ public class FieldScripts {
                 operations++;
             }
 
-            int requiredRepetitions = (region.getMaximumPoint().getBlockZ() - region.getMinimumPoint().getBlockZ());
+            // Reselect original region
+            Generator.createCuboidSelection(commands, region.getMaximumPoint(), region.getMinimumPoint());
 
-
-            //Select original region
-            commands.add("//pos1 " + region.getMaximumPoint().getBlockX() + "," + region.getMaximumPoint().getBlockY() + "," + region.getMaximumPoint().getBlockZ());
-            commands.add("//pos2 " + region.getMinimumPoint().getBlockX() + "," + region.getMinimumPoint().getBlockY() + "," + region.getMinimumPoint().getBlockZ());
-
-            //Remove extra non solid blocks
+            // Remove extra non solid blocks
             commands.add("//replace !#solid 0");
             operations++;
 
-            //Make original line correct shape
+            // Make original line correct shape
             commands.add("//gmask =queryRel(1,0,0,35,4)&&queryRel(-1,0,+1,35,4)");
             commands.add("//set 35:4");
             operations++;
 
-            //Make the line pattern extend over the field
-            for (int i = 0; i <= requiredRepetitions; i++) {
+            // Make the line pattern extend over the field
+            for (int i = 0; i <= targetLength; i++) {
                 if (i % 2 == 0 || (crop != Crop.VINEYARD && crop != Crop.PEAR)) {
                     //Orange wool
                     commands.add("//gmask =queryRel(0,0,-1,35,4)||queryRel(0,0,+1,35,4)||queryRel(0,1,-1,35,4)||queryRel(0,1,+1,35,4)||queryRel(0,-1,-1,35,4)||queryRel(0,-1,+1,35,4)");
@@ -239,10 +242,10 @@ public class FieldScripts {
             operations++;
 
             // Remove original yellow wool blocks
-
             commands.add("//gmask =queryRel(0,-6,0,7,0)");
             commands.add("//replace 2 0");
             operations++;
+
         }
 
 
@@ -253,13 +256,9 @@ public class FieldScripts {
 
         // First reselect the original poly region
 
-        commands.add("//sel poly");
+        Generator.createPolySelection(commands, points);
 
-        commands.add("//pos1 " + selectionPoints.get(0).getBlockX() + "," + maxY + "," + selectionPoints.get(0).getBlockZ());
-        for (int i = 1; i < selectionPoints.size(); i++) {
-            commands.add("//pos2 " + selectionPoints.get(i).getBlockX() + "," + minY + "," + selectionPoints.get(i).getBlockZ());
-        }
-
+        // Increase height to make sure the entire field height is inside the selection
         commands.add("//expand 20 20 up");
 
         if (crop == Crop.POTATO) {
@@ -437,8 +436,6 @@ public class FieldScripts {
         if (crop == Crop.CATTLE || crop == Crop.MEADOW) {
             commands.add("//gmask 0");
 
-            List<Vector> points = new ArrayList<>();
-            for (BlockVector2D blockVector2D : selectionPoints) points.add(blockVector2D.toVector());
             operations += Generator.createPolyLine(commands, points, "41", true, blocks, 1);
             commands.add("//gmask");
 
@@ -488,28 +485,15 @@ public class FieldScripts {
         Generator.getPlayerHistory(p).addHistoryEntry(new History.HistoryEntry(GeneratorType.FIELD, operations));
     }
 
-
-    public static double interpolateCoordinates(double x1, double z1, double x2, double z2, double targetX) {
-        if (x1 == x2) {
-            // If the start and end points have the same X-coordinate, return the Z-coordinate of the start point
-            return z1;
-        }
-
-        // Calculate the proportional distance between x1 and x2 for the target X value
-        double t = (targetX - x1) / (x2 - x1);
-
-        // Interpolate the coordinate based on the target X value
-        return z1 + (z2 - z1) * t;
-    }
-
-    /** Extends the length of a line between two vectors.
+    /**
+     * Extends the length of a line between two vectors.
      *
-     * @param point1
-     * @param point2
+     * @param point1       - The first point of the current line
+     * @param point2       - The second point of the current line
      * @param targetLength - Define how long the new line should be
      * @return - Two new points of the new line
      */
-    public static Vector[] interpolateVectors(Vector point1, Vector point2, double targetLength){
+    public static Vector[] interpolateVectors(Vector point1, Vector point2, double targetLength) {
         // Distance Vector between point1 and point2
         Vector distanceVector = point2.subtract(point1);
         double distanceVectorSize = distanceVector.length();
@@ -525,6 +509,6 @@ public class FieldScripts {
         Vector point1Extended = middle.add(extendedDistanceVector);
         Vector point2Extended = middle.subtract(extendedDistanceVector);
 
-        return new Vector[]{ point1Extended, point2Extended };
+        return new Vector[]{point1Extended, point2Extended};
     }
 }

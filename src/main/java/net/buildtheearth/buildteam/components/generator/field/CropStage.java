@@ -8,8 +8,8 @@ public enum CropStage {
     HARVESTED("HARVESTED"),
     LIGHT("LIGHT"),
     DARK("DARK"),
-    DRY("DRY"), //For harvested fields
-    WET("WET"); //For harvested fields
+    DRY("DRY"),
+    WET("WET");
 
 
     private final String identifier;
@@ -19,10 +19,11 @@ public enum CropStage {
     }
 
     public static CropStage getByIdentifier(String identifier) {
-        for (CropStage cropStage : CropStage.values())
-            if (cropStage.getIdentifier().equalsIgnoreCase(identifier))
+        for (CropStage cropStage : CropStage.values()) {
+            if (cropStage.getIdentifier().equalsIgnoreCase(identifier)) {
                 return cropStage;
-
+            }
+        }
         return FALLBACK;
     }
 

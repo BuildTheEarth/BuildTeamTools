@@ -595,6 +595,20 @@ public class Generator {
         return maxHeight;
     }
 
+    /**
+     * Creates a Cuboid WorldEdit selection from a list of points and adds it to the list of commands to execute.
+     *
+     * @param commands - The list of commands to add the selection to
+     * @param vector1 - Position 1
+     * @param vector2 - Position 2
+     */
+    public static void createCuboidSelection(List<String> commands, Vector vector1, Vector vector2){
+        commands.add("//sel cuboid");
+
+        commands.add("//pos1 " + vector1.getBlockX() + "," + vector1.getBlockY() + "," + vector1.getBlockZ());
+        commands.add("//pos2 " + vector2.getBlockX() + "," + vector2.getBlockY() + "," + vector2.getBlockZ());
+    }
+
 
     /** Creates a Convex WorldEdit selection from a list of points and adds it to the list of commands to execute.
      *
@@ -794,7 +808,7 @@ public class Generator {
      * @param p - The player to check for
      * @return Whether the player has a WorldEdit selection
      */
-    public static boolean checkForWorldEditSelection(Player p){
+    public static boolean checkForWorldEditSelection(Player p, boolean notify){
         // Get WorldEdit selection of player
         Region polyRegion = Generator.getWorldEditSelection(p);
 
@@ -815,7 +829,7 @@ public class Generator {
      * @param p - The player to check for
      * @return Whether the player has a WorldEdit Poly selection
      */
-    public static boolean checkForPolySelection(Player p){
+    public static boolean checkForPolySelection(Player p, boolean notify){
 
         Region polyRegion = Generator.getWorldEditSelection(p);
 

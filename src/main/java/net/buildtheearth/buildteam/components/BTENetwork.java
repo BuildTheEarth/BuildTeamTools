@@ -66,6 +66,9 @@ public class BTENetwork {
         if(getCommunicators().size() == 0)
             return false;
 
+        if(!Main.instance.isEnabled())
+            return false;
+
         Player p = Bukkit.getPlayer(getCommunicators().get(0));
 
         if(p == null) {

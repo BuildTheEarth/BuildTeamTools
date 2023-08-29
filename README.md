@@ -74,7 +74,7 @@ Thank you to the following developers for contributing towards the plugin:
 
 - **MineFact**
 - **Brigart**
-- **y4siv**
+- **v4siv**
 - **Adam**
 - **Noah Husby**
 

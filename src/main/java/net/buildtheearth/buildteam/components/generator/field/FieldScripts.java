@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 public class FieldScripts {
 
@@ -76,7 +77,7 @@ public class FieldScripts {
         commands.add("//replace leaves,log,pumpkin 0");
         operations++;
 
-        p.sendMessage("//expand 2 2 up"); // IMPORTANT! Doing it this way to fix yellow wool detection
+        p.chat("//expand 2 2 up"); // IMPORTANT! Doing it this way to fix yellow wool detection
         Block[][][] blocks = Generator.analyzeRegion(p, p.getWorld());
         int maxHeight = Generator.getMaxHeight(blocks);
 
@@ -110,32 +111,16 @@ public class FieldScripts {
         if (crop.isLinesRequired()) {
             // Make sure there are at least 2 yellow wool blocks inside the selection
             if (!Generator.containsBlock(blocks, Material.WOOL, (byte) 4, 2)) {
-                for (Block[][] block2D : blocks) {
-                    for (Block[] block1D : block2D) {
-                        int max = block1D.length;
-                        int random1 = (int) ((Math.random() * (max)) + 1);
-                        int random2 = (int) ((Math.random() * (max)) + 1);
+                Vector[] lineBlocks = interpolateVectors(points.get(0), points.get(1), -0.5);
 
-                        Location location1 = block1D[random1].getLocation();
-                        location1.setY(p.getWorld().getHighestBlockYAt(location1));
+                Location location1 = new Location(p.getWorld(), lineBlocks[0].getBlockX(), lineBlocks[0].getBlockY(), lineBlocks[0].getBlockZ());
+                Location location2 = new Location(p.getWorld(), lineBlocks[1].getBlockX(), lineBlocks[1].getBlockY(), lineBlocks[1].getBlockZ());
 
-                        Location location2 = block1D[random2].getLocation();
-                        location2.setY(p.getWorld().getHighestBlockYAt(location2));
+                location1.getBlock().setType(Material.WOOL);
+                location1.getBlock().setData((byte) 4);
 
-                        location1.getBlock().setType(Material.WOOL);
-                        location1.getBlock().setData((byte) 4);
-
-                        location2.getBlock().setType(Material.WOOL);
-                        location2.getBlock().setData((byte) 4);
-
-                        //TODO REMOVE THESE DEBUGS
-                        p.sendMessage(location1.toString());
-                        p.sendMessage(location1.getBlock().getType().toString());
-
-                        p.sendMessage(location2.toString());
-                        p.sendMessage(location2.getBlock().getType().toString());
-                    }
-                }
+                location2.getBlock().setType(Material.WOOL);
+                location2.getBlock().setData((byte) 4);
             }
 
             // Get the most Western and most Eastern yellow block.

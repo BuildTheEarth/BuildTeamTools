@@ -2,6 +2,7 @@ package net.buildtheearth.utils.menus;
 
 import net.buildtheearth.Main;
 import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.MenuItem;
 import net.buildtheearth.utils.MenuItems;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -11,6 +12,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.ipvp.canvas.Menu;
 import org.ipvp.canvas.mask.Mask;
 import org.ipvp.canvas.type.ChestMenu;
+
+import java.util.ArrayList;
 
 public abstract class AbstractMenu {
 
@@ -142,4 +145,34 @@ public abstract class AbstractMenu {
             getMenu().getSlot(sliderItemSlot + 1).setItem(MenuItems.getXItem(sliderColor, "§cDisable " + sliderName));
         }
     }
+
+    protected void setMenuItemsAsyncViaMenuItems(ArrayList<MenuItem> menuItems)
+    {
+        int i;
+        int iNumIcons = menuItems.size();
+        MenuItem menuItem;
+
+        //Adds all of the icons
+        for (i = 0 ; i < iNumIcons ; i++)
+        {
+            menuItem = menuItems.get(i);
+            getMenu().getSlot(menuItem.getSlot()).setItem(menuItem.getDisplayIcon());
+        }
+    }
+
+    protected void setMenuItemClickEventsAsyncViaMenuItems(ArrayList<MenuItem> menuItems)
+    {
+        int i;
+        int iNumIcons = menuItems.size();
+        MenuItem menuItem;
+
+        //Adds all of the actions
+        for (i = 0 ; i < iNumIcons ; i++)
+        {
+            menuItem = menuItems.get(i);
+            MenuItem finalMenuItem = menuItem;
+            getMenu().getSlot(menuItem.getSlot()).setClickHandler((player, clickInformation) -> finalMenuItem.getAction().click(player));
+        }
+    }
+
 }

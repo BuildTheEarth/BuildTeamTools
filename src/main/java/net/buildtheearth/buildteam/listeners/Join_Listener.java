@@ -18,6 +18,8 @@ public class Join_Listener implements Listener {
 
         //Notify the admins if a new update got installed automatically
         Main.buildTeamTools.notifyUpdate(p);
+
+        Main.buildTeamTools.fetchAndLoadPreferences(p.getUniqueId());
     }
 
     @EventHandler

@@ -1,0 +1,30 @@
+navigator:
+  enabled: true
+  # The hotbar slot into which the navigator item should be placed
+  slot: 0
+  # Specifies which menu items should be enabled and what their material should be
+  main_menu_items:
+    build:
+      enabled: true
+      material: DIAMOND_PICKAXE
+    explore:
+      enabled: true
+      material: BOAT_SPRUCE
+    tutorials:
+      enabled: false
+      material: KNOWLEDGE_BOOK
+  build_menu_items:
+    tutorials:
+      enabled: false
+      material: KNOWLEDGE_BOOK
+    plot_system:
+      enabled: false
+      material: SPRUCE_FENCE_GATE
+    regions:
+      enabled: true
+      material: MAP
+    tools:
+      enabled: true
+      material: DIAMOND_HOE
+
+Plot_Server_Name: "Plot1"

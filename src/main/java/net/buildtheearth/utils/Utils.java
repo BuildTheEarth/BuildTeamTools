@@ -3,6 +3,7 @@ package net.buildtheearth.utils;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -123,5 +124,15 @@ public class Utils {
 		}
 
 		return s;
+	}
+
+	public static String menuIconTitle(String szText)
+	{
+		return (ChatColor.GREEN +"" +ChatColor.BOLD +szText);
+	}
+
+	public static String loreText(String szText)
+	{
+		return (ChatColor.GRAY +"" +szText);
 	}
 }

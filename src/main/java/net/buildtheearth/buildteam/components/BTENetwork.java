@@ -27,21 +27,27 @@ public class BTENetwork {
     @Getter
     private StatsManager statsManager;
 
-
+    @Getter
+    private final boolean bIsConnected;
 
     public BTENetwork(){
-        start();
+        bIsConnected = start();
     }
 
-    public void start(){
+    public boolean start(){
         communicators = new ArrayList<>();
         statsManager = new StatsManager();
 
         //Ping all online players on startup
         for(Player p : Bukkit.getOnlinePlayers())
             ping(p);
+
+        return (communicators.size() > 0);
     }
 
+    public boolean isConnected() {
+        return bIsConnected;
+    }
 
     /** Sends a ping to the network.
      *  If the player is playing over the network the proxy will answer with another ping message.
@@ -88,9 +94,4 @@ public class BTENetwork {
 
         return true;
     }
-
-    public boolean isConnected() {
-        return communicators.size() > 0;
-    }
-
 }

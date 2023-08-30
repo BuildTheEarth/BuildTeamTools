@@ -2,26 +2,34 @@ package net.buildtheearth.buildteam;
 
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
+import net.buildtheearth.buildteam.commands.Navigator;
 import net.buildtheearth.buildteam.commands.buildteamtools_command;
 import net.buildtheearth.buildteam.commands.generate_command;
 import net.buildtheearth.buildteam.components.BTENetwork;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.stats.StatsPlayerType;
 import net.buildtheearth.buildteam.components.stats.StatsServerType;
+import net.buildtheearth.buildteam.components.universal_experience.PreferenceType;
+import net.buildtheearth.buildteam.database.DBConnection;
+import net.buildtheearth.buildteam.database.User;
 import net.buildtheearth.buildteam.listeners.CancelledEvents;
 import net.buildtheearth.buildteam.components.ConfigManager;
+import net.buildtheearth.buildteam.listeners.InteractEvent;
 import net.buildtheearth.buildteam.listeners.Join_Listener;
 import net.buildtheearth.buildteam.listeners.Stats_Listener;
+import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.Utils;
 import org.bukkit.Bukkit;
 
 import net.buildtheearth.Main;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.ipvp.canvas.MenuFunctionListener;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class BuildTeamTools {
 
@@ -36,10 +44,30 @@ public class BuildTeamTools {
 	private BTENetwork bteNetwork;
 	private Generator generator;
 
+	private ItemStack navigator;
+	//0 indexed
+	private int iSlot = Main.instance.getConfig().getInt("navigator.slot");
+
+	//Maps each preference to its preference map
+	private HashMap<PreferenceType, HashMap> userPreferences;
+
+	private DBConnection dbConnection;
+
 	public BuildTeamTools() {}
 	
 	public void start() {
+		initialisePreferences();
+
+		//connectToDB();
+		//createDBTables();
+
 		registerCommands();
+
+		//Create nav icon
+		ArrayList<String> lore = new ArrayList<>();
+		lore.add(Utils.loreText("Click to open the navigator."));
+		navigator = Item.create(Material.NETHER_STAR, Utils.menuIconTitle("Navigator"), 1, lore);
+
 		registerListeners();
 		startTimer();
 
@@ -65,7 +93,33 @@ public class BuildTeamTools {
 	 *  It contains all systems that have to run once a second.
 	 */
 	private void tickSeconds() {
+		if (bteNetwork.isConnected())
+		{
+			if (Main.instance.getConfig().getBoolean("navigator.enabled"))
+			{
+				ItemStack navLocation;
+				//Cycles through all players
+				for (Player player: Bukkit.getOnlinePlayers())
+				{
+					//If navigator is enabled check if they have it in the relevant slot.
+					if ((Boolean) userPreferences.get(PreferenceType.NavigatorEnabled).get(player.getUniqueId()))
+					{
+						//Gets what's in the relevant slot
+						navLocation = player.getInventory().getItem(this.iSlot);
 
+						//Give the player the inventory
+						if (navLocation == null)
+						{
+							player.getInventory().setItem(this.iSlot, this.navigator);
+						}
+						else if (!(navLocation.equals(this.navigator)))
+						{
+							player.getInventory().setItem(this.iSlot, this.navigator);
+						}
+					}
+				}
+			}
+		}
 	}
 	
 	
@@ -128,22 +182,66 @@ public class BuildTeamTools {
 			p.sendMessage("");
 		}
 	}
+
+	/**
+	 * Initialises the DB connection object and connects to the database
+	 */
+	private void connectToDB()
+	{
+		dbConnection = new DBConnection();
+		dbConnection.mysqlSetup(Main.instance.getConfig());
+		dbConnection.connect();
+	}
+
+	/**
+	 * Creates each preference list and adds it to the big list of everyone's preferences
+	 */
+	private void initialisePreferences()
+	{
+		this.userPreferences = new HashMap<>(PreferenceType.values().length+1, 1);
+		HashMap<UUID, Boolean> navigatorEnabled = new HashMap<>();
+		this.userPreferences.put(PreferenceType.NavigatorEnabled, navigatorEnabled);
+	}
 	
-	/** Registers all Commands of the plugin. */
+	/** Registers all global Commands of the plugin. */
 	private void registerCommands() {
 		Main.instance.getCommand("buildteam").setExecutor(new buildteamtools_command());
 		Main.instance.getCommand("generate").setExecutor(new generate_command());
-
+		Main.instance.getCommand("navigator").setExecutor(new Navigator());
 	}
 
-	/** Registers all Listeners of the plugin. */
+	/** Registers all global Listeners of the plugin. */
 	private void registerListeners() {
+		if (bteNetwork.isConnected())
+			new InteractEvent(Main.instance);
+		else
+			new InteractEvent(Main.instance); // Do change when actual release
 		Bukkit.getPluginManager().registerEvents(new MenuFunctionListener(), Main.instance);
 		Bukkit.getPluginManager().registerEvents(new CancelledEvents(), Main.instance);
 		Bukkit.getPluginManager().registerEvents(new Join_Listener(), Main.instance);
 		Bukkit.getPluginManager().registerEvents(new Stats_Listener(), Main.instance);
 	}
 
+	//-------------------------------------------------
+	//-------------------Preferences-------------------
+	//-------------------------------------------------
+	public void fetchAndLoadPreferences(UUID uuid)
+	{
+		User user = User.fetchUser(uuid);
+		userPreferences.get(PreferenceType.NavigatorEnabled).put(uuid, user.bNavigatorEnabled);
+	}
+
+	//Toggles a boolean preference
+	public void updatePreference(PreferenceType preferenceType, UUID uuid)
+	{
+		if (userPreferences.get(preferenceType).get(uuid) instanceof Boolean)
+		{
+			Boolean bValue = (Boolean) userPreferences.get(preferenceType).get(uuid);
+			userPreferences.get(preferenceType).replace(uuid, Boolean.valueOf(!bValue.booleanValue()));
+		}
+
+		//Todo: Make the change in the DB as well
+	}
 
 
 	public static class DependencyManager {
@@ -197,6 +295,19 @@ public class BuildTeamTools {
 
 	public boolean isDebug() {
 		return debug;
+	}
+
+	public ItemStack getNavigator() {
+		return navigator;
+	}
+
+	public int getNavSlot() {
+		return iSlot;
+	}
+
+	public DBConnection getDBConnection()
+	{
+		return dbConnection;
 	}
 
 	public void setDebug(boolean debug) {

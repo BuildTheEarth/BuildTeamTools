@@ -19,3 +19,6 @@ commands:
     aliases:
       - nav
       - navigate
+  statistics:
+    description: Opens the statistics menu
+    usage: /statistics

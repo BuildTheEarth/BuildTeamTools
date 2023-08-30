@@ -1,5 +1,10 @@
 package net.buildtheearth.buildteam.components.stats.menu;
 
+import net.buildtheearth.Main;
+import net.buildtheearth.buildteam.components.BTENetwork;
+import net.buildtheearth.buildteam.components.stats.StatsManager;
+import net.buildtheearth.buildteam.components.stats.StatsPlayer;
+import net.buildtheearth.buildteam.components.stats.StatsServer;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.Liste;
 import net.buildtheearth.utils.MenuItems;
@@ -9,6 +14,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
+import org.json.simple.JSONObject;
+
+import java.util.ArrayList;
+import java.util.UUID;
 
 public class StatsMenu extends AbstractMenu {
 
@@ -36,15 +45,6 @@ public class StatsMenu extends AbstractMenu {
      */
     @Override
     protected void setPreviewItems() {
-        super.setPreviewItems();
-    }
-
-
-    /**
-     * Places items asynchronously in the menu after it is opened
-     */
-    @Override
-    protected void setMenuItemsAsync() {
         setupLores();
 
 
@@ -52,6 +52,15 @@ public class StatsMenu extends AbstractMenu {
         getMenu().getSlot(TEAM_HEAD_SLOT).setItem(TEAM_HEAD);
         getMenu().getSlot(GLOBAL_HEAD_SLOT).setItem(GLOBAL_HEAD);
         getMenu().getSlot(ACHIEVEMENT_HEAD_SLOT).setItem(ACHIEVEMENTS_HEAD);
+        super.setPreviewItems();
+    }
+
+    /**
+     * Places items asynchronously in the menu after it is opened
+     */
+    @Override
+    protected void setMenuItemsAsync() {
+
     }
 
     /**
@@ -83,23 +92,51 @@ public class StatsMenu extends AbstractMenu {
      * Sets up the correct lores for all items
      */
     private void setupLores() {
-        PLAYER_HEAD.setLore(Liste.createList(
-                "",
-                "",
-                ""
-        ));
+        StatsManager statsManager = Main.buildTeamTools.getBTENetwork().getStatsManager();
 
-        TEAM_HEAD.setLore(Liste.createList(
-                "",
-                "",
-                ""
-        ));
+
+        // Set Player Head Lore
+
+        StatsPlayer statsPlayer = statsManager.getStatsPlayer(getMenuPlayer().getUniqueId());
+        JSONObject playerStats = statsPlayer.toJSON();
+
+        ArrayList<String> playerLore = new ArrayList<>();
+
+        for(Object key : playerStats.keySet()) {
+            if(key instanceof UUID) continue;
+
+            Object value = playerStats.get(key);
+            playerLore.add(key + ": " + value);
+        }
+        PLAYER_HEAD.setLore(playerLore);
+
+        // Set Team Head Lore
+
+        StatsServer statsServer = statsManager.getStatsServer();
+        JSONObject serverStats = statsServer.toJSON();
+
+        ArrayList<String> serverLore = new ArrayList<>();
+
+        for(Object key : serverStats.keySet()) {
+            Object value = serverStats.get(key);
+            serverLore.add(key + ": " + value);
+        }
+
+        TEAM_HEAD.setLore(serverLore);
+
+        // Set Global Head Lore
+
+        //TODO: HOW TO GET GLOBAL STATS?
 
         GLOBAL_HEAD.setLore(Liste.createList(
                 "",
                 "",
                 ""
         ));
+
+        // Set Achievements Head Lore
+
+        //TODO WAIT UNTIL ACHIEVEMENTS HAVE MORE PROGRESS
 
         ACHIEVEMENTS_HEAD.setLore(Liste.createList(
                 "",

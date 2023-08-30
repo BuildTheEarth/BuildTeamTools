@@ -5,6 +5,7 @@ import com.sk89q.worldedit.WorldEdit;
 import net.buildtheearth.buildteam.commands.Navigator;
 import net.buildtheearth.buildteam.commands.buildteamtools_command;
 import net.buildtheearth.buildteam.commands.generate_command;
+import net.buildtheearth.buildteam.commands.statistics_command;
 import net.buildtheearth.buildteam.components.BTENetwork;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.stats.StatsPlayerType;
@@ -208,6 +209,7 @@ public class BuildTeamTools {
 		Main.instance.getCommand("buildteam").setExecutor(new buildteamtools_command());
 		Main.instance.getCommand("generate").setExecutor(new generate_command());
 		Main.instance.getCommand("navigator").setExecutor(new Navigator());
+		Main.instance.getCommand("statistics").setExecutor(new statistics_command());
 	}
 
 	/** Registers all global Listeners of the plugin. */

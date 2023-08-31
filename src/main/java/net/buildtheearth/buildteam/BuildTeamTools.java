@@ -4,6 +4,7 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import net.buildtheearth.buildteam.commands.buildteamtools_command;
 import net.buildtheearth.buildteam.commands.generate_command;
+import net.buildtheearth.buildteam.commands.statistics_command;
 import net.buildtheearth.buildteam.components.BTENetwork;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.stats.StatsPlayerType;
@@ -26,6 +27,7 @@ public class BuildTeamTools {
 
 	public static int SPIGOT_PROJECT_ID = 101854;
 	public static String PREFIX = "§9§lBTE §8> §7";
+
 	private boolean debug;
 	private boolean updateInstalled;
 	private String newVersion;
@@ -142,6 +144,7 @@ public class BuildTeamTools {
 	private void registerCommands() {
 		Main.instance.getCommand("buildteam").setExecutor(new buildteamtools_command());
 		Main.instance.getCommand("generate").setExecutor(new generate_command());
+		Main.instance.getCommand("statistics").setExecutor(new statistics_command());
 	}
 
 	/** Registers all global Listeners of the plugin. */
@@ -219,5 +222,4 @@ public class BuildTeamTools {
 		for(Player p : Bukkit.getOnlinePlayers())
 			notifyUpdate(p);
 	}
-
 }

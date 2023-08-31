@@ -42,10 +42,14 @@ import java.util.*;
 
 public class Generator {
 
-    public static String WIKI_PAGE = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Generator";
-    public static String INSTALL_WIKI = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Installation";
+    public static final String WIKI_PAGE = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Generator";
+    public static final String INSTALL_WIKI = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Installation";
+
+    public static final Material[] IGNORED_MATERIALS = {Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL, Material.SNOW};
+
 
     private static HashMap<UUID, History> playerHistory = new HashMap<>();
+
 
     @Getter
     private List<Command> commands = new ArrayList<>();
@@ -232,13 +236,7 @@ public class Generator {
      * @return true if polygon region contains the block, false otherwise
      */
     public static boolean containsBlock(Block[][][] blocks, Material material, byte data){
-        for (Block[][] block2D : blocks)
-            for (Block[] block1D : block2D)
-                for (Block block : block1D)
-                    if (block != null && block.getType() == material && block.getData() == data)
-                        return true;
-
-        return false;
+        return containsBlock(blocks, material, data, 1);
     }
 
     /**
@@ -261,7 +259,7 @@ public class Generator {
         return false;
     }
 
-    /**
+    /** Checks if a block exists inside the block list
      *
      * @param blocks List of blocks to check
      * @param material Material to check for (e.g. Material.WALL_SIGN)
@@ -288,7 +286,7 @@ public class Generator {
 
         for(int i = 0; i < points.size(); i++) {
             Vector point = points.get(i);
-            point = point.setY(Generator.getMaxHeight(blocks, point.getBlockX(), point.getBlockZ(), Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.SNOW));
+            point = point.setY(Generator.getMaxHeight(blocks, point.getBlockX(), point.getBlockZ(), IGNORED_MATERIALS));
             points.set(i, point);
         }
 
@@ -454,7 +452,7 @@ public class Generator {
         int maxHeight = vector.getBlockY();
 
         if(blocks != null)
-            maxHeight = Generator.getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL, Material.SNOW);
+            maxHeight = Generator.getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), IGNORED_MATERIALS);
         if(maxHeight == 0)
             maxHeight = vector.getBlockY();
 
@@ -472,7 +470,7 @@ public class Generator {
         int maxHeight = vector.getBlockY();
 
         if(blocks != null)
-            maxHeight = Generator.getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL, Material.SNOW) + offset;
+            maxHeight = Generator.getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), IGNORED_MATERIALS) + offset;
         if(maxHeight == 0)
             maxHeight = vector.getBlockY();
 

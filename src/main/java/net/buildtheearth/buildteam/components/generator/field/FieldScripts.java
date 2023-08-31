@@ -10,6 +10,7 @@ import net.buildtheearth.buildteam.components.generator.Command;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.generator.GeneratorType;
 import net.buildtheearth.buildteam.components.generator.History;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -34,8 +35,8 @@ public class FieldScripts {
         // Information for later restoring original selection
         List<Vector> points = new ArrayList<>();
 
-        int minY = region.getMinimumPoint().getBlockY();
-        int maxY = region.getMaximumPoint().getBlockY();
+        Vector minPoint = region.getMinimumPoint();
+        Vector maxPoint = region.getMaximumPoint();
 
 
         if (region instanceof Polygonal2DRegion) {
@@ -111,10 +112,23 @@ public class FieldScripts {
         if (crop.isLinesRequired()) {
             // Make sure there are at least 2 yellow wool blocks inside the selection
             if (!Generator.containsBlock(blocks, Material.WOOL, (byte) 4, 2)) {
-                Vector[] lineBlocks = interpolateVectors(points.get(0), points.get(1), -0.5);
+                // Get two points of the selection. If selection points is > 2 take a point from the middle of all points.
+                Vector point1 = points.get(0);
+                Vector point2 = points.get(1);
 
-                Location location1 = new Location(p.getWorld(), lineBlocks[0].getBlockX(), lineBlocks[0].getBlockY(), lineBlocks[0].getBlockZ());
-                Location location2 = new Location(p.getWorld(), lineBlocks[1].getBlockX(), lineBlocks[1].getBlockY(), lineBlocks[1].getBlockZ());
+                if(points.size() > 2)
+                    point2 = points.get((int) Math.ceil(points.size()/2.0));
+
+                // Get two points that are half the size than the original points
+                Vector[] lineBlocks = interpolateVectors(point1, point2, point1.distance(point2) / 2);
+
+                // Get the elevation of the new points
+                int y1 = Generator.getMaxHeight(blocks, lineBlocks[0].getBlockX(), lineBlocks[0].getBlockZ(), Generator.IGNORED_MATERIALS) + 1;
+                int y2 = Generator.getMaxHeight(blocks, lineBlocks[1].getBlockX(), lineBlocks[1].getBlockZ(), Generator.IGNORED_MATERIALS) + 1;
+
+                // Create yellow wool on the new points
+                Location location1 = new Location(p.getWorld(), lineBlocks[0].getBlockX(), y1, lineBlocks[0].getBlockZ());
+                Location location2 = new Location(p.getWorld(), lineBlocks[1].getBlockX(), y2, lineBlocks[1].getBlockZ());
 
                 location1.getBlock().setType(Material.WOOL);
                 location1.getBlock().setData((byte) 4);
@@ -154,9 +168,9 @@ public class FieldScripts {
             // Get the target length of the new line
             double targetLength = 1;
 
-            double diagonal1 = region.getMaximumPoint().subtract(region.getMinimumPoint()).length();
-            Vector boundingBoxPoint3 = new Vector(region.getMinimumPoint().getX(), region.getMaximumPoint().getY(), region.getMaximumPoint().getZ());
-            Vector boundingBoxPoint4 = new Vector(region.getMaximumPoint().getX(), region.getMinimumPoint().getY(), region.getMinimumPoint().getZ());
+            double diagonal1 = maxPoint.subtract(minPoint).length();
+            Vector boundingBoxPoint3 = new Vector(minPoint.getX(), maxPoint.getY(), maxPoint.getZ());
+            Vector boundingBoxPoint4 = new Vector(maxPoint.getX(), minPoint.getY(), minPoint.getZ());
             double diagonal2 = boundingBoxPoint4.subtract(boundingBoxPoint3).length();
 
             targetLength = Math.max(diagonal1, diagonal2);
@@ -192,7 +206,7 @@ public class FieldScripts {
             }
 
             // Reselect original region
-            Generator.createCuboidSelection(commands, region.getMaximumPoint(), region.getMinimumPoint());
+            Generator.createCuboidSelection(commands, maxPoint, minPoint);
 
             // Remove extra non solid blocks
             commands.add("//replace !#solid 0");

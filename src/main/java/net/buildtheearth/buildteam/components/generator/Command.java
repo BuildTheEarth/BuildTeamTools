@@ -98,7 +98,7 @@ public class Command {
         int maxHeight = y;
 
         if(blocks != null)
-            maxHeight = Generator.getMaxHeight(blocks, x, z, Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL, Material.SNOW);
+            maxHeight = Generator.getMaxHeight(blocks, x, z, Generator.IGNORED_MATERIALS);
         if(maxHeight == 0)
             maxHeight = y;
 

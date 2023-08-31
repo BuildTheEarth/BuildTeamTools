@@ -808,7 +808,7 @@ public class Generator {
      * @param p - The player to check for
      * @return Whether the player has a WorldEdit selection
      */
-    public static boolean checkForWorldEditSelection(Player p, boolean notify){
+    public static boolean checkForWorldEditSelection(Player p){
         // Get WorldEdit selection of player
         Region polyRegion = Generator.getWorldEditSelection(p);
 

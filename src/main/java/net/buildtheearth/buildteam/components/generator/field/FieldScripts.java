@@ -479,6 +479,8 @@ public class FieldScripts {
 
         }
 
+        Generator.createPolySelection(commands, points);
+
 
         Main.buildTeamTools.getGenerator().getCommands().add(new Command(p, field, commands, operations, blocks));
         Generator.getPlayerHistory(p).addHistoryEntry(new History.HistoryEntry(GeneratorType.FIELD, operations));

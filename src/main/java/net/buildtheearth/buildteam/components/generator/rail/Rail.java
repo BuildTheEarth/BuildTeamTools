@@ -21,7 +21,7 @@ public class Rail extends GeneratorModule {
         if(!Generator.checkIfWorldEditIsInstalled(p))
             return false;
 
-        if(!Generator.checkForWorldEditSelection(p, true))
+        if(!Generator.checkForWorldEditSelection(p))
             return false;
 
         if(!Generator.checkForConvexSelection(p))

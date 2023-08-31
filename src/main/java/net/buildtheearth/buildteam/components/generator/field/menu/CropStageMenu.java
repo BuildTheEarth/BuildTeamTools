@@ -45,16 +45,16 @@ public class CropStageMenu extends AbstractMenu {
 
         switch (crop) {
             case POTATO:
-                itemOne = Item.create(Material.STONE_PLATE, "§bLow", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-                itemTwo = Item.create(Material.STONE, "§bTall", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+                itemOne = Item.create(Material.GRASS, "§bLow", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+                itemTwo = Item.create(Material.LONG_GRASS, "§bTall", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
                 break;
             case WHEAT:
                 itemOne = Item.create(Material.BIRCH_FENCE, "§bLight", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
                 itemTwo = Item.create(Material.DARK_OAK_FENCE, "§bDark", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
                 break;
             case CORN:
-                itemOne = Item.create(Material.STONE_PLATE, "§bHarvested", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-                itemTwo = Item.create(Material.STONE, "§bTall", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+                itemOne = Item.create(Material.GRASS, "§bHarvested", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+                itemTwo = Item.create(Material.LONG_GRASS, "§bTall", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
                 break;
             case HARVESTED:
             case OTHER:

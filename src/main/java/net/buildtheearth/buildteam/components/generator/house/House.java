@@ -16,7 +16,7 @@ public class House extends GeneratorModule {
 
     @Override
     public boolean checkPlayer(Player p){
-        if(!Generator.checkForWorldEditSelection(p, true))
+        if(!Generator.checkForWorldEditSelection(p))
             return false;
 
         if(getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)

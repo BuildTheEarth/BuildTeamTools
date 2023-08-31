@@ -1,30 +1,67 @@
 navigator:
+  # Determines whether any player on your server can have the navigator item in their hotbar
   enabled: true
   # The hotbar slot into which the navigator item should be placed
   slot: 0
   # Specifies which menu items should be enabled and what their material should be
   main_menu_items:
     build:
+      # Specifies whether the standard build icon is enabled
       enabled: true
-      material: DIAMOND_PICKAXE
+      material: "DIAMOND_PICKAXE"
+      lore: "Click to access the build menu !"
+
+      # If build is not enabled, BUT you have a command or message specified then the item will reappear and run the command or send the message you specify
+      # Include the /. Example: "/plots"
+      command:
+      message:
+
     explore:
+      # Specifies whether the standard explore icon is enabled
+      # If your server is not on the BTE network then enabling this will still operate but will only give you access to your own team's warps
       enabled: true
-      material: BOAT_SPRUCE
+      material: "BOAT_SPRUCE"
+      lore: "Click to explore the earth !"
+
+      # If explore is not enabled, BUT you have a command or message specified then the item will reappear and run the command or send the message you specify
+      # Include the /. Example: "/plots"
+      command:
+      message:
     tutorials:
       enabled: false
-      material: KNOWLEDGE_BOOK
+      material: "KNOWLEDGE_BOOK"
+      lore: "Click to do some tutorials !"
   build_menu_items:
     tutorials:
       enabled: false
-      material: KNOWLEDGE_BOOK
+      material: "KNOWLEDGE_BOOK"
     plot_system:
+      # Always disabled when not on the BTE network
       enabled: false
-      material: SPRUCE_FENCE_GATE
+      material: "SPRUCE_FENCE_GATE"
     regions:
+      # Always disabled when not on the BTE network
       enabled: true
-      material: MAP
+      material: "MAP"
     tools:
       enabled: true
-      material: DIAMOND_HOE
+      material: "DIAMOND_HOE"
 
 Plot_Server_Name: "Plot1"
+
+universal_tpll:
+  geography:
+    # Zoom detail level for OSM requests
+    zoom: 12
+
+    # Set false for fetching the latest data from OSM (more up to date), or true for using a downloaded database
+    # Please follow the guide on https://github.com/noahhusby/Sledgehammer/wiki/Border-Offline-Database about downloading and configuring the offline database
+    use_offline_mode: true
+
+    # Set to false to disable automatic border teleportation, or true to enable it. Border teleportation requires the offline database to be configured
+    border_teleportation: false
+
+    API: "https://nominatim.openstreetmap.org/reverse.php?osm_type=N&format=json&zoom={zoom}"
+
+  # Specify the world name of your earth projection world. This is the world which a tpll command will teleport a player to
+  earth_world:

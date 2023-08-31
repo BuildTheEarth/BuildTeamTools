@@ -1,6 +1,7 @@
-package net.buildtheearth.buildteam.components.universal_experience;
+package net.buildtheearth.buildteam.components.universal_experience.universal_navigator;
 
 import net.buildtheearth.Main;
+import net.buildtheearth.buildteam.Network;
 import net.buildtheearth.buildteam.components.generator.GeneratorMenu;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItem;
@@ -28,7 +29,7 @@ public class BuildMenu extends AbstractMenu
 {
     private static final int iRows = 3;
     private static final String szInventoryName = "Build Menu";
-    private static final ArrayList<MenuItem> menuItems = getGui();
+    private static final ArrayList<MenuItem> menuItems = getGui(Main.buildTeamTools.getNetwork());
     private static final FileConfiguration config = Main.instance.getConfig();
 
     public BuildMenu(Player player)
@@ -41,7 +42,7 @@ public class BuildMenu extends AbstractMenu
      * @see MenuItem
      * @return
      */
-    public static ArrayList<MenuItem> getGui()
+    public static ArrayList<MenuItem> getGui(Network network)
     {
         //Initiates the list
         ArrayList<MenuItem> menuItems = new ArrayList<>();
@@ -55,11 +56,11 @@ public class BuildMenu extends AbstractMenu
         if (bItemsNeeded[0])
             iItemsNeeded++;
 
-        bItemsNeeded[1] = config.getBoolean("navigator.build_menu_items.plot_system.enabled");
+        bItemsNeeded[1] = config.getBoolean("navigator.build_menu_items.plot_system.enabled") && network.isBTENetworkConnected();
         if (bItemsNeeded[1])
             iItemsNeeded++;
 
-        bItemsNeeded[2] = config.getBoolean("navigator.build_menu_items.regions.enabled");
+        bItemsNeeded[2] = config.getBoolean("navigator.build_menu_items.regions.enabled") && network.isBTENetworkConnected();
         if (bItemsNeeded[2])
             iItemsNeeded++;
 

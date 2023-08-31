@@ -20,6 +20,6 @@ public class ProxyUtil
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Connect");
         out.writeUTF(szServer);
-        player.sendPluginMessage(Main.instance, "server", out.toByteArray());
+        player.sendPluginMessage(Main.instance, "BungeeCord", out.toByteArray());
     }
 }

@@ -27,14 +27,18 @@ public class BTENetwork {
     @Getter
     private StatsManager statsManager;
 
-    @Getter
     private final boolean bIsConnected;
 
-    public BTENetwork(){
+    /**
+     * Starts the BTE network components, determines whether the BTE network is connected
+     */
+    public BTENetwork()
+    {
         bIsConnected = start();
     }
 
-    public boolean start(){
+    public boolean start()
+    {
         communicators = new ArrayList<>();
         statsManager = new StatsManager();
 
@@ -45,7 +49,8 @@ public class BTENetwork {
         return (communicators.size() > 0);
     }
 
-    public boolean isConnected() {
+    public boolean isConnected()
+    {
         return bIsConnected;
     }
 

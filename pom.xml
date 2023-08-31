@@ -149,7 +149,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>RELEASE</version>
+            <version>1.18.26</version>
             <scope>compile</scope>
         </dependency>
 
@@ -157,8 +157,28 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20180130</version>
+            <version>20230227</version>
             <scope>compile</scope>
         </dependency>
+
+        <!-- Terraminusminus -->
+        <dependency>
+            <groupId>com.github.SmylerMC</groupId>
+            <artifactId>terraminusminus</artifactId>
+            <version>master-ab645ef750-1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>13.0</version>
+        </dependency>
+
     </dependencies>
 </project>

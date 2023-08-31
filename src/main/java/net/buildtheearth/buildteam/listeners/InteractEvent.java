@@ -1,7 +1,8 @@
 package net.buildtheearth.buildteam.listeners;
 
 import net.buildtheearth.Main;
-import net.buildtheearth.buildteam.components.universal_experience.MainMenu;
+import net.buildtheearth.buildteam.Network;
+import net.buildtheearth.buildteam.components.universal_experience.universal_navigator.MainMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,12 +16,12 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
 public class InteractEvent implements Listener
 {
-    private Main instance;
+    private Network network;
 
-    public InteractEvent(Main instance)
+    public InteractEvent(Main plugin, Network network)
     {
-        this.instance = instance;
-        Bukkit.getServer().getPluginManager().registerEvents(this, instance);
+        this.network = network;
+        Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler
@@ -29,7 +30,7 @@ public class InteractEvent implements Listener
         if (event.getItem() != null)
         {
             //Checks to see if the navigator item was clicked on
-            if (event.getItem().equals(instance.buildTeamTools.getNavigator()))
+            if (event.getItem().equals(network.getNavigator()))
             {
                 event.setCancelled(true);
                 //Open navigator.
@@ -47,7 +48,7 @@ public class InteractEvent implements Listener
         }
 
         //Checks to see if the navigator item was clicked on
-        if (event.getCurrentItem().equals(instance.buildTeamTools.getNavigator()))
+        if (event.getCurrentItem().equals(network.getNavigator()))
         {
             //Extract the player
             if (!(event.getWhoClicked() instanceof Player))
@@ -58,7 +59,7 @@ public class InteractEvent implements Listener
             event.setCancelled(true);
 
             //If item is not in the correct slot, delete it.
-            if (event.getSlot() != Main.buildTeamTools.getNavSlot()) {
+            if (event.getSlot() != network.getNavSlot()) {
                 player.getInventory().clear(event.getSlot());
                 return;
             }
@@ -83,7 +84,7 @@ public class InteractEvent implements Listener
             return;
         }
 
-        if (e.getOffHandItem().equals(instance.buildTeamTools.getNavigator())) {
+        if (e.getOffHandItem().equals(network.getNavigator())) {
             e.setCancelled(true);
         }
     }
@@ -91,7 +92,7 @@ public class InteractEvent implements Listener
     @EventHandler
     public void dropItem(PlayerDropItemEvent e) {
 
-        if (e.getItemDrop().getItemStack().equals(instance.buildTeamTools.getNavigator())) {
+        if (e.getItemDrop().getItemStack().equals(network.getNavigator())) {
             e.setCancelled(true);
         }
 
@@ -99,7 +100,7 @@ public class InteractEvent implements Listener
 
     @EventHandler
     public void moveItem(InventoryMoveItemEvent e) {
-        if (e.getItem().equals(instance.buildTeamTools.getNavigator())) {
+        if (e.getItem().equals(network.getNavigator())) {
             e.setCancelled(true);
         }
 
@@ -107,7 +108,7 @@ public class InteractEvent implements Listener
 
     @EventHandler
     public void moveItem(InventoryDragEvent e) {
-        if (e.getOldCursor().equals(instance.buildTeamTools.getNavigator())) {
+        if (e.getOldCursor().equals(network.getNavigator())) {
             e.setCancelled(true);
         }
 
@@ -115,7 +116,7 @@ public class InteractEvent implements Listener
             return;
         }
 
-        if (e.getCursor().equals(instance.buildTeamTools.getNavigator())) {
+        if (e.getCursor().equals(network.getNavigator())) {
             e.setCancelled(true);
         }
     }

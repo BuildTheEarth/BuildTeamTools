@@ -8,12 +8,11 @@ import org.bukkit.command.CommandSender;
 
 import java.util.UUID;
 
-public class buildteamtools_command implements CommandExecutor{
+public class CMD_BuildTeamTools implements CommandExecutor{
 	
-	public boolean onCommand(CommandSender sender, Command cmd, String cmdlabel, String[] args){
+	public boolean onCommand(CommandSender sender, Command cmd, String cmdLabel, String[] args){
 
 		if(args.length == 0){
-
 			ChatUtil.sendMessageBox(sender, "Build Team Tools", new Runnable() {
 				@Override
 				public void run() {
@@ -52,9 +51,7 @@ public class buildteamtools_command implements CommandExecutor{
 
 				}
 			});
-
-			return true;
-		}else if(args[0].equalsIgnoreCase("communicators")){
+		} else if(args[0].equalsIgnoreCase("communicators")){
 			ChatUtil.sendMessageBox(sender, "Build Team Communicators", new Runnable() {
 				@Override
 				public void run() {
@@ -62,17 +59,17 @@ public class buildteamtools_command implements CommandExecutor{
 						sender.sendMessage("§7- §e" + uuid.toString());
 				}
 			});
-		}else if(args[0].equalsIgnoreCase("cache")){
+		} else if(args[0].equalsIgnoreCase("cache")){
 			ChatUtil.sendMessageBox(sender, "Build Team Cache", new Runnable() {
 				@Override
 				public void run() {
 					sender.sendMessage(Main.buildTeamTools.getBTENetwork().getStatsManager().getCurrentCache().toJSONString());
 				}
 			});
-		}else if(args[0].equalsIgnoreCase("uploadCache")){
+		} else if(args[0].equalsIgnoreCase("uploadCache")){
 			Main.buildTeamTools.getBTENetwork().update();
 			sender.sendMessage("§7Cache uploaded to the network.");
-		}else if(args[0].equalsIgnoreCase("checkForUpdates")){
+		} else if(args[0].equalsIgnoreCase("checkForUpdates")){
 			boolean wasDebug = Main.buildTeamTools.isDebug();
 
 			Main.buildTeamTools.setDebug(true);
@@ -80,14 +77,12 @@ public class buildteamtools_command implements CommandExecutor{
 			Main.buildTeamTools.setDebug(wasDebug);
 			sender.sendMessage("§7Checked for updates. " + result + " Please take a look at the console for details.");
 
-		}else if(args[0].equalsIgnoreCase("debug")){
+		} else if(args[0].equalsIgnoreCase("debug")){
 			boolean debug = Boolean.parseBoolean(args[1]);
 
 			Main.buildTeamTools.setDebug(debug);
 			sender.sendMessage("§7Debug Mode was set to: " + debug);
 		}
-
-
 
 		return true;
 	}

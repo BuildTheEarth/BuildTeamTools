@@ -2,8 +2,8 @@ package net.buildtheearth.buildteam;
 
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
-import net.buildtheearth.buildteam.commands.buildteamtools_command;
-import net.buildtheearth.buildteam.commands.generate_command;
+import net.buildtheearth.buildteam.commands.CMD_BuildTeamTools;
+import net.buildtheearth.buildteam.commands.CMD_Generate;
 import net.buildtheearth.buildteam.components.BTENetwork;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.stats.StatsPlayerType;
@@ -131,8 +131,8 @@ public class BuildTeamTools {
 	
 	/** Registers all Commands of the plugin. */
 	private void registerCommands() {
-		Main.instance.getCommand("buildteam").setExecutor(new buildteamtools_command());
-		Main.instance.getCommand("generate").setExecutor(new generate_command());
+		Main.instance.getCommand("buildteam").setExecutor(new CMD_BuildTeamTools());
+		Main.instance.getCommand("generate").setExecutor(new CMD_Generate());
 
 	}
 

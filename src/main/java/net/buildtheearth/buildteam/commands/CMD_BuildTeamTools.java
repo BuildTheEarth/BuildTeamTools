@@ -13,58 +13,45 @@ public class CMD_BuildTeamTools implements CommandExecutor{
 	public boolean onCommand(CommandSender sender, Command cmd, String cmdLabel, String[] args){
 
 		if(args.length == 0){
-			ChatUtil.sendMessageBox(sender, "Build Team Tools", new Runnable() {
-				@Override
-				public void run() {
-					String buildTeam = "-";
-					if(Main.buildTeamTools.getBTENetwork().getBuildTeamID() != null)
-						buildTeam = Main.buildTeamTools.getBTENetwork().getBuildTeamID();
+			ChatUtil.sendMessageBox(sender, "Build Team Tools", () -> {
+                String buildTeam = "-";
+                if(Main.buildTeamTools.getBTENetwork().getBuildTeamID() != null)
+                    buildTeam = Main.buildTeamTools.getBTENetwork().getBuildTeamID();
 
-					String serverID = "-";
-					if(Main.buildTeamTools.getBTENetwork().getServerID() != null)
-						serverID = Main.buildTeamTools.getBTENetwork().getServerID();
+                String serverID = "-";
+                if(Main.buildTeamTools.getBTENetwork().getServerID() != null)
+                    serverID = Main.buildTeamTools.getBTENetwork().getServerID();
 
-					String status = "§c§lDISCONNECTED";
-					if(Main.buildTeamTools.getBTENetwork().isConnected() &&! buildTeam.equals("-") &&! serverID.equals("-"))
-						status = "§a§lCONNECTED";
-					else if(! buildTeam.equals("-") &&! serverID.equals("-"))
-						status = "§6§lSTANDBY";
+                String status = "§c§lDISCONNECTED";
+                if(Main.buildTeamTools.getBTENetwork().isConnected() &&! buildTeam.equals("-") &&! serverID.equals("-"))
+                    status = "§a§lCONNECTED";
+                else if(! buildTeam.equals("-") &&! serverID.equals("-"))
+                    status = "§6§lSTANDBY";
 
-					sender.sendMessage("§eStatus: " + status);
-					sender.sendMessage("§eVersion: §7" + Main.instance.getDescription().getVersion());
-					sender.sendMessage("§eBuildTeam ID: §7" + buildTeam);
-					sender.sendMessage("§eServer ID: §7" + serverID);
-					sender.sendMessage("");
-					sender.sendMessage("§7Sub-Command list with §e/bt help§7.");
-				}
-			});
+                sender.sendMessage("§eStatus: " + status);
+                sender.sendMessage("§eVersion: §7" + Main.instance.getDescription().getVersion());
+                sender.sendMessage("§eBuildTeam ID: §7" + buildTeam);
+                sender.sendMessage("§eServer ID: §7" + serverID);
+                sender.sendMessage("");
+                sender.sendMessage("§7Sub-Command list with §e/bt help§7.");
+            });
 
 			return true;
 		}
 
 		if(args[0].equalsIgnoreCase("help")){
-			ChatUtil.sendMessageBox(sender, "Build Team Help", new Runnable() {
-				@Override
-				public void run() {
-					sender.sendMessage("§e/bt help - §7List of all sub commands.");
-					sender.sendMessage("§e/bt communicators - §7List of players who communicate with the network.");
-
-				}
-			});
+			ChatUtil.sendMessageBox(sender, "Build Team Help", () -> {
+                sender.sendMessage("§e/bt help - §7List of all sub commands.");
+                sender.sendMessage("§e/bt communicators - §7List of players who communicate with the network.");
+            });
 		} else if(args[0].equalsIgnoreCase("communicators")){
-			ChatUtil.sendMessageBox(sender, "Build Team Communicators", new Runnable() {
-				@Override
-				public void run() {
-					for(UUID uuid : Main.getBuildTeam().getBTENetwork().getCommunicators())
-						sender.sendMessage("§7- §e" + uuid.toString());
-				}
-			});
+			ChatUtil.sendMessageBox(sender, "Build Team Communicators", () -> {
+                for(UUID uuid : Main.getBuildTeam().getBTENetwork().getCommunicators())
+                    sender.sendMessage("§7- §e" + uuid.toString());
+            });
 		} else if(args[0].equalsIgnoreCase("cache")){
-			ChatUtil.sendMessageBox(sender, "Build Team Cache", new Runnable() {
-				@Override
-				public void run() {
-					sender.sendMessage(Main.buildTeamTools.getBTENetwork().getStatsManager().getCurrentCache().toJSONString());
-				}
+			ChatUtil.sendMessageBox(sender, "Build Team Cache", () -> {
+				sender.sendMessage(Main.buildTeamTools.getBTENetwork().getStatsManager().getCurrentCache().toJSONString());
 			});
 		} else if(args[0].equalsIgnoreCase("uploadCache")){
 			Main.buildTeamTools.getBTENetwork().update();

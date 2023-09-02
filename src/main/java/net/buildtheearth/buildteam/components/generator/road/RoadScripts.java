@@ -39,9 +39,7 @@ public class RoadScripts {
         p.chat("/clearhistory");
 
         // Is there a sidewalk?
-        boolean isSidewalk = false;
-        if(sidewalkWidth>1)
-            isSidewalk = true;
+        boolean isSidewalk = sidewalkWidth > 1;
 
         // Calculate current width from centre of road
         int road_width = laneWidth*laneCount;

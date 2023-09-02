@@ -69,20 +69,14 @@ public class Updater
         DOWNLOAD,
         // If updater finds new version automatically it downloads it.
         CHECK_DOWNLOAD
-
     }
 
     public enum Result
     {
-
         UPDATE_FOUND,
-
         NO_UPDATE,
-
         SUCCESS,
-
         FAILED,
-
         BAD_ID
     }
 
@@ -256,14 +250,10 @@ public class Updater
 
         // If version is an integer
         } else if(newVersion.matches("[0-9]+")) {
-            if(Integer.parseInt(newVersion) > Integer.parseInt(oldVersion))
-                return true;
-            else
-                return false;
+            return Integer.parseInt(newVersion) > Integer.parseInt(oldVersion);
 
         // If version has a different format
-        }else
-            return !newVersion.equalsIgnoreCase(oldVersion);
+        } else return !newVersion.equalsIgnoreCase(oldVersion);
     }
 
     /**
@@ -340,7 +330,6 @@ public class Updater
 
     public class UpdaterRunnable implements Runnable
     {
-
         public void run() {
             if(checkResource(downloadLink))
             {

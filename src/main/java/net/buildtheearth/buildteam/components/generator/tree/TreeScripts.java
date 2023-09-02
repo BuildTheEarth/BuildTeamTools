@@ -1,8 +1,6 @@
 package net.buildtheearth.buildteam.components.generator.tree;
 
-import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import net.buildtheearth.buildteam.components.generator.Settings;
-import net.buildtheearth.buildteam.components.generator.road.Road;
 import net.buildtheearth.utils.Item;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

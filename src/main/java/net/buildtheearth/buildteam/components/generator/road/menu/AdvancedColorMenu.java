@@ -5,7 +5,6 @@ import net.buildtheearth.buildteam.components.generator.Settings;
 import net.buildtheearth.buildteam.components.generator.road.RoadFlag;
 import net.buildtheearth.buildteam.components.generator.road.RoadSettings;
 import net.buildtheearth.utils.Item;
-import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.BlockListMenu;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;

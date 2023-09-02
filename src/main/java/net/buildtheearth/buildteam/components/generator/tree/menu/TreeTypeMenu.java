@@ -7,7 +7,6 @@ import net.buildtheearth.buildteam.components.generator.road.RoadSettings;
 import net.buildtheearth.buildteam.components.generator.road.menu.SidewalkColorMenu;
 import net.buildtheearth.buildteam.components.generator.tree.TreeType;
 import net.buildtheearth.utils.Item;
-import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.BlockListMenu;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;

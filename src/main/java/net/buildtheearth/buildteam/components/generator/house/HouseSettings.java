@@ -1,16 +1,10 @@
 package net.buildtheearth.buildteam.components.generator.house;
 
-import lombok.Getter;
-import lombok.Setter;
 import net.buildtheearth.buildteam.components.generator.Settings;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.Utils;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class HouseSettings extends Settings {
 

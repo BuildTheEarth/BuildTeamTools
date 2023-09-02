@@ -1,15 +1,7 @@
 package net.buildtheearth.buildteam.components.generator.road;
 
-import lombok.Getter;
 import net.buildtheearth.buildteam.components.generator.Settings;
-import net.buildtheearth.buildteam.components.generator.house.HouseFlag;
-import net.buildtheearth.buildteam.components.generator.house.RoofType;
-import net.buildtheearth.utils.MenuItems;
-import net.buildtheearth.utils.Utils;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.HashMap;
 
 public class RoadSettings extends Settings {
 

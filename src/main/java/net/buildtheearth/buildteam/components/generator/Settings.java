@@ -2,8 +2,6 @@ package net.buildtheearth.buildteam.components.generator;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.buildtheearth.buildteam.components.generator.house.HouseFlag;
-import net.buildtheearth.buildteam.components.generator.road.RoadFlag;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 

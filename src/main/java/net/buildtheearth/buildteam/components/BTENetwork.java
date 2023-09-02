@@ -23,8 +23,8 @@ public class BTENetwork {
     private String serverID;
     @Getter
     private List<UUID> communicators;
-
     @Getter
+
     private StatsManager statsManager;
 
 

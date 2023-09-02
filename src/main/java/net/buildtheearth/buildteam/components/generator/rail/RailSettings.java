@@ -1,7 +1,6 @@
 package net.buildtheearth.buildteam.components.generator.rail;
 
 import net.buildtheearth.buildteam.components.generator.Settings;
-import net.buildtheearth.buildteam.components.generator.road.RoadFlag;
 import org.bukkit.entity.Player;
 
 public class RailSettings extends Settings {

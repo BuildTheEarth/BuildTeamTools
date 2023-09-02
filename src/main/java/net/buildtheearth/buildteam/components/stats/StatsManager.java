@@ -1,13 +1,10 @@
 package net.buildtheearth.buildteam.components.stats;
 
 import net.buildtheearth.buildteam.components.BTENetwork;
-import org.bukkit.entity.Player;
 import org.json.JSONArray;
 import org.json.simple.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
 
 public class StatsManager {

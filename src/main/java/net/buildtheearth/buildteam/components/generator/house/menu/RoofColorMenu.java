@@ -6,20 +6,15 @@ import net.buildtheearth.buildteam.components.generator.house.HouseFlag;
 import net.buildtheearth.buildteam.components.generator.house.HouseSettings;
 import net.buildtheearth.buildteam.components.generator.house.RoofType;
 import net.buildtheearth.utils.*;
-import net.buildtheearth.utils.menus.AbstractPaginatedMenu;
 import net.buildtheearth.utils.menus.BlockListMenu;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.ipvp.canvas.mask.BinaryMask;
-import org.ipvp.canvas.mask.Mask;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class RoofColorMenu extends BlockListMenu {
 

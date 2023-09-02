@@ -2,7 +2,6 @@ package net.buildtheearth.buildteam.components.generator.house;
 
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -11,12 +10,10 @@ import net.buildtheearth.buildteam.components.generator.GeneratorType;
 import net.buildtheearth.buildteam.components.generator.History;
 import net.buildtheearth.utils.MenuItems;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

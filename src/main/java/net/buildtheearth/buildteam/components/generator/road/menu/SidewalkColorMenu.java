@@ -2,7 +2,6 @@ package net.buildtheearth.buildteam.components.generator.road.menu;
 
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.components.generator.Settings;
-import net.buildtheearth.buildteam.components.generator.house.menu.RoofTypeMenu;
 import net.buildtheearth.buildteam.components.generator.road.RoadFlag;
 import net.buildtheearth.buildteam.components.generator.road.RoadSettings;
 import net.buildtheearth.utils.Item;

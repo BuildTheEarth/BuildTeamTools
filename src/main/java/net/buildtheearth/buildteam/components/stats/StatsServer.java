@@ -1,7 +1,5 @@
 package net.buildtheearth.buildteam.components.stats;
 
-import lombok.Getter;
-import net.buildtheearth.buildteam.components.BTENetwork;
 import org.json.simple.JSONObject;
 
 import java.util.HashMap;

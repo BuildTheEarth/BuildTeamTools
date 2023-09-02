@@ -1,25 +1,17 @@
 package net.buildtheearth.buildteam.components.generator.road;
 
 
-import clipper2.Clipper;
-import clipper2.core.*;
-import clipper2.offset.EndType;
-import clipper2.offset.JoinType;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.components.generator.Command;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.generator.GeneratorType;
 import net.buildtheearth.buildteam.components.generator.History;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 public class RoadScripts {
     

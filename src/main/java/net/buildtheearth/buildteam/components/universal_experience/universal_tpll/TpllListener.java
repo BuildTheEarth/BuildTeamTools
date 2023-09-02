@@ -92,6 +92,10 @@ public class TpllListener implements Listener
             out.writeUTF(latLong.getLat()+"");
             out.writeUTF(latLong.getLng()+"");
 
+            //Specifies the pitch and yaw
+            out.writeUTF(player.getLocation().getYaw()+"");
+            out.writeUTF(player.getLocation().getPitch()+"");
+
             //Sends the message
             player.sendPluginMessage(Main.instance, "BuildTeam", out.toByteArray());
 
@@ -100,6 +104,12 @@ public class TpllListener implements Listener
         }
     }
 
+    /**
+     * Tplls a player. Used when the tpll is to the same server as the user is currently on
+     * @param player The player executing the tpll command
+     * @param dLatitude The target latitude
+     * @param dLongitude The target longitude
+     */
     public static void performTpll(Player player, double dLatitude, double dLongitude)
     {
         //Do the tpll
@@ -119,5 +129,19 @@ public class TpllListener implements Listener
             int y = tpWorld.getHighestBlockYAt((int) x, (int) z) + 1;
             player.teleport(new Location(tpWorld, x, y, z));
         }
+    }
+
+    /**
+     * Tplls a player. Used when the tpll is to a different server, so the location is created when the message is received by the plugin
+     * @param player The player executing the tpll command
+     * @param location The target location
+     */
+    public static void performTpll(Player player, Location location)
+    {
+        //Teleports the player
+        if (location.getWorld() == null)
+            player.sendMessage(ChatColor.RED +"The earth world for this build team is unknown");
+        else
+            player.teleport(location);
     }
 }

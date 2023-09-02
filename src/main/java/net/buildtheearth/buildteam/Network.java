@@ -38,7 +38,7 @@ public class Network
     /**
      * Stores the pending tpll events which are handled by Join_Event
      */
-    private HashMap<UUID, LatLng> tpllEvents = new HashMap<>();
+    private HashMap<UUID, Location> tpllEvents = new HashMap<>();
 
     /**
      * Stores the pending warp events which are handled by Join_Event
@@ -73,7 +73,7 @@ public class Network
 //        return dbConnection;
 //    }
 
-    public HashMap<UUID, LatLng> getTpllEvents()
+    public HashMap<UUID, Location> getTpllEvents()
     {
         return tpllEvents;
     }
@@ -88,7 +88,7 @@ public class Network
         return BTENetwork.isConnected();
     }
 
-    public void addTpllEvent(UUID uuid, LatLng coordinates)
+    public void addTpllEvent(UUID uuid, Location coordinates)
     {
         tpllEvents.put(uuid, coordinates);
     }

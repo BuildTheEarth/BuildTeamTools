@@ -3,6 +3,8 @@ package net.buildtheearth;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.buildteam.BuildTeamTools;
+import net.buildtheearth.buildteam.components.universal_experience.universal_tpll.projection.Airocean;
+import net.buildtheearth.buildteam.components.universal_experience.universal_tpll.projection.ModifiedAirocean;
 import net.buildtheearth.buildteam.components.updater.Updater;
 import net.buildtheearth.terraminusminus.util.geo.LatLng;
 import org.bukkit.Bukkit;
@@ -78,10 +80,29 @@ public class Main extends JavaPlugin implements PluginMessageListener
 					//Extracts the coordinares
 					double dLatitude = Double.parseDouble(in.readUTF());
 					double dLongitude = Double.parseDouble(in.readUTF());
-					LatLng latLng = new LatLng(dLatitude, dLongitude);
+
+					//Extracts the yaw and pitch
+					float fYaw = Float.parseFloat(in.readUTF());
+					float fPitch = Float.parseFloat(in.readUTF());
+
+					Airocean projection = new ModifiedAirocean();
+					double mpu = projection.metersPerUnit();
+
+					double[] xz = projection.fromGeo(dLongitude, dLatitude);
+
+					double x = xz[0] * mpu;
+					double z = -xz[1] * mpu;
+
+					//Creates the location
+					Location tpllTPLocation;
+					World tpWorld = Bukkit.getWorld(Main.instance.getConfig().getString("universal_tpll.earth_world"));
+					if (tpWorld == null)
+						tpllTPLocation = new Location(tpWorld, x, 64, z, fYaw, fPitch);
+					else
+						tpllTPLocation = new Location(tpWorld, x, (tpWorld.getHighestBlockYAt((int) x, (int) z) + 1), z, fYaw, fPitch);
 
 					//Adds the event to the list
-					this.buildTeamTools.getNetwork().addTpllEvent(player.getUniqueId(), latLng);
+					this.buildTeamTools.getNetwork().addTpllEvent(player.getUniqueId(), tpllTPLocation);
 				}
 			}
 

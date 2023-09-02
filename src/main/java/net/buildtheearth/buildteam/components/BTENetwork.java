@@ -63,7 +63,7 @@ public class BTENetwork {
      * @return true if success, false if failed
      */
     public boolean update(){
-        if(getCommunicators().size() == 0)
+        if(getCommunicators().isEmpty())
             return false;
 
         if(!Main.instance.isEnabled())
@@ -90,7 +90,7 @@ public class BTENetwork {
     }
 
     public boolean isConnected() {
-        return communicators.size() > 0;
+        return !communicators.isEmpty();
     }
 
 }

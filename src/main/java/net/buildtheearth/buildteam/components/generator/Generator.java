@@ -33,6 +33,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.file.Files;
 import java.util.*;
 
 public class Generator {
@@ -40,20 +41,20 @@ public class Generator {
     public static String WIKI_PAGE = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Generator";
     public static String INSTALL_WIKI = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Installation";
 
-    private static HashMap<UUID, History> playerHistory = new HashMap<>();
+    private static final HashMap<UUID, History> playerHistory = new HashMap<>();
 
     @Getter
-    private List<Command> commands = new ArrayList<>();
+    private final List<Command> commands = new ArrayList<>();
 
     @Getter
-    private House house;
+    private final House house;
     @Getter
-    private Road road;
+    private final Road road;
     @Getter
-    private Rail rail;
+    private final Rail rail;
 
     @Getter
-    private Tree tree;
+    private final Tree tree;
 
     public Generator(){
         house = new House();
@@ -69,10 +70,10 @@ public class Generator {
      * @see Command#tick()
      */
     public void tick(){
-        if(commands.size() == 0)
+        if(commands.isEmpty())
             return;
 
-        if(commands.get(0).getCommands().size() == 0){
+        if(commands.get(0).getCommands().isEmpty()){
             commands.remove(0);
             return;
         }
@@ -693,22 +694,18 @@ public class Generator {
             }
 
             ClipboardFormat format = ClipboardFormat.findByFile(myfile);
-            ClipboardReader reader = format.getReader(new FileInputStream(myfile));
+            assert format != null;
+            ClipboardReader reader = format.getReader(Files.newInputStream(myfile.toPath()));
             BukkitWorld bukkitWorld = new BukkitWorld(p.getWorld());
             Clipboard clipboard = reader.read(bukkitWorld.getWorldData());
 
             if(clipboard == null) {
-                if(sendError)
-                    sendTreePackError(p);
-
+                if(sendError) sendTreePackError(p);
                 return false;
-            }else
-                return true;
+            } else return true;
 
         } catch (Exception e) {
-            if(sendError)
-                sendTreePackError(p);
-
+            if(sendError) sendTreePackError(p);
             return false;
         }
     }
@@ -726,7 +723,6 @@ public class Generator {
         p.sendMessage("§cFor more installation help, please see the wiki:");
         p.sendMessage("§c" + INSTALL_WIKI);
     }
-
 
     /**
      * Checks if the player has a WorldEdit selection and sends them a message if they don't.
@@ -766,7 +762,6 @@ public class Generator {
             sendMoreInfo(p);
             return false;
         }
-
         return true;
     }
 
@@ -785,7 +780,6 @@ public class Generator {
 
             return false;
         }
-
         return true;
     }
 

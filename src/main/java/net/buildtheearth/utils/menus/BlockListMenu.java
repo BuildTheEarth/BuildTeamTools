@@ -24,7 +24,7 @@ public class BlockListMenu extends AbstractPaginatedMenu {
     public static int NEXT_ITEM_SLOT = 35;
 
     public ArrayList<String> selectedMaterials;
-    private List<ItemStack> items;
+    private final List<ItemStack> items;
 
 
     public BlockListMenu(Player player, String invName, List<ItemStack> items) {
@@ -115,7 +115,7 @@ public class BlockListMenu extends AbstractPaginatedMenu {
      * @return true if the player has selected at least one block, false otherwise.
      */
     protected boolean canProceed(){
-        return selectedMaterials.size() > 0;
+        return !selectedMaterials.isEmpty();
     }
 }
 

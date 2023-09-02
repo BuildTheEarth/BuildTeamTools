@@ -10,10 +10,10 @@ import java.util.HashMap;
 public abstract class Settings {
 
     @Getter
-    private Player player;
+    private final Player player;
 
     @Getter
-    private HashMap<Object, String> values;
+    private final HashMap<Object, String> values;
 
     @Getter
     @Setter

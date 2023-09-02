@@ -18,7 +18,7 @@ public enum HouseFlag implements Flag {
 
     MAX_ROOF_HEIGHT("mrh");     // Integer
 
-    private String flag;
+    private final String flag;
 
     HouseFlag(String flag){
         this.flag = flag;
@@ -30,9 +30,8 @@ public enum HouseFlag implements Flag {
 
     public static HouseFlag byString(String flag){
         for(HouseFlag houseFlag : HouseFlag.values())
-        if(houseFlag.getFlag().equalsIgnoreCase(flag))
-            return houseFlag;
-
+            if(houseFlag.getFlag().equalsIgnoreCase(flag))
+                return houseFlag;
         return null;
     }
 }

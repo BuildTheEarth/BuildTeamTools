@@ -22,7 +22,7 @@ public enum RoadFlag implements Flag {
 
     CROSSWALK("cw");                // boolean (ON/OFF)
 
-    private String flag;
+    private final String flag;
 
     RoadFlag(String flag){
         this.flag = flag;

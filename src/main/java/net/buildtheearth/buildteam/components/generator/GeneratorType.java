@@ -7,7 +7,7 @@ public enum GeneratorType {
     RAILWAY("Railway"),
     TREE("Tree");
 
-    private String name;
+    private final String name;
 
     GeneratorType(String name){
         this.name = name;

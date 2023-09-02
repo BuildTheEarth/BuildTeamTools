@@ -2,6 +2,7 @@ package net.buildtheearth.utils;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -17,6 +18,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class Item {
 	public static HashMap<String, ItemStack> nonPlayerSkulls = new HashMap<>();
@@ -29,7 +31,7 @@ public class Item {
 	private boolean hideAttributes;
 	private boolean hideEnchantments;
 
-	private HashMap<Enchantment, Integer> enchantments = new HashMap<>();
+	private final HashMap<Enchantment, Integer> enchantments = new HashMap<>();
 
 	public Item() {}
 
@@ -62,7 +64,7 @@ public class Item {
 	}
 
 	public Item addEnchantment(Enchantment enchantment, int level) {
-		this.enchantments.put(enchantment, Integer.valueOf(level));
+		this.enchantments.put(enchantment, level);
 		return this;
 	}
 
@@ -87,25 +89,24 @@ public class Item {
 
 		if(this.amount != -1)
 			item.setAmount(this.amount);
-		else
-			item.setAmount(1);
+		else item.setAmount(1);
 
-		if(item.getEnchantments().keySet().size() == 0)
-		for (Enchantment en : this.enchantments.keySet())
-			item.addUnsafeEnchantment(en, ((Integer)this.enchantments.get(en)).intValue());
+		if(item.getEnchantments().keySet().isEmpty())
+			for (Enchantment en : this.enchantments.keySet())
+				item.addUnsafeEnchantment(en, (Integer) this.enchantments.get(en));
 
 		ItemMeta itemmeta = item.getItemMeta();
 
 		if(!itemmeta.hasDisplayName())
-		itemmeta.setDisplayName(this.displayName);
+			itemmeta.setDisplayName(this.displayName);
 
 		if(!itemmeta.hasLore())
-		itemmeta.setLore(this.lore);
+			itemmeta.setLore(this.lore);
 
 		if (this.hideAttributes)
-			itemmeta.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ATTRIBUTES });
+			itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		if (this.hideEnchantments)
-			itemmeta.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ENCHANTS });
+			itemmeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 		item.setItemMeta(itemmeta);
 		return item;
 	}
@@ -123,7 +124,7 @@ public class Item {
 		ItemStack item = new ItemStack(material, 1);
 		ItemMeta itemmeta = item.getItemMeta();
 		itemmeta.setDisplayName(name);
-		itemmeta.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ATTRIBUTES });
+		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		item.setItemMeta(itemmeta);
 		return item;
 	}
@@ -132,7 +133,7 @@ public class Item {
 		ItemStack item = new ItemStack(material, amount);
 		ItemMeta itemmeta = item.getItemMeta();
 		itemmeta.setDisplayName(name);
-		itemmeta.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ATTRIBUTES });
+		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		item.setItemMeta(itemmeta);
 		return item;
 	}
@@ -142,7 +143,7 @@ public class Item {
 		ItemMeta itemmeta = item.getItemMeta();
 		itemmeta.setDisplayName(name);
 		itemmeta.setLore(lore);
-		itemmeta.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ATTRIBUTES });
+		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		item.setItemMeta(itemmeta);
 		return item;
 	}
@@ -152,7 +153,7 @@ public class Item {
 		ItemMeta itemmeta = item.getItemMeta();
 		itemmeta.setDisplayName(name);
 		itemmeta.setLore(lore);
-		itemmeta.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ATTRIBUTES });
+		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		item.setItemMeta(itemmeta);
 		return item;
 	}
@@ -162,7 +163,7 @@ public class Item {
 		ItemMeta itemmeta = item.getItemMeta();
 		itemmeta.setDisplayName(name);
 		itemmeta.setLore(lore);
-		itemmeta.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ATTRIBUTES });
+		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		item.setItemMeta(itemmeta);
 		return item;
 	}
@@ -173,43 +174,43 @@ public class Item {
 		itemmeta.setDisplayName(name);
 		itemmeta.setLore(lore);
 		itemmeta.setColor(color);
-		itemmeta.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ATTRIBUTES });
+		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		item.setItemMeta((ItemMeta)itemmeta);
 		return item;
 	}
 
 	public static ItemStack create(Material material, String name, ArrayList<String> lore, Enchantment enchnt1, Integer level1) {
 		ItemStack item = new ItemStack(material);
-		item.addUnsafeEnchantment(enchnt1, level1.intValue());
+		item.addUnsafeEnchantment(enchnt1, level1);
 		ItemMeta itemmeta = item.getItemMeta();
 		itemmeta.setDisplayName(name);
 		itemmeta.setLore(lore);
-		itemmeta.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ATTRIBUTES });
+		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		item.setItemMeta(itemmeta);
 		return item;
 	}
 
 	public static ItemStack create(Material material, String name, ArrayList<String> lore, Enchantment enchnt1, Integer level1, Enchantment enchnt2, Integer level2) {
 		ItemStack item = new ItemStack(material);
-		item.addUnsafeEnchantment(enchnt1, level1.intValue());
-		item.addUnsafeEnchantment(enchnt2, level2.intValue());
+		item.addUnsafeEnchantment(enchnt1, level1);
+		item.addUnsafeEnchantment(enchnt2, level2);
 		ItemMeta itemmeta = item.getItemMeta();
 		itemmeta.setDisplayName(name);
 		itemmeta.setLore(lore);
-		itemmeta.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ATTRIBUTES });
+		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		item.setItemMeta(itemmeta);
 		return item;
 	}
 
 	public static ItemStack create(Material material, String name, ArrayList<String> lore, Enchantment enchnt1, Integer level1, Enchantment enchnt2, Integer level2, Enchantment enchnt3, Integer level3) {
 		ItemStack item = new ItemStack(material);
-		item.addUnsafeEnchantment(enchnt1, level1.intValue());
-		item.addUnsafeEnchantment(enchnt2, level2.intValue());
-		item.addUnsafeEnchantment(enchnt3, level3.intValue());
+		item.addUnsafeEnchantment(enchnt1, level1);
+		item.addUnsafeEnchantment(enchnt2, level2);
+		item.addUnsafeEnchantment(enchnt3, level3);
 		ItemMeta itemmeta = item.getItemMeta();
 		itemmeta.setDisplayName(name);
 		itemmeta.setLore(lore);
-		itemmeta.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ATTRIBUTES });
+		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		item.setItemMeta(itemmeta);
 		return item;
 	}
@@ -219,45 +220,45 @@ public class Item {
 		LeatherArmorMeta itemmeta = (LeatherArmorMeta)item.getItemMeta();
 		itemmeta.setColor(color);
 		item.setItemMeta((ItemMeta)itemmeta);
-		itemmeta.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ATTRIBUTES });
+		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		return item;
 	}
 
 	public static ItemStack createLeatherArmor(Material material, String name, Color color, ArrayList<String> lore, Enchantment enchnt1, Integer level1) {
 		ItemStack item = new ItemStack(material);
-		item.addUnsafeEnchantment(enchnt1, level1.intValue());
+		item.addUnsafeEnchantment(enchnt1, level1);
 		LeatherArmorMeta itemmeta = (LeatherArmorMeta)item.getItemMeta();
 		itemmeta.setDisplayName(name);
 		itemmeta.setLore(lore);
 		itemmeta.setColor(color);
-		itemmeta.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ATTRIBUTES });
+		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		item.setItemMeta((ItemMeta)itemmeta);
 		return item;
 	}
 
 	public static ItemStack createLeatherArmor(Material material, String name, Color color, ArrayList<String> lore, Enchantment enchnt1, Integer level1, Enchantment enchnt2, Integer level2) {
 		ItemStack item = new ItemStack(material);
-		item.addUnsafeEnchantment(enchnt1, level1.intValue());
-		item.addUnsafeEnchantment(enchnt2, level2.intValue());
+		item.addUnsafeEnchantment(enchnt1, level1);
+		item.addUnsafeEnchantment(enchnt2, level2);
 		LeatherArmorMeta itemmeta = (LeatherArmorMeta)item.getItemMeta();
 		itemmeta.setDisplayName(name);
 		itemmeta.setLore(lore);
 		itemmeta.setColor(color);
-		itemmeta.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ATTRIBUTES });
+		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		item.setItemMeta((ItemMeta)itemmeta);
 		return item;
 	}
 
 	public static ItemStack createLeatherArmor(Material material, String name, Color color, ArrayList<String> lore, Enchantment enchnt1, Integer level1, Enchantment enchnt2, Integer level2, Enchantment enchnt3, Integer level3) {
 		ItemStack item = new ItemStack(material);
-		item.addUnsafeEnchantment(enchnt1, level1.intValue());
-		item.addUnsafeEnchantment(enchnt2, level2.intValue());
-		item.addUnsafeEnchantment(enchnt3, level3.intValue());
+		item.addUnsafeEnchantment(enchnt1, level1);
+		item.addUnsafeEnchantment(enchnt2, level2);
+		item.addUnsafeEnchantment(enchnt3, level3);
 		LeatherArmorMeta itemmeta = (LeatherArmorMeta)item.getItemMeta();
 		itemmeta.setDisplayName(name);
 		itemmeta.setLore(lore);
 		itemmeta.setColor(color);
-		itemmeta.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ATTRIBUTES });
+		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		item.setItemMeta((ItemMeta)itemmeta);
 		return item;
 	}
@@ -267,7 +268,7 @@ public class Item {
 		SkullMeta itemmeta = (SkullMeta)item.getItemMeta();
 		itemmeta.setDisplayName(name);
 		itemmeta.setOwner(owner);
-		itemmeta.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ATTRIBUTES });
+		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		item.setItemMeta((ItemMeta)itemmeta);
 		return item;
 	}
@@ -278,7 +279,7 @@ public class Item {
 		itemmeta.setDisplayName(name);
 		itemmeta.setOwner(owner);
 		itemmeta.setLore(lore);
-		itemmeta.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ATTRIBUTES });
+		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		item.setItemMeta((ItemMeta)itemmeta);
 		return item;
 	}
@@ -289,7 +290,7 @@ public class Item {
 		itemmeta.setDisplayName(name);
 		itemmeta.setOwner(owner);
 		itemmeta.setLore(lore);
-		itemmeta.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ATTRIBUTES });
+		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		item.setItemMeta((ItemMeta)itemmeta);
 		return item;
 	}
@@ -307,7 +308,7 @@ public class Item {
 	public static ItemStack edit(ItemStack item, String name) {
 		ItemMeta itemmeta = item.getItemMeta();
 		itemmeta.setDisplayName(name);
-		itemmeta.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ATTRIBUTES });
+		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		item.setItemMeta(itemmeta);
 		return item;
 	}
@@ -316,7 +317,7 @@ public class Item {
 		item.setAmount(amount);
 		ItemMeta itemmeta = item.getItemMeta();
 		itemmeta.setDisplayName(name);
-		itemmeta.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ATTRIBUTES });
+		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		item.setItemMeta(itemmeta);
 		return item;
 	}
@@ -324,7 +325,7 @@ public class Item {
 	public static ItemStack edit(ItemStack item, ArrayList<String> lore) {
 		ItemMeta itemmeta = item.getItemMeta();
 		itemmeta.setLore(lore);
-		itemmeta.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ATTRIBUTES });
+		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		item.setItemMeta(itemmeta);
 		return item;
 	}
@@ -333,7 +334,7 @@ public class Item {
 		item.setAmount(amount);
 		ItemMeta itemmeta = item.getItemMeta();
 		itemmeta.setDisplayName(name);
-		itemmeta.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ATTRIBUTES });
+		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		itemmeta.setLore(lore);
 		item.setItemMeta(itemmeta);
 		return item;
@@ -361,43 +362,39 @@ public class Item {
 	}
 
 	public static ItemStack fromUniqueMaterialString(String s){
-		try{
+		try {
 			String[] split = s.split(":");
 			return new ItemStack(Integer.parseInt(split[0]), 1, Short.parseShort(split[1]));
-		}catch(Exception e){
+		} catch(Exception e) {
 			return null;
 		}
 	}
 
 
 	public static String createStringFromItemList(ArrayList<String> items){
-		String s = items.get(0);
+		StringBuilder s = new StringBuilder(items.get(0));
 
 		for(int i = 1; i < items.size(); i++)
-			s += "," + items.get(i);
+			s.append(",").append(items.get(i));
 
-		return s;
+		return s.toString();
 	}
 
 	private static void mutateItemMeta(SkullMeta meta, String b64) {
 		Method metaSetProfileMethod = null;
 		Field metaProfileField = null;
 		try {
-			if (metaSetProfileMethod == null) {
-				metaSetProfileMethod = meta.getClass().getDeclaredMethod("setProfile", GameProfile.class);
-				metaSetProfileMethod.setAccessible(true);
-			}
-			metaSetProfileMethod.invoke(meta, makeProfile(b64));
+            metaSetProfileMethod = meta.getClass().getDeclaredMethod("setProfile", GameProfile.class);
+            metaSetProfileMethod.setAccessible(true);
+            metaSetProfileMethod.invoke(meta, makeProfile(b64));
 		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
 			try {
-				if (metaProfileField == null) {
-					metaProfileField = meta.getClass().getDeclaredField("profile");
-					metaProfileField.setAccessible(true);
-				}
-				metaProfileField.set(meta, makeProfile(b64));
+                metaProfileField = meta.getClass().getDeclaredField("profile");
+                metaProfileField.setAccessible(true);
+                metaProfileField.set(meta, makeProfile(b64));
 
 			} catch (NoSuchFieldException | IllegalAccessException ex2) {
-				ex2.printStackTrace();
+				Bukkit.getLogger().log(Level.SEVERE, "An error occurred, trying to mutate Item Meta!", ex2);
 			}
 		}
 	}

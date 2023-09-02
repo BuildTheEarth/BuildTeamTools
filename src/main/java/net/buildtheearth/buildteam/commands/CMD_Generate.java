@@ -65,7 +65,7 @@ public class CMD_Generate implements CommandExecutor {
                 });
                 break;
             case "undo":
-                if(Generator.getPlayerHistory(p).getHistoryEntries().size() == 0){
+                if(Generator.getPlayerHistory(p).getHistoryEntries().isEmpty()){
                     p.sendMessage("§cYou didn't generate any structures yet. Use /gen to create one.");
                     return true;
                 }

@@ -23,7 +23,7 @@ public abstract class GeneratorModule {
     GeneratorType generatorType;
 
     @Getter
-    private HashMap<UUID, Settings> playerSettings = new HashMap<>();
+    private final HashMap<UUID, Settings> playerSettings = new HashMap<>();
 
     public GeneratorModule(GeneratorType type) {
         generatorType = type;
@@ -103,16 +103,16 @@ public abstract class GeneratorModule {
                 break;
         }
 
-        String command = "/gen " + type;
+        StringBuilder command = new StringBuilder("/gen " + type);
         for(Object object : flags.keySet()) {
             if (!(object instanceof RoadFlag))
                 continue;
 
             RoadFlag roadFlag = (RoadFlag) object;
-            command += " -" + roadFlag.getFlag() + " " + flags.get(roadFlag);
+            command.append(" -").append(roadFlag.getFlag()).append(" ").append(flags.get(roadFlag));
         }
 
-        return command;
+        return command.toString();
     }
 
     public void sendSuccessMessage(Player p){
@@ -161,18 +161,16 @@ public abstract class GeneratorModule {
             String flagName = flagAndValue[0];
             String flagValue = flagAndValue[1];
 
-            if(flagName == null)
-                continue;
+            if(flagName == null) continue;
 
             Flag finalFlag = Flag.byString(generatorType, flagName);
 
-            if(finalFlag == null)
-                continue;
+            if(finalFlag == null) continue;
 
             getPlayerSettings().get(p.getUniqueId()).setValue(finalFlag, flagValue);
         }
 
-        if(getPlayerSettings().get(p.getUniqueId()).getValues().size() == 0 && args.length > 1)
+        if(getPlayerSettings().get(p.getUniqueId()).getValues().isEmpty() && args.length > 1)
             sendHelp(p);
     }
 }

@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 public class StatsServer {
 
-    private HashMap<StatsServerType, Object> stats;
+    private final HashMap<StatsServerType, Object> stats;
 
     public StatsServer(){
         stats = new HashMap<>();

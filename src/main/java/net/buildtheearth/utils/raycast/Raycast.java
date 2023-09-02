@@ -15,7 +15,7 @@ public class Raycast {
 
     private ArrayList<Material> passthroughMaterials = new ArrayList<>();
 
-    private ArrayList<Location> testedLocations = new ArrayList<>();
+    private final ArrayList<Location> testedLocations = new ArrayList<>();
 
     private World world;
 
@@ -89,7 +89,7 @@ public class Raycast {
                 if (this.showRayCast)
                     this.world.spawnParticle(Particle.CLOUD, this.rayCastLocation.getX(), this.rayCastLocation.getY(), this.rayCastLocation.getZ(), 0, 0.0D, 0.0D, 0.0D);
             }
-            if (entities.size() > 0) {
+            if (!entities.isEmpty()) {
                 for (Entity entity : entities) {
                     this.hurtEntity = entity;
                     this.hurtLocation = this.rayCastLocation;
@@ -112,7 +112,7 @@ public class Raycast {
                 this.hurtLocation = this.rayCastLocation;
                 return true;
             }
-            if (entities.size() > 0) {
+            if (!entities.isEmpty()) {
                 this.rayCastType = RaycastType.ENTITY;
                 for (Entity entity : entities) {
                     this.hurtEntity = entity;
@@ -255,6 +255,6 @@ public class Raycast {
     }
 
     public enum RaycastType {
-        ENTITY_AND_BLOCK, ENTITY, BLOCK;
+        ENTITY_AND_BLOCK, ENTITY, BLOCK
     }
 }

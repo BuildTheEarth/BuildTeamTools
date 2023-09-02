@@ -1,6 +1,9 @@
 package net.buildtheearth.buildteam.components;
 
 import java.io.IOException;
+import java.util.logging.Level;
+
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import net.buildtheearth.utils.Config;
 
@@ -17,7 +20,7 @@ public class ConfigManager {
 	    try {
 	        cfg.save(Config.getFile("config"));
 	    } catch (IOException e) {
-	        e.printStackTrace();
+			Bukkit.getLogger().log(Level.SEVERE, "An error occurred, trying to save the config file!", e);
 	    }
 	}
 }

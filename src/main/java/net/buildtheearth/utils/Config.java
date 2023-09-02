@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -14,7 +15,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import net.buildtheearth.Main;
 
 public class Config {
-	private static HashMap<String, File> files = new HashMap<String, File>();
+	private static final HashMap<String, File> files = new HashMap<String, File>();
 
 	public static File getFile(String file){
 	    return getFile("", file);
@@ -61,7 +62,7 @@ public class Config {
 		try {
 			cfg.save(getFile(file));
 		} catch (IOException e) {
-			e.printStackTrace();
+			Bukkit.getLogger().log(Level.SEVERE, "An error occurred, trying to save the config file!", e);
 		}
 	}
 	
@@ -71,7 +72,7 @@ public class Config {
 		try {
 			cfg.save(getFile(dir, file));
 		} catch (IOException e) {
-			e.printStackTrace();
+			Bukkit.getLogger().log(Level.SEVERE, "An error occurred, trying to save the config file!", e);
 		}
 	}
 	

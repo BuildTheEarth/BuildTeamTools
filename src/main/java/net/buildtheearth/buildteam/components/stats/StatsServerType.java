@@ -9,5 +9,5 @@ public enum StatsServerType {
     BROKEN_BLOCKS,
     PLACED_BLOCKS,
     COMMANDS,
-    WORLD_EDIT_COMMANDS;
+    WORLD_EDIT_COMMANDS
 }

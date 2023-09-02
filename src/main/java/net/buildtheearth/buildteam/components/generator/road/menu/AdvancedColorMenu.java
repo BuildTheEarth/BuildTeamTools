@@ -14,7 +14,7 @@ import java.util.List;
 
 public class AdvancedColorMenu extends BlockListMenu {
 
-    private RoadFlag roadFlag;
+    private final RoadFlag roadFlag;
 
     public AdvancedColorMenu(Player player, RoadFlag roadFlag, String invName, List<ItemStack> items) {
         super(player, invName, items);

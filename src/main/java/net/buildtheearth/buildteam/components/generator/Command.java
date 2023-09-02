@@ -13,19 +13,19 @@ public class Command {
     public static int MAX_COMMANDS_PER_SERVER_TICK = 10;
     public static int INVENTORY_SLOT = 27;
     @Getter
-    private Player player;
+    private final Player player;
     @Getter
-    private GeneratorModule module;
+    private final GeneratorModule module;
     @Getter
-    private List<String> commands;
+    private final List<String> commands;
 
     @Getter
-    private Block[][][] blocks;
+    private final Block[][][] blocks;
 
     @Getter
-    private int operations;
+    private final int operations;
 
-    private int totalCommands;
+    private final int totalCommands;
 
     @Getter
     private long percentage;
@@ -41,7 +41,7 @@ public class Command {
 
     /** Proecesses the commands from the command queue to prevent the server from freezing. */
     public void tick(){
-        if(commands.size() == 0)
+        if(commands.isEmpty())
             return;
 
         // As long as the player has the barrier in their inventory, we know that the command queue is still processing so we can skip this tick.
@@ -57,7 +57,7 @@ public class Command {
 
         // Process commands in batches of MAX_COMMANDS_PER_SERVER_TICK
         for(int i = 0; i < MAX_COMMANDS_PER_SERVER_TICK;){
-            if(commands.size() == 0){
+            if(commands.isEmpty()){
                 finish();
                 break;
             }

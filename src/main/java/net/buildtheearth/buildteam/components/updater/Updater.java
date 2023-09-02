@@ -19,17 +19,17 @@ public class Updater
     // Direct download link
     private String downloadLink;
     // Provided plugin
-    private Plugin plugin;
+    private final Plugin plugin;
     // The folder where update will be downloaded
-    private File updateFolder;
+    private final File updateFolder;
     // The plugin file
-    private File file;
+    private final File file;
     // ID of a project
-    private int id;
+    private final int id;
     // return a page
     private int page = 1;
     // Set the update type
-    private UpdateType updateType;
+    private final UpdateType updateType;
     // Get the outcome result
     private Result result = Result.SUCCESS;
     // If next page is empty set it to true, and get info from previous page.
@@ -37,9 +37,9 @@ public class Updater
     // Version returned from spigot
     private String version;
     // If true updater is going to log progress to the console.
-    private boolean logger;
+    private final boolean logger;
     // Updater thread
-    private Thread thread;
+    private final Thread thread;
 
     private static final String DOWNLOAD = "/download";
     private static final String VERSIONS = "/versions";

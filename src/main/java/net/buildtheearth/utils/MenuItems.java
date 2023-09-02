@@ -587,6 +587,6 @@ public class MenuItems {
 
 
     public enum SliderColor{
-        WHITE, LIGHT_GRAY;
+        WHITE, LIGHT_GRAY
     }
 }

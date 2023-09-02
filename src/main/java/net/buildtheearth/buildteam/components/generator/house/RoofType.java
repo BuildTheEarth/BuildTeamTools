@@ -11,7 +11,7 @@ public enum RoofType {
     STEEP_SLABS("STEEP_SLABS"),
     STAIRS("STAIRS");
 
-    private String type;
+    private final String type;
 
     RoofType(String type){
         this.type = type;
@@ -23,9 +23,8 @@ public enum RoofType {
 
     public static RoofType byString(String type){
         for(RoofType roofType : RoofType.values())
-        if(roofType.getType().equalsIgnoreCase(type))
-            return roofType;
-
+            if(roofType.getType().equalsIgnoreCase(type))
+                return roofType;
         return null;
     }
 }

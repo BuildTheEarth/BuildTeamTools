@@ -8,7 +8,7 @@ public enum TreeFlag implements Flag {
     WIDTH("w"),
     HEIGHT("h");
 
-    private String flag;
+    private final String flag;
 
     TreeFlag(String flag){
         this.flag = flag;

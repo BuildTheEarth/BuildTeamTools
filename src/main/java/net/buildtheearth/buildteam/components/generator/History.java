@@ -8,10 +8,10 @@ import java.util.ArrayList;
 public class History {
 
     @Getter
-    private Player p;
+    private final Player p;
 
     @Getter
-    private ArrayList<HistoryEntry> historyEntries;
+    private final ArrayList<HistoryEntry> historyEntries;
 
     public History(Player p){
         this.p = p;
@@ -28,11 +28,11 @@ public class History {
     public static class HistoryEntry{
 
         @Getter
-        private GeneratorType generatorType;
+        private final GeneratorType generatorType;
         @Getter
-        private long timeCreated;
+        private final long timeCreated;
         @Getter
-        private int worldEditCommandCount;
+        private final int worldEditCommandCount;
 
         public HistoryEntry(GeneratorType generatorType, int worldEditCommandCount) {
             this.generatorType = generatorType;

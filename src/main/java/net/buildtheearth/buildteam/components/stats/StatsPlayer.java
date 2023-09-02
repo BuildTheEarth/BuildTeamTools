@@ -7,8 +7,8 @@ import java.util.UUID;
 
 public class StatsPlayer {
 
-    private UUID uuid;
-    private HashMap<StatsPlayerType, Object> stats;
+    private final UUID uuid;
+    private final HashMap<StatsPlayerType, Object> stats;
 
     public StatsPlayer(UUID uuid){
         this.uuid = uuid;

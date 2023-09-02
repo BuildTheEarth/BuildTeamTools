@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
  */
 public class BlockListMenu extends AbstractPaginatedMenu {
 
-    public static int SWITCH_PAGE_ITEM_SLOT = 31;
-    public static int NEXT_ITEM_SLOT = 35;
+    public static final int SWITCH_PAGE_ITEM_SLOT = 31;
+    public static final int NEXT_ITEM_SLOT = 35;
 
     public ArrayList<String> selectedMaterials;
     private final List<ItemStack> items;

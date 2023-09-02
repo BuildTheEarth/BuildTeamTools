@@ -20,18 +20,18 @@ import java.util.UUID;
 
 public class AdvancedSettingsMenu extends AbstractMenu {
 
-    public static String ADVANCED_SETTINGS_INV_NAME = "Adjust some Advanced Settings";
+    public static final String ADVANCED_SETTINGS_INV_NAME = "Adjust some Advanced Settings";
 
-    public static int LANE_COUNT_SLOT = 11;
-    public static int LANE_WIDTH_SLOT = 20;
-    public static int SIDEWALK_WIDTH_SLOT = 29;
-    public static int MARKINGS_MATERIAL_SLOT = 15;
+    public static final int LANE_COUNT_SLOT = 11;
+    public static final int LANE_WIDTH_SLOT = 20;
+    public static final int SIDEWALK_WIDTH_SLOT = 29;
+    public static final int MARKINGS_MATERIAL_SLOT = 15;
 
-    public static int ROAD_SLAB_SLOT = 24;
-    public static int SIDEWALK_SLAB_SLOT = 33;
+    public static final int ROAD_SLAB_SLOT = 24;
+    public static final int SIDEWALK_SLAB_SLOT = 33;
 
 
-    public static int NEXT_ITEM_SLOT = 44;
+    public static final int NEXT_ITEM_SLOT = 44;
 
     private int laneCount, laneWidth, sidewalkWidth;
     private ItemStack markingsMaterial, sidewalkSlab, roadSlab;
@@ -150,12 +150,8 @@ public class AdvancedSettingsMenu extends AbstractMenu {
         Road road = Main.getBuildTeam().getGenerator().getRoad();
 
         // Set click event for X items
-        getMenu().getSlot(slot - 1).setClickHandler((clickPlayer, clickInformation) -> {
-            turnOffColorChoice(clickPlayer, roadFlag);
-        });
-        getMenu().getSlot(slot + 1).setClickHandler((clickPlayer, clickInformation) -> {
-            turnOffColorChoice(clickPlayer, roadFlag);
-        });
+        getMenu().getSlot(slot - 1).setClickHandler((clickPlayer, clickInformation) -> turnOffColorChoice(clickPlayer, roadFlag));
+        getMenu().getSlot(slot + 1).setClickHandler((clickPlayer, clickInformation) -> turnOffColorChoice(clickPlayer, roadFlag));
 
         // Set click event for color choice items
         getMenu().getSlot(slot).setClickHandler((clickPlayer, clickInformation) -> {

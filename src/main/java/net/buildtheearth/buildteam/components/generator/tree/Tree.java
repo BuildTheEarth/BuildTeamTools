@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 
 public class Tree extends GeneratorModule {
 
-    public static String TREE_PACK_VERSION = "v2.0";
+    public static final String TREE_PACK_VERSION = "v2.0";
 
 
     public Tree() {

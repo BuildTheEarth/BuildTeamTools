@@ -50,9 +50,8 @@ public class CMD_BuildTeamTools implements CommandExecutor{
                     sender.sendMessage("§7- §e" + uuid.toString());
             });
 		} else if(args[0].equalsIgnoreCase("cache")){
-			ChatUtil.sendMessageBox(sender, "Build Team Cache", () -> {
-				sender.sendMessage(Main.buildTeamTools.getBTENetwork().getStatsManager().getCurrentCache().toJSONString());
-			});
+			ChatUtil.sendMessageBox(sender, "Build Team Cache", () ->
+					sender.sendMessage(Main.buildTeamTools.getBTENetwork().getStatsManager().getCurrentCache().toJSONString()));
 		} else if(args[0].equalsIgnoreCase("uploadCache")){
 			Main.buildTeamTools.getBTENetwork().update();
 			sender.sendMessage("§7Cache uploaded to the network.");

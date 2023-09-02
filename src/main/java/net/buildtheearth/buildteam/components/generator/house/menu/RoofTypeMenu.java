@@ -17,13 +17,13 @@ import org.ipvp.canvas.mask.Mask;
 
 public class RoofTypeMenu extends AbstractMenu {
 
-    public static String ROOF_COLOR_INV_NAME = "Choose a Roof Type";
+    public static final String ROOF_COLOR_INV_NAME = "Choose a Roof Type";
 
-    public static int FLAT_ROOF_ITEM_SLOT = 9;
-    public static int GABLE_ROOF_ITEM_SLOT = 11;
-    public static int STEEP_SLAB_ROOF_ITEM_SLOT = 13;
-    public static int MEDIUM_SLAB_ROOF_ITEM_SLOT = 15;
-    public static int FLATTER_SLAB_ROOF_ITEM_SLOT = 17;
+    public static final  int FLAT_ROOF_ITEM_SLOT = 9;
+    public static final int GABLE_ROOF_ITEM_SLOT = 11;
+    public static final int STEEP_SLAB_ROOF_ITEM_SLOT = 13;
+    public static final int MEDIUM_SLAB_ROOF_ITEM_SLOT = 15;
+    public static final int FLATTER_SLAB_ROOF_ITEM_SLOT = 17;
 
     public RoofTypeMenu(Player player) {
         super(3, ROOF_COLOR_INV_NAME, player);
@@ -54,21 +54,16 @@ public class RoofTypeMenu extends AbstractMenu {
     @Override
     protected void setItemClickEventsAsync() {
         // Set click events for the roof type items
-        getMenu().getSlot(FLAT_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            performClickAction(clickPlayer, RoofType.FLAT);
-        }));
-        getMenu().getSlot(GABLE_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            performClickAction(clickPlayer, RoofType.STAIRS);
-        }));
-        getMenu().getSlot(STEEP_SLAB_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            performClickAction(clickPlayer, RoofType.STEEP_SLABS);
-        }));
-        getMenu().getSlot(MEDIUM_SLAB_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            performClickAction(clickPlayer, RoofType.MEDIUM_SLABS);
-        }));
-        getMenu().getSlot(FLATTER_SLAB_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            performClickAction(clickPlayer, RoofType.FLATTER_SLABS);
-        }));
+        getMenu().getSlot(FLAT_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) ->
+                performClickAction(clickPlayer, RoofType.FLAT)));
+        getMenu().getSlot(GABLE_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) ->
+                performClickAction(clickPlayer, RoofType.STAIRS)));
+        getMenu().getSlot(STEEP_SLAB_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) ->
+                performClickAction(clickPlayer, RoofType.STEEP_SLABS)));
+        getMenu().getSlot(MEDIUM_SLAB_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) ->
+                performClickAction(clickPlayer, RoofType.MEDIUM_SLABS)));
+        getMenu().getSlot(FLATTER_SLAB_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) ->
+                performClickAction(clickPlayer, RoofType.FLATTER_SLABS)));
     }
 
     private void performClickAction(Player p, RoofType roofType){

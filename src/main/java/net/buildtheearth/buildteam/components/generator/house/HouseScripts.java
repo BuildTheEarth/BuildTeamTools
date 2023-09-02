@@ -445,24 +445,24 @@ public class HouseScripts {
             maxRoofHeight = maxRoofHeight - 1;
 
             if(maxRoofHeight > 0)
-            for(int i = 0; i < maxRoofHeight; i++) {
-                //Only select air block that have stone slabs below them which are surrounded by other stone slabs
-                if(roofType == RoofType.FLATTER_SLABS || roofType == RoofType.MEDIUM_SLABS)
-                    p.chat("//gmask =!(queryRel(1,-1,0,44,-1)||queryRel(-1,-1,0,44,-1)||queryRel(0,-1,1,44,-1)||queryRel(0,-1,-1,44,-1)||(queryRel(-1,-1,1,44,-1)||queryRel(1,-1,-1,44,-1)||queryRel(1,-1,1,44,-1)||queryRel(-1,-1,-1,44,-1)))");
-                else if(roofType == RoofType.STEEP_SLABS)
-                    p.chat("//gmask =!(queryRel(1,-1,0,44,-1)||queryRel(-1,-1,0,44,-1)||queryRel(0,-1,1,44,-1)||queryRel(0,-1,-1,44,-1))");
+                for(int i = 0; i < maxRoofHeight; i++) {
+                    //Only select air block that have stone slabs below them which are surrounded by other stone slabs
+                    if(roofType == RoofType.FLATTER_SLABS || roofType == RoofType.MEDIUM_SLABS)
+                        p.chat("//gmask =!(queryRel(1,-1,0,44,-1)||queryRel(-1,-1,0,44,-1)||queryRel(0,-1,1,44,-1)||queryRel(0,-1,-1,44,-1)||(queryRel(-1,-1,1,44,-1)||queryRel(1,-1,-1,44,-1)||queryRel(1,-1,1,44,-1)||queryRel(-1,-1,-1,44,-1)))");
+                    else if(roofType == RoofType.STEEP_SLABS)
+                        p.chat("//gmask =!(queryRel(1,-1,0,44,-1)||queryRel(-1,-1,0,44,-1)||queryRel(0,-1,1,44,-1)||queryRel(0,-1,-1,44,-1))");
 
-                p.chat("//replace >43 44");
-                operations++;
+                    p.chat("//replace >43 44");
+                    operations++;
 
-                if(roofType == RoofType.FLATTER_SLABS)
-                    p.chat("//gmask =!(queryRel(1,0,0,0,-1)||queryRel(-1,0,0,0,-1)||queryRel(0,0,1,0,-1)||queryRel(0,0,-1,0,-1)||queryRel(-1,0,1,0,-1)||queryRel(1,0,-1,0,-1)||queryRel(1,0,1,0,-1)||queryRel(-1,0,-1,0,-1))");
-                else if(roofType == RoofType.MEDIUM_SLABS || roofType == RoofType.STEEP_SLABS)
-                    p.chat("//gmask =!(queryRel(1,0,0,0,-1)||queryRel(-1,0,0,0,-1)||queryRel(0,0,1,0,-1)||queryRel(0,0,-1,0,-1))");
+                    if(roofType == RoofType.FLATTER_SLABS)
+                        p.chat("//gmask =!(queryRel(1,0,0,0,-1)||queryRel(-1,0,0,0,-1)||queryRel(0,0,1,0,-1)||queryRel(0,0,-1,0,-1)||queryRel(-1,0,1,0,-1)||queryRel(1,0,-1,0,-1)||queryRel(1,0,1,0,-1)||queryRel(-1,0,-1,0,-1))");
+                    else if(roofType == RoofType.MEDIUM_SLABS || roofType == RoofType.STEEP_SLABS)
+                        p.chat("//gmask =!(queryRel(1,0,0,0,-1)||queryRel(-1,0,0,0,-1)||queryRel(0,0,1,0,-1)||queryRel(0,0,-1,0,-1))");
 
-                p.chat("//replace 44 43");
-                operations++;
-            }
+                    p.chat("//replace 44 43");
+                    operations++;
+                }
 
             // Create the flipped steps
             String[] roofColors = roofColor.split(",");
@@ -534,12 +534,12 @@ public class HouseScripts {
             if(maxRoofHeight > 0)
                 for(int i = 0; i < maxRoofHeight; i++) {
                     // Every 2nd layer
-                    if(i % 2 == 0){
+                    if(i % 2 == 0) {
                         //Only select air block that have yellow wool below them which are surrounded by other stone bricks
                         p.chat("//gmask =(queryRel(1,-1,0,98,-1)||queryRel(-1,-1,0,98,-1)||queryRel(0,-1,1,98,-1)||queryRel(0,-1,-1,98,-1))");
                         p.chat("//replace >35:4 98");
                         operations++;
-                    }else{
+                    } else {
                         // Only select air block that have yellow wool below them which are completely surrounded by other stone bricks
                         p.chat("//gmask =(queryRel(1,-1,0,98,-1)||queryRel(-1,-1,0,98,-1)||queryRel(0,-1,1,98,-1)||queryRel(0,-1,-1,98,-1)||queryRel(1,-1,1,98,-1)||queryRel(-1,-1,1,98,-1)||queryRel(-1,-1,-1,98,-1)||queryRel(1,-1,-1,98,-1))");
                         p.chat("//replace >35:4 98");
@@ -756,7 +756,7 @@ public class HouseScripts {
     }
 
     // Move blue, green and red wool one block up
-    public static int moveWoolUp(Player p, int operations){
+    public static int moveWoolUp(Player p, int operations) {
         p.chat("//gmask");
         p.chat("//replace >35:11 35:11");
         operations++;
@@ -768,7 +768,7 @@ public class HouseScripts {
         return operations;
     }
 
-    public static int raiseYellowWoolFloor(Player p, int operations){
+    public static int raiseYellowWoolFloor(Player p, int operations) {
         p.chat("//gmask");
         p.chat("//replace >35:4 35:4");
         operations++;

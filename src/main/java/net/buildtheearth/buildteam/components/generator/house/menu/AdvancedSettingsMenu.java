@@ -18,16 +18,16 @@ import java.util.UUID;
 
 public class AdvancedSettingsMenu extends AbstractMenu {
 
-    public static String ADVANCED_SETTINGS_INV_NAME = "Adjust some Advanced Settings";
+    public static final String ADVANCED_SETTINGS_INV_NAME = "Adjust some Advanced Settings";
 
-    public static int FLOOR_COUNT_SLOT = 11;
-    public static int FLOOR_HEIGHT_SLOT = 20;
-    public static int BASE_HEIGHT_SLOT = 29;
-    public static int WINDOW_WIDTH_SLOT = 15;
-    public static int WINDOW_HEIGHT_SLOT = 24;
-    public static int WINDOW_DISTANCE_SLOT = 33;
+    public static final int FLOOR_COUNT_SLOT = 11;
+    public static final int FLOOR_HEIGHT_SLOT = 20;
+    public static final int BASE_HEIGHT_SLOT = 29;
+    public static final int WINDOW_WIDTH_SLOT = 15;
+    public static final int WINDOW_HEIGHT_SLOT = 24;
+    public static final int WINDOW_DISTANCE_SLOT = 33;
 
-    public static int NEXT_ITEM_SLOT = 44;
+    public static final int NEXT_ITEM_SLOT = 44;
 
     public int floorCount, floorHeight, baseHeight, windowWidth, windowHeight, windowDistance;
 

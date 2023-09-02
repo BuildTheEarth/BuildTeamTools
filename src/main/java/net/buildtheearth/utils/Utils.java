@@ -21,8 +21,8 @@ public class Utils {
 
 	public static boolean containsStringFromList(String string, List<String> list) {
 		for(String s : list)
-		if(string.contains(s))
-			return true;
+			if(string.contains(s))
+				return true;
 		
 		return false;
 	}
@@ -73,22 +73,22 @@ public class Utils {
 
 		if(time > 86400000){					//Tage
 			days = (int) (time/86400000);
-			time = time - (86400000 * days);
+			time = time - (86400000L * days);
 		}
 
 		if(time > 3600000){						//Stunden
 			hours = (int) (time/3600000);
-			time = time - (3600000  * hours);
+			time = time - (3600000L * hours);
 		}
 
 		if(time > 60000){						//Minuten
 			minutes = (int) (time/60000);
-			time = time - (60000 * minutes);
+			time = time - (60000L * minutes);
 		}
 
 		if(time > 1000){						//Sekunden
 			seconds = (int) (time/1000);
-			time = time - (1000 * seconds);
+			time = time - (1000L * seconds);
 		}
 
 		if(days > 0){

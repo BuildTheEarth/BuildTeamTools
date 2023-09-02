@@ -396,8 +396,7 @@ public class RoadScripts {
         int operations = 0;
 
         List<String> positions = new ArrayList<>();
-        for(int i = 0; i < points.size(); i++)
-            positions.add(Generator.getXYZ(points.get(i), blocks));
+        for (Vector point : points) positions.add(Generator.getXYZ(point, blocks));
 
         for(int i = 0; i < points.size(); i++){
             if(i%2 == 0)

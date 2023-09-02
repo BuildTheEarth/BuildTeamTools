@@ -5,8 +5,8 @@ import org.bukkit.entity.Player;
 
 public class RoadSettings extends Settings {
 
-    public static String DISABLED = "OFF";
-    public static String ENABLED = "ON";
+    public static final String DISABLED = "OFF";
+    public static final String ENABLED = "ON";
 
     public RoadSettings(Player player){
         super(player);

@@ -19,7 +19,7 @@ import java.util.List;
 
 public class TreeTypeMenu extends BlockListMenu {
 
-    public static String TREE_TYPE_INV_NAME = "Choose a Tree Type";
+    public static final String TREE_TYPE_INV_NAME = "Choose a Tree Type";
 
     public TreeTypeMenu(Player player) {
         super(player, TREE_TYPE_INV_NAME, getTreeTypes());

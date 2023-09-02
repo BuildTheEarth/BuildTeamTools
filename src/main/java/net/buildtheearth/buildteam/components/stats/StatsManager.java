@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class StatsManager {
 
-    public static int RATE_LIMIT = BTENetwork.CACHE_UPLOAD_SPEED / 20;
+    public static final int RATE_LIMIT = BTENetwork.CACHE_UPLOAD_SPEED / 20;
 
     private StatsServer statsServer;
     private HashMap<UUID, StatsPlayer> statsPlayerList;

@@ -32,14 +32,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.util.*;
 
 public class Generator {
 
-    public static String WIKI_PAGE = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Generator";
-    public static String INSTALL_WIKI = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Installation";
+    public static final String WIKI_PAGE = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Generator";
+    public static final String INSTALL_WIKI = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Installation";
 
     private static final HashMap<UUID, History> playerHistory = new HashMap<>();
 

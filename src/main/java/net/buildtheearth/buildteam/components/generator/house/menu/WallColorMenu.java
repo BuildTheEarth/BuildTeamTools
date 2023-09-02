@@ -11,8 +11,7 @@ import org.bukkit.entity.Player;
 
 public class WallColorMenu extends BlockListMenu {
 
-    public static String WALL_COLOR_INV_NAME = "Choose a Wall Block";
-
+    public static final String WALL_COLOR_INV_NAME = "Choose a Wall Block";
 
     public WallColorMenu(Player player) {
         super(player, WALL_COLOR_INV_NAME, MenuItems.getBlocksByColor());

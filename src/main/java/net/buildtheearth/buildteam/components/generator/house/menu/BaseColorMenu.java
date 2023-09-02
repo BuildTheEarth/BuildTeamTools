@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 
 public class BaseColorMenu extends BlockListMenu {
 
-    public static String BASE_TYPE_INV_NAME = "Choose a Base Floor Color";
+    public static final String BASE_TYPE_INV_NAME = "Choose a Base Floor Color";
 
     public BaseColorMenu(Player player) {
         super(player, BASE_TYPE_INV_NAME, MenuItems.getBlocksByColor());

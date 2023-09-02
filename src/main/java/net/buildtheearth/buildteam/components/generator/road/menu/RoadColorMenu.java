@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 
 public class RoadColorMenu extends BlockListMenu {
 
-    public static String ROAD_COLOR_INV_NAME = "Choose a Road Block";
+    public static final String ROAD_COLOR_INV_NAME = "Choose a Road Block";
 
     public RoadColorMenu(Player player) {
         super(player, ROAD_COLOR_INV_NAME, MenuItems.getBlocksByColor());

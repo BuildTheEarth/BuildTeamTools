@@ -19,7 +19,7 @@ import java.util.List;
 
 public class TreeWidthMenu extends BlockListMenu {
 
-    public static String TREE_TYPE_INV_NAME = "Choose a Tree Width";
+    public static final String TREE_TYPE_INV_NAME = "Choose a Tree Width";
 
     public TreeWidthMenu(Player player) {
         super(player, TREE_TYPE_INV_NAME, getTreeWidths());

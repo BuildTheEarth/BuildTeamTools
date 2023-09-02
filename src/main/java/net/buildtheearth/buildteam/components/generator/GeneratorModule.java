@@ -20,7 +20,7 @@ public abstract class GeneratorModule {
 
 
     public String wikiPage;
-    GeneratorType generatorType;
+    final GeneratorType generatorType;
 
     @Getter
     private final HashMap<UUID, Settings> playerSettings = new HashMap<>();
@@ -120,6 +120,17 @@ public abstract class GeneratorModule {
         p.sendMessage(" ");
         p.sendMessage(" ");
 
+        TextComponent tc = getTextComponent();
+        tc.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, getCommand(p)));
+        tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§7Click to copy command").create()));
+
+        p.spigot().sendMessage(tc);
+
+        p.sendMessage(" ");
+        p.sendMessage("§cNote: You can undo the edit with /gen undo.");
+    }
+
+    private TextComponent getTextComponent() {
         String type = "Building";
 
         switch (generatorType){
@@ -137,14 +148,7 @@ public abstract class GeneratorModule {
                 break;
         }
 
-        TextComponent tc = new TextComponent(BuildTeamTools.PREFIX + type + " §asuccessfully §7generated. §e[Copy Command]");
-        tc.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, getCommand(p)));
-        tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§7Click to copy command").create()));
-
-        p.spigot().sendMessage(tc);
-
-        p.sendMessage(" ");
-        p.sendMessage("§cNote: You can undo the edit with /gen undo.");
+        return new TextComponent(BuildTeamTools.PREFIX + type + " §asuccessfully §7generated. §e[Copy Command]");
     }
 
     /** Conversion:

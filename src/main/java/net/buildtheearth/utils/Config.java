@@ -15,7 +15,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import net.buildtheearth.Main;
 
 public class Config {
-	private static final HashMap<String, File> files = new HashMap<String, File>();
+	private static final HashMap<String, File> files = new HashMap<>();
 
 	public static File getFile(String file){
 	    return getFile("", file);

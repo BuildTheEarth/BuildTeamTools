@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 
 public class SidewalkColorMenu extends BlockListMenu {
 
-    public static String ROAD_COLOR_INV_NAME = "Choose a Sidewalk Block";
+    public static final String ROAD_COLOR_INV_NAME = "Choose a Sidewalk Block";
 
 
     public SidewalkColorMenu(Player player) {

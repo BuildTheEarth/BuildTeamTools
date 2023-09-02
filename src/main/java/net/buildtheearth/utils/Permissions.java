@@ -6,19 +6,19 @@ import org.bukkit.entity.Player;
 
 
 public class Permissions {
-	public static String PermOwner = "server.owner";
-	public static String PermAdmin = "server.admin";
-	public static String PermModerator = "server.moderator";
-	public static String PermSupporter = "server.supporter";
-	public static String PermPremium = "server.premium";
-	public static String PermYoutuber = "server.youtuber";
-	public static String PermBuilder = "server.builder";
-	public static String PermDeveloper = "server.developer";
-	public static String PermDonator = "server.donator";
-	public static String PermAdvanced = "server.advanced";
-	public static String PermProfessional = "server.professional";
+	public static final String PermOwner = "server.owner";
+	public static final String PermAdmin = "server.admin";
+	public static final String PermModerator = "server.moderator";
+	public static final String PermSupporter = "server.supporter";
+	public static final String PermPremium = "server.premium";
+	public static final String PermYoutuber = "server.youtuber";
+	public static final String PermBuilder = "server.builder";
+	public static final String PermDeveloper = "server.developer";
+	public static final String PermDonator = "server.donator";
+	public static final String PermAdvanced = "server.advanced";
+	public static final String PermProfessional = "server.professional";
 	
-	public static boolean isMemsber(Player p) {
+	public static boolean isMember(Player p) {
 		return (
 				 !p.hasPermission(Permissions.PermPremium)
 				&!p.hasPermission(Permissions.PermAdmin) 
@@ -44,25 +44,26 @@ public class Permissions {
 	}
 	
 	public static String getPrefixColorString(String permission){
-		if(permission.equals(PermOwner)){
-			return "§4";
-		}else if(permission.equals(PermAdmin)){
-			return "§c";
-		}else if(permission.equals(PermModerator)){
-			return "§3";
-		}else if(permission.equals(PermDeveloper)){
-			return "§b";
-		}else if(permission.equals(PermSupporter)){
-			return "§9";
-		}else if(permission.equals(PermBuilder)){
-			return "§1";
-		}else if(permission.equals(PermYoutuber)){
-			return "§5";
-		}else if(permission.equals(PermPremium)){
-			return "§6";
-		}else{
-			return "§a";
-		}
+        switch (permission) {
+            case PermOwner:
+                return "§4";
+            case PermAdmin:
+                return "§c";
+            case PermModerator:
+                return "§3";
+            case PermDeveloper:
+                return "§b";
+            case PermSupporter:
+                return "§9";
+            case PermBuilder:
+                return "§1";
+            case PermYoutuber:
+                return "§5";
+            case PermPremium:
+                return "§6";
+            default:
+                return "§a";
+        }
 	}
 	
 	public static String getPrefixColorString(Player p){

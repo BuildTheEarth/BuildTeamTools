@@ -25,19 +25,17 @@ import java.util.ArrayList;
 
 public class GeneratorMenu extends AbstractMenu {
 
-    public static String GENERATOR_INV_NAME = "What do you want to generate?";
+    public static final String GENERATOR_INV_NAME = "What do you want to generate?";
 
-    public static int HOUSE_ITEM_SLOT = 9;
+    public static final int HOUSE_ITEM_SLOT = 9;
 
-    public static int ROAD_ITEM_SLOT = 11;
+    public static final int ROAD_ITEM_SLOT = 11;
 
-    public static int RAILWAY_ITEM_SLOT = 13;
+    public static final int RAILWAY_ITEM_SLOT = 13;
 
-    public static int TREE_ITEM_SLOT = 15;
+    public static final int TREE_ITEM_SLOT = 15;
 
-    public static int FIELD_SLOT = 17;
-
-
+    public static final int FIELD_SLOT = 17;
 
     public GeneratorMenu(Player player) {
         super(3, GENERATOR_INV_NAME, player);
@@ -45,7 +43,6 @@ public class GeneratorMenu extends AbstractMenu {
 
     @Override
     protected void setPreviewItems() {
-
         // HOUSE ITEM
         ArrayList<String> houseLore = Liste.createList("",
                 "§eDescription:",
@@ -106,7 +103,7 @@ public class GeneratorMenu extends AbstractMenu {
         getMenu().getSlot(RAILWAY_ITEM_SLOT).setItem(railwayItem);
 
 
-        if(!BuildTeamTools.DependencyManager.isSchematicBrushEnabled()){
+        if(!BuildTeamTools.DependencyManager.isSchematicBrushEnabled()) {
             // TREE ITEM
             ArrayList<String> treeLore = Liste.createList("", "§cPlugin §eSchematicBrush §cis not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
 
@@ -114,7 +111,7 @@ public class GeneratorMenu extends AbstractMenu {
 
             // Set navigator item
             getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
-        }else if(!Generator.checkIfTreePackIsInstalled(getMenuPlayer(), false)){
+        } else if(!Generator.checkIfTreePackIsInstalled(getMenuPlayer(), false)) {
             // TREE ITEM
             ArrayList<String> treeLore = Liste.createList("", "§cThe §eTree Pack " + Tree.TREE_PACK_VERSION + " §cis not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
 
@@ -122,7 +119,7 @@ public class GeneratorMenu extends AbstractMenu {
 
             // Set navigator item
             getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
-        }else{
+        } else {
             // TREE ITEM
             ArrayList<String> treeLore = Liste.createList("",
                     "§eDescription:",

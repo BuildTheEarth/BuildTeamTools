@@ -80,14 +80,11 @@ public class CMD_Generate implements CommandExecutor {
     }
 
     public static void sendHelp(CommandSender sender){
-        ChatUtil.sendMessageBox(sender, "Generator Command", new Runnable() {
-            @Override
-            public void run() {
-                sender.sendMessage("§eHouse Generator:§7 /gen house help");
-                sender.sendMessage("§eRoad Generator:§7 /gen road help");
-                sender.sendMessage("§eRail Generator:§7 /gen rail help");
-                sender.sendMessage("§eTree Generator:§7 /gen tree help");
-            }
+        ChatUtil.sendMessageBox(sender, "Generator Command", () -> {
+            sender.sendMessage("§eHouse Generator:§7 /gen house help");
+            sender.sendMessage("§eRoad Generator:§7 /gen road help");
+            sender.sendMessage("§eRail Generator:§7 /gen rail help");
+            sender.sendMessage("§eTree Generator:§7 /gen tree help");
         });
     }
 }

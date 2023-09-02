@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.buildtheearth.Main;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
 import java.io.*;
@@ -109,8 +110,7 @@ public class Updater
      * @param link link of the resource
      * @return true if id of resource is valid
      */
-    private boolean checkResource(String link)
-    {
+    private boolean checkResource(String link) {
         try
         {
             URL url = new URL(link);
@@ -127,9 +127,9 @@ public class Updater
             }
             connection.disconnect();
         }
-        catch (Exception e)
+        catch (IOException e)
         {
-            e.printStackTrace();
+            Bukkit.getLogger().log(Level.SEVERE, "An error occurred!", e);
         }
 
         return true;
@@ -169,8 +169,7 @@ public class Updater
             }
             else if(jsonArray.size() < 10)
             {
-                if(logger)
-                    plugin.getLogger().info("Found " + jsonArray.size() + " versions.");
+                if(logger) plugin.getLogger().info("Found " + jsonArray.size() + " versions.");
                 element = jsonArray.get(jsonArray.size()-1);
                 JsonObject object = element.getAsJsonObject();
                 element = object.get("name");
@@ -185,21 +184,18 @@ public class Updater
                 if(shouldUpdate(version, plugin.getDescription().getVersion()) && updateType == UpdateType.VERSION_CHECK)
                 {
                     result = Result.UPDATE_FOUND;
-                    if(logger)
-                        plugin.getLogger().info("Update found!");
+                    if(logger) plugin.getLogger().info("Update found!");
                 }
                 else if(updateType == UpdateType.DOWNLOAD)
                 {
-                    if(logger)
-                        plugin.getLogger().info("Downloading update... version not checked");
+                    if(logger) plugin.getLogger().info("Downloading update... version not checked");
                     download();
                 }
                 else if(updateType == UpdateType.CHECK_DOWNLOAD)
                 {
                     if(shouldUpdate(version, plugin.getDescription().getVersion()))
                     {
-                        if(logger)
-                            plugin.getLogger().info("Update found, downloading now...");
+                        if(logger) plugin.getLogger().info("Update found, downloading now...");
                         download();
                     }
                     else
@@ -211,15 +207,14 @@ public class Updater
                 }
                 else
                 {
-                    if(logger)
-                        plugin.getLogger().info("Update not found");
+                    if(logger) plugin.getLogger().info("Update not found");
                     result = Result.NO_UPDATE;
                 }
             }
         }
-        catch (Exception e)
+        catch (IOException e)
         {
-            e.printStackTrace();
+            Bukkit.getLogger().log(Level.SEVERE, "An error occurred, trying to mutate Item Meta!", e);
         }
     }
 
@@ -283,11 +278,10 @@ public class Updater
                 fout.write(data, 0, count);
             }
         }
-        catch (Exception e)
+        catch (IOException e)
         {
-            e.printStackTrace();
             if(logger)
-                plugin.getLogger().log(Level.SEVERE, "Updater tried to download the update, but was unsuccessful.");
+                plugin.getLogger().log(Level.SEVERE, "Updater tried to download the update, but was unsuccessful.", e);
             result = Result.FAILED;
         }
         finally {
@@ -297,14 +291,12 @@ public class Updater
                 }
             } catch (final IOException e) {
                 this.plugin.getLogger().log(Level.SEVERE, null, e);
-                e.printStackTrace();
             }
             try {
                 if (fout != null) {
                     fout.close();
                 }
             } catch (final IOException e) {
-                e.printStackTrace();
                 this.plugin.getLogger().log(Level.SEVERE, null, e);
             }
 

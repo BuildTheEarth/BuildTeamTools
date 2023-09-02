@@ -10,8 +10,8 @@ import java.util.List;
 
 public class Command {
 
-    public static int MAX_COMMANDS_PER_SERVER_TICK = 10;
-    public static int INVENTORY_SLOT = 27;
+    public static final int MAX_COMMANDS_PER_SERVER_TICK = 10;
+    public static final int INVENTORY_SLOT = 27;
     @Getter
     private final Player player;
     @Getter

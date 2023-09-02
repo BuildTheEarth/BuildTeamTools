@@ -18,7 +18,7 @@ import java.util.List;
 
 public class RoofColorMenu extends BlockListMenu {
 
-    public static String ROOF_TYPE_INV_NAME = "Choose a Roof Color";
+    public static final String ROOF_TYPE_INV_NAME = "Choose a Roof Color";
 
     public RoofColorMenu(Player player) {
         super(player, ROOF_TYPE_INV_NAME, getRoofBlocks(player));

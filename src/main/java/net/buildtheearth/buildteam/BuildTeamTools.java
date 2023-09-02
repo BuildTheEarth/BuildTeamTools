@@ -25,8 +25,8 @@ import java.util.List;
 
 public class BuildTeamTools {
 
-	public static int SPIGOT_PROJECT_ID = 101854;
-	public static String PREFIX = "§9§lBTE §8> §7";
+	public static final int SPIGOT_PROJECT_ID = 101854;
+	public static final String PREFIX = "§9§lBTE §8> §7";
 
 	private boolean debug;
 	private boolean updateInstalled;
@@ -73,47 +73,43 @@ public class BuildTeamTools {
 	 *  It calls the tick() function.
 	 */
 	private void startTimer() {
-		Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.instance, new Runnable() {
-			
-			@Override
-			public void run() {
-				time++;
+		Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.instance, () -> {
+            time++;
 
-				// Jede Stunde
-				if(time%(20*60*60) == 0){
-				}
+            // Jede Stunde
+            if(time%(20*60*60) == 0){
+            }
 
-				// Jede 10 Minuten (+1 Sekunde)
-				if(time%(BTENetwork.CACHE_UPLOAD_SPEED) == 0) {
-					Main.buildTeamTools.getBTENetwork().update();
-				}
+            // Jede 10 Minuten (+1 Sekunde)
+            if(time%(BTENetwork.CACHE_UPLOAD_SPEED) == 0) {
+                Main.buildTeamTools.getBTENetwork().update();
+            }
 
-				// Jede Minute
-				if(time%(20*60) == 0) {
-					Main.buildTeamTools.getBTENetwork().getStatsManager().getStatsServer().addValue(StatsServerType.UPTIME, 1);
+            // Jede Minute
+            if(time%(20*60) == 0) {
+                Main.buildTeamTools.getBTENetwork().getStatsManager().getStatsServer().addValue(StatsServerType.UPTIME, 1);
 
-					for (Player p : Bukkit.getOnlinePlayers()) {
-						Main.buildTeamTools.getBTENetwork().getStatsManager().getStatsServer().addValue(StatsServerType.PLAYTIME, 1);
-						Main.buildTeamTools.getBTENetwork().getStatsManager().getStatsPlayer(p.getUniqueId()).addValue(StatsPlayerType.PLAYTIME, 1);
-					}
-				}
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    Main.buildTeamTools.getBTENetwork().getStatsManager().getStatsServer().addValue(StatsServerType.PLAYTIME, 1);
+                    Main.buildTeamTools.getBTENetwork().getStatsManager().getStatsPlayer(p.getUniqueId()).addValue(StatsPlayerType.PLAYTIME, 1);
+                }
+            }
 
-				// Alle 5 Sekunden
-				if(time%100 == 0){
-				}
+            // Alle 5 Sekunden
+            if(time%100 == 0){
+            }
 
-				// Jede Sekunde
-				if(time%20 == 0){
-					tickSeconds();
-				}
+            // Jede Sekunde
+            if(time%20 == 0){
+                tickSeconds();
+            }
 
-				// Jede viertel Sekunde
-				if(time%5 == 0){
-				}
+            // Jede viertel Sekunde
+            if(time%5 == 0){
+            }
 
-				generator.tick();
-			}
-		},0,0);
+            generator.tick();
+        },0,0);
 	}
 
 	public void notifyUpdate(Player p){
@@ -143,8 +139,6 @@ public class BuildTeamTools {
 		Bukkit.getPluginManager().registerEvents(new Join_Listener(), Main.instance);
 		Bukkit.getPluginManager().registerEvents(new Stats_Listener(), Main.instance);
 	}
-
-
 
 	public static class DependencyManager {
 

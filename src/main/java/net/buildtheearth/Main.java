@@ -76,6 +76,7 @@ public class Main extends JavaPlugin implements PluginMessageListener
 				String serverID = in.readUTF();
 				String buildTeamID = in.readUTF();
 
+				Main.getBuildTeam().getBTENetwork().setConnected(true);
 				Main.getBuildTeam().getBTENetwork().setBuildTeamID(buildTeamID);
 				Main.getBuildTeam().getBTENetwork().setServerID(serverID);
 			}else if(subchannel.equalsIgnoreCase("Stats")){

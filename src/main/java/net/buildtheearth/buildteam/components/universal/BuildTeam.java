@@ -1,4 +1,4 @@
-package net.buildtheearth.buildteam.components.universal_experience;
+package net.buildtheearth.buildteam.components.universal;
 
 import net.buildtheearth.utils.ProxyUtil;
 import org.bukkit.entity.Player;

@@ -1,8 +1,38 @@
+# ----------------------------------------------------------------------------------------------
+# |                         BuildTeamTools - by BuildTheEarth
+# ----------------------------------------------------------------------------------------------
+# | [Github Repo]           https://github.com/BuildTheEarth/BuildTeamTools
+# | [Config Documentation]  https://github.com/BuildTheEarth/BuildTeamTools/wiki/Configuration
+# | [Contacts - Discord]    BuildTheEarth Staff Discord, @minefact
+# ----------------------------------------------------------------------------------------------
+
+
+# Defines the default language used on this server (NOT IMPLEMENTED YET)
+language: "EN"
+
+# Defines the Build Team API Key. This key is used to fetch information about your build team to display in several places.
+#
+# You can find your API Key on the Minecraft Server with IP "buildtheearth.net".
+# Open the Navigator, click "Build Teams", click "My Teams", select your team, click "API-Key" and copy the API Key from there.
+#
+# If you don't configure the API key, some components of this plugin won't work. If you need help with the API Key, ask for help in the #server-support channel on the staff discord.
+api-key: 00000000-0000-0000-0000-000000000000
+
+
+
+# -----------------------------------------------------
+# | Navigation: The navigator command that allows the player to navigate through the project
+# -----------------------------------------------------
+
 navigator:
-  # Determines whether any player on your server can have the navigator item in their hotbar
-  enabled: true
-  # The hotbar slot into which the navigator item should be placed
-  slot: 0
+
+  # Configures the navigator item in the players hotbar
+  item:
+    # Enables or disables the navigator item [true|false]
+    enabled: true
+    # The hotbar slot into which the navigator item should be placed
+    slot: 0
+
   # Specifies which menu items should be enabled and what their material should be
   main_menu_items:
     build:
@@ -24,30 +54,41 @@ navigator:
       lore: "Click to explore the earth !"
 
       # If explore is not enabled, BUT you have a command or message specified then the item will reappear and run the command or send the message you specify
-      # Include the /. Example: "/plots"
+      # Include the /. Example: "/warps"
       command:
       message:
+
     tutorials:
+      # Specifies whether the standard tutorials icon is enabled
       enabled: false
       material: "KNOWLEDGE_BOOK"
       lore: "Click to do some tutorials !"
+
+
+  # Specifies which items in the build menu should be enabled and what their material should be
   build_menu_items:
     tutorials:
       enabled: false
       material: "KNOWLEDGE_BOOK"
+
     plot_system:
       # Always disabled when not on the BTE network
       enabled: false
       material: "SPRUCE_FENCE_GATE"
+
     regions:
       # Always disabled when not on the BTE network
       enabled: true
       material: "MAP"
+
     tools:
       enabled: true
       material: "DIAMOND_HOE"
 
-Plot_Server_Name: "Plot1"
+
+# -----------------------------------------------------
+# | Universal TPLL: A global teleportation method to teleport between build team servers when using /tpll
+# -----------------------------------------------------
 
 universal_tpll:
   geography:
@@ -65,3 +106,10 @@ universal_tpll:
 
   # Specify the world name of your earth projection world. This is the world which a tpll command will teleport a player to
   earth_world:
+
+
+
+
+
+# NOTE: Do not change
+config-version: 1.1

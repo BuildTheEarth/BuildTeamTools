@@ -1,4 +1,4 @@
-package net.buildtheearth.buildteam.components.universal_experience.universal_navigator;
+package net.buildtheearth.buildteam.components.universal.universal_navigator;
 
 import net.buildtheearth.Main;
 import net.buildtheearth.utils.MenuItem;

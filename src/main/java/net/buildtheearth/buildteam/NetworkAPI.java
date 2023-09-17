@@ -1,9 +1,9 @@
 package net.buildtheearth.buildteam;
 
-import net.buildtheearth.buildteam.components.universal_experience.BuildTeam;
-import net.buildtheearth.buildteam.components.universal_experience.Category;
-import net.buildtheearth.buildteam.components.universal_experience.Country;
-import net.buildtheearth.buildteam.components.universal_experience.universal_navigator.ExploreMenu;
+import net.buildtheearth.buildteam.components.universal.BuildTeam;
+import net.buildtheearth.buildteam.components.universal.Category;
+import net.buildtheearth.buildteam.components.universal.Country;
+import net.buildtheearth.buildteam.components.universal.universal_navigator.ExploreMenu;
 
 public class NetworkAPI {
     public static Category[] getAllLocationsForCountry(String name) {

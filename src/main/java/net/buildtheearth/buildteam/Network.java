@@ -3,7 +3,7 @@ package net.buildtheearth.buildteam;
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.commands.Navigator;
 import net.buildtheearth.buildteam.components.BTENetwork;
-import net.buildtheearth.buildteam.components.universal_experience.PreferenceType;
+import net.buildtheearth.buildteam.components.universal.PreferenceType;
 import net.buildtheearth.buildteam.database.User;
 import net.buildtheearth.buildteam.listeners.CancelledEvents;
 import net.buildtheearth.buildteam.listeners.InteractEvent;

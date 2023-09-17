@@ -18,7 +18,7 @@
  *
  */
 
-package net.buildtheearth.buildteam.components.universal_experience.universal_tpll;
+package net.buildtheearth.buildteam.components.universal.universal_tpll;
 
 import com.google.gson.annotations.Expose;
 import net.buildtheearth.utils.ChatUtil;

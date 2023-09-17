@@ -1,4 +1,4 @@
-package net.buildtheearth.buildteam.components.universal_experience;
+package net.buildtheearth.buildteam.components.universal;
 
 /**
  * Represents a global BTE warp, as stored in the categories table of the BTE Network DB

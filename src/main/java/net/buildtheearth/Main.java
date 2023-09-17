@@ -5,9 +5,11 @@ import com.google.common.io.ByteStreams;
 import net.buildtheearth.buildteam.BuildTeamTools;
 import net.buildtheearth.buildteam.components.updater.Updater;
 import net.buildtheearth.utils.geo.LatLng;
+import net.buildtheearth.utils.io.ConfigUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
@@ -40,6 +42,21 @@ public class Main extends JavaPlugin implements PluginMessageListener
 		buildTeamTools.stop();
 
 		getLogger().info("Plugin stopped.");
+	}
+
+	@Override
+	public FileConfiguration getConfig() {
+		return ConfigUtil.getInstance().configs[0];
+	}
+
+	@Override
+	public void reloadConfig() {
+		ConfigUtil.getInstance().reloadFiles();
+	}
+
+	@Override
+	public void saveConfig() {
+		ConfigUtil.getInstance().saveFiles();
 	}
 	
 	@Override

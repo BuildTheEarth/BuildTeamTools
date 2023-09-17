@@ -2,7 +2,7 @@ package net.buildtheearth.buildteam.listeners;
 
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.Network;
-import net.buildtheearth.buildteam.components.universal_experience.universal_navigator.MainMenu;
+import net.buildtheearth.buildteam.components.universal.universal_navigator.MainMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

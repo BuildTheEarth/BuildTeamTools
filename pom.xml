@@ -167,6 +167,14 @@
             <scope>compile</scope>
         </dependency>
 
+        <!-- Alps BTE Lib -->
+        <dependency>
+            <groupId>com.alpsbte.alpslib</groupId>
+            <artifactId>alpslib-io</artifactId>
+            <version>1.0.17</version>
+            <scope>compile</scope>
+        </dependency>
+
         <!-- PorkLib -->
         <dependency>
             <groupId>net.daporkchop.lib</groupId>

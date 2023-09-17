@@ -1,10 +1,10 @@
-package net.buildtheearth.buildteam.components.universal_experience.universal_tpll;
+package net.buildtheearth.buildteam.components.universal.universal_tpll;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.Main;
-import net.buildtheearth.buildteam.components.universal_experience.universal_tpll.projection.Airocean;
-import net.buildtheearth.buildteam.components.universal_experience.universal_tpll.projection.ModifiedAirocean;
+import net.buildtheearth.buildteam.components.universal.universal_tpll.projection.Airocean;
+import net.buildtheearth.buildteam.components.universal.universal_tpll.projection.ModifiedAirocean;
 import net.buildtheearth.utils.geo.CoordinateParseUtils;
 import net.buildtheearth.utils.geo.LatLng;
 import net.buildtheearth.utils.ProxyUtil;

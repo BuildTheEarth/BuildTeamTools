@@ -1,5 +1,6 @@
 package net.buildtheearth.buildteam;
 
+import com.alpsbte.alpslib.io.config.ConfigNotImplementedException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import net.buildtheearth.buildteam.commands.buildteamtools_command;
@@ -9,10 +10,11 @@ import net.buildtheearth.buildteam.components.BTENetwork;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.stats.StatsPlayerType;
 import net.buildtheearth.buildteam.components.stats.StatsServerType;
-import net.buildtheearth.buildteam.components.ConfigManager;
+import net.buildtheearth.utils.io.ConfigUtil;
 import org.bukkit.Bukkit;
 
 import net.buildtheearth.Main;
+import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
@@ -40,10 +42,7 @@ public class BuildTeamTools {
 	 */
 	private Network network;
 
-	public BuildTeamTools()
-	{
-
-	}
+	public BuildTeamTools() {}
 
 	//Getters
 	public BTENetwork getBTENetwork()
@@ -61,6 +60,9 @@ public class BuildTeamTools {
 
 
 	public void start() {
+		String successPrefix = ChatColor.DARK_GRAY + "[" + ChatColor.DARK_GREEN + "✔" + ChatColor.DARK_GRAY + "] " + ChatColor.GRAY;
+		String errorPrefix = ChatColor.DARK_GRAY + "[" + ChatColor.RED + "X" + ChatColor.DARK_GRAY + "] " + ChatColor.GRAY;
+
 		//Starts the network and interface features
 		network = new Network();
 		network.start();
@@ -68,9 +70,20 @@ public class BuildTeamTools {
 		registerCommands();
 		registerListeners();
 
-		ConfigManager.setStandard();
-		ConfigManager.readData();
+		// Load config, if it throws an exception disable plugin
+		try {
+			ConfigUtil.init();
+		} catch (ConfigNotImplementedException ex) {
+			Bukkit.getConsoleSender().sendMessage(errorPrefix + "Could not load BuildTeamTools configuration file.");
+			Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "The config file must be configured!");
 
+			Main.instance.getServer().getPluginManager().disablePlugin(Main.instance);
+			return;
+		}
+		ConfigUtil.getInstance().reloadFiles();
+
+
+		// Register Plugin Messaging Channel
 		Main.instance.getServer().getMessenger().registerOutgoingPluginChannel(Main.instance, "BuildTeam");
 		Main.instance.getServer().getMessenger().registerIncomingPluginChannel(Main.instance, "BuildTeam", Main.instance);
 

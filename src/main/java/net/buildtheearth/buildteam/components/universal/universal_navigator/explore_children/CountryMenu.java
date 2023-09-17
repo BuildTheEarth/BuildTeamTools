@@ -1,10 +1,10 @@
-package net.buildtheearth.buildteam.components.universal_experience.universal_navigator.explore_children;
+package net.buildtheearth.buildteam.components.universal.universal_navigator.explore_children;
 
 import net.buildtheearth.buildteam.NetworkAPI;
-import net.buildtheearth.buildteam.components.universal_experience.BuildTeam;
-import net.buildtheearth.buildteam.components.universal_experience.Category;
-import net.buildtheearth.buildteam.components.universal_experience.Country;
-import net.buildtheearth.buildteam.components.universal_experience.universal_navigator.ExploreMenu;
+import net.buildtheearth.buildteam.components.universal.BuildTeam;
+import net.buildtheearth.buildteam.components.universal.Category;
+import net.buildtheearth.buildteam.components.universal.Country;
+import net.buildtheearth.buildteam.components.universal.universal_navigator.ExploreMenu;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItem;
 import net.buildtheearth.utils.menus.AbstractMenu;

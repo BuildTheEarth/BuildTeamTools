@@ -2,7 +2,7 @@ package net.buildtheearth.buildteam.listeners;
 
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.Network;
-import net.buildtheearth.buildteam.components.universal_experience.universal_tpll.TpllListener;
+import net.buildtheearth.buildteam.components.universal.universal_tpll.TpllListener;
 import net.buildtheearth.utils.geo.LatLng;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;

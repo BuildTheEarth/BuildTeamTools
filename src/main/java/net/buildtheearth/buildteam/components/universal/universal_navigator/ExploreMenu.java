@@ -1,12 +1,13 @@
-package net.buildtheearth.buildteam.components.universal_experience.universal_navigator;
+package net.buildtheearth.buildteam.components.universal.universal_navigator;
 
 import net.buildtheearth.Main;
-import net.buildtheearth.buildteam.components.universal_experience.Country;
-import net.buildtheearth.buildteam.components.universal_experience.universal_navigator.explore_children.CountryMenu;
-import net.buildtheearth.buildteam.components.universal_experience.universal_navigator.explore_children.CountrySelectorMenu;
+import net.buildtheearth.buildteam.components.universal.Country;
+import net.buildtheearth.buildteam.components.universal.universal_navigator.explore_children.CountryMenu;
+import net.buildtheearth.buildteam.components.universal.universal_navigator.explore_children.CountrySelectorMenu;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItem;
 import net.buildtheearth.utils.Utils;
+import net.buildtheearth.utils.io.ConfigPaths;
 import net.buildtheearth.utils.menus.AbstractMenu;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -57,7 +58,7 @@ public class ExploreMenu extends AbstractMenu
             continentLore.add(Utils.loreText("Visit countries in " +continents[i].label));
 
             //Creates the item
-            ItemStack continentItem = Item.create(Material.getMaterial(config.getString("navigator.main_menu_items.explore.material")),
+            ItemStack continentItem = Item.create(Material.getMaterial(config.getString(ConfigPaths.EXPLORE_ITEM_MATERIAL)),
                     ChatColor.YELLOW +"" +ChatColor.BOLD +"" +continents[i].label, 1, continentLore);
 
             MenuItem continent;

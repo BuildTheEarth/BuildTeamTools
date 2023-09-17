@@ -1,11 +1,12 @@
-package net.buildtheearth.buildteam.components.universal_experience.universal_navigator;
+package net.buildtheearth.buildteam.components.universal.universal_navigator;
 
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.Network;
-import net.buildtheearth.buildteam.components.universal_experience.PreferenceType;
+import net.buildtheearth.buildteam.components.universal.PreferenceType;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItem;
 import net.buildtheearth.utils.Utils;
+import net.buildtheearth.utils.io.ConfigPaths;
 import net.buildtheearth.utils.menus.AbstractMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -58,24 +59,24 @@ public class MainMenu extends AbstractMenu
         String[] szMessages = new String[3];
         int[] iSlotsToBeUsed;
 
-        bItemsNeeded[0] = config.getBoolean("navigator.main_menu_items.build.enabled");
+        bItemsNeeded[0] = config.getBoolean(ConfigPaths.BUILD_ITEM_ENABLED);
         if (bItemsNeeded[0])
             iItemsNeeded++;
         else
         {
-            szCommands[0] = config.getString("navigator.main_menu_items.build.command");
-            szMessages[0] = config.getString("navigator.main_menu_items.build.message");
+            szCommands[0] = config.getString(ConfigPaths.BUILD_ITEM_COMMAND);
+            szMessages[0] = config.getString(ConfigPaths.BUILD_ITEM_MESSAGE);
         }
-        bItemsNeeded[1] = config.getBoolean("navigator.build_menu_items.explore.enabled");
+        bItemsNeeded[1] = config.getBoolean(ConfigPaths.EXPLORE_ITEM_ENABLED);
         if (bItemsNeeded[1])
             iItemsNeeded++;
         else
         {
-            szCommands[1] = config.getString("navigator.main_menu_items.build.command");
-            szMessages[1] = config.getString("navigator.main_menu_items.build.message");
+            szCommands[1] = config.getString(ConfigPaths.BUILD_ITEM_COMMAND);
+            szMessages[1] = config.getString(ConfigPaths.BUILD_ITEM_MESSAGE);
         }
 
-        bItemsNeeded[2] = config.getBoolean("navigator.build_menu_items.tutorials.enabled");
+        bItemsNeeded[2] = config.getBoolean(ConfigPaths.TUTORIALS_ITEM_ENABLED);
         if (bItemsNeeded[2])
             iItemsNeeded++;
 
@@ -96,9 +97,9 @@ public class MainMenu extends AbstractMenu
         if (bItemsNeeded[0])
         {
             ArrayList<String> buildLore = new ArrayList<>();
-            buildLore.add(Utils.loreText(config.getString("navigator.main_menu_items.build.lore")));
+            buildLore.add(Utils.loreText(config.getString(ConfigPaths.BUILD_ITEM_LORE)));
 
-            ItemStack buildItem = Item.create(Material.getMaterial(config.getString("navigator.main_menu_items.build.material")), ChatColor.GREEN +"" +ChatColor.BOLD +"Build", 1, buildLore);
+            ItemStack buildItem = Item.create(Material.getMaterial(config.getString(ConfigPaths.BUILD_ITEM_MATERIAL)), ChatColor.GREEN +"" +ChatColor.BOLD +"Build", 1, buildLore);
             MenuItem build = new MenuItem(iSlotsToBeUsed[iItem], buildItem, player ->
             {
                 //Opens the build menu for the player
@@ -114,9 +115,9 @@ public class MainMenu extends AbstractMenu
             if (szCommands[0].startsWith("/"))
             {
                 ArrayList<String> buildLore = new ArrayList<>();
-                buildLore.add(Utils.loreText(config.getString("navigator.main_menu_items.build.lore")));
+                buildLore.add(Utils.loreText(config.getString(ConfigPaths.BUILD_ITEM_LORE)));
 
-                ItemStack buildItem = Item.create(Material.getMaterial(config.getString("navigator.main_menu_items.build.material")), ChatColor.GREEN +"" +ChatColor.BOLD +"Build", 1, buildLore);
+                ItemStack buildItem = Item.create(Material.getMaterial(config.getString(ConfigPaths.BUILD_ITEM_MATERIAL)), ChatColor.GREEN +"" +ChatColor.BOLD +"Build", 1, buildLore);
                 MenuItem build = new MenuItem(iSlotsToBeUsed[iItem], buildItem, player ->
                 {
                     Bukkit.getScheduler().runTask(Main.instance, () ->
@@ -134,9 +135,9 @@ public class MainMenu extends AbstractMenu
         else if (szMessages[0] != null)
         {
             ArrayList<String> buildLore = new ArrayList<>();
-            buildLore.add(Utils.loreText(config.getString("navigator.main_menu_items.build.lore")));
+            buildLore.add(Utils.loreText(config.getString(ConfigPaths.BUILD_ITEM_LORE)));
 
-            ItemStack buildItem = Item.create(Material.getMaterial(config.getString("navigator.main_menu_items.build.material")), ChatColor.GREEN +"" +ChatColor.BOLD +"Build", 1, buildLore);
+            ItemStack buildItem = Item.create(Material.getMaterial(config.getString(ConfigPaths.BUILD_ITEM_MATERIAL)), ChatColor.GREEN +"" +ChatColor.BOLD +"Build", 1, buildLore);
             MenuItem build = new MenuItem(iSlotsToBeUsed[iItem], buildItem, player ->
             {
                 //Sends the message
@@ -153,9 +154,9 @@ public class MainMenu extends AbstractMenu
         if (bItemsNeeded[1])
         {
             ArrayList<String> exploreLore = new ArrayList<>();
-            exploreLore.add(Utils.loreText(config.getString("navigator.main_menu_items.explore.lore")));
+            exploreLore.add(Utils.loreText(config.getString(ConfigPaths.EXPLORE_ITEM_LORE)));
 
-            ItemStack exploreItem = Item.create(Material.getMaterial(config.getString("navigator.main_menu_items.explore.material")), ChatColor.YELLOW +"" +ChatColor.BOLD +"Explore", 1, exploreLore);
+            ItemStack exploreItem = Item.create(Material.getMaterial(config.getString(ConfigPaths.EXPLORE_ITEM_MATERIAL)), ChatColor.YELLOW +"" +ChatColor.BOLD +"Explore", 1, exploreLore);
             MenuItem explore = new MenuItem(iSlotsToBeUsed[iItem], exploreItem, player ->
             {
                 //Opens the explore menu for the player
@@ -171,9 +172,9 @@ public class MainMenu extends AbstractMenu
             if (szCommands[1].startsWith("/"))
             {
                 ArrayList<String> exploreLore = new ArrayList<>();
-                exploreLore.add(Utils.loreText(config.getString("navigator.main_menu_items.explore.lore")));
+                exploreLore.add(Utils.loreText(config.getString(ConfigPaths.EXPLORE_ITEM_LORE)));
 
-                ItemStack exploreItem = Item.create(Material.getMaterial(config.getString("navigator.main_menu_items.explore.material")), ChatColor.YELLOW +"" +ChatColor.BOLD +"Explore", 1, exploreLore);
+                ItemStack exploreItem = Item.create(Material.getMaterial(config.getString(ConfigPaths.EXPLORE_ITEM_MATERIAL)), ChatColor.YELLOW +"" +ChatColor.BOLD +"Explore", 1, exploreLore);
                 MenuItem explore = new MenuItem(iSlotsToBeUsed[iItem], exploreItem, player ->
                 {
                     Bukkit.getScheduler().runTask(Main.instance, () ->
@@ -191,9 +192,9 @@ public class MainMenu extends AbstractMenu
         else if (szMessages[1] != null)
         {
             ArrayList<String> exploreLore = new ArrayList<>();
-            exploreLore.add(Utils.loreText(config.getString("navigator.main_menu_items.explore.lore")));
+            exploreLore.add(Utils.loreText(config.getString(ConfigPaths.EXPLORE_ITEM_LORE)));
 
-            ItemStack exploreItem = Item.create(Material.getMaterial(config.getString("navigator.main_menu_items.explore.material")), ChatColor.YELLOW +"" +ChatColor.BOLD +"Explore", 1, exploreLore);
+            ItemStack exploreItem = Item.create(Material.getMaterial(config.getString(ConfigPaths.EXPLORE_ITEM_MATERIAL)), ChatColor.YELLOW +"" +ChatColor.BOLD +"Explore", 1, exploreLore);
             MenuItem explore = new MenuItem(iSlotsToBeUsed[iItem], exploreItem, player ->
             {
                 //Sends the message
@@ -211,9 +212,9 @@ public class MainMenu extends AbstractMenu
         if (bItemsNeeded[2])
         {
             ArrayList<String> tutorialsLore = new ArrayList<>();
-            tutorialsLore.add(Utils.loreText(config.getString("navigator.main_menu_items.tutorials.lore")));
+            tutorialsLore.add(Utils.loreText(config.getString(ConfigPaths.TUTORIALS_ITEM_LORE)));
 
-            ItemStack tutorialsItem = Item.create(Material.getMaterial(config.getString("navigator.main_menu_items.tutorials.material")), ChatColor.AQUA +"" +ChatColor.BOLD +"Tutorials", 1, tutorialsLore);
+            ItemStack tutorialsItem = Item.create(Material.getMaterial(config.getString(ConfigPaths.TUTORIALS_ITEM_MATERIAL)), ChatColor.AQUA +"" +ChatColor.BOLD +"Tutorials", 1, tutorialsLore);
             MenuItem tutorials = new MenuItem(iSlotsToBeUsed[iItem], tutorialsItem, player ->
             {
                 //Open New tutorials menu

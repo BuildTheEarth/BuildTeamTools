@@ -1,12 +1,14 @@
-package net.buildtheearth.buildteam.components.universal_experience.universal_navigator;
+package net.buildtheearth.buildteam.components.universal.universal_navigator;
 
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.Network;
+import net.buildtheearth.buildteam.components.BTENetwork;
 import net.buildtheearth.buildteam.components.generator.GeneratorMenu;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItem;
 import net.buildtheearth.utils.ProxyUtil;
 import net.buildtheearth.utils.Utils;
+import net.buildtheearth.utils.io.ConfigPaths;
 import net.buildtheearth.utils.menus.AbstractMenu;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -52,19 +54,19 @@ public class BuildMenu extends AbstractMenu
         boolean[] bItemsNeeded = new boolean[4];
         int[] iSlotsToBeUsed;
 
-        bItemsNeeded[0] = config.getBoolean("navigator.build_menu_items.tutorials.enabled");
+        bItemsNeeded[0] = config.getBoolean(ConfigPaths.BUILD_ITEM_ENABLED);
         if (bItemsNeeded[0])
             iItemsNeeded++;
 
-        bItemsNeeded[1] = config.getBoolean("navigator.build_menu_items.plot_system.enabled") && network.isBTENetworkConnected();
+        bItemsNeeded[1] = config.getBoolean(ConfigPaths.PLOT_SYSTEM_ITEM_ENABLED) && network.isBTENetworkConnected();
         if (bItemsNeeded[1])
             iItemsNeeded++;
 
-        bItemsNeeded[2] = config.getBoolean("navigator.build_menu_items.regions.enabled") && network.isBTENetworkConnected();
+        bItemsNeeded[2] = config.getBoolean(ConfigPaths.REGIONS_ITEM_ENABLED) && network.isBTENetworkConnected();
         if (bItemsNeeded[2])
             iItemsNeeded++;
 
-        bItemsNeeded[3] = config.getBoolean("navigator.build_menu_items.tools.enabled");
+        bItemsNeeded[3] = config.getBoolean(ConfigPaths.TOOLS_ITEM_ENABLED);
         if (bItemsNeeded[3])
             iItemsNeeded++;
 
@@ -89,7 +91,7 @@ public class BuildMenu extends AbstractMenu
             tutorialsLore.add(Utils.loreText("Learn more BTE skills"));
 
             //Creates the item for tutorials
-            ItemStack tutorialItem = Item.create(Material.getMaterial(config.getString("navigator.build_menu_items.tutorials.material")), ChatColor.GREEN +"" +ChatColor.BOLD +"Learn", 1, tutorialsLore);
+            ItemStack tutorialItem = Item.create(Material.getMaterial(config.getString(ConfigPaths.TUTORIALS_ITEM_MATERIAL)), ChatColor.GREEN +"" +ChatColor.BOLD +"Learn", 1, tutorialsLore);
 
             //Creates the menu item, specifying the click actions
             MenuItem tutorials = new MenuItem(iSlotsToBeUsed[iItem], tutorialItem, player ->
@@ -112,13 +114,13 @@ public class BuildMenu extends AbstractMenu
             plotsLore.add(Utils.loreText("Access your plots"));
 
             //Creates the item for plots
-            ItemStack plotsItem = Item.create(Material.getMaterial(config.getString("navigator.build_menu_items.plot_system.material")), ChatColor.GREEN +"" +ChatColor.BOLD +"Plots", 1, plotsLore);
+            ItemStack plotsItem = Item.create(Material.getMaterial(config.getString(ConfigPaths.PLOT_SYSTEM_ITEM_MATERIAL)), ChatColor.GREEN +"" +ChatColor.BOLD +"Plots", 1, plotsLore);
 
             //Creates the menu item, specifying the click actions
             MenuItem plotSystem = new MenuItem(iSlotsToBeUsed[iItem], plotsItem, player ->
             {
                 //Connects the player to the plot server
-                ProxyUtil.SwitchServer(player, config.getString("Plot_Server_Name"));
+                ProxyUtil.SwitchServer(player, BTENetwork.PLOT_SERVER_NAME);
             });
             menuItems.add(plotSystem);
 
@@ -135,7 +137,7 @@ public class BuildMenu extends AbstractMenu
             regionsLore.add(Utils.loreText("Teleport to a specific region or team"));
 
             //Creates the item for regions
-            ItemStack regionsItem = Item.create(Material.getMaterial(config.getString("navigator.build_menu_items.regions.material")), ChatColor.GREEN +"" +ChatColor.BOLD +"Regions", 1, regionsLore);
+            ItemStack regionsItem = Item.create(Material.getMaterial(config.getString(ConfigPaths.REGIONS_ITEM_MATERIAL)), ChatColor.GREEN +"" +ChatColor.BOLD +"Regions", 1, regionsLore);
 
             //Creates the menu item, specifying the click actions
             MenuItem regions = new MenuItem(iSlotsToBeUsed[iItem], regionsItem, player ->
@@ -158,7 +160,7 @@ public class BuildMenu extends AbstractMenu
             toolsLore.add(Utils.loreText("Access the BTE build tools"));
 
             //Creates the item for tools
-            ItemStack toolsItem = Item.create(Material.getMaterial(config.getString("navigator.build_menu_items.tools.material")), ChatColor.GREEN +"" +ChatColor.BOLD +"Build Tools", 1, toolsLore);
+            ItemStack toolsItem = Item.create(Material.getMaterial(config.getString(ConfigPaths.TOOLS_ITEM_MATERIAL)), ChatColor.GREEN +"" +ChatColor.BOLD +"Build Tools", 1, toolsLore);
 
             //Creates the menu item, specifying the click actions
             MenuItem tools = new MenuItem(iSlotsToBeUsed[iItem], toolsItem, player ->

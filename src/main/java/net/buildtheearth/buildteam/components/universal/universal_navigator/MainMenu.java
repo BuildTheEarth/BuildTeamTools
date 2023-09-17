@@ -89,13 +89,17 @@ public class MainMenu extends AbstractMenu
                 boolean overwriteDefault = false;
                 clickPlayer.closeInventory();
 
-                if(config.getBoolean(ConfigPaths.BUILD_ITEM_MESSAGE)){
+                if(config.getString(ConfigPaths.BUILD_ITEM_MESSAGE) != null){
                     overwriteDefault = true;
                     clickPlayer.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString(ConfigPaths.BUILD_ITEM_MESSAGE)));
                 }
-                if(config.getBoolean(ConfigPaths.BUILD_ITEM_COMMAND)){
+                if(config.getString(ConfigPaths.BUILD_ITEM_COMMAND) != null){
                     overwriteDefault = true;
-                    clickPlayer.performCommand(config.getString(ConfigPaths.BUILD_ITEM_COMMAND));
+
+                    if(config.getString(ConfigPaths.BUILD_ITEM_COMMAND).startsWith("/"))
+                        clickPlayer.chat(config.getString(ConfigPaths.BUILD_ITEM_COMMAND));
+                    else
+                        clickPlayer.performCommand(config.getString(ConfigPaths.BUILD_ITEM_COMMAND));
                 }
                 if(!overwriteDefault)
                     new BuildMenu(clickPlayer);
@@ -108,13 +112,17 @@ public class MainMenu extends AbstractMenu
                 boolean overwriteDefault = false;
                 clickPlayer.closeInventory();
 
-                if(config.getBoolean(ConfigPaths.EXPLORE_ITEM_MESSAGE)){
+                if(config.getString(ConfigPaths.EXPLORE_ITEM_MESSAGE) != null){
                     overwriteDefault = true;
                     clickPlayer.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString(ConfigPaths.EXPLORE_ITEM_MESSAGE)));
                 }
-                if(config.getBoolean(ConfigPaths.EXPLORE_ITEM_COMMAND)){
+                if(config.getString(ConfigPaths.EXPLORE_ITEM_COMMAND) != null){
                     overwriteDefault = true;
-                    clickPlayer.performCommand(config.getString(ConfigPaths.EXPLORE_ITEM_COMMAND));
+
+                    if(config.getString(ConfigPaths.EXPLORE_ITEM_COMMAND).startsWith("/"))
+                        clickPlayer.chat(config.getString(ConfigPaths.EXPLORE_ITEM_COMMAND));
+                    else
+                        clickPlayer.performCommand(config.getString(ConfigPaths.EXPLORE_ITEM_COMMAND));
                 }
                 if(!overwriteDefault)
                     new ExploreMenu(clickPlayer);
@@ -127,13 +135,17 @@ public class MainMenu extends AbstractMenu
                 boolean overwriteDefault = false;
                 clickPlayer.closeInventory();
 
-                if(config.getBoolean(ConfigPaths.TUTORIALS_ITEM_MESSAGE)){
+                if(config.getString(ConfigPaths.TUTORIALS_ITEM_MESSAGE) != null){
                     overwriteDefault = true;
                     clickPlayer.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString(ConfigPaths.TUTORIALS_ITEM_MESSAGE)));
                 }
-                if(config.getBoolean(ConfigPaths.TUTORIALS_ITEM_COMMAND)){
+                if(config.getString(ConfigPaths.TUTORIALS_ITEM_COMMAND) != null){
                     overwriteDefault = true;
-                    clickPlayer.performCommand(config.getString(ConfigPaths.TUTORIALS_ITEM_COMMAND));
+
+                    if(config.getString(ConfigPaths.TUTORIALS_ITEM_COMMAND).startsWith("/"))
+                        clickPlayer.chat(config.getString(ConfigPaths.TUTORIALS_ITEM_COMMAND));
+                    else
+                        clickPlayer.performCommand(config.getString(ConfigPaths.TUTORIALS_ITEM_COMMAND));
                 }
                 if(!overwriteDefault)
                     new TutorialsMenu(clickPlayer);
@@ -151,8 +163,6 @@ public class MainMenu extends AbstractMenu
                 .pattern("111111111")
                 .build();
     }
-
-
 
     private int[] getSlots() {
         int[] slots = new int[3];

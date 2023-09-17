@@ -4,7 +4,7 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.buildteam.BuildTeamTools;
 import net.buildtheearth.buildteam.components.updater.Updater;
-import net.buildtheearth.terraminusminus.util.geo.LatLng;
+import net.buildtheearth.utils.geo.LatLng;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;

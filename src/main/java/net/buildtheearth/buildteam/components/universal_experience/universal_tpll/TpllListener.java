@@ -5,8 +5,8 @@ import com.google.common.io.ByteStreams;
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.components.universal_experience.universal_tpll.projection.Airocean;
 import net.buildtheearth.buildteam.components.universal_experience.universal_tpll.projection.ModifiedAirocean;
-import net.buildtheearth.terraminusminus.util.geo.CoordinateParseUtils;
-import net.buildtheearth.terraminusminus.util.geo.LatLng;
+import net.buildtheearth.utils.geo.CoordinateParseUtils;
+import net.buildtheearth.utils.geo.LatLng;
 import net.buildtheearth.utils.ProxyUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -68,7 +68,7 @@ public class TpllListener implements Listener
         Player player = event.getPlayer();
 
         //Locate the server
-        String szTargetServer = ServerLocator.getServerFromLocation(latLong.getLat(), latLong.getLng());
+        String szTargetServer = ""; //ServerLocator.getServerFromLocation(latLong.getLat(), latLong.getLng());
 
         //Checks to see whether the player needs to switch server
         if (szTargetServer.equals(szCurrentServer))

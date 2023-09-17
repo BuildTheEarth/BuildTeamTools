@@ -3,7 +3,7 @@ package net.buildtheearth.buildteam.listeners;
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.Network;
 import net.buildtheearth.buildteam.components.universal_experience.universal_tpll.TpllListener;
-import net.buildtheearth.terraminusminus.util.geo.LatLng;
+import net.buildtheearth.utils.geo.LatLng;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

@@ -1,6 +1,6 @@
 package net.buildtheearth.buildteam.commands;
 
-import net.buildtheearth.buildteam.components.universal_experience.MainMenu;
+import net.buildtheearth.buildteam.components.universal_experience.universal_navigator.MainMenu;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

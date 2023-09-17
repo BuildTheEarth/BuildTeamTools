@@ -110,6 +110,12 @@
             <url>https://repo.dmulloy2.net/repository/public/</url>
         </repository>
 
+        <!-- DaPorkchop PorkLib -->
+        <repository>
+            <id>DaPorkchop_</id>
+            <url>https://maven.daporkchop.net/</url>
+        </repository>
+
     </repositories>
 
     <dependencies>
@@ -161,11 +167,12 @@
             <scope>compile</scope>
         </dependency>
 
-        <!-- Terraminusminus -->
+        <!-- PorkLib -->
         <dependency>
-            <groupId>com.github.SmylerMC</groupId>
-            <artifactId>terraminusminus</artifactId>
-            <version>master-ab645ef750-1</version>
+            <groupId>net.daporkchop.lib</groupId>
+            <artifactId>binary</artifactId>
+            <version>0.5.7-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>

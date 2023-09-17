@@ -15,7 +15,7 @@ language: "EN"
 # You can find your API Key on the Minecraft Server with IP "buildtheearth.net".
 # Open the Navigator, click "Build Teams", click "My Teams", select your team, click "API-Key" and copy the API Key from there.
 #
-# If you don't configure the API key, some components of this plugin won't work. If you need help with the API Key, ask for help in the #server-support channel on the staff discord.
+# If you don`t configure the API key, some components of this plugin won`t work. If you need help with the API Key, ask for help in the #server-support channel on the staff discord.
 api-key: 00000000-0000-0000-0000-000000000000
 
 
@@ -25,14 +25,12 @@ api-key: 00000000-0000-0000-0000-000000000000
 # -----------------------------------------------------
 
 navigator:
-
   # Configures the navigator item in the players hotbar
   item:
     # Enables or disables the navigator item [true|false]
     enabled: true
     # The hotbar slot into which the navigator item should be placed
     slot: 0
-
   # Specifies which menu items should be enabled and what their material should be
   main_menu_items:
     build:
@@ -45,19 +43,16 @@ navigator:
       # Include the /. Example: "/plots"
       command:
       message:
-
     explore:
       # Specifies whether the standard explore icon is enabled
-      # If your server is not on the BTE network then enabling this will still operate but will only give you access to your own team's warps
+      # If your server is not on the BTE network then enabling this will still operate but will only give you access to your own teams warps
       enabled: true
       material: "BOAT_SPRUCE"
       lore: "Click to explore the earth !"
-
       # If explore is not enabled, BUT you have a command or message specified then the item will reappear and run the command or send the message you specify
       # Include the /. Example: "/warps"
       command:
       message:
-
     tutorials:
       # Specifies whether the standard tutorials icon is enabled
       enabled: false
@@ -70,17 +65,14 @@ navigator:
     tutorials:
       enabled: false
       material: "KNOWLEDGE_BOOK"
-
     plot_system:
       # Always disabled when not on the BTE network
       enabled: false
       material: "SPRUCE_FENCE_GATE"
-
     regions:
       # Always disabled when not on the BTE network
       enabled: true
       material: "MAP"
-
     tools:
       enabled: true
       material: "DIAMOND_HOE"
@@ -94,16 +86,12 @@ universal_tpll:
   geography:
     # Zoom detail level for OSM requests
     zoom: 12
-
     # Set false for fetching the latest data from OSM (more up to date), or true for using a downloaded database
     # Please follow the guide on https://github.com/noahhusby/Sledgehammer/wiki/Border-Offline-Database about downloading and configuring the offline database
     use_offline_mode: true
-
     # Set to false to disable automatic border teleportation, or true to enable it. Border teleportation requires the offline database to be configured
     border_teleportation: false
-
     API: "https://nominatim.openstreetmap.org/reverse.php?osm_type=N&format=json&zoom={zoom}"
-
   # Specify the world name of your earth projection world. This is the world which a tpll command will teleport a player to
   earth_world:
 

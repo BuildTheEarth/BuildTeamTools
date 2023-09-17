@@ -129,12 +129,7 @@ public class Main extends JavaPlugin implements PluginMessageListener
 	}
 
 	private String startUpdateChecker(){
-		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-			@Override
-			public void run() {
-				checkForUpdates();
-			}
-		}, 20*60*60);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> checkForUpdates(), 20*60*60);
 
 		return checkForUpdates();
 	}

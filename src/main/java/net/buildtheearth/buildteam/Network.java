@@ -5,7 +5,6 @@ import net.buildtheearth.buildteam.commands.Navigator;
 import net.buildtheearth.buildteam.components.BTENetwork;
 import net.buildtheearth.buildteam.components.universal.PreferenceType;
 import net.buildtheearth.buildteam.database.User;
-import net.buildtheearth.buildteam.listeners.CancelledEvents;
 import net.buildtheearth.buildteam.listeners.InteractEvent;
 import net.buildtheearth.buildteam.listeners.Join_Listener;
 import net.buildtheearth.buildteam.listeners.Stats_Listener;
@@ -129,7 +128,6 @@ public class Network
         //Navigator hotbar item
         new InteractEvent(Main.instance, this);
 
-        Bukkit.getPluginManager().registerEvents(new CancelledEvents(), Main.instance);
         Bukkit.getPluginManager().registerEvents(new Join_Listener(this), Main.instance);
         Bukkit.getPluginManager().registerEvents(new Stats_Listener(), Main.instance);
     }

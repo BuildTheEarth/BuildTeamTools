@@ -1,5 +1,6 @@
 package net.buildtheearth.buildteam;
 
+import com.alpsbte.alpslib.io.YamlFileFactory;
 import com.alpsbte.alpslib.io.config.ConfigNotImplementedException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -60,18 +61,11 @@ public class BuildTeamTools {
 
 
 	public void start() {
-		String successPrefix = ChatColor.DARK_GRAY + "[" + ChatColor.DARK_GREEN + "✔" + ChatColor.DARK_GRAY + "] " + ChatColor.GRAY;
 		String errorPrefix = ChatColor.DARK_GRAY + "[" + ChatColor.RED + "X" + ChatColor.DARK_GRAY + "] " + ChatColor.GRAY;
-
-		//Starts the network and interface features
-		network = new Network();
-		network.start();
-
-		registerCommands();
-		registerListeners();
 
 		// Load config, if it throws an exception disable plugin
 		try {
+			YamlFileFactory.registerPlugin(Main.instance);
 			ConfigUtil.init();
 		} catch (ConfigNotImplementedException ex) {
 			Bukkit.getConsoleSender().sendMessage(errorPrefix + "Could not load BuildTeamTools configuration file.");
@@ -82,13 +76,21 @@ public class BuildTeamTools {
 		}
 		ConfigUtil.getInstance().reloadFiles();
 
-
 		// Register Plugin Messaging Channel
 		Main.instance.getServer().getMessenger().registerOutgoingPluginChannel(Main.instance, "BuildTeam");
 		Main.instance.getServer().getMessenger().registerIncomingPluginChannel(Main.instance, "BuildTeam", Main.instance);
 
 
+
+		//Starts the network and interface features
+		network = new Network();
+		network.start();
+
+		//Starts the generator module
 		generator = new Generator();
+
+		registerCommands();
+		registerListeners();
 
 		LocalSession.MAX_HISTORY_SIZE = 500;
 
@@ -97,7 +99,8 @@ public class BuildTeamTools {
 
 	public void stop()
 	{
-		network.stop();
+		if(network != null)
+			network.stop();
 	}
 
 	/** This method is called every second.

@@ -80,7 +80,7 @@ public class CountrySelectorMenu extends AbstractMenu
         MenuItem back = new MenuItem((iRows * 9) - 1, backItem, player ->
         {
             //Opens the main menu
-            new ExploreMenu(player, bNetworkConnected);
+            new ExploreMenu(player);
         });
         menuItems.add(back);
 

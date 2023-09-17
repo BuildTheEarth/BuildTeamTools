@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.UUID;
 
-public class buildteamtools_command implements CommandExecutor{
+public class CMD_BuildTeamTools implements CommandExecutor{
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String cmdlabel, String[] args){
 

@@ -1,7 +1,7 @@
 package net.buildtheearth.buildteam;
 
 import net.buildtheearth.Main;
-import net.buildtheearth.buildteam.commands.Navigator;
+import net.buildtheearth.buildteam.commands.CMD_Navigator;
 import net.buildtheearth.buildteam.components.BTENetwork;
 import net.buildtheearth.buildteam.components.universal.PreferenceType;
 import net.buildtheearth.buildteam.database.User;
@@ -116,7 +116,7 @@ public class Network
         //createDBTables();
 
         //Register commands
-        Main.instance.getCommand("navigator").setExecutor(new Navigator());
+        Main.instance.getCommand("navigator").setExecutor(new CMD_Navigator());
 
         //Register listeners
         registerListeners();

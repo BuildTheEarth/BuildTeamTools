@@ -138,7 +138,7 @@ public class CountryMenu extends AbstractMenu
             back = new MenuItem((iRows * 9) - 1, backItem, player ->
             {
                 //Opens the explore menu (list of continents)
-                new ExploreMenu(player, bNetworkConnected);
+                new ExploreMenu(player);
             });
         }
         else

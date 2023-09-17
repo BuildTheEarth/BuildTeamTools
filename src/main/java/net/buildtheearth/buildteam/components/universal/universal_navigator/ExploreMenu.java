@@ -32,10 +32,12 @@ public class ExploreMenu extends AbstractMenu
     private static final String szInventoryName = "Explore Menu";
     private final ArrayList<MenuItem> menuItems;
 
-    public ExploreMenu(Player menuPlayer, boolean bNetworkConnected)
+    public ExploreMenu(Player menuPlayer)
     {
         super(iRows, szInventoryName, menuPlayer, false);
-        this.menuItems = getGui(bNetworkConnected, Main.instance.getConfig());
+
+        boolean isNetworkConnected = Main.buildTeamTools.getNetwork().isBTENetworkConnected();
+        this.menuItems = getGui(isNetworkConnected, Main.instance.getConfig());
         reloadMenuAsync();
     }
 

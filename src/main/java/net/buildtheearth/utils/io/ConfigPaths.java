@@ -30,19 +30,19 @@ public abstract class ConfigPaths {
     public static final String API_KEY = "api-key";
 
 
-    // Navigator
-    private static final String NAVIGATOR = "navigator.";
 
     // Navigator.Item
-    private static final String NAVIGATOR_ITEM = NAVIGATOR + "item.";
+    private static final String NAVIGATOR_ITEM = "navigator-item.";
 
     public static final String ITEM_ENABLED = NAVIGATOR_ITEM + "enabled";
     public static final String ITEM_SLOT = NAVIGATOR_ITEM + "slot";
 
     // Navigator.MainMenuItems
-    private static final String NAVIGATOR_MAIN_MENU = NAVIGATOR + "main_menu_items.";
+    private static final String NAVIGATOR_MAIN_MENU = "main_menu_items.";
     private static final String BUILD_ITEM = NAVIGATOR_MAIN_MENU + "build.";
     private static final String EXPLORE_ITEM = NAVIGATOR_MAIN_MENU + "explore.";
+
+    private static final String TUTORIALS_ITEM = NAVIGATOR_MAIN_MENU + "tutorials.";
 
     public static final String BUILD_ITEM_ENABLED = BUILD_ITEM + "enabled";
     public static final String BUILD_ITEM_MATERIAL = BUILD_ITEM + "material";
@@ -56,19 +56,21 @@ public abstract class ConfigPaths {
     public static final String EXPLORE_ITEM_COMMAND = EXPLORE_ITEM + "command";
     public static final String EXPLORE_ITEM_MESSAGE = EXPLORE_ITEM + "message";
 
-    public static final String TUTORIALS_ITEM_ENABLED = NAVIGATOR_MAIN_MENU + "tutorials.enabled";
-    public static final String TUTORIALS_ITEM_MATERIAL = NAVIGATOR_MAIN_MENU + "tutorials.material";
-    public static final String TUTORIALS_ITEM_LORE = NAVIGATOR_MAIN_MENU + "tutorials.lore";
+    public static final String TUTORIALS_ITEM_ENABLED = TUTORIALS_ITEM + "enabled";
+    public static final String TUTORIALS_ITEM_MATERIAL = TUTORIALS_ITEM + "material";
+    public static final String TUTORIALS_ITEM_LORE = TUTORIALS_ITEM + "lore";
+    public static final String TUTORIALS_ITEM_COMMAND = TUTORIALS_ITEM + "command";
+    public static final String TUTORIALS_ITEM_MESSAGE = TUTORIALS_ITEM + "message";
 
     // Navigator.BuildMenuItems
-    private static final String NAVIGATOR_BUILD_MENU = NAVIGATOR + "build_menu_items.";
-    private static final String TUTORIALS_ITEM = NAVIGATOR_BUILD_MENU + "tutorials.";
+    private static final String NAVIGATOR_BUILD_MENU = "build_menu_items.";
+    private static final String BUILD_TUTORIALS_ITEM = NAVIGATOR_BUILD_MENU + "tutorials.";
     private static final String PLOT_SYSTEM_ITEM = NAVIGATOR_BUILD_MENU + "plot_system.";
     private static final String REGIONS_ITEM = NAVIGATOR_BUILD_MENU + "regions.";
     private static final String TOOLS_ITEM = NAVIGATOR_BUILD_MENU + "tools.";
 
-    public static final String BUILD_TUTORIALS_ITEM_ENABLED = TUTORIALS_ITEM + "enabled";
-    public static final String BUILD_TUTORIALS_ITEM_MATERIAL = TUTORIALS_ITEM + "material";
+    public static final String BUILD_TUTORIALS_ITEM_ENABLED = BUILD_TUTORIALS_ITEM + "enabled";
+    public static final String BUILD_TUTORIALS_ITEM_MATERIAL = BUILD_TUTORIALS_ITEM + "material";
     public static final String PLOT_SYSTEM_ITEM_ENABLED = PLOT_SYSTEM_ITEM + "enabled";
     public static final String PLOT_SYSTEM_ITEM_MATERIAL = PLOT_SYSTEM_ITEM + "material";
     public static final String REGIONS_ITEM_ENABLED = REGIONS_ITEM + "enabled";

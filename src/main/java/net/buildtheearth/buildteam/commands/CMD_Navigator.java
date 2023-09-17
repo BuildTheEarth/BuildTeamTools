@@ -7,21 +7,19 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class Navigator implements CommandExecutor
+public class CMD_Navigator implements CommandExecutor
 {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
     {
-        if (!(sender instanceof Player))
-        {
+        if (!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED +"You must be a player to run this command");
             return true;
         }
-        else
-        {
-            //Opens the navigator
-            new MainMenu((Player) sender);
-        }
+
+        //Opens the navigator
+        new MainMenu((Player) sender);
+
         return true;
     }
 }

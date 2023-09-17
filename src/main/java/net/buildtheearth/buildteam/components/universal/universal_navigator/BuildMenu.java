@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.ipvp.canvas.mask.Mask;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 /**
  * The build menu for the BTE universal navigator. <p>
@@ -32,7 +33,7 @@ public class BuildMenu extends AbstractMenu
     private static final int iRows = 3;
     private static final String szInventoryName = "Build Menu";
     private static final ArrayList<MenuItem> menuItems = getGui(Main.buildTeamTools.getNetwork());
-    private static final FileConfiguration config = Main.instance.getConfig();
+    private static FileConfiguration config;
 
     public BuildMenu(Player player)
     {
@@ -46,6 +47,8 @@ public class BuildMenu extends AbstractMenu
      */
     public static ArrayList<MenuItem> getGui(Network network)
     {
+        config = Main.instance.getConfig();
+
         //Initiates the list
         ArrayList<MenuItem> menuItems = new ArrayList<>();
 

@@ -4,9 +4,9 @@ import com.alpsbte.alpslib.io.YamlFileFactory;
 import com.alpsbte.alpslib.io.config.ConfigNotImplementedException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
-import net.buildtheearth.buildteam.commands.buildteamtools_command;
-import net.buildtheearth.buildteam.commands.generate_command;
-import net.buildtheearth.buildteam.commands.statistics_command;
+import net.buildtheearth.buildteam.commands.CMD_BuildTeamTools;
+import net.buildtheearth.buildteam.commands.CMD_Generate;
+import net.buildtheearth.buildteam.commands.CMD_Statistics;
 import net.buildtheearth.buildteam.components.BTENetwork;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.stats.StatsPlayerType;
@@ -60,7 +60,7 @@ public class BuildTeamTools {
 	}
 
 
-	public void start() {
+	public boolean start() {
 		String errorPrefix = ChatColor.DARK_GRAY + "[" + ChatColor.RED + "X" + ChatColor.DARK_GRAY + "] " + ChatColor.GRAY;
 
 		// Load config, if it throws an exception disable plugin
@@ -72,7 +72,7 @@ public class BuildTeamTools {
 			Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "The config file must be configured!");
 
 			Main.instance.getServer().getPluginManager().disablePlugin(Main.instance);
-			return;
+			return false;
 		}
 		ConfigUtil.getInstance().reloadFiles();
 
@@ -95,6 +95,7 @@ public class BuildTeamTools {
 		LocalSession.MAX_HISTORY_SIZE = 500;
 
 		startTimer();
+		return true;
 	}
 
 	public void stop()
@@ -158,9 +159,9 @@ public class BuildTeamTools {
 
 	/** Registers all global Commands of the plugin. */
 	private void registerCommands() {
-		Main.instance.getCommand("buildteam").setExecutor(new buildteamtools_command());
-		Main.instance.getCommand("generate").setExecutor(new generate_command());
-		Main.instance.getCommand("statistics").setExecutor(new statistics_command());
+		Main.instance.getCommand("buildteam").setExecutor(new CMD_BuildTeamTools());
+		Main.instance.getCommand("generate").setExecutor(new CMD_Generate());
+		Main.instance.getCommand("statistics").setExecutor(new CMD_Statistics());
 	}
 
 	/** Registers all global Listeners of the plugin. */

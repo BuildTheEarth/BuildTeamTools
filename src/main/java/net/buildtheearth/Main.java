@@ -1,5 +1,6 @@
 package net.buildtheearth;
 
+import com.alpsbte.alpslib.io.config.ConfigurationUtil;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.buildteam.BuildTeamTools;
@@ -31,7 +32,10 @@ public class Main extends JavaPlugin implements PluginMessageListener
 		instance = this;
 
 		buildTeamTools = new BuildTeamTools();
-		buildTeamTools.start();
+		boolean successful = buildTeamTools.start();
+
+		if(!successful)
+			return;
 
 		String resultMessage = startUpdateChecker();
 		getLogger().info("Plugin with version " + getDescription().getVersion() + " started. " + resultMessage);

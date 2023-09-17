@@ -6,16 +6,11 @@
 # | [Contacts - Discord]    BuildTheEarth Staff Discord, @minefact
 # ----------------------------------------------------------------------------------------------
 
-
-# Defines the default language used on this server (NOT IMPLEMENTED YET)
 language: "EN"
 
-# Defines the Build Team API Key. This key is used to fetch information about your build team to display in several places.
-#
-# You can find your API Key on the Minecraft Server with IP "buildtheearth.net".
-# Open the Navigator, click "Build Teams", click "My Teams", select your team, click "API-Key" and copy the API Key from there.
-#
-# If you don`t configure the API key, some components of this plugin won`t work. If you need help with the API Key, ask for help in the #server-support channel on the staff discord.
+# The Build Team API Key used to fetch build team info for display.
+# Find the key on the Minecraft Network at "buildtheearth.net". Navigate: Compass > Build Teams > My Teams > Your Team > API-Key.
+# Without this key, some plugin components won`t function. For assistance, see #server-support on the staff discord.
 api-key: 00000000-0000-0000-0000-000000000000
 
 
@@ -24,58 +19,74 @@ api-key: 00000000-0000-0000-0000-000000000000
 # | Navigation: The navigator command that allows the player to navigate through the project
 # -----------------------------------------------------
 
-navigator:
-  # Configures the navigator item in the players hotbar
-  item:
-    # Enables or disables the navigator item [true|false]
+# Configures the navigator item in the players hotbar
+navigator-item:
+  # Enables or disables the navigator item [true|false]
+  enabled: true
+  # The hotbar slot into which the navigator item should be placed
+  slot: 0
+
+
+# Specifies which menu items should be enabled and what their material should be
+main_menu_items:
+  build:
+    # Specifies whether the standard build icon is enabled
     enabled: true
-    # The hotbar slot into which the navigator item should be placed
-    slot: 0
-  # Specifies which menu items should be enabled and what their material should be
-  main_menu_items:
-    build:
-      # Specifies whether the standard build icon is enabled
-      enabled: true
-      material: "DIAMOND_PICKAXE"
-      lore: "Click to access the build menu !"
+    # The material of the item
+    material: "DIAMOND_PICKAXE"
+    # The lore of the item
+    lore: "Click to access the build menu!"
+    # An optional command to run when the item is clicked
+    command:
+    # An optional message to send when the item is clicked
+    message:
+  explore:
+    # Specifies whether the standard explore icon is enabled. For teams on the BTE Network it shows all countries, for others it shows the regional warps.
+    enabled: true
+    # The material of the item
+    material: "BOAT_SPRUCE"
+    # The lore of the item
+    lore: "Click to explore the earth!"
+    # An optional command to run when the item is clicked
+    command:
+    # An optional message to send when the item is clicked
+    message:
+  tutorials:
+    # Specifies whether the standard tutorials icon is enabled
+    enabled: false
+    # The material of the item
+    material: "KNOWLEDGE_BOOK"
+    # The lore of the item
+    lore: "Click to do some tutorials!"
+    # An optional command to run when the item is clicked
+    command:
+    # An optional message to send when the item is clicked
+    message:
 
-      # If build is not enabled, BUT you have a command or message specified then the item will reappear and run the command or send the message you specify
-      # Include the /. Example: "/plots"
-      command:
-      message:
-    explore:
-      # Specifies whether the standard explore icon is enabled
-      # If your server is not on the BTE network then enabling this will still operate but will only give you access to your own teams warps
-      enabled: true
-      material: "BOAT_SPRUCE"
-      lore: "Click to explore the earth !"
-      # If explore is not enabled, BUT you have a command or message specified then the item will reappear and run the command or send the message you specify
-      # Include the /. Example: "/warps"
-      command:
-      message:
-    tutorials:
-      # Specifies whether the standard tutorials icon is enabled
-      enabled: false
-      material: "KNOWLEDGE_BOOK"
-      lore: "Click to do some tutorials !"
 
+# Specifies which items in the build menu should be enabled and what their material should be
+build_menu_items:
+  tutorials:
+    # Specifies whether the standard tutorials icon is enabled
+    enabled: false
+    # The material of the item
+    material: "KNOWLEDGE_BOOK"
+  plot_system:
+    # Specifies whether the standard plot system icon is enabled. NOTE: Always disabled when not on the BTE network
+    enabled: false
+    # The material of the item
+    material: "SPRUCE_FENCE_GATE"
+  regions:
+    # Specifies whether the standard regions icon is enabled. NOTE: Always disabled when not on the BTE network
+    enabled: true
+    # The material of the item
+    material: "MAP"
+  tools:
+    # Specifies whether the standard tools icon is enabled
+    enabled: true
+    # The material of the item
+    material: "DIAMOND_HOE"
 
-  # Specifies which items in the build menu should be enabled and what their material should be
-  build_menu_items:
-    tutorials:
-      enabled: false
-      material: "KNOWLEDGE_BOOK"
-    plot_system:
-      # Always disabled when not on the BTE network
-      enabled: false
-      material: "SPRUCE_FENCE_GATE"
-    regions:
-      # Always disabled when not on the BTE network
-      enabled: true
-      material: "MAP"
-    tools:
-      enabled: true
-      material: "DIAMOND_HOE"
 
 
 # -----------------------------------------------------
@@ -91,6 +102,7 @@ universal_tpll:
     use_offline_mode: true
     # Set to false to disable automatic border teleportation, or true to enable it. Border teleportation requires the offline database to be configured
     border_teleportation: false
+    # The API URL for the OSM API. Do not change unless you have your own OSM API
     API: "https://nominatim.openstreetmap.org/reverse.php?osm_type=N&format=json&zoom={zoom}"
   # Specify the world name of your earth projection world. This is the world which a tpll command will teleport a player to
   earth_world:

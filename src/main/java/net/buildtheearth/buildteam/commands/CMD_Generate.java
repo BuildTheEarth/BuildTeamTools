@@ -5,10 +5,6 @@ import net.buildtheearth.buildteam.BuildTeamTools;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.generator.GeneratorMenu;
 import net.buildtheearth.buildteam.components.generator.History;
-import net.buildtheearth.buildteam.components.generator.house.House;
-import net.buildtheearth.buildteam.components.generator.rail.Rail;
-import net.buildtheearth.buildteam.components.generator.road.Road;
-import net.buildtheearth.buildteam.components.generator.tree.Tree;
 import net.buildtheearth.utils.ChatUtil;
 import net.buildtheearth.utils.Utils;
 import org.bukkit.Sound;
@@ -17,7 +13,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class generate_command implements CommandExecutor {
+public class CMD_Generate implements CommandExecutor {
 
     public boolean onCommand(CommandSender sender, Command cmd, String cmdlabel, String[] args) {
         if(!(sender instanceof Player)){

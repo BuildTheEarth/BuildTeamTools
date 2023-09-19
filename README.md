@@ -20,7 +20,7 @@
 
 <p align="center">
     <a href="https://github.com/BuildTheEarth"><img src="https://go.buildtheearth.net/official-shield" alt="BuildTheEarth Github"></a>
-    <a href="https://www.discord.gg/buildtheearth"><img src="https://img.shields.io/discord/690908396404080650?label=Discord" alt="BuildTheEarth Discord"></a>
+    <a href="https://www.discord.gg/buildtheearth"><img src="https://img.shields.io/discord/690908396404080650?label=Discord&color=768AD4" alt="BuildTheEarth Discord"></a>
 </p>
 <p align="center">
     <a href="https://www.spigotmc.org/resources/buildteamtools.101854/"><img src="https://img.shields.io/spiget/downloads/101854?color=green&label=Downloads" alt="Downloads Count"></a>

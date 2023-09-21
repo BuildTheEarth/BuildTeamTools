@@ -65,6 +65,16 @@ public class FieldScripts {
         // ----------- PREPARATION 01 ----------
         // Preparing the field area
 
+        // Create a cuboid selection of the field area
+        Generator.createCuboidSelection(p, maxPoint, minPoint);
+
+        Block[][][] blocks = Generator.analyzeRegion(p, p.getWorld());
+        int maxHeight = Generator.getMaxHeight(blocks);
+
+        // Recreate the original polygon selection
+        Generator.createPolySelection(p, points, blocks);
+
+
         commands.add("//expand 10 up");
         commands.add("//expand 10 down");
 
@@ -79,8 +89,6 @@ public class FieldScripts {
         operations++;
 
         p.chat("//expand 40 40 up"); // IMPORTANT! Doing it this way to fix yellow wool detection
-        Block[][][] blocks = Generator.analyzeRegion(p, p.getWorld());
-        int maxHeight = Generator.getMaxHeight(blocks);
 
         // In case the player placed yellow wool for a crop which doesn't require it
         if (!crop.isLinesRequired()) {
@@ -93,15 +101,6 @@ public class FieldScripts {
         commands.add("//replace 35:4 2");
         operations++;
 
-        // Replace the field area by lime wool
-        commands.add("//gmask <0,35:4");
-        commands.add("//replace !35:4 35:5");
-        operations++;
-
-        // Set remembering blocks (bedrock) 5 blocks below lime blocks
-        commands.add("//gmask =queryRel(0,5,0,35,5)");
-        commands.add("//set 7");
-        operations++;
 
         commands.add("//expand 10 10 up");
 
@@ -185,20 +184,20 @@ public class FieldScripts {
             Vector extendedPoint2 = extendedVectors[1];
 
 
-            // Draw the first line
+            // Draw the first line in orange
             commands.add("//sel cuboid");
             commands.add("//gmask !air");
 
             commands.add("//pos1 " + extendedPoint1.getBlockX() + "," + (extendedPoint1.getBlockY() - 1) + "," + extendedPoint1.getBlockZ());
             commands.add("//pos2 " + extendedPoint2.getBlockX() + "," + (extendedPoint2.getBlockY() - 1) + "," + extendedPoint2.getBlockZ());
-            commands.add("//line 35:4");
+            commands.add("//line 35:8");
             operations++;
 
             commands.add("//expand 10 up");
             commands.add("//expand 10 down");
 
             // Make sure the line completely covers the required surface
-            commands.add("//gmask !7,0");
+            commands.add("//gmask !0");
             for (int i = maxHeight; i < maxHeight + 5; i++) {
                 commands.add("//replace >35:4 35:4");
                 commands.add("//replace <35:4 35:4");
@@ -208,6 +207,15 @@ public class FieldScripts {
             // Reselect original region as cuboid
             Generator.createCuboidSelection(commands, maxPoint, minPoint);
 
+            commands.add("//expand 40 40 up");
+
+            // Remove all non-solid blocks
+            commands.add("//gmask !#solid");
+            commands.add("//replace 0");
+            operations++;
+
+            // Find out what the highest block in the cuboid selection is to find out at which y value the air starts.
+            // This is needed to ensure that no blocks are overwritten.
             int currentHighestY = Integer.MIN_VALUE;
             int currentLowestY = Integer.MAX_VALUE;
             int yDifference = 0;
@@ -224,79 +232,80 @@ public class FieldScripts {
             }
             yDifference = currentHighestY - currentLowestY;
 
-            // Remove extra non solid blocks
-            commands.add("//replace !#solid 0");
-            operations++;
-
             // Make original line correct shape
-            commands.add("//gmask =queryRel(1,0,0,35,4)&&queryRel(-1,0,+1,35,4)");
-            commands.add("//set 35:4");
+            int absoluteXDistance = Math.abs(extendedPoint1.getBlockX() - extendedPoint2.getBlockX());
+            int absoluteZDistance = Math.abs(extendedPoint1.getBlockZ() - extendedPoint2.getBlockZ());
+            if(absoluteXDistance > absoluteZDistance) {
+                commands.add("//gmask =queryRel(1,0,0,35,5)&&queryRel(-1,0,+1,35,5)");
+            } else {
+                commands.add("//gmask =queryRel(0,0,1,35,5)&&queryRel(+1,0,-1,35,5)");
+            }
+            commands.add("//set 35:5");
             operations++;
 
             // Move everything up & delete what's on the floor
             commands.add("//expand 50 50 up");
 
+            // Move the line + yDifference blocks up and change the color from orange to yellow
             commands.add("//gmask =queryRel(0,"+(-yDifference)+",0,35,4)");
-            commands.add("//set 35:4");
-            commands.add("//gmask =queryRel(0,"+yDifference+",0,35,4)");
-            commands.add("//replace 35:4 2");
-
-            commands.add("//gmask =queryRel(0,"+(-yDifference)+",0,35,5)");
             commands.add("//set 35:5");
-            commands.add("//gmask =queryRel(0,"+yDifference+",0,35,5)");
-            commands.add("//replace 35:5 2");
+
+            // Replace the orange wool blocks with grass
+            commands.add("//gmask");
+            commands.add("//replace 35:4 2");
 
 
             // Make the line pattern extend over the field
             for (int i = 0; i <= targetLength; i++) {
                 if (i % 2 == 0 || (crop != Crop.VINEYARD && crop != Crop.PEAR)) {
-                    //Orange wool
-                    commands.add("//gmask =queryRel(0,0,-1,35,4)||queryRel(0,0,+1,35,4)||queryRel(0,1,-1,35,4)||queryRel(0,1,+1,35,4)||queryRel(0,-1,-1,35,4)||queryRel(0,-1,+1,35,4)");
-                    commands.add("//replace !35:4,35:2,0 35:1");
+                    // All blocks that are ydifference above the ground and one block next to lime wool are replaced with pink wool
+                    commands.add("//gmask =queryRel(0,-" + yDifference + ",0,0,0)&&!queryRel(0,-" + (yDifference+1) + ",0,0,0)&&(queryRel(0,0,-1,35,5)||queryRel(0,0,+1,35,5)||queryRel(0,1,-1,35,5)||queryRel(0,1,+1,35,5)||queryRel(0,-1,-1,35,5)||queryRel(0,-1,+1,35,5))");
+                    commands.add("//replace !35:5,35:7 35:6");
                     operations++;
+                    commands.add("//gmask =queryRel(0,-1,0,35,6)");
+                    commands.add("//replace 35:6 0");
                 } else {
                     //Magenta wool
-                    commands.add("//gmask =queryRel(0,0,-1,35,4)||queryRel(0,0,+1,35,4)||queryRel(0,1,-1,35,4)||queryRel(0,1,+1,35,4)||queryRel(0,-1,-1,35,4)||queryRel(0,-1,+1,35,4)");
-                    commands.add("//replace !35:4,35:1,0 35:2");
+                    commands.add("//gmask =queryRel(0,-" + yDifference + ",0,0,0)&&!queryRel(0,-" + (yDifference+1) + ",0,0,0)&&(queryRel(0,0,-1,35,5)||queryRel(0,0,+1,35,5)||queryRel(0,1,-1,35,5)||queryRel(0,1,+1,35,5)||queryRel(0,-1,-1,35,5)||queryRel(0,-1,+1,35,5))");
+                    commands.add("//replace !35:5,35:6 35:7");
+                    operations++;
+                    commands.add("//gmask =queryRel(0,-1,0,35,7)");
+                    commands.add("//replace 35:7 0");
                 }
                 //Yellow wool
-                commands.add("//gmask =queryRel(0,0,-1,35,1)||queryRel(-1,0,-1,35,1)||queryRel(0,0,+1,35,1)||queryRel(+1,1,+1,35,1)||queryRel(0,0,+1,35,1)||queryRel(+1,0,+1,35,1)||queryRel(+1,-1,+1,35,1)||queryRel(-1,1,-1,35,1)||queryRel(-1,-1,-1,35,1)||queryRel(0,0,-1,35,2)||queryRel(-1,0,-1,35,2)||queryRel(0,0,+1,35,2)||queryRel(+1,1,+1,35,2)||queryRel(0,0,+1,35,2)||queryRel(+1,0,+1,35,2)||queryRel(+1,-1,+1,35,2)||queryRel(-1,1,-1,35,2)||queryRel(-1,-1,-1,35,2)");
-                commands.add("//replace !35:1,35:2,0 35:4");
+                commands.add("//gmask =queryRel(0,-" + yDifference + ",0,0,0)&&!queryRel(0,-" + (yDifference+1) + ",0,0,0)&&(queryRel(0,0,-1,35,6)||queryRel(-1,0,-1,35,6)||queryRel(0,0,+1,35,6)||queryRel(+1,1,+1,35,6)||queryRel(0,0,+1,35,6)||queryRel(+1,0,+1,35,6)||queryRel(+1,-1,+1,35,6)||queryRel(-1,1,-1,35,6)||queryRel(-1,-1,-1,35,6)||queryRel(0,0,-1,35,7)||queryRel(-1,0,-1,35,7)||queryRel(0,0,+1,35,7)||queryRel(+1,1,+1,35,7)||queryRel(0,0,+1,35,7)||queryRel(+1,0,+1,35,7)||queryRel(+1,-1,+1,35,7)||queryRel(-1,1,-1,35,7)||queryRel(-1,-1,-1,35,7))");
+                commands.add("//replace !35:6,35:7 35:5");
+                operations++;
+                commands.add("//gmask =queryRel(0,-1,0,35,5)");
+                commands.add("//replace 35:5 0");
                 operations++;
             }
 
-            // Restore field to original polygon shape
-            commands.add("//gmask !=queryRel(0,"+(5+yDifference)+",0,7,0)");
-            commands.add("//set 0");
-            operations++;
 
+            // Create a Polygon Selection
+            Generator.createPolySelection(commands, points);
 
-
-
-
+            commands.add("//expand 40 40 up");
 
             // Move down the lines & clean up
-            commands.add("//gmask =queryRel(1,"+(-yDifference)+",0,35,4)");
+            commands.add("//gmask =queryRel(1,"+ (yDifference+1) +",0,35,5)");
             commands.add("//set 35:4");
-            commands.add("//gmask =queryRel(1,"+yDifference+",0,35,4)");
-            commands.add("//replace 35:4 0");
 
-            commands.add("//gmask =queryRel(1,"+(-yDifference)+",0,35,1)");
+            commands.add("//gmask =queryRel(1,"+ (yDifference+1) +",0,35,6)");
             commands.add("//set 35:1");
-            commands.add("//gmask =queryRel(1,"+yDifference+",0,35,1)");
-            commands.add("//replace 35:1 0");
 
-            commands.add("//gmask =queryRel(1,"+(-yDifference)+",0,35,2)");
+            commands.add("//gmask =queryRel(1,"+ (yDifference+1) +",0,35,7)");
             commands.add("//set 35:2");
-            commands.add("//gmask =queryRel(1,"+yDifference+",0,35,2)");
-            commands.add("//replace 35:2 0");
 
 
-            // Remove original yellow wool blocks
-            commands.add("//gmask =queryRel(0,-6,0,7,0)");
-            // commands.add("//replace 2 0");
-            operations++;
+            // Create a Cuboid Selection
+            Generator.createCuboidSelection(commands, maxPoint, minPoint);
 
+            commands.add("//expand 40 40 up");
+
+            // Replace blocks in the air with nothing
+            commands.add("//gmask");
+            commands.add("//replace 35:5,35:6,35:7 0");
         }
 
 
@@ -308,6 +317,8 @@ public class FieldScripts {
         // First reselect the original poly region
 
         Generator.createPolySelection(commands, points);
+
+        commands.add("//expand 40 40 up");
 
         // Increase height to make sure the entire field height is inside the selection
         commands.add("//expand 20 20 up");
@@ -438,7 +449,7 @@ public class FieldScripts {
 
         if (crop == Crop.CORN) {
             if (type == CropStage.HARVESTED) {
-                commands.add("//replace 35:5 60,3,5:1");
+                commands.add("//replace <air 60,3,5:1");
                 operations++;
 
                 commands.add("//fast");
@@ -448,7 +459,7 @@ public class FieldScripts {
                 commands.add("//fast");
 
             } else {
-                commands.add("//replace 35:5 60,3,5:1");
+                commands.add("//replace <air 60,3,5:1");
                 operations++;
 
                 commands.add("//fast");
@@ -465,14 +476,14 @@ public class FieldScripts {
 
         if (crop == Crop.WHEAT) {
             if (type == CropStage.LIGHT) {
-                commands.add("//replace 35:5 3,3:1");
+                commands.add("//replace <air 3,3:1");
                 operations++;
 
                 commands.add("//replace >3,3:1 107:4,107:5,107:6,107:7,184:4,184:5,184:6,184:7");
                 operations++;
 
             } else {
-                commands.add("//replace 35:5 3,3:1,5,5:3");
+                commands.add("//replace <air 3,3:1,5,5:3");
                 operations++;
 
                 commands.add("//fast");
@@ -522,11 +533,11 @@ public class FieldScripts {
             operations++;
 
             commands.add("//gmask !" + fence + ",77,166");
-            commands.add("//replace >35:5 70%0,30%31:1");
+            commands.add("//replace >#solid 70%0,30%31:1");
             operations++;
 
-            if (crop == Crop.CATTLE) commands.add("//replace 35:5 60%3,20%2,20%3:1");
-            if (crop == Crop.MEADOW) commands.add("//replace 35:5 70%2,20%3,10%3:1");
+            if (crop == Crop.CATTLE) commands.add("//replace <air 60%3,20%2,20%3:1");
+            if (crop == Crop.MEADOW) commands.add("//replace <air 70%2,20%3,10%3:1");
             operations++;
 
         }

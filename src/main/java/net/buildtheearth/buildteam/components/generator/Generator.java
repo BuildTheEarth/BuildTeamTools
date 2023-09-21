@@ -607,6 +607,20 @@ public class Generator {
         commands.add("//pos2 " + vector2.getBlockX() + "," + vector2.getBlockY() + "," + vector2.getBlockZ());
     }
 
+    /**
+     * Creates a Cuboid WorldEdit selection from a list of points and execute it right away.
+     *
+     * @param p - The player to create the selection for
+     * @param vector1 - Position 1
+     * @param vector2 - Position 2
+     */
+    public static void createCuboidSelection(Player p, Vector vector1, Vector vector2){
+        p.chat("//sel cuboid");
+
+        p.chat("//pos1 " + vector1.getBlockX() + "," + vector1.getBlockY() + "," + vector1.getBlockZ());
+        p.chat("//pos2 " + vector2.getBlockX() + "," + vector2.getBlockY() + "," + vector2.getBlockZ());
+    }
+
 
     /** Creates a Convex WorldEdit selection from a list of points and adds it to the list of commands to execute.
      *

@@ -78,7 +78,7 @@ public class FieldScripts {
         commands.add("//replace leaves,log,pumpkin 0");
         operations++;
 
-        p.chat("//expand 2 2 up"); // IMPORTANT! Doing it this way to fix yellow wool detection
+        p.chat("//expand 40 40 up"); // IMPORTANT! Doing it this way to fix yellow wool detection
         Block[][][] blocks = Generator.analyzeRegion(p, p.getWorld());
         int maxHeight = Generator.getMaxHeight(blocks);
 
@@ -205,8 +205,24 @@ public class FieldScripts {
                 operations++;
             }
 
-            // Reselect original region
+            // Reselect original region as cuboid
             Generator.createCuboidSelection(commands, maxPoint, minPoint);
+
+            int currentHighestY = Integer.MIN_VALUE;
+            int currentLowestY = Integer.MAX_VALUE;
+            int yDifference = 0;
+            for (Block[][]block2D : blocks) {
+                for(Block[] block1D : block2D) {
+                    for(Block block : block1D) {
+                        if(block != null) {
+                            int highestY = p.getWorld().getHighestBlockYAt(block.getX(), block.getZ()) + 5;
+                            if(highestY > currentHighestY) currentHighestY = highestY + 5;
+                            if(highestY < currentLowestY) currentLowestY = highestY;
+                        }
+                    }
+                }
+            }
+            yDifference = currentHighestY - currentLowestY;
 
             // Remove extra non solid blocks
             commands.add("//replace !#solid 0");
@@ -216,6 +232,20 @@ public class FieldScripts {
             commands.add("//gmask =queryRel(1,0,0,35,4)&&queryRel(-1,0,+1,35,4)");
             commands.add("//set 35:4");
             operations++;
+
+            // Move everything up & delete what's on the floor
+            commands.add("//expand 50 50 up");
+
+            commands.add("//gmask =queryRel(0,"+(-yDifference)+",0,35,4)");
+            commands.add("//set 35:4");
+            commands.add("//gmask =queryRel(0,"+yDifference+",0,35,4)");
+            commands.add("//replace 35:4 2");
+
+            commands.add("//gmask =queryRel(0,"+(-yDifference)+",0,35,5)");
+            commands.add("//set 35:5");
+            commands.add("//gmask =queryRel(0,"+yDifference+",0,35,5)");
+            commands.add("//replace 35:5 2");
+
 
             // Make the line pattern extend over the field
             for (int i = 0; i <= targetLength; i++) {
@@ -235,14 +265,36 @@ public class FieldScripts {
                 operations++;
             }
 
-            // Restore field to original shape
-            commands.add("//gmask !=queryRel(0,-5,0,7,0)");
-            commands.add("//replace !0 2");
+            // Restore field to original polygon shape
+            commands.add("//gmask !=queryRel(0,"+(5+yDifference)+",0,7,0)");
+            commands.add("//set 0");
             operations++;
+
+
+
+
+
+
+            // Move down the lines & clean up
+            commands.add("//gmask =queryRel(1,"+(-yDifference)+",0,35,4)");
+            commands.add("//set 35:4");
+            commands.add("//gmask =queryRel(1,"+yDifference+",0,35,4)");
+            commands.add("//replace 35:4 0");
+
+            commands.add("//gmask =queryRel(1,"+(-yDifference)+",0,35,1)");
+            commands.add("//set 35:1");
+            commands.add("//gmask =queryRel(1,"+yDifference+",0,35,1)");
+            commands.add("//replace 35:1 0");
+
+            commands.add("//gmask =queryRel(1,"+(-yDifference)+",0,35,2)");
+            commands.add("//set 35:2");
+            commands.add("//gmask =queryRel(1,"+yDifference+",0,35,2)");
+            commands.add("//replace 35:2 0");
+
 
             // Remove original yellow wool blocks
             commands.add("//gmask =queryRel(0,-6,0,7,0)");
-            commands.add("//replace 2 0");
+            // commands.add("//replace 2 0");
             operations++;
 
         }

@@ -1,16 +1,15 @@
 package net.buildtheearth.buildteam;
 
 import net.buildtheearth.Main;
-import net.buildtheearth.buildteam.commands.Navigator;
+import net.buildtheearth.buildteam.commands.CMD_Navigator;
 import net.buildtheearth.buildteam.components.BTENetwork;
-import net.buildtheearth.buildteam.components.universal_experience.PreferenceType;
+import net.buildtheearth.buildteam.components.universal.PreferenceType;
 import net.buildtheearth.buildteam.database.User;
-import net.buildtheearth.buildteam.listeners.CancelledEvents;
 import net.buildtheearth.buildteam.listeners.InteractEvent;
 import net.buildtheearth.buildteam.listeners.Join_Listener;
 import net.buildtheearth.buildteam.listeners.Stats_Listener;
-import net.buildtheearth.terraminusminus.util.geo.LatLng;
 import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.geo.LatLng;
 import net.buildtheearth.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -117,7 +116,7 @@ public class Network
         //createDBTables();
 
         //Register commands
-        Main.instance.getCommand("navigator").setExecutor(new Navigator());
+        Main.instance.getCommand("navigator").setExecutor(new CMD_Navigator());
 
         //Register listeners
         registerListeners();
@@ -129,7 +128,6 @@ public class Network
         //Navigator hotbar item
         new InteractEvent(Main.instance, this);
 
-        Bukkit.getPluginManager().registerEvents(new CancelledEvents(), Main.instance);
         Bukkit.getPluginManager().registerEvents(new Join_Listener(this), Main.instance);
         Bukkit.getPluginManager().registerEvents(new Stats_Listener(), Main.instance);
     }

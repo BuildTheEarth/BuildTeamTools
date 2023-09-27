@@ -1,15 +1,18 @@
 package net.buildtheearth;
 
+import com.alpsbte.alpslib.io.config.ConfigurationUtil;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.buildteam.BuildTeamTools;
 import net.buildtheearth.buildteam.components.universal_experience.universal_tpll.projection.Airocean;
 import net.buildtheearth.buildteam.components.universal_experience.universal_tpll.projection.ModifiedAirocean;
 import net.buildtheearth.buildteam.components.updater.Updater;
-import net.buildtheearth.terraminusminus.util.geo.LatLng;
+import net.buildtheearth.utils.geo.LatLng;
+import net.buildtheearth.utils.io.ConfigUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
@@ -31,7 +34,10 @@ public class Main extends JavaPlugin implements PluginMessageListener
 		instance = this;
 
 		buildTeamTools = new BuildTeamTools();
-		buildTeamTools.start();
+		boolean successful = buildTeamTools.start();
+
+		if(!successful)
+			return;
 
 		String resultMessage = startUpdateChecker();
 		getLogger().info("Plugin with version " + getDescription().getVersion() + " started. " + resultMessage);
@@ -42,6 +48,21 @@ public class Main extends JavaPlugin implements PluginMessageListener
 		buildTeamTools.stop();
 
 		getLogger().info("Plugin stopped.");
+	}
+
+	@Override
+	public FileConfiguration getConfig() {
+		return ConfigUtil.getInstance().configs[0];
+	}
+
+	@Override
+	public void reloadConfig() {
+		ConfigUtil.getInstance().reloadFiles();
+	}
+
+	@Override
+	public void saveConfig() {
+		ConfigUtil.getInstance().saveFiles();
 	}
 	
 	@Override
@@ -61,6 +82,7 @@ public class Main extends JavaPlugin implements PluginMessageListener
 				String serverID = in.readUTF();
 				String buildTeamID = in.readUTF();
 
+				Main.getBuildTeam().getBTENetwork().setConnected(true);
 				Main.getBuildTeam().getBTENetwork().setBuildTeamID(buildTeamID);
 				Main.getBuildTeam().getBTENetwork().setServerID(serverID);
 			}else if(subchannel.equalsIgnoreCase("Stats")){
@@ -132,12 +154,7 @@ public class Main extends JavaPlugin implements PluginMessageListener
 	}
 
 	private String startUpdateChecker(){
-		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-			@Override
-			public void run() {
-				checkForUpdates();
-			}
-		}, 20*60*60);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> checkForUpdates(), 20*60*60);
 
 		return checkForUpdates();
 	}

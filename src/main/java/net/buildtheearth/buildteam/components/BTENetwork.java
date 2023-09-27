@@ -17,6 +17,8 @@ public class BTENetwork {
 
     public static int CACHE_UPLOAD_SPEED = 20*60*10 + 20;
 
+    public static String PLOT_SERVER_NAME = "Plot1";
+
     @Setter @Getter
     private String buildTeamID;
     @Setter @Getter
@@ -27,17 +29,18 @@ public class BTENetwork {
     @Getter
     private StatsManager statsManager;
 
-    private final boolean bIsConnected;
+    @Setter @Getter
+    private boolean isConnected;
 
     /**
      * Starts the BTE network components, determines whether the BTE network is connected
      */
     public BTENetwork()
     {
-        bIsConnected = start();
+        start();
     }
 
-    public boolean start()
+    public void start()
     {
         communicators = new ArrayList<>();
         statsManager = new StatsManager();
@@ -45,14 +48,8 @@ public class BTENetwork {
         //Ping all online players on startup
         for(Player p : Bukkit.getOnlinePlayers())
             ping(p);
-
-        return (communicators.size() > 0);
     }
 
-    public boolean isConnected()
-    {
-        return bIsConnected;
-    }
 
     /** Sends a ping to the network.
      *  If the player is playing over the network the proxy will answer with another ping message.

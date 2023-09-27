@@ -1,18 +1,21 @@
 package net.buildtheearth.buildteam;
 
+import com.alpsbte.alpslib.io.YamlFileFactory;
+import com.alpsbte.alpslib.io.config.ConfigNotImplementedException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
-import net.buildtheearth.buildteam.commands.buildteamtools_command;
-import net.buildtheearth.buildteam.commands.generate_command;
-import net.buildtheearth.buildteam.commands.statistics_command;
+import net.buildtheearth.buildteam.commands.CMD_BuildTeamTools;
+import net.buildtheearth.buildteam.commands.CMD_Generate;
+import net.buildtheearth.buildteam.commands.CMD_Statistics;
 import net.buildtheearth.buildteam.components.BTENetwork;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.stats.StatsPlayerType;
 import net.buildtheearth.buildteam.components.stats.StatsServerType;
-import net.buildtheearth.buildteam.components.ConfigManager;
+import net.buildtheearth.utils.io.ConfigUtil;
 import org.bukkit.Bukkit;
 
 import net.buildtheearth.Main;
+import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
@@ -40,10 +43,7 @@ public class BuildTeamTools {
 	 */
 	private Network network;
 
-	public BuildTeamTools()
-	{
-
-	}
+	public BuildTeamTools() {}
 
 	//Getters
 	public BTENetwork getBTENetwork()
@@ -60,31 +60,48 @@ public class BuildTeamTools {
 	}
 
 
-	public void start() {
-		//Starts the network and interface features
-		network = new Network();
-		network.start();
+	public boolean start() {
+		String errorPrefix = ChatColor.DARK_GRAY + "[" + ChatColor.RED + "X" + ChatColor.DARK_GRAY + "] " + ChatColor.GRAY;
 
-		registerCommands();
-		registerListeners();
+		// Load config, if it throws an exception disable plugin
+		try {
+			YamlFileFactory.registerPlugin(Main.instance);
+			ConfigUtil.init();
+		} catch (ConfigNotImplementedException ex) {
+			Bukkit.getConsoleSender().sendMessage(errorPrefix + "Could not load BuildTeamTools configuration file.");
+			Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "The config file must be configured!");
 
-		ConfigManager.setStandard();
-		ConfigManager.readData();
+			Main.instance.getServer().getPluginManager().disablePlugin(Main.instance);
+			return false;
+		}
+		ConfigUtil.getInstance().reloadFiles();
 
+		// Register Plugin Messaging Channel
 		Main.instance.getServer().getMessenger().registerOutgoingPluginChannel(Main.instance, "BuildTeam");
 		Main.instance.getServer().getMessenger().registerIncomingPluginChannel(Main.instance, "BuildTeam", Main.instance);
 
 
+
+		//Starts the network and interface features
+		network = new Network();
+		network.start();
+
+		//Starts the generator module
 		generator = new Generator();
+
+		registerCommands();
+		registerListeners();
 
 		LocalSession.MAX_HISTORY_SIZE = 500;
 
 		startTimer();
+		return true;
 	}
 
 	public void stop()
 	{
-		network.stop();
+		if(network != null)
+			network.stop();
 	}
 
 	/** This method is called every second.
@@ -142,9 +159,9 @@ public class BuildTeamTools {
 
 	/** Registers all global Commands of the plugin. */
 	private void registerCommands() {
-		Main.instance.getCommand("buildteam").setExecutor(new buildteamtools_command());
-		Main.instance.getCommand("generate").setExecutor(new generate_command());
-		Main.instance.getCommand("statistics").setExecutor(new statistics_command());
+		Main.instance.getCommand("buildteam").setExecutor(new CMD_BuildTeamTools());
+		Main.instance.getCommand("generate").setExecutor(new CMD_Generate());
+		Main.instance.getCommand("statistics").setExecutor(new CMD_Statistics());
 	}
 
 	/** Registers all global Listeners of the plugin. */

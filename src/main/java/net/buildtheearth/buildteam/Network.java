@@ -3,7 +3,7 @@ package net.buildtheearth.buildteam;
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.commands.CMD_Navigator;
 import net.buildtheearth.buildteam.components.BTENetwork;
-import net.buildtheearth.buildteam.components.universal.PreferenceType;
+import net.buildtheearth.buildteam.components.universal_experience.PreferenceType;
 import net.buildtheearth.buildteam.database.User;
 import net.buildtheearth.buildteam.listeners.InteractEvent;
 import net.buildtheearth.buildteam.listeners.Join_Listener;
@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -32,7 +33,7 @@ public class Network
     private final int iSlot; //0 index
 
     //Maps each preference to its preference map
-    private HashMap<PreferenceType, HashMap> userPreferences;
+    private EnumMap<PreferenceType, HashMap> userPreferences;
 
     /**
      * Stores the pending tpll events which are handled by Join_Event

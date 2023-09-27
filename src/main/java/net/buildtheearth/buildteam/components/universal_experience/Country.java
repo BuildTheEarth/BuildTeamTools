@@ -1,7 +1,7 @@
-package net.buildtheearth.buildteam.components.universal;
+package net.buildtheearth.buildteam.components.universal_experience;
 
 import net.buildtheearth.buildteam.NetworkAPI;
-import net.buildtheearth.buildteam.components.universal.universal_navigator.ExploreMenu;
+import net.buildtheearth.buildteam.components.universal_experience.universal_navigator.ExploreMenu;
 
 public class Country
 {

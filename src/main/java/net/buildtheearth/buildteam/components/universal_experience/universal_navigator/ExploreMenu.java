@@ -1,9 +1,9 @@
-package net.buildtheearth.buildteam.components.universal.universal_navigator;
+package net.buildtheearth.buildteam.components.universal_experience.universal_navigator;
 
 import net.buildtheearth.Main;
-import net.buildtheearth.buildteam.components.universal.Country;
-import net.buildtheearth.buildteam.components.universal.universal_navigator.explore_children.CountryMenu;
-import net.buildtheearth.buildteam.components.universal.universal_navigator.explore_children.CountrySelectorMenu;
+import net.buildtheearth.buildteam.components.universal_experience.Country;
+import net.buildtheearth.buildteam.components.universal_experience.universal_navigator.explore_children.CountryMenu;
+import net.buildtheearth.buildteam.components.universal_experience.universal_navigator.explore_children.CountrySelectorMenu;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItem;
 import net.buildtheearth.utils.Utils;
@@ -32,12 +32,10 @@ public class ExploreMenu extends AbstractMenu
     private static final String szInventoryName = "Explore Menu";
     private final ArrayList<MenuItem> menuItems;
 
-    public ExploreMenu(Player menuPlayer)
+    public ExploreMenu(Player menuPlayer, boolean bNetworkConnected)
     {
         super(iRows, szInventoryName, menuPlayer, false);
-
-        boolean isNetworkConnected = Main.buildTeamTools.getNetwork().isBTENetworkConnected();
-        this.menuItems = getGui(isNetworkConnected, Main.instance.getConfig());
+        this.menuItems = getGui(bNetworkConnected, Main.instance.getConfig());
         reloadMenuAsync();
     }
 

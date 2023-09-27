@@ -37,7 +37,10 @@ public class Join_Listener implements Listener
         if (tpllTarget != null)
         {
             //Teleports the player
-            TpllListener.performTpll(p, tpllTarget);
+            if (tpllTarget.getWorld() == null)
+                p.sendMessage(ChatColor.RED +"The earth world for this build team is unknown");
+            else
+                p.teleport(tpllTarget);
 
             //Removes the tpll event from the list
             network.getTpllEvents().remove(p.getUniqueId());

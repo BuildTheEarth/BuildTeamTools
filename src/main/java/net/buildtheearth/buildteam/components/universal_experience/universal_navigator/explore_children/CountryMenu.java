@@ -1,11 +1,12 @@
-package net.buildtheearth.buildteam.components.universal.universal_navigator.explore_children;
+package net.buildtheearth.buildteam.components.universal_experience.universal_navigator.explore_children;
 
 import net.buildtheearth.buildteam.NetworkAPI;
-import net.buildtheearth.buildteam.components.universal.BuildTeam;
-import net.buildtheearth.buildteam.components.universal.Category;
-import net.buildtheearth.buildteam.components.universal.Country;
-import net.buildtheearth.buildteam.components.universal.universal_navigator.ExploreMenu;
-import net.buildtheearth.utils.Item;
+import net.buildtheearth.buildteam.components.universal_experience.BuildTeam;
+import net.buildtheearth.buildteam.components.universal_experience.Category;
+import net.buildtheearth.buildteam.components.universal_experience.Country;
+import net.buildtheearth.buildteam.components.universal_experience.Location;
+import net.buildtheearth.buildteam.components.universal_experience.universal_navigator.ExploreMenu;
+import net.buildtheearth.utils.*;
 import net.buildtheearth.utils.MenuItem;
 import net.buildtheearth.utils.menus.AbstractMenu;
 import org.bukkit.ChatColor;
@@ -64,21 +65,51 @@ public class CountryMenu extends AbstractMenu
             if (category.getCategoryName().equals("Uncategorised"))
             {
                 //Do something
+                //Note the index? if there are no categorised locations then we want all the uncategorised ones on display straight away
             }
             if (category.getLocations().length > 1)
             {
-                //Do something - is useful
+                //Create a category icon and link this to a category location menu
             }
         }
+
+        //How should the locations be editable? A right click from a BTO brings up an add location menu?
 
         //--------------------------------------------
         //----------------Add location----------------
         //--------------------------------------------
 
+        //A button shown to BT admins to add locations
+        //Also shown to regular builders but this one would suggest a command
 
-        //--------------------------------------------
-        //--------------------Team--------------------
-        //--------------------------------------------
+
+        //Only shows if the country the player is in and the location the menu is at match?
+
+        boolean bAdmin = true;
+
+        if (bAdmin)
+        {
+            //Creates the lore
+            ArrayList<String> newLocationLore = new ArrayList<>(2);
+            newLocationLore.add(Utils.loreText("Create a new location for this country "));
+            newLocationLore.add(Utils.loreText("at the location you are standing"));
+
+            ItemStack newLocationItem = MenuItems.getCounterPlusItem(MenuItems.SliderColor.WHITE, ChatColor.GREEN +"Add Location", 0, 1);
+            newLocationItem.getItemMeta().setLore(newLocationLore);
+
+            MenuItem newLocation = new MenuItem((iRows*9) - 9 , newLocationItem, player ->
+            {
+                new AddLocationMenu(player, country, bNetworkConnected);
+            });
+
+            menuItems.add(newLocation);
+        }
+
+
+
+        //---------------------------------------------
+        //------------------Team info------------------
+        //---------------------------------------------
 
         //Displays the information of the team of the country which menu is displayed
 
@@ -138,7 +169,7 @@ public class CountryMenu extends AbstractMenu
             back = new MenuItem((iRows * 9) - 1, backItem, player ->
             {
                 //Opens the explore menu (list of continents)
-                new ExploreMenu(player);
+                new ExploreMenu(player, bNetworkConnected);
             });
         }
         else

@@ -7,6 +7,7 @@ import net.buildtheearth.buildteam.BuildTeamTools;
 import net.buildtheearth.buildteam.components.universal_experience.universal_tpll.projection.Airocean;
 import net.buildtheearth.buildteam.components.universal_experience.universal_tpll.projection.ModifiedAirocean;
 import net.buildtheearth.buildteam.components.updater.Updater;
+import net.buildtheearth.utils.GeometricUtils;
 import net.buildtheearth.utils.geo.LatLng;
 import net.buildtheearth.utils.io.ConfigUtil;
 import org.bukkit.Bukkit;
@@ -64,7 +65,7 @@ public class Main extends JavaPlugin implements PluginMessageListener
 	public void saveConfig() {
 		ConfigUtil.getInstance().saveFiles();
 	}
-	
+
 	@Override
     public void onPluginMessageReceived(String channel, Player player, byte[] message) {
 		if (channel.equals("BuildTeam"))
@@ -82,7 +83,6 @@ public class Main extends JavaPlugin implements PluginMessageListener
 				String serverID = in.readUTF();
 				String buildTeamID = in.readUTF();
 
-				Main.getBuildTeam().getBTENetwork().setConnected(true);
 				Main.getBuildTeam().getBTENetwork().setBuildTeamID(buildTeamID);
 				Main.getBuildTeam().getBTENetwork().setServerID(serverID);
 			}else if(subchannel.equalsIgnoreCase("Stats")){
@@ -102,26 +102,19 @@ public class Main extends JavaPlugin implements PluginMessageListener
 					//Extracts the coordinares
 					double dLatitude = Double.parseDouble(in.readUTF());
 					double dLongitude = Double.parseDouble(in.readUTF());
+					LatLng coordinates = new LatLng(dLatitude, dLongitude);
 
 					//Extracts the yaw and pitch
 					float fYaw = Float.parseFloat(in.readUTF());
 					float fPitch = Float.parseFloat(in.readUTF());
 
-					Airocean projection = new ModifiedAirocean();
-					double mpu = projection.metersPerUnit();
+				//	//Height
+				//	int iHeight = Integer.parseInt(in.readUTF());
 
-					double[] xz = projection.fromGeo(dLongitude, dLatitude);
-
-					double x = xz[0] * mpu;
-					double z = -xz[1] * mpu;
-
-					//Creates the location
-					Location tpllTPLocation;
-					World tpWorld = Bukkit.getWorld(Main.instance.getConfig().getString("universal_tpll.earth_world"));
-					if (tpWorld == null)
-						tpllTPLocation = new Location(tpWorld, x, 64, z, fYaw, fPitch);
-					else
-						tpllTPLocation = new Location(tpWorld, x, (tpWorld.getHighestBlockYAt((int) x, (int) z) + 1), z, fYaw, fPitch);
+					//Creates a bukkit location for this tpll target
+					Location tpllTPLocation = GeometricUtils.getLocationFromCoordinatesYawPitch(coordinates, fYaw, fPitch);
+					//Location may contain a null world, this is checked for when the tpll event needs to be run
+					// so that the player can be informed that the earth world was not specified
 
 					//Adds the event to the list
 					this.buildTeamTools.getNetwork().addTpllEvent(player.getUniqueId(), tpllTPLocation);

@@ -92,7 +92,8 @@ public class MenuItem
 
     /**
      * Creates an item stack representing a back button in the universal navigator
-     * @param szTargetMenuName The name of the menu which the back button goes to. In the format "main menu" or "build menu"
+     * @param szTargetMenuName The name of the menu which the back button goes to. In the format "main menu" or "build menu".
+     * Do not include "the" at the start
      * @return An item stack with material spruce door and lore "back to the [menu name]"
      */
     public static ItemStack backButton(String szTargetMenuName)

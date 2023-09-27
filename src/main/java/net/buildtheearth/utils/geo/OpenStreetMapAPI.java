@@ -61,10 +61,16 @@ public class OpenStreetMapAPI {
         return stringBuilder.toString();
     }
 
-    public static String getCountryFromLocation(double[] coordinates) {
+
+    /**
+     *
+     * @param coordinates The latitude & longitude coordinates to get the country, region & city/town from
+     * @return A String array with [0] = country, [1] = region & [2] = city/town
+     */
+    public static String[] getCountryAndSubRegionsFromLocation(double[] coordinates) {
         String response;
         try {
-            URL url = new URL("https://nominatim.openstreetmap.org/reverse.php?lat=" + coordinates[0] + "&lon=" + coordinates[1] + "&zoom=1&format=jsonv2");
+            URL url = new URL("https://nominatim.openstreetmap.org/reverse.php?lat=" + coordinates[0] + "&lon=" + coordinates[1] + "&zoom=10&format=jsonv2");
             response = APIUtil.get(url);
             if(response == null) return null;
         } catch (MalformedURLException e) {
@@ -75,6 +81,11 @@ public class OpenStreetMapAPI {
         JSONObject jsonObject = APIUtil.createJSONObject(response);
         JSONObject addressObject = (JSONObject) jsonObject.get("address");
 
-        return addressObject.get("country_code").toString();
+        String countryCode = addressObject.get("country_code").toString();
+        String subRegion = addressObject.get("region").toString();
+        String city = addressObject.get("city").toString();
+        if(city == null) city = addressObject.get("town").toString();
+
+        return new String[]{countryCode, subRegion, city};
     }
 }

@@ -156,7 +156,6 @@ public class CropTypeMenu extends AbstractMenu {
         p.closeInventory();
         p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
         if (crop.hasStages()) {
-            p.sendMessage(crop.toString());
             new CropStageMenu(p, crop);
             return;
         }

@@ -68,6 +68,8 @@ public class FieldScripts {
         // Create a cuboid selection of the field area
         Generator.createCuboidSelection(p, maxPoint, minPoint);
 
+        p.chat("//expand 20 20 up");
+
         Block[][][] blocks = Generator.analyzeRegion(p, p.getWorld());
         int maxHeight = Generator.getMaxHeight(blocks);
 

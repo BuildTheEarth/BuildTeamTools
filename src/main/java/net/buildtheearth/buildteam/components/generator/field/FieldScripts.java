@@ -183,6 +183,10 @@ public class FieldScripts {
             Vector extendedPoint1 = extendedVectors[0];
             Vector extendedPoint2 = extendedVectors[1];
 
+            // Remove the original points
+            commands.add("//gmask");
+            commands.add("//replace 35:4 0");
+            operations++;
 
             // Draw the first line in orange
             commands.add("//sel cuboid");
@@ -190,7 +194,8 @@ public class FieldScripts {
 
             commands.add("//pos1 " + extendedPoint1.getBlockX() + "," + (extendedPoint1.getBlockY() - 1) + "," + extendedPoint1.getBlockZ());
             commands.add("//pos2 " + extendedPoint2.getBlockX() + "," + (extendedPoint2.getBlockY() - 1) + "," + extendedPoint2.getBlockZ());
-            commands.add("//line 35:8");
+
+            commands.add("//line 35:4");
             operations++;
 
             commands.add("//expand 10 up");
@@ -204,8 +209,25 @@ public class FieldScripts {
                 operations++;
             }
 
+            Vector extendedBoxMax = maxPoint;
+            Vector extendedBoxMin = minPoint;
+
+            Vector[] extendedPoints = {extendedPoint1, extendedPoint2};
+            for(Vector extendedPoint : extendedPoints) {
+                if (extendedPoint.getX() > extendedBoxMax.getBlockX())
+                    extendedBoxMax = extendedBoxMax.setX(extendedPoint.getBlockX());
+                if (extendedPoint.getX() < extendedBoxMin.getBlockX())
+                    extendedBoxMin = extendedBoxMin.setX(extendedPoint.getBlockX());
+
+                if (extendedPoint.getZ() > extendedBoxMax.getBlockZ())
+                    extendedBoxMax = extendedBoxMax.setZ(extendedPoint.getBlockZ());
+                if (extendedPoint.getZ() < extendedBoxMin.getBlockZ())
+                    extendedBoxMin = extendedBoxMin.setZ(extendedPoint.getBlockZ());
+            }
+
+
             // Reselect original region as cuboid
-            Generator.createCuboidSelection(commands, maxPoint, minPoint);
+            Generator.createCuboidSelection(commands, extendedBoxMax, extendedBoxMin);
 
             commands.add("//expand 40 40 up");
 
@@ -233,47 +255,55 @@ public class FieldScripts {
             yDifference = currentHighestY - currentLowestY;
 
             // Make original line correct shape
-            int absoluteXDistance = Math.abs(extendedPoint1.getBlockX() - extendedPoint2.getBlockX());
-            int absoluteZDistance = Math.abs(extendedPoint1.getBlockZ() - extendedPoint2.getBlockZ());
-            if(absoluteXDistance > absoluteZDistance) {
-                commands.add("//gmask =queryRel(1,0,0,35,5)&&queryRel(-1,0,+1,35,5)");
-            } else {
-                commands.add("//gmask =queryRel(0,0,1,35,5)&&queryRel(+1,0,-1,35,5)");
-            }
-            commands.add("//set 35:5");
+            commands.add("//gmask =queryRel(0,0,1,35,4)&&queryRel(1,0,0,35,4)");
+            commands.add("//set 35:4");
+            operations++;
+
+            commands.add("//gmask =queryRel(1,0,0,35,4)&&queryRel(0,0,-1,35,4)");
+            commands.add("//set 35:4");
             operations++;
 
             // Move everything up & delete what's on the floor
             commands.add("//expand 50 50 up");
 
-            // Move the line + yDifference blocks up and change the color from orange to yellow
-            commands.add("//gmask =queryRel(0,"+(-yDifference)+",0,35,4)");
+            // Replace the yellow wool that is under yellow wool with grass
+            commands.add("//gmask =queryRel(0,1,0,35,4)");
+            commands.add("//replace 35:4 2");
+
+            // Move the line + yDifference blocks up and change the color from yellow to lime
+            commands.add("//gmask =queryRel(0,-"+ yDifference +",0,35,4)");
             commands.add("//set 35:5");
 
-            // Replace the orange wool blocks with grass
+            // Replace the yellow wool blocks with grass
             commands.add("//gmask");
             commands.add("//replace 35:4 2");
 
 
             // Make the line pattern extend over the field
-            for (int i = 0; i <= targetLength; i++) {
+            for (int i = 0; i <= targetLength / 2; i++) {
+                String gmask = "//gmask =queryRel(0,-" + (yDifference-1) + ",0,0,0)&&!queryRel(0,-" + (yDifference) + ",0,0,0)&&(" + getQueryRelThinSurroundings(0, "35:5") + "||" + getQueryRelThinSurroundings(1, "35:5") + "||" + getQueryRelThinSurroundings(-1, "35:5") + ")";
+
+
                 if (i % 2 == 0 || (crop != Crop.VINEYARD && crop != Crop.PEAR)) {
                     // All blocks that are ydifference above the ground and one block next to lime wool are replaced with pink wool
-                    commands.add("//gmask =queryRel(0,-" + yDifference + ",0,0,0)&&!queryRel(0,-" + (yDifference+1) + ",0,0,0)&&(queryRel(0,0,-1,35,5)||queryRel(0,0,+1,35,5)||queryRel(0,1,-1,35,5)||queryRel(0,1,+1,35,5)||queryRel(0,-1,-1,35,5)||queryRel(0,-1,+1,35,5))");
+                    commands.add(gmask);
                     commands.add("//replace !35:5,35:7 35:6");
                     operations++;
                     commands.add("//gmask =queryRel(0,-1,0,35,6)");
                     commands.add("//replace 35:6 0");
                 } else {
                     //Magenta wool
-                    commands.add("//gmask =queryRel(0,-" + yDifference + ",0,0,0)&&!queryRel(0,-" + (yDifference+1) + ",0,0,0)&&(queryRel(0,0,-1,35,5)||queryRel(0,0,+1,35,5)||queryRel(0,1,-1,35,5)||queryRel(0,1,+1,35,5)||queryRel(0,-1,-1,35,5)||queryRel(0,-1,+1,35,5))");
+                    commands.add(gmask);
                     commands.add("//replace !35:5,35:6 35:7");
                     operations++;
                     commands.add("//gmask =queryRel(0,-1,0,35,7)");
                     commands.add("//replace 35:7 0");
                 }
-                //Yellow wool
-                commands.add("//gmask =queryRel(0,-" + yDifference + ",0,0,0)&&!queryRel(0,-" + (yDifference+1) + ",0,0,0)&&(queryRel(0,0,-1,35,6)||queryRel(-1,0,-1,35,6)||queryRel(0,0,+1,35,6)||queryRel(+1,1,+1,35,6)||queryRel(0,0,+1,35,6)||queryRel(+1,0,+1,35,6)||queryRel(+1,-1,+1,35,6)||queryRel(-1,1,-1,35,6)||queryRel(-1,-1,-1,35,6)||queryRel(0,0,-1,35,7)||queryRel(-1,0,-1,35,7)||queryRel(0,0,+1,35,7)||queryRel(+1,1,+1,35,7)||queryRel(0,0,+1,35,7)||queryRel(+1,0,+1,35,7)||queryRel(+1,-1,+1,35,7)||queryRel(-1,1,-1,35,7)||queryRel(-1,-1,-1,35,7))");
+                //Lime wool
+                commands.add("//gmask =queryRel(0,-" + (yDifference-1) + ",0,0,0)&&!queryRel(0,-" + (yDifference) + ",0,0,0)&&(" + getQueryRelThickSurroundings(0, "35:6") + "||" + getQueryRelThickSurroundings(1, "35:6") + "||" + getQueryRelThickSurroundings(-1, "35:6") +")");
+                commands.add("//replace !35:6,35:7 35:5");
+                operations++;
+                commands.add("//gmask =queryRel(0,-" + (yDifference-1) + ",0,0,0)&&!queryRel(0,-" + (yDifference) + ",0,0,0)&&(" + getQueryRelThickSurroundings(0, "35:7") + "||" + getQueryRelThickSurroundings(1, "35:7") + "||" + getQueryRelThickSurroundings(-1, "35:7") +")");
                 commands.add("//replace !35:6,35:7 35:5");
                 operations++;
                 commands.add("//gmask =queryRel(0,-1,0,35,5)");
@@ -288,18 +318,18 @@ public class FieldScripts {
             commands.add("//expand 40 40 up");
 
             // Move down the lines & clean up
-            commands.add("//gmask =queryRel(1,"+ (yDifference+1) +",0,35,5)");
+            commands.add("//gmask =queryRel(1,"+ (yDifference) +",0,35,5)");
             commands.add("//set 35:4");
 
-            commands.add("//gmask =queryRel(1,"+ (yDifference+1) +",0,35,6)");
+            commands.add("//gmask =queryRel(1,"+ (yDifference) +",0,35,6)");
             commands.add("//set 35:1");
 
-            commands.add("//gmask =queryRel(1,"+ (yDifference+1) +",0,35,7)");
+            commands.add("//gmask =queryRel(1,"+ (yDifference) +",0,35,7)");
             commands.add("//set 35:2");
 
 
             // Create a Cuboid Selection
-            Generator.createCuboidSelection(commands, maxPoint, minPoint);
+            Generator.createCuboidSelection(commands, extendedBoxMax, extendedBoxMin);
 
             commands.add("//expand 40 40 up");
 
@@ -574,5 +604,15 @@ public class FieldScripts {
         Vector point2Extended = middle.subtract(extendedDistanceVector);
 
         return new Vector[]{point1Extended, point2Extended};
+    }
+
+    public static String getQueryRelThinSurroundings(int yOffset, String blockID){
+        blockID = blockID.replace(":", ",");
+        return "queryRel(1," + yOffset + ",0," + blockID +")||queryRel(-1," + yOffset + ",0," + blockID + ")||queryRel(0," + yOffset + ",1," + blockID + ")||queryRel(0," + yOffset + ",-1," + blockID + ")";
+    }
+
+    public  static String getQueryRelThickSurroundings(int yOffset, String blockID){
+        blockID = blockID.replace(":", ",");
+        return "queryRel(1," + yOffset + ",0," + blockID +")||queryRel(-1," + yOffset + ",0," + blockID + ")||queryRel(0," + yOffset + ",1," + blockID + ")||queryRel(0," + yOffset + ",-1," + blockID + ")||queryRel(1," + yOffset + ",1," + blockID + ")||queryRel(-1," + yOffset + ",1," + blockID + ")||queryRel(1," + yOffset + ",-1," + blockID + ")||queryRel(-1," + yOffset + ",-1," + blockID + ")";
     }
 }

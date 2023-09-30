@@ -8,6 +8,7 @@ import net.buildtheearth.modules.utils.geo.projection.Airocean;
 import net.buildtheearth.modules.utils.geo.projection.ModifiedAirocean;
 import net.buildtheearth.modules.utils.io.ConfigPaths;
 import net.buildtheearth.modules.warp.WarpManager;
+import net.buildtheearth.modules.warp.menu.WarpMainMenu;
 import net.buildtheearth.modules.warp.model.Warp;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -30,7 +31,7 @@ public class WarpCommand implements CommandExecutor {
 
         // If no arguments were supplied assume the player wants to open the warp menu
         if (args == null) {
-            //TODO OPEN WARP MENU
+            new WarpMainMenu(player, null);
             return true;
         }
 

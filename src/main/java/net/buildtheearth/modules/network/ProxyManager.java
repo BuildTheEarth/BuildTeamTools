@@ -77,6 +77,16 @@ public class ProxyManager {
         player.sendPluginMessage(Main.instance, "BungeeCord", out.toByteArray());
     }
 
+    /**
+     * Get a list of all the countries of all servers that are currently connected to the network
+     * @return A list off all active countries
+     */
+    public List<String> getActiveCountries() {
+        //TODO IMPLEMENT METHOD
+        return null;
+    }
+
+
     // Getters & Setters
 
     public String getBuildTeamID() {

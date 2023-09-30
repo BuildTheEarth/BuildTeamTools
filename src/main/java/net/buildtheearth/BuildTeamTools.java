@@ -29,6 +29,8 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.MenuFunctionListener;
 
+import java.util.List;
+
 /**
  * The parent of all modules of the Build Team Tools plugin
  */
@@ -207,7 +209,6 @@ public class BuildTeamTools {
             notifyUpdate(p);
         }
     }
-
     // Getters & Setters
 
     public Generator getGenerator() {

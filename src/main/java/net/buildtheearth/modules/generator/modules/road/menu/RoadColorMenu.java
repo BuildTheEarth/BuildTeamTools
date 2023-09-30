@@ -23,11 +23,11 @@ public class RoadColorMenu extends BlockListMenu {
         super.setItemClickEventsAsync();
 
         // Set click event for next item
-        if(canProceed())
+        if (canProceed())
             getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
                 Settings settings = Main.buildTeamTools.getGenerator().getRoad().getPlayerSettings().get(clickPlayer.getUniqueId());
 
-                if(!(settings instanceof RoadSettings))
+                if (!(settings instanceof RoadSettings))
                     return;
 
                 RoadSettings roadSettings = (RoadSettings) settings;

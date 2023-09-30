@@ -19,11 +19,12 @@ public class TpllManager {
     /**
      * Stores a List of the tpll operations that need to happen on join
      */
-    private static HashMap<UUID, Location> tpllQueue = new HashMap<>();
+    private static final HashMap<UUID, Location> tpllQueue = new HashMap<>();
 
     /**
      * Adds a tpll operation to the queue
-     * @param in The ByteArray received through the PluginMessageChannel
+     *
+     * @param in     The ByteArray received through the PluginMessageChannel
      * @param player The player to whom the tpll operation belongs
      */
     public static void addTpllToQueue(ByteArrayDataInput in, Player player) {
@@ -51,9 +52,9 @@ public class TpllManager {
 
     public static void processQueueForPlayer(Player player) {
         Location tpllTarget = tpllQueue.get(player.getUniqueId());
-        if(tpllTarget == null) return;
+        if (tpllTarget == null) return;
 
-        if(tpllTarget.getWorld() == null) {
+        if (tpllTarget.getWorld() == null) {
             player.sendMessage(ChatHelper.highlight("The %s world of this server is %s.", "earth", "unknown"));
             tpllQueue.remove(player.getUniqueId());
             return;

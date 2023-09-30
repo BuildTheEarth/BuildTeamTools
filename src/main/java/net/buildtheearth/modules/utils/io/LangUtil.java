@@ -25,8 +25,13 @@
 package net.buildtheearth.modules.utils.io;
 
 import com.alpsbte.alpslib.io.lang.LanguageUtil;
+
 public class LangUtil extends LanguageUtil {
     private static LangUtil langUtilInstance;
+
+    public LangUtil(LanguageFile[] langFiles) {
+        super(langFiles);
+    }
 
     public static void init() {
         if (langUtilInstance != null) return;
@@ -40,11 +45,6 @@ public class LangUtil extends LanguageUtil {
                 new LanguageFile("zh_CN", 1.3),
                 new LanguageFile("zh_TW", 1.3, "zh_HK"),
         });
-    }
-
-
-    public LangUtil(LanguageFile[] langFiles) {
-        super(langFiles);
     }
 
     public static LangUtil getInstance() {

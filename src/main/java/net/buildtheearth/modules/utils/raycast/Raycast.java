@@ -1,7 +1,5 @@
 package net.buildtheearth.modules.utils.raycast;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -10,12 +8,15 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 public class Raycast {
     private final double divider = 100.0D;
 
     private ArrayList<Material> passthroughMaterials = new ArrayList<>();
 
-    private ArrayList<Location> testedLocations = new ArrayList<>();
+    private final ArrayList<Location> testedLocations = new ArrayList<>();
 
     private World world;
 
@@ -255,6 +256,6 @@ public class Raycast {
     }
 
     public enum RaycastType {
-        ENTITY_AND_BLOCK, ENTITY, BLOCK;
+        ENTITY_AND_BLOCK, ENTITY, BLOCK
     }
 }

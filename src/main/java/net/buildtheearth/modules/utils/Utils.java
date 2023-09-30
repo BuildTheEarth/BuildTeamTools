@@ -1,7 +1,5 @@
 package net.buildtheearth.modules.utils;
 
-import java.util.List;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -9,130 +7,130 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
+
 public class Utils {
-	public static String getBlockID(ItemStack item){
-		String blockID = "" + item.getType().getId();
+    public static String getBlockID(ItemStack item) {
+        String blockID = "" + item.getType().getId();
 
-		if(item.getDurability() != 0)
-			blockID += ":" + item.getDurability();
+        if (item.getDurability() != 0)
+            blockID += ":" + item.getDurability();
 
-		return blockID;
-	}
+        return blockID;
+    }
 
 
-	public static boolean containsStringFromList(String string, List<String> list) {
-		for(String s : list)
-		if(string.contains(s))
-			return true;
-		
-		return false;
-	}
-	
-	public static int getHighestY(World world, int x, int z) {
-	    int y = 255;
-	    while(world.getBlockAt(x, y, z).getType() == Material.AIR || world.getBlockAt(x, y, z).getType() == Material.AIR) {
-	    	y--; 
-	    	if(y == 0)
-	    		return 0;
-	    }
-	    return y;
-	}
+    public static boolean containsStringFromList(String string, List<String> list) {
+        for (String s : list)
+            if (string.contains(s))
+                return true;
 
-	public static int[] range(int start, int stop)
-	{
-		int[] result = new int[stop-start];
+        return false;
+    }
 
-		for(int i=0;i<stop-start;i++)
-			result[i] = start+i;
+    public static int getHighestY(World world, int x, int z) {
+        int y = 255;
+        while (world.getBlockAt(x, y, z).getType() == Material.AIR || world.getBlockAt(x, y, z).getType() == Material.AIR) {
+            y--;
+            if (y == 0)
+                return 0;
+        }
+        return y;
+    }
 
-		return result;
-	}
+    public static int[] range(int start, int stop) {
+        int[] result = new int[stop - start];
 
-	public static Player getRandomPlayer(){
-		for(Player player : Bukkit.getOnlinePlayers())
-			return player;
+        for (int i = 0; i < stop - start; i++)
+            result[i] = start + i;
 
-		return null;
-	}
+        return result;
+    }
 
-	public static Object pickRandom(Object[] array){
-		return array[(int) (Math.random() * array.length)];
-	}
+    public static Player getRandomPlayer() {
+        for (Player player : Bukkit.getOnlinePlayers())
+            return player;
 
-	/** Converts the given Time to a time string
-	 *
-	 * @param p player for translation
-	 * @param time time in Milliseconds
-	 * @return
-	 */
-	public static String toDate(Player p, long time){
-		String s = "";
-		int days = 0;
-		int hours = 0;
-		int minutes = 0;
-		int seconds = 0;
+        return null;
+    }
 
-		if(time > 86400000){					//Tage
-			days = (int) (time/86400000);
-			time = time - (86400000 * days);
-		}
+    public static Object pickRandom(Object[] array) {
+        return array[(int) (Math.random() * array.length)];
+    }
 
-		if(time > 3600000){						//Stunden
-			hours = (int) (time/3600000);
-			time = time - (3600000  * hours);
-		}
+    /**
+     * Converts the given Time to a time string
+     *
+     * @param p    player for translation
+     * @param time time in Milliseconds
+     * @return
+     */
+    public static String toDate(Player p, long time) {
+        String s = "";
+        int days = 0;
+        int hours = 0;
+        int minutes = 0;
+        int seconds = 0;
 
-		if(time > 60000){						//Minuten
-			minutes = (int) (time/60000);
-			time = time - (60000 * minutes);
-		}
+        if (time > 86400000) {                    //Tage
+            days = (int) (time / 86400000);
+            time = time - (86400000 * days);
+        }
 
-		if(time > 1000){						//Sekunden
-			seconds = (int) (time/1000);
-			time = time - (1000 * seconds);
-		}
+        if (time > 3600000) {                        //Stunden
+            hours = (int) (time / 3600000);
+            time = time - (3600000 * hours);
+        }
 
-		if(days > 0){
-			if(days == 1)
-				s = s + days + " Day, ";
-			else
-				s = s + days + " Days, ";
-		}
-		if(hours > 0 | days > 0){
-			if(hours == 1)
-				s = s + hours + " Hour";
-			else
-				s = s + hours + " Hours";
-		}
-		if((minutes > 0 | hours > 0)& days == 0){
-			if(hours > 0)
-				s = s + ", ";
+        if (time > 60000) {                        //Minuten
+            minutes = (int) (time / 60000);
+            time = time - (60000 * minutes);
+        }
 
-			if(minutes == 1)
-				s = s + minutes + " Minute";
-			else
-				s = s + minutes + " Minutes";
-		}
-		if((seconds > 0 | minutes > 0) &  hours == 0 & days == 0){
-			if(minutes > 0)
-				s = s + ", ";
+        if (time > 1000) {                        //Sekunden
+            seconds = (int) (time / 1000);
+            time = time - (1000 * seconds);
+        }
 
-			if(seconds == 1)
-				s = s + seconds + " Second";
-			else
-				s = s + seconds + " Seconds";
-		}
+        if (days > 0) {
+            if (days == 1)
+                s = s + days + " Day, ";
+            else
+                s = s + days + " Days, ";
+        }
+        if (hours > 0 | days > 0) {
+            if (hours == 1)
+                s = s + hours + " Hour";
+            else
+                s = s + hours + " Hours";
+        }
+        if ((minutes > 0 | hours > 0) & days == 0) {
+            if (hours > 0)
+                s = s + ", ";
 
-		return s;
-	}
+            if (minutes == 1)
+                s = s + minutes + " Minute";
+            else
+                s = s + minutes + " Minutes";
+        }
+        if ((seconds > 0 | minutes > 0) & hours == 0 & days == 0) {
+            if (minutes > 0)
+                s = s + ", ";
 
-	public static String menuIconTitle(String szText)
-	{
-		return (ChatColor.GREEN +"" +ChatColor.BOLD +szText);
-	}
+            if (seconds == 1)
+                s = s + seconds + " Second";
+            else
+                s = s + seconds + " Seconds";
+        }
 
-	public static String loreText(String szText)
-	{
-		return (ChatColor.GRAY +"" +szText);
-	}
+        return s;
+    }
+
+    public static String menuIconTitle(String szText) {
+        return (ChatColor.GREEN + "" + ChatColor.BOLD + szText);
+    }
+
+    public static String loreText(String szText) {
+        return (ChatColor.GRAY + "" + szText);
+    }
 }

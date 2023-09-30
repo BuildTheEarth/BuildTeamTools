@@ -7,9 +7,9 @@ import net.buildtheearth.modules.generator.modules.tree.TreeFlag;
 
 public interface Flag {
 
-    String getFlag();
-
-    /** @return the flag by the given string and generator type */
+    /**
+     * @return the flag by the given string and generator type
+     */
     static Flag byString(GeneratorType generatorType, String flag) {
         switch (generatorType) {
             case HOUSE:
@@ -23,4 +23,6 @@ public interface Flag {
         }
         return null;
     }
+
+    String getFlag();
 }

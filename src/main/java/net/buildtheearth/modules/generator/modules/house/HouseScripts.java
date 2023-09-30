@@ -20,7 +20,7 @@ import java.util.List;
 
 public class HouseScripts {
 
-    public static void buildscript_v_1_2(Player p, House house, Region region){
+    public static void buildscript_v_1_2(Player p, House house, Region region) {
         HashMap<Object, String> flags = house.getPlayerSettings().get(p.getUniqueId()).getValues();
 
         String wallColor = flags.get(HouseFlag.WALL_COLOR);
@@ -42,23 +42,21 @@ public class HouseScripts {
         int maxY = region.getMaximumPoint().getBlockY();
 
 
-        if(region instanceof Polygonal2DRegion){
+        if (region instanceof Polygonal2DRegion) {
             Polygonal2DRegion polyRegion = (Polygonal2DRegion) region;
             selectionPoints.addAll(polyRegion.getPoints());
 
-        }else if(region instanceof CuboidRegion){
+        } else if (region instanceof CuboidRegion) {
             CuboidRegion cuboidRegion = (CuboidRegion) region;
             Vector min = cuboidRegion.getMinimumPoint();
             Vector max = cuboidRegion.getMaximumPoint();
 
             selectionPoints.add(new BlockVector2D(min.getBlockX(), min.getBlockZ()));
             selectionPoints.add(new BlockVector2D(max.getBlockX(), max.getBlockZ()));
-        }else{
+        } else {
             p.sendMessage("§c§lERROR: §cRegion type not supported!");
             return;
         }
-
-
 
 
         int operations = 0;
@@ -89,7 +87,7 @@ public class HouseScripts {
 
         // Set pos1 and pos2
         p.chat("//pos1 " + selectionPoints.get(0).getBlockX() + "," + highestBlock + "," + selectionPoints.get(0).getBlockZ());
-        for(int i = 1; i < selectionPoints.size(); i++)
+        for (int i = 1; i < selectionPoints.size(); i++)
             p.chat("//pos2 " + selectionPoints.get(i).getBlockX() + "," + minY + "," + selectionPoints.get(i).getBlockZ());
 
         p.chat("//expand 10 down");
@@ -101,7 +99,7 @@ public class HouseScripts {
         // Replace all sponges with bricks that have bricks below them
         p.chat("//gmask >45");
 
-        for(int i = 0; i < 20; i++) {
+        for (int i = 0; i < 20; i++) {
             p.chat("//replace 19 45");
             operations++;
         }
@@ -117,10 +115,10 @@ public class HouseScripts {
 
         String[] woolColors = {"35:4", "35:11", "35:14", "35:5"};
 
-        for(String wool : woolColors){
+        for (String wool : woolColors) {
             // Replace all blocks above the wool
             p.chat("//gmask >" + wool);
-            for(int i = 0; i < 20; i++){
+            for (int i = 0; i < 20; i++) {
                 p.chat("//replace 0 " + wool);
                 operations++;
             }
@@ -146,12 +144,12 @@ public class HouseScripts {
         p.chat("//expand 1 up");
 
         String[] woolColorsNoYellow = {"35:11", "35:14", "35:5"};
-        for(String wool : woolColorsNoYellow) {
+        for (String wool : woolColorsNoYellow) {
             p.chat("//gmask =queryRel(1,0,0,45,0)||queryRel(-1,0,0,45,0)||queryRel(0,0,1,45,0)||queryRel(0,0,-1,45,0)||queryRel(1,0,1,45,0)||queryRel(-1,0,1,45,0)||queryRel(1,0,-1,45,0)||queryRel(-1,0,-1,45,0)");
             p.chat("//replace " + wool + " 19");
             operations++;
 
-            for(int i = 0; i < 10; i++){
+            for (int i = 0; i < 10; i++) {
                 p.chat("//gmask =queryRel(1,0,0,19,0)||queryRel(-1,0,0,19,0)||queryRel(0,0,1,19,0)||queryRel(0,0,-1,19,0)||queryRel(1,0,1,19,0)||queryRel(-1,0,1,19,0)||queryRel(1,0,-1,19,0)||queryRel(-1,0,-1,19,0)");
                 p.chat("//replace " + wool + " 19");
                 operations++;
@@ -163,7 +161,6 @@ public class HouseScripts {
             p.chat("//replace 19 45");
             operations++;
         }
-
 
 
         // ----------- PREPARATION 06 ----------
@@ -192,7 +189,7 @@ public class HouseScripts {
         // Select all blocks that are next to blue wool
         p.chat("//gmask =(queryRel(1,0,0,35,11)||queryRel(-1,0,0,35,11)||queryRel(0,0,1,35,11)||queryRel(0,0,-1,35,11)||queryRel(1,0,1,35,11)||queryRel(-1,0,-1,35,11)||queryRel(-1,0,1,35,11)||queryRel(1,0,-1,35,11))&&!(queryRel(1,0,0,35,5)||queryRel(-1,0,0,35,5)||queryRel(0,0,1,35,5)||queryRel(0,0,-1,35,5)||queryRel(1,0,1,35,5)||queryRel(-1,0,-1,35,5)||queryRel(-1,0,1,35,5)||queryRel(1,0,-1,35,5))");
 
-        for(int i = 0; i < 20; i++) {
+        for (int i = 0; i < 20; i++) {
             // Replace all blocks above lapis with blue wool
             p.chat("//replace >45 35:11");
             operations++;
@@ -208,7 +205,7 @@ public class HouseScripts {
 
         // Set pos1 and pos2
         p.chat("//pos1 " + selectionPoints.get(0).getBlockX() + "," + maxY + "," + selectionPoints.get(0).getBlockZ());
-        for(int i = 1; i < selectionPoints.size(); i++)
+        for (int i = 1; i < selectionPoints.size(); i++)
             p.chat("//pos2 " + selectionPoints.get(i).getBlockX() + "," + minY + "," + selectionPoints.get(i).getBlockZ());
 
         // Expand the current selection down by 10 blocks
@@ -222,7 +219,7 @@ public class HouseScripts {
         // Select all blocks around the yellow wool block
         p.chat("//gmask =queryRel(-1,0,0,35,4)||queryRel(1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4)");
 
-        for(int i = 0; i < 20; i++) {
+        for (int i = 0; i < 20; i++) {
             // Replace all blocks that are not bricks with yellow wool
             p.chat("//replace !45 35:4");
             operations++;
@@ -230,7 +227,7 @@ public class HouseScripts {
 
 
         // Make the outline as thin as possible and fill all inner corners with yellow wool that are too thick
-        for(int i = 0; i < 2; i++) {
+        for (int i = 0; i < 2; i++) {
             p.chat("//gmask =queryRel(-1,0,0,35,4)&&queryRel(0,0,-1,35,4)&&queryRel(0,0,1,45,-1)&&queryRel(1,0,0,45,-1)");
             p.chat("//replace 45 35:4");
             operations++;
@@ -258,31 +255,29 @@ public class HouseScripts {
         }
 
 
-
         // ----------- BASE ----------
         int currentheight = 0;
 
-        if(baseHeight > 0)
-        for(int i = 0; i < baseHeight; i++) {
-            currentheight++;
+        if (baseHeight > 0)
+            for (int i = 0; i < baseHeight; i++) {
+                currentheight++;
 
-            // Move wool one block up
-            operations = moveWoolUp(p, operations);
+                // Move wool one block up
+                operations = moveWoolUp(p, operations);
 
-            // Select everything x blocks above bricks. Then replace that with lapizlazuli
-            p.chat("//gmask =queryRel(0," + (-currentheight) + ",0,45,-1)");
-            p.chat("//set 22");
-            operations++;
+                // Select everything x blocks above bricks. Then replace that with lapizlazuli
+                p.chat("//gmask =queryRel(0," + (-currentheight) + ",0,45,-1)");
+                p.chat("//set 22");
+                operations++;
 
-            // Raise the yellow wool layer by one block
-            operations = raiseYellowWoolFloor(p, operations);
-        }
-
+                // Raise the yellow wool layer by one block
+                operations = raiseYellowWoolFloor(p, operations);
+            }
 
 
         // ----------- FLOORS ----------
         int heightdifference = 0;
-        for(int i = 0; i < floorCount; i++) {
+        for (int i = 0; i < floorCount; i++) {
             currentheight++;
 
             // Move wool one block up
@@ -296,7 +291,7 @@ public class HouseScripts {
             // Raise the yellow wool layer by one block
             operations = raiseYellowWoolFloor(p, operations);
 
-            for(int i2 = 0; i2 < windowHeight; i2++) {
+            for (int i2 = 0; i2 < windowHeight; i2++) {
                 currentheight++;
 
                 // Move wool one block up
@@ -309,7 +304,7 @@ public class HouseScripts {
                     // Replace everything with white glass
                     p.chat("//set 95:0");
                     operations++;
-                }else {
+                } else {
                     // Replace red wool with gray glass
                     p.chat("//replace 35:14 95:7");
                     operations++;
@@ -329,23 +324,23 @@ public class HouseScripts {
 
             heightdifference = floorHeight - (windowHeight + 1);
 
-            if(heightdifference > 0)
-            for(int i2 = 0; i2 < heightdifference; i2++) {
-                currentheight++;
+            if (heightdifference > 0)
+                for (int i2 = 0; i2 < heightdifference; i2++) {
+                    currentheight++;
 
-                // Move wool one block up
-                operations = moveWoolUp(p, operations);
+                    // Move wool one block up
+                    operations = moveWoolUp(p, operations);
 
-                // Select everything x blocks above bricks. Then replace that with lapizlazuli ore
-                p.chat("//gmask =queryRel(0," + (-currentheight) + ",0,45,-1)");
-                p.chat("//set 21");
-                operations++;
+                    // Select everything x blocks above bricks. Then replace that with lapizlazuli ore
+                    p.chat("//gmask =queryRel(0," + (-currentheight) + ",0,45,-1)");
+                    p.chat("//set 21");
+                    operations++;
 
-                // Raise the yellow wool layer by one block
-                operations = raiseYellowWoolFloor(p, operations);
-            }
+                    // Raise the yellow wool layer by one block
+                    operations = raiseYellowWoolFloor(p, operations);
+                }
         }
-        if(heightdifference == 0){
+        if (heightdifference == 0) {
             currentheight++;
 
             // Move wool one block up
@@ -364,7 +359,6 @@ public class HouseScripts {
         p.chat("//gmask");
         p.chat("//replace 35:14 0");
         operations++;
-
 
 
         // ----------- WINDOWS ----------
@@ -404,9 +398,6 @@ public class HouseScripts {
         operations++;
 
 
-
-
-
         // ----------- ROOF ----------
 
         String rm1 = roofColor;
@@ -414,8 +405,7 @@ public class HouseScripts {
         String rm3 = roofColor;
 
 
-
-        if(roofType == RoofType.FLATTER_SLABS || roofType == RoofType.STEEP_SLABS|| roofType == RoofType.MEDIUM_SLABS){
+        if (roofType == RoofType.FLATTER_SLABS || roofType == RoofType.STEEP_SLABS || roofType == RoofType.MEDIUM_SLABS) {
             // (One more yellow wool layer) Replace everything above yellow wool with one layer yellow wool
             p.chat("//replace >35:4 35:4");
             operations++;
@@ -444,48 +434,48 @@ public class HouseScripts {
 
             maxRoofHeight = maxRoofHeight - 1;
 
-            if(maxRoofHeight > 0)
-            for(int i = 0; i < maxRoofHeight; i++) {
-                //Only select air block that have stone slabs below them which are surrounded by other stone slabs
-                if(roofType == RoofType.FLATTER_SLABS || roofType == RoofType.MEDIUM_SLABS)
-                    p.chat("//gmask =!(queryRel(1,-1,0,44,-1)||queryRel(-1,-1,0,44,-1)||queryRel(0,-1,1,44,-1)||queryRel(0,-1,-1,44,-1)||(queryRel(-1,-1,1,44,-1)||queryRel(1,-1,-1,44,-1)||queryRel(1,-1,1,44,-1)||queryRel(-1,-1,-1,44,-1)))");
-                else if(roofType == RoofType.STEEP_SLABS)
-                    p.chat("//gmask =!(queryRel(1,-1,0,44,-1)||queryRel(-1,-1,0,44,-1)||queryRel(0,-1,1,44,-1)||queryRel(0,-1,-1,44,-1))");
+            if (maxRoofHeight > 0)
+                for (int i = 0; i < maxRoofHeight; i++) {
+                    //Only select air block that have stone slabs below them which are surrounded by other stone slabs
+                    if (roofType == RoofType.FLATTER_SLABS || roofType == RoofType.MEDIUM_SLABS)
+                        p.chat("//gmask =!(queryRel(1,-1,0,44,-1)||queryRel(-1,-1,0,44,-1)||queryRel(0,-1,1,44,-1)||queryRel(0,-1,-1,44,-1)||(queryRel(-1,-1,1,44,-1)||queryRel(1,-1,-1,44,-1)||queryRel(1,-1,1,44,-1)||queryRel(-1,-1,-1,44,-1)))");
+                    else if (roofType == RoofType.STEEP_SLABS)
+                        p.chat("//gmask =!(queryRel(1,-1,0,44,-1)||queryRel(-1,-1,0,44,-1)||queryRel(0,-1,1,44,-1)||queryRel(0,-1,-1,44,-1))");
 
-                p.chat("//replace >43 44");
-                operations++;
+                    p.chat("//replace >43 44");
+                    operations++;
 
-                if(roofType == RoofType.FLATTER_SLABS)
-                    p.chat("//gmask =!(queryRel(1,0,0,0,-1)||queryRel(-1,0,0,0,-1)||queryRel(0,0,1,0,-1)||queryRel(0,0,-1,0,-1)||queryRel(-1,0,1,0,-1)||queryRel(1,0,-1,0,-1)||queryRel(1,0,1,0,-1)||queryRel(-1,0,-1,0,-1))");
-                else if(roofType == RoofType.MEDIUM_SLABS || roofType == RoofType.STEEP_SLABS)
-                    p.chat("//gmask =!(queryRel(1,0,0,0,-1)||queryRel(-1,0,0,0,-1)||queryRel(0,0,1,0,-1)||queryRel(0,0,-1,0,-1))");
+                    if (roofType == RoofType.FLATTER_SLABS)
+                        p.chat("//gmask =!(queryRel(1,0,0,0,-1)||queryRel(-1,0,0,0,-1)||queryRel(0,0,1,0,-1)||queryRel(0,0,-1,0,-1)||queryRel(-1,0,1,0,-1)||queryRel(1,0,-1,0,-1)||queryRel(1,0,1,0,-1)||queryRel(-1,0,-1,0,-1))");
+                    else if (roofType == RoofType.MEDIUM_SLABS || roofType == RoofType.STEEP_SLABS)
+                        p.chat("//gmask =!(queryRel(1,0,0,0,-1)||queryRel(-1,0,0,0,-1)||queryRel(0,0,1,0,-1)||queryRel(0,0,-1,0,-1))");
 
-                p.chat("//replace 44 43");
-                operations++;
-            }
+                    p.chat("//replace 44 43");
+                    operations++;
+                }
 
             // Create the flipped steps
             String[] roofColors = roofColor.split(",");
             String[] roofColors2 = new String[roofColors.length];
             String[] roofColors3 = new String[roofColors.length];
 
-            for(int i = 0; i < roofColors.length; i++){
+            for (int i = 0; i < roofColors.length; i++) {
                 String[] values = roofColors[i].split(":");
                 String material = values[0];
                 int data = 0;
-                if(values.length > 1)
+                if (values.length > 1)
                     data = Integer.parseInt(values[1]);
                 data += 8;
 
                 roofColors2[i] = material + ":" + data;
-                roofColors3[i] = (Integer.parseInt(material)-1) + ":" + data;
+                roofColors3[i] = (Integer.parseInt(material) - 1) + ":" + data;
             }
 
             rm1 = StringUtils.join(roofColors, ",");
             rm2 = StringUtils.join(roofColors2, ",");
             rm3 = StringUtils.join(roofColors3, ",");
 
-        } else if(roofType == RoofType.FLAT){
+        } else if (roofType == RoofType.FLAT) {
             p.chat("//gmask 0");
             p.chat("//replace >21 171:7");
             operations++;
@@ -493,10 +483,10 @@ public class HouseScripts {
             p.chat("//replace 35:4 23");
             operations++;
 
-        } else if(roofType == RoofType.STAIRS){
+        } else if (roofType == RoofType.STAIRS) {
 
             // Create the roof house wall staircase
-            for(int i = 0; i < maxRoofHeight; i++){
+            for (int i = 0; i < maxRoofHeight; i++) {
                 // Select all air blocks that are above blue wool and next to green wool
                 p.chat("//gmask =queryRel(1,-1,0,35,5)||queryRel(-1,-1,0,35,5)||queryRel(0,-1,1,35,5)||queryRel(0,-1,-1,35,5)||queryRel(1,-1,1,35,5)||queryRel(-1,-1,-1,35,5)||queryRel(-1,-1,1,35,5)||queryRel(1,-1,-1,35,5)");
                 p.chat("//replace >35:11 35:5");
@@ -531,15 +521,15 @@ public class HouseScripts {
 
             maxRoofHeight = maxRoofHeight - 1;
 
-            if(maxRoofHeight > 0)
-                for(int i = 0; i < maxRoofHeight; i++) {
+            if (maxRoofHeight > 0)
+                for (int i = 0; i < maxRoofHeight; i++) {
                     // Every 2nd layer
-                    if(i % 2 == 0){
+                    if (i % 2 == 0) {
                         //Only select air block that have yellow wool below them which are surrounded by other stone bricks
                         p.chat("//gmask =(queryRel(1,-1,0,98,-1)||queryRel(-1,-1,0,98,-1)||queryRel(0,-1,1,98,-1)||queryRel(0,-1,-1,98,-1))");
                         p.chat("//replace >35:4 98");
                         operations++;
-                    }else{
+                    } else {
                         // Only select air block that have yellow wool below them which are completely surrounded by other stone bricks
                         p.chat("//gmask =(queryRel(1,-1,0,98,-1)||queryRel(-1,-1,0,98,-1)||queryRel(0,-1,1,98,-1)||queryRel(0,-1,-1,98,-1)||queryRel(1,-1,1,98,-1)||queryRel(-1,-1,1,98,-1)||queryRel(-1,-1,-1,98,-1)||queryRel(1,-1,-1,98,-1))");
                         p.chat("//replace >35:4 98");
@@ -691,11 +681,11 @@ public class HouseScripts {
             String[] colors = roofColor.split(",");
 
             // Remove :X from colors
-            for(int i = 0; i < colors.length; i++)
+            for (int i = 0; i < colors.length; i++)
                 colors[i] = colors[i].split(":")[0];
 
             String[] blockColors = new String[colors.length];
-            for(int i = 0; i < colors.length; i++)
+            for (int i = 0; i < colors.length; i++)
                 blockColors[i] = MenuItems.convertStairToBlock(colors[i]);
 
 
@@ -705,8 +695,8 @@ public class HouseScripts {
 
 
             // Replace all stairs with the correct color
-            for(int i = 0; i < 12; i++) {
-                if(colors.length == 1)
+            for (int i = 0; i < 12; i++) {
+                if (colors.length == 1)
                     p.chat("//replace 109:" + i + " " + colors[0] + ":" + i);
                 else
                     p.chat("//replace 109:" + i + " " + StringUtils.join(colors, ":" + i + ","));
@@ -719,7 +709,7 @@ public class HouseScripts {
 
         p.chat("//gmask 0,45,31,37,38,39,40,175");
 
-        for(int i = 0; i < 5; i++) {
+        for (int i = 0; i < 5; i++) {
             p.chat("//replace <22 22");
             operations++;
         }
@@ -736,7 +726,6 @@ public class HouseScripts {
         p.chat("//gmask");
 
 
-
         p.chat("//replace 44:0 " + rm1);
         operations++;
         p.chat("//replace 44:8 " + rm2);
@@ -749,14 +738,14 @@ public class HouseScripts {
 
         // Reset pos1 and pos2
         p.chat("//pos1 " + selectionPoints.get(0).getBlockX() + "," + maxY + "," + selectionPoints.get(0).getBlockZ());
-        for(int i = 1; i < selectionPoints.size(); i++)
+        for (int i = 1; i < selectionPoints.size(); i++)
             p.chat("//pos2 " + selectionPoints.get(i).getBlockX() + "," + minY + "," + selectionPoints.get(i).getBlockZ());
 
         Generator.getPlayerHistory(p).addHistoryEntry(new History.HistoryEntry(GeneratorType.HOUSE, operations));
     }
 
     // Move blue, green and red wool one block up
-    public static int moveWoolUp(Player p, int operations){
+    public static int moveWoolUp(Player p, int operations) {
         p.chat("//gmask");
         p.chat("//replace >35:11 35:11");
         operations++;
@@ -768,7 +757,7 @@ public class HouseScripts {
         return operations;
     }
 
-    public static int raiseYellowWoolFloor(Player p, int operations){
+    public static int raiseYellowWoolFloor(Player p, int operations) {
         p.chat("//gmask");
         p.chat("//replace >35:4 35:4");
         operations++;

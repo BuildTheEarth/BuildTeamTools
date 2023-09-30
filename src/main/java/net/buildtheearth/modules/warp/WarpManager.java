@@ -15,11 +15,12 @@ public class WarpManager {
     /**
      * Stores a List of the warp operations that need to happen on join
      */
-    private static HashMap<UUID, Location> warpQueue = new HashMap<>();
+    private static final HashMap<UUID, Location> warpQueue = new HashMap<>();
 
     /**
      * Adds a warp operation to the queue
-     * @param in The ByteArray received through the PluginMessageChannel
+     *
+     * @param in     The ByteArray received through the PluginMessageChannel
      * @param player The player to whom the warp operation belongs
      */
     public static void addWarpToQueue(ByteArrayDataInput in, Player player) {
@@ -45,7 +46,7 @@ public class WarpManager {
     public static void processQueueForPlayer(Player player) {
         Location targetWarpLocation = warpQueue.get(player.getUniqueId());
 
-        if(targetWarpLocation == null) {
+        if (targetWarpLocation == null) {
             return;
         }
 

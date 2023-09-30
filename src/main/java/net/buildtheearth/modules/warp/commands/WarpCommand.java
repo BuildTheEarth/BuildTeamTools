@@ -2,12 +2,12 @@ package net.buildtheearth.modules.warp.commands;
 
 import net.buildtheearth.Main;
 import net.buildtheearth.modules.network.api.NetworkAPI;
-import net.buildtheearth.modules.utils.geo.projection.Airocean;
-import net.buildtheearth.modules.utils.geo.projection.ModifiedAirocean;
-import net.buildtheearth.modules.warp.model.Warp;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.geo.OpenStreetMapAPI;
+import net.buildtheearth.modules.utils.geo.projection.Airocean;
+import net.buildtheearth.modules.utils.geo.projection.ModifiedAirocean;
 import net.buildtheearth.modules.utils.io.ConfigPaths;
+import net.buildtheearth.modules.warp.model.Warp;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -20,7 +20,7 @@ public class WarpCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(!(sender instanceof Player)) {
+        if (!(sender instanceof Player)) {
             sender.sendMessage(ChatHelper.highlight("This command can only be used by a player!"));
             return true;
         }
@@ -28,26 +28,26 @@ public class WarpCommand implements CommandExecutor {
         Player player = (Player) sender;
 
         // If no arguments were supplied assume the player wants to open the warp menu
-        if(args == null) {
+        if (args == null) {
             //TODO OPEN WARP MENU
             return true;
         }
 
         // WARP CREATE <KEY>
-        if(args[0].equalsIgnoreCase("create")) {
+        if (args[0].equalsIgnoreCase("create")) {
             // Check if the required arguments are provided & send usage otherwise
-            if(args.length < 2 || args.length > 3) return false;
+            if (args.length < 2 || args.length > 3) return false;
 
             // Extract the required data from the arguments
             String key = args[1];
             Location location = player.getLocation();
             boolean highlight = false;
-            if(args.length == 3) {
+            if (args.length == 3) {
                 highlight = Boolean.parseBoolean(args[2]);
             }
 
             // Check if the player has the required permissions
-            if(!player.hasPermission("btt.warp.create")) {
+            if (!player.hasPermission("btt.warp.create")) {
                 player.sendMessage(ChatHelper.highlight("You don't have the required %s to %s warps.", "permission", "create"));
                 return true;
             }
@@ -58,7 +58,7 @@ public class WarpCommand implements CommandExecutor {
 
             //Get the country, region & city belonging to the coordinates.
             String[] locationInfo = OpenStreetMapAPI.getCountryAndSubRegionsFromLocation(coordinates);
-            if(locationInfo == null) {
+            if (locationInfo == null) {
                 player.sendMessage(ChatHelper.highlight("Failed to get the location of this warp."));
                 return true;
             }
@@ -67,7 +67,7 @@ public class WarpCommand implements CommandExecutor {
             Collection<String> ownedCountries = NetworkAPI.getCountryCodesByKey(Main.instance.getConfig().getString(ConfigPaths.API_KEY));
 
             // Check if the that list contains the country the warp is in, else return
-            if(ownedCountries == null || locationInfo[0] == null || !ownedCountries.contains(locationInfo[0])) {
+            if (ownedCountries == null || locationInfo[0] == null || !ownedCountries.contains(locationInfo[0])) {
                 player.sendMessage(ChatHelper.highlight("This team does not own the country %s!", locationInfo[0]));
                 return true;
             }
@@ -93,18 +93,16 @@ public class WarpCommand implements CommandExecutor {
         }
 
 
-
-
         //WARP DELETE <KEY>
-        if(args[0].equalsIgnoreCase("delete")) {
+        if (args[0].equalsIgnoreCase("delete")) {
             // Check if the required arguments are provided & send usage otherwise
-            if(args.length != 2) return false;
+            if (args.length != 2) return false;
 
             // Extract the required data from the command arguments
             String key = args[1];
 
             // Check if the user has the required permission
-            if(!player.hasPermission("btt.warp.delete")) {
+            if (!player.hasPermission("btt.warp.delete")) {
                 player.sendMessage(ChatHelper.highlight("You don't have the required %s to %s warps.", "permission", "delete"));
                 return true;
             }
@@ -116,13 +114,13 @@ public class WarpCommand implements CommandExecutor {
         }
 
 
-        if(args.length == 1) {
+        if (args.length == 1) {
 
             // Extract the required data from the command arguments
             String key = args[0];
 
             // Check if the player has the required permission
-            if(!player.hasPermission("btt.warp.use")) {
+            if (!player.hasPermission("btt.warp.use")) {
                 player.sendMessage(ChatHelper.highlight("You don't have the required %s to %s warps.", "permission", "use"));
                 return true;
             }

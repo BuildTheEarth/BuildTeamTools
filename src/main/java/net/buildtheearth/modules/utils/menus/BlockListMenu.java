@@ -24,7 +24,7 @@ public class BlockListMenu extends AbstractPaginatedMenu {
     public static int NEXT_ITEM_SLOT = 35;
 
     public ArrayList<String> selectedMaterials;
-    private List<ItemStack> items;
+    private final List<ItemStack> items;
 
 
     public BlockListMenu(Player player, String invName, List<ItemStack> items) {
@@ -37,7 +37,7 @@ public class BlockListMenu extends AbstractPaginatedMenu {
     protected void setPreviewItems() {
         setSwitchPageItems(SWITCH_PAGE_ITEM_SLOT);
 
-        if(canProceed())
+        if (canProceed())
             getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.getNextItem());
         else
             getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.ITEM_BACKGROUND);
@@ -46,7 +46,8 @@ public class BlockListMenu extends AbstractPaginatedMenu {
     }
 
     @Override
-    protected void setMenuItemsAsync() {}
+    protected void setMenuItemsAsync() {
+    }
 
     @Override
     protected void setItemClickEventsAsync() {
@@ -56,7 +57,7 @@ public class BlockListMenu extends AbstractPaginatedMenu {
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short)15, null))
+                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null))
                 .pattern("000000000")
                 .pattern("000000000")
                 .pattern("000000000")
@@ -71,14 +72,14 @@ public class BlockListMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPaginatedPreviewItems(List<?> source) {
-        if(selectedMaterials == null)
+        if (selectedMaterials == null)
             selectedMaterials = new ArrayList<>();
 
         // Set pagignated items
         List<ItemStack> items = source.stream().map(l -> (ItemStack) l).collect(Collectors.toList());
         int slot = 0;
         for (ItemStack item : items) {
-            if(selectedMaterials.contains(Item.getUniqueMaterialString(item)))
+            if (selectedMaterials.contains(Item.getUniqueMaterialString(item)))
                 item = new Item(item).setAmount(1).addEnchantment(Enchantment.LUCK, 1).hideEnchantments(true).build();
 
             getMenu().getSlot(slot).setItem(item);
@@ -99,7 +100,7 @@ public class BlockListMenu extends AbstractPaginatedMenu {
             getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
                 String type = Item.getUniqueMaterialString(getMenu().getSlot(_slot).getItem(getMenuPlayer()));
 
-                if(selectedMaterials.contains(type))
+                if (selectedMaterials.contains(type))
                     selectedMaterials.remove(type);
                 else
                     selectedMaterials.add(type);
@@ -112,9 +113,10 @@ public class BlockListMenu extends AbstractPaginatedMenu {
 
     /**
      * Checks if the player has selected at least one block.
+     *
      * @return true if the player has selected at least one block, false otherwise.
      */
-    protected boolean canProceed(){
+    protected boolean canProceed() {
         return selectedMaterials.size() > 0;
     }
 }

@@ -8,11 +8,11 @@ public class RoadSettings extends Settings {
     public static String DISABLED = "OFF";
     public static String ENABLED = "ON";
 
-    public RoadSettings(Player player){
+    public RoadSettings(Player player) {
         super(player);
     }
 
-    public void setDefaultValues(){
+    public void setDefaultValues() {
 
         // Lane Count (Default: Fixed Value)
         getValues().put(RoadFlag.LANE_COUNT, "2");

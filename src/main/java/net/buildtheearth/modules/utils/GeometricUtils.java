@@ -1,26 +1,25 @@
 package net.buildtheearth.modules.utils;
 
 import net.buildtheearth.Main;
+import net.buildtheearth.modules.utils.geo.LatLng;
 import net.buildtheearth.modules.utils.geo.projection.Airocean;
 import net.buildtheearth.modules.utils.geo.projection.ModifiedAirocean;
-import net.buildtheearth.modules.utils.geo.LatLng;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-public class GeometricUtils
-{
+public class GeometricUtils {
     /**
      * Creates a minecraft location object for the specified coordinates, yaw and pitch from the BTE projection.. Height is extracted from the world.
      * The world is extracted from the server config's "earth world". If no earth world is specified then the height defaults to 64
      * and the world is nullified.
+     *
      * @param coordinates Latitude and longitude of the location
-     * @param fYaw Player's yaw
-     * @param fPitch Player's pitch
+     * @param fYaw        Player's yaw
+     * @param fPitch      Player's pitch
      * @return A bukkit location matching the coordinates, yaw and pitch specified.
      */
-    public static Location getLocationFromCoordinatesYawPitch(LatLng coordinates, float fYaw, float fPitch)
-    {
+    public static Location getLocationFromCoordinatesYawPitch(LatLng coordinates, float fYaw, float fPitch) {
         Airocean projection = new ModifiedAirocean();
         double mpu = projection.metersPerUnit();
 

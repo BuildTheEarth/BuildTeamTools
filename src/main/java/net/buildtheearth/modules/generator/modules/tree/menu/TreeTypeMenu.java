@@ -25,13 +25,15 @@ public class TreeTypeMenu extends BlockListMenu {
         super(player, TREE_TYPE_INV_NAME, getTreeTypes());
     }
 
-    /** Get a list of all tree types */
+    /**
+     * Get a list of all tree types
+     */
     private static List<ItemStack> getTreeTypes() {
         List<ItemStack> treeTypes = new ArrayList<>();
 
         treeTypes.add(Item.create(Material.CONCRETE, "Any", (byte) 5));
 
-        for(TreeType treeType : TreeType.values())
+        for (TreeType treeType : TreeType.values())
             treeTypes.add(Item.create(Material.SAPLING, StringUtils.capitalize(treeType.getName())));
 
         return treeTypes;
@@ -42,11 +44,11 @@ public class TreeTypeMenu extends BlockListMenu {
         super.setItemClickEventsAsync();
 
         // Set click event for next item
-        if(canProceed())
+        if (canProceed())
             getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
                 Settings settings = Main.buildTeamTools.getGenerator().getRoad().getPlayerSettings().get(clickPlayer.getUniqueId());
 
-                if(!(settings instanceof RoadSettings))
+                if (!(settings instanceof RoadSettings))
                     return;
 
                 RoadSettings roadSettings = (RoadSettings) settings;

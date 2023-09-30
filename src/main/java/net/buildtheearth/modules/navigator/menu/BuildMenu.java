@@ -1,8 +1,8 @@
 package net.buildtheearth.modules.navigator.menu;
 
 import net.buildtheearth.Main;
-import net.buildtheearth.modules.network.ProxyManager;
 import net.buildtheearth.modules.generator.menu.GeneratorMenu;
+import net.buildtheearth.modules.network.ProxyManager;
 import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.MenuItem;
 import net.buildtheearth.modules.utils.ProxyUtil;
@@ -26,22 +26,21 @@ import java.util.ArrayList;
  * <p>
  * <p> The menu has 3 rows and the centre row is the only occupied row. The layout depends on what icons are enabled in config.
  */
-public class BuildMenu extends AbstractMenu
-{
+public class BuildMenu extends AbstractMenu {
     private static final int iRows = 3;
     private static final String szInventoryName = "Build Menu";
-    private static final ArrayList<MenuItem> menuItems = getGui(Main.getBuildTeamTools().getProxyManager());
     private static FileConfiguration config;
+    private static final ArrayList<MenuItem> menuItems = getGui(Main.getBuildTeamTools().getProxyManager());
 
-    public BuildMenu(Player player)
-    {
+    public BuildMenu(Player player) {
         super(iRows, szInventoryName, player);
     }
 
     /**
      * Produces a list of Menu Items for the BuildMenu gui
-     * @see MenuItem
+     *
      * @return
+     * @see MenuItem
      */
     public static ArrayList<MenuItem> getGui(ProxyManager proxyManager) {
         config = Main.instance.getConfig();
@@ -84,14 +83,13 @@ public class BuildMenu extends AbstractMenu
         //--------------------------------------------
         //------------------Tutorial------------------
         //--------------------------------------------
-        if (bItemsNeeded[0])
-        {
+        if (bItemsNeeded[0]) {
             //Creates the lore for tutorials
             ArrayList<String> tutorialsLore = new ArrayList<>();
             tutorialsLore.add(Utils.loreText("Learn more BTE skills"));
 
             //Creates the item for tutorials
-            ItemStack tutorialItem = Item.create(Material.getMaterial(config.getString(ConfigPaths.TUTORIALS_ITEM_MATERIAL)), ChatColor.GREEN +"" +ChatColor.BOLD +"Learn", 1, tutorialsLore);
+            ItemStack tutorialItem = Item.create(Material.getMaterial(config.getString(ConfigPaths.TUTORIALS_ITEM_MATERIAL)), ChatColor.GREEN + "" + ChatColor.BOLD + "Learn", 1, tutorialsLore);
 
             //Creates the menu item, specifying the click actions
             MenuItem tutorials = new MenuItem(iSlotsToBeUsed[iItem], tutorialItem, player ->
@@ -107,14 +105,13 @@ public class BuildMenu extends AbstractMenu
         //-------------------------------------------
         //----------------Plot System----------------
         //-------------------------------------------
-        if (bItemsNeeded[1])
-        {
+        if (bItemsNeeded[1]) {
             //Creates the lore for plot system
             ArrayList<String> plotsLore = new ArrayList<>();
             plotsLore.add(Utils.loreText("Access your plots"));
 
             //Creates the item for plots
-            ItemStack plotsItem = Item.create(Material.getMaterial(config.getString(ConfigPaths.PLOT_SYSTEM_ITEM_MATERIAL)), ChatColor.GREEN +"" +ChatColor.BOLD +"Plots", 1, plotsLore);
+            ItemStack plotsItem = Item.create(Material.getMaterial(config.getString(ConfigPaths.PLOT_SYSTEM_ITEM_MATERIAL)), ChatColor.GREEN + "" + ChatColor.BOLD + "Plots", 1, plotsLore);
 
             //Creates the menu item, specifying the click actions
             MenuItem plotSystem = new MenuItem(iSlotsToBeUsed[iItem], plotsItem, player ->
@@ -130,20 +127,19 @@ public class BuildMenu extends AbstractMenu
         //-------------------------------------------
         //------------------Regions------------------
         //-------------------------------------------
-        if (bItemsNeeded[2])
-        {
+        if (bItemsNeeded[2]) {
             //Creates the lore for regions
             ArrayList<String> regionsLore = new ArrayList<>();
             regionsLore.add(Utils.loreText("Teleport to a specific region or team"));
 
             //Creates the item for regions
-            ItemStack regionsItem = Item.create(Material.getMaterial(config.getString(ConfigPaths.REGIONS_ITEM_MATERIAL)), ChatColor.GREEN +"" +ChatColor.BOLD +"Regions", 1, regionsLore);
+            ItemStack regionsItem = Item.create(Material.getMaterial(config.getString(ConfigPaths.REGIONS_ITEM_MATERIAL)), ChatColor.GREEN + "" + ChatColor.BOLD + "Regions", 1, regionsLore);
 
             //Creates the menu item, specifying the click actions
             MenuItem regions = new MenuItem(iSlotsToBeUsed[iItem], regionsItem, player ->
             {
                 //Opens the regions menu
-               // new RegionsList or possibly just the teams list menu. Explore should have regions list though
+                // new RegionsList or possibly just the teams list menu. Explore should have regions list though
             });
             menuItems.add(regions);
 
@@ -153,14 +149,13 @@ public class BuildMenu extends AbstractMenu
         //-------------------------------------------
         //-------------------Tools-------------------
         //-------------------------------------------
-        if (bItemsNeeded[3])
-        {
+        if (bItemsNeeded[3]) {
             //Creates the lore for regions
             ArrayList<String> toolsLore = new ArrayList<>();
             toolsLore.add(Utils.loreText("Access the BTE build tools"));
 
             //Creates the item for tools
-            ItemStack toolsItem = Item.create(Material.getMaterial(config.getString(ConfigPaths.TOOLS_ITEM_MATERIAL)), ChatColor.GREEN +"" +ChatColor.BOLD +"Build Tools", 1, toolsLore);
+            ItemStack toolsItem = Item.create(Material.getMaterial(config.getString(ConfigPaths.TOOLS_ITEM_MATERIAL)), ChatColor.GREEN + "" + ChatColor.BOLD + "Build Tools", 1, toolsLore);
 
             //Creates the menu item, specifying the click actions
             MenuItem tools = new MenuItem(iSlotsToBeUsed[iItem], toolsItem, player ->
@@ -190,14 +185,12 @@ public class BuildMenu extends AbstractMenu
     }
 
     @Override
-    protected void setMenuItemsAsync()
-    {
+    protected void setMenuItemsAsync() {
         setMenuItemsAsyncViaMenuItems(menuItems);
     }
 
     @Override
-    protected void setItemClickEventsAsync()
-    {
+    protected void setItemClickEventsAsync() {
         setMenuItemClickEventsAsyncViaMenuItems(menuItems);
     }
 

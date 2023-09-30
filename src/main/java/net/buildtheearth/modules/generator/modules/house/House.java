@@ -15,26 +15,23 @@ public class House extends GeneratorModule {
     }
 
     @Override
-    public boolean checkPlayer(Player p){
-        if(!Generator.checkForWorldEditSelection(p))
+    public boolean checkPlayer(Player p) {
+        if (!Generator.checkForWorldEditSelection(p))
             return false;
 
-        if(getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
+        if (getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
             getPlayerSettings().get(p.getUniqueId()).setBlocks(Generator.analyzeRegion(p, p.getWorld()));
 
         Block[][][] blocks = getPlayerSettings().get(p.getUniqueId()).getBlocks();
 
-        if(!Generator.checkForBrickOutline(blocks, p))
+        if (!Generator.checkForBrickOutline(blocks, p))
             return false;
-        if(!Generator.checkForWoolBlock(blocks, p))
-            return false;
-
-        return true;
+        return Generator.checkForWoolBlock(blocks, p);
     }
 
     @Override
-    public void generate(Player p){
-        if(!checkPlayer(p))
+    public void generate(Player p) {
+        if (!checkPlayer(p))
             return;
 
         Region polyRegion = Generator.getWorldEditSelection(p);

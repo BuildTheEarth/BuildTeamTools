@@ -25,13 +25,15 @@ public class TreeWidthMenu extends BlockListMenu {
         super(player, TREE_TYPE_INV_NAME, getTreeWidths());
     }
 
-    /** Get a list of all tree widths */
+    /**
+     * Get a list of all tree widths
+     */
     private static List<ItemStack> getTreeWidths() {
         List<ItemStack> treeTypes = new ArrayList<>();
 
         treeTypes.add(Item.create(Material.CONCRETE, "Any", (byte) 5));
 
-        for(TreeWidth treeWidth : TreeWidth.values())
+        for (TreeWidth treeWidth : TreeWidth.values())
             treeTypes.add(Item.create(Material.PAPER, StringUtils.capitalize(treeWidth.getName())));
 
         return treeTypes;
@@ -42,11 +44,11 @@ public class TreeWidthMenu extends BlockListMenu {
         super.setItemClickEventsAsync();
 
         // Set click event for next item
-        if(canProceed())
+        if (canProceed())
             getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
                 Settings settings = Main.buildTeamTools.getGenerator().getRoad().getPlayerSettings().get(clickPlayer.getUniqueId());
 
-                if(!(settings instanceof RoadSettings))
+                if (!(settings instanceof RoadSettings))
                     return;
 
                 RoadSettings roadSettings = (RoadSettings) settings;

@@ -23,11 +23,11 @@ public class BaseColorMenu extends BlockListMenu {
         super.setItemClickEventsAsync();
 
         // Set click event for next item
-        if(canProceed())
+        if (canProceed())
             getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
                 Settings settings = Main.buildTeamTools.getGenerator().getHouse().getPlayerSettings().get(clickPlayer.getUniqueId());
 
-                if(!(settings instanceof HouseSettings))
+                if (!(settings instanceof HouseSettings))
                     return;
 
                 HouseSettings houseSettings = (HouseSettings) settings;

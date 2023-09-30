@@ -24,30 +24,30 @@ public abstract class GeneratorModule {
     GeneratorType generatorType;
 
     @Getter
-    private HashMap<UUID, Settings> playerSettings = new HashMap<>();
+    private final HashMap<UUID, Settings> playerSettings = new HashMap<>();
 
     public GeneratorModule(GeneratorType type) {
         generatorType = type;
     }
 
     public abstract boolean checkPlayer(Player p);
+
     public abstract void generate(Player p);
 
 
-
-    public void analyzeCommand(Player p, String[] args){
+    public void analyzeCommand(Player p, String[] args) {
         sendHelp(p, args);
         addPlayerSetting(p, generatorType);
         convertArgsToSettings(p, args, generatorType);
         generate(p);
     }
 
-    public void addPlayerSetting(UUID uuid, Settings settings){
+    public void addPlayerSetting(UUID uuid, Settings settings) {
         playerSettings.put(uuid, settings);
     }
 
-    public void addPlayerSetting(Player p, GeneratorType type){
-        switch (type){
+    public void addPlayerSetting(Player p, GeneratorType type) {
+        switch (type) {
             case HOUSE:
                 addPlayerSetting(p.getUniqueId(), new HouseSettings(p));
                 break;
@@ -63,33 +63,33 @@ public abstract class GeneratorModule {
         }
     }
 
-    public void sendHelp(Player p, String[] args){
+    public void sendHelp(Player p, String[] args) {
         if (args.length == 2)
             if (args[1].equals("info") || args[1].equals("help") || args[1].equals("?"))
                 sendHelp(p);
     }
 
-    public void sendHelp(Player p){
+    public void sendHelp(Player p) {
         //TODO send houses help
         p.sendMessage("TODO send Houses Help");
     }
 
-    public void sendMoreInfo(Player p){
+    public void sendMoreInfo(Player p) {
         p.sendMessage(" ");
         p.sendMessage("§cFor more information take a look at the wiki:");
         p.sendMessage("§c" + wikiPage);
     }
 
-    public void sendError(Player p){
+    public void sendError(Player p) {
         p.sendMessage("§cThere was an error while generating the house. Please contact the admins");
     }
 
-    public String getCommand(Player p){
+    public String getCommand(Player p) {
         HashMap<Object, String> flags = getPlayerSettings().get(p.getUniqueId()).getValues();
 
         String type = "house";
 
-        switch (generatorType){
+        switch (generatorType) {
             case HOUSE:
                 type = "house";
                 break;
@@ -105,7 +105,7 @@ public abstract class GeneratorModule {
         }
 
         String command = "/gen " + type;
-        for(Object object : flags.keySet()) {
+        for (Object object : flags.keySet()) {
             if (!(object instanceof RoadFlag))
                 continue;
 
@@ -116,14 +116,14 @@ public abstract class GeneratorModule {
         return command;
     }
 
-    public void sendSuccessMessage(Player p){
+    public void sendSuccessMessage(Player p) {
         p.sendMessage(" ");
         p.sendMessage(" ");
         p.sendMessage(" ");
 
         String type = "Building";
 
-        switch (generatorType){
+        switch (generatorType) {
             case HOUSE:
                 type = "House";
                 break;
@@ -148,32 +148,33 @@ public abstract class GeneratorModule {
         p.sendMessage("§cNote: You can undo the edit with /gen undo.");
     }
 
-    /** Conversion:
-     *
+    /**
+     * Conversion:
+     * <p>
      * Command: /gen house -w 123:12 -r 456:78
      * args: ["-w", "123:12", "-r", "456:78"]
      * HouseSettings:
-     *  WALL_COLOR: 123:12
-     *  ROOF_TYPE:  456:78
+     * WALL_COLOR: 123:12
+     * ROOF_TYPE:  456:78
      */
-    protected void convertArgsToSettings(Player p, String[] args, GeneratorType generatorType){
-        for(String flag : Generator.convertArgsToFlags(args)){
+    protected void convertArgsToSettings(Player p, String[] args, GeneratorType generatorType) {
+        for (String flag : Generator.convertArgsToFlags(args)) {
             String[] flagAndValue = Generator.convertToFlagAndValue(flag, p);
             String flagName = flagAndValue[0];
             String flagValue = flagAndValue[1];
 
-            if(flagName == null)
+            if (flagName == null)
                 continue;
 
             Flag finalFlag = Flag.byString(generatorType, flagName);
 
-            if(finalFlag == null)
+            if (finalFlag == null)
                 continue;
 
             getPlayerSettings().get(p.getUniqueId()).setValue(finalFlag, flagValue);
         }
 
-        if(getPlayerSettings().get(p.getUniqueId()).getValues().size() == 0 && args.length > 1)
+        if (getPlayerSettings().get(p.getUniqueId()).getValues().size() == 0 && args.length > 1)
             sendHelp(p);
     }
 }

@@ -20,18 +20,14 @@ import java.util.UUID;
 
 public class StatsMenu extends AbstractMenu {
 
+    private final static ItemStack GLOBAL_HEAD = Item.createCustomHeadBase64(MenuItems.EARTH, "§eGlobal Statistics", Liste.createList("error"));
+    private final static ItemStack ACHIEVEMENTS_HEAD = Item.createCustomHeadBase64(MenuItems.GOLDEN_CUP, "§eAchievements", Liste.createList("error"));
     private final byte PLAYER_HEAD_SLOT = 4;
-
     private final byte TEAM_HEAD_SLOT = 20;
     private final byte GLOBAL_HEAD_SLOT = 22;
     private final byte ACHIEVEMENT_HEAD_SLOT = 24;
-
-    private final static ItemStack GLOBAL_HEAD = Item.createCustomHeadBase64(MenuItems.EARTH, "§eGlobal Statistics", Liste.createList("error"));
-    private final static ItemStack ACHIEVEMENTS_HEAD = Item.createCustomHeadBase64(MenuItems.GOLDEN_CUP, "§eAchievements", Liste.createList("error"));
-
     private final ItemStack PLAYER_HEAD = Item.createPlayerHead("&ePersonal Statistics", getMenuPlayer().getName());
     private final ItemStack TEAM_HEAD = Item.create(Material.STONE, "Placeholder", Liste.createList("placeholder")); //TODO GET HEAD BASED ON COUNTRY/TEAM
-
 
 
     public StatsMenu(Player p) {
@@ -79,7 +75,7 @@ public class StatsMenu extends AbstractMenu {
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short)15, null))
+                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null))
                 .pattern("111101111")
                 .pattern("110101011")
                 .pattern("111111111")
@@ -101,8 +97,8 @@ public class StatsMenu extends AbstractMenu {
 
         ArrayList<String> playerLore = new ArrayList<>();
 
-        for(Object key : playerStats.keySet()) {
-            if(key instanceof UUID) continue;
+        for (Object key : playerStats.keySet()) {
+            if (key instanceof UUID) continue;
 
             Object value = playerStats.get(key);
             playerLore.add(key + ": " + value);
@@ -116,7 +112,7 @@ public class StatsMenu extends AbstractMenu {
 
         ArrayList<String> serverLore = new ArrayList<>();
 
-        for(Object key : serverStats.keySet()) {
+        for (Object key : serverStats.keySet()) {
             Object value = serverStats.get(key);
             serverLore.add(key + ": " + value);
         }

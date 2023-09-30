@@ -8,15 +8,14 @@ import org.bukkit.entity.Player;
 /**
  * Functions related to Network wide functionality
  */
-public class ProxyUtil
-{
+public class ProxyUtil {
     /**
      * Sends a player server switch request to the proxy. The player will then be sent to the target server.
-     * @param player The player aiming to switch server
+     *
+     * @param player   The player aiming to switch server
      * @param szServer The name of the server the player must switch to
      */
-    public static void SwitchServer(Player player, String szServer)
-    {
+    public static void SwitchServer(Player player, String szServer) {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Connect");
         out.writeUTF(szServer);

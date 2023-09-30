@@ -1,6 +1,5 @@
 package net.buildtheearth.modules.generator.menu;
 
-import net.buildtheearth.modules.updater.DependencyManager;
 import net.buildtheearth.Main;
 import net.buildtheearth.modules.generator.Generator;
 import net.buildtheearth.modules.generator.modules.house.House;
@@ -13,15 +12,17 @@ import net.buildtheearth.modules.generator.modules.road.Road;
 import net.buildtheearth.modules.generator.modules.road.RoadSettings;
 import net.buildtheearth.modules.generator.modules.road.menu.RoadColorMenu;
 import net.buildtheearth.modules.generator.modules.tree.Tree;
-import net.buildtheearth.modules.utils.menus.AbstractMenu;
+import net.buildtheearth.modules.updater.DependencyManager;
 import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.Liste;
+import net.buildtheearth.modules.utils.menus.AbstractMenu;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
+
 import java.util.ArrayList;
 
 public class GeneratorMenu extends AbstractMenu {
@@ -37,7 +38,6 @@ public class GeneratorMenu extends AbstractMenu {
     public static int TREE_ITEM_SLOT = 15;
 
     public static int FIELD_SLOT = 17;
-
 
 
     public GeneratorMenu(Player player) {
@@ -82,7 +82,7 @@ public class GeneratorMenu extends AbstractMenu {
                 "§8Rightclick for Tutorial");
 
 
-        ItemStack roadItem =  Item.create(Material.STEP, "§bGenerate Road", (short) 0, roadLore);
+        ItemStack roadItem = Item.create(Material.STEP, "§bGenerate Road", (short) 0, roadLore);
 
         // Set navigator item
         getMenu().getSlot(ROAD_ITEM_SLOT).setItem(roadItem);
@@ -107,7 +107,7 @@ public class GeneratorMenu extends AbstractMenu {
         getMenu().getSlot(RAILWAY_ITEM_SLOT).setItem(railwayItem);
 
 
-        if(!DependencyManager.isSchematicBrushEnabled()){
+        if (!DependencyManager.isSchematicBrushEnabled()) {
             // TREE ITEM
             ArrayList<String> treeLore = Liste.createList("", "§cPlugin §eSchematicBrush §cis not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
 
@@ -115,7 +115,7 @@ public class GeneratorMenu extends AbstractMenu {
 
             // Set navigator item
             getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
-        }else if(!Generator.checkIfTreePackIsInstalled(getMenuPlayer(), false)){
+        } else if (!Generator.checkIfTreePackIsInstalled(getMenuPlayer(), false)) {
             // TREE ITEM
             ArrayList<String> treeLore = Liste.createList("", "§cThe §eTree Pack " + Tree.TREE_PACK_VERSION + " §cis not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
 
@@ -123,7 +123,7 @@ public class GeneratorMenu extends AbstractMenu {
 
             // Set navigator item
             getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
-        }else{
+        } else {
             // TREE ITEM
             ArrayList<String> treeLore = Liste.createList("",
                     "§eDescription:",
@@ -141,8 +141,6 @@ public class GeneratorMenu extends AbstractMenu {
             // Set navigator item
             getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
         }
-
-
 
 
         // FIELD ITEM
@@ -164,12 +162,12 @@ public class GeneratorMenu extends AbstractMenu {
         getMenu().getSlot(FIELD_SLOT).setItem(fieldItem);
 
 
-
         super.setPreviewItems();
     }
 
     @Override
-    protected void setMenuItemsAsync() {}
+    protected void setMenuItemsAsync() {
+    }
 
     @Override
     protected void setItemClickEventsAsync() {
@@ -178,7 +176,7 @@ public class GeneratorMenu extends AbstractMenu {
             House house = Main.buildTeamTools.getGenerator().getHouse();
             house.getPlayerSettings().put(clickPlayer.getUniqueId(), new HouseSettings(clickPlayer));
 
-            if(!house.checkPlayer(clickPlayer))
+            if (!house.checkPlayer(clickPlayer))
                 return;
 
             clickPlayer.closeInventory();
@@ -191,7 +189,7 @@ public class GeneratorMenu extends AbstractMenu {
             Road road = Main.buildTeamTools.getGenerator().getRoad();
             road.getPlayerSettings().put(clickPlayer.getUniqueId(), new RoadSettings(clickPlayer));
 
-            if(!road.checkPlayer(clickPlayer))
+            if (!road.checkPlayer(clickPlayer))
                 return;
 
             clickPlayer.closeInventory();
@@ -204,7 +202,7 @@ public class GeneratorMenu extends AbstractMenu {
             Rail rail = Main.buildTeamTools.getGenerator().getRail();
             rail.getPlayerSettings().put(clickPlayer.getUniqueId(), new RailSettings(clickPlayer));
 
-            if(!rail.checkPlayer(clickPlayer))
+            if (!rail.checkPlayer(clickPlayer))
                 return;
 
             clickPlayer.closeInventory();
@@ -217,7 +215,7 @@ public class GeneratorMenu extends AbstractMenu {
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short)15, null))
+                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null))
                 .pattern("111111111")
                 .pattern("010101010")
                 .pattern("111111111")

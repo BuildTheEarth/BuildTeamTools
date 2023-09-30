@@ -8,7 +8,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 public class TpllJoinListener implements Listener {
 
     @EventHandler
-    public void onJoin(PlayerJoinEvent event){
+    public void onJoin(PlayerJoinEvent event) {
         TpllManager.processQueueForPlayer(event.getPlayer());
     }
 }

@@ -20,7 +20,7 @@ public class StatsManager {
     private StatsServer statsServer;
     private HashMap<UUID, StatsPlayer> statsPlayerList;
 
-    public StatsManager(){
+    public StatsManager() {
         statsServer = new StatsServer();
         statsPlayerList = new HashMap<>();
     }
@@ -29,19 +29,19 @@ public class StatsManager {
         return statsServer;
     }
 
-    public StatsPlayer getStatsPlayer(UUID uuid){
-        if(statsPlayerList.get(uuid) == null)
+    public StatsPlayer getStatsPlayer(UUID uuid) {
+        if (statsPlayerList.get(uuid) == null)
             addStatsPlayer(uuid);
 
         return statsPlayerList.get(uuid);
     }
 
-    public void resetCache(){
+    public void resetCache() {
         statsServer = new StatsServer();
         statsPlayerList = new HashMap<>();
     }
 
-    public void addStatsPlayer(UUID uuid){
+    public void addStatsPlayer(UUID uuid) {
         statsPlayerList.remove(uuid);
         statsPlayerList.put(uuid, new StatsPlayer(uuid));
     }
@@ -49,21 +49,22 @@ public class StatsManager {
     /**
      * Sends the current stats cache to the network.
      * This also saves it to the database.
+     *
      * @return true if success, false if failed
      */
-    public boolean updateAndSave(){
+    public boolean updateAndSave() {
         List<UUID> communicators = Main.getBuildTeamTools().getProxyManager().getCommunicators();
-        if(communicators.size() == 0) return false;
+        if (communicators.size() == 0) return false;
 
-        if(!Main.instance.isEnabled()) return false;
+        if (!Main.instance.isEnabled()) return false;
 
         Player p = Bukkit.getPlayer(communicators.get(0));
 
-        if(p == null) {
+        if (p == null) {
             communicators.remove(0);
             return false;
         }
-        if(!p.isOnline()) {
+        if (!p.isOnline()) {
             communicators.remove(0);
             return false;
         }
@@ -78,12 +79,12 @@ public class StatsManager {
         return true;
     }
 
-    public JSONObject getCurrentCache(){
+    public JSONObject getCurrentCache() {
         JSONObject jsonObject = statsServer.toJSON();
 
         //Player Stats
         JSONArray jsonArray = new JSONArray();
-        for(UUID uuid : statsPlayerList.keySet())
+        for (UUID uuid : statsPlayerList.keySet())
             jsonArray.put(statsPlayerList.get(uuid).toJSON());
         jsonObject.put("PLAYERS", jsonArray);
 

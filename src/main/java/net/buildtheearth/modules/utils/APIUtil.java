@@ -1,7 +1,6 @@
 package net.buildtheearth.modules.utils;
 
 import org.bukkit.Bukkit;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -44,7 +43,7 @@ public class APIUtil {
         return null;
     }
 
-    public static JSONArray createJSONArray(String jsonString){
+    public static JSONArray createJSONArray(String jsonString) {
         JSONArray jsonArray = new JSONArray();
         JSONParser jsonParser = new JSONParser();
         if ((jsonString != null) && !(jsonString.isEmpty())) {
@@ -57,7 +56,7 @@ public class APIUtil {
         return jsonArray;
     }
 
-    public static JSONObject createJSONObject(String jsonString){
+    public static JSONObject createJSONObject(String jsonString) {
         JSONObject jsonObject = new JSONObject();
         JSONParser jsonParser = new JSONParser();
         if ((jsonString != null) && !(jsonString.isEmpty())) {

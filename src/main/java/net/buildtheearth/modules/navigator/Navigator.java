@@ -1,7 +1,7 @@
 package net.buildtheearth.modules.navigator;
 
-import org.bukkit.entity.Player;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class Navigator {

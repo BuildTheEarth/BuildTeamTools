@@ -9,363 +9,271 @@ import java.util.List;
 
 public class MenuItems {
 
-    public static ItemStack closeMenuItem() {
-        return Item.create(Material.BARRIER, "§c§lClose");
-    }
-
-    public static ItemStack getCurrentPageItem(int currentPage) {
-        return getWhiteNumberHead(currentPage, "§eCurrent Page §7- §f" + (currentPage), null);
-    }
-
-    public static ItemStack getPreviousPageItem(int currentPage) {
-        if(currentPage <= 1)
-            return Item.createCustomHeadBase64(WHITE_BLANK, " ", null);
-
-        return Item.createCustomHeadBase64(MenuItems.WHITE_ARROW_LEFT, "§ePrevious Page §7- §f" + (currentPage - 1), null);
-    }
-
-    public static ItemStack getNextPageItem(int currentPage, boolean hasNextPage) {
-        if(!hasNextPage)
-            return Item.createCustomHeadBase64(WHITE_BLANK, " ", null);
-
-        return Item.createCustomHeadBase64(MenuItems.WHITE_ARROW_RIGHT, "§eNext Page §7- §f" + (currentPage + 1), null);
-    }
-
-
-
-    public static ItemStack getCounterCurrentValueItem(SliderColor sliderColor, String name, int value, String valueType) {
-        String sliderName = "§e" + name + ": §7§l" + value;
-        if(valueType != null)
-            sliderName += " " + valueType;
-        
-        switch (sliderColor) {
-            default:
-            case WHITE: return getWhiteNumberHead(value, sliderName, null);
-            case LIGHT_GRAY: return getLightGrayNumberHead(value, sliderName, null);
-        }
-    }
-
-    public static ItemStack getCounterPlusItem(SliderColor sliderColor, String name, int value, int maxValue) {
-        if(value >= maxValue)
-        switch (sliderColor) {
-            case WHITE: return Item.createCustomHeadBase64(WHITE_BLANK, " ", null);
-            case LIGHT_GRAY: return Item.createCustomHeadBase64(LIGHT_GRAY_BLANK, " ", null);
-        }
-
-        switch (sliderColor) {
-            default:
-            case WHITE: return Item.createCustomHeadBase64(MenuItems.WHITE_PLUS, "§a§l+ §e" + name, null);
-            case LIGHT_GRAY: return Item.createCustomHeadBase64(MenuItems.LIGHT_GRAY_PLUS, "§a§l+ §e" + name, null);
-        }
-    }
-
-    public static ItemStack getCounterMinusItem(SliderColor sliderColor, String name, int value, int minValue) {
-        if(value <= minValue)
-        switch (sliderColor) {
-            case WHITE: return Item.createCustomHeadBase64(WHITE_BLANK, " ", null);
-            case LIGHT_GRAY: return Item.createCustomHeadBase64(LIGHT_GRAY_BLANK, " ", null);
-        }
-
-        switch (sliderColor) {
-            default:
-            case WHITE: return Item.createCustomHeadBase64(MenuItems.WHITE_MINUS, "§c§l- §e" + name, null);
-            case LIGHT_GRAY: return Item.createCustomHeadBase64(MenuItems.LIGHT_GRAY_MINUS, "§c§l- §e" + name, null);
-        }
-    }
-
-    public static ItemStack getXItem(SliderColor sliderColor, String name) {
-        switch (sliderColor) {
-            default:
-            case WHITE: return Item.createCustomHeadBase64(MenuItems.WHITE_X,  name, null);
-            case LIGHT_GRAY: return Item.createCustomHeadBase64(MenuItems.LIGHT_GRAY_X, name, null);
-        }
-    }
-
-    public static ItemStack getBlankItem(SliderColor sliderColor, String name) {
-        switch (sliderColor) {
-            default:
-            case WHITE: return Item.createCustomHeadBase64(MenuItems.WHITE_BLANK,  name, null);
-            case LIGHT_GRAY: return Item.createCustomHeadBase64(MenuItems.LIGHT_GRAY_BLANK, name, null);
-        }
-    }
-
-
-    public static ItemStack getNextItem(){
-        return Item.createCustomHeadBase64(MenuItems.CHECKMARK, "§eNext", null);
-    }
-
-
     public static ItemStack[] BLOCKS_BY_COLOR_1_12 = {
-            Item.create(Material.STAINED_GLASS, null, (short)15, null),
-            Item.create(Material.CONCRETE, null, (short)15, null),
+            Item.create(Material.STAINED_GLASS, null, (short) 15, null),
+            Item.create(Material.CONCRETE, null, (short) 15, null),
             Item.create(Material.COAL_BLOCK),
-            Item.create(Material.CONCRETE_POWDER, null, (short)15, null),
-            Item.create(Material.WOOL, null, (short)15, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 15, null),
+            Item.create(Material.WOOL, null, (short) 15, null),
             Item.create(Material.OBSIDIAN),
-            Item.create(Material.STAINED_GLASS, null, (short)7, null),
-            Item.create(Material.CONCRETE, null, (short)7, null),
-            Item.create(Material.CONCRETE_POWDER, null, (short)7, null),
-            Item.create(Material.STAINED_CLAY, null, (short)9, null),
-            Item.create(Material.CONCRETE, null, (short)8, null),
+            Item.create(Material.STAINED_GLASS, null, (short) 7, null),
+            Item.create(Material.CONCRETE, null, (short) 7, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 7, null),
+            Item.create(Material.STAINED_CLAY, null, (short) 9, null),
+            Item.create(Material.CONCRETE, null, (short) 8, null),
             Item.create(Material.COBBLESTONE),
-            Item.create(Material.SMOOTH_BRICK, null, (short)2, null),
+            Item.create(Material.SMOOTH_BRICK, null, (short) 2, null),
             Item.create(Material.SMOOTH_BRICK),
-            Item.create(Material.STAINED_GLASS, null, (short)8, null),
-            Item.create(Material.STONE, null, (short)6, null),
+            Item.create(Material.STAINED_GLASS, null, (short) 8, null),
+            Item.create(Material.STONE, null, (short) 6, null),
             Item.create(Material.STONE),
-            Item.create(Material.STONE, null, (short)5, null),
-            Item.create(Material.WOOL, null, (short)8, null),
-            Item.create(Material.CONCRETE_POWDER, null, (short)8, null),
+            Item.create(Material.STONE, null, (short) 5, null),
+            Item.create(Material.WOOL, null, (short) 8, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 8, null),
             Item.create(Material.CLAY),
             Item.create(Material.BONE_BLOCK),
-            Item.create(Material.STONE, null, (short)3, null),
-            Item.create(Material.STONE, null, (short)4, null),
-            Item.create(Material.CONCRETE, null, (short)0, null),
-            Item.create(Material.QUARTZ_BLOCK, null, (short)1, null),
-            Item.create(Material.QUARTZ_BLOCK, null, (short)2, null),
-            Item.create(Material.QUARTZ_BLOCK, null, (short)0, null),
-            Item.create(Material.LOG, null, (short)2, null),
+            Item.create(Material.STONE, null, (short) 3, null),
+            Item.create(Material.STONE, null, (short) 4, null),
+            Item.create(Material.CONCRETE, null, (short) 0, null),
+            Item.create(Material.QUARTZ_BLOCK, null, (short) 1, null),
+            Item.create(Material.QUARTZ_BLOCK, null, (short) 2, null),
+            Item.create(Material.QUARTZ_BLOCK, null, (short) 0, null),
+            Item.create(Material.LOG, null, (short) 2, null),
             Item.create(Material.SEA_LANTERN),
             Item.create(Material.IRON_BLOCK),
-            Item.create(Material.CONCRETE_POWDER, null, (short)0, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 0, null),
             Item.create(Material.WOOL),
             Item.create(Material.SNOW_BLOCK),
             Item.create(Material.STAINED_GLASS),
-            Item.create(Material.CONCRETE_POWDER, null, (short)6, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 6, null),
             Item.create(Material.PINK_GLAZED_TERRACOTTA),
-            Item.create(Material.WOOL, null, (short)6, null),
-            Item.create(Material.WOOL, null, (short)2, null),
+            Item.create(Material.WOOL, null, (short) 6, null),
+            Item.create(Material.WOOL, null, (short) 2, null),
             Item.create(Material.MAGENTA_GLAZED_TERRACOTTA),
-            Item.create(Material.CONCRETE_POWDER, null, (short)2, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 2, null),
             Item.create(Material.PURPUR_BLOCK),
             Item.create(Material.PURPUR_PILLAR),
-            Item.create(Material.STAINED_GLASS, null, (short)2, null),
-            Item.create(Material.STAINED_GLASS, null, (short)10, null),
-            Item.create(Material.CONCRETE_POWDER, null, (short)10, null),
-            Item.create(Material.WOOL, null, (short)10, null),
-            Item.create(Material.CONCRETE, null, (short)10, null),
-            Item.create(Material.STAINED_CLAY, null, (short)11, null),
-            Item.create(Material.STAINED_CLAY, null, (short)3, null),
-            Item.create(Material.STAINED_GLASS, null, (short)11, null),
-            Item.create(Material.STAINED_GLASS, null, (short)3, null),
-            Item.create(Material.CONCRETE, null, (short)11, null),
+            Item.create(Material.STAINED_GLASS, null, (short) 2, null),
+            Item.create(Material.STAINED_GLASS, null, (short) 10, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 10, null),
+            Item.create(Material.WOOL, null, (short) 10, null),
+            Item.create(Material.CONCRETE, null, (short) 10, null),
+            Item.create(Material.STAINED_CLAY, null, (short) 11, null),
+            Item.create(Material.STAINED_CLAY, null, (short) 3, null),
+            Item.create(Material.STAINED_GLASS, null, (short) 11, null),
+            Item.create(Material.STAINED_GLASS, null, (short) 3, null),
+            Item.create(Material.CONCRETE, null, (short) 11, null),
             Item.create(Material.LAPIS_BLOCK),
-            Item.create(Material.WOOL, null, (short)11, null),
-            Item.create(Material.CONCRETE_POWDER, null, (short)11, null),
-            Item.create(Material.PRISMARINE, null, (short)2, null),
-            Item.create(Material.WOOL, null, (short)9, null),
+            Item.create(Material.WOOL, null, (short) 11, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 11, null),
+            Item.create(Material.PRISMARINE, null, (short) 2, null),
+            Item.create(Material.WOOL, null, (short) 9, null),
             Item.create(Material.PRISMARINE),
-            Item.create(Material.PRISMARINE, null, (short)1, null),
+            Item.create(Material.PRISMARINE, null, (short) 1, null),
             Item.create(Material.PACKED_ICE),
             Item.create(Material.ICE),
-            Item.create(Material.CONCRETE, null, (short)3, null),
-            Item.create(Material.WOOL, null, (short)3, null),
-            Item.create(Material.CONCRETE_POWDER, null, (short)3, null),
+            Item.create(Material.CONCRETE, null, (short) 3, null),
+            Item.create(Material.WOOL, null, (short) 3, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 3, null),
             Item.create(Material.DIAMOND_BLOCK),
             Item.create(Material.LIME_GLAZED_TERRACOTTA),
-            Item.create(Material.CONCRETE_POWDER, null, (short)5, null),
-            Item.create(Material.WOOL, null, (short)5, null),
-            Item.create(Material.CONCRETE, null, (short)5, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 5, null),
+            Item.create(Material.WOOL, null, (short) 5, null),
+            Item.create(Material.CONCRETE, null, (short) 5, null),
             Item.create(Material.MELON_BLOCK),
-            Item.create(Material.STAINED_GLASS, null, (short)5, null),
+            Item.create(Material.STAINED_GLASS, null, (short) 5, null),
             Item.create(Material.EMERALD_BLOCK),
             Item.create(Material.GREEN_GLAZED_TERRACOTTA),
-            Item.create(Material.CONCRETE_POWDER, null, (short)13, null),
-            Item.create(Material.WOOL, null, (short)13, null),
-            Item.create(Material.CONCRETE, null, (short)13, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 13, null),
+            Item.create(Material.WOOL, null, (short) 13, null),
+            Item.create(Material.CONCRETE, null, (short) 13, null),
             Item.create(Material.GRASS),
-            Item.create(Material.STAINED_CLAY, null, (short)5, null),
-            Item.create(Material.STAINED_CLAY, null, (short)13, null),
-            Item.create(Material.LEAVES, null, (short)3, null),
-            Item.create(Material.LEAVES, null, (short)0, null),
-            Item.create(Material.LEAVES_2, null, (short)1, null),
-            Item.create(Material.LEAVES_2, null, (short)0, null),
-            Item.create(Material.LEAVES, null, (short)2, null),
-            Item.create(Material.LEAVES, null, (short)1, null),
+            Item.create(Material.STAINED_CLAY, null, (short) 5, null),
+            Item.create(Material.STAINED_CLAY, null, (short) 13, null),
+            Item.create(Material.LEAVES, null, (short) 3, null),
+            Item.create(Material.LEAVES, null, (short) 0, null),
+            Item.create(Material.LEAVES_2, null, (short) 1, null),
+            Item.create(Material.LEAVES_2, null, (short) 0, null),
+            Item.create(Material.LEAVES, null, (short) 2, null),
+            Item.create(Material.LEAVES, null, (short) 1, null),
             Item.create(Material.MOSSY_COBBLESTONE),
             Item.create(Material.LOG_2),
             Item.create(Material.HARD_CLAY),
-            Item.create(Material.STONE, null, (short)2, null),
-            Item.create(Material.STONE, null, (short)1, null),
-            Item.create(Material.WOOD, null, (short)3, null),
-            Item.create(Material.WOOD, null, (short)2, null),
+            Item.create(Material.STONE, null, (short) 2, null),
+            Item.create(Material.STONE, null, (short) 1, null),
+            Item.create(Material.WOOD, null, (short) 3, null),
+            Item.create(Material.WOOD, null, (short) 2, null),
             Item.create(Material.END_BRICKS),
             Item.create(Material.ENDER_STONE),
             Item.create(Material.SANDSTONE),
-            Item.create(Material.SANDSTONE, null, (short)1, null),
-            Item.create(Material.SANDSTONE, null, (short)2, null),
+            Item.create(Material.SANDSTONE, null, (short) 1, null),
+            Item.create(Material.SANDSTONE, null, (short) 2, null),
             Item.create(Material.SAND),
             Item.create(Material.GOLD_BLOCK),
-            Item.create(Material.CONCRETE_POWDER, null, (short)4, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 4, null),
             Item.create(Material.YELLOW_GLAZED_TERRACOTTA),
-            Item.create(Material.CONCRETE, null, (short)4, null),
-            Item.create(Material.STAINED_CLAY, null, (short)4, null),
+            Item.create(Material.CONCRETE, null, (short) 4, null),
+            Item.create(Material.STAINED_CLAY, null, (short) 4, null),
             Item.create(Material.GLOWSTONE),
             Item.create(Material.HAY_BLOCK),
             Item.create(Material.SPONGE),
-            Item.create(Material.SPONGE, null, (short)1, null),
-            Item.create(Material.STAINED_GLASS, null, (short)4, null),
-            Item.create(Material.STAINED_GLASS, null, (short)1, null),
-            Item.create(Material.CONCRETE_POWDER, null, (short)1, null),
-            Item.create(Material.WOOL, null, (short)1, null),
-            Item.create(Material.CONCRETE, null, (short)1, null),
-            Item.create(Material.SAND, null, (short)1, null),
+            Item.create(Material.SPONGE, null, (short) 1, null),
+            Item.create(Material.STAINED_GLASS, null, (short) 4, null),
+            Item.create(Material.STAINED_GLASS, null, (short) 1, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 1, null),
+            Item.create(Material.WOOL, null, (short) 1, null),
+            Item.create(Material.CONCRETE, null, (short) 1, null),
+            Item.create(Material.SAND, null, (short) 1, null),
             Item.create(Material.RED_SANDSTONE),
-            Item.create(Material.RED_SANDSTONE, null, (short)1, null),
-            Item.create(Material.RED_SANDSTONE, null, (short)2, null),
+            Item.create(Material.RED_SANDSTONE, null, (short) 1, null),
+            Item.create(Material.RED_SANDSTONE, null, (short) 2, null),
             Item.create(Material.PUMPKIN),
-            Item.create(Material.WOOD, null, (short)4, null),
+            Item.create(Material.WOOD, null, (short) 4, null),
             Item.create(Material.BRICK),
-            Item.create(Material.STAINED_CLAY, null, (short)1, null),
+            Item.create(Material.STAINED_CLAY, null, (short) 1, null),
             Item.create(Material.MAGMA),
             Item.create(Material.REDSTONE_BLOCK),
             Item.create(Material.HUGE_MUSHROOM_2),
-            Item.create(Material.WOOL, null, (short)14, null),
-            Item.create(Material.STAINED_CLAY, null, (short)14, null),
-            Item.create(Material.CONCRETE, null, (short)14, null),
+            Item.create(Material.WOOL, null, (short) 14, null),
+            Item.create(Material.STAINED_CLAY, null, (short) 14, null),
+            Item.create(Material.CONCRETE, null, (short) 14, null),
             Item.create(Material.RED_NETHER_BRICK),
-            Item.create(Material.STAINED_GLASS, null, (short)14, null),
+            Item.create(Material.STAINED_GLASS, null, (short) 14, null),
             Item.create(Material.NETHERRACK),
             Item.create(Material.QUARTZ_ORE),
             Item.create(Material.BLACK_GLAZED_TERRACOTTA),
             Item.create(Material.NETHER_BRICK),
-            Item.create(Material.STAINED_CLAY, null, (short)15, null),
-            Item.create(Material.LOG, null, (short)1, null),
-            Item.create(Material.WOOD, null, (short)5, null),
-            Item.create(Material.LOG_2, null, (short)1, null),
-            Item.create(Material.STAINED_CLAY, null, (short)7, null),
-            Item.create(Material.LOG, null, (short)3, null),
-            Item.create(Material.DIRT, null, (short)2, null),
-            Item.create(Material.STAINED_CLAY, null, (short)12, null),
+            Item.create(Material.STAINED_CLAY, null, (short) 15, null),
+            Item.create(Material.LOG, null, (short) 1, null),
+            Item.create(Material.WOOD, null, (short) 5, null),
+            Item.create(Material.LOG_2, null, (short) 1, null),
+            Item.create(Material.STAINED_CLAY, null, (short) 7, null),
+            Item.create(Material.LOG, null, (short) 3, null),
+            Item.create(Material.DIRT, null, (short) 2, null),
+            Item.create(Material.STAINED_CLAY, null, (short) 12, null),
             Item.create(Material.SOUL_SAND),
             Item.create(Material.REDSTONE_LAMP_OFF),
             Item.create(Material.NOTE_BLOCK),
             Item.create(Material.JUKEBOX),
-            Item.create(Material.STAINED_GLASS, null, (short)12, null),
-            Item.create(Material.LOG, null, (short)0, null),
-            Item.create(Material.CONCRETE, null, (short)12, null),
-            Item.create(Material.WOOD, null, (short)1, null),
-            Item.create(Material.WOOL, null, (short)12, null),
-            Item.create(Material.CONCRETE_POWDER, null, (short)12, null),
-            Item.create(Material.DIRT, null, (short)1, null),
+            Item.create(Material.STAINED_GLASS, null, (short) 12, null),
+            Item.create(Material.LOG, null, (short) 0, null),
+            Item.create(Material.CONCRETE, null, (short) 12, null),
+            Item.create(Material.WOOD, null, (short) 1, null),
+            Item.create(Material.WOOL, null, (short) 12, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 12, null),
+            Item.create(Material.DIRT, null, (short) 1, null),
             Item.create(Material.MYCEL),
             Item.create(Material.WOOD)
     };
-
-    public static List<ItemStack> getBlocksByColor(){
-        return Arrays.asList(BLOCKS_BY_COLOR_1_12);
-    }
-
     public static ItemStack[] WALL_BLOCKS = {
-            Item.create(Material.CONCRETE, null, (short)15, null),
+            Item.create(Material.CONCRETE, null, (short) 15, null),
             Item.create(Material.COAL_BLOCK),
-            Item.create(Material.CONCRETE_POWDER, null, (short)15, null),
-            Item.create(Material.WOOL, null, (short)15, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 15, null),
+            Item.create(Material.WOOL, null, (short) 15, null),
             Item.create(Material.OBSIDIAN),
-            Item.create(Material.CONCRETE, null, (short)7, null),
-            Item.create(Material.CONCRETE_POWDER, null, (short)7, null),
-            Item.create(Material.STAINED_CLAY, null, (short)9, null),
-            Item.create(Material.CONCRETE, null, (short)8, null),
+            Item.create(Material.CONCRETE, null, (short) 7, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 7, null),
+            Item.create(Material.STAINED_CLAY, null, (short) 9, null),
+            Item.create(Material.CONCRETE, null, (short) 8, null),
             Item.create(Material.COBBLESTONE),
-            Item.create(Material.SMOOTH_BRICK, null, (short)2, null),
+            Item.create(Material.SMOOTH_BRICK, null, (short) 2, null),
             Item.create(Material.SMOOTH_BRICK),
-            Item.create(Material.STONE, null, (short)6, null),
+            Item.create(Material.STONE, null, (short) 6, null),
             Item.create(Material.STONE),
-            Item.create(Material.STONE, null, (short)5, null),
-            Item.create(Material.WOOL, null, (short)8, null),
-            Item.create(Material.CONCRETE_POWDER, null, (short)8, null),
+            Item.create(Material.STONE, null, (short) 5, null),
+            Item.create(Material.WOOL, null, (short) 8, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 8, null),
             Item.create(Material.CLAY),
             Item.create(Material.BONE_BLOCK),
-            Item.create(Material.STONE, null, (short)3, null),
-            Item.create(Material.STONE, null, (short)4, null),
-            Item.create(Material.CONCRETE, null, (short)0, null),
-            Item.create(Material.QUARTZ_BLOCK, null, (short)1, null),
-            Item.create(Material.QUARTZ_BLOCK, null, (short)2, null),
-            Item.create(Material.QUARTZ_BLOCK, null, (short)0, null),
-            Item.create(Material.LOG, null, (short)2, null),
+            Item.create(Material.STONE, null, (short) 3, null),
+            Item.create(Material.STONE, null, (short) 4, null),
+            Item.create(Material.CONCRETE, null, (short) 0, null),
+            Item.create(Material.QUARTZ_BLOCK, null, (short) 1, null),
+            Item.create(Material.QUARTZ_BLOCK, null, (short) 2, null),
+            Item.create(Material.QUARTZ_BLOCK, null, (short) 0, null),
+            Item.create(Material.LOG, null, (short) 2, null),
             Item.create(Material.IRON_BLOCK),
-            Item.create(Material.CONCRETE_POWDER, null, (short)0, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 0, null),
             Item.create(Material.WOOL),
             Item.create(Material.SNOW_BLOCK),
-            Item.create(Material.CONCRETE_POWDER, null, (short)6, null),
-            Item.create(Material.WOOL, null, (short)6, null),
-            Item.create(Material.WOOL, null, (short)2, null),
-            Item.create(Material.CONCRETE_POWDER, null, (short)2, null),
-            Item.create(Material.CONCRETE_POWDER, null, (short)10, null),
-            Item.create(Material.WOOL, null, (short)10, null),
-            Item.create(Material.CONCRETE, null, (short)10, null),
-            Item.create(Material.STAINED_CLAY, null, (short)11, null),
-            Item.create(Material.STAINED_CLAY, null, (short)3, null),
-            Item.create(Material.CONCRETE, null, (short)11, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 6, null),
+            Item.create(Material.WOOL, null, (short) 6, null),
+            Item.create(Material.WOOL, null, (short) 2, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 2, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 10, null),
+            Item.create(Material.WOOL, null, (short) 10, null),
+            Item.create(Material.CONCRETE, null, (short) 10, null),
+            Item.create(Material.STAINED_CLAY, null, (short) 11, null),
+            Item.create(Material.STAINED_CLAY, null, (short) 3, null),
+            Item.create(Material.CONCRETE, null, (short) 11, null),
             Item.create(Material.LAPIS_BLOCK),
-            Item.create(Material.WOOL, null, (short)11, null),
-            Item.create(Material.CONCRETE_POWDER, null, (short)11, null),
-            Item.create(Material.PRISMARINE, null, (short)2, null),
-            Item.create(Material.WOOL, null, (short)9, null),
+            Item.create(Material.WOOL, null, (short) 11, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 11, null),
+            Item.create(Material.PRISMARINE, null, (short) 2, null),
+            Item.create(Material.WOOL, null, (short) 9, null),
             Item.create(Material.PRISMARINE),
-            Item.create(Material.PRISMARINE, null, (short)1, null),
+            Item.create(Material.PRISMARINE, null, (short) 1, null),
             Item.create(Material.PACKED_ICE),
-            Item.create(Material.CONCRETE, null, (short)3, null),
-            Item.create(Material.WOOL, null, (short)3, null),
-            Item.create(Material.CONCRETE_POWDER, null, (short)3, null),
-            Item.create(Material.CONCRETE_POWDER, null, (short)5, null),
-            Item.create(Material.WOOL, null, (short)5, null),
-            Item.create(Material.CONCRETE, null, (short)5, null),
-            Item.create(Material.CONCRETE_POWDER, null, (short)13, null),
-            Item.create(Material.WOOL, null, (short)13, null),
-            Item.create(Material.CONCRETE, null, (short)13, null),
-            Item.create(Material.STAINED_CLAY, null, (short)5, null),
-            Item.create(Material.STAINED_CLAY, null, (short)13, null),
+            Item.create(Material.CONCRETE, null, (short) 3, null),
+            Item.create(Material.WOOL, null, (short) 3, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 3, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 5, null),
+            Item.create(Material.WOOL, null, (short) 5, null),
+            Item.create(Material.CONCRETE, null, (short) 5, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 13, null),
+            Item.create(Material.WOOL, null, (short) 13, null),
+            Item.create(Material.CONCRETE, null, (short) 13, null),
+            Item.create(Material.STAINED_CLAY, null, (short) 5, null),
+            Item.create(Material.STAINED_CLAY, null, (short) 13, null),
             Item.create(Material.LOG_2),
             Item.create(Material.HARD_CLAY),
-            Item.create(Material.STONE, null, (short)2, null),
-            Item.create(Material.STONE, null, (short)1, null),
-            Item.create(Material.WOOD, null, (short)3, null),
-            Item.create(Material.WOOD, null, (short)2, null),
+            Item.create(Material.STONE, null, (short) 2, null),
+            Item.create(Material.STONE, null, (short) 1, null),
+            Item.create(Material.WOOD, null, (short) 3, null),
+            Item.create(Material.WOOD, null, (short) 2, null),
             Item.create(Material.END_BRICKS),
             Item.create(Material.ENDER_STONE),
             Item.create(Material.SANDSTONE),
-            Item.create(Material.SANDSTONE, null, (short)1, null),
-            Item.create(Material.SANDSTONE, null, (short)2, null),
+            Item.create(Material.SANDSTONE, null, (short) 1, null),
+            Item.create(Material.SANDSTONE, null, (short) 2, null),
             Item.create(Material.SAND),
-            Item.create(Material.CONCRETE_POWDER, null, (short)4, null),
-            Item.create(Material.CONCRETE, null, (short)4, null),
-            Item.create(Material.STAINED_CLAY, null, (short)4, null),
-            Item.create(Material.CONCRETE_POWDER, null, (short)1, null),
-            Item.create(Material.WOOL, null, (short)1, null),
-            Item.create(Material.CONCRETE, null, (short)1, null),
-            Item.create(Material.SAND, null, (short)1, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 4, null),
+            Item.create(Material.CONCRETE, null, (short) 4, null),
+            Item.create(Material.STAINED_CLAY, null, (short) 4, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 1, null),
+            Item.create(Material.WOOL, null, (short) 1, null),
+            Item.create(Material.CONCRETE, null, (short) 1, null),
+            Item.create(Material.SAND, null, (short) 1, null),
             Item.create(Material.RED_SANDSTONE),
-            Item.create(Material.RED_SANDSTONE, null, (short)1, null),
-            Item.create(Material.RED_SANDSTONE, null, (short)2, null),
+            Item.create(Material.RED_SANDSTONE, null, (short) 1, null),
+            Item.create(Material.RED_SANDSTONE, null, (short) 2, null),
             Item.create(Material.PUMPKIN),
-            Item.create(Material.WOOD, null, (short)4, null),
+            Item.create(Material.WOOD, null, (short) 4, null),
             Item.create(Material.BRICK),
-            Item.create(Material.STAINED_CLAY, null, (short)1, null),
+            Item.create(Material.STAINED_CLAY, null, (short) 1, null),
             Item.create(Material.HUGE_MUSHROOM_2),
-            Item.create(Material.WOOL, null, (short)14, null),
-            Item.create(Material.STAINED_CLAY, null, (short)14, null),
-            Item.create(Material.CONCRETE, null, (short)14, null),
+            Item.create(Material.WOOL, null, (short) 14, null),
+            Item.create(Material.STAINED_CLAY, null, (short) 14, null),
+            Item.create(Material.CONCRETE, null, (short) 14, null),
             Item.create(Material.RED_NETHER_BRICK),
             Item.create(Material.NETHERRACK),
             Item.create(Material.NETHER_BRICK),
-            Item.create(Material.STAINED_CLAY, null, (short)15, null),
-            Item.create(Material.LOG, null, (short)1, null),
-            Item.create(Material.WOOD, null, (short)5, null),
-            Item.create(Material.LOG_2, null, (short)1, null),
-            Item.create(Material.STAINED_CLAY, null, (short)7, null),
-            Item.create(Material.LOG, null, (short)3, null),
-            Item.create(Material.STAINED_CLAY, null, (short)12, null),
+            Item.create(Material.STAINED_CLAY, null, (short) 15, null),
+            Item.create(Material.LOG, null, (short) 1, null),
+            Item.create(Material.WOOD, null, (short) 5, null),
+            Item.create(Material.LOG_2, null, (short) 1, null),
+            Item.create(Material.STAINED_CLAY, null, (short) 7, null),
+            Item.create(Material.LOG, null, (short) 3, null),
+            Item.create(Material.STAINED_CLAY, null, (short) 12, null),
             Item.create(Material.SOUL_SAND),
             Item.create(Material.NOTE_BLOCK),
-            Item.create(Material.LOG, null, (short)0, null),
-            Item.create(Material.CONCRETE, null, (short)12, null),
-            Item.create(Material.WOOD, null, (short)1, null),
-            Item.create(Material.WOOL, null, (short)12, null),
-            Item.create(Material.CONCRETE_POWDER, null, (short)12, null),
+            Item.create(Material.LOG, null, (short) 0, null),
+            Item.create(Material.CONCRETE, null, (short) 12, null),
+            Item.create(Material.WOOD, null, (short) 1, null),
+            Item.create(Material.WOOL, null, (short) 12, null),
+            Item.create(Material.CONCRETE_POWDER, null, (short) 12, null),
             Item.create(Material.WOOD)
     };
-
     public static ItemStack[] SLABS = {
             Item.create(Material.STEP, null, (short) 0, null),
             Item.create(Material.STEP, null, (short) 1, null),
@@ -383,11 +291,6 @@ public class MenuItems {
             Item.create(Material.WOOD_STEP, null, (short) 4, null),
             Item.create(Material.WOOD_STEP, null, (short) 5, null),
     };
-
-    public static List<ItemStack> getSlabs(){
-        return Arrays.asList(SLABS);
-    }
-
     public static ItemStack[] STAIRS = {
             Item.create(Material.COBBLESTONE_STAIRS),
             Item.create(Material.SANDSTONE_STAIRS),
@@ -404,22 +307,12 @@ public class MenuItems {
             Item.create(Material.RED_SANDSTONE_STAIRS),
             Item.create(Material.WOOD_STAIRS)
     };
-
-    public static List<ItemStack> getStairs(){
-        return Arrays.asList(STAIRS);
-    }
-
     public static String EARTH = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjFkZDRmZTRhNDI5YWJkNjY1ZGZkYjNlMjEzMjFkNmVmYTZhNmI1ZTdiOTU2ZGI5YzVkNTljOWVmYWIyNSJ9fX0=";
     public static String GOLDEN_CUP = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTAyN2Q0YTg2NDVlYzc4YWZhNjIzZmU0MjkwN2YyZGI2NjQxYmZlZjFiNDk5ZmU3N2IzNjBhMWQwYjlhNjMzYyJ9fX0=";
-
-
     public static String WHITE_PLUS = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjBiNTVmNzQ2ODFjNjgyODNhMWMxY2U1MWYxYzgzYjUyZTI5NzFjOTFlZTM0ZWZjYjU5OGRmMzk5MGE3ZTcifX19";
     public static String WHITE_MINUS = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzNlNGI1MzNlNGJhMmRmZjdjMGZhOTBmNjdlOGJlZjM2NDI4YjZjYjA2YzQ1MjYyNjMxYjBiMjVkYjg1YiJ9fX0=";
     public static String WHITE_BLANK = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTdjMjE0NGZkY2I1NWMzZmMxYmYxZGU1MWNhYmRmNTJjMzg4M2JjYjU3ODkyMzIyNmJlYjBkODVjYjJkOTgwIn19fQ==";
-
     public static String WHITE_X = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWQxYTNjOTY1NjIzNDg1MjdkNTc5OGYyOTE2MDkyODFmNzJlMTZkNjExZjFhNzZjMGZhN2FiZTA0MzY2NSJ9fX0=";
-
-
     public static String WHITE_0_B64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2YwOTAxOGY0NmYzNDllNTUzNDQ2OTQ2YTM4NjQ5ZmNmY2Y5ZmRmZDYyOTE2YWVjMzNlYmNhOTZiYjIxYjUifX19";
     public static String WHITE_1_B64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2E1MTZmYmFlMTYwNThmMjUxYWVmOWE2OGQzMDc4NTQ5ZjQ4ZjZkNWI2ODNmMTljZjVhMTc0NTIxN2Q3MmNjIn19fQ==";
     public static String WHITE_2_B64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDY5OGFkZDM5Y2Y5ZTRlYTkyZDQyZmFkZWZkZWMzYmU4YTdkYWZhMTFmYjM1OWRlNzUyZTlmNTRhZWNlZGM5YSJ9fX0=";
@@ -441,15 +334,11 @@ public class MenuItems {
     public static String WHITE_18_B64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjZkZTlhNWEyZDhhMjM3MDcwMTliOWVmNjFkMTY2Mjg2MGUwYjE2NTNkZjZjMjc2MTZiZTJjNzZmY2QxODc1In19fQ==";
     public static String WHITE_19_B64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGJkNDU5MDRkMzRiNjM2YjJmNjQyNjFiM2Q4YmNlZDI1ODI4YzJiOGM0ODIzYjdlMTgzZWU4YTZmMWEyODRkIn19fQ==";
     public static String WHITE_20_B64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzRiOTNjNzIxNTE5ZTE0OTY0OWI3ZTRhZmI2ZDc2Y2ZjODE0NjA4YWU5Yzk1ZTdjM2RiNGJmNGJkYWFjZjMxZSJ9fX0=";
-
     public static String WHITE_ARROW_LEFT = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19";
     public static String WHITE_ARROW_RIGHT = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTU2YTM2MTg0NTllNDNiMjg3YjIyYjdlMjM1ZWM2OTk1OTQ1NDZjNmZjZDZkYzg0YmZjYTRjZjMwYWI5MzExIn19fQ==";
-    
-    
     public static String LIGHT_GRAY_PLUS = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjMyZmZmMTYzZTIzNTYzMmY0MDQ3ZjQ4NDE1OTJkNDZmODVjYmJmZGU4OWZjM2RmNjg3NzFiZmY2OWE2NjIifX19";
     public static String LIGHT_GRAY_MINUS = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGE1NmRhYjUzZDRlYTFhNzlhOGU1ZWQ2MzIyYzJkNTZjYjcxNGRkMzVlZGY0Nzg3NjNhZDFhODRhODMxMCJ9fX0=";
     public static String LIGHT_GRAY_BLANK = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODFmYjhjZTY0MDhhNTg1MTM4NGUxYzJlZjc1Mzg1MWVhYzE4YmE0MDE4MjY2Y2RkNjY5ZGM5NDQ4NzNkNDIifX19";
-
     public static String LIGHT_GRAY_X = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjVmM2VhN2M3YjI2YTA1NGE5ZmJiYjI4Yjk3YTYwODk5OWMyYzczZGY3NWJmNmIyMzQ4ZDdmYjFlNTllODU1In19fQ==";
     public static String LIGHT_GRAY_0_B64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmZhNDU5MTFiMTYyOThjZmNhNGIyMjkxZWVkYTY2NjExM2JjNmYyYTM3ZGNiMmVjZDhjMjc1NGQyNGVmNiJ9fX0=";
     public static String LIGHT_GRAY_1_B64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2FmMWIyODBjYWI1OWY0NDY5ZGFiOWYxYTJhZjc5MjdlZDk2YTgxZGYxZTI0ZDUwYThlMzk4NGFiZmU0MDQ0In19fQ==";
@@ -472,125 +361,331 @@ public class MenuItems {
     public static String LIGHT_GRAY_18_B64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjhkOTc3ODhiOTRjMzU2YzJmZjQ0NWY0NGY5NTM0ZmU0OGNiNWQyMTU0N2Q2NGZkYmI5OGFjYzFjNWRlZmUifX19";
     public static String LIGHT_GRAY_19_B64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmM1YjU5ZDk4YzkyNzRmOWI4NDMzNmNmMWFjYWUxNWIxYmU2OWY0MzQ4OGQ2NDI2YzhlMzQzZWMzN2FiMTI2In19fQ==";
     public static String LIGHT_GRAY_20_B64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTRhOTJlZGVkY2FmMTlmYmRjYjUwNWIyMGQ2NzQ3MmJkYTc4MWYyZGQzY2Y3MzcyZmFmOTcyOWQ5NzMxYiJ9fX0=";
-
-
     public static String CHECKMARK = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTkyZTMxZmZiNTljOTBhYjA4ZmM5ZGMxZmUyNjgwMjAzNWEzYTQ3YzQyZmVlNjM0MjNiY2RiNDI2MmVjYjliNiJ9fX0=";
+    public static ItemStack ITEM_BACKGROUND = Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null);
 
-    public static ItemStack ITEM_BACKGROUND = Item.create(Material.STAINED_GLASS_PANE, " ", (short)15, null);
+    public static ItemStack closeMenuItem() {
+        return Item.create(Material.BARRIER, "§c§lClose");
+    }
 
+    public static ItemStack getCurrentPageItem(int currentPage) {
+        return getWhiteNumberHead(currentPage, "§eCurrent Page §7- §f" + (currentPage), null);
+    }
 
-    public static ItemStack getWhiteNumberHead(int number, String headName, ArrayList<String> lore){
+    public static ItemStack getPreviousPageItem(int currentPage) {
+        if (currentPage <= 1)
+            return Item.createCustomHeadBase64(WHITE_BLANK, " ", null);
+
+        return Item.createCustomHeadBase64(MenuItems.WHITE_ARROW_LEFT, "§ePrevious Page §7- §f" + (currentPage - 1), null);
+    }
+
+    public static ItemStack getNextPageItem(int currentPage, boolean hasNextPage) {
+        if (!hasNextPage)
+            return Item.createCustomHeadBase64(WHITE_BLANK, " ", null);
+
+        return Item.createCustomHeadBase64(MenuItems.WHITE_ARROW_RIGHT, "§eNext Page §7- §f" + (currentPage + 1), null);
+    }
+
+    public static ItemStack getCounterCurrentValueItem(SliderColor sliderColor, String name, int value, String valueType) {
+        String sliderName = "§e" + name + ": §7§l" + value;
+        if (valueType != null)
+            sliderName += " " + valueType;
+
+        switch (sliderColor) {
+            default:
+            case WHITE:
+                return getWhiteNumberHead(value, sliderName, null);
+            case LIGHT_GRAY:
+                return getLightGrayNumberHead(value, sliderName, null);
+        }
+    }
+
+    public static ItemStack getCounterPlusItem(SliderColor sliderColor, String name, int value, int maxValue) {
+        if (value >= maxValue)
+            switch (sliderColor) {
+                case WHITE:
+                    return Item.createCustomHeadBase64(WHITE_BLANK, " ", null);
+                case LIGHT_GRAY:
+                    return Item.createCustomHeadBase64(LIGHT_GRAY_BLANK, " ", null);
+            }
+
+        switch (sliderColor) {
+            default:
+            case WHITE:
+                return Item.createCustomHeadBase64(MenuItems.WHITE_PLUS, "§a§l+ §e" + name, null);
+            case LIGHT_GRAY:
+                return Item.createCustomHeadBase64(MenuItems.LIGHT_GRAY_PLUS, "§a§l+ §e" + name, null);
+        }
+    }
+
+    public static ItemStack getCounterMinusItem(SliderColor sliderColor, String name, int value, int minValue) {
+        if (value <= minValue)
+            switch (sliderColor) {
+                case WHITE:
+                    return Item.createCustomHeadBase64(WHITE_BLANK, " ", null);
+                case LIGHT_GRAY:
+                    return Item.createCustomHeadBase64(LIGHT_GRAY_BLANK, " ", null);
+            }
+
+        switch (sliderColor) {
+            default:
+            case WHITE:
+                return Item.createCustomHeadBase64(MenuItems.WHITE_MINUS, "§c§l- §e" + name, null);
+            case LIGHT_GRAY:
+                return Item.createCustomHeadBase64(MenuItems.LIGHT_GRAY_MINUS, "§c§l- §e" + name, null);
+        }
+    }
+
+    public static ItemStack getXItem(SliderColor sliderColor, String name) {
+        switch (sliderColor) {
+            default:
+            case WHITE:
+                return Item.createCustomHeadBase64(MenuItems.WHITE_X, name, null);
+            case LIGHT_GRAY:
+                return Item.createCustomHeadBase64(MenuItems.LIGHT_GRAY_X, name, null);
+        }
+    }
+
+    public static ItemStack getBlankItem(SliderColor sliderColor, String name) {
+        switch (sliderColor) {
+            default:
+            case WHITE:
+                return Item.createCustomHeadBase64(MenuItems.WHITE_BLANK, name, null);
+            case LIGHT_GRAY:
+                return Item.createCustomHeadBase64(MenuItems.LIGHT_GRAY_BLANK, name, null);
+        }
+    }
+
+    public static ItemStack getNextItem() {
+        return Item.createCustomHeadBase64(MenuItems.CHECKMARK, "§eNext", null);
+    }
+
+    public static List<ItemStack> getBlocksByColor() {
+        return Arrays.asList(BLOCKS_BY_COLOR_1_12);
+    }
+
+    public static List<ItemStack> getSlabs() {
+        return Arrays.asList(SLABS);
+    }
+
+    public static List<ItemStack> getStairs() {
+        return Arrays.asList(STAIRS);
+    }
+
+    public static ItemStack getWhiteNumberHead(int number, String headName, ArrayList<String> lore) {
         String b64;
-        switch (number){
-            case 0: b64 = WHITE_0_B64; break;
-            case 1: b64 = WHITE_1_B64; break;
-            case 2: b64 = WHITE_2_B64; break;
-            case 3: b64 = WHITE_3_B64; break;
-            case 4: b64 = WHITE_4_B64; break;
-            case 5: b64 = WHITE_5_B64; break;
-            case 6: b64 = WHITE_6_B64; break;
-            case 7: b64 = WHITE_7_B64; break;
-            case 8: b64 = WHITE_8_B64; break;
-            case 9: b64 = WHITE_9_B64; break;
-            case 10: b64 = WHITE_10_B64; break;
-            case 11: b64 = WHITE_11_B64; break;
-            case 12: b64 = WHITE_12_B64; break;
-            case 13: b64 = WHITE_13_B64; break;
-            case 14: b64 = WHITE_14_B64; break;
-            case 15: b64 = WHITE_15_B64; break;
-            case 16: b64 = WHITE_16_B64; break;
-            case 17: b64 = WHITE_17_B64; break;
-            case 18: b64 = WHITE_18_B64; break;
-            case 19: b64 = WHITE_19_B64; break;
-            case 20: b64 = WHITE_20_B64; break;
+        switch (number) {
+            case 0:
+                b64 = WHITE_0_B64;
+                break;
+            case 1:
+                b64 = WHITE_1_B64;
+                break;
+            case 2:
+                b64 = WHITE_2_B64;
+                break;
+            case 3:
+                b64 = WHITE_3_B64;
+                break;
+            case 4:
+                b64 = WHITE_4_B64;
+                break;
+            case 5:
+                b64 = WHITE_5_B64;
+                break;
+            case 6:
+                b64 = WHITE_6_B64;
+                break;
+            case 7:
+                b64 = WHITE_7_B64;
+                break;
+            case 8:
+                b64 = WHITE_8_B64;
+                break;
+            case 9:
+                b64 = WHITE_9_B64;
+                break;
+            case 10:
+                b64 = WHITE_10_B64;
+                break;
+            case 11:
+                b64 = WHITE_11_B64;
+                break;
+            case 12:
+                b64 = WHITE_12_B64;
+                break;
+            case 13:
+                b64 = WHITE_13_B64;
+                break;
+            case 14:
+                b64 = WHITE_14_B64;
+                break;
+            case 15:
+                b64 = WHITE_15_B64;
+                break;
+            case 16:
+                b64 = WHITE_16_B64;
+                break;
+            case 17:
+                b64 = WHITE_17_B64;
+                break;
+            case 18:
+                b64 = WHITE_18_B64;
+                break;
+            case 19:
+                b64 = WHITE_19_B64;
+                break;
+            case 20:
+                b64 = WHITE_20_B64;
+                break;
 
-            default: b64 = WHITE_BLANK; break;
+            default:
+                b64 = WHITE_BLANK;
+                break;
         }
         return Item.createCustomHeadBase64(b64, headName, lore);
     }
 
-    public static ItemStack getLightGrayNumberHead(int number, String headName, ArrayList<String> lore){
+    public static ItemStack getLightGrayNumberHead(int number, String headName, ArrayList<String> lore) {
         String b64;
-        switch (number){
-            case 0: b64 = LIGHT_GRAY_0_B64; break;
-            case 1: b64 = LIGHT_GRAY_1_B64; break;
-            case 2: b64 = LIGHT_GRAY_2_B64; break;
-            case 3: b64 = LIGHT_GRAY_3_B64; break;
-            case 4: b64 = LIGHT_GRAY_4_B64; break;
-            case 5: b64 = LIGHT_GRAY_5_B64; break;
-            case 6: b64 = LIGHT_GRAY_6_B64; break;
-            case 7: b64 = LIGHT_GRAY_7_B64; break;
-            case 8: b64 = LIGHT_GRAY_8_B64; break;
-            case 9: b64 = LIGHT_GRAY_9_B64; break;
-            case 10: b64 = LIGHT_GRAY_10_B64; break;
-            case 11: b64 = LIGHT_GRAY_11_B64; break;
-            case 12: b64 = LIGHT_GRAY_12_B64; break;
-            case 13: b64 = LIGHT_GRAY_13_B64; break;
-            case 14: b64 = LIGHT_GRAY_14_B64; break;
-            case 15: b64 = LIGHT_GRAY_15_B64; break;
-            case 16: b64 = LIGHT_GRAY_16_B64; break;
-            case 17: b64 = LIGHT_GRAY_17_B64; break;
-            case 18: b64 = LIGHT_GRAY_18_B64; break;
-            case 19: b64 = LIGHT_GRAY_19_B64; break;
-            case 20: b64 = LIGHT_GRAY_20_B64; break;
+        switch (number) {
+            case 0:
+                b64 = LIGHT_GRAY_0_B64;
+                break;
+            case 1:
+                b64 = LIGHT_GRAY_1_B64;
+                break;
+            case 2:
+                b64 = LIGHT_GRAY_2_B64;
+                break;
+            case 3:
+                b64 = LIGHT_GRAY_3_B64;
+                break;
+            case 4:
+                b64 = LIGHT_GRAY_4_B64;
+                break;
+            case 5:
+                b64 = LIGHT_GRAY_5_B64;
+                break;
+            case 6:
+                b64 = LIGHT_GRAY_6_B64;
+                break;
+            case 7:
+                b64 = LIGHT_GRAY_7_B64;
+                break;
+            case 8:
+                b64 = LIGHT_GRAY_8_B64;
+                break;
+            case 9:
+                b64 = LIGHT_GRAY_9_B64;
+                break;
+            case 10:
+                b64 = LIGHT_GRAY_10_B64;
+                break;
+            case 11:
+                b64 = LIGHT_GRAY_11_B64;
+                break;
+            case 12:
+                b64 = LIGHT_GRAY_12_B64;
+                break;
+            case 13:
+                b64 = LIGHT_GRAY_13_B64;
+                break;
+            case 14:
+                b64 = LIGHT_GRAY_14_B64;
+                break;
+            case 15:
+                b64 = LIGHT_GRAY_15_B64;
+                break;
+            case 16:
+                b64 = LIGHT_GRAY_16_B64;
+                break;
+            case 17:
+                b64 = LIGHT_GRAY_17_B64;
+                break;
+            case 18:
+                b64 = LIGHT_GRAY_18_B64;
+                break;
+            case 19:
+                b64 = LIGHT_GRAY_19_B64;
+                break;
+            case 20:
+                b64 = LIGHT_GRAY_20_B64;
+                break;
 
-            default: b64 = LIGHT_GRAY_BLANK; break;
+            default:
+                b64 = LIGHT_GRAY_BLANK;
+                break;
         }
         return Item.createCustomHeadBase64(b64, headName, lore);
     }
 
-    public static String convertStairToBlock(String stair){
+    public static String convertStairToBlock(String stair) {
         stair = stair.split(":")[0];
 
-        switch (stair){
+        switch (stair) {
             //COBBLESTONE_STAIRS
-            case "67": return "4";
+            case "67":
+                return "4";
 
             //SANDSTONE_STAIRS
-            case "128": return "24";
+            case "128":
+                return "24";
 
             //SMOOTH_STAIRS
-            case "109": return "98";
+            case "109":
+                return "98";
 
             //SPRUCE_WOOD_STAIRS
-            case "134": return "5:1";
+            case "134":
+                return "5:1";
 
             //ACACIA_STAIRS
-            case "163": return "5:4";
+            case "163":
+                return "5:4";
 
             //BIRCH_WOOD_STAIRS
-            case "135": return "5:2";
+            case "135":
+                return "5:2";
 
             //BRICK_STAIRS
-            case "108": return "45";
+            case "108":
+                return "45";
 
             //DARK_OAK_STAIRS
-            case "164": return "5:5";
+            case "164":
+                return "5:5";
 
             //JUNGLE_WOOD_STAIRS
-            case "136": return "5:3";
+            case "136":
+                return "5:3";
 
             //NETHER_BRICK_STAIRS
-            case "114": return "112";
+            case "114":
+                return "112";
 
             //PURPUR_STAIRS
-            case "203": return "201";
+            case "203":
+                return "201";
 
             //QUARTZ_STAIRS
-            case "156": return "155";
+            case "156":
+                return "155";
 
             //RED_SANDSTONE_STAIRS
-            case "180": return "179";
+            case "180":
+                return "179";
 
             //WOOD_STAIRS
-            case "53": return "5";
+            case "53":
+                return "5";
         }
 
         return "67";
     }
 
 
-    public enum SliderColor{
-        WHITE, LIGHT_GRAY;
+    public enum SliderColor {
+        WHITE, LIGHT_GRAY
     }
 }

@@ -1,6 +1,7 @@
 package net.buildtheearth.modules.generator.modules.house;
 
 import net.buildtheearth.modules.generator.model.Flag;
+
 public enum HouseFlag implements Flag {
     WALL_COLOR("w"),            // String "123:24,21:3,3,..."
     ROOF_COLOR("r"),            // String "123:24,21:3,3,..."
@@ -18,21 +19,21 @@ public enum HouseFlag implements Flag {
 
     MAX_ROOF_HEIGHT("mrh");     // Integer
 
-    private String flag;
+    private final String flag;
 
-    HouseFlag(String flag){
+    HouseFlag(String flag) {
         this.flag = flag;
+    }
+
+    public static HouseFlag byString(String flag) {
+        for (HouseFlag houseFlag : HouseFlag.values())
+            if (houseFlag.getFlag().equalsIgnoreCase(flag))
+                return houseFlag;
+
+        return null;
     }
 
     public String getFlag() {
         return flag;
-    }
-
-    public static HouseFlag byString(String flag){
-        for(HouseFlag houseFlag : HouseFlag.values())
-        if(houseFlag.getFlag().equalsIgnoreCase(flag))
-            return houseFlag;
-
-        return null;
     }
 }

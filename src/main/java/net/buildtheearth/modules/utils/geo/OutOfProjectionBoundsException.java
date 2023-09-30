@@ -5,6 +5,10 @@ public final class OutOfProjectionBoundsException extends Exception {
 
     private static final boolean FAST = Boolean.parseBoolean(System.getProperty("terraplusplus.fastExcept", "true"));
 
+    private OutOfProjectionBoundsException(boolean flag) {
+        super(null, null, flag, flag);
+    }
+
     public static OutOfProjectionBoundsException get() {
         if (FAST) {
             return INSTANCE;
@@ -33,9 +37,5 @@ public final class OutOfProjectionBoundsException extends Exception {
      */
     public static void checkLongitudeLatitudeInRange(double longitude, double latitude) throws OutOfProjectionBoundsException {
         checkInRange(longitude, latitude, 180, 90);
-    }
-
-    private OutOfProjectionBoundsException(boolean flag) {
-        super(null, null, flag, flag);
     }
 }

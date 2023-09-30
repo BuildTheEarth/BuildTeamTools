@@ -8,21 +8,21 @@ public enum TreeFlag implements Flag {
     WIDTH("w"),
     HEIGHT("h");
 
-    private String flag;
+    private final String flag;
 
-    TreeFlag(String flag){
+    TreeFlag(String flag) {
         this.flag = flag;
+    }
+
+    public static TreeFlag byString(String flag) {
+        for (TreeFlag treeFlag : TreeFlag.values())
+            if (treeFlag.getFlag().equalsIgnoreCase(flag))
+                return treeFlag;
+
+        return null;
     }
 
     public String getFlag() {
         return flag;
-    }
-
-    public static TreeFlag byString(String flag){
-        for(TreeFlag treeFlag : TreeFlag.values())
-            if(treeFlag.getFlag().equalsIgnoreCase(flag))
-                return treeFlag;
-
-        return null;
     }
 }

@@ -3,6 +3,7 @@ package net.buildtheearth.modules.network.api;
 import net.buildtheearth.modules.utils.APIUtil;
 import org.bukkit.Bukkit;
 import org.json.simple.JSONObject;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
@@ -16,7 +17,7 @@ public class NetworkAPI {
 
         JSONObject jsonObject;
         try {
-            URL url = new URL("https://nwapi.buildtheearth.net/api/teams/"+ apiKey);
+            URL url = new URL("https://nwapi.buildtheearth.net/api/teams/" + apiKey);
             jsonObject = APIUtil.createJSONObject(APIUtil.get(url));
         } catch (MalformedURLException e) {
             return null;

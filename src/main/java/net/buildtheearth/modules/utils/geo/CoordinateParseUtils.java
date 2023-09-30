@@ -1,14 +1,15 @@
 package net.buildtheearth.modules.utils.geo;
 
+import com.google.common.base.Strings;
+import net.daporkchop.lib.common.util.PArrays;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.daporkchop.lib.common.util.PArrays;
-import org.apache.commons.lang3.StringUtils;
-import com.google.common.base.Strings;
 
 /**
  * Utilities for assisting in the parsing of latitude and longitude strings into Decimals.
@@ -37,11 +38,16 @@ public final class CoordinateParseUtils {
 
     private static final char[] PART_DELIMITERS = ";/,".toCharArray();
     private static final List<Function<String, Double>> NUMBER_PARSERS;
+
     static {
         List<Function<String, Double>> parsers = new ArrayList<>();
         parsers.add(Double::parseDouble);
         parsers.add(CoordinateParseUtils::parseDoubleWithCommaDecimalSeparator);
         NUMBER_PARSERS = Collections.unmodifiableList(parsers);
+    }
+
+    private CoordinateParseUtils() {
+        throw new UnsupportedOperationException("Can't initialize class");
     }
 
     private static boolean inRange(double lat, double lon) {
@@ -67,8 +73,7 @@ public final class CoordinateParseUtils {
      * <p>
      * If the context doesn't make it clear which of latitude or longitude comes first, latitude is assumed.
      *
-     * @param coordinates   the coordinates to parse
-     *
+     * @param coordinates the coordinates to parse
      * @return the parsed coordinates
      */
     public static LatLng parseVerbatimCoordinates(final String coordinates) {
@@ -84,7 +89,7 @@ public final class CoordinateParseUtils {
                 final String direction1 = m.group(4);
                 final String direction2 = m.group(8);
 
-                for (Function<String, Double> format: NUMBER_PARSERS) {
+                for (Function<String, Double> format : NUMBER_PARSERS) {
 
                     try {
 
@@ -115,7 +120,7 @@ public final class CoordinateParseUtils {
             String[] latlon = separateParts(coordinates);
 
             // Try with DMS format
-            for (Function<String, Double> format: NUMBER_PARSERS) {
+            for (Function<String, Double> format : NUMBER_PARSERS) {
                 try {
                     double lat = parseDMS(latlon[0], true, format);
                     double lon = parseDMS(latlon[1], false, format);
@@ -125,7 +130,7 @@ public final class CoordinateParseUtils {
             }
 
             // Try with literal values
-            for (Function<String, Double> format: NUMBER_PARSERS) {
+            for (Function<String, Double> format : NUMBER_PARSERS) {
                 try {
                     double lat = format.apply(latlon[0]);
                     double lon = format.apply(latlon[1]);
@@ -187,7 +192,7 @@ public final class CoordinateParseUtils {
             }
 
             // Split at the blank
-            return new String[] {coordinates.substring(0, firstBlankStart), coordinates.substring(firstBlankEnd)};
+            return new String[]{coordinates.substring(0, firstBlankStart), coordinates.substring(firstBlankEnd)};
         }
 
         // Look for a potential delimiter that only appears once and is not at the start or end of the string
@@ -269,9 +274,5 @@ public final class CoordinateParseUtils {
     private static double parseDoubleWithCommaDecimalSeparator(String str) {
         if (str.indexOf(".") > 0) throw new NumberFormatException("Illegal char in comma number: " + ".");
         return Double.parseDouble(str.replaceAll(",", "."));
-    }
-
-    private CoordinateParseUtils() {
-        throw new UnsupportedOperationException("Can't initialize class");
     }
 }

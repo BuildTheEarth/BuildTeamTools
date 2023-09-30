@@ -6,38 +6,38 @@ import java.util.HashMap;
 
 public class StatsServer {
 
-    private HashMap<StatsServerType, Object> stats;
+    private final HashMap<StatsServerType, Object> stats;
 
-    public StatsServer(){
+    public StatsServer() {
         stats = new HashMap<>();
     }
 
-    public void addValue(StatsServerType statsServerType, Object value){
+    public void addValue(StatsServerType statsServerType, Object value) {
         Object object = stats.get(statsServerType);
 
-        if(object == null)
+        if (object == null)
             object = value;
-        else if(object instanceof Integer && value instanceof Integer) {
-            if((Integer) object > StatsManager.RATE_LIMIT)
+        else if (object instanceof Integer && value instanceof Integer) {
+            if ((Integer) object > StatsManager.RATE_LIMIT)
                 return;
 
             object = (Integer) object + (Integer) value;
-        }else if(object instanceof Double && value instanceof Double) {
-            if((Double) object > StatsManager.RATE_LIMIT)
+        } else if (object instanceof Double && value instanceof Double) {
+            if ((Double) object > StatsManager.RATE_LIMIT)
                 return;
 
             object = (Double) object + (Double) value;
-        }else if(object instanceof Float && value instanceof Float) {
-            if((Float) object > StatsManager.RATE_LIMIT)
+        } else if (object instanceof Float && value instanceof Float) {
+            if ((Float) object > StatsManager.RATE_LIMIT)
                 return;
 
             object = (Float) object + (Float) value;
-        }else if(object instanceof Long && value instanceof Long) {
-            if((Long) object > StatsManager.RATE_LIMIT)
+        } else if (object instanceof Long && value instanceof Long) {
+            if ((Long) object > StatsManager.RATE_LIMIT)
                 return;
 
             object = (Long) object + (Long) value;
-        }else {
+        } else {
             object = value;
         }
 
@@ -45,10 +45,10 @@ public class StatsServer {
         stats.put(statsServerType, object);
     }
 
-    public JSONObject toJSON(){
+    public JSONObject toJSON() {
         JSONObject jsonObject = new JSONObject();
 
-        for(StatsServerType statsServerType : stats.keySet())
+        for (StatsServerType statsServerType : stats.keySet())
             jsonObject.put(statsServerType, stats.get(statsServerType));
 
         return jsonObject;

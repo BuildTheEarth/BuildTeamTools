@@ -5,9 +5,9 @@ import net.buildtheearth.modules.generator.model.Settings;
 import net.buildtheearth.modules.generator.modules.road.Road;
 import net.buildtheearth.modules.generator.modules.road.RoadFlag;
 import net.buildtheearth.modules.generator.modules.road.RoadSettings;
-import net.buildtheearth.modules.utils.menus.AbstractMenu;
 import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.MenuItems;
+import net.buildtheearth.modules.utils.menus.AbstractMenu;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -42,7 +42,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
 
     @Override
     protected void setPreviewItems() {
-        Road road = Main.getBuildTeam().getGenerator().getRoad();
+        Road road = Main.getBuildTeamTools().getGenerator().getRoad();
         UUID uuid = getMenuPlayer().getUniqueId();
 
         this.laneCount = Integer.parseInt(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.LANE_COUNT));
@@ -67,13 +67,14 @@ public class AdvancedSettingsMenu extends AbstractMenu {
     }
 
     @Override
-    protected void setMenuItemsAsync() {}
+    protected void setMenuItemsAsync() {
+    }
 
     @Override
     protected void setItemClickEventsAsync() {
-        setSliderClickEvents(RoadFlag.LANE_COUNT, LANE_COUNT_SLOT,  1, 10);
-        setSliderClickEvents(RoadFlag.LANE_WIDTH, LANE_WIDTH_SLOT,  1, 30);
-        setSliderClickEvents(RoadFlag.SIDEWALK_WIDTH, SIDEWALK_WIDTH_SLOT,  1, 30);
+        setSliderClickEvents(RoadFlag.LANE_COUNT, LANE_COUNT_SLOT, 1, 10);
+        setSliderClickEvents(RoadFlag.LANE_WIDTH, LANE_WIDTH_SLOT, 1, 30);
+        setSliderClickEvents(RoadFlag.SIDEWALK_WIDTH, SIDEWALK_WIDTH_SLOT, 1, 30);
 
         setColorChoiceClickEvents(RoadFlag.MARKING_MATERIAL, MARKINGS_MATERIAL_SLOT, "Choose a Line Marking Block", MenuItems.getBlocksByColor());
         setColorChoiceClickEvents(RoadFlag.ROAD_SLAB_COLOR, ROAD_SLAB_SLOT, "Choose a Road Elevation Slab", MenuItems.getSlabs());
@@ -84,14 +85,14 @@ public class AdvancedSettingsMenu extends AbstractMenu {
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
 
-            Main.getBuildTeam().getGenerator().getRoad().generate(clickPlayer);
+            Main.getBuildTeamTools().getGenerator().getRoad().generate(clickPlayer);
         });
     }
 
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short)15, null))
+                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null))
                 .pattern("111111111")
                 .pattern("100010001")
                 .pattern("100010001")
@@ -100,8 +101,8 @@ public class AdvancedSettingsMenu extends AbstractMenu {
                 .build();
     }
 
-    protected void setSliderClickEvents(RoadFlag roadFlag, int slot, int minValue, int maxValue){
-        Road road = Main.getBuildTeam().getGenerator().getRoad();
+    protected void setSliderClickEvents(RoadFlag roadFlag, int slot, int minValue, int maxValue) {
+        Road road = Main.getBuildTeamTools().getGenerator().getRoad();
 
         // Set click event for previous page item
         getMenu().getSlot(slot - 1).setClickHandler((clickPlayer, clickInformation) -> {
@@ -110,7 +111,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
             if (value > minValue) {
                 Settings settings = road.getPlayerSettings().get(clickPlayer.getUniqueId());
 
-                if(!(settings instanceof RoadSettings))
+                if (!(settings instanceof RoadSettings))
                     return;
 
                 RoadSettings roadSettings = (RoadSettings) settings;
@@ -118,7 +119,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
 
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
                 reloadMenuAsync();
-            }else{
+            } else {
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
             }
         });
@@ -130,7 +131,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
             if (value < maxValue) {
                 Settings settings = road.getPlayerSettings().get(clickPlayer.getUniqueId());
 
-                if(!(settings instanceof RoadSettings))
+                if (!(settings instanceof RoadSettings))
                     return;
 
                 RoadSettings roadSettings = (RoadSettings) settings;
@@ -138,7 +139,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
 
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
                 reloadMenuAsync();
-            }else{
+            } else {
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
 
             }
@@ -146,8 +147,8 @@ public class AdvancedSettingsMenu extends AbstractMenu {
     }
 
 
-    protected void setColorChoiceClickEvents(RoadFlag roadFlag, int slot, String choiceInvName, List<ItemStack> choices){
-        Road road = Main.getBuildTeam().getGenerator().getRoad();
+    protected void setColorChoiceClickEvents(RoadFlag roadFlag, int slot, String choiceInvName, List<ItemStack> choices) {
+        Road road = Main.getBuildTeamTools().getGenerator().getRoad();
 
         // Set click event for X items
         getMenu().getSlot(slot - 1).setClickHandler((clickPlayer, clickInformation) -> {
@@ -166,11 +167,11 @@ public class AdvancedSettingsMenu extends AbstractMenu {
         });
     }
 
-    protected void turnOffColorChoice(Player clickPlayer, RoadFlag roadFlag){
-        Road road = Main.getBuildTeam().getGenerator().getRoad();
+    protected void turnOffColorChoice(Player clickPlayer, RoadFlag roadFlag) {
+        Road road = Main.getBuildTeamTools().getGenerator().getRoad();
         Settings settings = road.getPlayerSettings().get(clickPlayer.getUniqueId());
 
-        if(!(settings instanceof RoadSettings))
+        if (!(settings instanceof RoadSettings))
             return;
 
         RoadSettings roadSettings = (RoadSettings) settings;

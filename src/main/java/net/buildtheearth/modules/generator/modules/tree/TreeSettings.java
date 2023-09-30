@@ -6,11 +6,11 @@ import org.bukkit.entity.Player;
 
 public class TreeSettings extends Settings {
 
-    public TreeSettings(Player player){
+    public TreeSettings(Player player) {
         super(player);
     }
 
-    public void setDefaultValues(){
+    public void setDefaultValues() {
 
         // Lane Count (Default: Fixed Value)
         getValues().put(TreeFlag.TYPE, "any");

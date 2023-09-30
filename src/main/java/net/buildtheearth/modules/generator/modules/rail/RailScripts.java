@@ -3,8 +3,8 @@ package net.buildtheearth.modules.generator.modules.rail;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import net.buildtheearth.Main;
-import net.buildtheearth.modules.generator.model.Command;
 import net.buildtheearth.modules.generator.Generator;
+import net.buildtheearth.modules.generator.model.Command;
 import net.buildtheearth.modules.generator.model.GeneratorType;
 import net.buildtheearth.modules.generator.model.History;
 import org.bukkit.block.Block;
@@ -18,7 +18,7 @@ public class RailScripts {
 
     public static void railscript_v_1_3(Player p, Rail rail, ConvexPolyhedralRegion region) {
         List<String> commands = new ArrayList<>();
-        HashMap< Object, String > flags = rail.getPlayerSettings().get(p.getUniqueId()).getValues();
+        HashMap<Object, String> flags = rail.getPlayerSettings().get(p.getUniqueId()).getValues();
 
         int xPos = p.getLocation().getBlockX();
         int zPos = p.getLocation().getBlockZ();

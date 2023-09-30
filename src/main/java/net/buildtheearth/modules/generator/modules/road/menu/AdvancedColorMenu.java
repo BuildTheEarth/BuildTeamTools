@@ -14,7 +14,7 @@ import java.util.List;
 
 public class AdvancedColorMenu extends BlockListMenu {
 
-    private RoadFlag roadFlag;
+    private final RoadFlag roadFlag;
 
     public AdvancedColorMenu(Player player, RoadFlag roadFlag, String invName, List<ItemStack> items) {
         super(player, invName, items);
@@ -27,11 +27,11 @@ public class AdvancedColorMenu extends BlockListMenu {
         super.setItemClickEventsAsync();
 
         // Set click event for next item
-        if(canProceed())
+        if (canProceed())
             getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
                 Settings settings = Main.buildTeamTools.getGenerator().getRoad().getPlayerSettings().get(clickPlayer.getUniqueId());
 
-                if(!(settings instanceof RoadSettings))
+                if (!(settings instanceof RoadSettings))
                     return;
 
                 RoadSettings roadSettings = (RoadSettings) settings;

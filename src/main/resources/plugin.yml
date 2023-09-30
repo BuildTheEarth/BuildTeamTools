@@ -19,9 +19,6 @@ commands:
     aliases:
       - nav
       - navigate
-  statistics:
-    description: Opens the statistics menu
-    usage: /statistics
   warp:
     description: Command for managing warps.
     usage: /warp <subcommand>

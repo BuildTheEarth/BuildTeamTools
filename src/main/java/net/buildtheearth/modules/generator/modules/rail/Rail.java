@@ -18,29 +18,29 @@ public class Rail extends GeneratorModule {
 
     @Override
     public boolean checkPlayer(Player p) {
-        if(!Generator.checkIfWorldEditIsInstalled(p))
+        if (!Generator.checkIfWorldEditIsInstalled(p))
             return false;
 
-        if(!Generator.checkForWorldEditSelection(p))
+        if (!Generator.checkForWorldEditSelection(p))
             return false;
 
-        if(!Generator.checkForConvexSelection(p))
+        if (!Generator.checkForConvexSelection(p))
             return false;
 
-        if(getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
+        if (getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
             getPlayerSettings().get(p.getUniqueId()).setBlocks(Generator.analyzeRegion(p, p.getWorld()));
 
         return true;
     }
 
     @Override
-    public void generate(Player p){
-        if(!Main.getBuildTeam().getGenerator().getRail().checkPlayer(p))
+    public void generate(Player p) {
+        if (!Main.getBuildTeamTools().getGenerator().getRail().checkPlayer(p))
             return;
 
         Region region = Generator.getWorldEditSelection(p);
 
-        if(region == null || !(region instanceof ConvexPolyhedralRegion))
+        if (region == null || !(region instanceof ConvexPolyhedralRegion))
             return;
 
         ConvexPolyhedralRegion convexRegion = (ConvexPolyhedralRegion) region;

@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public class ProxyManager {
 
-    public static int CACHE_UPLOAD_SPEED = 20*60*10 + 20;
+    public static int CACHE_UPLOAD_SPEED = 20 * 60 * 10 + 20;
 
     public static String PLOT_SERVER_NAME = "Plot1";
 
@@ -29,7 +29,7 @@ public class ProxyManager {
      * A List of players that are communicating with this server.
      * If isConnected is true, that means the players are also communicating with the network.
      */
-    private List<UUID> communicators = new ArrayList<>();
+    private final List<UUID> communicators = new ArrayList<>();
 
     /**
      * True if the server is connected to the network
@@ -45,9 +45,10 @@ public class ProxyManager {
      * Sends a ping to the network.
      * If the player is playing on a server connected to the network the proxy will answer with another ping message.
      * Afterwards the player will be added to the communicators list.
+     *
      * @param p: Player to ping.
      */
-    public void ping(Player p){
+    public void ping(Player p) {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Ping");
         out.writeUTF(p.getUniqueId().toString());
@@ -65,21 +66,20 @@ public class ProxyManager {
 
     // Getters & Setters
 
+    public String getBuildTeamID() {
+        return buildTeamID;
+    }
 
     public void setBuildTeamID(String buildTeamID) {
         this.buildTeamID = buildTeamID;
     }
 
-    public String getBuildTeamID() {
-        return buildTeamID;
+    public String getServerID() {
+        return serverID;
     }
 
     public void setServerID(String serverID) {
         this.serverID = serverID;
-    }
-
-    public String getServerID() {
-        return serverID;
     }
 
     public List<UUID> getCommunicators() {

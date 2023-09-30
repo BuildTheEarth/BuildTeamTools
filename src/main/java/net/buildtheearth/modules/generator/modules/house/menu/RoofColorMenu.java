@@ -25,29 +25,6 @@ public class RoofColorMenu extends BlockListMenu {
         super(player, ROOF_TYPE_INV_NAME, getRoofBlocks(player));
     }
 
-    @Override
-    protected void setItemClickEventsAsync() {
-        setSwitchPageItemClickEvents(SWITCH_PAGE_ITEM_SLOT);
-
-        // Set click event for next item
-        if(canProceed())
-            getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
-                Settings settings = Main.buildTeamTools.getGenerator().getHouse().getPlayerSettings().get(clickPlayer.getUniqueId());
-
-                if(!(settings instanceof HouseSettings))
-                    return;
-
-                HouseSettings houseSettings = (HouseSettings) settings;
-                houseSettings.setValue(HouseFlag.ROOF_COLOR, Item.createStringFromItemList(selectedMaterials));
-
-                clickPlayer.closeInventory();
-                clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
-
-                new BaseColorMenu(clickPlayer);
-            });
-    }
-
-
     /**
      * Get the roof blocks for the menu.
      * Depending on the roof type, the blocks will be different.
@@ -58,10 +35,10 @@ public class RoofColorMenu extends BlockListMenu {
     private static List<ItemStack> getRoofBlocks(Player player) {
         RoofType roofType = RoofType.byString(Main.buildTeamTools.getGenerator().getHouse().getPlayerSettings().get(player.getUniqueId()).getValues().get(HouseFlag.ROOF_TYPE));
 
-        if(roofType == null)
+        if (roofType == null)
             return new ArrayList<>();
 
-        switch (roofType){
+        switch (roofType) {
             case FLATTER_SLABS:
             case MEDIUM_SLABS:
             case STEEP_SLABS:
@@ -72,14 +49,37 @@ public class RoofColorMenu extends BlockListMenu {
 
             case FLAT:
                 ArrayList<ItemStack> items = new ArrayList<>();
-                for(int i = 0; i <= 15; i++)
-                    items.add(Item.create(Material.CARPET,null, (short) i, null));
+                for (int i = 0; i <= 15; i++)
+                    items.add(Item.create(Material.CARPET, null, (short) i, null));
 
                 items.addAll(Arrays.asList(MenuItems.SLABS));
 
                 return items;
 
-            default: return new ArrayList<>();
+            default:
+                return new ArrayList<>();
         }
+    }
+
+    @Override
+    protected void setItemClickEventsAsync() {
+        setSwitchPageItemClickEvents(SWITCH_PAGE_ITEM_SLOT);
+
+        // Set click event for next item
+        if (canProceed())
+            getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
+                Settings settings = Main.buildTeamTools.getGenerator().getHouse().getPlayerSettings().get(clickPlayer.getUniqueId());
+
+                if (!(settings instanceof HouseSettings))
+                    return;
+
+                HouseSettings houseSettings = (HouseSettings) settings;
+                houseSettings.setValue(HouseFlag.ROOF_COLOR, Item.createStringFromItemList(selectedMaterials));
+
+                clickPlayer.closeInventory();
+                clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
+
+                new BaseColorMenu(clickPlayer);
+            });
     }
 }

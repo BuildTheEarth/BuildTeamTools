@@ -1,7 +1,6 @@
 package net.buildtheearth.modules.navigator.menu;
 
 import net.buildtheearth.Main;
-import net.buildtheearth.modules.navigator.menu.BuildMenu;
 import net.buildtheearth.modules.utils.MenuItem;
 import net.buildtheearth.modules.utils.menus.AbstractMenu;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -11,8 +10,7 @@ import org.ipvp.canvas.mask.Mask;
 
 import java.util.ArrayList;
 
-public class TutorialsMenu extends AbstractMenu
-{
+public class TutorialsMenu extends AbstractMenu {
     //Will utilise the Tutorials API once created and published
 
     //3 rows
@@ -22,18 +20,17 @@ public class TutorialsMenu extends AbstractMenu
     private static final ArrayList<MenuItem> menuItems = getGui();
     private static final FileConfiguration config = Main.instance.getConfig();
 
-    public TutorialsMenu(Player player)
-    {
+    public TutorialsMenu(Player player) {
         super(iRows, szInventoryName, player);
     }
 
     /**
      * Produces a list of Menu Items for the BuildMenu gui
-     * @see MenuItem
+     *
      * @return
+     * @see MenuItem
      */
-    public static ArrayList<MenuItem> getGui()
-    {
+    public static ArrayList<MenuItem> getGui() {
         //Initiates the list
         ArrayList<MenuItem> menuItems = new ArrayList<>();
 

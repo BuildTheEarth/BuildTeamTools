@@ -9,8 +9,8 @@ import org.bukkit.entity.Player;
 import java.util.List;
 
 public abstract class AbstractPaginatedMenu extends AbstractMenu {
-    private List<?> source;
     private final int maxItemsPerPage;
+    private List<?> source;
     private int totalItemsAmount;
     private int currentPage = 0;
 
@@ -26,24 +26,28 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
 
     /**
      * Collects the source for the inventory items
+     *
      * @return item sources
      */
     protected abstract List<?> getSource();
 
     /**
      * Places paginated items asynchronously in the menu after it is opened
+     *
      * @param source paginated item sources
      */
     protected abstract void setPaginatedPreviewItems(List<?> source);
 
     /**
      * Places paginated items asynchronously in the menu after it is opened
+     *
      * @param source paginated item sources
      */
     protected abstract void setPaginatedMenuItemsAsync(List<?> source);
 
     /**
      * Sets click events for the paginated items placed in the menu after it is opened
+     *
      * @param source paginated item sources
      */
     protected abstract void setPaginatedItemClickEventsAsync(List<?> source);
@@ -72,6 +76,7 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
 
     /**
      * Sets the current page to the given index
+     *
      * @param index page index
      */
     protected void setPage(int index) {
@@ -81,6 +86,7 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
 
     /**
      * Collects all item sources for the current page
+     *
      * @return item sources for the current page
      */
     private List<?> getItemSources(boolean reloadSources) {
@@ -143,7 +149,7 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
         reloadMenuAsync(true);
     }
 
-    protected void setSwitchPageItems(int switchPageItemSlot){
+    protected void setSwitchPageItems(int switchPageItemSlot) {
         int currentPage = getPage();
 
         // Set previous page item
@@ -156,7 +162,7 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
         getMenu().getSlot(switchPageItemSlot + 1).setItem(MenuItems.getNextPageItem(currentPage, hasNextPage()));
     }
 
-    protected void setSwitchPageItemClickEvents(int switchPageItemSlot){
+    protected void setSwitchPageItemClickEvents(int switchPageItemSlot) {
         // Set click event for previous page item
         getMenu().getSlot(switchPageItemSlot - 1).setClickHandler((clickPlayer, clickInformation) -> {
             if (hasPreviousPage()) {

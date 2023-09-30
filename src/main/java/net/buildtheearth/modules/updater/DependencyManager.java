@@ -17,6 +17,7 @@ public class DependencyManager {
 
     /**
      * Check for all required dependencies and inform the console about missing dependencies
+     *
      * @return True if all dependencies are present
      */
     private static boolean checkForRequiredDependencies() {
@@ -31,6 +32,7 @@ public class DependencyManager {
 
     /**
      * Checks if the plugin "WorldEdit" is enabled.
+     *
      * @return True if WorldEdit is enabled, false if it is not enabled
      */
     public static boolean isWorldEditEnabled() {
@@ -39,6 +41,7 @@ public class DependencyManager {
 
     /**
      * Checks if the plugin "SchematicBrush" is enabled.
+     *
      * @return True if SchematicBrush is enabled, false if it is not enabled
      */
     public static boolean isSchematicBrushEnabled() {
@@ -47,6 +50,7 @@ public class DependencyManager {
 
     /**
      * Get an instance of WorldEdit
+     *
      * @return An instance of WorldEdit
      */
     public static WorldEdit getWorldEdit() {

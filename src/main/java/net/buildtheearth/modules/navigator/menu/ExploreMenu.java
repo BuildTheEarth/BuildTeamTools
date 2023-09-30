@@ -1,9 +1,6 @@
 package net.buildtheearth.modules.navigator.menu;
 
 import net.buildtheearth.Main;
-import net.buildtheearth.buildteam.components.universal_experience.Country;
-import net.buildtheearth.modules.navigator.explore_children.CountryMenu;
-import net.buildtheearth.modules.navigator.explore_children.CountrySelectorMenu;
 import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.MenuItem;
 import net.buildtheearth.modules.utils.Utils;
@@ -26,21 +23,18 @@ import java.util.ArrayList;
  * <p>
  * <p> The menu has 3 rows and the centre row is the only occupied row. The layout depends on what icons are enabled in config.
  */
-public class ExploreMenu extends AbstractMenu
-{
+public class ExploreMenu extends AbstractMenu {
     private static final int iRows = 3;
     private static final String szInventoryName = "Explore Menu";
     private final ArrayList<MenuItem> menuItems;
 
-    public ExploreMenu(Player menuPlayer, boolean bNetworkConnected)
-    {
+    public ExploreMenu(Player menuPlayer, boolean bNetworkConnected) {
         super(iRows, szInventoryName, menuPlayer, false);
         this.menuItems = getGui(bNetworkConnected, Main.instance.getConfig());
         reloadMenuAsync();
     }
 
-    public static ArrayList<MenuItem> getGui(boolean bNetworkConnected, FileConfiguration config)
-    {
+    public static ArrayList<MenuItem> getGui(boolean bNetworkConnected, FileConfiguration config) {
         //Initiates the list
         ArrayList<MenuItem> menuItems = new ArrayList<>();
 
@@ -51,32 +45,28 @@ public class ExploreMenu extends AbstractMenu
         //-----------Create continent items-----------
         //--------------------------------------------
         Continent[] continents = Continent.values();
-        for (int i = 0 ; i < 7 ; i++)
-        {
+        for (int i = 0; i < 7; i++) {
             //Creates the lore
             ArrayList<String> continentLore = new ArrayList<>();
-            continentLore.add(Utils.loreText("Visit countries in " +continents[i].label));
+            continentLore.add(Utils.loreText("Visit countries in " + continents[i].label));
 
             //Creates the item
             ItemStack continentItem = Item.create(Material.getMaterial(config.getString(ConfigPaths.EXPLORE_ITEM_MATERIAL)),
-                    ChatColor.YELLOW +"" +ChatColor.BOLD +"" +continents[i].label, 1, continentLore);
+                    ChatColor.YELLOW + "" + ChatColor.BOLD + "" + continents[i].label, 1, continentLore);
 
             MenuItem continent;
             int iSlot = i;
-            if (continents[i].equals(Continent.Africa))
-            {
+            if (continents[i].equals(Continent.Africa)) {
                 continent = new MenuItem(iSlots[i], continentItem, player ->
                 {
                     //The actions for the continent item
-                    new CountryMenu(player, bNetworkConnected, new Country("Africa", Continent.Africa));
+                    // new CountryMenu(player, bNetworkConnected, new Country("Africa", Continent.Africa));
                 });
-            }
-            else
-            {
+            } else {
                 continent = new MenuItem(iSlots[i], continentItem, player ->
                 {
                     //Opens a new country selector menu
-                    new CountrySelectorMenu(continents[iSlot],  player, bNetworkConnected);
+                    // new CountrySelectorMenu(continents[iSlot], player, bNetworkConnected);
                 });
             }
 
@@ -100,21 +90,19 @@ public class ExploreMenu extends AbstractMenu
 
         return menuItems;
     }
+
     @Override
-    protected void setMenuItemsAsync()
-    {
+    protected void setMenuItemsAsync() {
         setMenuItemsAsyncViaMenuItems(menuItems);
     }
 
     @Override
-    protected void setItemClickEventsAsync()
-    {
+    protected void setItemClickEventsAsync() {
         setMenuItemClickEventsAsyncViaMenuItems(menuItems);
     }
 
     @Override
-    protected Mask getMask()
-    {
+    protected Mask getMask() {
         return null;
     }
 

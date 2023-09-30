@@ -1,0 +1,46 @@
+package net.buildtheearth.modules.generator.model;
+
+import lombok.Getter;
+import net.buildtheearth.modules.generator.model.GeneratorType;
+import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+
+public class History {
+
+    @Getter
+    private Player p;
+
+    @Getter
+    private ArrayList<HistoryEntry> historyEntries;
+
+    public History(Player p){
+        this.p = p;
+        this.historyEntries = new ArrayList<>();
+    }
+
+    public void addHistoryEntry(HistoryEntry entry){
+        historyEntries.add(entry);
+    }
+
+
+
+
+    public static class HistoryEntry{
+
+        @Getter
+        private GeneratorType generatorType;
+        @Getter
+        private long timeCreated;
+        @Getter
+        private int worldEditCommandCount;
+
+        public HistoryEntry(GeneratorType generatorType, int worldEditCommandCount) {
+            this.generatorType = generatorType;
+            this.timeCreated = System.currentTimeMillis();
+            this.worldEditCommandCount = worldEditCommandCount;
+        }
+    }
+}
+
+

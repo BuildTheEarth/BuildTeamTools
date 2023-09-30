@@ -2,7 +2,7 @@ name: BuildTeam
 main: net.buildtheearth.Main
 api-version: 1.12
 version: 0.1.3-alpha
-author: MineFact, George112n, ELgamer
+author: MineFact, frikandelworst, George112n, ELgamer
 
 commands:
   buildteam:
@@ -22,3 +22,8 @@ commands:
   statistics:
     description: Opens the statistics menu
     usage: /statistics
+  warp:
+    description: Command for managing warps.
+    usage: /warp <subcommand>
+    aliases:
+      - warps

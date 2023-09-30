@@ -1,10 +1,16 @@
 package net.buildtheearth.modules.warp;
 
 import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import net.buildtheearth.Main;
+import net.buildtheearth.modules.network.api.NetworkAPI;
+import net.buildtheearth.modules.utils.ChatHelper;
+import net.buildtheearth.modules.utils.GeometricUtils;
+import net.buildtheearth.modules.utils.geo.LatLng;
+import net.buildtheearth.modules.warp.model.Warp;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -25,24 +31,26 @@ public class WarpManager {
      */
     public static void addWarpToQueue(ByteArrayDataInput in, Player player) {
         //Check the target server
-        String szServer = in.readUTF();
-        if (szServer.equals(Main.getBuildTeamTools().getProxyManager().getServerID())) {
-            //Extracts the coordinates from the plugin message
-            double targetX = Double.parseDouble(in.readUTF());
-            double targetY = Double.parseDouble(in.readUTF());
-            double targetZ = Double.parseDouble(in.readUTF());
-            float targetYaw = Float.parseFloat(in.readUTF());
-            float targetPitch = Float.parseFloat(in.readUTF());
+        String targetServer = in.readUTF();
+        if (targetServer.equals(Main.getBuildTeamTools().getProxyManager().getServerID())) {
+            //Extracts the warp key from the plugin message
+            String warpKey = in.readUTF();
 
-            // Creates a bukkit location for the warp target
-            World targetWorld = Bukkit.getWorld(Main.instance.getConfig().getString("universal_tpll.earth_world"));
-            Location targetWarpLocation = new Location(targetWorld, targetX, targetY, targetZ, targetYaw, targetPitch);
+            Warp warp = NetworkAPI.getWarpByKey(warpKey);
+
+            Location targetWarpLocation = GeometricUtils.getLocationFromCoordinatesYawPitch(new LatLng(warp.getLat(), warp.getLon()), warp.getYaw(), warp.getPitch());
+            targetWarpLocation.setY(warp.getY());
+            targetWarpLocation.setWorld(Bukkit.getWorld(warp.getWorldName()));
 
             // Adds the event to the list, to be dealt with by the join listener
             warpQueue.put(player.getUniqueId(), targetWarpLocation);
         }
     }
 
+    /**
+     * Checks if there is a warp in the queue of the current server and teleports the player if this is the case
+     * @param player the player to check the queue for
+     */
     public static void processQueueForPlayer(Player player) {
         Location targetWarpLocation = warpQueue.get(player.getUniqueId());
 
@@ -50,7 +58,37 @@ public class WarpManager {
             return;
         }
 
-        player.teleport(targetWarpLocation);
+        if(player.teleport(targetWarpLocation)) {
+            player.sendMessage(ChatHelper.successful("Successfully warped you to the desired location!"));
+        } else {
+            player.sendMessage(ChatHelper.highlight("Something went wrong trying to warp you to the desired location."));
+        }
+
         warpQueue.remove(player.getUniqueId());
+    }
+
+    /**
+     * Sends a plugin message to add the warp to the queue of the target server
+     * Then switches the player to that server
+     * @param player The player to warp
+     * @param key The key of the warp to teleport the player to
+     */
+    public static void warpPlayer(Player player, String key) {
+        // Get the warp using a GET request
+        Warp warp = NetworkAPI.getWarpByKey(key);
+
+        // Get the server the warp is on
+        String targetServer = NetworkAPI.getServerByCountryCode(warp.getCountryCode());
+
+        // Send a plugin message to that server which adds the warp to the queue
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF("UniversalWarps");
+        out.writeUTF(targetServer);
+        out.writeUTF(warp.getKey());
+
+        player.sendPluginMessage(Main.instance, "BuildTeam", out.toByteArray());
+
+        // Switch the player to the target server
+        Main.getBuildTeamTools().getProxyManager().switchServer(player, targetServer);
     }
 }

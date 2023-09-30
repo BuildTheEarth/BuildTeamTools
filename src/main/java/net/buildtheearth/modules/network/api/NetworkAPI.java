@@ -1,6 +1,7 @@
 package net.buildtheearth.modules.network.api;
 
 import net.buildtheearth.modules.utils.APIUtil;
+import net.buildtheearth.modules.warp.model.Warp;
 import org.bukkit.Bukkit;
 import org.json.simple.JSONObject;
 
@@ -24,6 +25,20 @@ public class NetworkAPI {
         }
 
         Bukkit.getLogger().info(jsonObject.toString());
+        return null;
+    }
+
+    public static Warp getWarpByKey(String warpKey) {
+        //TODO IMPLEMENT METHOD
+        return null;
+    }
+
+    public static void removeWarpByLocation(double[] coordinates) {
+        //TODO IMPLEMENT METHOD
+    }
+
+    public static String getServerByCountryCode(String countryCode) {
+        //TODO IMPLEMENT METHOD
         return null;
     }
 }

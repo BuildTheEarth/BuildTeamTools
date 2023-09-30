@@ -1,7 +1,7 @@
 package net.buildtheearth.modules.warp.model;
 
-
 public class Warp {
+    private final String worldName;
 
     private final String key;
     private final String countryCode;
@@ -12,12 +12,14 @@ public class Warp {
     private final double lon;
     private final double y;
 
-    private final double pitch;
-    private final double yaw;
+    private final float yaw;
+    private final float pitch;
 
     private final boolean isHighlight;
 
-    public Warp(String key, String countryCode, String subRegion, String city, double lat, double lon, double y, double pitch, double yaw, boolean isHighlight) {
+    public Warp(String key, String countryCode, String subRegion, String city, String worldName, double lat, double lon, double y, float pitch, float yaw, boolean isHighlight) {
+        this.worldName = worldName;
+
         this.key = key;
         this.countryCode = countryCode;
         this.subRegion = subRegion;
@@ -27,10 +29,14 @@ public class Warp {
         this.lon = lon;
         this.y = y;
 
-        this.pitch = pitch;
         this.yaw = yaw;
+        this.pitch = pitch;
 
         this.isHighlight = isHighlight;
+    }
+
+    public String getWorldName() {
+        return worldName;
     }
 
     public String getKey() {
@@ -61,11 +67,11 @@ public class Warp {
         return y;
     }
 
-    public double getPitch() {
+    public float getPitch() {
         return pitch;
     }
 
-    public double getYaw() {
+    public float getYaw() {
         return yaw;
     }
 

@@ -7,6 +7,7 @@ import net.buildtheearth.modules.utils.geo.OpenStreetMapAPI;
 import net.buildtheearth.modules.utils.geo.projection.Airocean;
 import net.buildtheearth.modules.utils.geo.projection.ModifiedAirocean;
 import net.buildtheearth.modules.utils.io.ConfigPaths;
+import net.buildtheearth.modules.warp.WarpManager;
 import net.buildtheearth.modules.warp.model.Warp;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -74,6 +75,7 @@ public class WarpCommand implements CommandExecutor {
 
             // Create an instance of the warp POJO
             Warp warp = new Warp(
+                    location.getWorld().getName(),
                     key,
                     locationInfo[0],
                     locationInfo[1],
@@ -125,11 +127,7 @@ public class WarpCommand implements CommandExecutor {
                 return true;
             }
 
-            // TODO Perform a GET request to get the information of this warp
-
-
-            // TODO Warp the player to this location
-
+            WarpManager.warpPlayer(player, key);
 
             return true;
         }

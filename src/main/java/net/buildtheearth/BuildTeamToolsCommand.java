@@ -1,7 +1,7 @@
 package net.buildtheearth;
 
 import net.buildtheearth.modules.updater.UpdateChecker;
-import net.buildtheearth.modules.utils.ChatUtil;
+import net.buildtheearth.modules.utils.ChatHelper;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -14,7 +14,7 @@ public class BuildTeamToolsCommand implements CommandExecutor {
 
         if (args.length == 0) {
 
-            ChatUtil.sendMessageBox(sender, "Build Team Tools", new Runnable() {
+            ChatHelper.sendMessageBox(sender, "Build Team Tools", new Runnable() {
                 @Override
                 public void run() {
                     String buildTeam = "-";
@@ -44,7 +44,7 @@ public class BuildTeamToolsCommand implements CommandExecutor {
         }
 
         if (args[0].equalsIgnoreCase("help")) {
-            ChatUtil.sendMessageBox(sender, "Build Team Help", new Runnable() {
+            ChatHelper.sendMessageBox(sender, "Build Team Help", new Runnable() {
                 @Override
                 public void run() {
                     sender.sendMessage("§e/bt help - §7List of all sub commands.");
@@ -55,7 +55,7 @@ public class BuildTeamToolsCommand implements CommandExecutor {
 
             return true;
         } else if (args[0].equalsIgnoreCase("communicators")) {
-            ChatUtil.sendMessageBox(sender, "Build Team Communicators", new Runnable() {
+            ChatHelper.sendMessageBox(sender, "Build Team Communicators", new Runnable() {
                 @Override
                 public void run() {
                     for (UUID uuid : Main.getBuildTeamTools().getProxyManager().getCommunicators())
@@ -63,7 +63,7 @@ public class BuildTeamToolsCommand implements CommandExecutor {
                 }
             });
         } else if (args[0].equalsIgnoreCase("cache")) {
-            ChatUtil.sendMessageBox(sender, "Build Team Cache", new Runnable() {
+            ChatHelper.sendMessageBox(sender, "Build Team Cache", new Runnable() {
                 @Override
                 public void run() {
                     sender.sendMessage(Main.buildTeamTools.getStatsManager().getCurrentCache().toJSONString());

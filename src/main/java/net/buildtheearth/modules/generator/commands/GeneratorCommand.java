@@ -5,7 +5,7 @@ import net.buildtheearth.modules.generator.Generator;
 import net.buildtheearth.modules.generator.menu.GeneratorMenu;
 import net.buildtheearth.modules.generator.model.History;
 import net.buildtheearth.modules.updater.DependencyManager;
-import net.buildtheearth.modules.utils.ChatUtil;
+import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.Utils;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
 public class GeneratorCommand implements CommandExecutor {
 
     public static void sendHelp(CommandSender sender) {
-        ChatUtil.sendMessageBox(sender, "Generator Command", new Runnable() {
+        ChatHelper.sendMessageBox(sender, "Generator Command", new Runnable() {
             @Override
             public void run() {
                 sender.sendMessage("§eHouse Generator:§7 /gen house help");
@@ -86,7 +86,7 @@ public class GeneratorCommand implements CommandExecutor {
                 return true;
             }
 
-            ChatUtil.sendMessageBox(sender, "Generator History for " + p.getName(), () -> {
+            ChatHelper.sendMessageBox(sender, "Generator History for " + p.getName(), () -> {
                 for (History.HistoryEntry history : Generator.getPlayerHistory(p).getHistoryEntries()) {
                     long timeDifference = System.currentTimeMillis() - history.getTimeCreated();
 

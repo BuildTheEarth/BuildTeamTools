@@ -64,6 +64,19 @@ public class ProxyManager {
         Bukkit.getOnlinePlayers().forEach(player -> ping(player));
     }
 
+    /**
+     * Sends a player server switch request to the proxy. The player will then be sent to the target server.
+     *
+     * @param player   The player aiming to switch server
+     * @param targetServer The name of the server the player must switch to
+     */
+    public void switchServer(Player player, String targetServer) {
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF("Connect");
+        out.writeUTF(targetServer);
+        player.sendPluginMessage(Main.instance, "BungeeCord", out.toByteArray());
+    }
+
     // Getters & Setters
 
     public String getBuildTeamID() {

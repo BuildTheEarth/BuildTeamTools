@@ -5,7 +5,6 @@ import net.buildtheearth.modules.generator.menu.GeneratorMenu;
 import net.buildtheearth.modules.network.ProxyManager;
 import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.MenuItem;
-import net.buildtheearth.modules.utils.ProxyUtil;
 import net.buildtheearth.modules.utils.Utils;
 import net.buildtheearth.modules.utils.io.ConfigPaths;
 import net.buildtheearth.modules.utils.menus.AbstractMenu;
@@ -117,7 +116,7 @@ public class BuildMenu extends AbstractMenu {
             MenuItem plotSystem = new MenuItem(iSlotsToBeUsed[iItem], plotsItem, player ->
             {
                 //Connects the player to the plot server
-                ProxyUtil.SwitchServer(player, ProxyManager.PLOT_SERVER_NAME);
+                Main.getBuildTeamTools().getProxyManager().switchServer(player, ProxyManager.PLOT_SERVER_NAME);
             });
             menuItems.add(plotSystem);
 

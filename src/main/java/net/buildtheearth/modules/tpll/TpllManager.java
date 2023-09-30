@@ -1,6 +1,8 @@
 package net.buildtheearth.modules.tpll;
 
 import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import net.buildtheearth.Main;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.GeometricUtils;
@@ -36,12 +38,8 @@ public class TpllManager {
             double targetLongitude = Double.parseDouble(in.readUTF());
             LatLng coordinates = new LatLng(targetLatitude, targetLongitude);
 
-            //Extracts the yaw and pitch
-            float targetYaw = Float.parseFloat(in.readUTF());
-            float targetPitch = Float.parseFloat(in.readUTF());
-
             // Creates a bukkit location for this tpll target
-            Location targetTpllLocation = GeometricUtils.getLocationFromCoordinatesYawPitch(coordinates, targetYaw, targetPitch);
+            Location targetTpllLocation = GeometricUtils.getLocationFromCoordinates(coordinates);
             // Location may contain a null world, this is checked for when the tpll event needs to be run
             // so that the player can be informed that the earth world was not specified
 
@@ -62,5 +60,20 @@ public class TpllManager {
 
         player.teleport(tpllTarget);
         tpllQueue.remove(player.getUniqueId());
+    }
+
+    public static void tpllPlayer(Player player, double[] coordinates, String targetServerID) {
+
+        // Send a plugin message to that server which adds the warp to the queue
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF("Tpll");
+        out.writeUTF(targetServerID);
+        out.writeUTF(String.valueOf(coordinates[0]));
+        out.writeUTF(String.valueOf(coordinates[1]));
+
+        player.sendPluginMessage(Main.instance, "BuildTeam", out.toByteArray());
+
+        // Switch the player to the target server
+        Main.getBuildTeamTools().getProxyManager().switchServer(player, targetServerID);
     }
 }

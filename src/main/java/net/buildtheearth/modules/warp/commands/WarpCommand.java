@@ -3,7 +3,7 @@ package net.buildtheearth.modules.warp.commands;
 import net.buildtheearth.Main;
 import net.buildtheearth.modules.network.api.NetworkAPI;
 import net.buildtheearth.modules.utils.ChatHelper;
-import net.buildtheearth.modules.utils.geo.OpenStreetMapAPI;
+import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.modules.utils.geo.projection.Airocean;
 import net.buildtheearth.modules.utils.geo.projection.ModifiedAirocean;
 import net.buildtheearth.modules.utils.io.ConfigPaths;

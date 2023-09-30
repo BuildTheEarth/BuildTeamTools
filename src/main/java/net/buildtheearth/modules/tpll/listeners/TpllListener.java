@@ -3,7 +3,7 @@ package net.buildtheearth.modules.tpll.listeners;
 import net.buildtheearth.Main;
 import net.buildtheearth.modules.network.api.NetworkAPI;
 import net.buildtheearth.modules.tpll.TpllManager;
-import net.buildtheearth.modules.utils.geo.OpenStreetMapAPI;
+import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;

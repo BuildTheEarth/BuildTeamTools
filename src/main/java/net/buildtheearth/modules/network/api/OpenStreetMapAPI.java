@@ -1,11 +1,13 @@
-package net.buildtheearth.modules.utils.geo;
+package net.buildtheearth.modules.network.api;
 
+import net.buildtheearth.Main;
 import net.buildtheearth.modules.utils.APIUtil;
 import org.bukkit.Bukkit;
 import org.json.simple.JSONObject;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.CompletableFuture;
 
 public class OpenStreetMapAPI {
 
@@ -34,6 +36,7 @@ public class OpenStreetMapAPI {
 
         return new double[]{lat, lon};
     }
+
 
     public static String getAddressFromLocation(double[] coordinates) {
         String response;

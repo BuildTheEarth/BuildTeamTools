@@ -17,6 +17,7 @@ import net.buildtheearth.modules.stats.StatsServerType;
 import net.buildtheearth.modules.stats.listeners.StatsListener;
 import net.buildtheearth.modules.tpll.TpllManager;
 import net.buildtheearth.modules.tpll.listeners.TpllJoinListener;
+import net.buildtheearth.modules.tpll.listeners.TpllListener;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.io.ConfigUtil;
 import net.buildtheearth.modules.warp.WarpManager;
@@ -161,8 +162,12 @@ public class BuildTeamTools {
         Bukkit.getPluginManager().registerEvents(new MenuFunctionListener(), Main.instance);
 
         Bukkit.getPluginManager().registerEvents(new StatsListener(), Main.instance);
+
         Bukkit.getPluginManager().registerEvents(new TpllJoinListener(), Main.instance);
+        Bukkit.getPluginManager().registerEvents(new TpllListener(), Main.instance);
+
         Bukkit.getPluginManager().registerEvents(new WarpJoinListener(), Main.instance);
+
         Bukkit.getPluginManager().registerEvents(new NavigatorOpenListener(proxyManager), Main.instance);
 
         Bukkit.getPluginManager().registerEvents(new NetworkJoinListener(), Main.instance);

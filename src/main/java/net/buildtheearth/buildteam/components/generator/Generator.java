@@ -1128,6 +1128,7 @@ public class Generator {
             String url = "https://api.github.com/repos/" + owner + "/" + repo + "/releases";
 
             HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
+            con.setRequestProperty("User-Agent", "Mozilla/5.0");
             con.setRequestMethod("GET");
 
             int responseCode = con.getResponseCode();

@@ -2,7 +2,6 @@ package net.buildtheearth.buildteam.components.generator;
 
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.BuildTeamTools;
-import net.buildtheearth.buildteam.components.generator.field.Crop;
 import net.buildtheearth.buildteam.components.generator.field.Field;
 import net.buildtheearth.buildteam.components.generator.field.FieldSettings;
 import net.buildtheearth.buildteam.components.generator.field.menu.CropTypeMenu;
@@ -120,9 +119,9 @@ public class GeneratorMenu extends AbstractMenu {
 
             // Set navigator item
             getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
-        }else if(!Generator.checkIfTreePackIsInstalled(getMenuPlayer(), false)){
+        }else if(!Generator.checkIfGeneratorCollectionsIsInstalled(getMenuPlayer())){
             // TREE ITEM
-            ArrayList<String> treeLore = Liste.createList("", "§cThe §eTree Pack " + Tree.TREE_PACK_VERSION + " §cis not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
+            ArrayList<String> treeLore = Liste.createList("", "§cThe §eGenerator Collections v" + Generator.GENERATOR_COLLECTIONS_VERSION + " §c package is not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
 
             ItemStack treeItem = Item.create(Material.SAPLING, "§aGenerate Tree & Forest §c(DISABLED)", treeLore);
 

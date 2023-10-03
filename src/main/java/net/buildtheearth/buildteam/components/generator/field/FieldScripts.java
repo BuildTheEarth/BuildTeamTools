@@ -16,6 +16,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,8 +36,7 @@ public class FieldScripts {
         // Information for later restoring original selection
         List<Vector> points = new ArrayList<>();
 
-        Vector minPoint = region.getMinimumPoint();
-        Vector maxPoint = region.getMaximumPoint();
+        float yaw = p.getLocation().getYaw();
 
 
         if (region instanceof Polygonal2DRegion) {
@@ -65,20 +65,10 @@ public class FieldScripts {
         // ----------- PREPARATION 01 ----------
         // Preparing the field area
 
-        // Create a cuboid selection of the field area
-        Generator.createCuboidSelection(p, maxPoint, minPoint);
-
-        p.chat("//expand 20 20 up");
+        p.chat("//expand 30 30 up");
 
         Block[][][] blocks = Generator.analyzeRegion(p, p.getWorld());
         int maxHeight = Generator.getMaxHeight(blocks);
-
-        // Recreate the original polygon selection
-        Generator.createPolySelection(p, points, blocks);
-
-
-        commands.add("//expand 10 up");
-        commands.add("//expand 10 down");
 
         // Remove all non-solid blocks
         commands.add("//gmask !#solid");
@@ -90,289 +80,69 @@ public class FieldScripts {
         commands.add("//replace leaves,log,pumpkin 0");
         operations++;
 
-        p.chat("//expand 40 40 up"); // IMPORTANT! Doing it this way to fix yellow wool detection
-
-        // In case the player placed yellow wool for a crop which doesn't require it
-        if (!crop.isLinesRequired()) {
-            commands.add("//replace 35:4 0");
-            operations++;
-        }
-
-        // Replaces all underground yellow wool blocks with grass
-        commands.add("//gmask !<0");
-        commands.add("//replace 35:4 2");
-        operations++;
-
-
-        commands.add("//expand 10 10 up");
-
-
         // ----------- PREPARATION 02 ----------
         // Drawing lines if the crop requires it
 
         if (crop.isLinesRequired()) {
-            // Make sure there are at least 2 yellow wool blocks inside the selection
-            if (!Generator.containsBlock(blocks, Material.WOOL, (byte) 4, 2)) {
-                // Get two points of the selection. If selection points is > 2 take a point from the middle of all points.
-                Vector point1 = points.get(0);
-                Vector point2 = points.get(1);
+            // Prepare for line drawing
+            boolean requiresAlternatingLines = crop.equals(Crop.VINEYARD) || crop.equals(Crop.PEAR);
 
-                if(points.size() > 2)
-                    point2 = points.get((int) Math.ceil(points.size()/2.0));
+            // Get the directory containing all schematic files.
+            File directory = new File(Main.instance.getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/GeneratorCollections/fieldpack/" + (requiresAlternatingLines ? "striped/" : "normal/"));
+            Bukkit.getLogger().info(directory.toString());
 
-                // Get two points that are half the size than the original points
-                Vector[] lineBlocks = interpolateVectors(point1, point2, point1.distance(point2) / 2);
+            // Get some information based on the list of schematics
+            short schematicAmount = (short) directory.getAbsoluteFile().listFiles().length;
+            File[] schematics = directory.getAbsoluteFile().listFiles();
+            short[] availableDirections = new short[schematicAmount];
 
-                // Get the elevation of the new points
-                int y1 = Generator.getMaxHeight(blocks, lineBlocks[0].getBlockX(), lineBlocks[0].getBlockZ(), Generator.IGNORED_MATERIALS) + 1;
-                int y2 = Generator.getMaxHeight(blocks, lineBlocks[1].getBlockX(), lineBlocks[1].getBlockZ(), Generator.IGNORED_MATERIALS) + 1;
-
-                // Create yellow wool on the new points
-                Location location1 = new Location(p.getWorld(), lineBlocks[0].getBlockX(), y1, lineBlocks[0].getBlockZ());
-                Location location2 = new Location(p.getWorld(), lineBlocks[1].getBlockX(), y2, lineBlocks[1].getBlockZ());
-
-                location1.getBlock().setType(Material.WOOL);
-                location1.getBlock().setData((byte) 4);
-
-                location2.getBlock().setType(Material.WOOL);
-                location2.getBlock().setData((byte) 4);
+            // Get an array with all available schematic line directions
+            for(int i = 0; i < schematicAmount; i++) {
+                availableDirections[i] = Short.parseShort(schematics[i].getName().replace(".schematic", ""));
             }
 
-            // Get the most Western and most Eastern yellow block.
-            List<Block> yellowWoolBlocks = Generator.getBlocksOfMaterial(blocks, Material.WOOL, (byte) 4);
-            Block westernMost = null;
-            Block easternMost = null;
-            double currentLowest = Double.MAX_VALUE;
-            double currentHighest = -Double.MAX_VALUE;
+            // Calculate which direction should be used
+            short directionToUse = availableDirections[0]; // Assume the first element is the closest initially
+            short minDifference = (short) Math.abs(yaw - availableDirections[0]); // Initial difference
 
-            for (Block yellowWoolBlock : yellowWoolBlocks) {
-                if (yellowWoolBlock.getLocation().getBlockX() < currentLowest) {
-                    currentLowest = yellowWoolBlock.getLocation().getBlockX();
-                    westernMost = yellowWoolBlock;
-                }
-
-                if (yellowWoolBlock.getLocation().getBlockX() > currentHighest) {
-                    currentHighest = yellowWoolBlock.getLocation().getBlockX();
-                    easternMost = yellowWoolBlock;
+            for (short current : availableDirections) {
+                short difference = (short) Math.abs(yaw - current);
+                if (difference < minDifference) {
+                    minDifference = difference;
+                    directionToUse = current;
                 }
             }
 
-            // Check to make sure 2 yellow wool blocks were correctly found
-            if (westernMost == null || easternMost == null) {
-                p.sendMessage("§cSomething went wrong while processing line data!");
-                p.sendMessage(" ");
-                p.sendMessage("§cPlease contact one of the developers!");
-                return;
-            }
+            commands.add("//schem load /GeneratorCollections/fieldpack/"+(requiresAlternatingLines ? "striped/" : "normal/")+(directionToUse < 100 ? "0"+directionToUse : directionToUse)+".schematic");
 
-
-            // Get the target length of the new line
-            double targetLength = 1;
-
-            double diagonal1 = maxPoint.subtract(minPoint).length();
-            Vector boundingBoxPoint3 = new Vector(minPoint.getX(), maxPoint.getY(), maxPoint.getZ());
-            Vector boundingBoxPoint4 = new Vector(maxPoint.getX(), minPoint.getY(), minPoint.getZ());
-            double diagonal2 = boundingBoxPoint4.subtract(boundingBoxPoint3).length();
-
-            targetLength = Math.max(diagonal1, diagonal2);
-
-
-            // Get two new points of the extended line
-            Vector point1 = new Vector(westernMost.getX(), westernMost.getY(), westernMost.getZ());
-            Vector point2 = new Vector(easternMost.getX(), easternMost.getY(), easternMost.getZ());
-
-            Vector[] extendedVectors = interpolateVectors(point1, point2, targetLength);
-            Vector extendedPoint1 = extendedVectors[0];
-            Vector extendedPoint2 = extendedVectors[1];
-
-            // Remove the original points
-            commands.add("//gmask");
-            commands.add("//replace 35:4 0");
+            commands.add("//gmask <0");
+            commands.add("//replace #solid #copy");
             operations++;
-
-            // Draw the first line in orange
-            commands.add("//sel cuboid");
-            commands.add("//gmask !air");
-
-            commands.add("//pos1 " + extendedPoint1.getBlockX() + "," + (extendedPoint1.getBlockY() - 1) + "," + extendedPoint1.getBlockZ());
-            commands.add("//pos2 " + extendedPoint2.getBlockX() + "," + (extendedPoint2.getBlockY() - 1) + "," + extendedPoint2.getBlockZ());
-
-            commands.add("//line 35:4");
-            operations++;
-
-            commands.add("//expand 10 up");
-            commands.add("//expand 10 down");
-
-            // Make sure the line completely covers the required surface
-            commands.add("//gmask !0");
-            for (int i = maxHeight; i < maxHeight + 5; i++) {
-                commands.add("//replace >35:4 35:4");
-                commands.add("//replace <35:4 35:4");
-                operations++;
-            }
-
-            Vector extendedBoxMax = maxPoint;
-            Vector extendedBoxMin = minPoint;
-
-            Vector[] extendedPoints = {extendedPoint1, extendedPoint2};
-            for(Vector extendedPoint : extendedPoints) {
-                if (extendedPoint.getX() > extendedBoxMax.getBlockX())
-                    extendedBoxMax = extendedBoxMax.setX(extendedPoint.getBlockX());
-                if (extendedPoint.getX() < extendedBoxMin.getBlockX())
-                    extendedBoxMin = extendedBoxMin.setX(extendedPoint.getBlockX());
-
-                if (extendedPoint.getZ() > extendedBoxMax.getBlockZ())
-                    extendedBoxMax = extendedBoxMax.setZ(extendedPoint.getBlockZ());
-                if (extendedPoint.getZ() < extendedBoxMin.getBlockZ())
-                    extendedBoxMin = extendedBoxMin.setZ(extendedPoint.getBlockZ());
-            }
-
-
-            // Reselect original region as cuboid
-            Generator.createCuboidSelection(commands, extendedBoxMax, extendedBoxMin);
-
-            commands.add("//expand 40 40 up");
-
-            // Remove all non-solid blocks
-            commands.add("//gmask !#solid");
-            commands.add("//replace 0");
-            operations++;
-
-            // Find out what the highest block in the cuboid selection is to find out at which y value the air starts.
-            // This is needed to ensure that no blocks are overwritten.
-            int currentHighestY = Integer.MIN_VALUE;
-            int currentLowestY = Integer.MAX_VALUE;
-            int yDifference = 0;
-            for (Block[][]block2D : blocks) {
-                for(Block[] block1D : block2D) {
-                    for(Block block : block1D) {
-                        if(block != null) {
-                            int highestY = p.getWorld().getHighestBlockYAt(block.getX(), block.getZ()) + 5;
-                            if(highestY > currentHighestY) currentHighestY = highestY + 5;
-                            if(highestY < currentLowestY) currentLowestY = highestY;
-                        }
-                    }
-                }
-            }
-            yDifference = currentHighestY - currentLowestY;
-
-            // Make original line correct shape
-            commands.add("//gmask =queryRel(0,0,1,35,4)&&queryRel(1,0,0,35,4)");
-            commands.add("//set 35:4");
-            operations++;
-
-            commands.add("//gmask =queryRel(1,0,0,35,4)&&queryRel(0,0,-1,35,4)");
-            commands.add("//set 35:4");
-            operations++;
-
-            // Move everything up & delete what's on the floor
-            commands.add("//expand 50 50 up");
-
-            // Replace the yellow wool that is under yellow wool with grass
-            commands.add("//gmask =queryRel(0,1,0,35,4)");
-            commands.add("//replace 35:4 2");
-
-            // Move the line + yDifference blocks up and change the color from yellow to lime
-            commands.add("//gmask =queryRel(0,-"+ yDifference +",0,35,4)");
-            commands.add("//set 35:5");
-
-            // Replace the yellow wool blocks with grass
-            commands.add("//gmask");
-            commands.add("//replace 35:4 2");
-
-
-            // Make the line pattern extend over the field
-            for (int i = 0; i <= targetLength / 2; i++) {
-                String gmask = "//gmask =queryRel(0,-" + (yDifference-1) + ",0,0,0)&&!queryRel(0,-" + (yDifference) + ",0,0,0)&&(" + getQueryRelThinSurroundings(0, "35:5") + "||" + getQueryRelThinSurroundings(1, "35:5") + "||" + getQueryRelThinSurroundings(-1, "35:5") + ")";
-
-
-                if (i % 2 == 0 || (crop != Crop.VINEYARD && crop != Crop.PEAR)) {
-                    // All blocks that are ydifference above the ground and one block next to lime wool are replaced with pink wool
-                    commands.add(gmask);
-                    commands.add("//replace !35:5,35:7 35:6");
-                    operations++;
-                    commands.add("//gmask =queryRel(0,-1,0,35,6)");
-                    commands.add("//replace 35:6 0");
-                } else {
-                    //Magenta wool
-                    commands.add(gmask);
-                    commands.add("//replace !35:5,35:6 35:7");
-                    operations++;
-                    commands.add("//gmask =queryRel(0,-1,0,35,7)");
-                    commands.add("//replace 35:7 0");
-                }
-                //Lime wool
-                commands.add("//gmask =queryRel(0,-" + (yDifference-1) + ",0,0,0)&&!queryRel(0,-" + (yDifference) + ",0,0,0)&&(" + getQueryRelThickSurroundings(0, "35:6") + "||" + getQueryRelThickSurroundings(1, "35:6") + "||" + getQueryRelThickSurroundings(-1, "35:6") +")");
-                commands.add("//replace !35:6,35:7 35:5");
-                operations++;
-                commands.add("//gmask =queryRel(0,-" + (yDifference-1) + ",0,0,0)&&!queryRel(0,-" + (yDifference) + ",0,0,0)&&(" + getQueryRelThickSurroundings(0, "35:7") + "||" + getQueryRelThickSurroundings(1, "35:7") + "||" + getQueryRelThickSurroundings(-1, "35:7") +")");
-                commands.add("//replace !35:6,35:7 35:5");
-                operations++;
-                commands.add("//gmask =queryRel(0,-1,0,35,5)");
-                commands.add("//replace 35:5 0");
-                operations++;
-            }
-
-
-            // Create a Polygon Selection
-            Generator.createPolySelection(commands, points);
-
-            commands.add("//expand 40 40 up");
-
-            // Move down the lines & clean up
-            commands.add("//gmask =queryRel(1,"+ (yDifference) +",0,35,5)");
-            commands.add("//set 35:4");
-
-            commands.add("//gmask =queryRel(1,"+ (yDifference) +",0,35,6)");
-            commands.add("//set 35:1");
-
-            commands.add("//gmask =queryRel(1,"+ (yDifference) +",0,35,7)");
-            commands.add("//set 35:2");
-
-
-            // Create a Cuboid Selection
-            Generator.createCuboidSelection(commands, extendedBoxMax, extendedBoxMin);
-
-            commands.add("//expand 40 40 up");
-
-            // Replace blocks in the air with nothing
-            commands.add("//gmask");
-            commands.add("//replace 35:5,35:6,35:7 0");
         }
-
 
         // ----------- PLACING CROPS ----------
         // Placing the crops
 
         commands.add("//gmask");
 
-        // First reselect the original poly region
-
-        Generator.createPolySelection(commands, points);
-
-        commands.add("//expand 40 40 up");
-
-        // Increase height to make sure the entire field height is inside the selection
-        commands.add("//expand 20 20 up");
-
         if (crop == Crop.POTATO) {
             if (type == CropStage.TALL) {
-                commands.add("//replace 35:4 24%3,24%3:1,1%17:4,1%5:1");
+                commands.add("//replace 251:0 24%3,24%3:1,1%17:4,1%5:1");
                 operations++;
-                commands.add("//replace 35:1 1%3,1%3:1,24%17:4,24%5:1");
+                commands.add("//replace 251:15 1%3,1%3:1,24%17:4,24%5:1");
                 operations++;
 
                 commands.add("//shift 1 up");
                 commands.add("//gmask 0");
 
-                commands.add("//replace >3 35:1,35:2,31:1,31:2");
+                commands.add("//replace >3 251:15,251:4,31:1,31:2");
                 operations++;
 
                 commands.add("//gmask");
 
-                commands.add("//replace 35:1 175:3");
+                commands.add("//replace 251:15 175:3");
                 operations++;
-                commands.add("//replace 35:2 175:2");
+                commands.add("//replace 251:4 175:2");
                 operations++;
 
                 commands.add("//shift 1 up");
@@ -383,9 +153,9 @@ public class FieldScripts {
                 operations++;
 
             } else {
-                commands.add("//replace 35:4 208,5");
+                commands.add("//replace 251:0 208,5");
                 operations++;
-                commands.add("//replace 35:1 252:13,2");
+                commands.add("//replace 251:15 252:13,2");
                 operations++;
 
                 commands.add("//shift 1 up");
@@ -399,15 +169,15 @@ public class FieldScripts {
 
         if (crop == Crop.HARVESTED) {
             if (type == CropStage.DRY) {
-                commands.add("//replace 35:4 5%208,95%5");
+                commands.add("//replace 251:0 5%208,95%5");
                 operations++;
-                commands.add("//replace 35:1 95%208,5%5");
+                commands.add("//replace 251:15 95%208,5%5");
                 operations++;
 
             } else {
-                commands.add("//replace 35:4 47%5:1,47%3:1,5%60");
+                commands.add("//replace 251:0 47%5:1,47%3:1,5%60");
                 operations++;
-                commands.add("//replace 35:1 95%60,2%3:1,2%5:1");
+                commands.add("//replace 251:15 95%60,2%3:1,2%5:1");
                 operations++;
 
             }
@@ -417,9 +187,9 @@ public class FieldScripts {
             if (type == CropStage.DRY) {
                 commands.add("//setbiome MESA");
 
-                commands.add("//replace 35:4 208,5");
+                commands.add("//replace 251:0 208,5");
                 operations++;
-                commands.add("//replace 35:1 252:13,2");
+                commands.add("//replace 251:15 252:13,2");
                 operations++;
 
                 commands.add("//shift 1 up");
@@ -431,22 +201,22 @@ public class FieldScripts {
             } else {
                 commands.add("//setbiome SWAMPLAND");
 
-                commands.add("//replace 35:4 24%3,24%3:1,1%17:4,1%5:1");
+                commands.add("//replace 251:0 24%3,24%3:1,1%17:4,1%5:1");
                 operations++;
-                commands.add("//replace 35:1 1%3,1%3:1,24%17:4,24%5:1");
+                commands.add("//replace 251:15 1%3,1%3:1,24%17:4,24%5:1");
                 operations++;
 
                 commands.add("//shift 1 up");
                 commands.add("//gmask 0");
 
-                commands.add("//replace >3 35:1,35:2,31:1,31:2");
+                commands.add("//replace >3 251:15,251:4,31:1,31:2");
                 operations++;
 
                 commands.add("//gmask");
 
-                commands.add("//replace 35:1 175:3");
+                commands.add("//replace 251:15 175:3");
                 operations++;
-                commands.add("//replace 35:2 175:2");
+                commands.add("//replace 251:4 175:2");
                 operations++;
 
                 commands.add("//shift 1 up");
@@ -460,16 +230,16 @@ public class FieldScripts {
         }
 
         if (crop == Crop.VINEYARD || crop == Crop.PEAR) {
-            commands.add("//replace >35:2 15%188,85%22");
+            commands.add("//replace >251:4 15%188,85%22");
             operations++;
             commands.add("//replace >188,22 251:13");
             operations++;
 
-            commands.add("//replace 35:1 5,208:0");
+            commands.add("//replace 251:15 5,208:0");
             operations++;
-            commands.add("//replace 35:4 208:0,5,3,3:1");
+            commands.add("//replace 251:0 208:0,5,3,3:1");
             operations++;
-            commands.add("//replace 35:2 3,3:1");
+            commands.add("//replace 251:4 3,3:1");
             operations++;
 
             commands.add("//replace 22 0");
@@ -574,47 +344,8 @@ public class FieldScripts {
 
         }
 
-        Generator.createPolySelection(commands, points);
-
 
         Main.buildTeamTools.getGenerator().getCommands().add(new Command(p, field, commands, operations, blocks));
         Generator.getPlayerHistory(p).addHistoryEntry(new History.HistoryEntry(GeneratorType.FIELD, operations));
-    }
-
-    /**
-     * Extends the length of a line between two vectors.
-     *
-     * @param point1       - The first point of the current line
-     * @param point2       - The second point of the current line
-     * @param targetLength - Define how long the new line should be
-     * @return - Two new points of the new line
-     */
-    public static Vector[] interpolateVectors(Vector point1, Vector point2, double targetLength) {
-        // Distance Vector between point1 and point2
-        Vector distanceVector = point2.subtract(point1);
-        double distanceVectorSize = distanceVector.length();
-
-        // Middle Vector between point1 and point2
-        Vector middle = point1.add(distanceVector.multiply(0.5));
-
-        // Factor how much the distance Vector has to be multiplied in order to create the new line
-        double multiplicationFactor = targetLength / distanceVectorSize / 2;
-        Vector extendedDistanceVector = distanceVector.multiply(multiplicationFactor);
-
-        // Extended points by adding and subtracting the extended Distance Vector to the Middle Vector
-        Vector point1Extended = middle.add(extendedDistanceVector);
-        Vector point2Extended = middle.subtract(extendedDistanceVector);
-
-        return new Vector[]{point1Extended, point2Extended};
-    }
-
-    public static String getQueryRelThinSurroundings(int yOffset, String blockID){
-        blockID = blockID.replace(":", ",");
-        return "queryRel(1," + yOffset + ",0," + blockID +")||queryRel(-1," + yOffset + ",0," + blockID + ")||queryRel(0," + yOffset + ",1," + blockID + ")||queryRel(0," + yOffset + ",-1," + blockID + ")";
-    }
-
-    public  static String getQueryRelThickSurroundings(int yOffset, String blockID){
-        blockID = blockID.replace(":", ",");
-        return "queryRel(1," + yOffset + ",0," + blockID +")||queryRel(-1," + yOffset + ",0," + blockID + ")||queryRel(0," + yOffset + ",1," + blockID + ")||queryRel(0," + yOffset + ",-1," + blockID + ")||queryRel(1," + yOffset + ",1," + blockID + ")||queryRel(-1," + yOffset + ",1," + blockID + ")||queryRel(1," + yOffset + ",-1," + blockID + ")||queryRel(-1," + yOffset + ",-1," + blockID + ")";
     }
 }

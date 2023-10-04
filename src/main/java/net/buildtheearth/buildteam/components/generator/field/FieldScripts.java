@@ -11,8 +11,6 @@ import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.generator.GeneratorType;
 import net.buildtheearth.buildteam.components.generator.History;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -20,7 +18,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
 public class FieldScripts {
 
@@ -35,6 +32,9 @@ public class FieldScripts {
 
         // Information for later restoring original selection
         List<Vector> points = new ArrayList<>();
+
+        Vector minPoint = region.getMinimumPoint();
+        Vector maxPoint = region.getMaximumPoint();
 
         float yaw = p.getLocation().getYaw();
         if(yaw < 0) yaw += 360;
@@ -66,10 +66,22 @@ public class FieldScripts {
         // ----------- PREPARATION 01 ----------
         // Preparing the field area
 
-        p.chat("//expand 30 30 up");
+        // Create a cuboid selection of the field area
+        Generator.createCuboidSelection(p, maxPoint, minPoint);
+
+        p.chat("//expand 20 20 up");
+        p.chat("//expand 10 10 north");
+        p.chat("//expand 10 10 west");
 
         Block[][][] blocks = Generator.analyzeRegion(p, p.getWorld());
         int maxHeight = Generator.getMaxHeight(blocks);
+
+        // Recreate the original polygon selection
+        Generator.createPolySelection(p, points, blocks);
+
+
+        commands.add("//expand 10 up");
+        commands.add("//expand 10 down");
 
         // Remove all non-solid blocks
         commands.add("//gmask !#solid");
@@ -90,7 +102,6 @@ public class FieldScripts {
 
             // Get the directory containing all schematic files.
             File directory = new File(Main.instance.getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/GeneratorCollections/fieldpack/" + (requiresAlternatingLines ? "striped/" : "normal/"));
-            Bukkit.getLogger().info(directory.toString());
 
             // Get some information based on the list of schematics
             short schematicAmount = (short) directory.getAbsoluteFile().listFiles().length;
@@ -305,17 +316,18 @@ public class FieldScripts {
         }
 
         if (crop == Crop.CATTLE || crop == Crop.MEADOW) {
-            commands.add("//gmask 0");
-
-            operations += Generator.createPolyLine(commands, points, "41", true, blocks, 1);
-            commands.add("//gmask");
-
-            Generator.createPolySelection(commands, points);
+            commands.add("//gmask !#solid");
 
             List<Vector> oneMeterPoints = new ArrayList<>(points);
+            oneMeterPoints.add(points.get(0));
             oneMeterPoints = Generator.populatePoints(oneMeterPoints, 1);
             List<Vector> fencePoints = new ArrayList<>(oneMeterPoints);
             fencePoints = Generator.reducePoints(fencePoints, 3 + 1, 3 - 1);
+
+            operations += Generator.createPolyLine(commands, fencePoints, "41", true, blocks, 1);
+            commands.add("//gmask");
+
+            Generator.createPolySelection(commands, points);
 
             commands.add("//sel cuboid");
             commands.add("//expand 10 10 west");
@@ -341,16 +353,24 @@ public class FieldScripts {
             commands.add("//replace 41 166");
             operations++;
 
+            Generator.createPolySelection(commands, points);
+
             commands.add("//gmask !" + fence + ",77,166");
-            commands.add("//replace >#solid 70%0,30%31:1");
-            operations++;
+            commands.add("//expand 10 10 up");
 
             if (crop == Crop.CATTLE) commands.add("//replace <air 60%3,20%2,20%3:1");
             if (crop == Crop.MEADOW) commands.add("//replace <air 70%2,20%3,10%3:1");
             operations++;
 
+            commands.add("//replace >#solid 70%0,30%31:1");
+            operations++;
+
+            // Make sure that the poly selection afterwards is the same as before
+            commands.add("//sel cuboid");
+
         }
 
+        Generator.createPolySelection(commands, points);
 
         Main.buildTeamTools.getGenerator().getCommands().add(new Command(p, field, commands, operations, blocks));
         Generator.getPlayerHistory(p).addHistoryEntry(new History.HistoryEntry(GeneratorType.FIELD, operations));

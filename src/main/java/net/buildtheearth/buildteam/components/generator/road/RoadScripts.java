@@ -121,7 +121,7 @@ public class RoadScripts {
         if(road_width > 10) {
             List<List<Vector>> yellowWoolLineNearSidewalk = Generator.shiftPointsAll(innerPoints, road_width - 4);
             for (List<Vector> path : yellowWoolLineNearSidewalk)
-                operations += Generator.createPolyLine(commands, path, "35:4", true, regionBlocks);
+                operations += Generator.createPolyLine(commands, path, "35:4", true, regionBlocks, 0);
         }
 
         commands.add("//gmask");
@@ -140,31 +140,31 @@ public class RoadScripts {
             // Draw the sidewalk middle lines
             commands.add("//gmask !solid," + roadMaterial + "," + markingMaterial);
             for(List<Vector> path : sidewalkPointsMid)
-                operations += Generator.createPolyLine(commands, path, "35:1", true, regionBlocks);
+                operations += Generator.createPolyLine(commands, path, "35:1", true, regionBlocks, 0);
 
             commands.add("//gmask !" + roadMaterial + "," + markingMaterial);
             // Create the outer sidewalk edge lines
             for(List<Vector> path : sidewalkPointsOut)
-                operations += Generator.createPolyLine(commands, path, "35:3", true, regionBlocks);
+                operations += Generator.createPolyLine(commands, path, "35:3", true, regionBlocks, 0);
 
             // Create the inner sidewalk edge lines
             for(List<Vector> path : sidewalkPointsIn)
-                operations += Generator.createPolyLine(commands, path, "35:3", true, regionBlocks);
+                operations += Generator.createPolyLine(commands, path, "35:3", true, regionBlocks, 0);
             commands.add("//gmask");
 
             if(crosswalk){
                 // Draw the sidewalk middle lines
                 commands.add("//gmask " + roadMaterial + "," + markingMaterial);
                 for(List<Vector> path : sidewalkPointsMid)
-                    operations += Generator.createPolyLine(commands, path, "35:2", true, regionBlocks);
+                    operations += Generator.createPolyLine(commands, path, "35:2", true, regionBlocks, 0);
 
                 // Create the outer sidewalk edge lines
                 for(List<Vector> path : sidewalkPointsOut)
-                    operations += Generator.createPolyLine(commands, path, "35:11", true, regionBlocks);
+                    operations += Generator.createPolyLine(commands, path, "35:11", true, regionBlocks, 0);
 
                 // Create the inner sidewalk edge lines
                 for(List<Vector> path : sidewalkPointsIn)
-                    operations += Generator.createPolyLine(commands, path, "35:11", true, regionBlocks);
+                    operations += Generator.createPolyLine(commands, path, "35:11", true, regionBlocks, 0);
                 commands.add("//gmask");
             }
         }

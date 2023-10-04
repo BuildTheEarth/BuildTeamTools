@@ -223,7 +223,7 @@ public class Updater
      * @param newVersion remote version
      * @param oldVersion current version
      */
-    private boolean shouldUpdate(String newVersion, String oldVersion)
+    public static boolean shouldUpdate(String newVersion, String oldVersion)
     {
         // If version has format 1.0.0
         if(newVersion.contains(".")){

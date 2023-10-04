@@ -2,6 +2,9 @@ package net.buildtheearth.buildteam.components.generator;
 
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.BuildTeamTools;
+import net.buildtheearth.buildteam.components.generator.field.Field;
+import net.buildtheearth.buildteam.components.generator.field.FieldSettings;
+import net.buildtheearth.buildteam.components.generator.field.menu.CropTypeMenu;
 import net.buildtheearth.buildteam.components.generator.house.House;
 import net.buildtheearth.buildteam.components.generator.house.HouseSettings;
 import net.buildtheearth.buildteam.components.generator.house.RoofType;
@@ -15,9 +18,11 @@ import net.buildtheearth.buildteam.components.generator.tree.Tree;
 import net.buildtheearth.utils.menus.AbstractMenu;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.Liste;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
@@ -35,7 +40,8 @@ public class GeneratorMenu extends AbstractMenu {
 
     public static final int TREE_ITEM_SLOT = 15;
 
-    public static final int FIELD_SLOT = 17;
+    public static int FIELD_ITEM_SLOT = 17;
+
 
     public GeneratorMenu(Player player) {
         super(3, GENERATOR_INV_NAME, player);
@@ -111,9 +117,9 @@ public class GeneratorMenu extends AbstractMenu {
 
             // Set navigator item
             getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
-        } else if(!Generator.checkIfTreePackIsInstalled(getMenuPlayer(), false)) {
+        }else if(!Generator.checkIfGeneratorCollectionsIsInstalled(getMenuPlayer())){
             // TREE ITEM
-            ArrayList<String> treeLore = Liste.createList("", "§cThe §eTree Pack " + Tree.TREE_PACK_VERSION + " §cis not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
+            ArrayList<String> treeLore = Liste.createList("", "§cThe §eGenerator Collections v" + Generator.GENERATOR_COLLECTIONS_VERSION + " §c package is not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
 
             ItemStack treeItem = Item.create(Material.SAPLING, "§aGenerate Tree & Forest §c(DISABLED)", treeLore);
 
@@ -154,10 +160,10 @@ public class GeneratorMenu extends AbstractMenu {
                 "§8Leftclick to generate",
                 "§8Rightclick for Tutorial");
 
-        ItemStack fieldItem = Item.create(Material.WHEAT, "§6Generate Field §c(TODO)", fieldLore);
+        ItemStack fieldItem = Item.create(Material.WHEAT, "§6Generate Field", fieldLore);
 
         // Set navigator item
-        getMenu().getSlot(FIELD_SLOT).setItem(fieldItem);
+        getMenu().getSlot(FIELD_ITEM_SLOT).setItem(fieldItem);
 
 
 
@@ -208,6 +214,32 @@ public class GeneratorMenu extends AbstractMenu {
 
             Main.getBuildTeam().getGenerator().getRail().generate(clickPlayer);
         }));
+
+        // Set click event for field item
+        getMenu().getSlot(FIELD_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
+            if(clickInformation.getClickType().equals(ClickType.RIGHT)) {
+                sendMoreInformation(clickPlayer, "FIELD");
+                return;
+            }
+
+            Field field = Main.buildTeamTools.getGenerator().getField();
+            field.getPlayerSettings().put(clickPlayer.getUniqueId(), new FieldSettings(clickPlayer));
+
+            if(!field.checkPlayer(clickPlayer))
+                return;
+
+            clickPlayer.closeInventory();
+            clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
+            new CropTypeMenu(clickPlayer);
+        }));
+    }
+
+    private void sendMoreInformation(Player clickPlayer, String generator) {
+        switch (generator) {
+            case "FIELD":
+                clickPlayer.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Field-Command");
+                break;
+        }
     }
 
     @Override

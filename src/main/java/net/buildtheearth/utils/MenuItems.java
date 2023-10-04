@@ -409,6 +409,20 @@ public class MenuItems {
         return Arrays.asList(STAIRS);
     }
 
+    public static ItemStack[] FENCES = {
+            Item.create(Material.FENCE),
+            Item.create(Material.BIRCH_FENCE),
+            Item.create(Material.ACACIA_FENCE),
+            Item.create(Material.JUNGLE_FENCE),
+            Item.create(Material.SPRUCE_FENCE),
+            Item.create(Material.DARK_OAK_FENCE),
+            Item.create(Material.NETHER_FENCE)
+    };
+
+    public static List<ItemStack> getFences() {
+        return Arrays.asList(FENCES);
+    }
+
     public static final String WHITE_PLUS = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjBiNTVmNzQ2ODFjNjgyODNhMWMxY2U1MWYxYzgzYjUyZTI5NzFjOTFlZTM0ZWZjYjU5OGRmMzk5MGE3ZTcifX19";
     public static final String WHITE_MINUS = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzNlNGI1MzNlNGJhMmRmZjdjMGZhOTBmNjdlOGJlZjM2NDI4YjZjYjA2YzQ1MjYyNjMxYjBiMjVkYjg1YiJ9fX0=";
     public static final String WHITE_BLANK = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTdjMjE0NGZkY2I1NWMzZmMxYmYxZGU1MWNhYmRmNTJjMzg4M2JjYjU3ODkyMzIyNmJlYjBkODVjYjJkOTgwIn19fQ==";

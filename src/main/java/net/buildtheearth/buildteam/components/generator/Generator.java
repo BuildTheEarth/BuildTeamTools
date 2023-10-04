@@ -14,33 +14,53 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
+import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import lombok.Getter;
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.BuildTeamTools;
+import net.buildtheearth.buildteam.components.generator.field.Field;
 import net.buildtheearth.buildteam.components.generator.house.House;
 import net.buildtheearth.buildteam.components.generator.rail.Rail;
 import net.buildtheearth.buildteam.components.generator.road.Road;
 import net.buildtheearth.buildteam.components.generator.tree.Tree;
+import net.buildtheearth.buildteam.components.updater.Updater;
+import net.buildtheearth.utils.Config;
 import net.buildtheearth.utils.Item;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-import java.io.File;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class Generator {
 
     public static final String WIKI_PAGE = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Generator";
     public static final String INSTALL_WIKI = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Installation";
 
+    public static String GENERATOR_COLLECTIONS_VERSION;
+
+    public static final Material[] IGNORED_MATERIALS = {Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL, Material.SNOW};
+
+
     private static final HashMap<UUID, History> playerHistory = new HashMap<>();
+
 
     @Getter
     private final List<Command> commands = new ArrayList<>();
@@ -54,12 +74,21 @@ public class Generator {
 
     @Getter
     private final Tree tree;
+    @Getter
+    private final Field field;
 
     public Generator(){
         house = new House();
         road = new Road();
         rail = new Rail();
         tree = new Tree();
+        field = new Field();
+
+        GENERATOR_COLLECTIONS_VERSION = getRepositoryReleaseVersionString("BuildTheEarth", "GeneratorCollections");
+
+        // In case the version could not be retrieved, set it to 3.0 as a fallback
+        if(GENERATOR_COLLECTIONS_VERSION == null)
+            GENERATOR_COLLECTIONS_VERSION = "3.0";
     }
 
     /** Processes the command queues one after another and lets the waiting players know their position in the queue and the percentage of the current generation.
@@ -221,29 +250,60 @@ public class Generator {
      * @param blocks List of blocks in polygon region
      * @param material Material to check for (e.g. Material.WALL_SIGN)
      * @param data Data value of material to check for (0-15)
-     * @return true if polygon region contains a sign, false otherwise
+     * @return true if polygon region contains the block, false otherwise
      */
     public static boolean containsBlock(Block[][][] blocks, Material material, byte data){
+        return containsBlock(blocks, material, data, 1);
+    }
+
+    /**
+     * Checks if polygon region contains a minimum amount of blocks of a certain type
+     * @param blocks List of blocks in polygon region
+     * @param material Material to check for (e.g. Material.WALL_SIGN)
+     * @param data Data value of material to check for (0-15)
+     * @param requiredAmount The minimum amount required to return true
+     * @return true if polygon region contains the required amount of the block, false otherwise
+     */
+    public static boolean containsBlock(Block[][][] blocks, Material material, byte data, int requiredAmount){
+        int amountFound = 0;
         for (Block[][] block2D : blocks)
             for (Block[] block1D : block2D)
                 for (Block block : block1D)
                     if (block != null && block.getType() == material && block.getData() == data)
-                        return true;
+                        amountFound++;
 
+        if(amountFound >= requiredAmount) return true;
         return false;
+    }
+
+    /** Checks if a block exists inside the block list
+     *
+     * @param blocks List of blocks to check
+     * @param material Material to check for (e.g. Material.WALL_SIGN)
+     * @param data Data value of material to check for (0-15)
+     * @return All the blocks in @param blocks that have the specified materials
+     */
+    public static List<Block> getBlocksOfMaterial(Block[][][] blocks, Material material, byte data){
+        List<Block> foundBlocks = new ArrayList<>();
+        for (Block[][] block2D : blocks)
+            for (Block[] block1D : block2D)
+                for (Block block : block1D)
+                    if (block != null && block.getType() == material && block.getData() == data)
+                        foundBlocks.add(block);
+        return foundBlocks;
     }
 
     /**
      * Adjusts the height of a list of vectors so that they are on the surface of the terrain.
-     * @param points - List of vectors to adjust
-     * @param blocks - List of blocks in polygon region
+     * @param points List of vectors to adjust
+     * @param blocks List of blocks in polygon region
      * @return List of vectors with adjusted height
      */
     public static List<Vector> adjustHeight(List<Vector> points, Block[][][] blocks){
 
         for(int i = 0; i < points.size(); i++) {
             Vector point = points.get(i);
-            point = point.setY(Generator.getMaxHeight(blocks, point.getBlockX(), point.getBlockZ(), Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.SNOW));
+            point = point.setY(Generator.getMaxHeight(blocks, point.getBlockX(), point.getBlockZ(), IGNORED_MATERIALS));
             points.set(i, point);
         }
 
@@ -391,7 +451,7 @@ public class Generator {
     /**
      * Returns a temporary XYZ String that indicates that the height of the point should be inspected later to match the surface of the terrain.
      *
-     * @param vector - The vector to get the XYZ String from
+     * @param vector The vector to get the XYZ String from
      * @return The temporary XYZ String
      */
     public static String getXYZ(Vector vector){
@@ -401,22 +461,38 @@ public class Generator {
     /**
      * Returns a XYZ String with the height of the point matching the surface of the terrain.
      *
-     * @param vector - The vector to get the XYZ String from
-     * @param blocks - The dataset to get the height from
+     * @param vector The vector to get the XYZ String from
+     * @param blocks The dataset to get the height from
      * @return The XYZ String
      */
     public static String getXYZ(Vector vector, Block[][][] blocks){
         int maxHeight = vector.getBlockY();
 
         if(blocks != null)
-            maxHeight = Generator.getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL, Material.SNOW);
+            maxHeight = Generator.getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), IGNORED_MATERIALS);
         if(maxHeight == 0)
             maxHeight = vector.getBlockY();
 
         return vector.getBlockX() + "," + maxHeight + "," + vector.getBlockZ();
     }
 
+    /**
+     * Returns a XYZ String with the height of the point matching the surface of the terrain.
+     *
+     * @param vector The vector to get the XYZ String from
+     * @param blocks The dataset to get the height from
+     * @return The XYZ String
+     */
+    public static String getXYZWithVerticalOffset(Vector vector, Block[][][] blocks, int offset){
+        int maxHeight = vector.getBlockY();
 
+        if(blocks != null)
+            maxHeight = Generator.getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), IGNORED_MATERIALS) + offset;
+        if(maxHeight == 0)
+            maxHeight = vector.getBlockY();
+
+        return vector.getBlockX() + "," + maxHeight + "," + vector.getBlockZ();
+    }
 
     public static Path64 convertVectorListToPath64(List<Vector> vectors, Vector reference){
         List<Point64> points = new ArrayList<>();
@@ -452,9 +528,9 @@ public class Generator {
      *
      * @see #shiftPointsAll(List, double)
      *
-     * @param vectors - The polyline to shift
-     * @param shift - The amount to shift the points by
-     * @param useLongestPathOnly - Whether to only return the longest path
+     * @param vectors The polyline to shift
+     * @param shift The amount to shift the points by
+     * @param useLongestPathOnly Whether to only return the longest path
      * @return The shifted polyline
      */
     public static List<Vector> shiftPoints(List<Vector> vectors, double shift, boolean useLongestPathOnly) {
@@ -491,8 +567,8 @@ public class Generator {
      *
      * @see #shiftPoints(List, double, boolean)
      *
-     * @param vectors - The polyline to shift
-     * @param shift - The amount to shift the points by
+     * @param vectors The polyline to shift
+     * @param shift The amount to shift the points by
      * @return The shifted polyline
      */
     public static List<List<Vector>> shiftPointsAll(List<Vector> vectors, double shift) {
@@ -509,7 +585,7 @@ public class Generator {
     /**
      * Gets the minimum height of a list of vectors
      *
-     * @param vectors - The list of vectors to get the minimum height of
+     * @param vectors The list of vectors to get the minimum height of
      * @return The minimum height
      */
     public static int getMinHeight(List<Vector> vectors){
@@ -523,7 +599,7 @@ public class Generator {
     /**
      * Gets the maximum height of a list of vectors
      *
-     * @param vectors - The list of vectors to get the maximum height of
+     * @param vectors The list of vectors to get the maximum height of
      * @return The maximum height
      */
     public static int getMaxHeight(List<Vector> vectors){
@@ -534,11 +610,39 @@ public class Generator {
         return maxHeight;
     }
 
+    /**
+     * Creates a Cuboid WorldEdit selection from a list of points and adds it to the list of commands to execute.
+     *
+     * @param commands The list of commands to add the selection to
+     * @param vector1 Position 1
+     * @param vector2 Position 2
+     */
+    public static void createCuboidSelection(List<String> commands, Vector vector1, Vector vector2){
+        commands.add("//sel cuboid");
+
+        commands.add("//pos1 " + vector1.getBlockX() + "," + vector1.getBlockY() + "," + vector1.getBlockZ());
+        commands.add("//pos2 " + vector2.getBlockX() + "," + vector2.getBlockY() + "," + vector2.getBlockZ());
+    }
+
+    /**
+     * Creates a Cuboid WorldEdit selection from a list of points and execute it right away.
+     *
+     * @param p The player to create the selection for
+     * @param vector1 Position 1
+     * @param vector2 Position 2
+     */
+    public static void createCuboidSelection(Player p, Vector vector1, Vector vector2){
+        p.chat("//sel cuboid");
+
+        p.chat("//pos1 " + vector1.getBlockX() + "," + vector1.getBlockY() + "," + vector1.getBlockZ());
+        p.chat("//pos2 " + vector2.getBlockX() + "," + vector2.getBlockY() + "," + vector2.getBlockZ());
+    }
+
 
     /** Creates a Convex WorldEdit selection from a list of points and adds it to the list of commands to execute.
      *
-     * @param commands - The list of commands to add the selection to
-     * @param points - The list of points to create the selection from
+     * @param commands The list of commands to add the selection to
+     * @param points The list of points to create the selection from
      */
     public static void createConvexSelection(List<String> commands, List<Vector> points){
         commands.add("//sel convex");
@@ -552,8 +656,8 @@ public class Generator {
      * Creates a Poly WorldEdit selection from a list of points and adds it to the list of commands to execute.
      * This functions determines the surface height of each location later once it's processed by the command queue.
      *
-     * @param commands - The list of commands to add the selection to
-     * @param points - The list of points to create the selection from
+     * @param commands The list of commands to add the selection to
+     * @param points The list of points to create the selection from
      */
     public static void createPolySelection(List<String> commands, List<Vector> points){
         commands.add("//sel poly");
@@ -567,9 +671,9 @@ public class Generator {
      * Creates a Poly WorldEdit selection from a list of points and adds it to the list of commands to execute.
      * This functions determines the surface height of each location directly.
      *
-     * @param p - The player to create the selection for
-     * @param points - The list of points to create the selection from
-     * @param blocks - The blocks to get the surface height from
+     * @param p The player to create the selection for
+     * @param points The list of points to create the selection from
+     * @param blocks The blocks to get the surface height from
      */
     public static void createPolySelection(Player p, List<Vector> points, Block[][][] blocks){
         p.chat("//sel poly");
@@ -583,22 +687,25 @@ public class Generator {
      * Draws a curved poly line from a list of points and adds it to the list of commands to execute.
      * It draws the curve by drawing a straight line between each of the points.
      *
-     * @param commands - The list of commands to add the selection to
-     * @param points - The list of points to create the selection from
-     * @param lineMaterial - The material to draw the line with
-     * @param connectLineEnds - Whether to connect the line ends in case the line is a circle
-     * @param blocks - The blocks to get the surface height from
-     * @return
+     * @param commands The list of commands to add the selection to
+     * @param points The list of points to create the selection from
+     * @param lineMaterial The material to draw the line with
+     * @param connectLineEnds Whether to connect the line ends in case the line is a circle
+     * @param blocks The blocks to get the surface height from
+     * @param offset The vertical offset you want the PolyLine to be created at
+     * @return The amount of operations used to accomplish this
      */
-    public static int createPolyLine(List<String> commands, List<Vector> points, String lineMaterial, boolean connectLineEnds, Block[][][] blocks){
+    public static int createPolyLine(List<String> commands, List<Vector> points, String lineMaterial, boolean connectLineEnds, Block[][][] blocks, int offset){
         commands.add("//sel cuboid");
-        commands.add("//pos1 " + getXYZ(points.get(0), blocks));
+
+        commands.add("//pos1 " + getXYZWithVerticalOffset(points.get(0), blocks, offset));
+
         int operations = 0;
 
         List<String> positions = new ArrayList<>();
         for(int i = 1; i < points.size(); i++)
-            positions.add(getXYZ(points.get(i), blocks));
-        String pos2 = getXYZ(points.get(0), blocks);
+            positions.add(getXYZWithVerticalOffset(points.get(i), blocks, offset));
+        String pos2 = getXYZWithVerticalOffset(points.get(0), blocks, offset);
 
         for(int i = 1; i < points.size(); i++){
             commands.add("//pos2 " + positions.get(i-1));
@@ -615,8 +722,6 @@ public class Generator {
 
         return operations;
     }
-
-
 
     /**
      * Returns the current WorldEdit selection of a player.
@@ -640,7 +745,7 @@ public class Generator {
     /**
      * Checks if WorldEdit is installed and sends the player a message if it isn't.
      *
-     * @param p - The player to check for
+     * @param p The player to check for
      * @return Whether WorldEdit is installed
      */
     public static boolean checkIfWorldEditIsInstalled(Player p){
@@ -659,7 +764,7 @@ public class Generator {
     /**
      * Checks if Schematic Brush is installed and sends the player a message if it isn't.
      *
-     * @param p - The player to check for
+     * @param p The player to check for
      * @return Whether Schematic Brush is installed
      */
     public static boolean checkIfSchematicBrushIsInstalled(Player p){
@@ -675,58 +780,121 @@ public class Generator {
     }
 
     /**
-     * Checks if the TreePack is installed and sends the player a message if it isn't.
+     * Checks if the GeneratorCollections is installed and sends the player a message if it isn't.
      *
-     * @param p - The player to check for
-     * @return Whether the TreePack is installed
+     * @param p The player to check for
+     * @return Whether the Generator Collections package is installed
      */
-    public static boolean checkIfTreePackIsInstalled(Player p, boolean sendError){
+    public static boolean checkIfGeneratorCollectionsIsInstalled(Player p){
         // Load the schematic file
         try {
-            String filepath = "newtrees/oak41.schematic";
-            File myfile = new File(Main.instance.getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/" + filepath);
+            String filepath = "GeneratorCollections/treepack/oak41.schematic";
+            File myFile = new File(Main.instance.getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/" + filepath);
 
-            if(!myfile.exists()) {
-                if(sendError)
-                    sendTreePackError(p);
-                return false;
+            if(!myFile.exists()) {
+               return installGeneratorCollections(p, false);
             }
 
-            ClipboardFormat format = ClipboardFormat.findByFile(myfile);
-            assert format != null;
-            ClipboardReader reader = format.getReader(Files.newInputStream(myfile.toPath()));
+            ClipboardFormat format = ClipboardFormat.findByFile(myFile);
+            ClipboardReader reader = format.getReader(new FileInputStream(myFile));
             BukkitWorld bukkitWorld = new BukkitWorld(p.getWorld());
             Clipboard clipboard = reader.read(bukkitWorld.getWorldData());
 
             if(clipboard == null) {
-                if(sendError) sendTreePackError(p);
-                return false;
-            } else return true;
+                return installGeneratorCollections(p, false);
+            }else
+                return checkIfGeneratorCollectionsIsUpToDate(p);
 
         } catch (Exception e) {
-            if(sendError) sendTreePackError(p);
-            return false;
+            return installGeneratorCollections(p, true);
         }
     }
 
     /**
-     * Sends the player a message with more information about the tree pack in case it isn't installed.
+     * Checks if the GeneratorCollections is up-to-date and sends the player a message if it isn't.
      *
-     * @see #checkIfTreePackIsInstalled(Player, boolean)
-     *
-     * @param p - The player to send the message to
+     * @param p The player to check for
+     * @return Whether the Generator Collections package is up-to-date or not
      */
-    public static void sendTreePackError(Player p){
-        p.sendMessage("§cPlease install the Tree Pack " + Tree.TREE_PACK_VERSION +" to use this tool. You can ask the server administrator to install it.");
+    public static boolean checkIfGeneratorCollectionsIsUpToDate(Player p){
+        // Load the schematic file
+        try {
+            String filepath = "GeneratorCollections/";
+
+            FileConfiguration cfg = YamlConfiguration.loadConfiguration(new File(Main.instance.getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/" + filepath, "config.yml"));
+
+            if(!cfg.contains("version"))
+                return installGeneratorCollections(p, true);
+
+            String oldVersion = cfg.getString("version");
+
+            if(!Updater.shouldUpdate(GENERATOR_COLLECTIONS_VERSION, oldVersion))
+                return true;
+            else
+                return installGeneratorCollections(p, true);
+
+        } catch (Exception e) {
+            return installGeneratorCollections(p, true);
+        }
+    }
+
+    /**
+     * Sends the player a message with more information about the generator collections package in case it isn't installed.
+     *
+     * @see #checkIfGeneratorCollectionsIsInstalled(Player)
+     *
+     * @param p The player to send the message to
+     */
+    public static void sendGeneratorCollectionsError(Player p){
+        p.sendMessage("§cAn error occurred while installing the Generator Collections.");
+        p.sendMessage("§cPlease install the Generator Collections v" + GENERATOR_COLLECTIONS_VERSION +" to use this tool. You can ask the server administrator to install it.");
         p.sendMessage(" ");
         p.sendMessage("§cFor more installation help, please see the wiki:");
         p.sendMessage("§c" + INSTALL_WIKI);
     }
 
+
+    /** Installs or updates the Generator Collections on the system by downloading it from the buildtheearth cdn and extracting it.
+     *
+     * @param p The player to send the error message to in case the installation fails
+     * @param update Whether the Generator Collections package is already installed or should just be updated
+     * @return Whether the installation was successful
+     */
+    public static boolean installGeneratorCollections(Player p, boolean update){
+        String parentURL = "https://github.com/BuildTheEarth/GeneratorCollections/releases/latest/download/";
+        String filename = "GeneratorCollections.zip";
+        String fileDirectory = "GeneratorCollections/";
+        String path = "/../WorldEdit/schematics/";
+
+        if(update) {
+            p.sendMessage("§cThe Generator Collections package is outdated. Updating...");
+
+            deleteDirectory(Main.instance.getDataFolder().getAbsolutePath() + path + fileDirectory);
+        } else
+            p.sendMessage("§cThe Generator Collections package wasn't found on your server. Installing...");
+
+        try {
+            boolean success = installZipFolder(parentURL, filename, path);
+
+            if(success) {
+                p.sendMessage("§7Successfully installed §eGenerator Collections v" + GENERATOR_COLLECTIONS_VERSION + "§7!");
+                return true;
+            }else {
+                sendGeneratorCollectionsError(p);
+                return false;
+            }
+
+        } catch (IOException e) {
+            sendGeneratorCollectionsError(p);
+            return false;
+        }
+    }
+
+
     /**
      * Checks if the player has a WorldEdit selection and sends them a message if they don't.
      *
-     * @param p - The player to check for
+     * @param p The player to check for
      * @return Whether the player has a WorldEdit selection
      */
     public static boolean checkForWorldEditSelection(Player p){
@@ -745,9 +913,28 @@ public class Generator {
     }
 
     /**
+     * Checks if the player has a WorldEdit 2D Polygonal selection and sends them a message if they don't.
+     *
+     * @param p The player to check for
+     * @return Whether the player has a WorldEdit Poly selection
+     */
+    public static boolean checkForPolySelection(Player p, boolean notify){
+
+        Region polyRegion = Generator.getWorldEditSelection(p);
+
+        if(!(polyRegion instanceof Polygonal2DRegion)){
+            p.sendMessage("§cPlease make a WorldEdit 2D Polygonal Selection first (//sel poly).");
+            p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+            sendMoreInfo(p);
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Checks if the player has a WorldEdit Convex selection and sends them a message if they don't.
      *
-     * @param p - The player to check for
+     * @param p The player to check for
      * @return Whether the player has a WorldEdit Convex selection
      */
     public static boolean checkForConvexSelection(Player p){
@@ -767,7 +954,7 @@ public class Generator {
     /**
      * Checks if the player has a brick block in their selection and sends them a message if they don't.
      *
-     * @param p - The player to check for
+     * @param p The player to check for
      * @return Whether the player has a brick block in their selection
      */
     public static boolean checkForBrickOutline(Block[][][] blocks, Player p){
@@ -785,7 +972,7 @@ public class Generator {
     /**
      * Checks if the player has a yellow wool block in their selection and sends them a message if they don't.
      *
-     * @param p - The player to check for
+     * @param p The player to check for
      * @return Whether the player has a yellow wool block in their selection
      */
     public static boolean checkForWoolBlock(Block[][][] blocks, Player p){
@@ -804,5 +991,169 @@ public class Generator {
             return false;
         }
         return true;
+    }
+
+    /** Installs and extracts a zip folder on the system
+     *
+     * @param filename The name of the zip folder to install. Example: "newtrees.zip"
+     * @param path The path to extract the zip folder to. Parent Folder is the plugin folder. Example: "/../WorldEdit/schematics/"
+     */
+    public static boolean installZipFolder(String parentURL, String filename, String path) throws IOException {
+        path = Main.instance.getDataFolder().getAbsolutePath() + path;
+        String zipFilePath = path + "/" + filename;
+        URL url = new URL(parentURL + filename);
+
+        // Open a connection to the URL
+        HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
+        httpConn.setRequestProperty("User-Agent", "Mozilla/5.0");
+        int responseCode = httpConn.getResponseCode();
+
+
+        // Check HTTP response code, 200 means OK
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+
+            // Save the zip file to the path
+            try (BufferedInputStream in = new BufferedInputStream(httpConn.getInputStream());
+                FileOutputStream out = new FileOutputStream(path + "/" + filename)) {
+
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                while ((bytesRead = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, bytesRead);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+                return false;
+            }
+        } else {
+            return false;
+        }
+        httpConn.disconnect();
+
+        // Extract the zip file
+        return unzip(zipFilePath, path);
+    }
+
+    /** Extracts a zip folder on the system
+     *
+     * @param zipFilePath The path to the zip folder. Example: "/../WorldEdit/schematics/newtrees.zip"
+     * @param destDirectory The path to extract the zip folder to. Parent Folder is the plugin folder. Example: "/../WorldEdit/schematics/"
+     */
+    public static boolean unzip(String zipFilePath, String destDirectory) {
+        File destDir = new File(destDirectory);
+        if (!destDir.exists()) {
+            destDir.mkdir();
+        }
+
+        try (ZipInputStream zipIn = new ZipInputStream(Files.newInputStream(Paths.get(zipFilePath)))) {
+            ZipEntry entry = zipIn.getNextEntry();
+
+            while (entry != null) {
+                String filePath = destDirectory + File.separator + entry.getName();
+
+                if (!entry.isDirectory()) {
+                    File file = new File(filePath);
+                    File parentDir = file.getParentFile();
+                    if (!parentDir.exists()) {
+                        if (!parentDir.mkdirs()) {
+                            throw new IOException("Failed to create parent directories for: " + filePath);
+                        }
+                    }
+
+                    try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath))) {
+                        byte[] bytesIn = new byte[4096];
+                        int read;
+                        while ((read = zipIn.read(bytesIn)) != -1) {
+                            bos.write(bytesIn, 0, read);
+                        }
+                    }
+                } else {
+                    File dir = new File(filePath);
+                    dir.mkdirs();
+                }
+                zipIn.closeEntry();
+                entry = zipIn.getNextEntry();
+            }
+
+            // Delete the old zip file
+            deleteFile(zipFilePath);
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+
+    /** Deletes a directory from the system
+     *
+     * @param path The path to the directory to delete
+     * @return Whether the directory was deleted successfully
+     */
+    public static boolean deleteDirectory(String path) {
+        File dir = new File(path);
+
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteDirectory(new File(dir, children[i]).getAbsolutePath());
+                if (!success) {
+                    return false; // Return false if deletion is unsuccessful
+                }
+            }
+        }
+        return dir.delete(); // Return true if directory is deleted successfully
+    }
+
+    /** Deletes a file from the system
+     *
+     * @param path The path to the file to delete
+     * @return Whether the file was deleted successfully
+     */
+    public static boolean deleteFile(String path) {
+        File file = new File(path);
+        return file.delete();
+    }
+
+    /** Returns the latest release version of a repository on GitHub
+     *
+     * @param owner The owner of the repository
+     * @param repo The name of the repository
+     * @return The latest release version of the repository
+     */
+    public static String getRepositoryReleaseVersionString(String owner, String repo){
+        try {
+            String url = "https://api.github.com/repos/" + owner + "/" + repo + "/releases";
+
+            HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
+            con.setRequestProperty("User-Agent", "Mozilla/5.0");
+            con.setRequestMethod("GET");
+
+            int responseCode = con.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                JSONArray releases = new JSONArray(response.toString());
+                if (releases.length() > 0) {
+                    JSONObject latestRelease = releases.getJSONObject(0); // The first object in the array is the latest release
+                    String latestVersion = latestRelease.getString("tag_name").replace("v", "");
+
+                    return latestVersion;
+                } else
+                    return null;
+            } else
+                return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

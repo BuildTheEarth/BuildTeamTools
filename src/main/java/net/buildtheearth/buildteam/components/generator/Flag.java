@@ -1,5 +1,6 @@
 package net.buildtheearth.buildteam.components.generator;
 
+import net.buildtheearth.buildteam.components.generator.field.FieldFlag;
 import net.buildtheearth.buildteam.components.generator.house.HouseFlag;
 import net.buildtheearth.buildteam.components.generator.rail.RailFlag;
 import net.buildtheearth.buildteam.components.generator.road.RoadFlag;
@@ -20,6 +21,8 @@ public interface Flag {
                 return TreeFlag.byString(flag);
             case RAILWAY:
                 return RailFlag.byString(flag);
+            case FIELD:
+                return FieldFlag.byString(flag);
         }
         return null;
     }

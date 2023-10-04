@@ -196,7 +196,7 @@ public class FieldScripts {
 
                 commands.add("//replace 251:0 208,5");
                 operations++;
-                commands.add("//replace 251:15 252:13,2");
+                commands.add("//replace 251:15 3:1,2");
                 operations++;
 
                 commands.add("//shift 1 up");

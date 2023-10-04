@@ -37,7 +37,8 @@ public class FieldScripts {
         List<Vector> points = new ArrayList<>();
 
         float yaw = p.getLocation().getYaw();
-
+        if(yaw < 0) yaw += 360;
+        if(yaw > 360) yaw -= 360;
 
         if (region instanceof Polygonal2DRegion) {
             Polygonal2DRegion polyRegion = (Polygonal2DRegion) region;
@@ -103,12 +104,18 @@ public class FieldScripts {
 
             // Calculate which direction should be used
             short directionToUse = availableDirections[0]; // Assume the first element is the closest initially
-            short minDifference = (short) Math.abs(yaw - availableDirections[0]); // Initial difference
+            short minDifference = Short.MAX_VALUE; // Initial difference
 
             for (short current : availableDirections) {
-                short difference = (short) Math.abs(yaw - current);
-                if (difference < minDifference) {
-                    minDifference = difference;
+                short difference1 = (short) Math.abs(yaw - current);
+                if (difference1 < minDifference) {
+                    minDifference = difference1;
+                    directionToUse = current;
+                }
+
+                short difference2 = (short) Math.abs(yaw - (current + 180));
+                if (difference2 < minDifference) {
+                    minDifference = difference2;
                     directionToUse = current;
                 }
             }

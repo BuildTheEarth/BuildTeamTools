@@ -26,87 +26,17 @@ navigator-item:
   # The hotbar slot into which the navigator item should be placed
   slot: 0
 
+build-item:
+  # Execute a custom command when build is clicked [true|false]
+  enabled: false
+  command: /build
+  
 
-# Specifies which menu items should be enabled and what their material should be
-main_menu_items:
-  build:
-    # Specifies whether the standard build icon is enabled
-    enabled: true
-    # The material of the item
-    material: "DIAMOND_PICKAXE"
-    # The lore of the item
-    lore: "Click to access the build menu!"
-    # An optional command to run when the item is clicked
-    command:
-    # An optional message to send when the item is clicked
-    message:
-  explore:
-    # Specifies whether the standard explore icon is enabled. For teams on the BTE Network it shows all countries, for others it shows the regional warps.
-    enabled: true
-    # The material of the item
-    material: "BOAT_SPRUCE"
-    # The lore of the item
-    lore: "Click to explore the earth!"
-    # An optional command to run when the item is clicked
-    command:
-    # An optional message to send when the item is clicked
-    message:
-  tutorials:
-    # Specifies whether the standard tutorials icon is enabled
-    enabled: false
-    # The material of the item
-    material: "KNOWLEDGE_BOOK"
-    # The lore of the item
-    lore: "Click to do some tutorials!"
-    # An optional command to run when the item is clicked
-    command:
-    # An optional message to send when the item is clicked
-    message:
-
-
-# Specifies which items in the build menu should be enabled and what their material should be
-build_menu_items:
-  tutorials:
-    # Specifies whether the standard tutorials icon is enabled
-    enabled: false
-    # The material of the item
-    material: "KNOWLEDGE_BOOK"
-  plot_system:
-    # Specifies whether the standard plot system icon is enabled. NOTE: Always disabled when not on the BTE network
-    enabled: false
-    # The material of the item
-    material: "SPRUCE_FENCE_GATE"
-  regions:
-    # Specifies whether the standard regions icon is enabled. NOTE: Always disabled when not on the BTE network
-    enabled: true
-    # The material of the item
-    material: "MAP"
-  tools:
-    # Specifies whether the standard tools icon is enabled
-    enabled: true
-    # The material of the item
-    material: "DIAMOND_HOE"
-
-
-
-# -----------------------------------------------------
-# | Universal TPLL: A global teleportation method to teleport between build team servers when using /tpll
-# -----------------------------------------------------
-
-universal_tpll:
-  geography:
-    # Zoom detail level for OSM requests
-    zoom: 12
-    # Set false for fetching the latest data from OSM (more up to date), or true for using a downloaded database
-    # Please follow the guide on https://github.com/noahhusby/Sledgehammer/wiki/Border-Offline-Database about downloading and configuring the offline database
-    use_offline_mode: true
-    # Set to false to disable automatic border teleportation, or true to enable it. Border teleportation requires the offline database to be configured
-    border_teleportation: false
-    # The API URL for the OSM API. Do not change unless you have your own OSM API
-    API: "https://nominatim.openstreetmap.org/reverse.php?osm_type=N&format=json&zoom={zoom}"
-  # Specify the world name of your earth projection world. This is the world which a tpll command will teleport a player to
-  earth_world:
-
+tutorial-item:
+  # Enables or disables the tutorial item inside the navigator [true|false]
+  enabled: false
+  # Command to execute when the tutorial item is clicked
+  command: /tutorials 
 
 
 

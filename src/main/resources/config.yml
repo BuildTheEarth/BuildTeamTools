@@ -13,6 +13,9 @@ language: "EN"
 # Without this key, some plugin components won`t function. For assistance, see #server-support on the staff discord.
 api-key: 00000000-0000-0000-0000-000000000000
 
+# The main world using the custom BTE Dynmaxion projection
+earth-world: world
+
 
 
 # -----------------------------------------------------

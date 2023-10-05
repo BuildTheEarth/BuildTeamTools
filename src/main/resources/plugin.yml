@@ -1,4 +1,4 @@
-name: BuildTeam
+name: BuildTeamTools
 main: net.buildtheearth.Main
 api-version: 1.12
 version: 0.1.3-alpha
@@ -6,15 +6,18 @@ author: MineFact, frikandelworst, George112n, ELgamer
 
 commands:
   buildteam:
-    description: Main command of the Build Team plugin
+    description: Main command of the Build Team plugin.
     usage: /buildteamtools
-    aliases: [btt]
+    aliases:
+      - btt
   generate:
-    description: Generator tool of BuildTheEarth
+    description: Allows usage of the Generator Tool.
     usage: /generate
-    aliases: [gen, g]
+    aliases:
+      - gen
+      - g
   navigator:
-    description: Opens the universal navigator
+    description: Opens the universal navigator.
     usage: /navigator
     aliases:
       - nav

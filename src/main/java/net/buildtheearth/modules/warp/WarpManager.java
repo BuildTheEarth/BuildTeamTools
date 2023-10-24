@@ -78,7 +78,7 @@ public class WarpManager {
         Warp warp = NetworkAPI.getWarpByKey(key);
 
         // Get the server the warp is on
-        String targetServer = NetworkAPI.getServerByCountryCode(warp.getCountryCode());
+        String targetServer = NetworkAPI.getServerNameByCountryCode(warp.getCountryCode());
 
         // Send a plugin message to that server which adds the warp to the queue
         ByteArrayDataOutput out = ByteStreams.newDataOutput();

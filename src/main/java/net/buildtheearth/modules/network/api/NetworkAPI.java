@@ -8,10 +8,12 @@ import org.json.simple.JSONObject;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.List;
 
 
 public class NetworkAPI {
 
+    //TODO CHANGE PARAMETER TO serverName
     public static Collection<String> getCountryCodesByKey(String apiKey) {
 
         //TODO change url once functionality is added to API
@@ -37,7 +39,18 @@ public class NetworkAPI {
         //TODO IMPLEMENT METHOD
     }
 
-    public static String getServerByCountryCode(String countryCode) {
+    public static String getServerNameByCountryCode(String countryCode) {
+        //TODO IMPLEMENT METHOD
+        return null;
+    }
+
+    public static String getCurrentServerName() {
+        //TODO IMPLEMENT METHOD
+        // https://nwapi.buildtheearth.net/api/teams/%BUILD_TEAM_ID%/servers
+        return null;
+    }
+
+    public static List<String> getCountriesByActiveServers() {
         //TODO IMPLEMENT METHOD
         return null;
     }

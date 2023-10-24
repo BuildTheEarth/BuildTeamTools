@@ -1,8 +1,11 @@
 package net.buildtheearth.modules.network;
 
+import com.google.common.collect.Iterables;
+import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.Main;
+import net.buildtheearth.modules.network.api.NetworkAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -14,15 +17,11 @@ public class ProxyManager {
 
     public static int CACHE_UPLOAD_SPEED = 20 * 60 * 10 + 20;
 
-    public static String PLOT_SERVER_NAME = "Plot1";
-
     /**
-     * The buildTeamID corresponding to this server.
+     * Information about the current server
      */
     private String buildTeamID;
-    /**
-     * The serverID corresponding to this server.
-     */
+    private String serverName;
     private String serverID;
 
     /**
@@ -32,6 +31,11 @@ public class ProxyManager {
     private final List<UUID> communicators = new ArrayList<>();
 
     /**
+     * A List of servers that are currently communicating with the network
+     */
+    private final List<String> activeServers = new ArrayList<>();
+
+    /**
      * True if the server is connected to the network
      * False if it isn't
      */
@@ -39,7 +43,10 @@ public class ProxyManager {
 
     public ProxyManager() {
         pingAllOnlinePlayers();
+        sendServerPing();
     }
+
+    // Methods
 
     /**
      * Sends a ping to the network.
@@ -78,12 +85,39 @@ public class ProxyManager {
     }
 
     /**
+     * Sends a plugin message to check the status of all servers
+     */
+    public void sendServerPing() {
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF("ServerPing");
+        out.writeUTF("requesting");
+        Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+        player.sendPluginMessage(Main.instance, "BuildTeam", out.toByteArray());
+    }
+
+    public void handleServerPing(ByteArrayDataInput in) {
+        String requestType = in.readUTF();
+        if(requestType.equals("requesting")) {
+            ByteArrayDataOutput out = ByteStreams.newDataOutput();
+            out.writeUTF("ServerPing");
+            out.writeUTF("responding");
+            out.writeUTF(serverName);
+            Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+            if(player != null) player.sendPluginMessage(Main.instance, "BuildTeam", out.toByteArray());
+            activeServers.clear();
+        } else if (requestType.equals("responding")) {
+            String pingServerName = in.readUTF();
+            activeServers.add(pingServerName);
+        }
+    }
+
+    /**
      * Get a list of all the countries of all servers that are currently connected to the network
      * @return A list off all active countries
      */
     public List<String> getActiveCountries() {
-        //TODO IMPLEMENT METHOD
-        return null;
+       sendServerPing();
+       return NetworkAPI.getCountriesByActiveServers();
     }
 
 
@@ -95,6 +129,11 @@ public class ProxyManager {
 
     public void setBuildTeamID(String buildTeamID) {
         this.buildTeamID = buildTeamID;
+    }
+
+    public String getServerName() {
+        if(serverName != null) return serverName;
+        return NetworkAPI.getCurrentServerName();
     }
 
     public String getServerID() {
@@ -111,5 +150,10 @@ public class ProxyManager {
 
     public boolean isConnected() {
         return isConnected;
+    }
+
+    public void setConnected(boolean connected) {
+        isConnected = connected;
+        if(serverName == null) serverName = NetworkAPI.getCurrentServerName();
     }
 }

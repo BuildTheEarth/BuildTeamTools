@@ -31,8 +31,8 @@ public class TpllManager {
      */
     public static void addTpllToQueue(ByteArrayDataInput in, Player player) {
         //Check the target server
-        String szServer = in.readUTF();
-        if (szServer.equals(Main.getBuildTeamTools().getProxyManager().getServerID())) {
+        String targetServerName = in.readUTF();
+        if (targetServerName.equals(Main.buildTeamTools.getProxyManager().getServerName())) {
             //Extracts the coordinates from the plugin message
             double targetLatitude = Double.parseDouble(in.readUTF());
             double targetLongitude = Double.parseDouble(in.readUTF());
@@ -62,18 +62,22 @@ public class TpllManager {
         tpllQueue.remove(player.getUniqueId());
     }
 
-    public static void tpllPlayer(Player player, double[] coordinates, String targetServerID) {
-
-        // Send a plugin message to that server which adds the warp to the queue
+    /**
+     * Sends a plugin message with a tpll request to the target server and sends the player there.
+     * @param player The player to send to the new server.
+     * @param coordinates The coordinates to send the player to on join.
+     * @param targetServerName The server to send the player to.
+     */
+    public static void tpllPlayer(Player player, double[] coordinates, String targetServerName) {
+        // Send a plugin message to the target server which adds the tpll to the queue
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Tpll");
-        out.writeUTF(targetServerID);
+        out.writeUTF(targetServerName);
         out.writeUTF(String.valueOf(coordinates[0]));
         out.writeUTF(String.valueOf(coordinates[1]));
-
         player.sendPluginMessage(Main.instance, "BuildTeam", out.toByteArray());
 
         // Switch the player to the target server
-        Main.getBuildTeamTools().getProxyManager().switchServer(player, targetServerID);
+        Main.getBuildTeamTools().getProxyManager().switchServer(player, targetServerName);
     }
 }

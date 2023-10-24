@@ -2,6 +2,7 @@ package net.buildtheearth;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
+import net.buildtheearth.modules.network.ProxyManager;
 import net.buildtheearth.modules.tpll.TpllManager;
 import net.buildtheearth.modules.updater.UpdateChecker;
 import net.buildtheearth.modules.utils.ChatHelper;
@@ -19,6 +20,7 @@ import java.util.UUID;
 public class Main extends JavaPlugin implements PluginMessageListener {
 
     public static Main instance;
+
     /**
      * Handles all of the plugin's features
      */
@@ -85,14 +87,18 @@ public class Main extends JavaPlugin implements PluginMessageListener {
 
             getLogger().info(ChatHelper.standard("Plugin Message received: %s from Player: %s", subChannel, player.getName()));
 
-            // The server sent a ping to the network
             if (subChannel.equalsIgnoreCase("Ping")) {
                 String serverID = in.readUTF();
                 String buildTeamID = in.readUTF();
 
-                Main.getBuildTeamTools().getProxyManager().setBuildTeamID(buildTeamID);
-                Main.getBuildTeamTools().getProxyManager().setServerID(serverID);
+                ProxyManager proxyManager = Main.getBuildTeamTools().getProxyManager();
+                proxyManager.setBuildTeamID(buildTeamID);
+                proxyManager.setServerID(serverID);
+                if(!proxyManager.isConnected()) proxyManager.setConnected(true);
+            }
 
+            if (subChannel.equalsIgnoreCase("ServerPing")) {
+               Main.getBuildTeamTools().getProxyManager().handleServerPing(in);
             }
 
             // Reset the stats cache

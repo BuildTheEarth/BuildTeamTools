@@ -13,7 +13,7 @@ public abstract class Settings {
     private final Player player;
 
     @Getter
-    private final HashMap<Object, String> values;
+    private final HashMap<Flag, String> values;
 
     @Getter
     @Setter

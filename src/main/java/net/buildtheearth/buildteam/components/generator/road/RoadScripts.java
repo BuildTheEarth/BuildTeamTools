@@ -4,10 +4,7 @@ package net.buildtheearth.buildteam.components.generator.road;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import net.buildtheearth.Main;
-import net.buildtheearth.buildteam.components.generator.Command;
-import net.buildtheearth.buildteam.components.generator.Generator;
-import net.buildtheearth.buildteam.components.generator.GeneratorType;
-import net.buildtheearth.buildteam.components.generator.History;
+import net.buildtheearth.buildteam.components.generator.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -17,7 +14,7 @@ public class RoadScripts {
     
     public static void roadscript_v_2_0(Player p, Road road, ConvexPolyhedralRegion region) {
         List<String> commands = new ArrayList<>();
-        HashMap < Object, String > flags = road.getPlayerSettings().get(p.getUniqueId()).getValues();
+        HashMap <Flag, String > flags = road.getPlayerSettings().get(p.getUniqueId()).getValues();
 
         String roadMaterial = flags.get(RoadFlag.ROAD_MATERIAL);
         String markingMaterial = flags.get(RoadFlag.MARKING_MATERIAL);

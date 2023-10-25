@@ -3,10 +3,7 @@ package net.buildtheearth.buildteam.components.generator.rail;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import net.buildtheearth.Main;
-import net.buildtheearth.buildteam.components.generator.Command;
-import net.buildtheearth.buildteam.components.generator.Generator;
-import net.buildtheearth.buildteam.components.generator.GeneratorType;
-import net.buildtheearth.buildteam.components.generator.History;
+import net.buildtheearth.buildteam.components.generator.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -18,7 +15,7 @@ public class RailScripts {
 
     public static void railscript_v_1_3(Player p, Rail rail, ConvexPolyhedralRegion region) {
         List<String> commands = new ArrayList<>();
-        HashMap< Object, String > flags = rail.getPlayerSettings().get(p.getUniqueId()).getValues();
+        HashMap<Flag, String > flags = rail.getPlayerSettings().get(p.getUniqueId()).getValues();
 
         int xPos = p.getLocation().getBlockX();
         int zPos = p.getLocation().getBlockZ();

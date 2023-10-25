@@ -6,10 +6,7 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.Main;
-import net.buildtheearth.buildteam.components.generator.Command;
-import net.buildtheearth.buildteam.components.generator.Generator;
-import net.buildtheearth.buildteam.components.generator.GeneratorType;
-import net.buildtheearth.buildteam.components.generator.History;
+import net.buildtheearth.buildteam.components.generator.*;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -23,7 +20,7 @@ public class FieldScripts {
 
     public static void fieldscript_v_1_0(Player p, Field field, Region region) {
         List<String> commands = new ArrayList<>();
-        HashMap<Object, String> flags = field.getPlayerSettings().get(p.getUniqueId()).getValues();
+        HashMap<Flag, String> flags = field.getPlayerSettings().get(p.getUniqueId()).getValues();
 
         // Settings
         Crop crop = Crop.getByIdentifier(flags.get(FieldFlag.CROP));

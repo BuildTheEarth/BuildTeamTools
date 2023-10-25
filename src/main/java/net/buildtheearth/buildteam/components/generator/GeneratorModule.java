@@ -12,6 +12,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -88,7 +89,7 @@ public abstract class GeneratorModule {
     }
 
     public String getCommand(Player p){
-        HashMap<Object, String> flags = getPlayerSettings().get(p.getUniqueId()).getValues();
+        HashMap<Flag, String> flags = getPlayerSettings().get(p.getUniqueId()).getValues();
 
         String type = "house";
 
@@ -108,13 +109,8 @@ public abstract class GeneratorModule {
         }
 
         StringBuilder command = new StringBuilder("/gen " + type);
-        for(Object object : flags.keySet()) {
-            if (!(object instanceof RoadFlag))
-                continue;
-
-            RoadFlag roadFlag = (RoadFlag) object;
-            command.append(" -").append(roadFlag.getFlag()).append(" ").append(flags.get(roadFlag));
-        }
+        for(Flag flag : flags.keySet())
+            command.append(" -").append(flag.getFlag()).append(" ").append(flags.get(flag));
 
         return command.toString();
     }

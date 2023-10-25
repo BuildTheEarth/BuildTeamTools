@@ -94,17 +94,6 @@ public class Updater
     }
 
     /**
-     * Get the latest version from spigot.
-     *
-     * @return latest version.
-     */
-    public String getVersion()
-    {
-        waitThread();
-        return version;
-    }
-
-    /**
      * Check if id of resource is valid
      *
      * @param link link of the resource
@@ -257,7 +246,7 @@ public class Updater
     private void download()
     {
         BufferedInputStream in = null;
-        FileOutputStream fout = null;
+        FileOutputStream out = null;
 
         try
         {
@@ -268,14 +257,18 @@ public class Updater
             InputStream inputStream = connection.getInputStream();
 
             in = new BufferedInputStream(inputStream);
-            if (!updateFolder.exists())
-                updateFolder.mkdirs();
-            fout = new FileOutputStream(new File(updateFolder, file.getName()));
+            if (!updateFolder.exists()) {
+                boolean success = updateFolder.mkdirs();
+
+                if(!success)
+                    return;
+            }
+            out = new FileOutputStream(new File(updateFolder, file.getName()));
 
             final byte[] data = new byte[4096];
             int count;
             while ((count = in.read(data, 0, 4096)) != -1) {
-                fout.write(data, 0, count);
+                out.write(data, 0, count);
             }
         }
         catch (IOException e)
@@ -293,8 +286,8 @@ public class Updater
                 this.plugin.getLogger().log(Level.SEVERE, null, e);
             }
             try {
-                if (fout != null) {
-                    fout.close();
+                if (out != null) {
+                    out.close();
                 }
             } catch (final IOException e) {
                 this.plugin.getLogger().log(Level.SEVERE, null, e);

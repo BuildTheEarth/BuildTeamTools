@@ -33,9 +33,6 @@ public class AdvancedSettingsMenu extends AbstractMenu {
 
     public static final int NEXT_ITEM_SLOT = 44;
 
-    private int laneCount, laneWidth, sidewalkWidth;
-    private ItemStack markingsMaterial, sidewalkSlab, roadSlab;
-
     public AdvancedSettingsMenu(Player player) {
         super(5, ADVANCED_SETTINGS_INV_NAME, player);
     }
@@ -45,13 +42,13 @@ public class AdvancedSettingsMenu extends AbstractMenu {
         Road road = Main.getBuildTeam().getGenerator().getRoad();
         UUID uuid = getMenuPlayer().getUniqueId();
 
-        this.laneCount = Integer.parseInt(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.LANE_COUNT));
-        this.laneWidth = Integer.parseInt(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.LANE_WIDTH));
-        this.sidewalkWidth = Integer.parseInt(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.SIDEWALK_WIDTH));
+        int laneCount = Integer.parseInt(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.LANE_COUNT));
+        int laneWidth = Integer.parseInt(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.LANE_WIDTH));
+        int sidewalkWidth = Integer.parseInt(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.SIDEWALK_WIDTH));
 
-        this.markingsMaterial = Item.fromUniqueMaterialString(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.MARKING_MATERIAL));
-        this.sidewalkSlab = Item.fromUniqueMaterialString(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.SIDEWALK_SLAB_COLOR));
-        this.roadSlab = Item.fromUniqueMaterialString(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.ROAD_SLAB_COLOR));
+        ItemStack markingsMaterial = Item.fromUniqueMaterialString(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.MARKING_MATERIAL));
+        ItemStack sidewalkSlab = Item.fromUniqueMaterialString(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.SIDEWALK_SLAB_COLOR));
+        ItemStack roadSlab = Item.fromUniqueMaterialString(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.ROAD_SLAB_COLOR));
 
         createCounter(MenuItems.SliderColor.WHITE, LANE_COUNT_SLOT, "Number of Lanes", laneCount, 1, 10, "Lanes");
         createCounter(MenuItems.SliderColor.LIGHT_GRAY, LANE_WIDTH_SLOT, "Lane Width", laneWidth, 1, 30, "Blocks");

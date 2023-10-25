@@ -57,27 +57,26 @@ public class BTENetwork {
         p.sendPluginMessage(Main.instance, "BuildTeam", out.toByteArray());
     }
 
-    /** Sends the current cache to the network.
-     *  Once it was received it confirms that and the cache gets resetted.
-     *
-     * @return true if success, false if failed
+    /**
+     * Sends the current cache to the network.
+     * Once it was received it confirms that and the cache gets reset.
      */
-    public boolean update(){
+    public void update(){
         if(getCommunicators().isEmpty())
-            return false;
+            return;
 
         if(!Main.instance.isEnabled())
-            return false;
+            return;
 
         Player p = Bukkit.getPlayer(getCommunicators().get(0));
 
         if(p == null) {
             getCommunicators().remove(0);
-            return false;
+            return;
         }
         if(!p.isOnline()) {
             getCommunicators().remove(0);
-            return false;
+            return;
         }
 
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
@@ -86,7 +85,6 @@ public class BTENetwork {
         out.writeUTF(getStatsManager().getCurrentCache().toJSONString());
         p.sendPluginMessage(Main.instance, "BuildTeam", out.toByteArray());
 
-        return true;
     }
 
     public boolean isConnected() {

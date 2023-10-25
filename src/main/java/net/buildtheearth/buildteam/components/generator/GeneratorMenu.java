@@ -14,7 +14,6 @@ import net.buildtheearth.buildteam.components.generator.rail.RailSettings;
 import net.buildtheearth.buildteam.components.generator.road.Road;
 import net.buildtheearth.buildteam.components.generator.road.RoadSettings;
 import net.buildtheearth.buildteam.components.generator.road.menu.RoadColorMenu;
-import net.buildtheearth.buildteam.components.generator.tree.Tree;
 import net.buildtheearth.utils.menus.AbstractMenu;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.Liste;
@@ -60,8 +59,8 @@ public class GeneratorMenu extends AbstractMenu {
                 "- Custom Wall, Base and Roof Color",
                 "- Custom Floor and Window Sizes",
                 "",
-                "§8Leftclick to generate",
-                "§8Rightclick for Tutorial");
+                "§8Left-click to generate",
+                "§8Right-click for Tutorial");
 
         ItemStack houseItem = Item.create(Material.BIRCH_DOOR_ITEM, "§cGenerate House", houseLore);
 
@@ -80,8 +79,8 @@ public class GeneratorMenu extends AbstractMenu {
                 "- Custom Sidewalk Width and Color",
                 "- Custom Lane Count",
                 "",
-                "§8Leftclick to generate",
-                "§8Rightclick for Tutorial");
+                "§8Left-click to generate",
+                "§8Right-click for Tutorial");
 
 
         ItemStack roadItem =  Item.create(Material.STEP, "§bGenerate Road", (short) 0, roadLore);
@@ -100,8 +99,8 @@ public class GeneratorMenu extends AbstractMenu {
                 "- Custom Railway Width and Color (TODO)",
                 "- Custom Track Count (TODO)",
                 "",
-                "§8Leftclick to generate",
-                "§8Rightclick for Tutorial");
+                "§8Left-click to generate",
+                "§8Right-click for Tutorial");
 
         ItemStack railwayItem = Item.create(Material.RAILS, "§9Generate Railway", railwayLore);
 
@@ -109,9 +108,9 @@ public class GeneratorMenu extends AbstractMenu {
         getMenu().getSlot(RAILWAY_ITEM_SLOT).setItem(railwayItem);
 
 
-        if(!BuildTeamTools.DependencyManager.isSchematicBrushEnabled()) {
+        if(BuildTeamTools.DependencyManager.isSchematicBrushDisabled()) {
             // TREE ITEM
-            ArrayList<String> treeLore = Liste.createList("", "§cPlugin §eSchematicBrush §cis not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
+            ArrayList<String> treeLore = Liste.createList("", "§cPlugin §eSchematicBrush §cis not installed", "§cTree Generator is disabled", "", "§8Left-click for Installation Instructions");
 
             ItemStack treeItem = Item.create(Material.SAPLING, "§aGenerate Tree & Forest §c(DISABLED)", treeLore);
 
@@ -119,7 +118,7 @@ public class GeneratorMenu extends AbstractMenu {
             getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
         }else if(!Generator.checkIfGeneratorCollectionsIsInstalled(getMenuPlayer())){
             // TREE ITEM
-            ArrayList<String> treeLore = Liste.createList("", "§cThe §eGenerator Collections v" + Generator.GENERATOR_COLLECTIONS_VERSION + " §c package is not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
+            ArrayList<String> treeLore = Liste.createList("", "§cThe §eGenerator Collections v" + Generator.GENERATOR_COLLECTIONS_VERSION + " §c package is not installed", "§cTree Generator is disabled", "", "§8Left-click for Installation Instructions");
 
             ItemStack treeItem = Item.create(Material.SAPLING, "§aGenerate Tree & Forest §c(DISABLED)", treeLore);
 
@@ -135,8 +134,8 @@ public class GeneratorMenu extends AbstractMenu {
                     "§eFeatures:",
                     "- Custom Tree Type",
                     "",
-                    "§8Leftclick to generate",
-                    "§8Rightclick for Tutorial");
+                    "§8Left-click to generate",
+                    "§8Right-click for Tutorial");
 
             ItemStack treeItem = Item.create(Material.SAPLING, "§aGenerate Tree & Forest", treeLore);
 
@@ -157,8 +156,8 @@ public class GeneratorMenu extends AbstractMenu {
                 "- Custom Crop Type",
                 "- Custom Crop Size",
                 "",
-                "§8Leftclick to generate",
-                "§8Rightclick for Tutorial");
+                "§8Left-click to generate",
+                "§8Right-click for Tutorial");
 
         ItemStack fieldItem = Item.create(Material.WHEAT, "§6Generate Field", fieldLore);
 
@@ -177,10 +176,15 @@ public class GeneratorMenu extends AbstractMenu {
     protected void setItemClickEventsAsync() {
         // Set click event for house item
         getMenu().getSlot(HOUSE_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
+            if(clickInformation.getClickType().equals(ClickType.RIGHT)) {
+                sendMoreInformation(clickPlayer, GeneratorType.HOUSE);
+                return;
+            }
+
             House house = Main.buildTeamTools.getGenerator().getHouse();
             house.getPlayerSettings().put(clickPlayer.getUniqueId(), new HouseSettings(clickPlayer));
 
-            if(!house.checkPlayer(clickPlayer))
+            if(house.checkForNoPlayer(clickPlayer))
                 return;
 
             clickPlayer.closeInventory();
@@ -190,10 +194,15 @@ public class GeneratorMenu extends AbstractMenu {
 
         // Set click event for road item
         getMenu().getSlot(ROAD_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
+            if(clickInformation.getClickType().equals(ClickType.RIGHT)) {
+                sendMoreInformation(clickPlayer, GeneratorType.ROAD);
+                return;
+            }
+
             Road road = Main.buildTeamTools.getGenerator().getRoad();
             road.getPlayerSettings().put(clickPlayer.getUniqueId(), new RoadSettings(clickPlayer));
 
-            if(!road.checkPlayer(clickPlayer))
+            if(road.checkForNoPlayer(clickPlayer))
                 return;
 
             clickPlayer.closeInventory();
@@ -203,10 +212,15 @@ public class GeneratorMenu extends AbstractMenu {
 
         // Set click event for railway item
         getMenu().getSlot(RAILWAY_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
+            if(clickInformation.getClickType().equals(ClickType.RIGHT)) {
+                sendMoreInformation(clickPlayer, GeneratorType.RAILWAY);
+                return;
+            }
+
             Rail rail = Main.buildTeamTools.getGenerator().getRail();
             rail.getPlayerSettings().put(clickPlayer.getUniqueId(), new RailSettings(clickPlayer));
 
-            if(!rail.checkPlayer(clickPlayer))
+            if(rail.checkForNoPlayer(clickPlayer))
                 return;
 
             clickPlayer.closeInventory();
@@ -218,14 +232,14 @@ public class GeneratorMenu extends AbstractMenu {
         // Set click event for field item
         getMenu().getSlot(FIELD_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
             if(clickInformation.getClickType().equals(ClickType.RIGHT)) {
-                sendMoreInformation(clickPlayer, "FIELD");
+                sendMoreInformation(clickPlayer, GeneratorType.FIELD);
                 return;
             }
 
             Field field = Main.buildTeamTools.getGenerator().getField();
             field.getPlayerSettings().put(clickPlayer.getUniqueId(), new FieldSettings(clickPlayer));
 
-            if(!field.checkPlayer(clickPlayer))
+            if(field.checkForNoPlayer(clickPlayer))
                 return;
 
             clickPlayer.closeInventory();
@@ -234,10 +248,19 @@ public class GeneratorMenu extends AbstractMenu {
         }));
     }
 
-    private void sendMoreInformation(Player clickPlayer, String generator) {
+    private void sendMoreInformation(Player clickPlayer, GeneratorType generator) {
         switch (generator) {
-            case "FIELD":
+            case FIELD:
                 clickPlayer.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Field-Command");
+                break;
+            case HOUSE:
+                clickPlayer.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/House-Command");
+                break;
+            case RAILWAY:
+                clickPlayer.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Rail-Command");
+                break;
+            case ROAD:
+                clickPlayer.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Road-Command");
                 break;
         }
     }

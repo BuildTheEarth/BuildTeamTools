@@ -24,7 +24,7 @@ public class CMD_Generate implements CommandExecutor {
         Player p = (Player) sender;
 
         // Check if WorldEdit is enabled
-        if(!BuildTeamTools.DependencyManager.isWorldEditEnabled()){
+        if(BuildTeamTools.DependencyManager.isWorldEditDisabled()){
             p.sendMessage("§cPlease install WorldEdit to use this tool.");
             Generator.sendMoreInfo(p);
             p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
@@ -33,7 +33,7 @@ public class CMD_Generate implements CommandExecutor {
 
         // Command Usage: /gen
         if(args.length == 0){
-            if(!Generator.checkIfWorldEditIsInstalled(p)) return true;
+            if(Generator.checkIfWorldEditIsNotInstalled(p)) return true;
             new GeneratorMenu(p);
             return true;
         }

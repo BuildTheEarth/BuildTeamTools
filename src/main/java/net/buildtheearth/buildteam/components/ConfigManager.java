@@ -10,7 +10,6 @@ import net.buildtheearth.utils.Config;
 public class ConfigManager {
 
 	public static void readData() {
-        FileConfiguration cfg = Config.getFileConfiguration("config");
 	}
 	
 	public static void setStandard() {

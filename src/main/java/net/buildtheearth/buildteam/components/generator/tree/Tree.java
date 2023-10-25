@@ -15,25 +15,25 @@ public class Tree extends GeneratorModule {
     }
 
     @Override
-    public boolean checkPlayer(Player p) {
-        if(!Generator.checkIfWorldEditIsInstalled(p))
-            return false;
+    public boolean checkForNoPlayer(Player p) {
+        if(Generator.checkIfWorldEditIsNotInstalled(p))
+            return true;
 
         if(!Generator.checkIfGeneratorCollectionsIsInstalled(p))
-            return false;
+            return true;
 
         if(!Generator.checkIfSchematicBrushIsInstalled(p))
-            return false;
+            return true;
 
         if(getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
             getPlayerSettings().get(p.getUniqueId()).setBlocks(Generator.analyzeRegion(p, p.getWorld()));
 
-        return true;
+        return false;
     }
 
     @Override
     public void generate(Player p) {
-        if(!Main.getBuildTeam().getGenerator().getRoad().checkPlayer(p))
+        if(Main.getBuildTeam().getGenerator().getRoad().checkForNoPlayer(p))
             return;
 
         TreeScripts.treescript_v_1_0(p, this);

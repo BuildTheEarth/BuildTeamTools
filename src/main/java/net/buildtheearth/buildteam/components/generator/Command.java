@@ -39,7 +39,7 @@ public class Command {
         this.totalCommands = commands.size();
     }
 
-    /** Proecesses the commands from the command queue to prevent the server from freezing. */
+    /** Processes the commands from the command queue to prevent the server from freezing. */
     public void tick(){
         if(commands.isEmpty())
             return;
@@ -63,10 +63,10 @@ public class Command {
             }
 
             String command = commands.get(0);
-            processCommand(player, command);
+            processCommand(command);
             commands.remove(0);
 
-            // Skip worldedit commands that take no time to execute
+            // Skip WorldEdit commands that take no time to execute
             if(!command.startsWith("//gmask")
             && !command.startsWith("//mask")
             && !command.startsWith("//pos")
@@ -79,7 +79,7 @@ public class Command {
     }
 
     /** Processes a single command. */
-    public void processCommand(Player p, String command){
+    public void processCommand(String command){
         if(command.contains("%%XYZ/"))
             command = convertXYZ(command);
 

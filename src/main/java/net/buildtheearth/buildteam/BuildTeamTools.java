@@ -76,16 +76,12 @@ public class BuildTeamTools {
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.instance, () -> {
             time++;
 
-            // Jede Stunde
-            if(time%(20*60*60) == 0){
-            }
-
-            // Jede 10 Minuten (+1 Sekunde)
+			// Each 10 minutes (+1 second)
             if(time%(BTENetwork.CACHE_UPLOAD_SPEED) == 0) {
                 Main.buildTeamTools.getBTENetwork().update();
             }
 
-            // Jede Minute
+            // Each minute
             if(time%(20*60) == 0) {
                 Main.buildTeamTools.getBTENetwork().getStatsManager().getStatsServer().addValue(StatsServerType.UPTIME, 1);
 
@@ -95,17 +91,9 @@ public class BuildTeamTools {
                 }
             }
 
-            // Alle 5 Sekunden
-            if(time%100 == 0){
-            }
-
-            // Jede Sekunde
+			// Each second
             if(time%20 == 0){
                 tickSeconds();
-            }
-
-            // Jede viertel Sekunde
-            if(time%5 == 0){
             }
 
             generator.tick();
@@ -162,15 +150,15 @@ public class BuildTeamTools {
 		/**
 		 * @return True if WorldEdit is present
 		 */
-		public static boolean isWorldEditEnabled() {
-			return Main.instance.getServer().getPluginManager().isPluginEnabled("WorldEdit");
+		public static boolean isWorldEditDisabled() {
+			return !Main.instance.getServer().getPluginManager().isPluginEnabled("WorldEdit");
 		}
 
 		/**
 		 * @return True if SchematicBrush is present
 		 */
-		public static boolean isSchematicBrushEnabled() {
-			return Main.instance.getServer().getPluginManager().isPluginEnabled("SchematicBrush");
+		public static boolean isSchematicBrushDisabled() {
+			return !Main.instance.getServer().getPluginManager().isPluginEnabled("SchematicBrush");
 		}
 
 		/**

@@ -25,10 +25,8 @@ import net.buildtheearth.buildteam.components.generator.rail.Rail;
 import net.buildtheearth.buildteam.components.generator.road.Road;
 import net.buildtheearth.buildteam.components.generator.tree.Tree;
 import net.buildtheearth.buildteam.components.updater.Updater;
-import net.buildtheearth.utils.Config;
 import net.buildtheearth.utils.Item;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -92,7 +90,6 @@ public class Generator {
     }
 
     /** Processes the command queues one after another and lets the waiting players know their position in the queue and the percentage of the current generation.
-     *
      * Relations:
      * @see Command
      * @see Command#tick()
@@ -158,9 +155,8 @@ public class Generator {
     public static String[] convertArgsToFlags(String[] args){
         String argsString = " " + StringUtils.join(Arrays.copyOfRange(args, 1, args.length), " ");
         String[] argsArray = argsString.split(" -");
-        String[] flagsArray = Arrays.copyOfRange(argsArray, 1, argsArray.length);
 
-        return flagsArray;
+        return Arrays.copyOfRange(argsArray, 1, argsArray.length);
     }
 
     /** Converts a string with all flags and values to a string array with the flag name and the flag value.
@@ -195,6 +191,9 @@ public class Generator {
     public static Block[][][] analyzeRegion(Player p, World world) {
         // Get WorldEdit selection of player
         Region polyRegion = Generator.getWorldEditSelection(p);
+
+        if(polyRegion == null)
+            return null;
 
         Block[][][] blocks = new Block[polyRegion.getWidth()][polyRegion.getHeight()][polyRegion.getLength()];
 
@@ -272,48 +271,27 @@ public class Generator {
                     if (block != null && block.getType() == material && block.getData() == data)
                         amountFound++;
 
-        if(amountFound >= requiredAmount) return true;
-        return false;
-    }
-
-    /** Checks if a block exists inside the block list
-     *
-     * @param blocks List of blocks to check
-     * @param material Material to check for (e.g. Material.WALL_SIGN)
-     * @param data Data value of material to check for (0-15)
-     * @return All the blocks in @param blocks that have the specified materials
-     */
-    public static List<Block> getBlocksOfMaterial(Block[][][] blocks, Material material, byte data){
-        List<Block> foundBlocks = new ArrayList<>();
-        for (Block[][] block2D : blocks)
-            for (Block[] block1D : block2D)
-                for (Block block : block1D)
-                    if (block != null && block.getType() == material && block.getData() == data)
-                        foundBlocks.add(block);
-        return foundBlocks;
+        return amountFound >= requiredAmount;
     }
 
     /**
      * Adjusts the height of a list of vectors so that they are on the surface of the terrain.
+     *
      * @param points List of vectors to adjust
      * @param blocks List of blocks in polygon region
-     * @return List of vectors with adjusted height
      */
-    public static List<Vector> adjustHeight(List<Vector> points, Block[][][] blocks){
-
+    public static void adjustHeight(List<Vector> points, Block[][][] blocks){
         for(int i = 0; i < points.size(); i++) {
             Vector point = points.get(i);
             point = point.setY(Generator.getMaxHeight(blocks, point.getBlockX(), point.getBlockZ(), IGNORED_MATERIALS));
             points.set(i, point);
         }
-
-        return points;
     }
 
     /** As long as two neighboring vectors are further than a given distance of blocks apart, add a new vector in between them
      *
-     * @param points
-     * @return
+     * @param points   The points to populate
+     * @return         The populated points
      */
     public static List<Vector> populatePoints(List<Vector> points, int distance){
         List<Vector> result = new ArrayList<>();
@@ -349,10 +327,10 @@ public class Generator {
         return points;
     }
 
-    /** As long as two neighboring vectors are closer than a given distance of blocks apart, remove the second point. The distances switches between distance1 and distance2
+    /** As long as two neighboring vectors are closer than a given distance of blocks apart, remove the second point. The distances switch between distance1 and distance2
      *
-     * @param points
-     * @return
+     * @param points    The points to reduce
+     * @return          The reduced points
      */
     public static List<Vector> reducePoints(List<Vector> points, int distance1, int distance2){
         points = new ArrayList<>(points);
@@ -385,7 +363,7 @@ public class Generator {
     /** Extends a polyline by taking the first two points and the last two points of the polyline and extending them
      *
      * @param vectors:  The polyline to extend
-     * @return:         The extended polyline
+     * @return         The extended polyline
      */
     public static List<Vector> extendPolyLine(List<Vector> vectors){
         List<Vector> result = new ArrayList<>();
@@ -412,7 +390,7 @@ public class Generator {
     /** Shortens a polyline by taking the first two points and the last two points of the polyline and shortening them
      *
      * @param vectors:  The polyline to shorten
-     * @return:         The shortened polyline
+     * @return         The shortened polyline
      */
     public static List<Vector> shortenPolyLine(List<Vector> vectors, int distance){
         List<Vector> result = new ArrayList<>();
@@ -748,17 +726,17 @@ public class Generator {
      * @param p The player to check for
      * @return Whether WorldEdit is installed
      */
-    public static boolean checkIfWorldEditIsInstalled(Player p){
+    public static boolean checkIfWorldEditIsNotInstalled(Player p){
         // Check if WorldEdit is enabled
-        if(!BuildTeamTools.DependencyManager.isWorldEditEnabled()){
+        if(BuildTeamTools.DependencyManager.isWorldEditDisabled()){
             p.sendMessage("§cPlease install WorldEdit to use this tool. You can ask the server administrator to install it.");
             p.sendMessage(" ");
             p.sendMessage("§cFor more installation help, please see the wiki:");
             p.sendMessage("§c" + INSTALL_WIKI);
             sendMoreInfo(p);
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**
@@ -769,7 +747,7 @@ public class Generator {
      */
     public static boolean checkIfSchematicBrushIsInstalled(Player p){
         // Check if WorldEdit is enabled
-        if(!BuildTeamTools.DependencyManager.isSchematicBrushEnabled()){
+        if(BuildTeamTools.DependencyManager.isSchematicBrushDisabled()){
             p.sendMessage("§cPlease install Schematic Brush to use this tool. You can ask the server administrator to install it.");
             p.sendMessage(" ");
             p.sendMessage("§cFor more installation help, please see the wiki:");
@@ -796,9 +774,17 @@ public class Generator {
             }
 
             ClipboardFormat format = ClipboardFormat.findByFile(myFile);
-            ClipboardReader reader = format.getReader(new FileInputStream(myFile));
+
+            ClipboardReader reader = null;
+            if (format != null)
+                reader = format.getReader(Files.newInputStream(myFile.toPath()));
+
             BukkitWorld bukkitWorld = new BukkitWorld(p.getWorld());
-            Clipboard clipboard = reader.read(bukkitWorld.getWorldData());
+
+            Clipboard clipboard = null;
+            if (reader != null)
+                clipboard = reader.read(bukkitWorld.getWorldData());
+
 
             if(clipboard == null) {
                 return installGeneratorCollections(p, false);
@@ -897,18 +883,17 @@ public class Generator {
      * @param p The player to check for
      * @return Whether the player has a WorldEdit selection
      */
-    public static boolean checkForWorldEditSelection(Player p){
+    public static boolean checkForNoWorldEditSelection(Player p){
         // Get WorldEdit selection of player
         Region polyRegion = Generator.getWorldEditSelection(p);
 
-        if(polyRegion == null){
-            p.sendMessage("§cPlease make a WorldEdit Selection first.");
-            p.closeInventory();
-            p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-            sendMoreInfo(p);
+        if(polyRegion != null)
             return false;
-        }
 
+        p.sendMessage("§cPlease make a WorldEdit Selection first.");
+        p.closeInventory();
+        p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+        sendMoreInfo(p);
         return true;
     }
 
@@ -918,7 +903,7 @@ public class Generator {
      * @param p The player to check for
      * @return Whether the player has a WorldEdit Poly selection
      */
-    public static boolean checkForPolySelection(Player p, boolean notify){
+    public static boolean checkForPolySelection(Player p){
 
         Region polyRegion = Generator.getWorldEditSelection(p);
 
@@ -937,7 +922,7 @@ public class Generator {
      * @param p The player to check for
      * @return Whether the player has a WorldEdit Convex selection
      */
-    public static boolean checkForConvexSelection(Player p){
+    public static boolean checkForNoConvexSelection(Player p){
         // Get WorldEdit selection of player
         Region polyRegion = Generator.getWorldEditSelection(p);
 
@@ -946,9 +931,9 @@ public class Generator {
             p.closeInventory();
             p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
             sendMoreInfo(p);
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**
@@ -1042,7 +1027,9 @@ public class Generator {
     public static boolean unzip(String zipFilePath, String destDirectory) {
         File destDir = new File(destDirectory);
         if (!destDir.exists()) {
-            destDir.mkdir();
+            boolean success = destDir.mkdir();
+            if(!success)
+                return false;
         }
 
         try (ZipInputStream zipIn = new ZipInputStream(Files.newInputStream(Paths.get(zipFilePath)))) {
@@ -1060,7 +1047,7 @@ public class Generator {
                         }
                     }
 
-                    try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath))) {
+                    try (BufferedOutputStream bos = new BufferedOutputStream(Files.newOutputStream(Paths.get(filePath)))) {
                         byte[] bytesIn = new byte[4096];
                         int read;
                         while ((read = zipIn.read(bytesIn)) != -1) {
@@ -1069,7 +1056,10 @@ public class Generator {
                     }
                 } else {
                     File dir = new File(filePath);
-                    dir.mkdirs();
+                    boolean success = dir.mkdirs();
+
+                    if(!success)
+                        return false;
                 }
                 zipIn.closeEntry();
                 entry = zipIn.getNextEntry();
@@ -1095,24 +1085,28 @@ public class Generator {
 
         if (dir.isDirectory()) {
             String[] children = dir.list();
-            for (int i = 0; i < children.length; i++) {
-                boolean success = deleteDirectory(new File(dir, children[i]).getAbsolutePath());
-                if (!success) {
-                    return false; // Return false if deletion is unsuccessful
+
+            if (children != null)
+                for (String child : children) {
+                    boolean success = deleteDirectory(new File(dir, child).getAbsolutePath());
+                    if (!success) {
+                        return false; // Return false if deletion is unsuccessful
+                    }
                 }
-            }
         }
         return dir.delete(); // Return true if directory is deleted successfully
     }
 
-    /** Deletes a file from the system
+    /**
+     * Deletes a file from the system
      *
      * @param path The path to the file to delete
-     * @return Whether the file was deleted successfully
      */
-    public static boolean deleteFile(String path) {
+    public static void deleteFile(String path) {
         File file = new File(path);
-        return file.delete();
+        boolean success = file.delete();
+        if(!success)
+            System.out.println("Failed to delete file: " + path);
     }
 
     /** Returns the latest release version of a repository on GitHub
@@ -1134,7 +1128,7 @@ public class Generator {
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
                 String inputLine;
-                StringBuffer response = new StringBuffer();
+                StringBuilder response = new StringBuilder();
 
                 while ((inputLine = in.readLine()) != null) {
                     response.append(inputLine);
@@ -1144,9 +1138,8 @@ public class Generator {
                 JSONArray releases = new JSONArray(response.toString());
                 if (releases.length() > 0) {
                     JSONObject latestRelease = releases.getJSONObject(0); // The first object in the array is the latest release
-                    String latestVersion = latestRelease.getString("tag_name").replace("v", "");
 
-                    return latestVersion;
+                    return latestRelease.getString("tag_name").replace("v", "");
                 } else
                     return null;
             } else

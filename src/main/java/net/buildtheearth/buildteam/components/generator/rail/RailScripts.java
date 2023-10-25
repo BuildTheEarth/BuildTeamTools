@@ -8,14 +8,13 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class RailScripts {
 
-    public static void railscript_v_1_3(Player p, Rail rail, ConvexPolyhedralRegion region) {
+    public static void railScript_v_1_3(Player p, Rail rail, ConvexPolyhedralRegion region) {
         List<String> commands = new ArrayList<>();
-        HashMap<Flag, String > flags = rail.getPlayerSettings().get(p.getUniqueId()).getValues();
+        //HashMap<Flag, String > flags = rail.getPlayerSettings().get(p.getUniqueId()).getValues();
 
         int xPos = p.getLocation().getBlockX();
         int zPos = p.getLocation().getBlockZ();
@@ -56,7 +55,7 @@ public class RailScripts {
 
 
         Block[][][] regionBlocks = Generator.analyzeRegion(p, p.getWorld());
-        points = Generator.adjustHeight(points, regionBlocks);
+        Generator.adjustHeight(points, regionBlocks);
 
 
         // ----------- RAILWAY ----------

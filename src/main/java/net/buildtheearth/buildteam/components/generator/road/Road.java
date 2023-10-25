@@ -17,35 +17,35 @@ public class Road extends GeneratorModule {
     }
 
     @Override
-    public boolean checkPlayer(Player p){
+    public boolean checkForNoPlayer(Player p){
 
-        if(!Generator.checkIfWorldEditIsInstalled(p))
-            return false;
+        if(Generator.checkIfWorldEditIsNotInstalled(p))
+            return true;
 
-        if(!Generator.checkForWorldEditSelection(p))
-            return false;
+        if(Generator.checkForNoWorldEditSelection(p))
+            return true;
 
-        if(!Generator.checkForConvexSelection(p))
-            return false;
+        if(Generator.checkForNoConvexSelection(p))
+            return true;
 
         if(getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
             getPlayerSettings().get(p.getUniqueId()).setBlocks(Generator.analyzeRegion(p, p.getWorld()));
 
-        return true;
+        return false;
     }
 
     @Override
     public void generate(Player p){
-        if(!Main.getBuildTeam().getGenerator().getRoad().checkPlayer(p))
+        if(Main.getBuildTeam().getGenerator().getRoad().checkForNoPlayer(p))
             return;
 
         Region region = Generator.getWorldEditSelection(p);
 
-        if(region == null || !(region instanceof ConvexPolyhedralRegion))
+        if(!(region instanceof ConvexPolyhedralRegion))
             return;
 
         ConvexPolyhedralRegion convexRegion = (ConvexPolyhedralRegion) region;
 
-        RoadScripts.roadscript_v_2_0(p, this, convexRegion);
+        RoadScripts.roadScript_v_2_0(p, this, convexRegion);
     }
 }

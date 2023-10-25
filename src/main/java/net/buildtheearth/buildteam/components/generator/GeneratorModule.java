@@ -5,14 +5,12 @@ import net.buildtheearth.buildteam.BuildTeamTools;
 import net.buildtheearth.buildteam.components.generator.field.FieldSettings;
 import net.buildtheearth.buildteam.components.generator.house.HouseSettings;
 import net.buildtheearth.buildteam.components.generator.rail.RailSettings;
-import net.buildtheearth.buildteam.components.generator.road.RoadFlag;
 import net.buildtheearth.buildteam.components.generator.road.RoadSettings;
 import net.buildtheearth.buildteam.components.generator.tree.TreeSettings;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -31,7 +29,7 @@ public abstract class GeneratorModule {
         generatorType = type;
     }
 
-    public abstract boolean checkPlayer(Player p);
+    public abstract boolean checkForNoPlayer(Player p);
     public abstract void generate(Player p);
 
 
@@ -76,16 +74,6 @@ public abstract class GeneratorModule {
     public void sendHelp(Player p){
         //TODO send houses help
         p.sendMessage("TODO send Houses Help");
-    }
-
-    public void sendMoreInfo(Player p){
-        p.sendMessage(" ");
-        p.sendMessage("§cFor more information take a look at the wiki:");
-        p.sendMessage("§c" + wikiPage);
-    }
-
-    public void sendError(Player p){
-        p.sendMessage("§cThere was an error while generating the house. Please contact the admins");
     }
 
     public String getCommand(Player p){
@@ -148,11 +136,10 @@ public abstract class GeneratorModule {
                 break;
         }
 
-        return new TextComponent(BuildTeamTools.PREFIX + type + " §asuccessfully §7generated. §e[Copy Command]");
+        return new TextComponent(BuildTeamTools.PREFIX + type + "§a successfully §7generated. §e[Copy Command]");
     }
 
     /** Conversion:
-     *
      * Command: /gen house -w 123:12 -r 456:78
      * args: ["-w", "123:12", "-r", "456:78"]
      * HouseSettings:
@@ -162,6 +149,9 @@ public abstract class GeneratorModule {
     protected void convertArgsToSettings(Player p, String[] args, GeneratorType generatorType){
         for(String flag : Generator.convertArgsToFlags(args)){
             String[] flagAndValue = Generator.convertToFlagAndValue(flag, p);
+
+            if(flagAndValue == null) continue;
+
             String flagName = flagAndValue[0];
             String flagValue = flagAndValue[1];
 

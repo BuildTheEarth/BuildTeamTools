@@ -14,27 +14,28 @@ public class Field extends GeneratorModule {
     }
 
     @Override
-    public boolean checkPlayer(Player p) {
-        if (!Generator.checkIfWorldEditIsInstalled(p))
-            return false;
+    public boolean checkForNoPlayer(Player p) {
+        if (Generator.checkIfWorldEditIsNotInstalled(p))
+            return true;
 
-        if (!Generator.checkForWorldEditSelection(p)) {
-            return false;
+        if (Generator.checkForNoWorldEditSelection(p)) {
+            return true;
         }
 
         if (getPlayerSettings().get(p.getUniqueId()).getBlocks() == null) {
             getPlayerSettings().get(p.getUniqueId()).setBlocks(Generator.analyzeRegion(p, p.getWorld()));
         }
 
-        return true;
+        return false;
     }
 
     @Override
     public void generate(Player p) {
-        if (!checkPlayer(p)) return;
+        if (checkForNoPlayer(p)) return;
 
         Region polyRegion = Generator.getWorldEditSelection(p);
 
-        FieldScripts.fieldscript_v_1_0(p, this, polyRegion);
+        if(polyRegion != null)
+            FieldScripts.fieldScript_v_1_0(p, this, polyRegion);
     }
 }

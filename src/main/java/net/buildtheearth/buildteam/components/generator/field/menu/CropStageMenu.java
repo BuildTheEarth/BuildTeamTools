@@ -45,21 +45,21 @@ public class CropStageMenu extends AbstractMenu {
 
         switch (crop) {
             case POTATO:
-                itemOne = Item.create(Material.GRASS, "§bLow", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-                itemTwo = Item.create(Material.LONG_GRASS, "§bTall", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+                itemOne = Item.create(Material.GRASS, "§bLow", Liste.createList("", "§8Left-click to select", "§8Right-click for more information"));
+                itemTwo = Item.create(Material.LONG_GRASS, "§bTall", Liste.createList("", "§8Left-click to select", "§8Right-click for more information"));
                 break;
             case WHEAT:
-                itemOne = Item.create(Material.BIRCH_FENCE, "§bLight", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-                itemTwo = Item.create(Material.DARK_OAK_FENCE, "§bDark", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+                itemOne = Item.create(Material.BIRCH_FENCE, "§bLight", Liste.createList("", "§8Left-click to select", "§8Right-click for more information"));
+                itemTwo = Item.create(Material.DARK_OAK_FENCE, "§bDark", Liste.createList("", "§8Left-click to select", "§8Right-click for more information"));
                 break;
             case CORN:
-                itemOne = Item.create(Material.GRASS, "§bHarvested", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-                itemTwo = Item.create(Material.LONG_GRASS, "§bTall", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+                itemOne = Item.create(Material.GRASS, "§bHarvested", Liste.createList("", "§8Left-click to select", "§8Right-click for more information"));
+                itemTwo = Item.create(Material.LONG_GRASS, "§bTall", Liste.createList("", "§8Left-click to select", "§8Right-click for more information"));
                 break;
             case HARVESTED:
             case OTHER:
-                itemOne = Item.create(Material.DEAD_BUSH, "§bDry", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-                itemTwo = Item.create(Material.WATER_BUCKET, "§bWet", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+                itemOne = Item.create(Material.DEAD_BUSH, "§bDry", Liste.createList("", "§8Left-click to select", "§8Right-click for more information"));
+                itemTwo = Item.create(Material.WATER_BUCKET, "§bWet", Liste.createList("", "§8Left-click to select", "§8Right-click for more information"));
                 break;
         }
 

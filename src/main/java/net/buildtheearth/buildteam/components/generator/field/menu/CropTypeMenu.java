@@ -39,15 +39,15 @@ public class CropTypeMenu extends AbstractMenu {
     @Override
     protected void setPreviewItems() {
 
-        ItemStack potatoItem = Item.create(Material.POTATO_ITEM, "§bPotato", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-        ItemStack wheatItem = Item.create(Material.WHEAT, "§bWheat", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-        ItemStack cornItem = Item.create(Material.PUMPKIN_SEEDS, "§bCorn", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-        ItemStack vineyardItem = Item.create(Material.VINE, "§bVineyard", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-        ItemStack pearItem = Item.create(Material.SLIME_BALL, "§bPear", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-        ItemStack cattleItem = Item.create(Material.SPRUCE_FENCE, "§bWheat", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-        ItemStack meadowItem = Item.create(Material.GRASS, "§bMeadow", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-        ItemStack harvestedItem = Item.create(Material.HAY_BLOCK, "§bHarvested", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
-        ItemStack otherItem = Item.create(Material.DEAD_BUSH, "§bOther", Liste.createList("", "§8Leftclick to select", "§8Rightclick for more information"));
+        ItemStack potatoItem = Item.create(Material.POTATO_ITEM, "§bPotato", Liste.createList("", "§8Left-click to select", "§8Right-click for more information"));
+        ItemStack wheatItem = Item.create(Material.WHEAT, "§bWheat", Liste.createList("", "§8Left-click to select", "§8Right-click for more information"));
+        ItemStack cornItem = Item.create(Material.PUMPKIN_SEEDS, "§bCorn", Liste.createList("", "§8Left-click to select", "§8Right-click for more information"));
+        ItemStack vineyardItem = Item.create(Material.VINE, "§bVineyard", Liste.createList("", "§8Left-click to select", "§8Right-click for more information"));
+        ItemStack pearItem = Item.create(Material.SLIME_BALL, "§bPear", Liste.createList("", "§8Left-click to select", "§8Right-click for more information"));
+        ItemStack cattleItem = Item.create(Material.SPRUCE_FENCE, "§bWheat", Liste.createList("", "§8Left-click to select", "§8Right-click for more information"));
+        ItemStack meadowItem = Item.create(Material.GRASS, "§bMeadow", Liste.createList("", "§8Left-click to select", "§8Right-click for more information"));
+        ItemStack harvestedItem = Item.create(Material.HAY_BLOCK, "§bHarvested", Liste.createList("", "§8Left-click to select", "§8Right-click for more information"));
+        ItemStack otherItem = Item.create(Material.DEAD_BUSH, "§bOther", Liste.createList("", "§8Left-click to select", "§8Right-click for more information"));
 
         // Set items
         getMenu().getSlot(POTATO_CROP_SLOT).setItem(potatoItem);

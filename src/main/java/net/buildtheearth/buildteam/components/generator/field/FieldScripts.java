@@ -7,7 +7,6 @@ import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.components.generator.*;
-import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -18,7 +17,7 @@ import java.util.List;
 
 public class FieldScripts {
 
-    public static void fieldscript_v_1_0(Player p, Field field, Region region) {
+    public static void fieldScript_v_1_0(Player p, Field field, Region region) {
         List<String> commands = new ArrayList<>();
         HashMap<Flag, String> flags = field.getPlayerSettings().get(p.getUniqueId()).getValues();
 
@@ -71,7 +70,7 @@ public class FieldScripts {
         p.chat("//expand 10 10 west");
 
         Block[][][] blocks = Generator.analyzeRegion(p, p.getWorld());
-        int maxHeight = Generator.getMaxHeight(blocks);
+
 
         // Recreate the original polygon selection
         Generator.createPolySelection(p, points, blocks);
@@ -100,9 +99,15 @@ public class FieldScripts {
             // Get the directory containing all schematic files.
             File directory = new File(Main.instance.getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/GeneratorCollections/fieldpack/" + (requiresAlternatingLines ? "striped/" : "normal/"));
 
-            // Get some information based on the list of schematics
-            short schematicAmount = (short) directory.getAbsoluteFile().listFiles().length;
             File[] schematics = directory.getAbsoluteFile().listFiles();
+
+            if(schematics == null) {
+                p.sendMessage("§c§lERROR: §cNo schematics found!");
+                return;
+            }
+
+            // Get some information based on the list of schematics
+            short schematicAmount = (short) schematics.length;
             short[] availableDirections = new short[schematicAmount];
 
             // Get an array with all available schematic line directions
@@ -163,9 +168,8 @@ public class FieldScripts {
                 commands.add("//shift 1 up");
 
                 commands.add("//replace >175:3 175:15");
-                operations++;
                 commands.add("//replace >175:2 175:14");
-                operations++;
+                operations+=2;
 
             } else {
                 commands.add("//replace 251:0 208,5");
@@ -185,9 +189,8 @@ public class FieldScripts {
         if (crop == Crop.HARVESTED) {
             if (type == CropStage.DRY) {
                 commands.add("//replace 251:0 5%208,95%5");
-                operations++;
                 commands.add("//replace 251:15 95%208,5%5");
-                operations++;
+                operations+=2;
 
             } else {
                 commands.add("//replace 251:0 47%5:1,47%3:1,5%60");
@@ -205,13 +208,12 @@ public class FieldScripts {
                 commands.add("//replace 251:0 208,5");
                 operations++;
                 commands.add("//replace 251:15 3:1,2");
-                operations++;
 
                 commands.add("//shift 1 up");
                 commands.add("//gmask 0");
 
                 commands.add("//replace >2 31:1,31:2");
-                operations++;
+                operations+=2;
 
             } else {
                 commands.add("//setbiome SWAMPLAND");

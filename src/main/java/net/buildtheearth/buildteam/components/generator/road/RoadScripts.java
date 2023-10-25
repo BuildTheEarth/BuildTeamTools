@@ -12,7 +12,7 @@ import java.util.*;
 
 public class RoadScripts {
     
-    public static void roadscript_v_2_0(Player p, Road road, ConvexPolyhedralRegion region) {
+    public static void roadScript_v_2_0(Player p, Road road, ConvexPolyhedralRegion region) {
         List<String> commands = new ArrayList<>();
         HashMap <Flag, String > flags = road.getPlayerSettings().get(p.getUniqueId()).getValues();
 
@@ -82,7 +82,7 @@ public class RoadScripts {
 
 
         Block[][][] regionBlocks = Generator.analyzeRegion(p, p.getWorld());
-        points = Generator.adjustHeight(points, regionBlocks);
+        Generator.adjustHeight(points, regionBlocks);
 
         List<Vector> innerPoints = new ArrayList<>(points);
         innerPoints = Generator.shortenPolyLine(innerPoints, 2);
@@ -341,28 +341,28 @@ public class RoadScripts {
 
             // Create the road markings for the other lanes
             if(laneCount >= 3)
-            for(int i = 0; i < (laneCount-1)/2; i++) {
-                int distance = (i+1) * laneWidth * 2 - (!isEven ? laneWidth : 0);
+                for(int i = 0; i < (laneCount-1)/2; i++) {
+                    int distance = (i+1) * laneWidth * 2 - (!isEven ? laneWidth : 0);
 
-                List<List<Vector>> roadMarkingPointsList = Generator.shiftPointsAll(points, distance);
-                for(List<Vector> path : roadMarkingPointsList) {
+                    List<List<Vector>> roadMarkingPointsList = Generator.shiftPointsAll(points, distance);
+                    for(List<Vector> path : roadMarkingPointsList) {
 
-                    List<Vector> markingsOneMeterPoints = new ArrayList<>(path);
-                    markingsOneMeterPoints = Generator.populatePoints(markingsOneMeterPoints, 1);
+                        List<Vector> markingsOneMeterPoints = new ArrayList<>(path);
+                        markingsOneMeterPoints = Generator.populatePoints(markingsOneMeterPoints, 1);
 
-                    List<Vector> shiftedRoadMarkingPoints = new ArrayList<>(markingsOneMeterPoints);
-                    shiftedRoadMarkingPoints = Generator.reducePoints(shiftedRoadMarkingPoints, markingGap + 1, markingLength - 1);
+                        List<Vector> shiftedRoadMarkingPoints = new ArrayList<>(markingsOneMeterPoints);
+                        shiftedRoadMarkingPoints = Generator.reducePoints(shiftedRoadMarkingPoints, markingGap + 1, markingLength - 1);
 
-                    operations += createRoadMarkingLine(commands, shiftedRoadMarkingPoints, markingMaterial, regionBlocks);
+                        operations += createRoadMarkingLine(commands, shiftedRoadMarkingPoints, markingMaterial, regionBlocks);
+                    }
                 }
-            }
 
             commands.add("//gmask");
         }
 
 
         // ----------- MATERIAL ----------
-        // Replace all light blue wool with the sidwalk material
+        // Replace all light blue wool with the sidewalk material
         Generator.createPolySelection(commands, polyRegionPoints);
         commands.add("//replace 35:3 " + sidewalkMaterial);
         operations++;

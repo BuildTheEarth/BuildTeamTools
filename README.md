@@ -41,6 +41,7 @@ The goal of the plugin is to massively accelerate the building process by elimin
 <!-- FEATURES -->
 ## Features
 🔨 **Easy-to-use** tools for everything around BuildTheEarth<br/>
+⏱ **Multi-Version** support from `1.12` - `1.20` (PLANNED)<br/>
 ✔️ **User-friendly** GUIs and commands<br/>
 💬 **Multi-Language** Support (PLANNED)<br/>
 📆 **Automatic** updates<br/>
@@ -55,6 +56,10 @@ The goal of the plugin is to massively accelerate the building process by elimin
 <img width="250" align="top" src="https://github.com/BuildTheEarth/BuildTeamTools/assets/66020920/405ce924-e03d-4e2b-ba32-ff6844cf5b37">
 <img width="250" align="top" src="https://github.com/BuildTheEarth/BuildTeamTools/assets/66020920/a773aacf-3285-48c8-940d-1ed277adfe6c">
 <img width="250" align="top" src="https://github.com/BuildTheEarth/BuildTeamTools/assets/66020920/f9d95564-ad5d-4293-b6ef-fcccabbe2e01">
+
+<br/><br/>
+The **\*** symbol shows that this feature is still being developed or under maintenance
+<br/><br/>
 
 <!-- INSTALLATION -->
 ## Installation
@@ -78,6 +83,7 @@ The goal of the plugin is to massively accelerate the building process by elimin
 Thank you to the following developers for contributing towards the plugin:
 
 - **MineFact**
+- **frikandelworst**
 - **Brigart**
 - **v4siv**
 - **Adam**

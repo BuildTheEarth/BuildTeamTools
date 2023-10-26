@@ -38,18 +38,23 @@ BuildTeamTools provides a large set of tools for builders which improve the buil
 
 The goal of the plugin is to massively accelerate the building process by eliminating many of the repetitive tasks that come with building in BuildTheEarth, while simultaneously providing an easy way for people to get started in the project.
 
+<!-- FEATURES -->
 ## Features
-🔨 **Easy-to-use** tools for structure generation including:<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- **Building shells**<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- **Roads**<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- **Railways**<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- **Trees**<br/>
+🔨 **Easy-to-use** tools for everything around BuildTheEarth<br/>
 ✔️ **User-friendly** GUIs and commands<br/>
 💬 **Multi-Language** Support (PLANNED)<br/>
 📆 **Automatic** updates<br/>
 🔌 **Easy setup** and configuration<br/>
 📡 **BTE Network** improvements (PLANNED).
 
+<!-- COMPONENTS -->
+## Components
+<img width="250" align="top" src="https://github.com/BuildTheEarth/BuildTeamTools/assets/66020920/c7cb17f4-c240-4212-958f-70ced88467c8">
+<img width="250" align="top" src="https://github.com/BuildTheEarth/BuildTeamTools/assets/66020920/5d22d157-900a-4632-bc24-414bb7f4bc22">
+<img width="250" align="top" src="https://github.com/BuildTheEarth/BuildTeamTools/assets/66020920/3c684e41-2b4f-48f8-a13f-a4f8af106866">
+<img width="250" align="top" src="https://github.com/BuildTheEarth/BuildTeamTools/assets/66020920/405ce924-e03d-4e2b-ba32-ff6844cf5b37">
+<img width="250" align="top" src="https://github.com/BuildTheEarth/BuildTeamTools/assets/66020920/a773aacf-3285-48c8-940d-1ed277adfe6c">
+<img width="250" align="top" src="https://github.com/BuildTheEarth/BuildTeamTools/assets/66020920/f9d95564-ad5d-4293-b6ef-fcccabbe2e01">
 
 <!-- INSTALLATION -->
 ## Installation

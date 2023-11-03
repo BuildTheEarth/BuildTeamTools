@@ -22,19 +22,26 @@ public class BlockListMenu extends AbstractPaginatedMenu {
 
     public static final int SWITCH_PAGE_ITEM_SLOT = 31;
     public static final int NEXT_ITEM_SLOT = 35;
+    public static final int BACK_ITEM_SLOT = 27;
 
     public ArrayList<String> selectedMaterials;
     private final List<ItemStack> items;
 
+    private final AbstractMenu backMenu;
 
-    public BlockListMenu(Player player, String invName, List<ItemStack> items) {
-        super(4, 3, invName, player);
+
+    public BlockListMenu(Player player, String invName, List<ItemStack> items, AbstractMenu backMenu, boolean autoLoad) {
+        super(4, 3, invName, player, autoLoad);
 
         this.items = items;
+        this.backMenu = backMenu;
     }
 
     @Override
     protected void setPreviewItems() {
+        if(backMenu != null)
+            setBackItem(BACK_ITEM_SLOT, backMenu);
+
         setSwitchPageItems(SWITCH_PAGE_ITEM_SLOT);
 
         if(canProceed())
@@ -55,12 +62,14 @@ public class BlockListMenu extends AbstractPaginatedMenu {
 
     @Override
     protected Mask getMask() {
+        String backSlot = backMenu == null ? "1" : "0";
+
         return BinaryMask.builder(getMenu())
                 .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short)15, null))
                 .pattern("000000000")
                 .pattern("000000000")
                 .pattern("000000000")
-                .pattern("111000110")
+                .pattern(backSlot + "11000110")
                 .build();
     }
 

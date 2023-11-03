@@ -1,6 +1,7 @@
 package net.buildtheearth.buildteam.components.generator.road.menu;
 
 import net.buildtheearth.Main;
+import net.buildtheearth.buildteam.components.generator.GeneratorMenu;
 import net.buildtheearth.buildteam.components.generator.Settings;
 import net.buildtheearth.buildteam.components.generator.road.RoadFlag;
 import net.buildtheearth.buildteam.components.generator.road.RoadSettings;
@@ -14,8 +15,8 @@ public class RoadColorMenu extends BlockListMenu {
 
     public static final String ROAD_COLOR_INV_NAME = "Choose a Road Block";
 
-    public RoadColorMenu(Player player) {
-        super(player, ROAD_COLOR_INV_NAME, MenuItems.getBlocksByColor());
+    public RoadColorMenu(Player player, boolean autoLoad) {
+        super(player, ROAD_COLOR_INV_NAME, MenuItems.getBlocksByColor(), new GeneratorMenu(player, false), autoLoad);
     }
 
     @Override
@@ -36,7 +37,7 @@ public class RoadColorMenu extends BlockListMenu {
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
 
-                new SidewalkColorMenu(clickPlayer);
+                new SidewalkColorMenu(clickPlayer, true);
             });
     }
 }

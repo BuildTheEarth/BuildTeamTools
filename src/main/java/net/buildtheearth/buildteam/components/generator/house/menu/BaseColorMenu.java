@@ -14,8 +14,8 @@ public class BaseColorMenu extends BlockListMenu {
 
     public static final String BASE_TYPE_INV_NAME = "Choose a Base Floor Color";
 
-    public BaseColorMenu(Player player) {
-        super(player, BASE_TYPE_INV_NAME, MenuItems.getBlocksByColor());
+    public BaseColorMenu(Player player, boolean autoLoad) {
+        super(player, BASE_TYPE_INV_NAME, MenuItems.getBlocksByColor(), new RoofColorMenu(player, false), autoLoad);
     }
 
     @Override

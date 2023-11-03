@@ -14,6 +14,9 @@ import net.buildtheearth.buildteam.components.generator.rail.RailSettings;
 import net.buildtheearth.buildteam.components.generator.road.Road;
 import net.buildtheearth.buildteam.components.generator.road.RoadSettings;
 import net.buildtheearth.buildteam.components.generator.road.menu.RoadColorMenu;
+import net.buildtheearth.buildteam.components.generator.tree.Tree;
+import net.buildtheearth.buildteam.components.generator.tree.TreeSettings;
+import net.buildtheearth.buildteam.components.generator.tree.menu.TreeTypeMenu;
 import net.buildtheearth.utils.menus.AbstractMenu;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.Liste;
@@ -42,8 +45,8 @@ public class GeneratorMenu extends AbstractMenu {
     public static int FIELD_ITEM_SLOT = 17;
 
 
-    public GeneratorMenu(Player player) {
-        super(3, GENERATOR_INV_NAME, player);
+    public GeneratorMenu(Player player, boolean autoLoad) {
+        super(3, GENERATOR_INV_NAME, player, autoLoad);
     }
 
     @Override
@@ -189,7 +192,7 @@ public class GeneratorMenu extends AbstractMenu {
 
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
-            new WallColorMenu(clickPlayer);
+            new WallColorMenu(clickPlayer, true);
         }));
 
         // Set click event for road item
@@ -207,7 +210,7 @@ public class GeneratorMenu extends AbstractMenu {
 
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
-            new RoadColorMenu(clickPlayer);
+            new RoadColorMenu(clickPlayer, true);
         }));
 
         // Set click event for railway item
@@ -229,6 +232,24 @@ public class GeneratorMenu extends AbstractMenu {
             Main.getBuildTeam().getGenerator().getRail().generate(clickPlayer);
         }));
 
+        // Set click event for tree item
+        getMenu().getSlot(TREE_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
+            if(clickInformation.getClickType().equals(ClickType.RIGHT)) {
+                sendMoreInformation(clickPlayer, GeneratorType.TREE);
+                return;
+            }
+
+            Tree tree = Main.buildTeamTools.getGenerator().getTree();
+            tree.getPlayerSettings().put(clickPlayer.getUniqueId(), new TreeSettings(clickPlayer));
+
+            if(tree.checkForNoPlayer(clickPlayer))
+                return;
+
+            clickPlayer.closeInventory();
+            clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
+            new TreeTypeMenu(clickPlayer, true);
+        }));
+
         // Set click event for field item
         getMenu().getSlot(FIELD_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
             if(clickInformation.getClickType().equals(ClickType.RIGHT)) {
@@ -244,7 +265,7 @@ public class GeneratorMenu extends AbstractMenu {
 
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
-            new CropTypeMenu(clickPlayer);
+            new CropTypeMenu(clickPlayer, true);
         }));
     }
 

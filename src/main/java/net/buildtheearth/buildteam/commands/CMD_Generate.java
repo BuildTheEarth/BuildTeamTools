@@ -34,23 +34,26 @@ public class CMD_Generate implements CommandExecutor {
         // Command Usage: /gen
         if(args.length == 0){
             if(Generator.checkIfWorldEditIsNotInstalled(p)) return true;
-            new GeneratorMenu(p);
+            new GeneratorMenu(p, true);
             return true;
         }
 
         switch (args[0]) {
             case "house": // Command Usage: /gen house ...
                 Main.getBuildTeam().getGenerator().getHouse().analyzeCommand(p, args);
-                break;
+                return true;
             case "road": // Command Usage: /gen road ...
                 Main.getBuildTeam().getGenerator().getRoad().analyzeCommand(p, args);
-                break;
+                return true;
             case "rail": // Command Usage: /gen rail ...
                 Main.getBuildTeam().getGenerator().getRail().analyzeCommand(p, args);
-                break;
+                return true;
             case "tree": // Command Usage: /gen tree ...
                 Main.getBuildTeam().getGenerator().getTree().analyzeCommand(p, args);
-                break;
+                return true;
+            case "field": // Command Usage: /gen tree ...
+                Main.getBuildTeam().getGenerator().getField().analyzeCommand(p, args);
+                return true;
             case "history": // Command Usage: /gen history
                 if(Generator.getPlayerHistory(p).getHistoryEntries().isEmpty()) {
                     p.sendMessage("§cYou didn't generate any structures yet. Use /gen to create one.");
@@ -63,7 +66,7 @@ public class CMD_Generate implements CommandExecutor {
                         p.sendMessage("§e- " + history.getGeneratorType().name() + " §7-§e " + Utils.toDate(p, timeDifference) + " ago §7-§e " + history.getWorldEditCommandCount() + " Commands executed");
                     }
                 });
-                break;
+                return true;
             case "undo":
                 if(Generator.getPlayerHistory(p).getHistoryEntries().isEmpty()){
                     p.sendMessage("§cYou didn't generate any structures yet. Use /gen to create one.");
@@ -72,7 +75,7 @@ public class CMD_Generate implements CommandExecutor {
 
                 p.chat("//undo 500");
                 Generator.getPlayerHistory(p).getHistoryEntries().clear();
-                break;
+                return true;
         }
 
         sendHelp(p);

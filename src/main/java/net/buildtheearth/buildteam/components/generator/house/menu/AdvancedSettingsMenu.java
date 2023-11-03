@@ -28,6 +28,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
     public static final int WINDOW_DISTANCE_SLOT = 33;
 
     public static final int NEXT_ITEM_SLOT = 44;
+    public static final int BACK_ITEM_SLOT = 36;
 
     public int floorCount, floorHeight, baseHeight, windowWidth, windowHeight, windowDistance;
 
@@ -56,6 +57,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
 
 
         getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.getNextItem());
+        setBackItem(BACK_ITEM_SLOT, new BaseColorMenu(getMenuPlayer(), false));
 
         super.setPreviewItems();
     }
@@ -90,7 +92,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
                 .pattern("100010001")
                 .pattern("100010001")
                 .pattern("100010001")
-                .pattern("111111110")
+                .pattern("011111110")
                 .build();
     }
 

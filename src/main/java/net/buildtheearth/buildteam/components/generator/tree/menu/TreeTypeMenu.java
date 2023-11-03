@@ -1,6 +1,7 @@
 package net.buildtheearth.buildteam.components.generator.tree.menu;
 
 import net.buildtheearth.Main;
+import net.buildtheearth.buildteam.components.generator.GeneratorMenu;
 import net.buildtheearth.buildteam.components.generator.Settings;
 import net.buildtheearth.buildteam.components.generator.road.RoadFlag;
 import net.buildtheearth.buildteam.components.generator.road.RoadSettings;
@@ -21,8 +22,8 @@ public class TreeTypeMenu extends BlockListMenu {
 
     public static final String TREE_TYPE_INV_NAME = "Choose a Tree Type";
 
-    public TreeTypeMenu(Player player) {
-        super(player, TREE_TYPE_INV_NAME, getTreeTypes());
+    public TreeTypeMenu(Player player, boolean autoLoad) {
+        super(player, TREE_TYPE_INV_NAME, getTreeTypes(), new GeneratorMenu(player, false), autoLoad);
     }
 
     /** Get a list of all tree types */
@@ -55,7 +56,7 @@ public class TreeTypeMenu extends BlockListMenu {
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
 
-                new SidewalkColorMenu(clickPlayer);
+                //new SidewalkColorMenu(clickPlayer);
             });
     }
 }

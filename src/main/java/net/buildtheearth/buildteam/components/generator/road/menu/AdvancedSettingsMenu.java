@@ -33,8 +33,10 @@ public class AdvancedSettingsMenu extends AbstractMenu {
 
     public static final int NEXT_ITEM_SLOT = 44;
 
-    public AdvancedSettingsMenu(Player player) {
-        super(5, ADVANCED_SETTINGS_INV_NAME, player);
+    private static final int BACK_ITEM_SLOT = 36;
+
+    public AdvancedSettingsMenu(Player player, boolean autoLoad) {
+        super(5, ADVANCED_SETTINGS_INV_NAME, player, autoLoad);
     }
 
     @Override
@@ -59,6 +61,8 @@ public class AdvancedSettingsMenu extends AbstractMenu {
         setColorChoiceItems(MenuItems.SliderColor.WHITE, SIDEWALK_SLAB_SLOT, "Sidewalk Elevation Slab", sidewalkSlab);
 
         getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.getNextItem());
+
+        setBackItem(BACK_ITEM_SLOT, new SidewalkColorMenu(getMenuPlayer(), false));
 
         super.setPreviewItems();
     }
@@ -93,7 +97,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
                 .pattern("100010001")
                 .pattern("100010001")
                 .pattern("100010001")
-                .pattern("111111110")
+                .pattern("011111110")
                 .build();
     }
 
@@ -144,8 +148,6 @@ public class AdvancedSettingsMenu extends AbstractMenu {
 
 
     protected void setColorChoiceClickEvents(RoadFlag roadFlag, int slot, String choiceInvName, List<ItemStack> choices){
-        Road road = Main.getBuildTeam().getGenerator().getRoad();
-
         // Set click event for X items
         getMenu().getSlot(slot - 1).setClickHandler((clickPlayer, clickInformation) -> turnOffColorChoice(clickPlayer, roadFlag));
         getMenu().getSlot(slot + 1).setClickHandler((clickPlayer, clickInformation) -> turnOffColorChoice(clickPlayer, roadFlag));
@@ -155,7 +157,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
 
-            new AdvancedColorMenu(clickPlayer, roadFlag, choiceInvName, choices);
+            new AdvancedColorMenu(clickPlayer, roadFlag, choiceInvName, choices, true);
         });
     }
 

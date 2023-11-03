@@ -25,8 +25,10 @@ public class RoofTypeMenu extends AbstractMenu {
     public static final int MEDIUM_SLAB_ROOF_ITEM_SLOT = 15;
     public static final int FLATTER_SLAB_ROOF_ITEM_SLOT = 17;
 
-    public RoofTypeMenu(Player player) {
-        super(3, ROOF_COLOR_INV_NAME, player);
+    private static final int BACK_ITEM_SLOT = 18;
+
+    public RoofTypeMenu(Player player, boolean autoLoad) {
+        super(3, ROOF_COLOR_INV_NAME, player, autoLoad);
     }
 
     @Override
@@ -44,6 +46,8 @@ public class RoofTypeMenu extends AbstractMenu {
         getMenu().getSlot(STEEP_SLAB_ROOF_ITEM_SLOT).setItem(steepSlabRoofItem);
         getMenu().getSlot(MEDIUM_SLAB_ROOF_ITEM_SLOT).setItem(mediumSlabRoofItem);
         getMenu().getSlot(FLATTER_SLAB_ROOF_ITEM_SLOT).setItem(flatterSlabRoofItem);
+
+        setBackItem(BACK_ITEM_SLOT, new WallColorMenu(getMenuPlayer(), false));
 
         super.setPreviewItems();
     }
@@ -77,7 +81,7 @@ public class RoofTypeMenu extends AbstractMenu {
 
         p.closeInventory();
         p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
-        new RoofColorMenu(p);
+        new RoofColorMenu(p, true);
     }
 
     @Override
@@ -86,7 +90,7 @@ public class RoofTypeMenu extends AbstractMenu {
                 .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short)15, null))
                 .pattern("111111111")
                 .pattern("010101010")
-                .pattern("111111111")
+                .pattern("011111111")
                 .build();
     }
 }

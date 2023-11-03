@@ -14,12 +14,13 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
     private int totalItemsAmount;
     private int currentPage = 0;
 
-    public AbstractPaginatedMenu(int rows, int pagedRows, String title, Player menuPlayer) {
+    public AbstractPaginatedMenu(int rows, int pagedRows, String title, Player menuPlayer, boolean autoLoad) {
         super(rows, title, menuPlayer, false);
 
         this.maxItemsPerPage = pagedRows * 9;
 
-        Bukkit.getScheduler().scheduleSyncDelayedTask(Main.instance, this::reloadMenuAsync);
+        if (autoLoad)
+            Bukkit.getScheduler().scheduleSyncDelayedTask(Main.instance, this::reloadMenuAsync);
     }
 
     /**

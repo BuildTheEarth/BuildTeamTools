@@ -36,8 +36,8 @@ public abstract class GeneratorModule {
 
     public void analyzeCommand(Player p, String[] args){
         sendHelp(p, args);
-        addPlayerSetting(p, generatorType);
-        convertArgsToSettings(p, args, generatorType);
+        addPlayerSetting(p);
+        convertArgsToSettings(p, args);
         generate(p);
     }
 
@@ -45,8 +45,8 @@ public abstract class GeneratorModule {
         playerSettings.put(uuid, settings);
     }
 
-    public void addPlayerSetting(Player p, GeneratorType type){
-        switch (type){
+    public void addPlayerSetting(Player p){
+        switch (generatorType){
             case HOUSE:
                 addPlayerSetting(p.getUniqueId(), new HouseSettings(p));
                 break;
@@ -146,7 +146,7 @@ public abstract class GeneratorModule {
      *  WALL_COLOR: 123:12
      *  ROOF_TYPE:  456:78
      */
-    protected void convertArgsToSettings(Player p, String[] args, GeneratorType generatorType){
+    protected void convertArgsToSettings(Player p, String[] args){
         for(String flag : Generator.convertArgsToFlags(args)){
             String[] flagAndValue = Generator.convertToFlagAndValue(flag, p);
 

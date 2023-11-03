@@ -1,6 +1,7 @@
 package net.buildtheearth.buildteam.components.generator.field.menu;
 
 import net.buildtheearth.Main;
+import net.buildtheearth.buildteam.components.generator.GeneratorMenu;
 import net.buildtheearth.buildteam.components.generator.Settings;
 import net.buildtheearth.buildteam.components.generator.field.Crop;
 import net.buildtheearth.buildteam.components.generator.field.FieldFlag;
@@ -31,8 +32,10 @@ public class CropTypeMenu extends AbstractMenu {
     private final byte HARVESTED_CROP_SLOT = 16;
     private final byte OTHER_CROP_SLOT = 17;
 
-    public CropTypeMenu(Player player) {
-        super(3, CROP_TYPE_INV_NAME, player);
+    private final int BACK_ITEM_SLOT = 18;
+
+    public CropTypeMenu(Player player, boolean autoLoad) {
+        super(3, CROP_TYPE_INV_NAME, player, autoLoad);
     }
 
 
@@ -60,6 +63,7 @@ public class CropTypeMenu extends AbstractMenu {
         getMenu().getSlot(HARVESTED_CROP_SLOT).setItem(harvestedItem);
         getMenu().getSlot(OTHER_CROP_SLOT).setItem(otherItem);
 
+        setBackItem(BACK_ITEM_SLOT, new GeneratorMenu(getMenuPlayer(), false));
 
         super.setPreviewItems();
     }
@@ -142,6 +146,8 @@ public class CropTypeMenu extends AbstractMenu {
             }
             performClickAction(clickPlayer, Crop.OTHER);
         }));
+
+
     }
 
     private void performClickAction(Player p, Crop crop) {
@@ -160,7 +166,7 @@ public class CropTypeMenu extends AbstractMenu {
             return;
         }
         if (crop.equals(Crop.CATTLE) || crop.equals(Crop.MEADOW)) {
-            new FenceTypeMenu(p);
+            new FenceTypeMenu(p, true);
             return;
         }
 
@@ -205,7 +211,7 @@ public class CropTypeMenu extends AbstractMenu {
                 .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null))
                 .pattern("111111111")
                 .pattern("000000000")
-                .pattern("111111111")
+                .pattern("011111111")
                 .build();
     }
 }

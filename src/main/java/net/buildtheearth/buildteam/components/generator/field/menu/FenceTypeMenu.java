@@ -15,8 +15,8 @@ public class FenceTypeMenu extends BlockListMenu {
     public static String FENCE_TYPE_INV_NAME = "Choose a Fence Type";
 
 
-    public FenceTypeMenu(Player player) {
-        super(player, FENCE_TYPE_INV_NAME, MenuItems.getFences());
+    public FenceTypeMenu(Player player, boolean autoLoad) {
+        super(player, FENCE_TYPE_INV_NAME, MenuItems.getFences(), new CropTypeMenu(player, false), autoLoad);
     }
 
     @Override

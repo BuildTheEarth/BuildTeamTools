@@ -20,8 +20,8 @@ public class RoofColorMenu extends BlockListMenu {
 
     public static final String ROOF_TYPE_INV_NAME = "Choose a Roof Color";
 
-    public RoofColorMenu(Player player) {
-        super(player, ROOF_TYPE_INV_NAME, getRoofBlocks(player));
+    public RoofColorMenu(Player player, boolean autoLoad) {
+        super(player, ROOF_TYPE_INV_NAME, getRoofBlocks(player), new RoofTypeMenu(player, false), autoLoad);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class RoofColorMenu extends BlockListMenu {
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
 
-                new BaseColorMenu(clickPlayer);
+                new BaseColorMenu(clickPlayer, true);
             });
     }
 

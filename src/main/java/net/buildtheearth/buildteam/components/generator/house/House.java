@@ -35,7 +35,5 @@ public class House extends GeneratorModule {
 
         if(polyRegion != null)
             HouseScripts.buildscript_v_1_2(p, this, polyRegion);
-
-        sendSuccessMessage(p);
     }
 }

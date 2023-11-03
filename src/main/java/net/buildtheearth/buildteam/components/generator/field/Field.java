@@ -22,9 +22,8 @@ public class Field extends GeneratorModule {
             return true;
         }
 
-        if (getPlayerSettings().get(p.getUniqueId()).getBlocks() == null) {
+        if (getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
             getPlayerSettings().get(p.getUniqueId()).setBlocks(Generator.analyzeRegion(p, p.getWorld()));
-        }
 
         return false;
     }

@@ -28,9 +28,10 @@ public class CropStageMenu extends AbstractMenu {
     private final byte STAGE_ONE_SLOT = 11;
     private final byte STAGE_TWO_SLOT = 15;
 
+    private final int BACK_ITEM_SLOT = 18;
+
     public CropStageMenu(Player player, Crop crop) {
         super(3, CROP_TYPE_INV_NAME, player);
-        player.sendMessage("TEST " + crop.toString());
         this.crop = crop;
     }
 
@@ -67,6 +68,8 @@ public class CropStageMenu extends AbstractMenu {
         // Set items
         getMenu().getSlot(STAGE_ONE_SLOT).setItem(itemOne);
         getMenu().getSlot(STAGE_TWO_SLOT).setItem(itemTwo);
+
+        setBackItem(BACK_ITEM_SLOT, new CropTypeMenu(getMenuPlayer(), false));
 
 
         super.setPreviewItems();
@@ -173,7 +176,7 @@ public class CropStageMenu extends AbstractMenu {
                 .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null))
                 .pattern("111111111")
                 .pattern("110111011")
-                .pattern("111111111")
+                .pattern("011111111")
                 .build();
     }
 }

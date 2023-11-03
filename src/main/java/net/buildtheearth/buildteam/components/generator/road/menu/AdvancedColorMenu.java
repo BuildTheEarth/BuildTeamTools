@@ -16,8 +16,8 @@ public class AdvancedColorMenu extends BlockListMenu {
 
     private final RoadFlag roadFlag;
 
-    public AdvancedColorMenu(Player player, RoadFlag roadFlag, String invName, List<ItemStack> items) {
-        super(player, invName, items);
+    public AdvancedColorMenu(Player player, RoadFlag roadFlag, String invName, List<ItemStack> items, boolean autoLoad) {
+        super(player, invName, items, new AdvancedSettingsMenu(player, false), autoLoad);
 
         this.roadFlag = roadFlag;
     }
@@ -40,7 +40,7 @@ public class AdvancedColorMenu extends BlockListMenu {
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
 
-                new AdvancedSettingsMenu(clickPlayer);
+                new AdvancedSettingsMenu(clickPlayer, true);
             });
     }
 }

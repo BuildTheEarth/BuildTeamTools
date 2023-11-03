@@ -1,6 +1,7 @@
 package net.buildtheearth.buildteam.components.generator.house.menu;
 
 import net.buildtheearth.Main;
+import net.buildtheearth.buildteam.components.generator.GeneratorMenu;
 import net.buildtheearth.buildteam.components.generator.Settings;
 import net.buildtheearth.buildteam.components.generator.house.HouseFlag;
 import net.buildtheearth.buildteam.components.generator.house.HouseSettings;
@@ -13,8 +14,8 @@ public class WallColorMenu extends BlockListMenu {
 
     public static final String WALL_COLOR_INV_NAME = "Choose a Wall Block";
 
-    public WallColorMenu(Player player) {
-        super(player, WALL_COLOR_INV_NAME, MenuItems.getBlocksByColor());
+    public WallColorMenu(Player player, boolean autoLoad) {
+        super(player, WALL_COLOR_INV_NAME, MenuItems.getBlocksByColor(), new GeneratorMenu(player, false), autoLoad);
     }
 
     @Override
@@ -34,7 +35,7 @@ public class WallColorMenu extends BlockListMenu {
 
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
-                new RoofTypeMenu(clickPlayer);
+                new RoofTypeMenu(clickPlayer, true);
             });
     }
 }

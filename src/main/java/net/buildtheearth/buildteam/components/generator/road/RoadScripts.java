@@ -25,6 +25,7 @@ public class RoadScripts {
         String sidewalkMaterial = flags.get(RoadFlag.SIDEWALK_MATERIAL);
         String sidewalkSlabMaterial = flags.get(RoadFlag.SIDEWALK_SLAB_COLOR);
         String roadSlabMaterial = flags.get(RoadFlag.ROAD_SLAB_COLOR);
+        String streetLampType = flags.get(RoadFlag.STREET_LAMP_TYPE);
 
         int laneCount = Integer.parseInt(flags.get(RoadFlag.LANE_COUNT));
         int laneWidth = Integer.parseInt(flags.get(RoadFlag.LANE_WIDTH));
@@ -32,6 +33,7 @@ public class RoadScripts {
         int markingLength = Integer.parseInt(flags.get(RoadFlag.MARKING_LENGTH));
         int markingGap = Integer.parseInt(flags.get(RoadFlag.MARKING_GAP));
         int sidewalkWidth = Integer.parseInt(flags.get(RoadFlag.SIDEWALK_WIDTH));
+        int streetLampDistance = Integer.parseInt(flags.get(RoadFlag.STREET_LAMP_DISTANCE));
 
         boolean crosswalk = flags.get(RoadFlag.CROSSWALK).equals(RoadSettings.ENABLED);
 

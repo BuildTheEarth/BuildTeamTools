@@ -21,7 +21,10 @@ public enum RoadFlag implements Flag {
 
     ROAD_SLAB_COLOR("rs", FlagType.BLOCKS),
 
-    CROSSWALK("cw", FlagType.BOOLEAN);
+    CROSSWALK("cw", FlagType.BOOLEAN),
+
+    STREET_LAMP_TYPE("st", FlagType.ENUM),
+    STREET_LAMP_DISTANCE("sd", FlagType.NUMBER);
 
     private final String flag;
     private final FlagType flagType;

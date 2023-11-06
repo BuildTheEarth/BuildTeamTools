@@ -49,5 +49,11 @@ public class RoadSettings extends Settings {
 
         // Crosswalk (Default: Fixed Value)
         getValues().put(RoadFlag.CROSSWALK, ENABLED);
+
+        // Street Lamp Type (Default: Fixed Value)
+        getValues().put(RoadFlag.STREET_LAMP_TYPE, DISABLED);
+
+        // Street Lamp Distance (Default: Fixed Value)
+        getValues().put(RoadFlag.STREET_LAMP_DISTANCE, "40");
     }
 }

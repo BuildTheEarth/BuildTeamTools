@@ -73,7 +73,7 @@ The **\*** symbol shows that this feature is still being developed or under main
 2. Place the downloaded plugin in your server's **../plugins** folder.
 3. Some of the modules require dependencies so if you want to use them you need to install them:
   - To activate the **Generators**, please install the [WorldEdit 6.1.9](https://dev.bukkit.org/projects/worldedit/files/2597538) plugin.
-  - To activate the **Tree Generator**, install the [SchematicBrush 0.5.2](https://dev.bukkit.org/projects/schematicbrush) plugin and unzip the [Generator Collections 3.0](https://github.com/BuildTheEarth/GeneratorCollections/releases/latest/download/GeneratorCollections.zip) into `\plugins\WorldEdit\schematics`.
+  - To activate the **Tree Generator**, install the [SchematicBrush 0.5.2](https://dev.bukkit.org/projects/schematicbrush) plugin.
 5. Restart your server.
 6. Done!
 
@@ -93,12 +93,15 @@ Thank you to the following developers for contributing towards the plugin:
 ## Index
 Click the links below for more information, or see the [wiki](https://github.com/BuildTheEarth/BuildTeamTools/wiki).
 
-- [Generator](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Generator)
+- [Generators](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Generators)
   - [Houses](https://github.com/BuildTheEarth/BuildTeamTools/wiki/House-Command)
-  - Roads
-  - Railways
+  - [Roads](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Road-Command)
+  - [Railways](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Rail-Command)
   - [Trees](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Tree-Command)
-- Build Team Stats (PLANNED)
-- Build Team Security (PLANNED)
-- [Sledgehammer](https://github.com/noahhusby/Sledgehammer)
+  - [Fields](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Field-Command)
+- [Sledgehammer](https://github.com/noahhusby/Sledgehammer) (PLANNED)
+- Statistics (PLANNED)
+- Plot System (PLANNED)
+- Tutorials (PLANNED)
+- Security (PLANNED)
 

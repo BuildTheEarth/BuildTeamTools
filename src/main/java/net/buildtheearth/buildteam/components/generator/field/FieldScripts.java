@@ -2,6 +2,7 @@ package net.buildtheearth.buildteam.components.generator.field;
 
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -36,10 +37,16 @@ public class FieldScripts {
         if(yaw < 0) yaw += 360;
         if(yaw > 360) yaw -= 360;
 
+        // Add all points of the region to the list no matter what type of region it is
         if (region instanceof Polygonal2DRegion) {
             Polygonal2DRegion polyRegion = (Polygonal2DRegion) region;
 
-            for (BlockVector2D blockVector2D : polyRegion.getPoints()) points.add(blockVector2D.toVector());
+            for (BlockVector2D blockVector2D : polyRegion.getPoints())
+                points.add(blockVector2D.toVector());
+
+        } else if (region instanceof ConvexPolyhedralRegion) {
+            ConvexPolyhedralRegion convexRegion = (ConvexPolyhedralRegion) region;
+            points.addAll(convexRegion.getVertices());
 
         } else if (region instanceof CuboidRegion) {
             CuboidRegion cuboidRegion = (CuboidRegion) region;
@@ -369,7 +376,11 @@ public class FieldScripts {
 
         }
 
-        Generator.createPolySelection(commands, points);
+        // Depending on the selection type, the selection needs to be recreated
+        if(region instanceof Polygonal2DRegion || region instanceof ConvexPolyhedralRegion)
+            Generator.createPolySelection(commands, points);
+        else if(region instanceof CuboidRegion)
+            Generator.createCuboidSelection(commands, maxPoint, minPoint);
 
         Main.buildTeamTools.getGenerator().getCommands().add(new Command(p, field, commands, operations, blocks));
         Generator.getPlayerHistory(p).addHistoryEntry(new History.HistoryEntry(GeneratorType.FIELD, operations));

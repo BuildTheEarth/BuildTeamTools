@@ -32,9 +32,9 @@ public class Field extends GeneratorModule {
     public void generate(Player p) {
         if (checkForNoPlayer(p)) return;
 
-        Region polyRegion = Generator.getWorldEditSelection(p);
+        Region region = Generator.getWorldEditSelection(p);
 
-        if(polyRegion != null)
-            FieldScripts.fieldScript_v_1_0(p, this, polyRegion);
+        if(region != null)
+            FieldScripts.fieldScript_v_1_0(p, this, region);
     }
 }

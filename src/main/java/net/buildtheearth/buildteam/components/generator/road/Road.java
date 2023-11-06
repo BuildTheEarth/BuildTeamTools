@@ -1,6 +1,5 @@
 package net.buildtheearth.buildteam.components.generator.road;
 
-import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.components.generator.Generator;
@@ -25,9 +24,6 @@ public class Road extends GeneratorModule {
         if(Generator.checkForNoWorldEditSelection(p))
             return true;
 
-        if(Generator.checkForNoConvexSelection(p))
-            return true;
-
         if(getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
             getPlayerSettings().get(p.getUniqueId()).setBlocks(Generator.analyzeRegion(p, p.getWorld()));
 
@@ -41,11 +37,7 @@ public class Road extends GeneratorModule {
 
         Region region = Generator.getWorldEditSelection(p);
 
-        if(!(region instanceof ConvexPolyhedralRegion))
-            return;
-
-        ConvexPolyhedralRegion convexRegion = (ConvexPolyhedralRegion) region;
-
-        RoadScripts.roadScript_v_2_0(p, this, convexRegion);
+        if(region != null)
+            RoadScripts.roadScript_v_2_0(p, this, region);
     }
 }

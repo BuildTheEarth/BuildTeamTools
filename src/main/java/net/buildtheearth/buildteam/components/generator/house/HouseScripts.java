@@ -2,6 +2,7 @@ package net.buildtheearth.buildteam.components.generator.house;
 
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -45,6 +46,12 @@ public class HouseScripts {
         if(region instanceof Polygonal2DRegion){
             Polygonal2DRegion polyRegion = (Polygonal2DRegion) region;
             selectionPoints.addAll(polyRegion.getPoints());
+
+        } else if (region instanceof ConvexPolyhedralRegion) {
+            ConvexPolyhedralRegion convexRegion = (ConvexPolyhedralRegion) region;
+
+            for (Vector vector : convexRegion.getVertices())
+                selectionPoints.add(new BlockVector2D(vector.getBlockX(), vector.getBlockZ()));
 
         }else if(region instanceof CuboidRegion){
             CuboidRegion cuboidRegion = (CuboidRegion) region;

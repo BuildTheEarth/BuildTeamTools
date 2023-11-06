@@ -1,7 +1,11 @@
 package net.buildtheearth.buildteam.components.generator.rail;
 
+import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Polygonal2DRegion;
+import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.components.generator.*;
 import org.bukkit.block.Block;
@@ -12,7 +16,7 @@ import java.util.List;
 
 public class RailScripts {
 
-    public static void railScript_v_1_3(Player p, Rail rail, ConvexPolyhedralRegion region) {
+    public static void railScript_v_1_3(Player p, Rail rail, Region region) {
         List<String> commands = new ArrayList<>();
         //HashMap<Flag, String > flags = rail.getPlayerSettings().get(p.getUniqueId()).getValues();
 
@@ -25,7 +29,29 @@ public class RailScripts {
         int railWidth = 5;
 
         // Get the points of the region
-        List<Vector> points = new ArrayList<>(region.getVertices());
+        List<Vector> points = new ArrayList<>();
+
+        // Add all points of the region to the list no matter what type of region it is
+        if (region instanceof Polygonal2DRegion) {
+            Polygonal2DRegion polyRegion = (Polygonal2DRegion) region;
+
+            for (BlockVector2D blockVector2D : polyRegion.getPoints())
+                points.add(blockVector2D.toVector());
+
+        } else if (region instanceof ConvexPolyhedralRegion) {
+            ConvexPolyhedralRegion convexRegion = (ConvexPolyhedralRegion) region;
+            points.addAll(convexRegion.getVertices());
+
+        }else if (region instanceof CuboidRegion) {
+            CuboidRegion cuboidRegion = (CuboidRegion) region;
+
+            points.add(cuboidRegion.getPos1());
+            points.add(cuboidRegion.getPos2());
+        } else {
+            p.sendMessage("§c§lERROR: §cRegion type not supported!");
+            return;
+        }
+
         points = Generator.populatePoints(points, 5);
 
         // ----------- PREPARATION 01 ----------

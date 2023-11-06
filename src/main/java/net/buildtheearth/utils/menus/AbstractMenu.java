@@ -149,11 +149,9 @@ public abstract class AbstractMenu {
      */
     protected void setBackItem(int slot, AbstractMenu backMenu){
         getMenu().getSlot(slot).setItem(MenuItems.getBackItem());
-        getMenu().getSlot(slot).setClickHandler((clickPlayer, clickInformation) -> {
-            Bukkit.getScheduler().scheduleSyncDelayedTask(Main.instance, () -> {
-                clickPlayer.closeInventory();
-                backMenu.reloadMenuAsync();
-            });
-        });
+        getMenu().getSlot(slot).setClickHandler((clickPlayer, clickInformation) -> Bukkit.getScheduler().scheduleSyncDelayedTask(Main.instance, () -> {
+            clickPlayer.closeInventory();
+            backMenu.reloadMenuAsync();
+        }));
     }
 }

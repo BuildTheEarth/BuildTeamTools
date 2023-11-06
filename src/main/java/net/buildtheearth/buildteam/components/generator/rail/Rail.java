@@ -24,9 +24,6 @@ public class Rail extends GeneratorModule {
         if(Generator.checkForNoWorldEditSelection(p))
             return true;
 
-        if(Generator.checkForNoConvexSelection(p))
-            return true;
-
         if(getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
             getPlayerSettings().get(p.getUniqueId()).setBlocks(Generator.analyzeRegion(p, p.getWorld()));
 
@@ -40,12 +37,7 @@ public class Rail extends GeneratorModule {
 
         Region region = Generator.getWorldEditSelection(p);
 
-        if(!(region instanceof ConvexPolyhedralRegion))
-            return;
-
-        ConvexPolyhedralRegion convexRegion = (ConvexPolyhedralRegion) region;
-
-        RailScripts.railScript_v_1_3(p, this, convexRegion);
+        RailScripts.railScript_v_1_3(p, this, region);
 
         sendSuccessMessage(p);
     }

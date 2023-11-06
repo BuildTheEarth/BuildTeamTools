@@ -157,7 +157,7 @@ public class CropTypeMenu extends AbstractMenu {
             return;
 
         FieldSettings fieldSettings = (FieldSettings) settings;
-        fieldSettings.setValue(FieldFlag.CROP, crop.getIdentifier());
+        fieldSettings.setValue(FieldFlag.CROP_TYPE, crop.getIdentifier());
 
         p.closeInventory();
         p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);

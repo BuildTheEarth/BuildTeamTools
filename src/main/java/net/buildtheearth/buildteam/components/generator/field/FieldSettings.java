@@ -13,7 +13,7 @@ public class FieldSettings extends Settings {
     @Override
     public void setDefaultValues() {
         Crop crop = (Crop) Utils.pickRandom(Crop.values());
-        getValues().put(FieldFlag.CROP, crop.getIdentifier());
+        getValues().put(FieldFlag.CROP_TYPE, crop.getIdentifier());
 
         CropStage cropStage = CropStage.FALLBACK;
         if (crop.equals(Crop.POTATO)) {
@@ -26,7 +26,7 @@ public class FieldSettings extends Settings {
             cropStage = (CropStage) Utils.pickRandom(new CropStage[]{CropStage.DRY, CropStage.WET});
         }
 
-        getValues().put(FieldFlag.TYPE, cropStage.getIdentifier());
+        getValues().put(FieldFlag.CROP_STAGE, cropStage.getIdentifier());
         getValues().put(FieldFlag.FENCE, "188");
     }
 

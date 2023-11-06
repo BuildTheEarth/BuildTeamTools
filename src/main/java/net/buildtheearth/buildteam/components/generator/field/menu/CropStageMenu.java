@@ -39,7 +39,7 @@ public class CropStageMenu extends AbstractMenu {
     @Override
     protected void setPreviewItems() {
         Field field = Main.buildTeamTools.getGenerator().getField();
-        Crop crop = Crop.getByIdentifier(field.getPlayerSettings().get(getMenuPlayer().getUniqueId()).getValues().get(FieldFlag.CROP));
+        Crop crop = Crop.getByIdentifier(field.getPlayerSettings().get(getMenuPlayer().getUniqueId()).getValues().get(FieldFlag.CROP_TYPE));
 
         ItemStack itemOne = Item.create(Material.BARRIER);
         ItemStack itemTwo = Item.create(Material.BARRIER);
@@ -140,7 +140,7 @@ public class CropStageMenu extends AbstractMenu {
             return;
 
         FieldSettings fieldSettings = (FieldSettings) settings;
-        fieldSettings.setValue(FieldFlag.TYPE, cropStage.getIdentifier());
+        fieldSettings.setValue(FieldFlag.CROP_STAGE, cropStage.getIdentifier());
 
         p.closeInventory();
         p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);

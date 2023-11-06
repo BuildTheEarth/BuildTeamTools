@@ -1,31 +1,41 @@
 package net.buildtheearth.buildteam.components.generator.house;
 
 import net.buildtheearth.buildteam.components.generator.Flag;
+import net.buildtheearth.buildteam.components.generator.FlagType;
+
 public enum HouseFlag implements Flag {
-    WALL_COLOR("w"),            // String "123:24,21:3,3,..."
-    ROOF_COLOR("r"),            // String "123:24,21:3,3,..."
-    BASE_COLOR("b"),            // String "123:24,21:3,3,..."
-    WINDOW_COLOR("wd"),         // String "123:24,21:3,3,..."
+    WALL_COLOR("w", FlagType.BLOCKS),
+    ROOF_COLOR("r", FlagType.BLOCKS),
+    BASE_COLOR("b", FlagType.BLOCKS),
+    WINDOW_COLOR("wd", FlagType.BLOCKS),
 
-    ROOF_TYPE("rt"),            // RoofType
-    FLOOR_COUNT("fc"),          // Integer
-    FLOOR_HEIGHT("fh"),         // Integer
-    BASE_HEIGHT("bh"),          // Integer
+    ROOF_TYPE("rt", FlagType.ENUM),
+    FLOOR_COUNT("fc", FlagType.NUMBER),
+    FLOOR_HEIGHT("fh", FlagType.NUMBER),
+    BASE_HEIGHT("bh", FlagType.NUMBER),
 
-    WINDOW_HEIGHT("wdh"),       // Integer
-    WINDOW_WIDTH("wdw"),        // Integer
-    WINDOW_DISTANCE("wdd"),     // Integer
+    WINDOW_HEIGHT("wdh", FlagType.NUMBER),
+    WINDOW_WIDTH("wdw", FlagType.NUMBER),
+    WINDOW_DISTANCE("wdd", FlagType.NUMBER),
 
-    MAX_ROOF_HEIGHT("mrh");     // Integer
+    MAX_ROOF_HEIGHT("mrh", FlagType.NUMBER);
 
     private final String flag;
+    private final FlagType flagType;
 
-    HouseFlag(String flag){
+    HouseFlag(String flag, FlagType flagType){
         this.flag = flag;
+        this.flagType = flagType;
     }
 
+    @Override
     public String getFlag() {
         return flag;
+    }
+
+    @Override
+    public FlagType getFlagType() {
+        return flagType;
     }
 
     public static HouseFlag byString(String flag){

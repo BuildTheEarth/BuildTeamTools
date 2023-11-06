@@ -1,18 +1,27 @@
 package net.buildtheearth.buildteam.components.generator.rail;
 
 import net.buildtheearth.buildteam.components.generator.Flag;
+import net.buildtheearth.buildteam.components.generator.FlagType;
 
 public enum RailFlag implements Flag {
-    LANE_COUNT("c");
+    LANE_COUNT("c", FlagType.NUMBER);
 
     private final String flag;
+    private final FlagType flagType;
 
-    RailFlag(String flag){
+    RailFlag(String flag, FlagType flagType){
         this.flag = flag;
+        this.flagType = flagType;
     }
 
+    @Override
     public String getFlag() {
         return flag;
+    }
+
+    @Override
+    public FlagType getFlagType() {
+        return null;
     }
 
     public static RailFlag byString(String flag){

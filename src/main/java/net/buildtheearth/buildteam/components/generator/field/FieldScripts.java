@@ -23,8 +23,8 @@ public class FieldScripts {
         HashMap<Flag, String> flags = field.getPlayerSettings().get(p.getUniqueId()).getValues();
 
         // Settings
-        Crop crop = Crop.getByIdentifier(flags.get(FieldFlag.CROP));
-        CropStage type = CropStage.getByIdentifier(flags.get(FieldFlag.TYPE));
+        Crop crop = Crop.getByIdentifier(flags.get(FieldFlag.CROP_TYPE));
+        CropStage type = CropStage.getByIdentifier(flags.get(FieldFlag.CROP_STAGE));
         String fence = flags.get(FieldFlag.FENCE);
 
         // Information for later restoring original selection

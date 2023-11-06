@@ -10,6 +10,8 @@ public interface Flag {
 
     String getFlag();
 
+    FlagType getFlagType();
+
     /** @return the flag by the given string and generator type */
     static Flag byString(GeneratorType generatorType, String flag) {
         switch (generatorType) {

@@ -32,7 +32,7 @@ public class Road extends GeneratorModule {
 
     @Override
     public void generate(Player p){
-        if(Main.getBuildTeam().getGenerator().getRoad().checkForNoPlayer(p))
+        if(checkForNoPlayer(p))
             return;
 
         Region region = Generator.getWorldEditSelection(p);

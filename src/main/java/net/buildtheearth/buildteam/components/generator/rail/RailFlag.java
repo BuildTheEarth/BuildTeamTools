@@ -4,7 +4,7 @@ import net.buildtheearth.buildteam.components.generator.Flag;
 import net.buildtheearth.buildteam.components.generator.FlagType;
 
 public enum RailFlag implements Flag {
-    LANE_COUNT("c", FlagType.NUMBER);
+    LANE_COUNT("c", FlagType.INTEGER);
 
     private final String flag;
     private final FlagType flagType;

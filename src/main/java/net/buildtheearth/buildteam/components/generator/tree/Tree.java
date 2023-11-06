@@ -33,7 +33,7 @@ public class Tree extends GeneratorModule {
 
     @Override
     public void generate(Player p) {
-        if(Main.getBuildTeam().getGenerator().getRoad().checkForNoPlayer(p))
+        if(checkForNoPlayer(p))
             return;
 
         TreeScripts.treescript_v_1_0(p, this);

@@ -32,7 +32,7 @@ public class Rail extends GeneratorModule {
 
     @Override
     public void generate(Player p){
-        if(Main.getBuildTeam().getGenerator().getRail().checkForNoPlayer(p))
+        if(checkForNoPlayer(p))
             return;
 
         Region region = Generator.getWorldEditSelection(p);

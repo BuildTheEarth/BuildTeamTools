@@ -10,15 +10,15 @@ public enum HouseFlag implements Flag {
     WINDOW_COLOR("wd", FlagType.BLOCKS),
 
     ROOF_TYPE("rt", FlagType.ENUM),
-    FLOOR_COUNT("fc", FlagType.NUMBER),
-    FLOOR_HEIGHT("fh", FlagType.NUMBER),
-    BASE_HEIGHT("bh", FlagType.NUMBER),
+    FLOOR_COUNT("fc", FlagType.INTEGER),
+    FLOOR_HEIGHT("fh", FlagType.INTEGER),
+    BASE_HEIGHT("bh", FlagType.INTEGER),
 
-    WINDOW_HEIGHT("wdh", FlagType.NUMBER),
-    WINDOW_WIDTH("wdw", FlagType.NUMBER),
-    WINDOW_DISTANCE("wdd", FlagType.NUMBER),
+    WINDOW_HEIGHT("wdh", FlagType.INTEGER),
+    WINDOW_WIDTH("wdw", FlagType.INTEGER),
+    WINDOW_DISTANCE("wdd", FlagType.INTEGER),
 
-    MAX_ROOF_HEIGHT("mrh", FlagType.NUMBER);
+    MAX_ROOF_HEIGHT("mrh", FlagType.INTEGER);
 
     private final String flag;
     private final FlagType flagType;

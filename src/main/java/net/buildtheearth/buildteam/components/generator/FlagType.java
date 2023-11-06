@@ -4,7 +4,9 @@ public enum FlagType {
 
     ENUM,
     STRING,
-    NUMBER,
+    INTEGER,
+    DOUBLE,
+    FLOAT,
     BOOLEAN,
     BLOCKS;
 

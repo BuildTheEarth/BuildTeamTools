@@ -30,7 +30,8 @@ public class Field extends GeneratorModule {
 
     @Override
     public void generate(Player p) {
-        if (checkForNoPlayer(p)) return;
+        if (checkForNoPlayer(p))
+            return;
 
         Region region = Generator.getWorldEditSelection(p);
 

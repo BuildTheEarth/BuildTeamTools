@@ -402,7 +402,13 @@ public class RoadScripts {
         operations++;
 
         commands.add("//gmask");
-        Generator.createConvexSelection(commands, points);
+
+        // Depending on the selection type, the selection needs to be restored correctly
+        if(region instanceof Polygonal2DRegion || region instanceof ConvexPolyhedralRegion)
+            Generator.createConvexSelection(commands, points);
+        else if(region instanceof CuboidRegion)
+            Generator.createCuboidSelection(commands, ((CuboidRegion) region).getPos1(), ((CuboidRegion) region).getPos2());
+
 
         Main.buildTeamTools.getGenerator().getCommands().add(new Command(p, road, commands, operations, regionBlocks));
         Generator.getPlayerHistory(p).addHistoryEntry(new History.HistoryEntry(GeneratorType.ROAD, operations));

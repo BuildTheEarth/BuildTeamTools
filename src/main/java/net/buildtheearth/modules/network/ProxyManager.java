@@ -12,6 +12,8 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public class ProxyManager {
 
@@ -91,8 +93,7 @@ public class ProxyManager {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("ServerPing");
         out.writeUTF("requesting");
-        Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
-        player.sendPluginMessage(Main.instance, "BuildTeam", out.toByteArray());
+        Bukkit.getServer().sendPluginMessage(Main.instance, "BuildTeam", out.toByteArray());
     }
 
     public void handleServerPing(ByteArrayDataInput in) {
@@ -113,11 +114,18 @@ public class ProxyManager {
 
     /**
      * Get a list of all the countries of all servers that are currently connected to the network
-     * @return A list off all active countries
+     * @return A list off all active countries or null if an exception occurs
      */
     public List<String> getActiveCountries() {
        sendServerPing();
-       return NetworkAPI.getCountriesByActiveServers();
+        try {
+            return NetworkAPI.getCountriesByActiveServers().get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 
@@ -131,9 +139,13 @@ public class ProxyManager {
         this.buildTeamID = buildTeamID;
     }
 
-    public String getServerName() {
-        if(serverName != null) return serverName;
-        return NetworkAPI.getCurrentServerName();
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
+    public CompletableFuture<String> getServerNameAsync() {
+        if(serverName != null) return CompletableFuture.completedFuture(serverName);
+        return NetworkAPI.getCurrentServerNameAsync();
     }
 
     public String getServerID() {
@@ -154,6 +166,10 @@ public class ProxyManager {
 
     public void setConnected(boolean connected) {
         isConnected = connected;
-        if(serverName == null) serverName = NetworkAPI.getCurrentServerName();
+        if(serverName == null) NetworkAPI.getCurrentServerNameAsync().thenAccept(newServerName -> serverName = newServerName);
+    }
+
+    public List<String> getActiveServers() {
+        return activeServers;
     }
 }

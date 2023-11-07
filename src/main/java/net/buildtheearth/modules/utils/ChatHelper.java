@@ -1,11 +1,21 @@
 package net.buildtheearth.modules.utils;
 
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
+import java.util.logging.Level;
 
 public class ChatHelper {
+
+    public static void logError(String errorMessage, Object... objects) {
+        Bukkit.getLogger().log(Level.INFO, ChatHelper.highlight(errorMessage, objects));
+    }
+
+    public static void logDebug(String errorMessage, Object... objects) {
+        Bukkit.getLogger().log(Level.INFO, ChatHelper.standard(errorMessage, objects));
+    }
 
     public static String successful(String string, Object... objects) {
         return ChatColor.DARK_GREEN + String.format(string.replaceAll("%s", ChatColor.GREEN + "%s" + ChatColor.DARK_GREEN), objects);

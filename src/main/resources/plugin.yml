@@ -27,3 +27,6 @@ commands:
     usage: /warp <subcommand>
     aliases:
       - warps
+  temporary:
+    description: Temporary test command.
+    usage: /temporary

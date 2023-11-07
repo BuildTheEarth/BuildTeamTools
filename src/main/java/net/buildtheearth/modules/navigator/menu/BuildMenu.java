@@ -116,7 +116,7 @@ public class BuildMenu extends AbstractMenu {
             MenuItem plotSystem = new MenuItem(iSlotsToBeUsed[iItem], plotsItem, player ->
             {
                 //Connects the player to the plot server
-                Main.getBuildTeamTools().getProxyManager().switchServer(player, ProxyManager.PLOT_SERVER_NAME);
+                // Main.getBuildTeamTools().getProxyManager().switchServer(player, ProxyManager.PLOT_SERVER_NAME);
             });
             menuItems.add(plotSystem);
 

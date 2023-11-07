@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class WarpMainMenu extends AbstractPaginatedMenu {
@@ -51,7 +52,7 @@ public class WarpMainMenu extends AbstractPaginatedMenu {
 
     @Override
     protected List<?> getSource() {
-        return Main.getBuildTeamTools().getProxyManager().getActiveCountries();
+        return Arrays.asList(Main.getBuildTeamTools().getProxyManager().getActiveCountries());
     }
 
     @Override

@@ -47,10 +47,10 @@ public class BuildTeamTools {
     private Generator generator;
 
 
-    private final TpllManager tpllManager = new TpllManager();
-    private final WarpManager warpManager = new WarpManager();
-    private final ProxyManager proxyManager = new ProxyManager();
-    private final StatsManager statsManager = new StatsManager();
+    private TpllManager tpllManager;
+    private WarpManager warpManager;
+    private ProxyManager proxyManager;
+    private StatsManager statsManager;
 
     /**
      * Tries to start up an instance of BuildTeamTools
@@ -78,6 +78,11 @@ public class BuildTeamTools {
 
         //Starts the generator module
         generator = new Generator();
+
+        tpllManager = new TpllManager();
+        warpManager = new WarpManager();
+        proxyManager = new ProxyManager();
+        statsManager = new StatsManager();
 
         // Register all commands & listeners
         registerCommands();
@@ -154,6 +159,7 @@ public class BuildTeamTools {
         Main.instance.getCommand("generate").setExecutor(new GeneratorCommand());
         Main.instance.getCommand("warp").setExecutor(new WarpCommand());
         Main.instance.getCommand("navigator").setExecutor(new NavigatorCommand());
+        Main.instance.getCommand("temporary").setExecutor(new TestCommand());
     }
 
     /**

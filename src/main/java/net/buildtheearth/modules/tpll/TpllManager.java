@@ -32,7 +32,7 @@ public class TpllManager {
     public static void addTpllToQueue(ByteArrayDataInput in, Player player) {
         //Check the target server
         String targetServerName = in.readUTF();
-        if (targetServerName.equals(Main.buildTeamTools.getProxyManager().getServerName())) {
+        if (targetServerName.equals(Main.buildTeamTools.getProxyManager().getServerNameAsync())) {
             //Extracts the coordinates from the plugin message
             double targetLatitude = Double.parseDouble(in.readUTF());
             double targetLongitude = Double.parseDouble(in.readUTF());

@@ -59,7 +59,7 @@ public class WarpCommand implements CommandExecutor {
             double[] coordinates = projection.toGeo(location.getX(), location.getY());
 
             //Get the country, region & city belonging to the coordinates.
-            String[] locationInfo = OpenStreetMapAPI.getCountryAndSubRegionsFromLocation(coordinates);
+            String[] locationInfo = new String[]{"Russia", "EAJJTJ", "Moscow"}; // OpenStreetMapAPI.getCountryAndSubRegionsFromLocationAsync(coordinates);
             if (locationInfo == null) {
                 player.sendMessage(ChatHelper.highlight("Failed to get the location of this warp."));
                 return true;

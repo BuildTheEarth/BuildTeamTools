@@ -1,7 +1,7 @@
 package net.buildtheearth.buildteam.components.generator.tree;
 
-import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.components.generator.Generator;
+import net.buildtheearth.buildteam.components.generator.GeneratorCollections;
 import net.buildtheearth.buildteam.components.generator.GeneratorModule;
 import net.buildtheearth.buildteam.components.generator.GeneratorType;
 import org.bukkit.entity.Player;
@@ -19,7 +19,7 @@ public class Tree extends GeneratorModule {
         if(Generator.checkIfWorldEditIsNotInstalled(p))
             return true;
 
-        if(!Generator.checkIfGeneratorCollectionsIsInstalled(p))
+        if(!GeneratorCollections.checkIfGeneratorCollectionsIsInstalled(p))
             return true;
 
         if(!Generator.checkIfSchematicBrushIsInstalled(p))

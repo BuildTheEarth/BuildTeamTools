@@ -119,9 +119,9 @@ public class GeneratorMenu extends AbstractMenu {
 
             // Set navigator item
             getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
-        }else if(!Generator.checkIfGeneratorCollectionsIsInstalled(getMenuPlayer())){
+        }else if(GeneratorCollections.checkIfGeneratorCollectionsIsInstalled(getMenuPlayer())){
             // TREE ITEM
-            ArrayList<String> treeLore = Liste.createList("", "§cThe §eGenerator Collections v" + Generator.GENERATOR_COLLECTIONS_VERSION + " §c package is not installed", "§cTree Generator is disabled", "", "§8Left-click for Installation Instructions");
+            ArrayList<String> treeLore = Liste.createList("", "§cThe §eGenerator Collections v" + GeneratorCollections.GENERATOR_COLLECTIONS_VERSION + " §c package is not installed", "§cTree Generator is disabled", "", "§8Left-click for Installation Instructions");
 
             ItemStack treeItem = Item.create(Material.SAPLING, "§aGenerate Tree & Forest §c(DISABLED)", treeLore);
 

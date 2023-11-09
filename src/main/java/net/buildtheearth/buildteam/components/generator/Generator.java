@@ -10,55 +10,32 @@ import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.bukkit.BukkitWorld;
-import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
-import jdk.jfr.internal.LogLevel;
 import lombok.Getter;
-import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.BuildTeamTools;
 import net.buildtheearth.buildteam.components.generator.field.Field;
 import net.buildtheearth.buildteam.components.generator.house.House;
 import net.buildtheearth.buildteam.components.generator.rail.Rail;
 import net.buildtheearth.buildteam.components.generator.road.Road;
 import net.buildtheearth.buildteam.components.generator.tree.Tree;
-import net.buildtheearth.buildteam.components.updater.Updater;
 import net.buildtheearth.utils.Item;
-import net.buildtheearth.utils.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
-import javax.annotation.Nullable;
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 public class Generator {
 
     public static final String WIKI_PAGE = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Generator";
     public static final String INSTALL_WIKI = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Installation";
-
-    public static String GENERATOR_COLLECTIONS_VERSION;
 
     public static final Material[] IGNORED_MATERIALS = {Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL, Material.SNOW};
 
@@ -68,6 +45,7 @@ public class Generator {
 
     @Getter
     private final List<Command> commands = new ArrayList<>();
+
 
     @Getter
     private final House house;
@@ -88,14 +66,14 @@ public class Generator {
         tree = new Tree();
         field = new Field();
 
-        GENERATOR_COLLECTIONS_VERSION = getRepositoryReleaseVersionString("BuildTheEarth", "GeneratorCollections");
+        GeneratorCollections.GENERATOR_COLLECTIONS_VERSION = GeneratorCollections.getRepositoryReleaseVersionString("BuildTheEarth", "GeneratorCollections");
 
         // In case the version could not be retrieved, set it to 3.0 as a fallback
-        if(GENERATOR_COLLECTIONS_VERSION == null)
-            GENERATOR_COLLECTIONS_VERSION = "3.0";
+        if(GeneratorCollections.GENERATOR_COLLECTIONS_VERSION == null)
+            GeneratorCollections.GENERATOR_COLLECTIONS_VERSION = "3.0";
 
         // Check if the GeneratorCollections plugin is installed and up to date
-        checkIfGeneratorCollectionsIsInstalled(null);
+        GeneratorCollections.checkIfGeneratorCollectionsIsInstalled(null);
 
         // Set the maximum history size to 5000 to allow for more history entries
         LocalSession.MAX_HISTORY_SIZE = 5000;
@@ -779,128 +757,6 @@ public class Generator {
         return true;
     }
 
-    /**
-     * Checks if the GeneratorCollections is installed and sends the player a message if it isn't.
-     *
-     * @param p The player to check for. If null, the console will be used instead.
-     * @return Whether the Generator Collections package is installed
-     */
-    public static boolean checkIfGeneratorCollectionsIsInstalled(@Nullable Player p){
-        // Load the schematic file
-        try {
-            String filepath = "GeneratorCollections/treepack/oak41.schematic";
-            File myFile = new File(Main.instance.getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/" + filepath);
-
-            if(!myFile.exists()) {
-               return installGeneratorCollections(p, false);
-            }
-
-            ClipboardFormat format = ClipboardFormat.findByFile(myFile);
-
-            ClipboardReader reader = null;
-            if (format != null)
-                reader = format.getReader(Files.newInputStream(myFile.toPath()));
-
-            BukkitWorld bukkitWorld = new BukkitWorld(p.getWorld());
-
-            Clipboard clipboard = null;
-            if (reader != null)
-                clipboard = reader.read(bukkitWorld.getWorldData());
-
-
-            if(clipboard == null) {
-                return installGeneratorCollections(p, false);
-            }else
-                return checkIfGeneratorCollectionsIsUpToDate(p);
-
-        } catch (Exception e) {
-            return installGeneratorCollections(p, true);
-        }
-    }
-
-    /**
-     * Checks if the GeneratorCollections is up-to-date and sends the player a message if it isn't.
-     *
-     * @param p The player to check for
-     * @return Whether the Generator Collections package is up-to-date or not
-     */
-    public static boolean checkIfGeneratorCollectionsIsUpToDate(Player p){
-        // Load the schematic file
-        try {
-            String filepath = "GeneratorCollections/";
-
-            FileConfiguration cfg = YamlConfiguration.loadConfiguration(new File(Main.instance.getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/" + filepath, "config.yml"));
-
-            if(!cfg.contains("version"))
-                return installGeneratorCollections(p, true);
-
-            String oldVersion = cfg.getString("version");
-
-            if(!Updater.shouldUpdate(GENERATOR_COLLECTIONS_VERSION, oldVersion))
-                return true;
-            else
-                return installGeneratorCollections(p, true);
-
-        } catch (Exception e) {
-            return installGeneratorCollections(p, true);
-        }
-    }
-
-    /**
-     * Sends the player and console a message with more information about the generator collections package in case it isn't installed.
-     *
-     * @see #checkIfGeneratorCollectionsIsInstalled(Player)
-     *
-     * @param p The player to send the message to
-     */
-    public static void sendGeneratorCollectionsError(@Nullable Player p){
-        Utils.sendToPlayerAndConsole(p, "§cAn error occurred while installing the Generator Collections.", Level.INFO);
-        Utils.sendToPlayerAndConsole(p, "§cPlease install the Generator Collections v" + GENERATOR_COLLECTIONS_VERSION + " to use this tool. You can ask the server administrator to install it.", Level.INFO);
-        Utils.sendToPlayerAndConsole(p, " ", Level.INFO);
-        Utils.sendToPlayerAndConsole(p, "§cFor more installation help, please see the wiki:", Level.INFO);
-        Utils.sendToPlayerAndConsole(p, "§c" + INSTALL_WIKI, Level.INFO);
-    }
-
-
-    /** Installs or updates the Generator Collections on the system by downloading it from the buildtheearth cdn and extracting it.
-     *
-     * @param p The player to send the error message to in case the installation fails
-     * @param update Whether the Generator Collections package is already installed or should just be updated
-     * @return Whether the installation was successful
-     */
-    public static boolean installGeneratorCollections(@Nullable Player p, boolean update){
-        String parentURL = "https://github.com/BuildTheEarth/GeneratorCollections/releases/latest/download/";
-        String filename = "GeneratorCollections.zip";
-        String fileDirectory = "GeneratorCollections/";
-        String path = "/../WorldEdit/schematics/";
-
-        if(update) {
-            Utils.sendToPlayerAndConsole(p, "§cThe Generator Collections package is outdated. Updating...", Level.INFO);
-
-            deleteDirectory(Main.instance.getDataFolder().getAbsolutePath() + path + fileDirectory);
-        } else
-            Utils.sendToPlayerAndConsole(p, "§cThe Generator Collections package wasn't found on your server. Installing...", Level.INFO);
-
-
-
-        try {
-            boolean success = installZipFolder(parentURL, filename, path);
-
-            if(success) {
-                Utils.sendToPlayerAndConsole(p, "§7Successfully installed §eGenerator Collections v" + GENERATOR_COLLECTIONS_VERSION + "§7!", Level.INFO);
-
-                return true;
-            }else {
-                sendGeneratorCollectionsError(p);
-                return false;
-            }
-
-        } catch (IOException e) {
-            sendGeneratorCollectionsError(p);
-            return false;
-        }
-    }
-
 
     /**
      * Checks if the player has a WorldEdit selection and sends them a message if they don't.
@@ -1003,179 +859,4 @@ public class Generator {
         return true;
     }
 
-    /** Installs and extracts a zip folder on the system
-     *
-     * @param filename The name of the zip folder to install. Example: "newtrees.zip"
-     * @param path The path to extract the zip folder to. Parent Folder is the plugin folder. Example: "/../WorldEdit/schematics/"
-     */
-    public static boolean installZipFolder(String parentURL, String filename, String path) throws IOException {
-        path = Main.instance.getDataFolder().getAbsolutePath() + path;
-        String zipFilePath = path + "/" + filename;
-        URL url = new URL(parentURL + filename);
-
-        File file = new File(path);
-        if(!file.exists())
-            file.mkdir();
-
-        // Open a connection to the URL
-        HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
-        httpConn.setRequestProperty("User-Agent", "Mozilla/5.0");
-        int responseCode = httpConn.getResponseCode();
-
-
-        // Check HTTP response code, 200 means OK
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-
-            // Save the zip file to the path
-            try (BufferedInputStream in = new BufferedInputStream(httpConn.getInputStream());
-                FileOutputStream out = new FileOutputStream(path + "/" + filename)) {
-
-                byte[] buffer = new byte[4096];
-                int bytesRead;
-                while ((bytesRead = in.read(buffer)) != -1) {
-                    out.write(buffer, 0, bytesRead);
-                }
-            }catch (Exception e){
-                e.printStackTrace();
-                return false;
-            }
-        } else {
-            return false;
-        }
-        httpConn.disconnect();
-
-        // Extract the zip file
-        return unzip(zipFilePath, path);
-    }
-
-    /** Extracts a zip folder on the system
-     *
-     * @param zipFilePath The path to the zip folder. Example: "/../WorldEdit/schematics/newtrees.zip"
-     * @param destDirectory The path to extract the zip folder to. Parent Folder is the plugin folder. Example: "/../WorldEdit/schematics/"
-     */
-    public static boolean unzip(String zipFilePath, String destDirectory) {
-        File destDir = new File(destDirectory);
-        if (!destDir.exists()) {
-            boolean success = destDir.mkdir();
-            if(!success)
-                return false;
-        }
-
-        try (ZipInputStream zipIn = new ZipInputStream(Files.newInputStream(Paths.get(zipFilePath)))) {
-            ZipEntry entry = zipIn.getNextEntry();
-
-            while (entry != null) {
-                String filePath = destDirectory + File.separator + entry.getName();
-
-                if (!entry.isDirectory()) {
-                    File file = new File(filePath);
-                    File parentDir = file.getParentFile();
-                    if (!parentDir.exists()) {
-                        if (!parentDir.mkdirs()) {
-                            throw new IOException("Failed to create parent directories for: " + filePath);
-                        }
-                    }
-
-                    try (BufferedOutputStream bos = new BufferedOutputStream(Files.newOutputStream(Paths.get(filePath)))) {
-                        byte[] bytesIn = new byte[4096];
-                        int read;
-                        while ((read = zipIn.read(bytesIn)) != -1) {
-                            bos.write(bytesIn, 0, read);
-                        }
-                    }
-                } else {
-                    File dir = new File(filePath);
-                    boolean success = dir.mkdirs();
-
-                    if(!success)
-                        return false;
-                }
-                zipIn.closeEntry();
-                entry = zipIn.getNextEntry();
-            }
-
-            // Delete the old zip file
-            deleteFile(zipFilePath);
-        }catch (Exception e){
-            e.printStackTrace();
-            return false;
-        }
-
-        return true;
-    }
-
-    /** Deletes a directory from the system
-     *
-     * @param path The path to the directory to delete
-     * @return Whether the directory was deleted successfully
-     */
-    public static boolean deleteDirectory(String path) {
-        File dir = new File(path);
-
-        if (dir.isDirectory()) {
-            String[] children = dir.list();
-
-            if (children != null)
-                for (String child : children) {
-                    boolean success = deleteDirectory(new File(dir, child).getAbsolutePath());
-                    if (!success) {
-                        return false; // Return false if deletion is unsuccessful
-                    }
-                }
-        }
-        return dir.delete(); // Return true if directory is deleted successfully
-    }
-
-    /**
-     * Deletes a file from the system
-     *
-     * @param path The path to the file to delete
-     */
-    public static void deleteFile(String path) {
-        File file = new File(path);
-        boolean success = file.delete();
-        if(!success)
-            System.out.println("Failed to delete file: " + path);
-    }
-
-    /** Returns the latest release version of a repository on GitHub
-     *
-     * @param owner The owner of the repository
-     * @param repo The name of the repository
-     * @return The latest release version of the repository
-     */
-    public static String getRepositoryReleaseVersionString(String owner, String repo){
-        try {
-            String url = "https://api.github.com/repos/" + owner + "/" + repo + "/releases";
-
-            HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
-            con.setRequestProperty("User-Agent", "Mozilla/5.0");
-            con.setRequestMethod("GET");
-
-            int responseCode = con.getResponseCode();
-
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                String inputLine;
-                StringBuilder response = new StringBuilder();
-
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-                in.close();
-
-                JSONArray releases = new JSONArray(response.toString());
-                if (releases.length() > 0) {
-                    JSONObject latestRelease = releases.getJSONObject(0); // The first object in the array is the latest release
-
-                    return latestRelease.getString("tag_name").replace("v", "");
-                } else
-                    return null;
-            } else
-                return null;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 }

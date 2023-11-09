@@ -1,12 +1,17 @@
 package net.buildtheearth.utils;
 
 import java.util.List;
+import java.util.logging.Level;
 
+import jdk.jfr.internal.LogLevel;
+import net.buildtheearth.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import javax.annotation.Nullable;
 
 public class Utils {
 	public static String getBlockID(ItemStack item){
@@ -25,16 +30,6 @@ public class Utils {
 				return true;
 		
 		return false;
-	}
-	
-	public static int getHighestY(World world, int x, int z) {
-	    int y = 255;
-	    while(world.getBlockAt(x, y, z).getType() == Material.AIR || world.getBlockAt(x, y, z).getType() == Material.AIR) {
-	    	y--; 
-	    	if(y == 0)
-	    		return 0;
-	    }
-	    return y;
 	}
 
 	public static int[] range(int start, int stop)
@@ -123,5 +118,18 @@ public class Utils {
 		}
 
 		return s;
+	}
+
+	/** Sends the given message to the given player and the console
+	 *
+	 * @param p player to send the message to. If null, the message will only be sent to the console
+	 * @param message message to send
+	 * @param logLevel log level to use for the console
+	 */
+	public static void sendToPlayerAndConsole(@Nullable Player p, String message, Level logLevel){
+		if(p != null)
+			p.sendMessage(message);
+
+		Main.instance.getLogger().log(logLevel, message);
 	}
 }

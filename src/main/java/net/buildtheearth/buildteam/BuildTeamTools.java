@@ -51,8 +51,6 @@ public class BuildTeamTools {
 
 		bteNetwork = new BTENetwork();
 		generator = new Generator();
-
-		LocalSession.MAX_HISTORY_SIZE = 500;
 	}
 
 	public void stop(){

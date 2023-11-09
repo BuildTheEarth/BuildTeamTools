@@ -9,6 +9,7 @@ import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.components.generator.*;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -35,7 +36,7 @@ public class RoadScripts {
         int sidewalkWidth = Integer.parseInt(flags.get(RoadFlag.SIDEWALK_WIDTH));
         int streetLampDistance = Integer.parseInt(flags.get(RoadFlag.STREET_LAMP_DISTANCE));
 
-        boolean crosswalk = flags.get(RoadFlag.CROSSWALK).equals(RoadSettings.ENABLED);
+        boolean isCrosswalk = flags.get(RoadFlag.CROSSWALK).equals(RoadSettings.ENABLED);
 
 
         int operations = 0;
@@ -43,6 +44,9 @@ public class RoadScripts {
 
         // Is there a sidewalk?
         boolean isSidewalk = sidewalkWidth > 1;
+
+        // Are there street lamps?
+        boolean isStreetLamp = streetLampType != null && !streetLampType.equals(RoadSettings.DISABLED);
 
         // Calculate current width from centre of road
         int road_width = laneWidth*laneCount;
@@ -80,6 +84,10 @@ public class RoadScripts {
 
         List<Vector> roadMarkingPoints = new ArrayList<>(oneMeterPoints);
         roadMarkingPoints = Generator.reducePoints(roadMarkingPoints, markingGap + 1, markingLength - 1);
+
+        List<Vector> streetLampPointsMid = new ArrayList<>(oneMeterPoints);
+        streetLampPointsMid = Generator.reducePoints(streetLampPointsMid, streetLampDistance + 1, streetLampDistance + 1);
+        List<List<Vector>> streetLampPoints = Generator.shiftPointsAll(streetLampPointsMid, road_width + sidewalkWidth*2);
 
 
         // ----------- PREPARATION 01 ----------
@@ -177,7 +185,7 @@ public class RoadScripts {
                 operations += Generator.createPolyLine(commands, path, "35:3", true, regionBlocks, 0);
             commands.add("//gmask");
 
-            if(crosswalk){
+            if(isCrosswalk){
                 // Draw the sidewalk middle lines
                 commands.add("//gmask " + roadMaterial + "," + markingMaterial);
                 for(List<Vector> path : sidewalkPointsMid)
@@ -193,6 +201,8 @@ public class RoadScripts {
                 commands.add("//gmask");
             }
         }
+
+
 
 
         // ----------- OLD ROAD REPLACEMENTS ----------
@@ -310,7 +320,7 @@ public class RoadScripts {
         // ----------- CROSSWALK ----------
         // Draw the crosswalk
 
-        if(crosswalk){
+        if(isCrosswalk){
             commands.add("//gmask =queryRel(1,0,0,35,3)||queryRel(-1,0,0,35,3)||queryRel(0,0,1,35,3)||queryRel(0,0,-1,35,3)");
             commands.add("//replace 35:6 35:9");
             operations++;
@@ -404,6 +414,22 @@ public class RoadScripts {
         operations++;
 
         commands.add("//gmask");
+
+
+
+        // ----------- STREET LAMPS ----------
+        // Draw the street lamps
+
+        if(isStreetLamp){
+            for(List<Vector> path : streetLampPoints)
+                for(Vector point : path) {
+                    Location loc = new Location(p.getWorld(), point.getBlockX(), point.getBlockY(), point.getBlockZ());
+                    commands.add(Generator.getPasteSchematicString("GeneratorCollections/roadpack/streetlamp" + streetLampType + ".schematic", loc));
+                    operations++;
+                }
+        }
+
+
 
         // Depending on the selection type, the selection needs to be restored correctly
         if(region instanceof Polygonal2DRegion || region instanceof ConvexPolyhedralRegion)

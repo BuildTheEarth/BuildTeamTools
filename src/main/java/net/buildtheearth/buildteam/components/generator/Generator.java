@@ -7,6 +7,7 @@ import clipper2.core.Point64;
 import clipper2.offset.EndType;
 import clipper2.offset.JoinType;
 import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
@@ -16,6 +17,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
+import jdk.jfr.internal.LogLevel;
 import lombok.Getter;
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.BuildTeamTools;
@@ -26,7 +28,9 @@ import net.buildtheearth.buildteam.components.generator.road.Road;
 import net.buildtheearth.buildteam.components.generator.tree.Tree;
 import net.buildtheearth.buildteam.components.updater.Updater;
 import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.Utils;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -38,12 +42,14 @@ import org.bukkit.inventory.ItemStack;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import javax.annotation.Nullable;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -87,6 +93,12 @@ public class Generator {
         // In case the version could not be retrieved, set it to 3.0 as a fallback
         if(GENERATOR_COLLECTIONS_VERSION == null)
             GENERATOR_COLLECTIONS_VERSION = "3.0";
+
+        // Check if the GeneratorCollections plugin is installed and up to date
+        checkIfGeneratorCollectionsIsInstalled(null);
+
+        // Set the maximum history size to 5000 to allow for more history entries
+        LocalSession.MAX_HISTORY_SIZE = 5000;
     }
 
     /** Processes the command queues one after another and lets the waiting players know their position in the queue and the percentage of the current generation.
@@ -426,6 +438,16 @@ public class Generator {
         return result;
     }
 
+    /** Returns a temporary XYZ String that is used to paste a schematic at a later point at those coordinates with the WorldEdit API
+     *
+     * @param pathToSchematic The path to the schematic file
+     * @param location The location where the schematic should be pasted
+     * @return The temporary XYZ String
+     */
+    public static String getPasteSchematicString(String pathToSchematic, Location location){
+        return "%%SCHEMATIC/" + pathToSchematic + "," + location.getWorld().getName() + "," + location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ() + "/%%";
+    }
+
     /**
      * Returns a temporary XYZ String that indicates that the height of the point should be inspected later to match the surface of the terrain.
      *
@@ -760,10 +782,10 @@ public class Generator {
     /**
      * Checks if the GeneratorCollections is installed and sends the player a message if it isn't.
      *
-     * @param p The player to check for
+     * @param p The player to check for. If null, the console will be used instead.
      * @return Whether the Generator Collections package is installed
      */
-    public static boolean checkIfGeneratorCollectionsIsInstalled(Player p){
+    public static boolean checkIfGeneratorCollectionsIsInstalled(@Nullable Player p){
         // Load the schematic file
         try {
             String filepath = "GeneratorCollections/treepack/oak41.schematic";
@@ -825,18 +847,18 @@ public class Generator {
     }
 
     /**
-     * Sends the player a message with more information about the generator collections package in case it isn't installed.
+     * Sends the player and console a message with more information about the generator collections package in case it isn't installed.
      *
      * @see #checkIfGeneratorCollectionsIsInstalled(Player)
      *
      * @param p The player to send the message to
      */
-    public static void sendGeneratorCollectionsError(Player p){
-        p.sendMessage("§cAn error occurred while installing the Generator Collections.");
-        p.sendMessage("§cPlease install the Generator Collections v" + GENERATOR_COLLECTIONS_VERSION +" to use this tool. You can ask the server administrator to install it.");
-        p.sendMessage(" ");
-        p.sendMessage("§cFor more installation help, please see the wiki:");
-        p.sendMessage("§c" + INSTALL_WIKI);
+    public static void sendGeneratorCollectionsError(@Nullable Player p){
+        Utils.sendToPlayerAndConsole(p, "§cAn error occurred while installing the Generator Collections.", Level.INFO);
+        Utils.sendToPlayerAndConsole(p, "§cPlease install the Generator Collections v" + GENERATOR_COLLECTIONS_VERSION + " to use this tool. You can ask the server administrator to install it.", Level.INFO);
+        Utils.sendToPlayerAndConsole(p, " ", Level.INFO);
+        Utils.sendToPlayerAndConsole(p, "§cFor more installation help, please see the wiki:", Level.INFO);
+        Utils.sendToPlayerAndConsole(p, "§c" + INSTALL_WIKI, Level.INFO);
     }
 
 
@@ -846,24 +868,27 @@ public class Generator {
      * @param update Whether the Generator Collections package is already installed or should just be updated
      * @return Whether the installation was successful
      */
-    public static boolean installGeneratorCollections(Player p, boolean update){
+    public static boolean installGeneratorCollections(@Nullable Player p, boolean update){
         String parentURL = "https://github.com/BuildTheEarth/GeneratorCollections/releases/latest/download/";
         String filename = "GeneratorCollections.zip";
         String fileDirectory = "GeneratorCollections/";
         String path = "/../WorldEdit/schematics/";
 
         if(update) {
-            p.sendMessage("§cThe Generator Collections package is outdated. Updating...");
+            Utils.sendToPlayerAndConsole(p, "§cThe Generator Collections package is outdated. Updating...", Level.INFO);
 
             deleteDirectory(Main.instance.getDataFolder().getAbsolutePath() + path + fileDirectory);
         } else
-            p.sendMessage("§cThe Generator Collections package wasn't found on your server. Installing...");
+            Utils.sendToPlayerAndConsole(p, "§cThe Generator Collections package wasn't found on your server. Installing...", Level.INFO);
+
+
 
         try {
             boolean success = installZipFolder(parentURL, filename, path);
 
             if(success) {
-                p.sendMessage("§7Successfully installed §eGenerator Collections v" + GENERATOR_COLLECTIONS_VERSION + "§7!");
+                Utils.sendToPlayerAndConsole(p, "§7Successfully installed §eGenerator Collections v" + GENERATOR_COLLECTIONS_VERSION + "§7!", Level.INFO);
+
                 return true;
             }else {
                 sendGeneratorCollectionsError(p);
@@ -987,6 +1012,10 @@ public class Generator {
         path = Main.instance.getDataFolder().getAbsolutePath() + path;
         String zipFilePath = path + "/" + filename;
         URL url = new URL(parentURL + filename);
+
+        File file = new File(path);
+        if(!file.exists())
+            file.mkdir();
 
         // Open a connection to the URL
         HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();

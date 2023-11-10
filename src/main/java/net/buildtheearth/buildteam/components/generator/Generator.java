@@ -416,14 +416,37 @@ public class Generator {
         return result;
     }
 
+    /** Returns the closest vector from a list of vectors to a reference vector
+     *
+     * @param vectors List of vectors to search through
+     * @param reference Reference vector to compare to
+     * @return Closest vector to the reference vector
+     */
+    public static Vector getClosestVector(List<Vector> vectors, Vector reference){
+        Vector closestVector = null;
+        double closestDistance = Double.MAX_VALUE;
+
+        for(Vector vector : vectors){
+            double distance = vector.distance(reference);
+            if(distance < closestDistance){
+                closestVector = vector;
+                closestDistance = distance;
+            }
+        }
+
+        return closestVector;
+    }
+
     /** Returns a temporary XYZ String that is used to paste a schematic at a later point at those coordinates with the WorldEdit API
      *
      * @param pathToSchematic The path to the schematic file
      * @param location The location where the schematic should be pasted
+     * @param rotation The rotation at which the schematic should be pasted
+     * @param offsetY The offset in the Y direction at which the schematic should be pasted
      * @return The temporary XYZ String
      */
-    public static String getPasteSchematicString(String pathToSchematic, Location location){
-        return "%%SCHEMATIC/" + pathToSchematic + "," + location.getWorld().getName() + "," + location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ() + "/%%";
+    public static String getPasteSchematicString(String pathToSchematic, Location location, double rotation, int offsetY){
+        return "%%SCHEMATIC/" + pathToSchematic + "," + location.getWorld().getName() + "," + location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ() + "," + rotation + "," + offsetY + "/%%";
     }
 
     /**

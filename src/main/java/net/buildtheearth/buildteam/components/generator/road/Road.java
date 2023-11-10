@@ -1,7 +1,6 @@
 package net.buildtheearth.buildteam.components.generator.road;
 
 import com.sk89q.worldedit.regions.Region;
-import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.components.generator.Generator;
 import net.buildtheearth.buildteam.components.generator.GeneratorModule;
 import net.buildtheearth.buildteam.components.generator.GeneratorType;

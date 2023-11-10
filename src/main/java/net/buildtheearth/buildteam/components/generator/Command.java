@@ -13,6 +13,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
@@ -150,6 +151,8 @@ public class Command {
         int x = Integer.parseInt(schematicSplit[2]);
         int y = Integer.parseInt(schematicSplit[3]);
         int z = Integer.parseInt(schematicSplit[4]);
+        double rotation = Double.parseDouble(schematicSplit[5]);
+        int offsetY = Integer.parseInt(schematicSplit[6]);
 
         int maxHeight = y;
 
@@ -158,7 +161,7 @@ public class Command {
         if(maxHeight == 0)
             maxHeight = y;
 
-        Vector vector = new Vector(x, maxHeight, z);
+        Vector vector = new Vector(x, maxHeight + offsetY, z);
 
         World weWorld = new BukkitWorld(world);
         com.sk89q.worldedit.entity.Player wePlayer = worldEditPlugin.wrapPlayer(player);
@@ -174,7 +177,13 @@ public class Command {
             reader = format.getReader(new FileInputStream(schematicFile));
             Clipboard clipboard = reader.read(weWorld.getWorldData());
 
-            Operation operation = new ClipboardHolder(clipboard, weWorld.getWorldData())
+            AffineTransform transform = new AffineTransform();
+            transform = transform.rotateY(rotation);
+
+            ClipboardHolder holder = new ClipboardHolder(clipboard, weWorld.getWorldData());
+            holder.setTransform(transform);
+
+            Operation operation = holder
                     .createPaste(editSession, weWorld.getWorldData())
                     .to(vector)
                     .ignoreAirBlocks(true)

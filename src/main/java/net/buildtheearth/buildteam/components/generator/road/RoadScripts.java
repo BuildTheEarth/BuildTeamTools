@@ -9,6 +9,7 @@ import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.components.generator.*;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -422,9 +423,43 @@ public class RoadScripts {
 
         if(isStreetLamp){
             for(List<Vector> path : streetLampPoints)
-                for(Vector point : path) {
+                for(int i = 0; i < path.size(); i++) {
+                    Vector point = path.get(i);
+
+                    // Find the closest distance to all other points
+                    double closestDistance = Double.MAX_VALUE;
+                    for(List<Vector> otherPoints : streetLampPoints)
+                    for(int i2 = 0; i2 < otherPoints.size(); i2++) {
+                        Vector otherPoint = otherPoints.get(i2);
+
+                        if(point.equals(otherPoint))
+                            continue;
+
+                        if(i < i2 && path.equals(otherPoints))
+                            continue;
+
+                        closestDistance = Math.min(closestDistance, point.distance(otherPoint));
+                    }
+
+                    // If the distance is too small, skip this point to prevent streetlamps from being too close to each other
+                    if(closestDistance < 5)
+                        continue;
+
+
                     Location loc = new Location(p.getWorld(), point.getBlockX(), point.getBlockY(), point.getBlockZ());
-                    commands.add(Generator.getPasteSchematicString("GeneratorCollections/roadpack/streetlamp" + streetLampType + ".schematic", loc));
+                    Vector closest = Generator.getClosestVector(streetLampPointsMid, point);
+
+                    // Vector pointing from the lamp to the closest point on the middle line
+                    Vector toMiddle = closest.subtract(point).normalize();
+
+                    // Calculate the angle with respect to the negative Z-axis (north)
+                    double angle = Math.toDegrees(Math.atan2(-toMiddle.getX(), -toMiddle.getZ()));
+
+                    // Adjust the angle to Minecraft's coordinate system
+                    angle = (angle + 360) % 360; // Normalize angle to be between 0 and 360
+
+
+                    commands.add(Generator.getPasteSchematicString("GeneratorCollections/roadpack/streetlamp" + streetLampType + ".schematic", loc, angle, 1));
                     operations++;
                 }
         }

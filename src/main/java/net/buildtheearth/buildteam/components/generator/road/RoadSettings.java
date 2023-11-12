@@ -55,5 +55,8 @@ public class RoadSettings extends Settings {
 
         // Street Lamp Distance (Default: Fixed Value)
         getValues().put(RoadFlag.STREET_LAMP_DISTANCE, "40");
+
+        // Road Side (Default: Fixed Value)
+        getValues().put(RoadFlag.ROAD_SIDE, "10");
     }
 }

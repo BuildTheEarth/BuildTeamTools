@@ -36,6 +36,7 @@ public class RoadScripts {
         int markingGap = Integer.parseInt(flags.get(RoadFlag.MARKING_GAP));
         int sidewalkWidth = Integer.parseInt(flags.get(RoadFlag.SIDEWALK_WIDTH));
         int streetLampDistance = Integer.parseInt(flags.get(RoadFlag.STREET_LAMP_DISTANCE));
+        int roadSide = Integer.parseInt(flags.get(RoadFlag.ROAD_SIDE));
 
         boolean isCrosswalk = flags.get(RoadFlag.CROSSWALK).equals(RoadSettings.ENABLED);
 
@@ -51,7 +52,7 @@ public class RoadScripts {
 
         // Calculate current width from centre of road
         int road_width = laneWidth*laneCount;
-        int max_width = road_width + sidewalkWidth*2 + laneGap;
+        int max_width = road_width + sidewalkWidth*2 + laneGap + roadSide;
         int road_height = region.getHeight();
 
         // Get the points of the region

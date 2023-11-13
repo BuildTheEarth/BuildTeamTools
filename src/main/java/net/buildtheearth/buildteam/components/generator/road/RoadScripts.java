@@ -9,12 +9,13 @@ import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.components.generator.*;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class RoadScripts {
     
@@ -38,7 +39,7 @@ public class RoadScripts {
         int streetLampDistance = Integer.parseInt(flags.get(RoadFlag.STREET_LAMP_DISTANCE));
         int roadSide = Integer.parseInt(flags.get(RoadFlag.ROAD_SIDE));
 
-        boolean isCrosswalk = flags.get(RoadFlag.CROSSWALK).equals(RoadSettings.ENABLED);
+        boolean isCrosswalk = flags.get(RoadFlag.CROSSWALK).equals(Flag.ENABLED);
 
 
         int operations = 0;
@@ -47,8 +48,8 @@ public class RoadScripts {
         // Is there a sidewalk?
         boolean isSidewalk = sidewalkWidth > 1;
 
-        // Are there street lamps?
-        boolean isStreetLamp = streetLampType != null && !streetLampType.equals(RoadSettings.DISABLED);
+        // Are there streetlamps?
+        boolean isStreetLamp = streetLampType != null && !streetLampType.equalsIgnoreCase(Flag.DISABLED);
 
         // Calculate current width from centre of road
         int road_width = laneWidth*laneCount;
@@ -219,7 +220,7 @@ public class RoadScripts {
         // Replace the current road material with light green wool
         commands.add("//replace " + roadMaterial + " 35:5");
         operations++;
-        if(!roadSlabMaterial.equals(RoadSettings.DISABLED)) {
+        if(!roadSlabMaterial.equalsIgnoreCase(Flag.DISABLED)) {
             commands.add("//replace " + roadSlabMaterial + " 35:5");
             operations++;
         }
@@ -229,7 +230,7 @@ public class RoadScripts {
         // Replace the current sidewalk material with pink wool
         commands.add("//replace " + sidewalkMaterial + " 35:6");
         operations++;
-        if(!sidewalkSlabMaterial.equals(RoadSettings.DISABLED)) {
+        if(!sidewalkSlabMaterial.equalsIgnoreCase(Flag.DISABLED)) {
             commands.add("//replace " + sidewalkSlabMaterial + " 35:6");
             operations++;
         }
@@ -349,7 +350,7 @@ public class RoadScripts {
         // Create the road and sidewalk slabs
 
         // Create the road slabs
-        if(!roadSlabMaterial.equals(RoadSettings.DISABLED)){
+        if(!roadSlabMaterial.equalsIgnoreCase(Flag.DISABLED)){
             commands.add("//gmask =queryRel(0,-1,0,35,4)&&queryRel(0,0,0,0,0)&&(queryRel(1,0,0,35,4)||queryRel(-1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4))");
             commands.add("//set " + roadSlabMaterial);
             operations++;
@@ -357,7 +358,7 @@ public class RoadScripts {
 
 
         // Create the sidewalk slabs
-        if(!sidewalkSlabMaterial.equals(RoadSettings.DISABLED)){
+        if(!sidewalkSlabMaterial.equalsIgnoreCase(Flag.DISABLED)){
             commands.add("//gmask =queryRel(0,-1,0,35,3)&&queryRel(0,0,0,0,0)&&(queryRel(1,0,0,35,3)||queryRel(-1,0,0,35,3)||queryRel(0,0,1,35,3)||queryRel(0,0,-1,35,3))");
             commands.add("//set " + sidewalkSlabMaterial);
             operations++;
@@ -430,17 +431,17 @@ public class RoadScripts {
                     // Find the closest distance to all other points
                     double closestDistance = Double.MAX_VALUE;
                     for(List<Vector> otherPoints : streetLampPoints)
-                    for(int i2 = 0; i2 < otherPoints.size(); i2++) {
-                        Vector otherPoint = otherPoints.get(i2);
+                        for(int i2 = 0; i2 < otherPoints.size(); i2++) {
+                            Vector otherPoint = otherPoints.get(i2);
 
-                        if(point.equals(otherPoint))
-                            continue;
+                            if(point.equals(otherPoint))
+                                continue;
 
-                        if(i < i2 && path.equals(otherPoints))
-                            continue;
+                            if(i < i2 && path.equals(otherPoints))
+                                continue;
 
-                        closestDistance = Math.min(closestDistance, point.distance(otherPoint));
-                    }
+                            closestDistance = Math.min(closestDistance, point.distance(otherPoint));
+                        }
 
                     // If the distance is too small, skip this point to prevent streetlamps from being too close to each other
                     if(closestDistance < 5)

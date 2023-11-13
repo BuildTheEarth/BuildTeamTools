@@ -1,12 +1,12 @@
 package net.buildtheearth.buildteam.components.generator.road;
 
+import net.buildtheearth.buildteam.components.generator.Flag;
 import net.buildtheearth.buildteam.components.generator.Settings;
 import org.bukkit.entity.Player;
 
 public class RoadSettings extends Settings {
 
-    public static final String DISABLED = "OFF";
-    public static final String ENABLED = "ON";
+
 
     public RoadSettings(Player player){
         super(player);
@@ -45,10 +45,10 @@ public class RoadSettings extends Settings {
         getValues().put(RoadFlag.SIDEWALK_SLAB_COLOR, "44:0");
 
         // Road Slab Material (Default: Fixed Value)
-        getValues().put(RoadFlag.ROAD_SLAB_COLOR, DISABLED);
+        getValues().put(RoadFlag.ROAD_SLAB_COLOR, Flag.DISABLED);
 
         // Crosswalk (Default: Fixed Value)
-        getValues().put(RoadFlag.CROSSWALK, ENABLED);
+        getValues().put(RoadFlag.CROSSWALK, Flag.ENABLED);
 
         // Street Lamp Type (Default: Fixed Value)
         getValues().put(RoadFlag.STREET_LAMP_TYPE, "001");

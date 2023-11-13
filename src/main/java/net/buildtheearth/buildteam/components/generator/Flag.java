@@ -8,6 +8,9 @@ import net.buildtheearth.buildteam.components.generator.tree.TreeFlag;
 
 public interface Flag {
 
+    public static final String DISABLED = "OFF";
+    public static final String ENABLED = "ON";
+
     String getFlag();
 
     FlagType getFlagType();

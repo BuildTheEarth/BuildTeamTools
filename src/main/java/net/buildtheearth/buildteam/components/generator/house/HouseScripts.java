@@ -28,6 +28,8 @@ public class HouseScripts {
         String roofColor = flags.get(HouseFlag.ROOF_COLOR);
         String baseColor = flags.get(HouseFlag.BASE_COLOR);
         String windowColor = flags.get(HouseFlag.WINDOW_COLOR);
+        String balconyColor = flags.get(HouseFlag.BALCONY_COLOR);
+        String balconyFenceColor = flags.get(HouseFlag.BALCONY_FENCE_COLOR);
         RoofType roofType = RoofType.byString(flags.get(HouseFlag.ROOF_TYPE));
 
         int floorCount = Integer.parseInt(flags.get(HouseFlag.FLOOR_COUNT));
@@ -89,6 +91,7 @@ public class HouseScripts {
 
         int highestBlock = Generator.getMaxHeight(blocks, Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL);
         boolean containsRedWool = Generator.containsBlock(blocks, Material.WOOL, (byte) 14);
+        boolean containsOrangeWool = Generator.containsBlock(blocks, Material.WOOL, (byte) 1);
 
 
         // ----------- PREPARATION 02 ----------
@@ -120,9 +123,9 @@ public class HouseScripts {
 
 
         // ----------- PREPARATION 03 ----------
-        // Bring the yellow, green, blue and red wool blocks to the same height
+        // Bring the orange, yellow, green, blue and red wool blocks to the same height
 
-        String[] woolColors = {"35:4", "35:11", "35:14", "35:5"};
+        String[] woolColors = {"35:1", "35:4", "35:11", "35:14", "35:5"};
 
         for(String wool : woolColors){
             // Replace all blocks above the wool
@@ -148,7 +151,7 @@ public class HouseScripts {
         }
 
         // ----------- PREPARATION 05 ----------
-        // Move blue wool one block up and replace block below with brick
+        // Move blue, red and lime wool one block up and replace block below with brick
 
         commands.add("//expand 1 up");
 
@@ -274,7 +277,7 @@ public class HouseScripts {
                 currentHeight++;
 
                 // Move wool one block up
-                operations = moveWoolUp(commands, operations);
+                operations = moveWoolUp(commands, operations, 0);
 
                 // Select everything x blocks above bricks. Then replace that with lapislazuli
                 commands.add("//gmask =queryRel(0," + (-currentHeight) + ",0,45,-1)");
@@ -293,7 +296,7 @@ public class HouseScripts {
             currentHeight++;
 
             // Move wool one block up
-            operations = moveWoolUp(commands, operations);
+            operations = moveWoolUp(commands, operations, i+1);
 
             // Select everything x blocks above bricks. Then replace that with lapislazuli ore
             commands.add("//gmask =queryRel(0," + (-currentHeight) + ",0,45,-1)");
@@ -303,11 +306,12 @@ public class HouseScripts {
             // Raise the yellow wool layer by one block
             operations = raiseYellowWoolFloor(commands, operations);
 
+            // Windows
             for(int i2 = 0; i2 < windowHeight; i2++) {
                 currentHeight++;
 
                 // Move wool one block up
-                operations = moveWoolUp(commands, operations);
+                operations = moveWoolUp(commands, operations, 0);
 
                 // Select everything x blocks above bricks. Then replace that with white glass
                 commands.add("//gmask =queryRel(0," + (-currentHeight) + ",0,45,-1)");
@@ -341,7 +345,7 @@ public class HouseScripts {
                     currentHeight++;
 
                     // Move wool one block up
-                    operations = moveWoolUp(commands, operations);
+                    operations = moveWoolUp(commands, operations, -1);
 
                     // Select everything x blocks above bricks. Then replace that with lapislazuli ore
                     commands.add("//gmask =queryRel(0," + (-currentHeight) + ",0,45,-1)");
@@ -356,7 +360,7 @@ public class HouseScripts {
             currentHeight++;
 
             // Move wool one block up
-            operations = moveWoolUp(commands, operations);
+            operations = moveWoolUp(commands, operations, -1);
 
             // Select everything x blocks above bricks. Then replace that with lapislazuli ore
             commands.add("//gmask =queryRel(0," + (-currentHeight) + ",0,45,-1)");
@@ -372,6 +376,16 @@ public class HouseScripts {
         commands.add("//replace 35:14 0");
         operations++;
 
+
+        // ----------- BALCONY 1/2 ----------
+
+        if(containsOrangeWool){
+            // Disable the gmask
+            commands.add("//gmask");
+
+            // Replace all orange wool with air
+            commands.add("//replace 35:1 0");
+        }
 
 
         // ----------- WINDOWS ----------
@@ -412,6 +426,26 @@ public class HouseScripts {
 
 
 
+        // ----------- BALCONY 2/2 ----------
+
+        if(containsOrangeWool){
+
+            // Select all blocks that have orange wool below them and have air next to them
+            commands.add("//gmask =queryRel(0,-1,0,35,13)&&(queryRel(-1,-1,0,0,0)||queryRel(1,-1,0,0,0)||queryRel(0,-1,-1,0,0)||queryRel(0,-1,1,0,0))");
+
+            // Replace all blocks above green wool with the balcony fence color
+            commands.add("//replace >35:13 " + balconyFenceColor);
+
+
+            // If the balcony fence color is enabled, replace all blocks above green wool with the balcony fence color
+            if(!balconyFenceColor.equalsIgnoreCase(Flag.DISABLED)) {
+                // Disable the global mask
+                commands.add("//gmask");
+
+                // Replace all green wool with the balcony color
+                commands.add("//replace 35:13 " + balconyColor);
+            }
+        }
 
 
         // ----------- ROOF ----------
@@ -720,6 +754,7 @@ public class HouseScripts {
             }
         }
 
+
         // ----------- FINAL FINISH ----------
 
         commands.add("//gmask 0,45,31,37,38,39,40,175");
@@ -762,7 +797,7 @@ public class HouseScripts {
     }
 
     // Move blue, green and red wool one block up
-    public static int moveWoolUp(List<String> commands, int operations) {
+    public static int moveWoolUp(List<String> commands, int operations, int floor) {
         commands.add("//gmask");
         commands.add("//replace >35:11 35:11");
         operations++;
@@ -770,6 +805,14 @@ public class HouseScripts {
         operations++;
         commands.add("//replace >35:5 35:5");
         operations++;
+
+        if(floor >= 0) {
+            if (floor == 0)
+                commands.add("//replace >35:1,35:13 35:1");
+            else
+                commands.add("//replace >35:1,35:13 35:13");
+            operations++;
+        }
 
         return operations;
     }

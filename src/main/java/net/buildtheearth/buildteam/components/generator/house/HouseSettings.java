@@ -1,8 +1,10 @@
 package net.buildtheearth.buildteam.components.generator.house;
 
 import net.buildtheearth.buildteam.components.generator.Settings;
+import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.Utils;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -37,6 +39,13 @@ public class HouseSettings extends Settings {
             block = (ItemStack) Utils.pickRandom(MenuItems.SLABS);
 
         getValues().put(HouseFlag.ROOF_COLOR, Utils.getBlockID(block));
+
+        // Balcony Color (Default: Random)
+        getValues().put(HouseFlag.BALCONY_COLOR, Utils.getBlockID(Item.create(Material.CONCRETE)));
+
+        // Balcony Fence Color (Default: Random)
+        getValues().put(HouseFlag.BALCONY_FENCE_COLOR, Utils.getBlockID(Item.create(Material.IRON_FENCE)));
+
 
         // Floor Count (Default: Random)
         getValues().put(HouseFlag.FLOOR_COUNT, "" + ((int)(Math.random()*3.0) + 1));

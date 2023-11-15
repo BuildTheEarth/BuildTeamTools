@@ -89,6 +89,11 @@ public class HouseScripts {
 
         Block[][][] blocks = Generator.analyzeRegion(p, p.getWorld());
 
+        if(blocks == null){
+            p.sendMessage("§c§lERROR: §cRegion not readable. Please report this to the developers of the BuildTeamTool plugin.");
+            return;
+        }
+
         int highestBlock = Generator.getMaxHeight(blocks, Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL);
         boolean containsRedWool = Generator.containsBlock(blocks, Material.WOOL, (byte) 14);
         boolean containsOrangeWool = Generator.containsBlock(blocks, Material.WOOL, (byte) 1);
@@ -457,6 +462,31 @@ public class HouseScripts {
 
 
         if(roofType == RoofType.FLATTER_SLABS || roofType == RoofType.STEEP_SLABS|| roofType == RoofType.MEDIUM_SLABS){
+
+            // Replace the blue wool next to green wool with green wool
+            commands.add("//gmask =queryRel(1,0,0,35,5)||queryRel(-1,0,0,35,5)||queryRel(0,0,1,35,5)||queryRel(0,0,-1,35,5)||queryRel(1,0,1,35,5)||queryRel(-1,0,-1,35,5)||queryRel(-1,0,1,35,5)||queryRel(1,0,-1,35,5)");
+            commands.add("//replace 35:11 35:5");
+            operations++;
+
+            // Create the roof house wall staircase
+            for(int i = 0; i < maxRoofHeight; i++){
+                // Select all air blocks that are above blue wool and above & next to green wool
+                commands.add("//gmask =queryRel(1,-1,0,35,5)||queryRel(-1,-1,0,35,5)||queryRel(0,-1,1,35,5)||queryRel(0,-1,-1,35,5)||queryRel(1,-1,1,35,5)||queryRel(-1,-1,-1,35,5)||queryRel(-1,-1,1,35,5)||queryRel(1,-1,-1,35,5)");
+                commands.add("//replace >35:11 35:5");
+                operations++;
+
+                // Select all air blocks that are above blue wool and next to green wool
+                commands.add("//gmask =queryRel(1,0,0,35,5)||queryRel(-1,0,0,35,5)||queryRel(0,0,1,35,5)||queryRel(0,0,-1,35,5)||queryRel(1,0,1,35,5)||queryRel(-1,0,-1,35,5)||queryRel(-1,0,1,35,5)||queryRel(1,0,-1,35,5)");
+                commands.add("//replace >35:11 35:5");
+                operations++;
+
+                // Select all air blocks that are above blue wool and replace them with blue wool
+                commands.add("//gmask 0");
+                commands.add("//replace >35:11 35:11");
+                operations++;
+            }
+
+
             // (One more yellow wool layer) Replace everything above yellow wool with one layer yellow wool
             commands.add("//replace >35:4 35:4");
             operations++;
@@ -466,17 +496,29 @@ public class HouseScripts {
             commands.add("//replace >21 44");
             operations++;
 
-            // (Fix First Roof Layer) Select only air blocks that are next to stone slabs in any direction and above lapislazuli ore. Then replace them with stone slabs
-            commands.add("//gmask =queryRel(0,0,0,0,0)&&(queryRel(1,0,0,44,0)||queryRel(1,0,0,44,0)||queryRel(-1,0,0,44,0)||queryRel(0,0,1,44,0)||queryRel(0,0,-1,44,0))");
+            // (Fix First Roof Layer) Select only air blocks that are next to stone slabs and green wool in any direction and above lapislazuli ore. Then replace them with stone slabs
+            commands.add("//gmask =queryRel(0,0,0,0,0)&&(queryRel(1,0,0,44,0)||queryRel(-1,0,0,44,0)||queryRel(0,0,1,44,0)||queryRel(0,0,-1,44,0))");
             commands.add("//replace >21 44");
             commands.add("//replace >21 44");
             operations++;
             operations++;
 
-            // (Overhang Roof Layer) Select all air blocks next to lapislazuli ores that have a stone slab above them. Then replace them with and upside down stone slab
+            // (Overhang Roof Layer 1) Select all air blocks next to lapislazuli ores that have a stone slab above them. Then replace them with and upside down stone slab
             commands.add("//gmask =(queryRel(1,0,0,21,-1)&&queryRel(1,1,0,44,0))||(queryRel(-1,0,0,21,-1)&&queryRel(-1,1,0,44,0))||(queryRel(0,0,1,21,-1)&&queryRel(0,1,1,44,0))||(queryRel(0,0,-1,21,-1)&&queryRel(0,1,-1,44,0))");
             commands.add("//replace 0 44:8");
             operations++;
+
+            // (Overhang Roof Layer 2) Select all air blocks next to upside down stone slab and lapislazuli. Then replace them with and upside down stone slab
+            commands.add("//gmask =(" +
+                    "(queryRel(1,0,0,44,8)&&(queryRel(0,0,1,21,0)||queryRel(0,0,-1,21,0)))" +
+                    "||(queryRel(-1,0,0,44,8)&&(queryRel(0,0,1,21,0)||queryRel(0,0,-1,21,0)))" +
+                    "||(queryRel(0,0,1,44,8)&&(queryRel(1,0,0,21,0)||queryRel(-1,0,0,21,0)))" +
+                    "||(queryRel(0,0,-1,44,8)&&(queryRel(1,0,0,21,0)||queryRel(-1,0,0,21,0)))" +
+                    ")");
+            commands.add("//replace 0 44:8");
+            operations++;
+
+
 
             // Replace the highest yellow wool layer with double slabs
             commands.add("//gmask <0");
@@ -487,9 +529,21 @@ public class HouseScripts {
 
             if(maxRoofHeight > 0)
                 for(int i = 0; i < maxRoofHeight; i++) {
-                    //Only select air block that have stone slabs below them which are surrounded by other stone slabs
                     if(roofType == RoofType.FLATTER_SLABS || roofType == RoofType.MEDIUM_SLABS)
-                        commands.add("//gmask =!(queryRel(1,-1,0,44,-1)||queryRel(-1,-1,0,44,-1)||queryRel(0,-1,1,44,-1)||queryRel(0,-1,-1,44,-1)||(queryRel(-1,-1,1,44,-1)||queryRel(1,-1,-1,44,-1)||queryRel(1,-1,1,44,-1)||queryRel(-1,-1,-1,44,-1)))");
+                        //Only select air block that are surrounded by other stone slabs below or which are directly neighbors to green wool or blue wool
+                        commands.add("//gmask =" +
+                                "(" +
+                                    "queryRel(1,-1,0,43,-1)&&queryRel(-1,-1,0,43,-1)&&queryRel(0,-1,1,43,-1)&&queryRel(0,-1,-1,43,-1)" +
+                                    "&&(queryRel(-1,-1,1,43,-1)||queryRel(-1,0,1,35,5)||queryRel(-1,0,1,35,11))" +
+                                    "&&(queryRel(1,-1,-1,43,-1)||queryRel(1,0,-1,35,5)||queryRel(1,0,-1,35,11))" +
+                                    "&&(queryRel(1,-1,1,43,-1)||queryRel(1,0,1,35,5)||queryRel(1,0,1,35,11))" +
+                                    "&&(queryRel(-1,-1,-1,43,-1)||queryRel(-1,0,-1,35,5)||queryRel(-1,0,-1,35,11))" +
+                                ")" +
+                                "||queryRel(1,0,0,35,5)||queryRel(1,0,0,35,11)" +
+                                "||queryRel(-1,0,0,35,5)||queryRel(-1,0,0,35,11)" +
+                                "||queryRel(0,0,1,35,5)||queryRel(0,0,1,35,11)" +
+                                "||queryRel(0,0,-1,35,5)||queryRel(0,0,-1,35,11)"
+                        );
                     else
                         commands.add("//gmask =!(queryRel(1,-1,0,44,-1)||queryRel(-1,-1,0,44,-1)||queryRel(0,-1,1,44,-1)||queryRel(0,-1,-1,44,-1))");
 
@@ -497,13 +551,70 @@ public class HouseScripts {
                     operations++;
 
                     if(roofType == RoofType.FLATTER_SLABS)
-                        commands.add("//gmask =!(queryRel(1,0,0,0,-1)||queryRel(-1,0,0,0,-1)||queryRel(0,0,1,0,-1)||queryRel(0,0,-1,0,-1)||queryRel(-1,0,1,0,-1)||queryRel(1,0,-1,0,-1)||queryRel(1,0,1,0,-1)||queryRel(-1,0,-1,0,-1))");
+
+                        //Only select air block that are surrounded by other stone slabs or which are directly neighbors to green wool or blue wool
+                        commands.add("//gmask =" +
+                                "(" +
+                                    "queryRel(1,0,0,44,-1)&&queryRel(-1,0,0,44,-1)&&queryRel(0,0,1,44,-1)&&queryRel(0,0,-1,44,-1)" +
+                                    "&&(queryRel(-1,0,1,44,-1)||queryRel(-1,0,1,35,5)||queryRel(-1,0,1,35,11))" +
+                                    "&&(queryRel(1,0,-1,44,-1)||queryRel(1,0,-1,35,5)||queryRel(1,0,-1,35,11))" +
+                                    "&&(queryRel(1,0,1,44,-1)||queryRel(1,0,1,35,5)||queryRel(1,0,1,35,11))" +
+                                    "&&(queryRel(-1,0,-1,44,-1)||queryRel(-1,0,-1,35,5)||queryRel(-1,0,-1,35,11))" +
+                                ")" +
+                                "||queryRel(1,0,0,35,5)||queryRel(1,0,0,35,11)" +
+                                "||queryRel(-1,0,0,35,5)||queryRel(-1,0,0,35,11)" +
+                                "||queryRel(0,0,1,35,5)||queryRel(0,0,1,35,11)" +
+                                "||queryRel(0,0,-1,35,5)||queryRel(0,0,-1,35,11)"
+
+                        );
                     else
                         commands.add("//gmask =!(queryRel(1,0,0,0,-1)||queryRel(-1,0,0,0,-1)||queryRel(0,0,1,0,-1)||queryRel(0,0,-1,0,-1))");
 
                     commands.add("//replace 44 43");
                     operations++;
                 }
+
+            // Replace everything above upside down stone slabs with purple wool
+            commands.add("//gmask");
+            commands.add("//replace >44:8 35:10");
+            operations++;
+
+            operations += expandGreenWool(commands);
+
+            // (Overhang Roof Layer 3) Select all air blocks next to two upside down stone slabs. Then replace them with and upside down stone slab
+            commands.add("//gmask =(queryRel(1,0,0,44,8)&&queryRel(2,0,0,44,8))||(queryRel(-1,0,0,44,8)&&queryRel(-2,0,0,44,8))||(queryRel(0,0,1,44,8)&&queryRel(0,0,2,44,8))||(queryRel(0,0,-1,44,8)&&queryRel(0,0,-2,44,8))");
+            commands.add("//replace 0 44:8");
+            operations++;
+
+            // Select all green wool that are above & next to green wool and replace it with stone slabs
+            commands.add("//gmask =queryRel(1,-1,0,35,5)||queryRel(-1,-1,0,35,5)||queryRel(0,-1,1,35,5)||queryRel(0,-1,-1,35,5)||queryRel(1,-1,1,35,5)||queryRel(-1,-1,-1,35,5)||queryRel(-1,-1,1,35,5)||queryRel(1,-1,-1,35,5)");
+            commands.add("//replace 35:5 44");
+            operations++;
+
+            // Select all green wool that are above & next to upside down stone slabs and replace it with stone slabs
+            commands.add("//gmask =queryRel(1,-1,0,44,8)||queryRel(-1,-1,0,44,8)||queryRel(0,-1,1,44,8)||queryRel(0,-1,-1,44,8)||queryRel(1,-1,1,44,8)||queryRel(-1,-1,-1,44,8)||queryRel(-1,-1,1,44,8)||queryRel(1,-1,-1,44,8)");
+            commands.add("//replace 35:5 44");
+            operations++;
+
+            // Select all air blocks that are below & next to green wool and under a stone slab and replace it with upside down stone slabs
+            commands.add("//gmask =queryRel(0,1,0,44,0)&&(queryRel(1,1,0,35,5)||queryRel(-1,1,0,35,5)||queryRel(0,1,1,35,5)||queryRel(0,1,-1,35,5)||queryRel(1,1,1,35,5)||queryRel(-1,1,-1,35,5)||queryRel(-1,1,1,35,5)||queryRel(1,1,-1,35,5))");
+            commands.add("//replace 0 44:8");
+            operations++;
+
+            // Select all air blocks that are next to green wool and under a stone slab and replace it with upside down stone slabs
+            commands.add("//gmask =queryRel(0,1,0,44,0)&&(queryRel(1,0,0,35,5)||queryRel(-1,0,0,35,5)||queryRel(0,0,1,35,5)||queryRel(0,0,-1,35,5))");
+            commands.add("//replace 0 44:8");
+            operations++;
+
+            // Select all left over green wool replace it with double stone slabs
+            commands.add("//gmask");
+            commands.add("//replace 35:5 43");
+            operations++;
+
+            // Replace blue wool with lapislazuli ore
+            commands.add("//replace 35:11 21");
+            operations++;
+
 
             // Create the flipped steps
             String[] roofColors = roofColor.split(",");
@@ -593,24 +704,7 @@ public class HouseScripts {
 
             // ROOF OVERHANG
 
-            // Replace everything above green wool with temporary purple wool
-            commands.add("//gmask");
-            commands.add("//replace >35:5 35:10");
-            operations++;
-
-            // Replace air next to purple wool with purple wool
-            commands.add("//gmask =queryRel(1,0,0,35,10)||queryRel(-1,0,0,35,10)||queryRel(0,0,1,35,10)||queryRel(0,0,-1,35,10)");
-            commands.add("//replace 0 35:10");
-            operations++;
-
-            // Replace air next to green wool with green wool
-            commands.add("//gmask =queryRel(1,0,0,35,5)||queryRel(-1,0,0,35,5)||queryRel(0,0,1,35,5)||queryRel(0,0,-1,35,5)");
-            commands.add("//replace 0 35:5");
-            operations++;
-
-            // Replace purple wool with air
-            commands.add("//gmask");
-            commands.add("//replace 35:10 0");
+            operations += expandGreenWool(commands);
 
 
             // Replace green wool with stone bricks
@@ -797,7 +891,7 @@ public class HouseScripts {
     }
 
     // Move blue, green and red wool one block up
-    public static int moveWoolUp(List<String> commands, int operations, int floor) {
+    private static int moveWoolUp(List<String> commands, int operations, int floor) {
         commands.add("//gmask");
         commands.add("//replace >35:11 35:11");
         operations++;
@@ -817,10 +911,35 @@ public class HouseScripts {
         return operations;
     }
 
-    public static int raiseYellowWoolFloor(List<String> commands, int operations) {
+    private static int raiseYellowWoolFloor(List<String> commands, int operations) {
         commands.add("//gmask");
         commands.add("//replace >35:4 35:4");
         operations++;
+        return operations;
+    }
+
+    private static int expandGreenWool(List<String> commands){
+        int operations = 0;
+
+        // Replace everything above green wool with temporary purple wool
+        commands.add("//gmask");
+        commands.add("//replace >35:5 35:10");
+        operations++;
+
+        // Replace air next to purple wool with purple wool
+        commands.add("//gmask =queryRel(1,0,0,35,10)||queryRel(-1,0,0,35,10)||queryRel(0,0,1,35,10)||queryRel(0,0,-1,35,10)");
+        commands.add("//replace 0 35:10");
+        operations++;
+
+        // Replace air next to green wool with green wool
+        commands.add("//gmask =queryRel(1,0,0,35,5)||queryRel(-1,0,0,35,5)||queryRel(0,0,1,35,5)||queryRel(0,0,-1,35,5)");
+        commands.add("//replace 0 35:5");
+        operations++;
+
+        // Replace purple wool with air
+        commands.add("//gmask");
+        commands.add("//replace 35:10 0");
+
         return operations;
     }
 }

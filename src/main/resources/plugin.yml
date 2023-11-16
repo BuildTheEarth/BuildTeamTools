@@ -2,7 +2,7 @@ name: BuildTeamTools
 main: net.buildtheearth.Main
 api-version: 1.12
 version: 0.1.3-alpha
-author: MineFact, frikandelworst, George112n, ELgamer
+author: MineFact, frikandelworst, George112n, ELgamer, SirJodelstein
 
 commands:
   buildteam:
@@ -30,3 +30,7 @@ commands:
   temporary:
     description: Temporary test command.
     usage: /temporary
+
+  kml:
+    description: kml pasting and parsing
+    usage: /kml

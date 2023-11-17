@@ -7,7 +7,8 @@ import net.buildtheearth.modules.utils.geo.LatLng;
 
 import java.util.List;
 import java.util.ArrayList;
-
+import java.util.Set;
+import java.util.HashSet;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -33,6 +34,8 @@ import org.bukkit.block.CommandBlock;
 
 import org.bukkit.metadata.FixedMetadataValue;
 
+import com.sk89q.worldedit.Vector;
+
 
 public class KmlCommand implements CommandExecutor {
 
@@ -56,6 +59,11 @@ public class KmlCommand implements CommandExecutor {
             List<List<Location>> mcLines = convertToMC(geoLines, world);
             Location tpLoc = null;
 
+            //collect all blocklocations in a set
+            //if just iterate and create blocks one by one, we create multiple blocks at the same XZ coordinates,
+            // this also stacks them vertically because we check terrain altitude.
+            Set<LineRasterization.IntPoint3D> blockPositions = new HashSet<LineRasterization.IntPoint3D>();
+
             for (List<Location> polyline : mcLines)
             {
                 //rasterize line and create intermediate blocks
@@ -63,7 +71,9 @@ public class KmlCommand implements CommandExecutor {
 
                 for (int i = 1; i < polyline.size(); ++i)
                 {
-                    LineRasterization.fillLineWithBlocks(polyline.get(i-1), polyline.get(i), world, Material.GOLD_BLOCK);
+                    blockPositions.addAll(
+                        LineRasterization.rasterizeLine(polyline.get(i-1), polyline.get(i)));
+                    //LineRasterization.fillLineWithBlocks(polyline.get(i-1), polyline.get(i), world, Material.GOLD_BLOCK);
                     //set only single block
                     //world.getBlockAt(loc).setType(Material.GOLD_BLOCK);
                     if (tpLoc == null)
@@ -74,6 +84,13 @@ public class KmlCommand implements CommandExecutor {
                 
             }
 
+            //now create the blocks
+            //TODO remember these changes for /kml undo
+            for (LineRasterization.IntPoint3D pt : blockPositions)
+            {
+                world.getBlockAt(pt.x, pt.y, pt.z).setType(Material.GOLD_BLOCK);
+            }
+            //now create blocks for each unique position in the set
             //Teleport player to first location
 
             if (tpLoc != null && player != null)

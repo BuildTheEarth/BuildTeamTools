@@ -12,19 +12,9 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class LineRasterization {
-    public static class IntPoint3D{
-        public IntPoint3D(int x, int y, int z){
-            this.x=x;
-            this.y=y;
-            this.z=z;
-        }
-
-        public int x,y,z;
-    }
-    
-    public static List<IntPoint3D> rasterizeLine(Location start, Location end){
+    public static List<BlockLocation> rasterizeLine(Location start, Location end){
         
-        List<IntPoint3D> rasterLine = new ArrayList<>();
+        List<BlockLocation> rasterLine = new ArrayList<>();
 
         //Bresenhams algorithm for 3D. Works on integer coordinates
         //void bresenham3D (int x0, int y0, int z0, int x1, int y1, int z1)
@@ -47,7 +37,7 @@ public class LineRasterization {
 
         for (x1 = y1 = z1 = i/2; i-- >= 0; ) { /* loop */
             //setPixel(x0,y0,z0);
-            rasterLine.add(new IntPoint3D(x0,y0,z0));
+            rasterLine.add(new BlockLocation(x0,y0,z0));
             x1 -= dx; 
             if (x1 < 0) {
                  x1 += dm; x0 += sx;
@@ -69,8 +59,8 @@ public class LineRasterization {
         //TODO World from server-config as in GeometricUtils
         ////World tpWorld = Bukkit.getWorld(Main.instance.getConfig().getString("universal_tpll.earth_world"));
         
-        List<IntPoint3D> rasterLine = rasterizeLine(start, end);
-        for (IntPoint3D loc : rasterLine)
+        List<BlockLocation> rasterLine = rasterizeLine(start, end);
+        for (BlockLocation loc : rasterLine)
         {
             world.getBlockAt(loc.x, loc.y, loc.z).setType(blockType);
         }

@@ -1,12 +1,8 @@
 package net.buildtheearth.modules.kml;
 
-import java.io.File;
-import java.util.Collections;
+
 import java.util.List;
 import java.util.ArrayList;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
 
 import org.bukkit.Bukkit;
 
@@ -37,11 +33,6 @@ public class KmlParser {
         Document doc = (Document) kml.getFeature();
         List<Placemark> placemarks = findPlacemarks(doc);
 
-        //Placemark placemark = (Placemark) kml.getFeature();
-        //Polygon geom = (Polygon) placemark.getGeometry();
-        //List<Coordinate> coordinates = linearRing.getCoordinates();
-
-        //}
 
         for (Placemark placemark : placemarks){
             // #extract coordinates assuming geometry is linestring
@@ -80,9 +71,6 @@ public class KmlParser {
     {
         List<LineString> lines = new ArrayList<>();
 
-    //     """parse geometry of the placemark.
-    //        return list of points as 2-tuple (lat lon) or 3-tuble(lat lon altitude)
-    //     """
         Geometry geom = placemark.getGeometry();
 
         

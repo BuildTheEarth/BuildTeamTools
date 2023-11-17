@@ -1,6 +1,7 @@
 package net.buildtheearth.modules.kml;
 
 import net.buildtheearth.Main;
+import net.buildtheearth.modules.utils.BlockLocation;
 import net.buildtheearth.modules.utils.GeometricUtils;
 import net.buildtheearth.modules.utils.LineRasterization;
 import net.buildtheearth.modules.utils.geo.LatLng;
@@ -21,7 +22,6 @@ import org.bukkit.command.BlockCommandSender;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.bukkit.material.MaterialData;
 
 import de.micromata.opengis.kml.v_2_2_0.Coordinate;
 import de.micromata.opengis.kml.v_2_2_0.LineString;
@@ -34,7 +34,6 @@ import org.bukkit.block.CommandBlock;
 
 import org.bukkit.metadata.FixedMetadataValue;
 
-import com.sk89q.worldedit.Vector;
 
 
 public class KmlCommand implements CommandExecutor {
@@ -62,7 +61,7 @@ public class KmlCommand implements CommandExecutor {
             //collect all blocklocations in a set
             //if just iterate and create blocks one by one, we create multiple blocks at the same XZ coordinates,
             // this also stacks them vertically because we check terrain altitude.
-            Set<LineRasterization.IntPoint3D> blockPositions = new HashSet<LineRasterization.IntPoint3D>();
+            Set<BlockLocation> blockPositions = new HashSet<BlockLocation>();
 
             for (List<Location> polyline : mcLines)
             {
@@ -86,7 +85,7 @@ public class KmlCommand implements CommandExecutor {
 
             //now create the blocks
             //TODO remember these changes for /kml undo
-            for (LineRasterization.IntPoint3D pt : blockPositions)
+            for (BlockLocation pt : blockPositions)
             {
                 world.getBlockAt(pt.x, pt.y, pt.z).setType(Material.GOLD_BLOCK);
             }
@@ -130,7 +129,7 @@ public class KmlCommand implements CommandExecutor {
         cmdBlock.setMetadata("kmlPlayerName", new FixedMetadataValue(Main.instance, p.getName()));
         cmdBlock.setMetadata("kmlPlayerID", new FixedMetadataValue(Main.instance, p.getUniqueId()));
         
-        //TODO maybe with blocktype selection as argument
+        //TODO blocktype selection as argument
         cmdBlock.update();
         p.sendMessage("§cCommand block created. Please open the GUI, paste the KML content, set it to 'always on' and confirm");
         

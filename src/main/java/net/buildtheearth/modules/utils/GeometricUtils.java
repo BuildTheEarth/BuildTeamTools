@@ -23,7 +23,8 @@ public class GeometricUtils {
         Airocean projection = new ModifiedAirocean();
         double mpu = projection.metersPerUnit();
 
-        double[] xz = projection.fromGeo(coordinates.getLat(), coordinates.getLng());
+        //fromGeo wamts longitude, then latitude
+        double[] xz = projection.fromGeo(coordinates.getLng(), coordinates.getLat());
 
         double x = xz[0] * mpu;
         double z = -xz[1] * mpu;
@@ -51,7 +52,8 @@ public class GeometricUtils {
         Airocean projection = new ModifiedAirocean();
         double mpu = projection.metersPerUnit();
 
-        double[] xz = projection.fromGeo(coordinates.getLat(), coordinates.getLng());
+        //fromGeo wamts longitude, then latitude
+        double[] xz = projection.fromGeo(coordinates.getLng(), coordinates.getLat());
 
         double x = xz[0] * mpu;
         double z = -xz[1] * mpu;

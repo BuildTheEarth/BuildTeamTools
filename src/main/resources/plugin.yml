@@ -30,7 +30,6 @@ commands:
   temporary:
     description: Temporary test command.
     usage: /temporary
-
   kml:
     description: kml pasting and parsing
     usage: /kml

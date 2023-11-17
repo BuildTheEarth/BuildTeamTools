@@ -1,6 +1,9 @@
 package net.buildtheearth.modules.kml;
 
 import net.buildtheearth.Main;
+import net.buildtheearth.modules.utils.GeometricUtils;
+import net.buildtheearth.modules.utils.LineRasterization;
+import net.buildtheearth.modules.utils.geo.LatLng;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -44,12 +47,16 @@ public class KmlCommand implements CommandExecutor {
 
             for (List<Location> polyline : mcLines)
             {
-                //TODO rasterize line and create intermediate blocks
-                //for now, just create a block at each location
-                for (Location loc : polyline)
+                //rasterize line and create intermediate blocks
+                //note: iteration starts at second block, so we always have a previous block to draw the line
+
+                for (int i = 1; i < polyline.size(); ++i)
                 {
-                    world.getBlockAt(loc).setType(Material.GOLD_BLOCK);
+                    LineRasterization.fillLineWithBlocks(polyline.get(i-1), polyline.get(i), world, Material.GOLD_BLOCK);
+                    //set only single block
+                    //world.getBlockAt(loc).setType(Material.GOLD_BLOCK);
                 }
+                
             }
             
 
@@ -66,7 +73,7 @@ public class KmlCommand implements CommandExecutor {
         p.sendMessage(String.format("----received /kml command with %d arguments----", args.length));
 
         //The command either creates a command-block at the player location
-        //or, if a command-block is targeted, parses its content
+        //command handling will handled server-side with CommandBlock as CommandSender
         Block targetedBlock = p.getTargetBlock(null, 10);
         if (targetedBlock == null || targetedBlock.getType() != Material.COMMAND)
         {
@@ -76,15 +83,8 @@ public class KmlCommand implements CommandExecutor {
             World world = blockLocation.getWorld();
             Block block = world.getBlockAt(blockLocation);
 
-            block.setType(Material.COMMAND);
-            //set command and "always on" via blockdata, because CommandBlock API does not have "setAuto"
-            //BlockState blockState = block.getState();
+            block.setType(Material.COMMAND);    
 
-            //byte data;
-            
-            //block.setData(data);
-            //blockState.update(true);
-            
             //for now, user has to manually set the command to "auto" to get it immediately triggered on confirm
             CommandBlock cmdBlock = (CommandBlock) block.getState();
             cmdBlock.setCommand("/kml "); //ready to paste kml content
@@ -94,9 +94,6 @@ public class KmlCommand implements CommandExecutor {
             
         } 
       
-       
-        
-
         //sendHelp(p);
         return true;
     }
@@ -115,14 +112,15 @@ public class KmlCommand implements CommandExecutor {
 
             for (Coordinate coordinate : line.getCoordinates()) {
                 //convert lat/lon to minecraft x z
-                double x = 0; double y=0; double z=0;
-                
-                //add altitude plus terrain altitude
-                System.out.println(coordinate.getLongitude());
-                System.out.println(coordinate.getLatitude());
-                System.out.println(coordinate.getAltitude());
+                LatLng coordinates = new LatLng(coordinate.getLatitude(), coordinate.getLongitude());
 
-                mcLine.add(new Location(world, x,y,z));
+                // convert with projection and extract terrain altitude
+                Location mcLocation = GeometricUtils.getLocationFromCoordinates(coordinates);
+                //add altitude from kml (altitude from Google Earth is always relative to ground)
+                mcLocation.add(0, coordinate.getAltitude(), 0);
+                //System.out.println(mcLocation);
+
+                mcLine.add(mcLocation);
             }
             mcLines.add(mcLine);
         }

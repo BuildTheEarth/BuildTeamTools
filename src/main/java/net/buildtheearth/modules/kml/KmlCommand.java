@@ -24,7 +24,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.BlockCommandSender;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 import de.micromata.opengis.kml.v_2_2_0.Coordinate;
 import de.micromata.opengis.kml.v_2_2_0.LineString;
@@ -38,10 +37,29 @@ import org.bukkit.block.CommandBlock;
 import org.bukkit.metadata.FixedMetadataValue;
 
 
-
+    /** Class to handle kml command and its aliases
+     *  
+     * Since kml content easily exceeds the normal chat/character limit, 
+     * we use the following workflow: 
+     * 
+     * if sent from a player, generates a CommandBlock and adds some metadata to it
+     * the player then pastes the kml contents and confirms the command
+     * 
+     * the CommandBlock then sends a kml command with the contents, which is parsed by the server
+     * 
+     * note: this command differentiates between aliases to determine wether to 
+     * generate intermediate points between the geo-coordinates from the kml linestrings.
+     * Players should only use /geopoints or /geopath aliases, 
+     * direct use of the /kml command is restricted to CommandBlockSender
+     * 
+     */
 public class KmlCommand implements CommandExecutor {
 
-    public boolean onCommand(CommandSender sender, Command cmd, String cmdLabel, String[] args) {
+    
+    /** Command handling
+     *  
+     */
+    public boolean onCommand(CommandSender sender, Command cmd, String alias, String[] args) {
         if (sender instanceof BlockCommandSender){
             Block senderBlock = ((BlockCommandSender)sender).getBlock();
 
@@ -50,27 +68,39 @@ public class KmlCommand implements CommandExecutor {
 
         if(!(sender instanceof Player)){
             sender.sendMessage("§cOnly players can execute this command.");
-            return true;
+            return false;
         }
 
 
         Player p = (Player) sender;
-
-        //TESTING location/elevation code
-        Block targetedBlock = p.getTargetBlock(null, 10);
-        Location targetedLocation = targetedBlock.getLocation();
-        int highY = p.getWorld().getHighestBlockYAt(targetedLocation);
-        p.sendMessage(String.format("elevation test: targeted block (%s) location Y %d (%f), highestY %d",
-            targetedBlock.getType().toString(), targetedLocation.getBlockY(), targetedLocation.getY(),highY));
-        
         if (args.length > 0 && args[0].equals("undo")){
             return undoCommand(p);
-        }            
+        }  
 
-        return createPasteUI(p, cmd, args);
+        // //TESTING location/elevation code
+        // Block targetedBlock = p.getTargetBlock(null, 10);
+        // Location targetedLocation = targetedBlock.getLocation();
+        // int highY = p.getWorld().getHighestBlockYAt(targetedLocation);
+        // p.sendMessage(String.format("elevation test: targeted block (%s) location Y %d (%f), highestY %d",
+        //     targetedBlock.getType().toString(), targetedLocation.getBlockY(), targetedLocation.getY(),highY));
+        
+          
+        //check if alias is geopoints or geopath (direct /kml is only allowed for undo)
+        if (alias.equals("kml")){
+            sender.sendMessage("§cPlease use /geopoints or /geopath to execute this command.");
+            return false;
+        }
+
+        return createPasteUI(p, cmd, alias, args);
     }
 
 
+    
+    /** 
+     * @param senderBlock
+     * @param args
+     * @return boolean
+     */
     public boolean processKml(Block senderBlock, String[] args){
 
         //read metadata to get player name/ID
@@ -78,7 +108,8 @@ public class KmlCommand implements CommandExecutor {
         String playerName = blockState.getMetadata("kmlPlayerName").get(0).asString(); 
         String blocktypeString = blockState.getMetadata("kmlBlocktype").get(0).asString();
         String previousCommandBlockType = blockState.getMetadata("kmlPreviousBlocktype").get(0).asString();
-                
+        boolean interpolatePoints = blockState.getMetadata("kmlInterpolatePoints").get(0).asBoolean();
+
         if (playerName == "" || blocktypeString == ""){
             //invalid metadata, cancel
             //send error message to all players within 50m of the command block
@@ -107,9 +138,6 @@ public class KmlCommand implements CommandExecutor {
 
         World world = senderBlock.getWorld();
         List<List<Location>> mcLines = convertToMC(geoLines, world);
-        Location tpLoc = null;
-
-
 
         //set up a transaction (collection of block changes)
         ChangeTransaction transaction = new ChangeTransaction(player);
@@ -119,19 +147,25 @@ public class KmlCommand implements CommandExecutor {
         // this also stacks them vertically because we check terrain altitude.
         Set<BlockLocation> blockPositions = new HashSet<>();
 
+
         for (List<Location> polyline : mcLines)
         {
             //rasterize line and create intermediate blocks
             //note: iteration starts at second block, so we always have a previous block to draw the line
+            //for single point mode, we explicitly add the first block
+            if (!interpolatePoints)
+                blockPositions.add(new BlockLocation(polyline.get(0)));
+
 
             for (int i = 1; i < polyline.size(); ++i)
             {
-                blockPositions.addAll(
-                    LineRasterization.rasterizeLine(polyline.get(i-1), polyline.get(i)));
-
-                if (tpLoc == null)
+                if (interpolatePoints)
                 {
-                    tpLoc = polyline.get(0);
+                    blockPositions.addAll(
+                        LineRasterization.rasterizeLine(polyline.get(i-1), polyline.get(i)));
+                } else {
+                    //single points only
+                    blockPositions.add(new BlockLocation(polyline.get(i)));
                 }
             }
             
@@ -189,7 +223,7 @@ public class KmlCommand implements CommandExecutor {
         return true;
     }
 
-    public boolean createPasteUI(Player player, Command cmd, String[] args){
+    public boolean createPasteUI(Player player, Command cmd, String alias, String[] args){
         //The command either creates a command-block at the player location
         //TODO TabCompleter
 
@@ -216,7 +250,15 @@ public class KmlCommand implements CommandExecutor {
         cmdBlock.setMetadata("kmlPlayerName", new FixedMetadataValue(Main.instance, player.getName()));
         //cmdBlock.setMetadata("kmlPlayerID", new FixedMetadataValue(Main.instance, p.getUniqueId()));
         cmdBlock.setMetadata("kmlBlocktype", new FixedMetadataValue(Main.instance, blocktype));
-        block.setMetadata("kmlPreviousBlocktype", new FixedMetadataValue(Main.instance, previousMaterial.toString()));
+        cmdBlock.setMetadata("kmlPreviousBlocktype", new FixedMetadataValue(Main.instance, previousMaterial.toString()));
+        
+        boolean interpolatePoints;
+        if (alias.equals("geopoints"))
+            interpolatePoints = false;
+        else
+            interpolatePoints = true;
+
+        cmdBlock.setMetadata("kmlInterpolatePoints", new FixedMetadataValue(Main.instance, interpolatePoints));
         
         cmdBlock.update();
         player.sendMessage("§6Command block created. Right click the block, paste the KML content, set it to 'always on' and confirm");

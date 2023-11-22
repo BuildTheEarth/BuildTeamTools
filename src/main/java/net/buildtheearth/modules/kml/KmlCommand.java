@@ -56,11 +56,14 @@ public class KmlCommand implements CommandExecutor {
 
         Player p = (Player) sender;
 
-        sender.sendMessage(String.format("§ckml command with args len %d", args.length));
-        if (args.length > 0)
-            sender.sendMessage(String.format("§ckml command arg0 = %s", args[0]));
+        //TESTING location/elevation code
+        Block targetedBlock = p.getTargetBlock(null, 10);
+        Location targetedLocation = targetedBlock.getLocation();
+        int highY = p.getWorld().getHighestBlockYAt(targetedLocation);
+        p.sendMessage(String.format("elevation test: targeted block (%s) location Y %d (%f), highestY %d",
+            targetedBlock.getType().toString(), targetedLocation.getBlockY(), targetedLocation.getY(),highY));
         
-        if (args.length > 0 && args[0] == "undo"){
+        if (args.length > 0 && args[0].equals("undo")){
             return undoCommand(p);
         }            
 
@@ -94,7 +97,7 @@ public class KmlCommand implements CommandExecutor {
 
         Material blockMaterial = Material.getMaterial(blocktypeString);
         if (blockMaterial == null){
-            player.sendMessage("received /kml command with invalid blocktype string. Using bricks as fallback.");
+            player.sendMessage("§creceived /kml command with invalid blocktype string. Using bricks as fallback.");
             blockMaterial = Material.BRICK;
         }
 
@@ -155,25 +158,24 @@ public class KmlCommand implements CommandExecutor {
         }
 
         if (transaction.size() == 0){
-            player.sendMessage("kml command did not contain any allowed block changes.\nThis command can only change blocks near your current location, and cannot load new chunks.");
+            player.sendMessage("§ckml command did not contain any allowed block changes.\nThis command can only change blocks near your current location, and cannot load new chunks.");
             return false;
         }
 
         //create commandHistory if not exits
-        if (commandHistory == null)
-            commandHistory = new HashMap<>();
+        if (this.playerHistories == null)
+            this.playerHistories = new HashMap<>();
 
-        Stack<ChangeTransaction> playerHistory = commandHistory.getOrDefault(player, new Stack<>());
+        if (! playerHistories.containsKey(player))
+            playerHistories.put(player, new Stack<>());
+
+        Stack<ChangeTransaction> playerHistory = playerHistories.get(player);
+
         playerHistory.push(transaction);
         int blocksChanged = transaction.commit();
-        //now create blocks for each unique position in the set
-        //Teleport player to first location
-
-        if (tpLoc != null && player != null)
-        {
-            player.teleport(tpLoc, TeleportCause.COMMAND);
-            player.sendMessage(String.format("imported KML data. Changed %d blocks and teleported to position.", blocksChanged));
-        }
+        
+        player.sendMessage(String.format("imported KML data. Changed %d blocks.", blocksChanged));
+        
 
         if (preventedUnloadedChunkChanges){
             player.sendMessage("§cSome block changes target unloaded chunks and were not applied.");
@@ -199,7 +201,7 @@ public class KmlCommand implements CommandExecutor {
 
         //spawn a command block in front of the player
         Location commandBlockLocation = player.getLocation().add(player.getLocation().getDirection().multiply(2));
-        commandBlockLocation = commandBlockLocation.add(0, 1, 0);
+        commandBlockLocation = commandBlockLocation.add(0, 2, 0);
 
         World world = commandBlockLocation.getWorld();
         Block block = world.getBlockAt(commandBlockLocation);
@@ -223,19 +225,21 @@ public class KmlCommand implements CommandExecutor {
     }
 
     public boolean undoCommand(Player player){
-        if (commandHistory==null){
+        if (playerHistories==null){
             player.sendMessage("kml undo failed - no command history available.");
             return false;
         }
 
-        Stack<ChangeTransaction> playerHistory = commandHistory.get(player);
+        Stack<ChangeTransaction> playerHistory = playerHistories.get(player);
+        
         if (playerHistory == null || playerHistory.empty()){
             player.sendMessage("kml undo failed - there is no previously executed kml command.");
             return false;
         }
-        player.sendMessage("kml undo start");
+
         ChangeTransaction transaction = playerHistory.pop();
         transaction.undo();
+        player.sendMessage(String.format("undo successful. Restored %d blocks.", transaction.size()));
         return true;
     }
 
@@ -258,8 +262,10 @@ public class KmlCommand implements CommandExecutor {
                 // convert with projection and extract terrain altitude
                 Location mcLocation = GeometricUtils.getLocationFromCoordinates(coordinates);
                 //add altitude from kml (altitude from Google Earth is always relative to ground)
-                //note: the "-1" is only neccesary because getLocationFromCoordinates returns terrain altitude + 1
-                mcLocation.add(0, coordinate.getAltitude() - 1, 0);
+                //note: the "-2" is only neccesary because 
+                //  getLocationFromCoordinates returns terrain altitude + 2
+                //      (one from Bukkits getHighestBlockY and one from our geoutils)
+                mcLocation.add(0, coordinate.getAltitude() - 2, 0);
 
                 mcLine.add(mcLocation);
             }
@@ -268,5 +274,5 @@ public class KmlCommand implements CommandExecutor {
         return mcLines;
     }
 
-    private HashMap<Player, Stack<ChangeTransaction>> commandHistory;
+    private HashMap<Player, Stack<ChangeTransaction>> playerHistories;
 }

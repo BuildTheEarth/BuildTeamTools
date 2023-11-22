@@ -60,7 +60,9 @@ public class GeometricUtils {
 
         //Creates the location
         Location location;
-        World tpWorld = Bukkit.getWorld(Main.instance.getConfig().getString("universal_tpll.earth_world"));
+        //System.out.println(String.format("earthworld is named %s", Main.instance.getConfig().getString("universal_tpll.earth_world")));
+        //World tpWorld = Bukkit.getWorld(Main.instance.getConfig().getString("universal_tpll.earth_world"));
+        World tpWorld = Bukkit.getWorld("world");//Hack to get around invalid configuration
         if (tpWorld == null)
             location = new Location(null, x, 64, z);
         else

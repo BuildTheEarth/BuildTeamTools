@@ -33,3 +33,6 @@ commands:
   kml:
     description: kml pasting and parsing
     usage: /kml
+    aliases:
+     - geopoints
+     - geopath

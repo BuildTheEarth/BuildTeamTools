@@ -21,7 +21,12 @@ public class ConformalEstimate extends Airocean {
         double[][] ys = new double[xs.length][];
         try {
             //is = new FileInputStream(Bukkit.getPluginManager().getPlugin(Main.instance.getName()).getDataFolder().getAbsolutePath() + "/conformal.txt");
-            is = getClass().getClassLoader().getResourceAsStream("resources/conformal.txt");
+            //is = getClass().getClassLoader().getResourceAsStream("resources/conformal.txt");
+            is = getClass().getClassLoader().getResourceAsStream("conformal.txt");
+            //System.out.println("inputscanner loading conformal resource ");
+            if (is == null)
+                System.out.println("inputstream is is NULL!");
+
             @SuppressWarnings("resource")
             Scanner sc = new Scanner(is);
 

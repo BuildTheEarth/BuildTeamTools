@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Scanner;
 
+import net.buildtheearth.Main;
+
 public class ConformalEstimate extends Airocean {
 
     InvertableVectorField forward;
@@ -20,12 +22,12 @@ public class ConformalEstimate extends Airocean {
         double[][] xs = new double[sideLength + 1][];
         double[][] ys = new double[xs.length][];
         try {
+            //TODO decide wether to load conformal.txt from plugin folder or from .jar
+            //currently (jo), the txt file is compiled into the root of the .jar and accessed from there
+
             //is = new FileInputStream(Bukkit.getPluginManager().getPlugin(Main.instance.getName()).getDataFolder().getAbsolutePath() + "/conformal.txt");
             //is = getClass().getClassLoader().getResourceAsStream("resources/conformal.txt");
             is = getClass().getClassLoader().getResourceAsStream("conformal.txt");
-            //System.out.println("inputscanner loading conformal resource ");
-            if (is == null)
-                System.out.println("inputstream is is NULL!");
 
             @SuppressWarnings("resource")
             Scanner sc = new Scanner(is);

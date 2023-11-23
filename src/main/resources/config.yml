@@ -15,8 +15,7 @@ api-key: 00000000-0000-0000-0000-000000000000
 
 # The main world using the custom BTE Dynmaxion projection
 earth-world: world
-
-
+universal_tpll.earth_world: world
 
 # -----------------------------------------------------
 # | Navigation: The navigator command that allows the player to navigate through the project

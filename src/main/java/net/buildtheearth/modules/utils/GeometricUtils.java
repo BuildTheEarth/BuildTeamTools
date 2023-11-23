@@ -7,6 +7,7 @@ import net.buildtheearth.modules.utils.geo.projection.ModifiedAirocean;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.configuration.file.FileConfiguration;
 
 public class GeometricUtils {
     /**
@@ -61,6 +62,7 @@ public class GeometricUtils {
         //Creates the location
         Location location;
         World tpWorld = Bukkit.getWorld(Main.instance.getConfig().getString("universal_tpll.earth_world"));
+
         if (tpWorld == null)
             location = new Location(null, x, 64, z);
         else

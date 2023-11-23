@@ -2,7 +2,12 @@ package net.buildtheearth.modules.utils;
 
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Server;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -42,5 +47,13 @@ public class ChatHelper {
         String bottom = "==============================" + new String(array);
         sender.sendMessage("");
         sender.sendMessage("§7§m" + bottom);
+    }
+
+    public static void sendMessageToPlayersNearLocation(Location location, String message, double maxDistance)
+    {
+        
+        for (Player player : location.getWorld().getNearbyEntitiesByType(Player.class, location, maxDistance)) {
+            player.sendMessage(message);
+        }
     }
 }

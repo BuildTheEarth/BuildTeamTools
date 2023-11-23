@@ -133,7 +133,7 @@ public class KmlCommand implements CommandExecutor {
         }
 
         //parse kml
-        KmlParser parser = new KmlParser();
+        KmlParser parser = new KmlParser(player); // we pass the player here to be able to report parsing errors
         List<LineString> geoLines = parser.extractLinestrings(String.join(" ", args));
 
         World world = senderBlock.getWorld();
@@ -225,12 +225,20 @@ public class KmlCommand implements CommandExecutor {
 
     public boolean createPasteUI(Player player, Command cmd, String alias, String[] args){
         //The command either creates a command-block at the player location
-        //TODO TabCompleter
 
-        String blocktype = "bricks";
+        String blocktype;
         if (args.length > 0)
         {
-            blocktype = args[0];
+            blocktype = args[0].toUpperCase();
+            if (Material.getMaterial(blocktype) == null)
+            {
+                player.sendMessage(String.format("§cInvalid block type '%s'. Using bricks as fallback.", blocktype));
+                blocktype = "BRICKS";
+            }
+                
+        }
+        else{
+            blocktype = "BRICKS";
         }
 
         //spawn a command block in front of the player

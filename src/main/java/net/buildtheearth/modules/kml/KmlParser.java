@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import de.micromata.opengis.kml.v_2_2_0.Document;
 import de.micromata.opengis.kml.v_2_2_0.Feature;
@@ -15,27 +16,32 @@ import de.micromata.opengis.kml.v_2_2_0.MultiGeometry;
 import de.micromata.opengis.kml.v_2_2_0.Placemark;
 
 public class KmlParser {
-    public KmlParser(){}
+    private Player player;
+
+    public KmlParser(Player player){
+        this.player = player;
+    }
 
     public List<LineString> extractLinestrings(String kmlString)
-    {
-        Bukkit.getServer().broadcastMessage(
-                    String.format("Parsing kml string of length %d", kmlString.length())); 
-        
+    {       
         List<LineString> linestrings = new ArrayList<>();
 
         //https://github.com/micromata/javaapiforkml
+        try {
+            Kml kml = Kml.unmarshal(kmlString);
+            //Top-level element will be a document
+            Document doc = (Document) kml.getFeature();
+            List<Placemark> placemarks = findPlacemarks(doc);
 
-        Kml kml = Kml.unmarshal(kmlString);
-        //Top-level element will be a document
-        Document doc = (Document) kml.getFeature();
-        List<Placemark> placemarks = findPlacemarks(doc);
 
+            for (Placemark placemark : placemarks){
+                // #extract coordinates assuming geometry is linestring
+                List<LineString> lines = findLineStrings(placemark);
+                linestrings.addAll(lines);
+            }
 
-        for (Placemark placemark : placemarks){
-            // #extract coordinates assuming geometry is linestring
-            List<LineString> lines = findLineStrings(placemark);
-            linestrings.addAll(lines);
+        } catch (Exception ex) {
+            player.sendMessage(String.format("§cthere was an error parsing the kml string: '%s'", ex.toString()));
         }
 
         return linestrings;
@@ -49,8 +55,6 @@ public class KmlParser {
 
          for (Feature feature : container.getFeature())
          {
-            Bukkit.getServer().broadcastMessage(
-                    String.format("Feature of type %s: %s", feature.getClass().getName(), feature.getName())); 
             if (feature instanceof Placemark)  
                 placemarks.add((Placemark)feature);
             //else if (feature instanceof Folder)
@@ -65,8 +69,7 @@ public class KmlParser {
         return placemarks;
     }
 
-    private List<LineString> findLineStrings(Placemark placemark)
-    {
+    private List<LineString> findLineStrings(Placemark placemark){
         List<LineString> lines = new ArrayList<>();
 
         Geometry geom = placemark.getGeometry();
@@ -87,8 +90,8 @@ public class KmlParser {
             }
         }
         else {
-            Bukkit.getServer().broadcastMessage(
-                    String.format("Placemark has geometry of unsupported type %s", geom.getClass().getName())); 
+            this.player.sendMessage(
+                String.format("§cPlacemark has geometry of unsupported type %s", geom.getClass().getName())); 
         }
 
         return lines;

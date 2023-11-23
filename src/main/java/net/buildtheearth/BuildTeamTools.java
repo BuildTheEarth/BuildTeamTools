@@ -24,6 +24,7 @@ import net.buildtheearth.modules.warp.WarpManager;
 import net.buildtheearth.modules.warp.commands.WarpCommand;
 import net.buildtheearth.modules.warp.listeners.WarpJoinListener;
 import net.buildtheearth.modules.kml.KmlCommand;
+import net.buildtheearth.modules.kml.KmlTabCompleter;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -163,6 +164,7 @@ public class BuildTeamTools {
         Main.instance.getCommand("navigator").setExecutor(new NavigatorCommand());
         Main.instance.getCommand("temporary").setExecutor(new TestCommand());
         Main.instance.getCommand("kml").setExecutor(new KmlCommand());
+        Main.instance.getCommand("kml").setTabCompleter(new KmlTabCompleter());
     }
 
     /**

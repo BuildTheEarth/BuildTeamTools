@@ -22,6 +22,17 @@ public class KmlParser {
         this.player = player;
     }
 
+    
+    /** 
+     * returns all line-strings (also called "paths" or "poly-lines") from the KML content.
+     * A linestring is a list of geo-coordinates that are interpreted as beeing connected by straight lines.
+     * Note that a linestring is not automatically "closed", startpoint and endpoint can be different.
+     * 
+     * Note: Each placemark can have multiple linestrings when using the type "MultiGeometry".
+     * 
+     * @param kmlString KML content
+     * @return List<LineString>: A list of LineString objects, which themselves are lists of geocoordiantes.
+     */
     public List<LineString> extractLinestrings(String kmlString)
     {       
         List<LineString> linestrings = new ArrayList<>();
@@ -48,6 +59,12 @@ public class KmlParser {
             
     }
 
+    
+    /** 
+     * Finds all placemarks in the KML Document
+     * @param container the document to search
+     * @return List<Placemark>: the list of Placemark objects in the document
+     */
     private List<Placemark> findPlacemarks(Document container){
 
         //recursive search for placemarks in the document,            returns list of placemarks
@@ -69,6 +86,19 @@ public class KmlParser {
         return placemarks;
     }
 
+    
+    /** 
+     * returns all LineStrings in the given KML Placemark
+     * A placemark can have different geometry types. The type MultiGeometry can be used to create
+     * arbitrarily complex hierarchies of Geometries.
+     * 
+     * This method only cares about LineString and MultiGeometry.
+     * 
+     * A placemark can have multiple linestrings when using the type "MultiGeometry".
+     * 
+     * @param placemark the placemark to search
+     * @return List<LineString>: A list of LineString objects, which themselves are lists of geocoordiantes.
+     */
     private List<LineString> findLineStrings(Placemark placemark){
         List<LineString> lines = new ArrayList<>();
 

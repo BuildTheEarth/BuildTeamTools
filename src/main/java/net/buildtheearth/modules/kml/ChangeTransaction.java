@@ -14,6 +14,14 @@ import org.bukkit.entity.Player;
 
 import net.buildtheearth.modules.utils.BlockLocation;
 
+/**
+ * A set of block changes that should be bundled together. 
+ * Can be used to keep track of changes stemming from a single command, and for undo.
+ * 
+ * Use @see addBlockChange() to add to the set of changes
+ * 
+ * Use @see commit() to execute the changes, and @see undo() to revert the changes. 
+ */
 public class ChangeTransaction {
 
     public class BlockModification{
@@ -37,15 +45,34 @@ public class ChangeTransaction {
         blockPositions = new HashSet<BlockLocation>();
     }
 
-    public void addBlockChange(Location location, Material newType){
-        addBlockChange(new BlockLocation(location.getBlockX(), location.getBlockY(), location.getBlockZ()), location.getWorld(), newType);
+    
+    /** 
+     * adds a block change to this change-set. If this already has a change for this location, the change is ignored.
+     * use @see commit() to execute the changes.
+     * 
+     * @param location the location to change
+     * @param newType the new material / block type for the location
+     * @return boolean: indicate if the change was accepted or not (i.e. wether this already had a change for the location or not)
+     */
+    public boolean addBlockChange(Location location, Material newType){
+        return addBlockChange(new BlockLocation(location.getBlockX(), location.getBlockY(), location.getBlockZ()), location.getWorld(), newType);
     }
 
-    public void addBlockChange(BlockLocation location, World world, Material newType){
+    
+    /** 
+     * adds a block change to this change-set. If this already has a change for this location, the change is ignored.
+     * use @see commit() to execute the changes.
+     * 
+     * @param world the world for the change
+     * @param location the location to change
+     * @param newType the new material / block type for the location
+     * @return boolean: indicate if the change was accepted or not (i.e. wether this already had a change for the location or not)
+     */
+    public boolean addBlockChange(BlockLocation location, World world, Material newType){
         //check if we already have a change for this location.
         
         if (blockPositions.contains(location)){
-            return; //ignore change
+            return false; //ignore change
             //TODO maybe instead update type?
         }
         blockPositions.add(location);
@@ -53,6 +80,7 @@ public class ChangeTransaction {
         BlockModification mod = new BlockModification(
             world.getBlockAt(location.getLocation(world)), newType);
         changes.add(mod);
+        return true;
     }
 
     public int commit(){

@@ -1,17 +1,21 @@
 package net.buildtheearth.modules.utils;
 
-import org.bukkit.block.Block;
-
-import javafx.geometry.Point3D;
-
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
 
 import java.util.List;
 import java.util.ArrayList;
 
 public class LineRasterization {
+    
+    /** 
+     * Interpolates block positions between to given locations, similarly to what 
+     * the WorldEdit command "//line" does. Internally uses Bresenhams algorithm to
+     * calculate the intermediate positions
+     * 
+     * @param start Start position
+     * @param end End position
+     * @return List<BlockLocation> all locations forming the line, including start and endpoint.
+     */
     public static List<BlockLocation> rasterizeLine(Location start, Location end){
         
         List<BlockLocation> rasterLine = new ArrayList<>();
@@ -53,17 +57,6 @@ public class LineRasterization {
         }
         
         return rasterLine;
-    }
-
-    public static void fillLineWithBlocks(Location start, Location end, World world, Material blockType){
-        //TODO World from server-config as in GeometricUtils
-        ////World tpWorld = Bukkit.getWorld(Main.instance.getConfig().getString("universal_tpll.earth_world"));
-        
-        List<BlockLocation> rasterLine = rasterizeLine(start, end);
-        for (BlockLocation loc : rasterLine)
-        {
-            world.getBlockAt(loc.x, loc.y, loc.z).setType(blockType);
-        }
     }
 
 }

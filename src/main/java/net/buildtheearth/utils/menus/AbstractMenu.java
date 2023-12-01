@@ -115,7 +115,7 @@ public abstract class AbstractMenu {
      * @param sliderName Name of the slider
      * @param current Current block item
      */
-    protected void setColorChoiceItems(MenuItems.SliderColor sliderColor, int sliderItemSlot, String sliderName, ItemStack current){
+    protected void setChoiceItems(MenuItems.SliderColor sliderColor, int sliderItemSlot, String sliderName, ItemStack current){
         sliderName = "§e" + sliderName;
 
         if(current == null) {

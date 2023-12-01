@@ -1,15 +1,29 @@
 package net.buildtheearth.buildteam.components.generator.road;
 
+import net.buildtheearth.Main;
 import net.buildtheearth.buildteam.components.generator.Flag;
 import net.buildtheearth.buildteam.components.generator.Settings;
 import org.bukkit.entity.Player;
 
+import java.io.File;
+import java.sql.Array;
+import java.util.ArrayList;
+import java.util.List;
+
 public class RoadSettings extends Settings {
 
+    public static List<String> streetLampTypes = new ArrayList<>();
 
 
     public RoadSettings(Player player){
         super(player);
+
+        File directory = new File(Main.instance.getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/GeneratorCollections/roadpack/");
+        File[] files = directory.listFiles();
+
+        for(File file : files)
+            if(file.getName().contains("streetlamp"))
+                streetLampTypes.add(file.getName().replace(".schematic", "").replace("streetlamp", ""));
     }
 
     public void setDefaultValues(){

@@ -65,17 +65,14 @@ public class BuildTeamTools {
         try {
             YamlFileFactory.registerPlugin(Main.instance);
             ConfigUtil.init();
-        } catch (ConfigNotImplementedException ex) {
-            Bukkit.getLogger().severe(ChatHelper.highlight("Could not load BuildTeamTools configuration file!"));
-            Bukkit.getLogger().warning(ChatColor.YELLOW + "The configuration file must be configured!");
+        } catch (ConfigNotImplementedException ex) {}
 
-            Main.instance.getServer().getPluginManager().disablePlugin(Main.instance);
-            return false;
-        }
         // Reload the configuration file
         ConfigUtil.getInstance().reloadFiles();
 
         // Register an incoming & outgoing Plugin Messaging Channel
+        Main.instance.getServer().getMessenger().registerOutgoingPluginChannel(Main.instance, "BungeeCord");
+        Main.instance.getServer().getMessenger().registerIncomingPluginChannel(Main.instance, "BungeeCord", Main.instance);
         Main.instance.getServer().getMessenger().registerOutgoingPluginChannel(Main.instance, "BuildTeam");
         Main.instance.getServer().getMessenger().registerIncomingPluginChannel(Main.instance, "BuildTeam", Main.instance);
 

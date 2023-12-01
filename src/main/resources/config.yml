@@ -15,31 +15,34 @@ api-key: 00000000-0000-0000-0000-000000000000
 
 # The main world using the custom BTE Dynmaxion projection
 earth-world: world
-universal_tpll.earth_world: world
+
+
 
 # -----------------------------------------------------
 # | Navigation: The navigator command that allows the player to navigate through the project
 # -----------------------------------------------------
 
 # Configures the navigator item in the players hotbar
-navigator-item:
-  # Enables or disables the navigator item [true|false]
+navigator-hotbar-item:
+  # Enables or disables the navigator hotbar item [true|false]
   enabled: true
   # The hotbar slot into which the navigator item should be placed
   slot: 0
 
-build-item:
-  # Execute a custom command when build is clicked [true|false]
-  enabled: false
-  command: /build
-  
-
-tutorial-item:
-  # Enables or disables the tutorial item inside the navigator [true|false]
-  enabled: false
-  # Command to execute when the tutorial item is clicked
-  command: /tutorials 
-
+# Specifies which menu items should be enabled
+main_menu_items:
+  # Configures the build item inside the navigator
+  build-item:
+    # Enables or disables the build item inside the navigator [true|false]
+    enabled: true
+    # (Optional) Execute a custom command or send a message when the build item is clicked [/command|message]
+    action: /command
+  # Configures the tutorial item inside the navigator
+  tutorial-item:
+    # Enables or disables the tutorial item inside the navigator [true|false]
+    enabled: false
+    # (Optional) Execute a custom command or send a message when the tutorial item is clicked [/command|message]
+    action: /command
 
 
 

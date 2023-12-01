@@ -1,5 +1,8 @@
 package net.buildtheearth.modules.utils;
 
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
+import net.buildtheearth.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -36,6 +39,13 @@ public class Utils {
                 return 0;
         }
         return y;
+    }
+
+    public static void sendPlayerToSerer(Player player, String server) {
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF("Connect");
+        out.writeUTF(server);
+        player.sendPluginMessage(Main.instance, "BungeeCord", out.toByteArray());
     }
 
     public static int[] range(int start, int stop) {

@@ -17,6 +17,8 @@ import java.util.concurrent.ExecutionException;
 
 public class ProxyManager {
 
+    public static String GLOBAL_PLOT_SYSTEM_SERVER = "Plot1";
+
     public static int CACHE_UPLOAD_SPEED = 20 * 60 * 10 + 20;
 
     /**

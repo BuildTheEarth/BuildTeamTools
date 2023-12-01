@@ -103,7 +103,8 @@ public class BuildTeamTools {
      * Stops the instance of BuildTeamTools which is currently running
      */
     public void stop() {
-        statsManager.updateAndSave();
+        if(statsManager != null)
+            statsManager.updateAndSave();
     }
 
     /**

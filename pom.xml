@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.buildtheearth</groupId>
-    <artifactId>BuildTeam</artifactId>
+    <artifactId>BuildTeamTools</artifactId>
     <version>0.1.3-alpha</version>
     <packaging>jar</packaging>
 
-    <name>BuildTeam</name>
+    <name>BuildTeamTools</name>
 
-    <description>BuildTeam Plugin</description>
+    <description>BuildTeamTools Plugin</description>
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

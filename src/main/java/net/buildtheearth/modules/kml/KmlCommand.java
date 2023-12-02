@@ -26,7 +26,6 @@ import org.bukkit.command.BlockCommandSender;
 import org.bukkit.entity.Player;
 
 import de.micromata.opengis.kml.v_2_2_0.Coordinate;
-import de.micromata.opengis.kml.v_2_2_0.LineString;
 
 import org.bukkit.World;
 
@@ -95,20 +94,23 @@ public class KmlCommand implements CommandExecutor {
     }
 
 
-    
+
     /** 
      * @param senderBlock
      * @param args
      * @return boolean
      */
     public boolean processKml(Block senderBlock, String[] args){
+        long time_start = System.currentTimeMillis();
+
 
         //read metadata to get player name/ID
         BlockState blockState = senderBlock.getState();
         String playerName = blockState.getMetadata("kmlPlayerName").get(0).asString(); 
         String blocktypeString = blockState.getMetadata("kmlBlocktype").get(0).asString();
         String previousCommandBlockType = blockState.getMetadata("kmlPreviousBlocktype").get(0).asString();
-        boolean interpolatePoints = blockState.getMetadata("kmlInterpolatePoints").get(0).asBoolean();
+        String blockCreationCommand = blockState.getMetadata("kmlBlockCreationCommand").get(0).asString();
+        BlockCreationMode operationMode = commandToCreationMode(blockCreationCommand);
 
         if (playerName == "" || blocktypeString == ""){
             //invalid metadata, cancel
@@ -126,6 +128,10 @@ public class KmlCommand implements CommandExecutor {
             return false;
         }
 
+        String kml_content = String.join(" ", args);
+        // player.sendMessage(String.format("§creceived /kml command with blocktypestring %s and and kml length %d: %s",
+        //  blocktypeString, kml_content.length(), kml_content));
+
         Material blockMaterial = Material.getMaterial(blocktypeString);
         if (blockMaterial == null){
             player.sendMessage("§creceived /kml command with invalid blocktype string. Using bricks as fallback.");
@@ -133,11 +139,20 @@ public class KmlCommand implements CommandExecutor {
         }
 
         //parse kml
+        long time_beforeKMLParse = System.currentTimeMillis();
+
+
+
         KmlParser parser = new KmlParser(player); // we pass the player here to be able to report parsing errors
-        List<LineString> geoLines = parser.extractLinestrings(String.join(" ", args));
+        List<List<Coordinate>> geoCoords = parser.extractCoordinates(kml_content);
+        long time_afterKMLParse = System.currentTimeMillis();
+
 
         World world = senderBlock.getWorld();
-        List<List<Location>> mcLines = convertToMC(geoLines, world);
+
+        List<List<Location>> mcLocations = convertToMC(geoCoords, world);
+        long time_afterProjection = System.currentTimeMillis();
+
 
         //set up a transaction (collection of block changes)
         ChangeTransaction transaction = new ChangeTransaction(player);
@@ -148,27 +163,34 @@ public class KmlCommand implements CommandExecutor {
         Set<BlockLocation> blockPositions = new HashSet<>();
 
 
-        for (List<Location> polyline : mcLines)
+        for (List<Location> polyline : mcLocations)
         {
             //rasterize line and create intermediate blocks
             //note: iteration starts at second block, so we always have a previous block to draw the line
             //for single point mode, we explicitly add the first block
-            if (!interpolatePoints)
+            if (operationMode == BlockCreationMode.POINTS)
                 blockPositions.add(new BlockLocation(polyline.get(0)));
 
 
             for (int i = 1; i < polyline.size(); ++i)
             {
-                if (interpolatePoints)
+                if (operationMode == BlockCreationMode.POINTS)
+                    blockPositions.add(new BlockLocation(polyline.get(i)));
+                else //interpolate
                 {
                     blockPositions.addAll(
                         LineRasterization.rasterizeLine(polyline.get(i-1), polyline.get(i)));
-                } else {
-                    //single points only
-                    blockPositions.add(new BlockLocation(polyline.get(i)));
                 }
             }
+
+            //for closed-path-mode, add extra line between start and end
+            if (operationMode == BlockCreationMode.CLOSED_PATH)
+            {
+                blockPositions.addAll(
+                    LineRasterization.rasterizeLine(polyline.get(0), polyline.get(polyline.size()-1)));
+            }
             
+            //TODO for filled mode, also triangulate and fill the surface
         }
 
         //now create the blocks
@@ -206,9 +228,20 @@ public class KmlCommand implements CommandExecutor {
         Stack<ChangeTransaction> playerHistory = playerHistories.get(player);
 
         playerHistory.push(transaction);
-        int blocksChanged = transaction.commit();
+
+
+        long time_beforeBlockChange = System.currentTimeMillis();
+
+
+        player.sendMessage(String.format("KML parsing: %d ms. BTE Projection: %d ms, Transaction preparation: %d ms. Changing %d blocks, please stand by."
+            , (time_afterKMLParse-time_beforeKMLParse)
+            , (time_afterProjection - time_afterKMLParse )
+            , (time_beforeBlockChange - time_afterProjection), transaction.size()));
         
-        player.sendMessage(String.format("imported KML data. Changed %d blocks.", blocksChanged));
+        int blocksChanged = transaction.commit();
+
+        long time_afterBlockChanged = System.currentTimeMillis();
+        player.sendMessage(String.format("KML command changed %d blocks (%d ms).", blocksChanged, (time_afterBlockChanged - time_beforeBlockChange)));
         
 
         if (preventedUnloadedChunkChanges){
@@ -233,12 +266,12 @@ public class KmlCommand implements CommandExecutor {
             if (Material.getMaterial(blocktype) == null)
             {
                 player.sendMessage(String.format("§cInvalid block type '%s'. Using bricks as fallback.", blocktype));
-                blocktype = "BRICKS";
+                blocktype = "BRICK";
             }
                 
         }
         else{
-            blocktype = "BRICKS";
+            blocktype = "BRICK";
         }
 
         //spawn a command block in front of the player
@@ -260,13 +293,7 @@ public class KmlCommand implements CommandExecutor {
         cmdBlock.setMetadata("kmlBlocktype", new FixedMetadataValue(Main.instance, blocktype));
         cmdBlock.setMetadata("kmlPreviousBlocktype", new FixedMetadataValue(Main.instance, previousMaterial.toString()));
         
-        boolean interpolatePoints;
-        if (alias.equals("geopoints"))
-            interpolatePoints = false;
-        else
-            interpolatePoints = true;
-
-        cmdBlock.setMetadata("kmlInterpolatePoints", new FixedMetadataValue(Main.instance, interpolatePoints));
+        cmdBlock.setMetadata("kmlBlockCreationCommand", new FixedMetadataValue(Main.instance, alias));
         
         cmdBlock.update();
         player.sendMessage("§6Command block created. Right click the block, paste the KML content, set it to 'always on' and confirm");
@@ -299,29 +326,46 @@ public class KmlCommand implements CommandExecutor {
         //});
     }
 
-    private List<List<org.bukkit.Location> > convertToMC(List<LineString> geoLines, World world){
+    private List<List<org.bukkit.Location> > convertToMC(List<List<Coordinate>> geocoords_lists, World world){
         List<List<org.bukkit.Location> > mcLines = new ArrayList<>();
 
-        for (LineString line : geoLines){
+        for (List<Coordinate> geocoords : geocoords_lists){
             List<org.bukkit.Location> mcLine =new ArrayList<>();
 
-            for (Coordinate coordinate : line.getCoordinates()) {
+            for (Coordinate geocoord : geocoords) {
                 //convert lat/lon to minecraft x z
-                LatLng coordinates = new LatLng(coordinate.getLatitude(), coordinate.getLongitude());
+                LatLng latlng = new LatLng(geocoord.getLatitude(), geocoord.getLongitude());
 
                 // convert with projection and extract terrain altitude
-                Location mcLocation = GeometricUtils.getLocationFromCoordinates(coordinates);
+                Location mcLocation = GeometricUtils.getLocationFromCoordinates(latlng);
                 //add altitude from kml (altitude from Google Earth is always relative to ground)
                 //note: the "-2" is only neccesary because 
                 //  getLocationFromCoordinates returns terrain altitude + 2
                 //      (one from Bukkits getHighestBlockY and one from our geoutils)
-                mcLocation.add(0, coordinate.getAltitude() - 2, 0);
+                mcLocation.add(0, geocoord.getAltitude() - 2, 0);
 
                 mcLine.add(mcLocation);
             }
             mcLines.add(mcLine);
         }
         return mcLines;
+    }
+
+    private BlockCreationMode commandToCreationMode(String command){
+        if (command.equals("geopoints"))
+            return BlockCreationMode.POINTS;
+        else if (command.equals("geopath"))
+            return BlockCreationMode.PATH;
+        else if (command.equals("georing"))
+            return BlockCreationMode.CLOSED_PATH;
+        else if (command.equals("geosurface"))
+        {
+            throw new UnsupportedOperationException("Operation mode 'filled surface' is not yet implemented");
+            //return BlockCreationMode.FILLED;
+        }
+        else
+            throw new IllegalArgumentException(command);
+            
     }
 
     private HashMap<Player, Stack<ChangeTransaction>> playerHistories;

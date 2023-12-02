@@ -1,240 +1,168 @@
 package net.buildtheearth.modules.navigator.menu;
 
+import com.alpsbte.alpslib.utils.item.ItemBuilder;
 import net.buildtheearth.Main;
 import net.buildtheearth.modules.network.ProxyManager;
 import net.buildtheearth.modules.utils.Item;
-import net.buildtheearth.modules.utils.MenuItem;
 import net.buildtheearth.modules.utils.Utils;
+import net.buildtheearth.modules.utils.io.ConfigPaths;
 import net.buildtheearth.modules.utils.menus.AbstractMenu;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
- * The main menu for the BTE universal navigator. <p>
- * <p>
- * <p> Accessed from here is an explore menu, a build menu (plot system and tools) and a tutorials menu
- * All of these 3 icons can be enabled and disabled <p>
- * <p>
- * <p> Also in Main Menu is an option to toggle whether the navigator item is in the hotbar. A player can always use /navigator to open
- * the navigator <p>
- * <p>
- * <p> The menu has 3 rows. The centre row is occupied with Build, Explore and Tutorials (if enabled), and the last row holds the navigator hide option <p>
+ * The main menu for the BTE universal navigator. <br>
+ * <br>
+ * Accessed from here is an explore menu, a build menu (plot system and tools) and a tutorials menu
+ * The build and tutorials item can be enabled and disabled <br>
+ * <br>
+ * The Main Menu also contains an option to toggle whether the navigator item is in the hotbar. A player can always use /navigator to open
+ * the navigator <br>
+ * <br>
+ * The menu has 3 rows. The centre row is occupied with Build, Explore and Tutorials (if enabled), and the last row holds the navigator hide option.
  */
 public class MainMenu extends AbstractMenu {
-    private static final int iRows = 3;
-    private static final String szInventoryName = "Build the Earth";
-    private static final FileConfiguration config = Main.instance.getConfig();
-    private static final ArrayList<MenuItem> menuItems = getGui(Main.buildTeamTools.getProxyManager());
+
+    private static final String inventoryName = "Build the Earth";
+    private static FileConfiguration config;
 
     public MainMenu(Player menuPlayer) {
-        super(iRows, szInventoryName, menuPlayer);
-    }
-
-    /**
-     * Produces a list of Menu Items for the MainMenu gui
-     *
-     * @return
-     * @see MenuItem
-     */
-    public static ArrayList<MenuItem> getGui(ProxyManager proxyManager) {
-        //Initiates the list
-        ArrayList<MenuItem> menuItems = new ArrayList<>();
-
-        //Gets the list of items needed in the GUI
-        int iItemsNeeded = 0;
-        boolean[] bItemsNeeded = new boolean[3];
-        String[] szCommands = new String[3];
-        String[] szMessages = new String[3];
-        int[] iSlotsToBeUsed;
-
-        bItemsNeeded[0] = config.getBoolean("navigator.main_menu_items.build.enabled");
-        if (bItemsNeeded[0])
-            iItemsNeeded++;
-        else {
-            szCommands[0] = config.getString("navigator.main_menu_items.build.command");
-            szMessages[0] = config.getString("navigator.main_menu_items.build.message");
-        }
-        bItemsNeeded[1] = config.getBoolean("navigator.build_menu_items.explore.enabled");
-        if (bItemsNeeded[1])
-            iItemsNeeded++;
-        else {
-            szCommands[1] = config.getString("navigator.main_menu_items.build.command");
-            szMessages[1] = config.getString("navigator.main_menu_items.build.message");
-        }
-
-        bItemsNeeded[2] = config.getBoolean("navigator.build_menu_items.tutorials.enabled");
-        if (bItemsNeeded[2])
-            iItemsNeeded++;
-
-        //Deals with the number of items needed
-        if (iItemsNeeded == 0)
-            return menuItems;
-        else
-            iSlotsToBeUsed = MenuItem.getSlotIndexesMiddleRowOf3(iItemsNeeded);
-
-        //-----------------------------------------------------
-        //--------------Adds the items to the GUI--------------
-        //-----------------------------------------------------
-        int iItem = 0;
-
-        //-------------------------------------------
-        //-------------------Build-------------------
-        //-------------------------------------------
-        if (bItemsNeeded[0]) {
-            ArrayList<String> buildLore = new ArrayList<>();
-            buildLore.add(Utils.loreText(config.getString("navigator.main_menu_items.build.lore")));
-
-            ItemStack buildItem = Item.create(Material.getMaterial(config.getString("navigator.main_menu_items.build.material")), ChatColor.GREEN + "" + ChatColor.BOLD + "Build", 1, buildLore);
-            MenuItem build = new MenuItem(iSlotsToBeUsed[iItem], buildItem, player ->
-            {
-                //Opens the build menu for the player
-                new BuildMenu(player);
-            });
-            menuItems.add(build);
-
-            iItem++;
-        }
-        //A command was specified
-        else if (szCommands[0] != null) {
-            if (szCommands[0].startsWith("/")) {
-                ArrayList<String> buildLore = new ArrayList<>();
-                buildLore.add(Utils.loreText(config.getString("navigator.main_menu_items.build.lore")));
-
-                ItemStack buildItem = Item.create(Material.getMaterial(config.getString("navigator.main_menu_items.build.material")), ChatColor.GREEN + "" + ChatColor.BOLD + "Build", 1, buildLore);
-                MenuItem build = new MenuItem(iSlotsToBeUsed[iItem], buildItem, player ->
-                {
-                    Bukkit.getScheduler().runTask(Main.instance, () ->
-                    {
-                        //Performs the command
-                        player.performCommand(szCommands[0]);
-                    });
-                });
-                menuItems.add(build);
-
-                iItem++;
-            }
-        }
-        //A message was specified
-        else if (szMessages[0] != null) {
-            ArrayList<String> buildLore = new ArrayList<>();
-            buildLore.add(Utils.loreText(config.getString("navigator.main_menu_items.build.lore")));
-
-            ItemStack buildItem = Item.create(Material.getMaterial(config.getString("navigator.main_menu_items.build.material")), ChatColor.GREEN + "" + ChatColor.BOLD + "Build", 1, buildLore);
-            MenuItem build = new MenuItem(iSlotsToBeUsed[iItem], buildItem, player ->
-            {
-                //Sends the message
-                player.sendMessage(ChatColor.GREEN + szMessages[0]);
-            });
-            menuItems.add(build);
-
-            iItem++;
-        }
-
-        //-------------------------------------------
-        //------------------Explore------------------
-        //-------------------------------------------
-        if (bItemsNeeded[1]) {
-            ArrayList<String> exploreLore = new ArrayList<>();
-            exploreLore.add(Utils.loreText(config.getString("navigator.main_menu_items.explore.lore")));
-
-            ItemStack exploreItem = Item.create(Material.getMaterial(config.getString("navigator.main_menu_items.explore.material")), ChatColor.YELLOW + "" + ChatColor.BOLD + "Explore", 1, exploreLore);
-            MenuItem explore = new MenuItem(iSlotsToBeUsed[iItem], exploreItem, player ->
-            {
-                //Opens the explore menu for the player
-                new ExploreMenu(player, proxyManager.isConnected());
-            });
-            menuItems.add(explore);
-
-            iItem++;
-        }
-        //A command was specified
-        else if (szCommands[1] != null) {
-            if (szCommands[1].startsWith("/")) {
-                ArrayList<String> exploreLore = new ArrayList<>();
-                exploreLore.add(Utils.loreText(config.getString("navigator.main_menu_items.explore.lore")));
-
-                ItemStack exploreItem = Item.create(Material.getMaterial(config.getString("navigator.main_menu_items.explore.material")), ChatColor.YELLOW + "" + ChatColor.BOLD + "Explore", 1, exploreLore);
-                MenuItem explore = new MenuItem(iSlotsToBeUsed[iItem], exploreItem, player ->
-                {
-                    Bukkit.getScheduler().runTask(Main.instance, () ->
-                    {
-                        //Performs the command
-                        player.performCommand(szCommands[1]);
-                    });
-                });
-                menuItems.add(explore);
-
-                iItem++;
-            }
-        }
-        //A message was specified
-        else if (szMessages[1] != null) {
-            ArrayList<String> exploreLore = new ArrayList<>();
-            exploreLore.add(Utils.loreText(config.getString("navigator.main_menu_items.explore.lore")));
-
-            ItemStack exploreItem = Item.create(Material.getMaterial(config.getString("navigator.main_menu_items.explore.material")), ChatColor.YELLOW + "" + ChatColor.BOLD + "Explore", 1, exploreLore);
-            MenuItem explore = new MenuItem(iSlotsToBeUsed[iItem], exploreItem, player ->
-            {
-                //Sends the message
-                player.sendMessage(ChatColor.GREEN + szMessages[1]);
-            });
-            menuItems.add(explore);
-
-            iItem++;
-        }
-
-
-        //-------------------------------------------
-        //-----------------Tutorials-----------------
-        //-------------------------------------------
-        if (bItemsNeeded[2]) {
-            ArrayList<String> tutorialsLore = new ArrayList<>();
-            tutorialsLore.add(Utils.loreText(config.getString("navigator.main_menu_items.tutorials.lore")));
-
-            ItemStack tutorialsItem = Item.create(Material.getMaterial(config.getString("navigator.main_menu_items.tutorials.material")), ChatColor.AQUA + "" + ChatColor.BOLD + "Tutorials", 1, tutorialsLore);
-            MenuItem tutorials = new MenuItem(iSlotsToBeUsed[iItem], tutorialsItem, player ->
-            {
-                //Open New tutorials menu
-            });
-            menuItems.add(tutorials);
-        }
-
-        //--------------------------------------------
-        //-----------------Toggle nav-----------------
-        //--------------------------------------------
-        ArrayList<String> navLore = new ArrayList<>();
-        navLore.add(Utils.loreText("Click to toggle the navigator in your inventory"));
-        navLore.add(Utils.loreText("You can always open the navigator with /navigator"));
-
-        ItemStack navToggleItem = Item.create(Material.KNOWLEDGE_BOOK, ChatColor.AQUA + "" + ChatColor.BOLD + "Tutorials", 1, navLore);
-        MenuItem toggleNav = new MenuItem(18, navToggleItem, player ->
-        {
-            //TODO Navigator.updatePreference(PreferenceType.NavigatorEnabled, player.getUniqueId());
-        });
-        menuItems.add(toggleNav);
-
-        return menuItems;
+        super(3, inventoryName, menuPlayer);
     }
 
     @Override
-    protected void setMenuItemsAsync() {
-        setMenuItemsAsyncViaMenuItems(menuItems);
+    protected void setPreviewItems() {
+        config = Main.instance.getConfig();
+        int[] slots = getSlots();
+
+        // Fill the blank slots with glass panes
+        getMenu().getSlot(11).setItem(new ItemBuilder(Material.STAINED_GLASS_PANE, 1, (byte) 7).setName(" ").build());
+        getMenu().getSlot(13).setItem(new ItemBuilder(Material.STAINED_GLASS_PANE, 1, (byte) 7).setName(" ").build());
+        getMenu().getSlot(15).setItem(new ItemBuilder(Material.STAINED_GLASS_PANE, 1, (byte) 7).setName(" ").build());
+
+        // Set Explore Item
+        ArrayList<String> exploreLore = new ArrayList<>(Collections.singletonList(ChatColor.GRAY + "Click to explore the project!"));
+        getMenu().getSlot(slots[0]).setItem(Item.create(Material.BOAT_SPRUCE, ChatColor.YELLOW + "" + ChatColor.BOLD + "Explore", 1, exploreLore));
+
+
+        // Set Build Item
+        if(config.getBoolean(ConfigPaths.BUILD_ITEM_ENABLED)) {
+            ArrayList<String> buildLore = new ArrayList<>(Collections.singletonList(ChatColor.GRAY + "Click to build for the project!"));
+            getMenu().getSlot(slots[1]).setItem(Item.create(Material.DIAMOND_PICKAXE, ChatColor.GREEN + "" + ChatColor.BOLD + "Build", 1, buildLore));
+        }
+
+        // Set Tutorials Item
+        if(config.getBoolean(ConfigPaths.TUTORIALS_ITEM_ENABLED)) {
+            ArrayList<String> tutorialsLore = new ArrayList<>(Collections.singletonList(ChatColor.GRAY + "Click to do some tutorials!"));
+            getMenu().getSlot(slots[2]).setItem(Item.create(Material.KNOWLEDGE_BOOK, ChatColor.AQUA + "" + ChatColor.BOLD + "Tutorials", 1, tutorialsLore));
+        }
+
+        super.setPreviewItems();
     }
+
+    @Override
+    protected void setMenuItemsAsync() {}
 
     @Override
     protected void setItemClickEventsAsync() {
-        setMenuItemClickEventsAsyncViaMenuItems(menuItems);
+        int[] slots = getSlots();
+
+        // Set Explore Item Click Event
+        getMenu().getSlot(slots[0]).setClickHandler((clickPlayer, clickInformation) -> {
+            clickPlayer.closeInventory();
+            new ExploreMenu(clickPlayer);
+        });
+
+        // Set Build Item Click Event
+        if(config.getBoolean(ConfigPaths.BUILD_ITEM_ENABLED)) {
+            getMenu().getSlot(slots[1]).setClickHandler((clickPlayer, clickInformation) -> {
+                clickPlayer.closeInventory();
+                String action = config.getString(ConfigPaths.BUILD_ITEM_ACTION);
+
+                // If no command is set, open the build menu
+                if(action == null) {
+                    Utils.sendPlayerToSerer(clickPlayer, ProxyManager.GLOBAL_PLOT_SYSTEM_SERVER);
+                    return;
+                }
+
+                performClickAction(clickPlayer, action.replace("&", "§"));
+            });
+        }
+
+        // Set Tutorials Item Click Event
+        if(config.getBoolean(ConfigPaths.TUTORIALS_ITEM_ENABLED)) {
+            getMenu().getSlot(slots[2]).setClickHandler((clickPlayer, clickInformation) -> {
+                clickPlayer.closeInventory();
+                String action = config.getString(ConfigPaths.BUILD_ITEM_ACTION);
+
+                // If no command is set, open the build menu
+                if(action == null) {
+                    Utils.sendPlayerToSerer(clickPlayer, ProxyManager.GLOBAL_PLOT_SYSTEM_SERVER);
+                    return;
+                }
+
+                performClickAction(clickPlayer, action.replace("&", "§"));
+            });
+        }
     }
 
     @Override
     protected Mask getMask() {
-        return null;
+        return BinaryMask.builder(getMenu())
+                .item(new ItemBuilder(Material.STAINED_GLASS_PANE, 1, (byte) 7).setName(" ").build())
+                .pattern("111111111")
+                .pattern("110101011")
+                .pattern("111111111")
+                .build();
+    }
+
+    /** Returns the slots for the Build, Explore and Tutorials items depending on which items are enabled in the config
+     *
+     * @return int[] - Slots of the Explore [0], Build [1] and Tutorials [2] items
+     */
+    private int[] getSlots() {
+        int[] slots = new int[3];
+
+        boolean buildEnabled = config.getBoolean(ConfigPaths.BUILD_ITEM_ENABLED);
+        boolean tutorialsEnabled = config.getBoolean(ConfigPaths.TUTORIALS_ITEM_ENABLED);
+
+        int exploreSlot = 11;
+        int buildSlot = 13;
+        int tutorialsSlot = 15;
+
+        int enabledItemCount = (buildEnabled ? 1 : 0) + 1 + (tutorialsEnabled ? 1 : 0);
+
+        // Depending on how many items are enabled, set the slots to the correct positions
+        if (enabledItemCount == 2) {
+            if (buildEnabled)
+                buildSlot = 15;
+            else
+                buildSlot = 11;
+        }
+
+        slots[0] = exploreSlot;
+        slots[1] = buildSlot;
+        slots[2] = tutorialsSlot;
+
+        return slots;
+    }
+
+    private void performClickAction(Player p, String action) {
+        // Check if an action is set in the config
+        if(!action.equals("/command")) {
+
+            if (action.startsWith("/"))
+                p.chat(action);
+            else
+                p.performCommand(action);
+        } else
+            p.sendMessage("§cNo action is set for the build item in the config yet! Please contact an admin.");
     }
 }

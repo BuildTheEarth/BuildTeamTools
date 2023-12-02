@@ -5,61 +5,42 @@ import net.buildtheearth.modules.utils.MenuItem;
 import net.buildtheearth.modules.utils.menus.AbstractMenu;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.ipvp.canvas.mask.Mask;
 
-import java.util.ArrayList;
-
+/** The Tutorials Menu for the BTE universal navigator.<br>
+ * <br>
+ * Accessed from the main menu, this menu will contain a list of tutorials for the player to view.<br>
+ * <br>
+ * The Tutorials Menu will utilise the Tutorials API once created and published.
+ */
 public class TutorialsMenu extends AbstractMenu {
-    //Will utilise the Tutorials API once created and published
 
-    //3 rows
-    //Top and bottom blank, middle row filled with options, layout depends on what icons are enabled in config
-    private static final int iRows = 3;
-    private static final String szInventoryName = "Tutorials Menu";
-    private static final ArrayList<MenuItem> menuItems = getGui();
+    private static final int BACK_BUTTON_SLOT = 13;
+
+    private static final String inventoryName = "Tutorials Menu";
     private static final FileConfiguration config = Main.instance.getConfig();
 
     public TutorialsMenu(Player player) {
-        super(iRows, szInventoryName, player);
-    }
-
-    /**
-     * Produces a list of Menu Items for the BuildMenu gui
-     *
-     * @return
-     * @see MenuItem
-     */
-    public static ArrayList<MenuItem> getGui() {
-        //Initiates the list
-        ArrayList<MenuItem> menuItems = new ArrayList<>();
-
-        //--------------------------------------------
-        //--------------------Back--------------------
-        //--------------------------------------------
-
-        //Creates the item for back button
-        ItemStack backItem = MenuItem.backButton("Build Menu");
-
-        //Creates the menu item, specifying the click actions
-        MenuItem back = new MenuItem((iRows * 9) - 1, backItem, player ->
-        {
-            //Opens the build menu
-            new BuildMenu(player);
-        });
-        menuItems.add(back);
-
-        return menuItems;
+        super(3, inventoryName, player);
     }
 
     @Override
-    protected void setMenuItemsAsync() {
-        setMenuItemsAsyncViaMenuItems(menuItems);
+    protected void setPreviewItems() {
+        getMenu().getSlot(BACK_BUTTON_SLOT).setItem(MenuItem.backButton("Main Menu"));
+
+        super.setPreviewItems();
     }
+
+
+    @Override
+    protected void setMenuItemsAsync() {}
 
     @Override
     protected void setItemClickEventsAsync() {
-        setMenuItemClickEventsAsyncViaMenuItems(menuItems);
+        getMenu().getSlot(BACK_BUTTON_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
+            clickPlayer.closeInventory();
+            new MainMenu(clickPlayer);
+        });
     }
 
     @Override

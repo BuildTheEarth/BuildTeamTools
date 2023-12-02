@@ -1,124 +1,90 @@
 package net.buildtheearth.modules.navigator.menu;
 
-import net.buildtheearth.Main;
+
+import com.alpsbte.alpslib.utils.item.ItemBuilder;
 import net.buildtheearth.modules.utils.Item;
-import net.buildtheearth.modules.utils.MenuItem;
-import net.buildtheearth.modules.utils.Utils;
-import net.buildtheearth.modules.utils.io.ConfigPaths;
 import net.buildtheearth.modules.utils.menus.AbstractMenu;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
- * The explore menu for the BTE universal navigator. <p>
- * <p>
- * <p> Accessed from here is the warp menu, the plot system, the region menu and the building tools (generator) menu.
- * All of these icons can be enabled and disabled. <p>
- * <p>
- * <p> The menu has 3 rows and the centre row is the only occupied row. The layout depends on what icons are enabled in config.
+ * The ExploreMenu for the BTE universal navigator.<br>
+ * <br>
+ * Accessed from here is the warp menu, the plot system, the region menu and the building tools (generator) menu.
+ * All of these icons can be enabled and disabled.<br>
+ * <br>
+ * The menu has 3 rows and the centre row is the only occupied row. The layout depends on what icons are enabled in config.
  */
 public class ExploreMenu extends AbstractMenu {
-    private static final int iRows = 3;
-    private static final String szInventoryName = "Explore Menu";
-    private final ArrayList<MenuItem> menuItems;
+    private static final String inventoryName = "Explore Menu";
 
-    public ExploreMenu(Player menuPlayer, boolean bNetworkConnected) {
-        super(iRows, szInventoryName, menuPlayer, false);
-        this.menuItems = getGui(bNetworkConnected, Main.instance.getConfig());
-        reloadMenuAsync();
-    }
-
-    public static ArrayList<MenuItem> getGui(boolean bNetworkConnected, FileConfiguration config) {
-        //Initiates the list
-        ArrayList<MenuItem> menuItems = new ArrayList<>();
-
-        //Creates slot index
-        int[] iSlots = new int[]{1, 3, 5, 7, 11, 13, 15};
-
-        //--------------------------------------------
-        //-----------Create continent items-----------
-        //--------------------------------------------
-        Continent[] continents = Continent.values();
-        for (int i = 0; i < 7; i++) {
-            //Creates the lore
-            ArrayList<String> continentLore = new ArrayList<>();
-            continentLore.add(Utils.loreText("Visit countries in " + continents[i].label));
-
-            //Creates the item
-            ItemStack continentItem = Item.create(Material.getMaterial(config.getString(ConfigPaths.EXPLORE_ITEM_MATERIAL)),
-                    ChatColor.YELLOW + "" + ChatColor.BOLD + "" + continents[i].label, 1, continentLore);
-
-            MenuItem continent;
-            int iSlot = i;
-            if (continents[i].equals(Continent.Africa)) {
-                continent = new MenuItem(iSlots[i], continentItem, player ->
-                {
-                    //The actions for the continent item
-                    // new CountryMenu(player, bNetworkConnected, new Country("Africa", Continent.Africa));
-                });
-            } else {
-                continent = new MenuItem(iSlots[i], continentItem, player ->
-                {
-                    //Opens a new country selector menu
-                    // new CountrySelectorMenu(continents[iSlot], player, bNetworkConnected);
-                });
-            }
-
-            menuItems.add(continent);
-        }
-
-        //--------------------------------------------
-        //--------------------Back--------------------
-        //--------------------------------------------
-
-        //Creates the item for back button
-        ItemStack backItem = MenuItem.backButton("Main Menu");
-
-        //Creates the menu item, specifying the click actions
-        MenuItem back = new MenuItem((iRows * 9) - 1, backItem, player ->
-        {
-            //Opens the main menu
-            new MainMenu(player);
-        });
-        menuItems.add(back);
-
-        return menuItems;
+    public ExploreMenu(Player menuPlayer) {
+        super(4, inventoryName, menuPlayer);
     }
 
     @Override
-    protected void setMenuItemsAsync() {
-        setMenuItemsAsyncViaMenuItems(menuItems);
+    protected void setPreviewItems() {
+        // Create the continent items
+        for (Continent continent : Continent.values()) {
+            ArrayList<String> continentLore = new ArrayList<>(Collections.singletonList(ChatColor.GRAY + "Visit countries in " + continent.label));
+            getMenu().getSlot(continent.slot).setItem(Item.create(Material.COMPASS,"§e§l" + continent.label, 1, continentLore));
+        }
+
+        super.setPreviewItems();
     }
 
     @Override
     protected void setItemClickEventsAsync() {
-        setMenuItemClickEventsAsyncViaMenuItems(menuItems);
+        // Set click events for the continent items
+        for(Continent continent : Continent.values()) {
+            getMenu().getSlot(continent.slot).setClickHandler((clickPlayer, clickInformation) -> {
+                clickPlayer.closeInventory();
+
+                if(continent.equals(Continent.Africa))
+                    ;// TODO implement that the player gets information about the BTE Africa server when clicking on Africa
+                else
+                    // TODO implement a country menu
+                    ;// new CountrySelectorMenu(continents[iSlot], player, bNetworkConnected);
+
+            });
+        }
     }
 
     @Override
+    protected void setMenuItemsAsync() {}
+
+
+    @Override
     protected Mask getMask() {
-        return null;
+        return BinaryMask.builder(getMenu())
+                .item(new ItemBuilder(Material.STAINED_GLASS_PANE, 1, (byte) 7).setName(" ").build())
+                .pattern("111111111")
+                .pattern("010101010")
+                .pattern("111101111")
+                .pattern("111111111")
+                .build();
     }
 
     public enum Continent {
-        North_America("North America"),
-        South_America("South America"),
-        Europe("Europe"),
-        Africa("Africa"),
-        Asia("Asia"),
-        Oceania("Oceania"),
-        Other("Asia");
+        North_America("North America", 9),
+        South_America("South America", 11),
+        Europe("Europe", 13),
+        Africa("Africa", 15),
+        Asia("Asia", 17),
+        Other("Other", 22);
 
         public final String label;
+        public final int slot;
 
-        Continent(String label) {
+        Continent(String label, int slot) {
             this.label = label;
+            this.slot = slot;
         }
     }
 

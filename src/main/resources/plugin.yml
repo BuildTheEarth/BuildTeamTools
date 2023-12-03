@@ -37,3 +37,4 @@ commands:
      - geopoints
      - geopath
      - georing
+     - geosurface

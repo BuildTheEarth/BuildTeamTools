@@ -5,6 +5,7 @@ import net.buildtheearth.modules.utils.BlockLocation;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.GeometricUtils;
 import net.buildtheearth.modules.utils.LineRasterization;
+import net.buildtheearth.modules.utils.PolygonTools;
 import net.buildtheearth.modules.utils.geo.LatLng;
 
 import java.util.List;
@@ -12,6 +13,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.Stack;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 import java.util.HashSet;
 
 import org.bukkit.Bukkit;
@@ -163,34 +168,38 @@ public class KmlCommand implements CommandExecutor {
         Set<BlockLocation> blockPositions = new HashSet<>();
 
 
+
         for (List<Location> polyline : mcLocations)
         {
-            //rasterize line and create intermediate blocks
-            //note: iteration starts at second block, so we always have a previous block to draw the line
-            //for single point mode, we explicitly add the first block
-            if (operationMode == BlockCreationMode.POINTS)
-                blockPositions.add(new BlockLocation(polyline.get(0)));
-
-
-            for (int i = 1; i < polyline.size(); ++i)
-            {
+            if (operationMode == BlockCreationMode.FILLED)
+                blockPositions = triangulateAndFill(polyline);
+            else{
+                //rasterize line and create intermediate blocks
+                //note: iteration starts at second block, so we always have a previous block to draw the line
+                //for single point mode, we explicitly add the first block
                 if (operationMode == BlockCreationMode.POINTS)
-                    blockPositions.add(new BlockLocation(polyline.get(i)));
-                else //interpolate
+                    blockPositions.add(new BlockLocation(polyline.get(0)));
+
+
+                for (int i = 1; i < polyline.size(); ++i)
+                {
+                    if (operationMode == BlockCreationMode.POINTS)
+                        blockPositions.add(new BlockLocation(polyline.get(i)));
+                    else //interpolate
+                    {
+                        blockPositions.addAll(
+                            LineRasterization.rasterizeLine(polyline.get(i-1), polyline.get(i)));
+                    }
+                }
+
+                //for closed-path-mode, add extra line between start and end
+                if (operationMode == BlockCreationMode.CLOSED_PATH)
                 {
                     blockPositions.addAll(
-                        LineRasterization.rasterizeLine(polyline.get(i-1), polyline.get(i)));
+                        LineRasterization.rasterizeLine(polyline.get(0), polyline.get(polyline.size()-1)));
                 }
             }
-
-            //for closed-path-mode, add extra line between start and end
-            if (operationMode == BlockCreationMode.CLOSED_PATH)
-            {
-                blockPositions.addAll(
-                    LineRasterization.rasterizeLine(polyline.get(0), polyline.get(polyline.size()-1)));
-            }
             
-            //TODO for filled mode, also triangulate and fill the surface
         }
 
         //now create the blocks
@@ -255,6 +264,24 @@ public class KmlCommand implements CommandExecutor {
         senderBlock.setType(Material.getMaterial(previousCommandBlockType));
         return true;
     }
+
+    private Set<BlockLocation> triangulateAndFill(List<Location> polyline) {
+        Set<BlockLocation>result = new HashSet<>();
+        //triangulate the polygon
+        List<PolygonTools.Triangle> triangles = PolygonTools.triangulatePolygon(polyline);
+        //fill with bresenham. for now, just all border-lines
+        for (PolygonTools.Triangle tri : triangles){
+            result.addAll(PolygonTools.rasterizeTriangle(tri));
+            
+            //dEBUG: ALL triangle borders
+            result.addAll(LineRasterization.rasterizeLine(tri.getVertex1(), tri.getVertex2()));
+            result.addAll(LineRasterization.rasterizeLine(tri.getVertex1(), tri.getVertex3()));
+            result.addAll(LineRasterization.rasterizeLine(tri.getVertex2(), tri.getVertex3()));
+        }
+        return result;
+    }
+
+
 
     public boolean createPasteUI(Player player, Command cmd, String alias, String[] args){
         //The command either creates a command-block at the player location
@@ -326,27 +353,56 @@ public class KmlCommand implements CommandExecutor {
         //});
     }
 
+    private Location getLocationFromCoordinates(LatLng latlng, double altitudeFromKML)
+    {
+        Location mcLocation = GeometricUtils.getLocationFromCoordinates(latlng);
+        //add altitude from kml (altitude from Google Earth is always relative to ground)
+        //note: the "-2" is only neccesary because 
+        //  getLocationFromCoordinates returns terrain altitude + 2
+        //      (one from Bukkits getHighestBlockY and one from our geoutils)
+        mcLocation.add(0, altitudeFromKML - 2, 0);
+        return mcLocation;
+    }
+
     private List<List<org.bukkit.Location> > convertToMC(List<List<Coordinate>> geocoords_lists, World world){
+    
         List<List<org.bukkit.Location> > mcLines = new ArrayList<>();
 
+        //This lat/long to xyz conversion takes most of the runtime for this command
+        //TODO parallelize 
         for (List<Coordinate> geocoords : geocoords_lists){
-            List<org.bukkit.Location> mcLine =new ArrayList<>();
+            // ExecutorService to manage the threads
+            ExecutorService executorService = Executors.newFixedThreadPool(geocoords.size());
 
+            // List to store CompletableFuture results
+            List<CompletableFuture<Location>> completableFutureList = new ArrayList<>();
+
+            // Create a CompletableFuture for each set of coordinates
             for (Coordinate geocoord : geocoords) {
-                //convert lat/lon to minecraft x z
                 LatLng latlng = new LatLng(geocoord.getLatitude(), geocoord.getLongitude());
 
-                // convert with projection and extract terrain altitude
-                Location mcLocation = GeometricUtils.getLocationFromCoordinates(latlng);
-                //add altitude from kml (altitude from Google Earth is always relative to ground)
-                //note: the "-2" is only neccesary because 
-                //  getLocationFromCoordinates returns terrain altitude + 2
-                //      (one from Bukkits getHighestBlockY and one from our geoutils)
-                mcLocation.add(0, geocoord.getAltitude() - 2, 0);
-
-                mcLine.add(mcLocation);
+                CompletableFuture<Location> completableFuture = CompletableFuture.supplyAsync(() ->
+                        getLocationFromCoordinates(latlng, geocoord.getAltitude()), executorService);
+                completableFutureList.add(completableFuture);
             }
+
+            // Combine all CompletableFutures into a single CompletableFuture representing all of them
+            CompletableFuture<Void> allOf = CompletableFuture.allOf(
+                    completableFutureList.toArray(new CompletableFuture[0])
+            );
+
+            // Wait for all CompletableFutures to complete
+            allOf.join();
+
+            // Collect the results from the CompletableFutures
+            List<org.bukkit.Location> mcLine = completableFutureList.stream()
+                    .map(CompletableFuture::join)
+                    .collect(Collectors.toList());
+
             mcLines.add(mcLine);
+
+            // Shutdown the ExecutorService
+            executorService.shutdown();
         }
         return mcLines;
     }

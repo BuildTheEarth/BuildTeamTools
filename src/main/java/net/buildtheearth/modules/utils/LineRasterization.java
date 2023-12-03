@@ -7,6 +7,12 @@ import java.util.ArrayList;
 
 public class LineRasterization {
     
+    public static List<BlockLocation> rasterizeLine(Location start, Location end){
+        return rasterizeLine(
+                    start.getBlockX(),start.getBlockY(),start.getBlockZ(),
+                    end.getBlockX(),end.getBlockY(),end.getBlockZ());
+    }
+
     /** 
      * Interpolates block positions between to given locations, similarly to what 
      * the WorldEdit command "//line" does. Internally uses Bresenhams algorithm to
@@ -16,20 +22,14 @@ public class LineRasterization {
      * @param end End position
      * @return List<BlockLocation> all locations forming the line, including start and endpoint.
      */
-    public static List<BlockLocation> rasterizeLine(Location start, Location end){
+    public static List<BlockLocation> rasterizeLine(int x0, int y0, int z0, int x1, int y1, int z1){
         
         List<BlockLocation> rasterLine = new ArrayList<>();
 
         //Bresenhams algorithm for 3D. Works on integer coordinates
         //void bresenham3D (int x0, int y0, int z0, int x1, int y1, int z1)
-        int x0 = start.getBlockX();
-        int y0 = start.getBlockY();
-        int z0 = start.getBlockZ();
 
-        int x1 = end.getBlockX();
-        int y1 = end.getBlockY();
-        
-        int z1 = end.getBlockZ();
+
         int dx = Math.abs(x1-x0);
         int sx = x0<x1 ? 1:-1;
         int dy = Math.abs(y1-y0);

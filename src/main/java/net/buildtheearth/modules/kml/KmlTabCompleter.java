@@ -20,6 +20,7 @@ public class KmlTabCompleter implements TabCompleter{
         }        
     }
 
+
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args)
     {
         //the player can use /geopoints and /geopath with a single argument: "undo" or Blocktype
@@ -30,14 +31,20 @@ public class KmlTabCompleter implements TabCompleter{
             //alias kml only has undo as return option
             if (alias.equalsIgnoreCase("kml"))
                 completions.add("undo");
-            else if (args.length == 1) {
-                //player has started to type the first argument
-
-                //add all blocktypes that match the characters of the argument
-                for (String blocktype : blocktypes){
-                    if (blocktype.startsWith(args[0].toLowerCase())){
-                        completions.add(blocktype);
+            else if (args.length > 0){
+                //player has started to type an argument
+                //allowed arguments are blocktype and/or -extend:blocktype
+                String currentArg = args[args.length-1];
+                if (currentArg.startsWith("-")){
+                    if (currentArg.startsWith("-extend:")){
+                        addMatchingBlocktypeCompletions(currentArg, completions, "-extend:");
+                    }else{
+                        completions.add("-extend:");
                     }
+                }
+                else {
+                    //add all blocktypes that match the characters of the argument
+                    addMatchingBlocktypeCompletions(currentArg, completions, "");
                 }
 
                 Collections.sort(completions);
@@ -50,5 +57,15 @@ public class KmlTabCompleter implements TabCompleter{
         return completions;
     }
 
+    private void addMatchingBlocktypeCompletions(String currentArg, List<String> completions, String prefix)
+    {
+        //add all blocktypes that match the characters of the argument
+        String argWithoutPrefix = currentArg.substring(prefix.length());
+        for (String blocktype : blocktypes){
+            if (blocktype.startsWith(argWithoutPrefix.toLowerCase())){
+                completions.add(prefix + blocktype);
+            }
+        }
+    }
     private List<String> blocktypes;
 }

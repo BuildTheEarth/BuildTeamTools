@@ -98,8 +98,26 @@ public class KmlCommand implements CommandExecutor {
         return createPasteUI(p, cmd, alias, args);
     }
 
+    void addSingleLocation(BlockLocation loc, boolean extendToGround, World world, Set<BlockLocation> container, Set<BlockLocation> fillPositions)
+    {
+        container.add(loc);
+        if (extendToGround)
+            fillVerticalToTerrain(loc, world, fillPositions);
+    }
 
+    void addLocations(List<BlockLocation> locs, boolean extendToGround, World world, Set<BlockLocation> container, Set<BlockLocation> fillPositions)
+    {
+        for (BlockLocation loc : locs)
+            addSingleLocation(loc, extendToGround, world, container, fillPositions);
+    }
 
+    void fillVerticalToTerrain(BlockLocation locationOverGround, World world, Set<BlockLocation> container)
+    {
+        int terrainElevation = world.getHighestBlockYAt(locationOverGround.x, locationOverGround.z);
+        for (int y = terrainElevation; y < locationOverGround.y; y++){
+            container.add(new BlockLocation(locationOverGround.x, y, locationOverGround.z));
+        }
+    }
     /** 
      * @param senderBlock
      * @param args
@@ -116,6 +134,10 @@ public class KmlCommand implements CommandExecutor {
         String previousCommandBlockType = blockState.getMetadata("kmlPreviousBlocktype").get(0).asString();
         String blockCreationCommand = blockState.getMetadata("kmlBlockCreationCommand").get(0).asString();
         BlockCreationMode operationMode = commandToCreationMode(blockCreationCommand);
+
+        boolean extendToGround = blockState.getMetadata("kmlExtendToGround").get(0).asBoolean();
+        String extendToGroundBlockType = blockState.getMetadata("kmlExtendToGroundBlocktype").get(0).asString();
+        
 
         if (playerName == "" || blocktypeString == ""){
             //invalid metadata, cancel
@@ -139,9 +161,15 @@ public class KmlCommand implements CommandExecutor {
 
         Material blockMaterial = Material.getMaterial(blocktypeString);
         if (blockMaterial == null){
-            player.sendMessage("§creceived /kml command with invalid blocktype string. Using bricks as fallback.");
+            player.sendMessage("§cServer received /kml command with invalid blocktype string metadata. Using bricks as fallback.");
             blockMaterial = Material.BRICK;
         }
+        Material extendMaterial = Material.getMaterial(extendToGroundBlockType);
+        if (extendMaterial == null){
+            player.sendMessage("§cServer received /kml command with invalid blocktype string metadata. Using bricks as fallback.");
+            extendMaterial = Material.BRICK;
+        }
+
 
         //parse kml
         long time_beforeKMLParse = System.currentTimeMillis();
@@ -166,6 +194,7 @@ public class KmlCommand implements CommandExecutor {
         //if just iterate and create blocks one by one, we create multiple blocks at the same XZ coordinates,
         // this also stacks them vertically because we check terrain altitude.
         Set<BlockLocation> blockPositions = new HashSet<>();
+        Set<BlockLocation> fillPositions = new HashSet<>();
 
 
 
@@ -178,25 +207,30 @@ public class KmlCommand implements CommandExecutor {
                 //note: iteration starts at second block, so we always have a previous block to draw the line
                 //for single point mode, we explicitly add the first block
                 if (operationMode == BlockCreationMode.POINTS)
-                    blockPositions.add(new BlockLocation(polyline.get(0)));
-
+                {
+                    BlockLocation loc = new BlockLocation(polyline.get(0));
+                    addSingleLocation(loc, extendToGround, world, blockPositions, fillPositions);
+                }
 
                 for (int i = 1; i < polyline.size(); ++i)
                 {
                     if (operationMode == BlockCreationMode.POINTS)
-                        blockPositions.add(new BlockLocation(polyline.get(i)));
+                    {
+                        BlockLocation loc = new BlockLocation(polyline.get(i));
+                        addSingleLocation(loc, extendToGround, world, blockPositions, fillPositions);
+                    }
                     else //interpolate
                     {
-                        blockPositions.addAll(
-                            LineRasterization.rasterizeLine(polyline.get(i-1), polyline.get(i)));
+                        addLocations(LineRasterization.rasterizeLine(polyline.get(i-1), polyline.get(i)),
+                            extendToGround, world, blockPositions, fillPositions);
                     }
                 }
 
                 //for closed-path-mode, add extra line between start and end
                 if (operationMode == BlockCreationMode.CLOSED_PATH)
                 {
-                    blockPositions.addAll(
-                        LineRasterization.rasterizeLine(polyline.get(0), polyline.get(polyline.size()-1)));
+                    addLocations(LineRasterization.rasterizeLine(polyline.get(0), polyline.get(polyline.size()-1))
+                        , extendToGround, world, blockPositions, fillPositions);
                 }
             }
             
@@ -221,6 +255,20 @@ public class KmlCommand implements CommandExecutor {
                 transaction.addBlockChange(pt, world, blockMaterial);
             }
         }
+
+        for (BlockLocation pt : fillPositions)
+        {
+            Location loc = pt.getLocation(world);
+            if (!loc.getChunk().isLoaded())
+                preventedUnloadedChunkChanges = true;
+            else if (loc.distance(player.getLocation()) > maxDistanceToPlayer)
+                preventedFarChanges = true;
+            else
+            {
+                transaction.addBlockChange(pt, world, extendMaterial);
+            }
+        }
+
 
         if (transaction.size() == 0){
             player.sendMessage("§ckml command did not contain any allowed block changes.\nThis command can only change blocks near your current location, and cannot load new chunks.");
@@ -285,21 +333,35 @@ public class KmlCommand implements CommandExecutor {
 
     public boolean createPasteUI(Player player, Command cmd, String alias, String[] args){
         //The command either creates a command-block at the player location
-
-        String blocktype;
-        if (args.length > 0)
+        //arguments are an 
+        //  optional blocktype 
+        //  optional -toGround:blockType
+        String blocktype = "BRICK";
+        boolean extendToGround = false;
+        String extendToGroundBlockType = "GREEN_WOOL";
+        String prefix_extendParam = "-extend:";
+        for (String arg : args)
         {
-            blocktype = args[0].toUpperCase();
-            if (Material.getMaterial(blocktype) == null)
-            {
-                player.sendMessage(String.format("§cInvalid block type '%s'. Using bricks as fallback.", blocktype));
-                blocktype = "BRICK";
+            if (arg.startsWith(prefix_extendParam)){
+                extendToGround = true;
+                extendToGroundBlockType = arg.substring(prefix_extendParam.length()).toUpperCase();
+                if (Material.getMaterial(extendToGroundBlockType) == null)
+                {
+                    player.sendMessage(String.format("§cInvalid block type for extend parameter '%s'. Using bricks as fallback.", extendToGroundBlockType));
+                    extendToGroundBlockType = "BRICK";
+                }
+            }else{
+                blocktype = arg.toUpperCase();
+                if (Material.getMaterial(blocktype) == null)
+                {
+                    player.sendMessage(String.format("§cInvalid block type '%s'. Using bricks as fallback.", blocktype));
+                    blocktype = "BRICK";
+                }
             }
+
                 
         }
-        else{
-            blocktype = "BRICK";
-        }
+
 
         //spawn a command block in front of the player
         Location commandBlockLocation = player.getLocation().add(player.getLocation().getDirection().multiply(2));
@@ -318,6 +380,9 @@ public class KmlCommand implements CommandExecutor {
         cmdBlock.setMetadata("kmlPlayerName", new FixedMetadataValue(Main.instance, player.getName()));
         //cmdBlock.setMetadata("kmlPlayerID", new FixedMetadataValue(Main.instance, p.getUniqueId()));
         cmdBlock.setMetadata("kmlBlocktype", new FixedMetadataValue(Main.instance, blocktype));
+        cmdBlock.setMetadata("kmlExtendToGround", new FixedMetadataValue(Main.instance, extendToGround));
+        cmdBlock.setMetadata("kmlExtendToGroundBlocktype", new FixedMetadataValue(Main.instance, extendToGroundBlockType));
+        
         cmdBlock.setMetadata("kmlPreviousBlocktype", new FixedMetadataValue(Main.instance, previousMaterial.toString()));
         
         cmdBlock.setMetadata("kmlBlockCreationCommand", new FixedMetadataValue(Main.instance, alias));
@@ -369,7 +434,7 @@ public class KmlCommand implements CommandExecutor {
         List<List<org.bukkit.Location> > mcLines = new ArrayList<>();
 
         //This lat/long to xyz conversion takes most of the runtime for this command
-        //TODO parallelize 
+        // since the conversions do not influence each other, we can parallelize them.
         for (List<Coordinate> geocoords : geocoords_lists){
             // ExecutorService to manage the threads
             ExecutorService executorService = Executors.newFixedThreadPool(geocoords.size());

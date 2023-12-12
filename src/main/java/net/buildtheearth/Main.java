@@ -98,7 +98,8 @@ public class Main extends JavaPlugin implements PluginMessageListener {
             }
 
             if (subChannel.equalsIgnoreCase("ServerPing")) {
-               Main.getBuildTeamTools().getProxyManager().handleServerPing(in);
+                ChatHelper.logDebug("Received a server ping.");
+                Main.getBuildTeamTools().getProxyManager().handleServerPing(in);
             }
 
             // Reset the stats cache

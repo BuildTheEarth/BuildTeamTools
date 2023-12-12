@@ -9,7 +9,7 @@ public class TestCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        String result = Main.getBuildTeamTools().getProxyManager().getActiveCountries().toString();
+        String result = Main.getBuildTeamTools().getProxyManager().getActiveServers().toString();
         Bukkit.getLogger().info(result == null ? "null" : result);
         return true;
     }

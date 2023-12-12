@@ -166,7 +166,8 @@ public class NetworkAPI {
 
         List<String> targetBuildTeams = new ArrayList<>();
         for(String serverName : Main.getBuildTeamTools().getProxyManager().getActiveServers()) {
-            //TODO ADD TEAMS BELONGING TO SERVERNAME TO TARGET BUILDTEAMS
+            ChatHelper.logDebug("Getting teams by servername...");
+            //TODO IMPLEMENT GETTING BT IDS BY SERVER NAME
         }
 
 

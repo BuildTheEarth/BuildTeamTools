@@ -6,6 +6,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.Main;
 import net.buildtheearth.modules.network.api.NetworkAPI;
+import net.buildtheearth.modules.utils.ChatHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -96,6 +97,7 @@ public class ProxyManager {
         out.writeUTF("ServerPing");
         out.writeUTF("requesting");
         Bukkit.getServer().sendPluginMessage(Main.instance, "BuildTeam", out.toByteArray());
+        ChatHelper.logDebug("Sending server ping.");
     }
 
     public void handleServerPing(ByteArrayDataInput in) {

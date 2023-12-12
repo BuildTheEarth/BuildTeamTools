@@ -30,26 +30,35 @@ public class TpllManager {
      * @param player The player to whom the tpll operation belongs
      */
     public static void addTpllToQueue(ByteArrayDataInput in, Player player) {
+        ChatHelper.logDebug("Adding tpll event to queue... %s for %s" + in, player.getDisplayName());
         //Check the target server
         String targetServerName = in.readUTF();
+        ChatHelper.logDebug("The name of the target server is: %s", targetServerName);
         if (targetServerName.equals(Main.buildTeamTools.getProxyManager().getServerNameAsync())) {
+            ChatHelper.logDebug("The target server equals the current server");
             //Extracts the coordinates from the plugin message
             double targetLatitude = Double.parseDouble(in.readUTF());
             double targetLongitude = Double.parseDouble(in.readUTF());
             LatLng coordinates = new LatLng(targetLatitude, targetLongitude);
+            ChatHelper.logDebug("The coordinates of the tpll event are: %s %s", targetLatitude, targetLongitude);
 
             // Creates a bukkit location for this tpll target
             Location targetTpllLocation = GeometricUtils.getLocationFromCoordinates(coordinates);
+            ChatHelper.logDebug("Created a bukkit location for this event");
             // Location may contain a null world, this is checked for when the tpll event needs to be run
             // so that the player can be informed that the earth world was not specified
 
             // Adds the event to the list
             tpllQueue.put(player.getUniqueId(), targetTpllLocation);
+            ChatHelper.logDebug("Successfully added the tpll event to the queue.");
         }
     }
 
     public static void processQueueForPlayer(Player player) {
+        ChatHelper.logDebug("Trying to process tpll queue for player: %s", player.getDisplayName());
+        if(!tpllQueue.containsKey(player.getUniqueId())) return;
         Location tpllTarget = tpllQueue.get(player.getUniqueId());
+        ChatHelper.logDebug("The tpll target is: %s", tpllTarget.toString());
         if (tpllTarget == null) return;
 
         if (tpllTarget.getWorld() == null) {
@@ -59,7 +68,9 @@ public class TpllManager {
         }
 
         player.teleport(tpllTarget);
+        ChatHelper.logDebug("Teleported the player to the tpll target.");
         tpllQueue.remove(player.getUniqueId());
+        ChatHelper.logDebug("Successfully processed the tpll queue for this player.");
     }
 
     /**
@@ -69,6 +80,7 @@ public class TpllManager {
      * @param targetServerName The server to send the player to.
      */
     public static void tpllPlayer(Player player, double[] coordinates, String targetServerName) {
+        ChatHelper.logDebug("Starting universal tpll teleportation for %s to %s.", player.getDisplayName(), targetServerName);
         // Send a plugin message to the target server which adds the tpll to the queue
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Tpll");
@@ -79,5 +91,6 @@ public class TpllManager {
 
         // Switch the player to the target server
         Main.getBuildTeamTools().getProxyManager().switchServer(player, targetServerName);
+        ChatHelper.logDebug("Teleported player to the target server.");
     }
 }

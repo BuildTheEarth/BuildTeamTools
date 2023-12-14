@@ -47,7 +47,7 @@ public class NavigatorOpenListener implements Listener {
         event.setCancelled(true);
 
         //If item is not in the correct slot, delete it.
-        if (event.getSlot() != Navigator.getSlot(player)) {
+        if (event.getSlot() != Navigator.getSlot()) {
             player.getInventory().clear(event.getSlot());
             return;
         }

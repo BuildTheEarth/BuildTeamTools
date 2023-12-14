@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.navigator.commands;
 
+import net.buildtheearth.modules.navigator.Navigator;
 import net.buildtheearth.modules.navigator.menu.MainMenu;
 import net.buildtheearth.modules.utils.ChatHelper;
 import org.bukkit.command.Command;
@@ -15,8 +16,14 @@ public class NavigatorCommand implements CommandExecutor {
             return true;
         }
 
-        //Opens the navigator
-        new MainMenu((Player) sender);
+        if (args.length == 1 && args[0].equalsIgnoreCase("toggle")) {
+            // Toggle the navigator item on/off
+            Navigator.toggle((Player) sender);
+        } else {
+            // Opens the navigator
+            new MainMenu((Player) sender);
+        }
         return true;
     }
 }
+

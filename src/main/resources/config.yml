@@ -27,7 +27,7 @@ navigator-hotbar-item:
   # Enables or disables the navigator hotbar item [true|false]
   enabled: true
   # The hotbar slot into which the navigator item should be placed
-  slot: 0
+  slot: 8
 
 # Specifies which menu items should be enabled
 main_menu_items:
@@ -47,4 +47,4 @@ main_menu_items:
 
 
 # NOTE: Do not change
-config-version: 1.1
+config-version: 1.2

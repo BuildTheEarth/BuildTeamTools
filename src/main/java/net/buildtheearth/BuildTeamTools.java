@@ -139,7 +139,7 @@ public class BuildTeamTools {
 
             // Every second
             if (time % 20 == 0) {
-                Navigator.checkNavigatorSlot();
+                // Do something
             }
 
             // Every 0.25 seconds

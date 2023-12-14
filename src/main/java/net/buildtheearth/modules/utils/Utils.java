@@ -41,7 +41,10 @@ public class Utils {
         return y;
     }
 
-    public static void sendPlayerToSerer(Player player, String server) {
+    public static void sendPlayerToServer(Player player, String server) {
+        if(!Main.getBuildTeamTools().getProxyManager().isConnected()) {
+            player.sendMessage(ChatHelper.highlight("The %s needs to be connected to the %s to be able to do this!", "server", "network"));
+        }
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Connect");
         out.writeUTF(server);

@@ -3,6 +3,7 @@ package net.buildtheearth.modules.navigator.menu;
 import com.alpsbte.alpslib.utils.item.ItemBuilder;
 import net.buildtheearth.Main;
 import net.buildtheearth.modules.network.ProxyManager;
+import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.Utils;
 import net.buildtheearth.modules.utils.io.ConfigPaths;
@@ -48,20 +49,20 @@ public class MainMenu extends AbstractMenu {
         getMenu().getSlot(15).setItem(new ItemBuilder(Material.STAINED_GLASS_PANE, 1, (byte) 7).setName(" ").build());
 
         // Set Explore Item
-        ArrayList<String> exploreLore = new ArrayList<>(Collections.singletonList(ChatColor.GRAY + "Click to explore the project!"));
-        getMenu().getSlot(slots[0]).setItem(Item.create(Material.BOAT_SPRUCE, ChatColor.YELLOW + "" + ChatColor.BOLD + "Explore", 1, exploreLore));
+        ArrayList<String> exploreLore = new ArrayList<>(Collections.singletonList(ChatHelper.colorize(ChatColor.GRAY, "Click to explore the project!", false)));
+        getMenu().getSlot(slots[0]).setItem(Item.create(Material.BOAT_SPRUCE, ChatHelper.colorize(ChatColor.YELLOW, "Explore", true), 1, exploreLore));
 
 
         // Set Build Item
         if(config.getBoolean(ConfigPaths.BUILD_ITEM_ENABLED)) {
-            ArrayList<String> buildLore = new ArrayList<>(Collections.singletonList(ChatColor.GRAY + "Click to build for the project!"));
-            getMenu().getSlot(slots[1]).setItem(Item.create(Material.DIAMOND_PICKAXE, ChatColor.GREEN + "" + ChatColor.BOLD + "Build", 1, buildLore));
+            ArrayList<String> buildLore = new ArrayList<>(Collections.singletonList(ChatHelper.colorize(ChatColor.GRAY, "Click to build for the project!", false)));
+            getMenu().getSlot(slots[1]).setItem(Item.create(Material.DIAMOND_PICKAXE, ChatHelper.colorize(ChatColor.GREEN, "Build", true), 1, buildLore));
         }
 
         // Set Tutorials Item
         if(config.getBoolean(ConfigPaths.TUTORIALS_ITEM_ENABLED)) {
-            ArrayList<String> tutorialsLore = new ArrayList<>(Collections.singletonList(ChatColor.GRAY + "Click to do some tutorials!"));
-            getMenu().getSlot(slots[2]).setItem(Item.create(Material.KNOWLEDGE_BOOK, ChatColor.AQUA + "" + ChatColor.BOLD + "Tutorials", 1, tutorialsLore));
+            ArrayList<String> tutorialsLore = new ArrayList<>(Collections.singletonList(ChatHelper.colorize(ChatColor.GRAY, "Click to do some tutorials!", false)));
+            getMenu().getSlot(slots[2]).setItem(Item.create(Material.KNOWLEDGE_BOOK, ChatHelper.colorize(ChatColor.AQUA, "Tutorials", true), 1, tutorialsLore));
         }
 
         super.setPreviewItems();
@@ -86,9 +87,9 @@ public class MainMenu extends AbstractMenu {
                 clickPlayer.closeInventory();
                 String action = config.getString(ConfigPaths.BUILD_ITEM_ACTION);
 
-                // If no command is set, open the build menu
+                // If no command is set, teleport player to the plot system server
                 if(action == null) {
-                    Utils.sendPlayerToSerer(clickPlayer, ProxyManager.GLOBAL_PLOT_SYSTEM_SERVER);
+                    Utils.sendPlayerToServer(clickPlayer, ProxyManager.GLOBAL_PLOT_SYSTEM_SERVER);
                     return;
                 }
 
@@ -100,11 +101,11 @@ public class MainMenu extends AbstractMenu {
         if(config.getBoolean(ConfigPaths.TUTORIALS_ITEM_ENABLED)) {
             getMenu().getSlot(slots[2]).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
-                String action = config.getString(ConfigPaths.BUILD_ITEM_ACTION);
+                String action = config.getString(ConfigPaths.TUTORIALS_ITEM_ACTION);
 
-                // If no command is set, open the build menu
+                // If no command is set, open the tutorial menu
                 if(action == null) {
-                    Utils.sendPlayerToSerer(clickPlayer, ProxyManager.GLOBAL_PLOT_SYSTEM_SERVER);
+                    new TutorialsMenu(clickPlayer);
                     return;
                 }
 
@@ -163,6 +164,6 @@ public class MainMenu extends AbstractMenu {
             else
                 p.performCommand(action);
         } else
-            p.sendMessage("§cNo action is set for the build item in the config yet! Please contact an admin.");
+            p.sendMessage(ChatHelper.highlight("No action is set for the %s in the config yet! Please contact an %s.", "build item", "admin"));
     }
 }

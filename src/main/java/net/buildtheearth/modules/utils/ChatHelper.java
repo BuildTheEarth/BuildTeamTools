@@ -1,12 +1,9 @@
 package net.buildtheearth.modules.utils;
 
-import net.md_5.bungee.api.ChatColor;
+import org.bukkit.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Server;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
@@ -34,6 +31,14 @@ public class ChatHelper {
         return ChatColor.GOLD + String.format(string.replaceAll("%s", ChatColor.AQUA + "%s" + ChatColor.GOLD), objects);
     }
 
+    public static String colorize(ChatColor color, String string, boolean bold) {
+        return bold ? color + "" + ChatColor.BOLD + string : color + string;
+    }
+
+    public static String colorize(ChatColor color, ChatColor secondColor, String string, Object... objects) {
+        return color + String.format(string.replaceAll("%s", secondColor + "%s" + color), objects);
+    }
+
     public static void sendMessageBox(CommandSender sender, String title, Runnable runnable) {
         sender.sendMessage("");
         sender.sendMessage("§7§m==============§e§l " + title + " §7§m==============");
@@ -49,9 +54,7 @@ public class ChatHelper {
         sender.sendMessage("§7§m" + bottom);
     }
 
-    public static void sendMessageToPlayersNearLocation(Location location, String message, double maxDistance)
-    {
-        
+    public static void sendMessageToPlayersNearLocation(Location location, String message, double maxDistance) {
         for (Player player : location.getWorld().getNearbyEntitiesByType(Player.class, location, maxDistance)) {
             player.sendMessage(message);
         }

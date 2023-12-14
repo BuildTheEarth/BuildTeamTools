@@ -2,6 +2,8 @@ package net.buildtheearth.modules.navigator.menu;
 
 
 import com.alpsbte.alpslib.utils.item.ItemBuilder;
+import net.buildtheearth.modules.navigator.model.Continent;
+import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.menus.AbstractMenu;
 import org.bukkit.ChatColor;
@@ -23,16 +25,18 @@ import java.util.Collections;
  */
 public class ExploreMenu extends AbstractMenu {
     private static final String inventoryName = "Explore Menu";
+    private final Player menuPlayer;
 
     public ExploreMenu(Player menuPlayer) {
         super(4, inventoryName, menuPlayer);
+        this.menuPlayer = menuPlayer;
     }
 
     @Override
     protected void setPreviewItems() {
         // Create the continent items
         for (Continent continent : Continent.values()) {
-            ArrayList<String> continentLore = new ArrayList<>(Collections.singletonList(ChatColor.GRAY + "Visit countries in " + continent.label));
+            ArrayList<String> continentLore = new ArrayList<>(Collections.singletonList(ChatHelper.colorize(ChatColor.GRAY, ChatColor.GRAY, "Visit countries in %s", continent.label)));
             getMenu().getSlot(continent.slot).setItem(Item.create(Material.COMPASS,"§e§l" + continent.label, 1, continentLore));
         }
 
@@ -46,12 +50,11 @@ public class ExploreMenu extends AbstractMenu {
             getMenu().getSlot(continent.slot).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
 
-                if(continent.equals(Continent.Africa))
-                    ;// TODO implement that the player gets information about the BTE Africa server when clicking on Africa
-                else
-                    // TODO implement a country menu
-                    ;// new CountrySelectorMenu(continents[iSlot], player, bNetworkConnected);
-
+                if(continent.equals(Continent.Africa)) {
+                    // TODO implement that the player gets information about the BTE Africa server when clicking on Africa
+                } else {
+                    new CountrySelectorMenu(Continent.getBySlot(continent.slot), menuPlayer);
+                }
             });
         }
     }
@@ -69,23 +72,6 @@ public class ExploreMenu extends AbstractMenu {
                 .pattern("111101111")
                 .pattern("111111111")
                 .build();
-    }
-
-    public enum Continent {
-        North_America("North America", 9),
-        South_America("South America", 11),
-        Europe("Europe", 13),
-        Africa("Africa", 15),
-        Asia("Asia", 17),
-        Other("Other", 22);
-
-        public final String label;
-        public final int slot;
-
-        Continent(String label, int slot) {
-            this.label = label;
-            this.slot = slot;
-        }
     }
 
 }

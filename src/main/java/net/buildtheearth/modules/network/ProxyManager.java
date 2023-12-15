@@ -36,11 +36,6 @@ public class ProxyManager {
     private final List<UUID> communicators = new ArrayList<>();
 
     /**
-     * A List of servers that are currently communicating with the network
-     */
-    private final List<String> activeServers = new ArrayList<>();
-
-    /**
      * True if the server is connected to the network
      * False if it isn't
      */
@@ -48,7 +43,7 @@ public class ProxyManager {
 
     public ProxyManager() {
         pingAllOnlinePlayers();
-        sendServerPing();
+        NetworkAPI.getConnectedRegions();
     }
 
     // Methods
@@ -89,50 +84,6 @@ public class ProxyManager {
         player.sendPluginMessage(Main.instance, "BungeeCord", out.toByteArray());
     }
 
-    /**
-     * Sends a plugin message to check the status of all servers
-     */
-    public void sendServerPing() {
-        ByteArrayDataOutput out = ByteStreams.newDataOutput();
-        out.writeUTF("ServerPing");
-        out.writeUTF("requesting");
-        Bukkit.getServer().sendPluginMessage(Main.instance, "BuildTeam", out.toByteArray());
-        ChatHelper.logDebug("Sending server ping.");
-    }
-
-    public void handleServerPing(ByteArrayDataInput in) {
-        String requestType = in.readUTF();
-        if(requestType.equals("requesting")) {
-            ByteArrayDataOutput out = ByteStreams.newDataOutput();
-            out.writeUTF("ServerPing");
-            out.writeUTF("responding");
-            out.writeUTF(serverName);
-            Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
-            if(player != null) player.sendPluginMessage(Main.instance, "BuildTeam", out.toByteArray());
-            activeServers.clear();
-        } else if (requestType.equals("responding")) {
-            String pingServerName = in.readUTF();
-            activeServers.add(pingServerName);
-        }
-    }
-
-    /**
-     * Get a list of all the countries of all servers that are currently connected to the network
-     * @return A list off all active countries or null if an exception occurs
-     */
-    public List<String> getActiveCountries() {
-       sendServerPing();
-        try {
-            return NetworkAPI.getCountriesByActiveServers().get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-
     // Getters & Setters
 
     public String getBuildTeamID() {
@@ -171,9 +122,5 @@ public class ProxyManager {
     public void setConnected(boolean connected) {
         isConnected = connected;
         if(serverName == null) NetworkAPI.getCurrentServerNameAsync().thenAccept(newServerName -> serverName = newServerName);
-    }
-
-    public List<String> getActiveServers() {
-        return activeServers;
     }
 }

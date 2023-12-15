@@ -97,11 +97,6 @@ public class Main extends JavaPlugin implements PluginMessageListener {
                 if(!proxyManager.isConnected()) proxyManager.setConnected(true);
             }
 
-            if (subChannel.equalsIgnoreCase("ServerPing")) {
-                ChatHelper.logDebug("Received a server ping.");
-                Main.getBuildTeamTools().getProxyManager().handleServerPing(in);
-            }
-
             // Reset the stats cache
             if (subChannel.equalsIgnoreCase("Stats")) {
                 String status = in.readUTF();

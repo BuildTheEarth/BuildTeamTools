@@ -1,6 +1,8 @@
 package net.buildtheearth.modules.network.api;
 
 import net.buildtheearth.Main;
+import net.buildtheearth.modules.network.model.Continent;
+import net.buildtheearth.modules.network.model.Country;
 import net.buildtheearth.modules.utils.APIUtil;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.warp.model.Warp;
@@ -160,45 +162,71 @@ public class NetworkAPI {
         return future;
     }
 
-
-    public static CompletableFuture<List<String>> getCountriesByActiveServers() {
-        CompletableFuture<List<String>> future = new CompletableFuture<>();
-
-        List<String> targetBuildTeams = new ArrayList<>();
-        for(String serverName : Main.getBuildTeamTools().getProxyManager().getActiveServers()) {
-            ChatHelper.logDebug("Getting teams by servername...");
-            //TODO IMPLEMENT GETTING BT IDS BY SERVER NAME
-        }
-
-
-        List<String> matchingCountries = new ArrayList<>();
-        API.getAsync("https://nwapi.buildtheearth.net/api/teams/countries", new API.ApiResponseCallback() {
+    // Add all currently connected regions to their respective continents
+    public static void getConnectedRegions() {
+        API.getAsync("https://nwapi.buildtheearth.net/api/teams", new API.ApiResponseCallback() {
             @Override
             public void onResponse(String response) {
-                JSONArray jsonResponse = APIUtil.createJSONArray(response);
+                JSONArray responseArray = APIUtil.createJSONArray(response);
 
-                for (Object obj : jsonResponse) {
-                    if (obj instanceof JSONObject) {
-                        JSONObject country = (JSONObject) obj;
-                        String buildTeam = (String) country.get("BuildTeam");
+                for(Object object : responseArray.toArray()) {
 
-                        // Check if the BuildTeam matches the target
-                        if (targetBuildTeams.contains(buildTeam)) {
-                            String regionName = (String) country.get("RegionName");
-                            matchingCountries.add(regionName);
-                        }
+                    // Check if the object is a JSON object
+                    if(!(object instanceof JSONObject)) return;
+                    JSONObject teamObject = (JSONObject) object;
+
+                    // Extract a JSON array containing the regions belonging to the team
+                    Object regions = teamObject.get("Regions");
+                    if(!(regions instanceof JSONArray)) return;
+                    JSONArray regionArray = (JSONArray) regions;
+
+                    // Get some values that will be needed in the for loop
+                    Continent continent = Continent.getByLabel((String) teamObject.get("Continent"));
+                    boolean isConnected = (boolean) teamObject.get("isConnectedToNetwork");
+                    boolean hasBuildTeamToolsInstalled = (long) teamObject.get("hasBuildTeamToolsInstalled") == 1 ? true : false;
+                    String mainServerIP = (String) teamObject.get("MainServerIP");
+
+                    // Add all the regions of the team to their respective continents
+                    for(Object region : regionArray.toArray()) {
+                        if(!(region instanceof JSONObject)) return;
+                        JSONObject regionObject = (JSONObject) region;
+
+                        String regionName = (String) regionObject.get("RegionName");
+
+                        String teamID = (String) regionObject.get("BuildTeam");
+                        String serverName = getMainServerName(teamObject);
+
+                        Country country = new Country(continent, regionName, teamID, serverName, isConnected, hasBuildTeamToolsInstalled);
+                        if(!isConnected && hasBuildTeamToolsInstalled) country.setIP(mainServerIP);
+                        continent.getCountries().add(country);
+
                     }
                 }
-                future.complete(matchingCountries);
+            }
+
+
+
+            private String getMainServerName(JSONObject teamObject) {
+                String mainServerIP = (String) teamObject.get("MainServerIP");
+
+                Object serversObject = teamObject.get("Servers");
+                if(!(serversObject instanceof JSONArray)) return null;
+                JSONArray serversArray = (JSONArray) serversObject;
+
+                for(Object object : serversArray.toArray()) {
+                    if(!(object instanceof JSONObject)) return null;
+                    JSONObject serverObject = (JSONObject) object;
+
+                    String serverIP = (String) serverObject.get("IP");
+                    if(serverIP.equals(mainServerIP)) return (String) serverObject.get("Name");
+                }
+                return null;
             }
 
             @Override
             public void onFailure(IOException e) {
-                future.completeExceptionally(e);
-                Bukkit.getLogger().info(ChatHelper.highlight("Failed to get countries by active servers from the Network API."));
+                ChatHelper.logError("Failed to get team & server information from the network API: %s", e);
             }
         });
-
-        return future;
     }
 }

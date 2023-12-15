@@ -52,7 +52,7 @@ public class WarpMainMenu extends AbstractPaginatedMenu {
 
     @Override
     protected List<?> getSource() {
-        return Arrays.asList(Main.getBuildTeamTools().getProxyManager().getActiveCountries());
+        return null;
     }
 
     @Override

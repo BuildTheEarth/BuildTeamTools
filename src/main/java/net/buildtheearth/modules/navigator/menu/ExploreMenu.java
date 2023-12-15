@@ -2,7 +2,7 @@ package net.buildtheearth.modules.navigator.menu;
 
 
 import com.alpsbte.alpslib.utils.item.ItemBuilder;
-import net.buildtheearth.modules.navigator.model.Continent;
+import net.buildtheearth.modules.network.model.Continent;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.menus.AbstractMenu;
@@ -36,8 +36,8 @@ public class ExploreMenu extends AbstractMenu {
     protected void setPreviewItems() {
         // Create the continent items
         for (Continent continent : Continent.values()) {
-            ArrayList<String> continentLore = new ArrayList<>(Collections.singletonList(ChatHelper.colorize(ChatColor.GRAY, ChatColor.GRAY, "Visit countries in %s", continent.label)));
-            getMenu().getSlot(continent.slot).setItem(Item.create(Material.COMPASS,"§e§l" + continent.label, 1, continentLore));
+            ArrayList<String> continentLore = new ArrayList<>(Collections.singletonList(ChatHelper.colorize(ChatColor.GRAY, ChatColor.GRAY, "Visit countries in %s", continent.getLabel())));
+            getMenu().getSlot(continent.getSlot()).setItem(Item.create(Material.COMPASS,"§e§l" + continent.getLabel(), 1, continentLore));
         }
 
         super.setPreviewItems();
@@ -47,13 +47,13 @@ public class ExploreMenu extends AbstractMenu {
     protected void setItemClickEventsAsync() {
         // Set click events for the continent items
         for(Continent continent : Continent.values()) {
-            getMenu().getSlot(continent.slot).setClickHandler((clickPlayer, clickInformation) -> {
+            getMenu().getSlot(continent.getSlot()).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
 
                 if(continent.equals(Continent.Africa)) {
                     // TODO implement that the player gets information about the BTE Africa server when clicking on Africa
                 } else {
-                    new CountrySelectorMenu(Continent.getBySlot(continent.slot), menuPlayer);
+                    new CountrySelectorMenu(Continent.getBySlot(continent.getSlot()), menuPlayer);
                 }
             });
         }

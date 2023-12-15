@@ -74,11 +74,12 @@ public class CountrySelectorMenu extends AbstractMenu {
         int currentIndex = 0;
 
         for(int slot = 9; currentIndex >= offset && slot < 36;) {
+            int finalCurrentIndex = currentIndex;
             getMenu().getSlot(slot).setClickHandler((clickPlayer, clickInformation) -> {
                 ChatHelper.logDebug("Country clicked");
                 clickPlayer.closeInventory();
 
-                Country clickedCountry = continent.getCountries().get(currentIndex);
+                Country clickedCountry = continent.getCountries().get(finalCurrentIndex);
                 ChatHelper.logDebug("%s", clickedCountry.getName());
                 if(clickedCountry.isConnected()) {
                     Utils.sendPlayerToServer(clickPlayer, clickedCountry.getServerName());
@@ -86,6 +87,8 @@ public class CountrySelectorMenu extends AbstractMenu {
                     clickPlayer.sendMessage(ChatHelper.highlight("This country isn't connected to the network! Connect to %s instead.", clickedCountry.getIP()));
                 }
             });
+            currentIndex++;
+            slot++;
         }
 
         getMenu().getSlot(36).setClickHandler((clickPlayer, clickInformation) -> {

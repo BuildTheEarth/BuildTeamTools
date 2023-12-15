@@ -17,6 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -203,8 +204,9 @@ public class NetworkAPI {
                         Country country = new Country(continent, regionName, teamID, serverName, isConnected, hasBuildTeamToolsInstalled);
                         if(!isConnected && hasBuildTeamToolsInstalled) country.setIP(mainServerIP);
                         continent.getCountries().add(country);
-
                     }
+
+
                 }
             }
 

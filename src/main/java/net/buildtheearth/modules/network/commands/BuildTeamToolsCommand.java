@@ -105,7 +105,7 @@ public class BuildTeamToolsCommand implements CommandExecutor {
                     for(Country country : continent.getCountries()) {
                         if(country.getTeamID().equals(Main.getBuildTeamTools().getProxyManager().getBuildTeamID())) {
                             if(!sentContinentMessage) {
-                                sender.sendMessage("§7§l" + continent.getLabel());
+                                sender.sendMessage("§7§n" + continent.getLabel());
                                 sentContinentMessage = true;
                             }
                             sender.sendMessage("§7" + country.getName());

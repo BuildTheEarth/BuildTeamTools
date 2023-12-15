@@ -12,6 +12,8 @@ public class Country {
     private final String teamID;
     private final String serverName;
 
+    private final String headBase64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWJkNTFmNDY5M2FmMTc0ZTZmZTE5NzkyMzNkMjNhNDBiYjk4NzM5OGUzODkxNjY1ZmFmZDJiYTU2N2I1YTUzYSJ9fX0=";
+
     public Country(Continent continent, String name, String teamID, String serverName, boolean isConnected, boolean hasBTToolsInstalled) {
         this.continent = continent;
         this.name = name;
@@ -19,6 +21,17 @@ public class Country {
         this.serverName = serverName;
         this.isConnected = isConnected;
         this.hasBTToolsInstalled = hasBTToolsInstalled;
+    }
+
+    public static Country getByName(String name) {
+        Country lastCountry = null;
+        for(Continent continent : Continent.values()) {
+            for (Country country : continent.getCountries()) {
+                lastCountry = country;
+                if(country.getName().equals(name)) return country;
+            }
+        }
+        return lastCountry;
     }
 
     public boolean isConnected() {
@@ -51,5 +64,9 @@ public class Country {
 
     public void setIP(String IP) {
         this.IP = IP;
+    }
+
+    public String getHeadBase64() {
+        return headBase64;
     }
 }

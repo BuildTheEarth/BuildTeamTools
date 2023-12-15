@@ -2,7 +2,7 @@ package net.buildtheearth.modules.tpll.listeners;
 
 import net.buildtheearth.Main;
 import net.buildtheearth.modules.network.ProxyManager;
-import net.buildtheearth.modules.network.api.NetworkAPI;
+import net.buildtheearth.modules.network.model.Country;
 import net.buildtheearth.modules.tpll.TpllManager;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.modules.utils.ChatHelper;
@@ -79,29 +79,21 @@ public class TpllListener implements Listener {
                     if (address == null) return CompletableFuture.completedFuture(false);
 
                     String countryName = address[0];
+                    Country country = Country.getByName(countryName);
 
-                    // If not connected to the network, inform the player of the IP and return false
-                    if (!proxyManager.isConnected()) {
-                        return NetworkAPI.getTeamIPByCountryAsync(countryName)
-                                .thenAcceptAsync(ip -> {
-                                    event.getPlayer().sendMessage(ChatHelper.highlight("The current server is %s connected to the network! Teleporting here is %s available on this server.", "not"));
-                                    event.getPlayer().sendMessage(ChatHelper.highlight("Connect to %s instead.", ip));
-                                }).thenApplyAsync(v -> false);
+                    if (!proxyManager.isConnected() || !country.isConnected()) {
+                        event.getPlayer().sendMessage(ChatHelper.highlight("Either this server or the receiving server isn't connected to the network."));
+                        return CompletableFuture.completedFuture(true);
                     }
 
-                    // Check if the current server name differs from the target server name
-                    return null; // proxyManager.getServerName()
-//                            .thenComposeAsync(currentServerName ->
-//                                    NetworkAPI.getTeamIdByCountryAsync(countryName)
-//                                            .thenComposeAsync(teamID ->
-//                                                    NetworkAPI.getServerNameByTeamId(teamID)
-//                                                            .thenApplyAsync(newTargetServerName -> {
-//                                                                this.targetServerName = newTargetServerName;
-//                                                                return !currentServerName.equals(newTargetServerName);
-//                                                            })
-//                                            )
-//                            );
+                    if (country.getTeamID() != proxyManager.getBuildTeamID()) {
+                        targetServerName = country.getServerName();
+                        return CompletableFuture.completedFuture(true);
+                    }
+
+                    return CompletableFuture.completedFuture(false);
                 });
     }
+
 }
 

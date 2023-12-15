@@ -50,14 +50,17 @@ public class ExploreMenu extends AbstractMenu {
             getMenu().getSlot(continent.getSlot()).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
 
+                System.out.println("Continent before creating CountrySelectorMenu: " + continent); // Add this line
+
                 if(continent.equals(Continent.Africa)) {
                     // TODO implement that the player gets information about the BTE Africa server when clicking on Africa
                 } else {
-                    new CountrySelectorMenu(Continent.getBySlot(continent.getSlot()), menuPlayer);
+                    new CountrySelectorMenu(continent, clickPlayer, 1);
                 }
             });
         }
     }
+
 
     @Override
     protected void setMenuItemsAsync() {}

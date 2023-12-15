@@ -5,10 +5,10 @@ import com.alpsbte.alpslib.io.config.ConfigNotImplementedException;
 import com.sk89q.worldedit.LocalSession;
 import net.buildtheearth.modules.generator.Generator;
 import net.buildtheearth.modules.generator.commands.GeneratorCommand;
-import net.buildtheearth.modules.navigator.Navigator;
 import net.buildtheearth.modules.navigator.commands.NavigatorCommand;
 import net.buildtheearth.modules.navigator.listeners.NavigatorOpenListener;
 import net.buildtheearth.modules.network.ProxyManager;
+import net.buildtheearth.modules.network.commands.BuildTeamToolsCommand;
 import net.buildtheearth.modules.network.listeners.NetworkJoinListener;
 import net.buildtheearth.modules.network.listeners.NetworkQuitListener;
 import net.buildtheearth.modules.stats.StatsManager;
@@ -18,7 +18,6 @@ import net.buildtheearth.modules.stats.listeners.StatsListener;
 import net.buildtheearth.modules.tpll.TpllManager;
 import net.buildtheearth.modules.tpll.listeners.TpllJoinListener;
 import net.buildtheearth.modules.tpll.listeners.TpllListener;
-import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.io.ConfigUtil;
 import net.buildtheearth.modules.warp.WarpManager;
 import net.buildtheearth.modules.warp.commands.WarpCommand;
@@ -27,12 +26,9 @@ import net.buildtheearth.modules.kml.KmlCommand;
 import net.buildtheearth.modules.kml.KmlTabCompleter;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.MenuFunctionListener;
-
-import java.util.List;
 
 /**
  * The parent of all modules of the Build Team Tools plugin

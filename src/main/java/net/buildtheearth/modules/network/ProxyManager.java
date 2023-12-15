@@ -1,20 +1,17 @@
 package net.buildtheearth.modules.network;
 
-import com.google.common.collect.Iterables;
-import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.Main;
 import net.buildtheearth.modules.network.api.NetworkAPI;
-import net.buildtheearth.modules.utils.ChatHelper;
+import net.buildtheearth.modules.network.model.Continent;
+import net.buildtheearth.modules.network.model.Country;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class ProxyManager {
 
@@ -27,7 +24,7 @@ public class ProxyManager {
      */
     private String buildTeamID;
     private String serverName;
-    private String serverID;
+    private boolean isConnected;
 
     /**
      * A List of players that are communicating with this server.
@@ -35,18 +32,24 @@ public class ProxyManager {
      */
     private final List<UUID> communicators = new ArrayList<>();
 
-    /**
-     * True if the server is connected to the network
-     * False if it isn't
-     */
-    private boolean isConnected;
-
     public ProxyManager() {
         pingAllOnlinePlayers();
         NetworkAPI.getConnectedRegions();
+        setupCurrentServerData();
     }
 
     // Methods
+
+    private void setupCurrentServerData() {
+        for(Continent continent : Continent.values()) {
+            for(Country country : continent.getCountries()) {
+                if(!country.getIP().equals(Bukkit.getServer().getIp())) continue;
+                buildTeamID = country.getTeamID();
+                serverName = country.getServerName();
+                isConnected = country.isConnected();
+            }
+        }
+    }
 
     /**
      * Sends a ping to the network.
@@ -86,29 +89,13 @@ public class ProxyManager {
 
     // Getters & Setters
 
+
     public String getBuildTeamID() {
         return buildTeamID;
     }
 
-    public void setBuildTeamID(String buildTeamID) {
-        this.buildTeamID = buildTeamID;
-    }
-
-    public void setServerName(String serverName) {
-        this.serverName = serverName;
-    }
-
-    public CompletableFuture<String> getServerNameAsync() {
-        if(serverName != null) return CompletableFuture.completedFuture(serverName);
-        return NetworkAPI.getCurrentServerNameAsync();
-    }
-
-    public String getServerID() {
-        return serverID;
-    }
-
-    public void setServerID(String serverID) {
-        this.serverID = serverID;
+    public String getServerName() {
+        return serverName;
     }
 
     public List<UUID> getCommunicators() {
@@ -117,10 +104,5 @@ public class ProxyManager {
 
     public boolean isConnected() {
         return isConnected;
-    }
-
-    public void setConnected(boolean connected) {
-        isConnected = connected;
-        if(serverName == null) NetworkAPI.getCurrentServerNameAsync().thenAccept(newServerName -> serverName = newServerName);
     }
 }

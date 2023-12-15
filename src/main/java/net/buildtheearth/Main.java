@@ -88,13 +88,8 @@ public class Main extends JavaPlugin implements PluginMessageListener {
             getLogger().info(ChatHelper.standard("Plugin Message received: %s from Player: %s", subChannel, player.getName()));
 
             if (subChannel.equalsIgnoreCase("Ping")) {
-                String serverID = in.readUTF();
-                String buildTeamID = in.readUTF();
-
-                ProxyManager proxyManager = Main.getBuildTeamTools().getProxyManager();
-                proxyManager.setBuildTeamID(buildTeamID);
-                proxyManager.setServerID(serverID);
-                if(!proxyManager.isConnected()) proxyManager.setConnected(true);
+                String uuid = in.readUTF();
+                buildTeamTools.getProxyManager().getCommunicators().add(UUID.fromString(uuid));
             }
 
             // Reset the stats cache

@@ -6,6 +6,7 @@ import net.buildtheearth.Main;
 import net.buildtheearth.modules.network.api.NetworkAPI;
 import net.buildtheearth.modules.network.model.Continent;
 import net.buildtheearth.modules.network.model.Country;
+import net.buildtheearth.modules.utils.ChatHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -34,21 +35,8 @@ public class ProxyManager {
 
     public ProxyManager() {
         pingAllOnlinePlayers();
-        NetworkAPI.getConnectedRegions();
-        setupCurrentServerData();
-    }
-
-    // Methods
-
-    private void setupCurrentServerData() {
-        for(Continent continent : Continent.values()) {
-            for(Country country : continent.getCountries()) {
-                if(!country.getIP().equals(Bukkit.getServer().getIp())) continue;
-                buildTeamID = country.getTeamID();
-                serverName = country.getServerName();
-                isConnected = country.isConnected();
-            }
-        }
+        NetworkAPI.getCountries();
+        NetworkAPI.setupCurrentServerData();
     }
 
     /**
@@ -104,5 +92,17 @@ public class ProxyManager {
 
     public boolean isConnected() {
         return isConnected;
+    }
+
+    public void setBuildTeamID(String buildTeamID) {
+        this.buildTeamID = buildTeamID;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
+    public void setConnected(boolean connected) {
+        isConnected = connected;
     }
 }

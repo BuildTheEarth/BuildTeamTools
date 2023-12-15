@@ -90,17 +90,17 @@ public class TpllListener implements Listener {
                     }
 
                     // Check if the current server name differs from the target server name
-                    return proxyManager.getServerNameAsync()
-                            .thenComposeAsync(currentServerName ->
-                                    NetworkAPI.getTeamIdByCountryAsync(countryName)
-                                            .thenComposeAsync(teamID ->
-                                                    NetworkAPI.getServerNameByTeamId(teamID)
-                                                            .thenApplyAsync(newTargetServerName -> {
-                                                                this.targetServerName = newTargetServerName;
-                                                                return !currentServerName.equals(newTargetServerName);
-                                                            })
-                                            )
-                            );
+                    return null; // proxyManager.getServerName()
+//                            .thenComposeAsync(currentServerName ->
+//                                    NetworkAPI.getTeamIdByCountryAsync(countryName)
+//                                            .thenComposeAsync(teamID ->
+//                                                    NetworkAPI.getServerNameByTeamId(teamID)
+//                                                            .thenApplyAsync(newTargetServerName -> {
+//                                                                this.targetServerName = newTargetServerName;
+//                                                                return !currentServerName.equals(newTargetServerName);
+//                                                            })
+//                                            )
+//                            );
                 });
     }
 }

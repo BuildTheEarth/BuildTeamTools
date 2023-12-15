@@ -34,7 +34,7 @@ public class TpllManager {
         //Check the target server
         String targetServerName = in.readUTF();
         ChatHelper.logDebug("The name of the target server is: %s", targetServerName);
-        if (targetServerName.equals(Main.buildTeamTools.getProxyManager().getServerNameAsync())) {
+        if (targetServerName.equals(Main.buildTeamTools.getProxyManager().getServerName())) {
             ChatHelper.logDebug("The target server equals the current server");
             //Extracts the coordinates from the plugin message
             double targetLatitude = Double.parseDouble(in.readUTF());

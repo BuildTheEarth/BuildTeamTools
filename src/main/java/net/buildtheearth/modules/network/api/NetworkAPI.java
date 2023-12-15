@@ -1,10 +1,12 @@
 package net.buildtheearth.modules.network.api;
 
 import net.buildtheearth.Main;
+import net.buildtheearth.modules.network.ProxyManager;
 import net.buildtheearth.modules.network.model.Continent;
 import net.buildtheearth.modules.network.model.Country;
 import net.buildtheearth.modules.utils.APIUtil;
 import net.buildtheearth.modules.utils.ChatHelper;
+import net.buildtheearth.modules.utils.io.ConfigPaths;
 import net.buildtheearth.modules.warp.model.Warp;
 import org.bukkit.Bukkit;
 import org.json.simple.JSONArray;
@@ -162,8 +164,10 @@ public class NetworkAPI {
         return future;
     }
 
+    //100% keep
+
     // Add all currently connected regions to their respective continents
-    public static void getConnectedRegions() {
+    public static void getCountries() {
         API.getAsync("https://nwapi.buildtheearth.net/api/teams", new API.ApiResponseCallback() {
             @Override
             public void onResponse(String response) {
@@ -193,7 +197,7 @@ public class NetworkAPI {
 
                         String regionName = (String) regionObject.get("RegionName");
 
-                        String teamID = (String) regionObject.get("BuildTeam");
+                        String teamID = (String) teamObject.get("ID");
                         String serverName = getMainServerName(teamObject);
 
                         Country country = new Country(continent, regionName, teamID, serverName, isConnected, hasBuildTeamToolsInstalled);
@@ -205,6 +209,46 @@ public class NetworkAPI {
             }
 
 
+
+            private String getMainServerName(JSONObject teamObject) {
+                String mainServerIP = (String) teamObject.get("MainServerIP");
+
+                Object serversObject = teamObject.get("Servers");
+                if(!(serversObject instanceof JSONArray)) return null;
+                JSONArray serversArray = (JSONArray) serversObject;
+
+                for(Object object : serversArray.toArray()) {
+                    if(!(object instanceof JSONObject)) return null;
+                    JSONObject serverObject = (JSONObject) object;
+
+                    String serverIP = (String) serverObject.get("IP");
+                    if(serverIP.equals(mainServerIP)) return (String) serverObject.get("Name");
+                }
+                return null;
+            }
+
+            @Override
+            public void onFailure(IOException e) {
+                ChatHelper.logError("Failed to get team & server information from the network API: %s", e);
+            }
+        });
+    }
+
+    public static void setupCurrentServerData() {
+        API.getAsync("https://nwapi.buildtheearth.net/api/teams/" + Main.instance.getConfig().getString(ConfigPaths.API_KEY), new API.ApiResponseCallback() {
+            @Override
+            public void onResponse(String response) {
+                JSONObject teamObject = APIUtil.createJSONObject(response);
+
+                boolean isConnected = (boolean) teamObject.get("isConnectedToNetwork");
+                String teamID = (String) teamObject.get("ID");
+                String serverName = getMainServerName(teamObject);
+
+                ProxyManager proxyManager = Main.getBuildTeamTools().getProxyManager();
+                proxyManager.setServerName(serverName);
+                proxyManager.setBuildTeamID(teamID);
+                proxyManager.setConnected(isConnected);
+            }
 
             private String getMainServerName(JSONObject teamObject) {
                 String mainServerIP = (String) teamObject.get("MainServerIP");

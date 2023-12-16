@@ -203,6 +203,9 @@ public class NetworkAPI {
 
                         Country country = new Country(continent, regionName, teamID, serverName, isConnected, hasBuildTeamToolsInstalled);
                         if(!isConnected && hasBuildTeamToolsInstalled) country.setIP(mainServerIP);
+
+                        String headBase64 = (String) regionObject.get("Head");
+                        if(headBase64 != null) country.setHeadBase64(headBase64);
                         continent.getCountries().add(country);
                     }
 

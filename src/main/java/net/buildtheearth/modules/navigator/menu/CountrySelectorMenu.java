@@ -56,7 +56,7 @@ public class CountrySelectorMenu extends AbstractMenu {
         for (Country country : countries) {
             if (currentIndex >= offset && slot < 36) {
                 ArrayList<String> countryLore = new ArrayList<>(Collections.singletonList(ChatHelper.colorize(ChatColor.GRAY, ChatColor.GRAY, "Visit countries in %s", continent.getLabel())));
-                getMenu().getSlot(slot).setItem(Item.createCustomHeadBase64(country.getHeadBase64(), country.getName(), countryLore));
+                getMenu().getSlot(slot).setItem(Item.createCustomHeadBase64(country.getHeadBase64() == null ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19" : country.getHeadBase64(), country.getName(), countryLore));
                 slot++;
             }
             currentIndex++;
@@ -95,7 +95,7 @@ public class CountrySelectorMenu extends AbstractMenu {
             ChatHelper.logDebug("Prev page clicked");
             if(clickInformation.getClickedSlot().getItem(clickPlayer).getType().equals(Material.ARROW)) {
                 clickPlayer.closeInventory();
-                new CountrySelectorMenu(continent, clickPlayer, page--);
+                new CountrySelectorMenu(continent, clickPlayer, --page);
             }
         });
 
@@ -103,7 +103,7 @@ public class CountrySelectorMenu extends AbstractMenu {
             ChatHelper.logDebug("Next page clicked");
             if(clickInformation.getClickedSlot().getItem(clickPlayer).getType().equals(Material.ARROW)) {
                 clickPlayer.closeInventory();
-                new CountrySelectorMenu(continent, clickPlayer, page++);
+                new CountrySelectorMenu(continent, clickPlayer, ++page);
             }
         });
     }

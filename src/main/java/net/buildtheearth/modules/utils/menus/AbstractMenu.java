@@ -67,6 +67,7 @@ public abstract class AbstractMenu {
         Bukkit.getScheduler().runTaskAsynchronously(Main.instance, () -> {
             setMenuItemsAsync();
             setItemClickEventsAsync();
+            menu.update(getMenuPlayer());
         });
     }
 

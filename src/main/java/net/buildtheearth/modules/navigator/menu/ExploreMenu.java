@@ -55,7 +55,7 @@ public class ExploreMenu extends AbstractMenu {
                 if(continent.equals(Continent.Africa)) {
                     // TODO implement that the player gets information about the BTE Africa server when clicking on Africa
                 } else {
-                    new CountrySelectorMenu(continent, clickPlayer, 1);
+                    new CountrySelectorMenu(continent, clickPlayer);
                 }
             });
         }

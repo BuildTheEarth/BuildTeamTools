@@ -1,12 +1,14 @@
 package net.buildtheearth.modules.navigator.menu;
 
 import com.alpsbte.alpslib.utils.item.ItemBuilder;
+import lombok.NonNull;
 import net.buildtheearth.modules.network.model.Continent;
 import net.buildtheearth.modules.network.model.Country;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.Item;
+import net.buildtheearth.modules.utils.MenuItems;
 import net.buildtheearth.modules.utils.Utils;
-import net.buildtheearth.modules.utils.menus.AbstractMenu;
+import net.buildtheearth.modules.utils.menus.AbstractPaginatedMenu;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -17,108 +19,99 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class CountrySelectorMenu extends AbstractMenu {
+public class CountrySelectorMenu extends AbstractPaginatedMenu {
 
     private final Continent continent;
-    private int page;
+    private final List<Country> countries;
 
-    public CountrySelectorMenu(Continent continent, Player menuPlayer, int page) {
-        super(5, continent.getLabel() + " - countries", menuPlayer);
+    public final int BACK_ITEM_SLOT = 27;
+    public static int SWITCH_PAGE_ITEM_SLOT = 34;
+
+    public CountrySelectorMenu(@NonNull Continent continent, Player menuPlayer) {
+        super(4, 3, continent.getLabel() + " - countries", menuPlayer);
         this.continent = continent;
-        this.page = page;
+        this.countries = continent.getCountries();
+
+        if(countries.size() > 0)
+            countries.sort(Comparator.comparing(Country::isConnected).reversed().thenComparing(Country::getName));
 
         ChatHelper.logDebug("Continent in constructor: %s", continent);
     }
 
     @Override
-    protected void setMenuItemsAsync() {
-        if (continent == null) {
-            ChatHelper.logDebug("Continent is null in setPreviewItems");
-            return;
-        }
+    protected void setPreviewItems() {
+        getMenu().getSlot(BACK_ITEM_SLOT).setItem(MenuItems.getBackItem());
+        setSwitchPageItems(SWITCH_PAGE_ITEM_SLOT);
 
-        // Create the country items
-        int slot = 9;
-        int offset = (page == 1) ? 0 : 27 * (page - 1);
-
-        List<Country> countries = this.continent.getCountries();
-        if (countries == null) {
-            ChatHelper.logDebug("Countries list is null in setPreviewItems");
-            return;
-        }
-
-        countries.sort(Comparator.comparing(Country::isConnected).reversed().thenComparing(Country::getName));
-
-        System.out.println("Continent in setPreviewItems: " + continent);
-
-        int currentIndex = 0;
-        for (Country country : countries) {
-            if (currentIndex >= offset && slot < 36) {
-                ArrayList<String> countryLore = new ArrayList<>(Collections.singletonList(ChatHelper.colorize(ChatColor.GRAY, ChatColor.GRAY, "Visit countries in %s", continent.getLabel())));
-                getMenu().getSlot(slot).setItem(Item.createCustomHeadBase64(country.getHeadBase64() == null ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19" : country.getHeadBase64(), country.getName(), countryLore));
-                slot++;
-            }
-            currentIndex++;
-        }
-
-        if(!getMenu().getSlot(35).getItem(getMenuPlayer()).getType().equals(Material.AIR))
-            getMenu().getSlot(44).setItem(Item.create(Material.ARROW, "Next Page"));
-        if(page > 1) getMenu().getSlot(36).setItem(Item.create(Material.ARROW, "Previous Page"));
-
+        super.setPreviewItems();
     }
 
     @Override
-    protected void setItemClickEventsAsync() {
-        int offset = (page == 1) ? 0 : 27 * (page - 1);
-        int currentIndex = 0;
+    protected void setPaginatedPreviewItems(List<?> source) {
+        List<Country> countries = source.stream().map(l -> (Country) l).collect(Collectors.toList());
 
-        for(int slot = 9; currentIndex >= offset && slot < 36;) {
-            int finalCurrentIndex = currentIndex;
-            getMenu().getSlot(slot).setClickHandler((clickPlayer, clickInformation) -> {
-                ChatHelper.logDebug("Country clicked");
-                clickPlayer.closeInventory();
+        // Create the country items
+        int slot = 0;
 
-                Country clickedCountry = continent.getCountries().get(finalCurrentIndex);
-                ChatHelper.logDebug("%s", clickedCountry.getName());
-                if(clickedCountry.isConnected()) {
-                    Utils.sendPlayerToServer(clickPlayer, clickedCountry.getServerName());
-                } else {
-                    clickPlayer.sendMessage(ChatHelper.highlight("This country isn't connected to the network! Connect to %s instead.", clickedCountry.getIP()));
-                }
-            });
-            currentIndex++;
+        for (Country country : countries) {
+            ArrayList<String> countryLore = new ArrayList<>(Collections.singletonList(ChatHelper.colorize(ChatColor.GRAY, ChatColor.GRAY, "Visit countries in %s", continent.getLabel())));
+            getMenu().getSlot(slot).setItem(Item.createCustomHeadBase64(country.getHeadBase64() == null ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19" : country.getHeadBase64(), country.getName(), countryLore));
             slot++;
         }
-
-        getMenu().getSlot(36).setClickHandler((clickPlayer, clickInformation) -> {
-            ChatHelper.logDebug("Prev page clicked");
-            if(clickInformation.getClickedSlot().getItem(clickPlayer).getType().equals(Material.ARROW)) {
-                clickPlayer.closeInventory();
-                new CountrySelectorMenu(continent, clickPlayer, --page);
-            }
-        });
-
-        getMenu().getSlot(44).setClickHandler((clickPlayer, clickInformation) -> {
-            ChatHelper.logDebug("Next page clicked");
-            if(clickInformation.getClickedSlot().getItem(clickPlayer).getType().equals(Material.ARROW)) {
-                clickPlayer.closeInventory();
-                new CountrySelectorMenu(continent, clickPlayer, ++page);
-            }
-        });
     }
 
+    @Override
+    protected void setMenuItemsAsync() {}
+
+    @Override
+    protected void setItemClickEventsAsync() {
+        setSwitchPageItemClickEvents(SWITCH_PAGE_ITEM_SLOT);
+    }
+
+    @Override
+    protected void setPaginatedItemClickEventsAsync(List<?> source) {
+        List<Country> countries = source.stream().map(l -> (Country) l).collect(Collectors.toList());
+
+        int slot = 0;
+        for (Country ignored : countries) {
+            final int _slot = slot;
+            getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
+                clickPlayer.closeInventory();
+
+                Country clickedCountry = this.countries.get(_slot);
+                ChatHelper.logDebug("%s", clickedCountry.getName());
+
+                if (clickedCountry.isConnected())
+                    Utils.sendPlayerToServer(clickPlayer, clickedCountry.getServerName());
+                else
+                    clickPlayer.sendMessage(ChatHelper.highlight("This country isn't connected to the network! Connect to %s instead.", clickedCountry.getIP()));
+
+            });
+            slot++;
+        }
+    }
 
 
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
                 .item(new ItemBuilder(Material.STAINED_GLASS_PANE, 1, (byte) 7).setName(" ").build())
-                .pattern("111111111")
                 .pattern("000000000")
                 .pattern("000000000")
                 .pattern("000000000")
-                .pattern("111111111")
+                .pattern("011111000")
                 .build();
+    }
+
+    @Override
+    protected List<?> getSource() {
+        return countries;
+    }
+
+    @Override
+    protected void setPaginatedMenuItemsAsync(List<?> source) {
+
     }
 }

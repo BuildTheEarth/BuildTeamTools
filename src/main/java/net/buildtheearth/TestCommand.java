@@ -1,7 +1,7 @@
 package net.buildtheearth;
 
 import net.buildtheearth.modules.network.model.Continent;
-import net.buildtheearth.modules.network.model.Country;
+import net.buildtheearth.modules.network.model.Region;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -13,11 +13,11 @@ public class TestCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         String result = "";
         for(Continent continent : Continent.values()) {
-            for(Country country : continent.getCountries()) {
-                if(country.isConnected()) {
-                    result += country.getName();
-                    result += country.getServerName();
-                    result += country.getContinent().getLabel();
+            for(Region region : continent.getRegions()) {
+                if(region.isConnected()) {
+                    result += region.getName();
+                    result += region.getBuildTeam().getServerName();
+                    result += region.getContinent().getLabel();
                 }
             }
         }

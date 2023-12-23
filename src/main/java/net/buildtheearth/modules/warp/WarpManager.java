@@ -32,7 +32,7 @@ public class WarpManager {
     public static void addWarpToQueue(ByteArrayDataInput in, Player player) {
         //Check the target server
         String targetServer = in.readUTF();
-        if (targetServer.equals(Main.getBuildTeamTools().getProxyManager().getServerName())) {
+        if (targetServer.equals(Main.getBuildTeamTools().getProxyManager().getBuildTeam().getServerName())) {
             //Extracts the warp key from the plugin message
             String warpKey = in.readUTF();
 

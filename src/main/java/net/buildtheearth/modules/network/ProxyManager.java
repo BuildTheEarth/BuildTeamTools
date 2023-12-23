@@ -2,11 +2,11 @@ package net.buildtheearth.modules.network;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import lombok.Getter;
+import lombok.Setter;
 import net.buildtheearth.Main;
 import net.buildtheearth.modules.network.api.NetworkAPI;
-import net.buildtheearth.modules.network.model.Continent;
-import net.buildtheearth.modules.network.model.Country;
-import net.buildtheearth.modules.utils.ChatHelper;
+import net.buildtheearth.modules.network.model.BuildTeam;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -21,21 +21,27 @@ public class ProxyManager {
     public static int CACHE_UPLOAD_SPEED = 20 * 60 * 10 + 20;
 
     /**
-     * Information about the current server
+     * Information about the build team of this server
      */
-    private String buildTeamID;
-    private String serverName;
-    private boolean isConnected;
+    @Getter @Setter
+    private BuildTeam buildTeam;
 
     /**
      * A List of players that are communicating with this server.
      * If isConnected is true, that means the players are also communicating with the network.
      */
+    @Getter
     private final List<UUID> communicators = new ArrayList<>();
+
+    /**
+     * A List of all build teams of BuildTheEarth.
+     */
+    @Getter
+    private final List<BuildTeam> buildTeams = new ArrayList<>();
 
     public ProxyManager() {
         pingAllOnlinePlayers();
-        NetworkAPI.getCountries();
+        NetworkAPI.getBuildTeamInformation();
         NetworkAPI.setupCurrentServerData();
     }
 
@@ -77,32 +83,17 @@ public class ProxyManager {
 
     // Getters & Setters
 
-
-    public String getBuildTeamID() {
-        return buildTeamID;
-    }
-
-    public String getServerName() {
-        return serverName;
-    }
-
-    public List<UUID> getCommunicators() {
-        return communicators;
-    }
-
-    public boolean isConnected() {
-        return isConnected;
-    }
-
-    public void setBuildTeamID(String buildTeamID) {
-        this.buildTeamID = buildTeamID;
-    }
-
-    public void setServerName(String serverName) {
-        this.serverName = serverName;
-    }
-
-    public void setConnected(boolean connected) {
-        isConnected = connected;
+    /** Returns the BuildTeam of the given teamID.
+     *
+     * @param teamID The ID of the BuildTeam
+     * @return The BuildTeam with the given ID
+     */
+    public BuildTeam getBuildTeamByID(String teamID) {
+        for(BuildTeam buildTeam : buildTeams) {
+            if(buildTeam.getID().equals(teamID)) {
+                return buildTeam;
+            }
+        }
+        return null;
     }
 }

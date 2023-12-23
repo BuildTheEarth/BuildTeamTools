@@ -3,7 +3,7 @@ package net.buildtheearth.modules.navigator.menu;
 import com.alpsbte.alpslib.utils.item.ItemBuilder;
 import lombok.NonNull;
 import net.buildtheearth.modules.network.model.Continent;
-import net.buildtheearth.modules.network.model.Country;
+import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.MenuItems;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class CountrySelectorMenu extends AbstractPaginatedMenu {
 
     private final Continent continent;
-    private final List<Country> countries;
+    private final List<Region> regions;
 
     public final int BACK_ITEM_SLOT = 27;
     public static int SWITCH_PAGE_ITEM_SLOT = 34;
@@ -32,10 +32,10 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
     public CountrySelectorMenu(@NonNull Continent continent, Player menuPlayer) {
         super(4, 3, continent.getLabel() + " - countries", menuPlayer);
         this.continent = continent;
-        this.countries = continent.getCountries();
+        this.regions = continent.getRegions();
 
-        if(countries.size() > 0)
-            countries.sort(Comparator.comparing(Country::isConnected).reversed().thenComparing(Country::getName));
+        if(regions.size() > 0)
+            regions.sort(Comparator.comparing(Region::isConnected).reversed().thenComparing(Region::getName));
 
         ChatHelper.logDebug("Continent in constructor: %s", continent);
     }
@@ -50,14 +50,14 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPaginatedPreviewItems(List<?> source) {
-        List<Country> countries = source.stream().map(l -> (Country) l).collect(Collectors.toList());
+        List<Region> countries = source.stream().map(l -> (Region) l).collect(Collectors.toList());
 
         // Create the country items
         int slot = 0;
 
-        for (Country country : countries) {
+        for (Region region : countries) {
             ArrayList<String> countryLore = new ArrayList<>(Collections.singletonList(ChatHelper.colorize(ChatColor.GRAY, ChatColor.GRAY, "Visit countries in %s", continent.getLabel())));
-            getMenu().getSlot(slot).setItem(Item.createCustomHeadBase64(country.getHeadBase64() == null ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19" : country.getHeadBase64(), country.getName(), countryLore));
+            getMenu().getSlot(slot).setItem(Item.createCustomHeadBase64(region.getHeadBase64() == null ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19" : region.getHeadBase64(), region.getName(), countryLore));
             slot++;
         }
     }
@@ -72,21 +72,21 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPaginatedItemClickEventsAsync(List<?> source) {
-        List<Country> countries = source.stream().map(l -> (Country) l).collect(Collectors.toList());
+        List<Region> countries = source.stream().map(l -> (Region) l).collect(Collectors.toList());
 
         int slot = 0;
-        for (Country ignored : countries) {
+        for (Region ignored : countries) {
             final int _slot = slot;
             getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
 
-                Country clickedCountry = this.countries.get(_slot);
-                ChatHelper.logDebug("%s", clickedCountry.getName());
+                Region clickedRegion = this.regions.get(_slot);
+                ChatHelper.logDebug("%s", clickedRegion.getName());
 
-                if (clickedCountry.isConnected())
-                    Utils.sendPlayerToServer(clickPlayer, clickedCountry.getServerName());
+                if (clickedRegion.getBuildTeam().isConnected())
+                    Utils.sendPlayerToServer(clickPlayer, clickedRegion.getBuildTeam().getServerName());
                 else
-                    clickPlayer.sendMessage(ChatHelper.highlight("This country isn't connected to the network! Connect to %s instead.", clickedCountry.getIP()));
+                    clickPlayer.sendMessage(ChatHelper.highlight("This country isn't connected to the network! Connect to %s instead.", clickedRegion.getBuildTeam().getIP()));
 
             });
             slot++;
@@ -107,7 +107,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
 
     @Override
     protected List<?> getSource() {
-        return countries;
+        return regions;
     }
 
     @Override

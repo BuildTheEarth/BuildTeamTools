@@ -2,7 +2,7 @@ package net.buildtheearth.modules.tpll.listeners;
 
 import net.buildtheearth.Main;
 import net.buildtheearth.modules.network.ProxyManager;
-import net.buildtheearth.modules.network.model.Country;
+import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.tpll.TpllManager;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.modules.utils.ChatHelper;
@@ -79,15 +79,15 @@ public class TpllListener implements Listener {
                     if (address == null) return CompletableFuture.completedFuture(false);
 
                     String countryName = address[0];
-                    Country country = Country.getByName(countryName);
+                    Region region = Region.getByName(countryName);
 
-                    if (!proxyManager.isConnected() || !country.isConnected()) {
+                    if (!proxyManager.getBuildTeam().isConnected() || !region.isConnected()) {
                         event.getPlayer().sendMessage(ChatHelper.highlight("Either this server or the receiving server isn't connected to the network."));
                         return CompletableFuture.completedFuture(true);
                     }
 
-                    if (country.getTeamID() != proxyManager.getBuildTeamID()) {
-                        targetServerName = country.getServerName();
+                    if (region.getBuildTeam().getID() != proxyManager.getBuildTeam().getID()) {
+                        targetServerName = region.getBuildTeam().getServerName();
                         return CompletableFuture.completedFuture(true);
                     }
 

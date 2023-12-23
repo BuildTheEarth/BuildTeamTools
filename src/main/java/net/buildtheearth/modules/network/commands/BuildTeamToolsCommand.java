@@ -1,8 +1,7 @@
 package net.buildtheearth.modules.network.commands;
 
 import net.buildtheearth.Main;
-import net.buildtheearth.modules.network.model.Continent;
-import net.buildtheearth.modules.network.model.Country;
+import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.updater.UpdateChecker;
 import net.buildtheearth.modules.utils.ChatHelper;
 import org.bukkit.command.Command;
@@ -81,15 +80,15 @@ public class BuildTeamToolsCommand implements CommandExecutor {
             @Override
             public void run() {
                 String buildTeamID = "-";
-                if (Main.buildTeamTools.getProxyManager().getBuildTeamID() != null)
-                    buildTeamID = Main.buildTeamTools.getProxyManager().getBuildTeamID();
+                if (Main.buildTeamTools.getProxyManager().getBuildTeam().getID() != null)
+                    buildTeamID = Main.buildTeamTools.getProxyManager().getBuildTeam().getID();
 
                 String serverName = "-";
-                if (Main.buildTeamTools.getProxyManager().getServerName() != null)
-                    serverName = Main.buildTeamTools.getProxyManager().getServerName();
+                if (Main.buildTeamTools.getProxyManager().getBuildTeam().getServerName() != null)
+                    serverName = Main.buildTeamTools.getProxyManager().getBuildTeam().getServerName();
 
                 String status = "§c§lDISCONNECTED";
-                if (Main.buildTeamTools.getProxyManager().isConnected() && !buildTeamID.equals("-") && !serverName.equals("-"))
+                if (Main.buildTeamTools.getProxyManager().getBuildTeam().isConnected() && !buildTeamID.equals("-") && !serverName.equals("-"))
                     status = "§a§lCONNECTED";
                 else if (!buildTeamID.equals("-") && !serverName.equals("-"))
                     status = "§6§lSTANDBY";
@@ -99,20 +98,12 @@ public class BuildTeamToolsCommand implements CommandExecutor {
                 sender.sendMessage("§eBuildTeam ID: §7" + buildTeamID);
                 sender.sendMessage("§eServer Name: §7" + serverName);
                 sender.sendMessage("");
-                sender.sendMessage("§eCountries: §7");
-                for(Continent continent : Continent.values()) {
-                    boolean sentContinentMessage = false;
-                    for(Country country : continent.getCountries()) {
-                        if(country.getTeamID().equals(Main.getBuildTeamTools().getProxyManager().getBuildTeamID())) {
-                            if(!sentContinentMessage) {
-                                sender.sendMessage("§7§n" + continent.getLabel());
-                                sentContinentMessage = true;
-                            }
-                            sender.sendMessage("§7" + country.getName());
-                        }
-                    }
-                }
+                sender.sendMessage("§eContinent: §7" + Main.getBuildTeamTools().getProxyManager().getBuildTeam().getContinent().getLabel());
+                sender.sendMessage("§eRegions: §7");
 
+                for(Region region : Main.getBuildTeamTools().getProxyManager().getBuildTeam().getRegions()) {
+                    sender.sendMessage("§7" + region.getName());
+                }
 
                 sender.sendMessage("");
                 sender.sendMessage("§7Sub-Command list with §e/btt help§7.");

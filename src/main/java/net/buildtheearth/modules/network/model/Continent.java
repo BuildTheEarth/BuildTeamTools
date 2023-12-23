@@ -1,5 +1,8 @@
 package net.buildtheearth.modules.network.model;
 
+import lombok.Getter;
+import lombok.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,41 +14,24 @@ public enum Continent {
     Asia("Asia", 17),
     Other("Other", 22);
 
+    @Getter
     private final String label;
+    @Getter
     private final int slot;
-    private final List<Country> countries;
+    @Getter
+    private final List<Region> regions;
 
     Continent(String label, int slot) {
         this.label = label;
         this.slot = slot;
-
-        // This line makes a set that automatically sorts the countries on connection status and alphabetically
-        this.countries = new ArrayList<>();
+        this.regions = new ArrayList<>();
     }
 
-    public static Continent getBySlot(int slot) {
+    public static @NonNull Continent getByLabel(String label) {
         for(Continent continent : Continent.values())
-            if(continent.getSlot() == slot) return continent;
-        return Other;
-    }
+            if(continent.getLabel().equalsIgnoreCase(label)) return continent;
 
-    public String getLabel() {
-        return label;
-    }
-
-    public int getSlot() {
-        return slot;
-    }
-
-    public List<Country> getCountries() {
-        return countries;
-    }
-
-    public static Continent getByLabel(String label) {
-        for(Continent continent : Continent.values()) {
-            if(continent.getLabel().equals(label)) return continent;
-        }
-        return null;
+        return Continent.Other;
     }
 }
 

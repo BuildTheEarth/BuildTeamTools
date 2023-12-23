@@ -7,6 +7,7 @@ import lombok.Setter;
 import net.buildtheearth.Main;
 import net.buildtheearth.modules.network.api.NetworkAPI;
 import net.buildtheearth.modules.network.model.BuildTeam;
+import net.buildtheearth.modules.network.model.Region;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -38,6 +39,12 @@ public class ProxyManager {
      */
     @Getter
     private final List<BuildTeam> buildTeams = new ArrayList<>();
+
+    /**
+     * A List of all regions of BuildTheEarth.
+     */
+    @Getter
+    private final List<Region> regions = new ArrayList<>();
 
     public ProxyManager() {
         pingAllOnlinePlayers();

@@ -56,9 +56,20 @@ public class NetworkAPI {
             public void onResponse(String response) {
                 JSONArray responseArray = APIUtil.createJSONArray(response);
 
-                // Clear all countries from the continents
+                // Clear all regions from the continents
                 for(Continent continent : Continent.values())
                     continent.getRegions().clear();
+
+                // Clear all regions from the build teams
+                for(BuildTeam buildTeam : Main.getBuildTeamTools().getProxyManager().getBuildTeams())
+                    buildTeam.getRegions().clear();
+
+                // Clear all build teams
+                Main.getBuildTeamTools().getProxyManager().getBuildTeams().clear();
+
+                // Clear all regions
+                Main.getBuildTeamTools().getProxyManager().getRegions().clear();
+
 
                 // Add all countries to their respective continents
                 for(Object object : responseArray.toArray()) {
@@ -94,9 +105,9 @@ public class NetworkAPI {
 
                         Region region = new Region(regionName, regionType, continent, buildTeam, headBase64);
 
-
                         continent.getRegions().add(region);
                         buildTeam.getRegions().add(region);
+                        Main.getBuildTeamTools().getProxyManager().getRegions().add(region);
                     }
                 }
             }

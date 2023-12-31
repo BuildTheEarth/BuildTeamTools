@@ -12,6 +12,10 @@ public class BuildTeam {
     @Getter
     private final String IP;
     @Getter
+    private final String name;
+    @Getter
+    private final String blankName;
+    @Getter
     private final String serverName;
     @Getter
     private final boolean isConnected;
@@ -22,8 +26,10 @@ public class BuildTeam {
     @Getter
     private final Continent continent;
 
-    public BuildTeam(String ID, String serverIP, String serverName, Continent continent, boolean isConnected, boolean hasBTToolsInstalled) {
+    public BuildTeam(String ID, String serverIP, String name, String blankName, String serverName, Continent continent, boolean isConnected, boolean hasBTToolsInstalled) {
         this.ID = ID;
+        this.name = name;
+        this.blankName = blankName;
         this.serverName = serverName;
         this.continent = continent;
         this.isConnected = isConnected;

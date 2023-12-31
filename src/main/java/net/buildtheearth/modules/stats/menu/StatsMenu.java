@@ -5,7 +5,7 @@ import net.buildtheearth.modules.stats.StatsManager;
 import net.buildtheearth.modules.stats.StatsPlayer;
 import net.buildtheearth.modules.stats.StatsServer;
 import net.buildtheearth.modules.utils.Item;
-import net.buildtheearth.modules.utils.Liste;
+import net.buildtheearth.modules.utils.ListUtil;
 import net.buildtheearth.modules.utils.MenuItems;
 import net.buildtheearth.modules.utils.menus.AbstractMenu;
 import org.bukkit.Material;
@@ -20,14 +20,14 @@ import java.util.UUID;
 
 public class StatsMenu extends AbstractMenu {
 
-    private final static ItemStack GLOBAL_HEAD = Item.createCustomHeadBase64(MenuItems.EARTH, "§eGlobal Statistics", Liste.createList("error"));
-    private final static ItemStack ACHIEVEMENTS_HEAD = Item.createCustomHeadBase64(MenuItems.GOLDEN_CUP, "§eAchievements", Liste.createList("error"));
+    private final static ItemStack GLOBAL_HEAD = Item.createCustomHeadBase64(MenuItems.EARTH, "§eGlobal Statistics", ListUtil.createList("error"));
+    private final static ItemStack ACHIEVEMENTS_HEAD = Item.createCustomHeadBase64(MenuItems.GOLDEN_CUP, "§eAchievements", ListUtil.createList("error"));
     private final byte PLAYER_HEAD_SLOT = 4;
     private final byte TEAM_HEAD_SLOT = 20;
     private final byte GLOBAL_HEAD_SLOT = 22;
     private final byte ACHIEVEMENT_HEAD_SLOT = 24;
     private final ItemStack PLAYER_HEAD = Item.createPlayerHead("&ePersonal Statistics", getMenuPlayer().getName());
-    private final ItemStack TEAM_HEAD = Item.create(Material.STONE, "Placeholder", Liste.createList("placeholder")); //TODO GET HEAD BASED ON COUNTRY/TEAM
+    private final ItemStack TEAM_HEAD = Item.create(Material.STONE, "Placeholder", ListUtil.createList("placeholder")); //TODO GET HEAD BASED ON COUNTRY/TEAM
 
 
     public StatsMenu(Player p) {
@@ -123,7 +123,7 @@ public class StatsMenu extends AbstractMenu {
 
         //TODO: HOW TO GET GLOBAL STATS?
 
-        GLOBAL_HEAD.setLore(Liste.createList(
+        GLOBAL_HEAD.setLore(ListUtil.createList(
                 "",
                 "",
                 ""
@@ -133,7 +133,7 @@ public class StatsMenu extends AbstractMenu {
 
         //TODO WAIT UNTIL ACHIEVEMENTS HAVE MORE PROGRESS
 
-        ACHIEVEMENTS_HEAD.setLore(Liste.createList(
+        ACHIEVEMENTS_HEAD.setLore(ListUtil.createList(
                 "",
                 "",
                 ""

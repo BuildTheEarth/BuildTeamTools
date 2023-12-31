@@ -6,7 +6,7 @@ import net.buildtheearth.modules.generator.modules.house.HouseFlag;
 import net.buildtheearth.modules.generator.modules.house.HouseSettings;
 import net.buildtheearth.modules.generator.modules.house.RoofType;
 import net.buildtheearth.modules.utils.Item;
-import net.buildtheearth.modules.utils.Liste;
+import net.buildtheearth.modules.utils.ListUtil;
 import net.buildtheearth.modules.utils.menus.AbstractMenu;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -32,11 +32,11 @@ public class RoofTypeMenu extends AbstractMenu {
     @Override
     protected void setPreviewItems() {
 
-        ItemStack flatRoofItem = Item.create(Material.CARPET, "§bFlat Roof", Liste.createList("", "§eDescription:", "A flat roof for", "skyscrapers using carpets", "or slabs"));
-        ItemStack gableRoofItem = Item.create(Material.COBBLESTONE_STAIRS, "§bGable Roof", Liste.createList("", "§eDescription:", "A gable roof for", "residential houses using stairs"));
-        ItemStack steepSlabRoofItem = Item.create(Material.STEP, "§bSteep Slab Roof", (short) 3, Liste.createList("", "§eDescription:", "A gable roof for", "residential houses using the", "steepest way you can", "create a roof with slabs"));
-        ItemStack mediumSlabRoofItem = Item.create(Material.STEP, "§bMedium Steep Slab Roof", (short) 3, Liste.createList("", "§eDescription:", "A gable roof for", "residential houses by creating", "a medium steep roof with slabs"));
-        ItemStack flatterSlabRoofItem = Item.create(Material.STEP, "§bFlatter Slab Roof", (short) 3, Liste.createList("", "§eDescription:", "A flat gable roof for", "residential houses by creating", "a very flat roof with slabs"));
+        ItemStack flatRoofItem = Item.create(Material.CARPET, "§bFlat Roof", ListUtil.createList("", "§eDescription:", "A flat roof for", "skyscrapers using carpets", "or slabs"));
+        ItemStack gableRoofItem = Item.create(Material.COBBLESTONE_STAIRS, "§bGable Roof", ListUtil.createList("", "§eDescription:", "A gable roof for", "residential houses using stairs"));
+        ItemStack steepSlabRoofItem = Item.create(Material.STEP, "§bSteep Slab Roof", (short) 3, ListUtil.createList("", "§eDescription:", "A gable roof for", "residential houses using the", "steepest way you can", "create a roof with slabs"));
+        ItemStack mediumSlabRoofItem = Item.create(Material.STEP, "§bMedium Steep Slab Roof", (short) 3, ListUtil.createList("", "§eDescription:", "A gable roof for", "residential houses by creating", "a medium steep roof with slabs"));
+        ItemStack flatterSlabRoofItem = Item.create(Material.STEP, "§bFlatter Slab Roof", (short) 3, ListUtil.createList("", "§eDescription:", "A flat gable roof for", "residential houses by creating", "a very flat roof with slabs"));
 
         // Set items
         getMenu().getSlot(FLAT_ROOF_ITEM_SLOT).setItem(flatRoofItem);

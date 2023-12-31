@@ -148,29 +148,7 @@ public abstract class AbstractMenu {
         }
     }
 
-    protected void setMenuItemsAsyncViaMenuItems(ArrayList<MenuItem> menuItems) {
-        int i;
-        int iNumIcons = menuItems.size();
-        MenuItem menuItem;
-
-        //Adds all of the icons
-        for (i = 0; i < iNumIcons; i++) {
-            menuItem = menuItems.get(i);
-            getMenu().getSlot(menuItem.getSlot()).setItem(menuItem.getDisplayIcon());
-        }
+    public void setBackItem(int slot) {
+        getMenu().getSlot(slot).setItem(MenuItems.getBackItem());
     }
-
-    protected void setMenuItemClickEventsAsyncViaMenuItems(ArrayList<MenuItem> menuItems) {
-        int i;
-        int iNumIcons = menuItems.size();
-        MenuItem menuItem;
-
-        //Adds all of the actions
-        for (i = 0; i < iNumIcons; i++) {
-            menuItem = menuItems.get(i);
-            MenuItem finalMenuItem = menuItem;
-            getMenu().getSlot(menuItem.getSlot()).setClickHandler((player, clickInformation) -> finalMenuItem.getAction().click(player));
-        }
-    }
-
 }

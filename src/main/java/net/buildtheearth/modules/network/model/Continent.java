@@ -7,12 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum Continent {
-    North_America("North America", 9),
-    South_America("South America", 11),
-    Europe("Europe", 13),
-    Africa("Africa", 15),
-    Asia("Asia", 17),
-    Other("Other", 22);
+    NORTH_AMERICA("North America", 9),
+    SOUTH_AMERICA("South America", 11),
+    EUROPE("Europe", 13),
+    AFRICA("Africa", 15),
+    ASIA("Asia", 17),
+    OTHER("Other", 22);
 
     @Getter
     private final String label;
@@ -27,11 +27,20 @@ public enum Continent {
         this.regions = new ArrayList<>();
     }
 
+    public List<Region> getCountries() {
+        List<Region> countries = new ArrayList<>();
+        for(Region region : regions)
+            if(region.getType() == RegionType.COUNTRY)
+                countries.add(region);
+
+        return countries;
+    }
+
     public static @NonNull Continent getByLabel(String label) {
         for(Continent continent : Continent.values())
             if(continent.getLabel().equalsIgnoreCase(label)) return continent;
 
-        return Continent.Other;
+        return Continent.OTHER;
     }
 }
 

@@ -90,8 +90,10 @@ public class NetworkAPI {
                     String mainServerIP = (String) teamObject.get("MainServerIP");
                     String teamID = (String) teamObject.get("ID");
                     String serverName = getMainServerName(teamObject);
+                    String name = (String) teamObject.get("Name");
+                    String blankName = (String) teamObject.get("BlankName");
 
-                    BuildTeam buildTeam = new BuildTeam(teamID, mainServerIP, serverName, continent, isConnected, hasBuildTeamToolsInstalled);
+                    BuildTeam buildTeam = new BuildTeam(teamID, mainServerIP, name, blankName, serverName, continent, isConnected, hasBuildTeamToolsInstalled);
                     Main.getBuildTeamTools().getProxyManager().getBuildTeams().add(buildTeam);
 
                     // Add all the regions of the team to their respective continents
@@ -102,8 +104,9 @@ public class NetworkAPI {
                         String regionName = (String) regionObject.get("RegionName");
                         String headBase64 = (String) regionObject.get("Head");
                         RegionType regionType = RegionType.getByLabel((String) regionObject.get("RegionType"));
+                        int area = getArea(regionObject);
 
-                        Region region = new Region(regionName, regionType, continent, buildTeam, headBase64);
+                        Region region = new Region(regionName, regionType, continent, buildTeam, headBase64, area);
 
                         continent.getRegions().add(region);
                         buildTeam.getRegions().add(region);
@@ -129,6 +132,16 @@ public class NetworkAPI {
                     if(serverIP.equals(mainServerIP)) return (String) serverObject.get("Name");
                 }
                 return null;
+            }
+
+            private int getArea(JSONObject regionObject) {
+                if(regionObject == null) return 0;
+                if(regionObject.get("area") == null) return 0;
+
+                if (regionObject.get("area") instanceof Long)
+                    return ((Long) regionObject.get("area")).intValue();
+
+                return ((Double) regionObject.get("area")).intValue();
             }
 
             @Override

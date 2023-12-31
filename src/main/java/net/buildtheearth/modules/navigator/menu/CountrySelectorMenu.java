@@ -2,12 +2,12 @@ package net.buildtheearth.modules.navigator.menu;
 
 import com.alpsbte.alpslib.utils.item.ItemBuilder;
 import lombok.NonNull;
+import net.buildtheearth.Main;
+import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Continent;
 import net.buildtheearth.modules.network.model.Region;
-import net.buildtheearth.modules.utils.ChatHelper;
-import net.buildtheearth.modules.utils.Item;
-import net.buildtheearth.modules.utils.MenuItems;
-import net.buildtheearth.modules.utils.Utils;
+import net.buildtheearth.modules.network.model.RegionType;
+import net.buildtheearth.modules.utils.*;
 import net.buildtheearth.modules.utils.menus.AbstractPaginatedMenu;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -32,18 +32,39 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
     public CountrySelectorMenu(@NonNull Continent continent, Player menuPlayer) {
         super(4, 3, continent.getLabel() + " - countries", menuPlayer);
         this.continent = continent;
-        this.regions = continent.getRegions();
+        this.regions = new ArrayList<>(continent.getCountries());
 
-        if(regions.size() > 0)
-            regions.sort(Comparator.comparing(Region::isConnected).reversed().thenComparing(Region::getName));
+        // Add USA region to North America because it is being built by multiple teams
+        if(continent == Continent.NORTH_AMERICA)
+            regions.add(
+                    new Region("USA",
+                            RegionType.COUNTRY,
+                            Continent.NORTH_AMERICA,
+                            new BuildTeam(null, null, null, "4 Teams", null, Continent.NORTH_AMERICA, false, false),
+                            "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGNhYzk3NzRkYTEyMTcyNDg1MzJjZTE0N2Y3ODMxZjY3YTEyZmRjY2ExY2YwY2I0YjM4NDhkZTZiYzk0YjQifX19", 9372610)
+            );
+
+        if(regions.size() > 0) {
+            // Sort countries by area
+            regions.sort(Comparator.comparing(Region::getArea).reversed());
+
+            // Remove all regions that don't have a build team
+            regions.removeAll(regions.stream().filter(region -> region.getBuildTeam() == null || region.getHeadBase64() == null).collect(Collectors.toList()));
+        }
 
         ChatHelper.logDebug("Continent in constructor: %s", continent);
     }
 
     @Override
     protected void setPreviewItems() {
-        getMenu().getSlot(BACK_ITEM_SLOT).setItem(MenuItems.getBackItem());
-        setSwitchPageItems(SWITCH_PAGE_ITEM_SLOT);
+        setBackItem(BACK_ITEM_SLOT);
+
+        // If there are more than 27 countries, add the switch page items, otherwise add glass panes
+        if(regions.size() > 27)
+            setSwitchPageItems(SWITCH_PAGE_ITEM_SLOT);
+        else
+            for(int i = -1; i < 2; i++)
+                getMenu().getSlot(SWITCH_PAGE_ITEM_SLOT + i).setItem(new ItemBuilder(Material.STAINED_GLASS_PANE, 1, (byte) 7).setName(" ").build());
 
         super.setPreviewItems();
     }
@@ -56,8 +77,12 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
         int slot = 0;
 
         for (Region region : countries) {
-            ArrayList<String> countryLore = new ArrayList<>(Collections.singletonList(ChatHelper.colorize(ChatColor.GRAY, ChatColor.GRAY, "Visit countries in %s", continent.getLabel())));
-            getMenu().getSlot(slot).setItem(Item.createCustomHeadBase64(region.getHeadBase64() == null ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19" : region.getHeadBase64(), region.getName(), countryLore));
+            ArrayList<String> countryLore = ListUtil.createList("", "§eBuild Team:", region.getBuildTeam().getBlankName(), "", "§eArea:", formatArea(region.getArea()) + " km²", "", "§8Click to join this country's server!");
+            getMenu().getSlot(slot).setItem(
+                    Item.createCustomHeadBase64(region.getHeadBase64() == null ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19" : region.getHeadBase64(),
+              "§6§l" + region.getName(),
+                    countryLore)
+            );
             slot++;
         }
     }
@@ -67,7 +92,13 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setItemClickEventsAsync() {
-        setSwitchPageItemClickEvents(SWITCH_PAGE_ITEM_SLOT);
+        if(regions.size() > 27)
+            setSwitchPageItemClickEvents(SWITCH_PAGE_ITEM_SLOT);
+
+        getMenu().getSlot(BACK_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
+            clickPlayer.closeInventory();
+            new ExploreMenu(clickPlayer);
+        });
     }
 
     @Override
@@ -113,5 +144,25 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
     @Override
     protected void setPaginatedMenuItemsAsync(List<?> source) {
 
+    }
+
+    /** Converts an area in square meters to a string with dot notation starting from the right every 3 digits.
+     *
+     * @param area
+     * @return
+     */
+    public static String formatArea(double area) {
+        String areaStr = String.valueOf((int) area);
+        StringBuilder formattedArea = new StringBuilder();
+
+        int length = areaStr.length();
+        for (int i = 0; i < length; i++) {
+            if (i > 0 && (length - i) % 3 == 0) {
+                formattedArea.append(".");
+            }
+            formattedArea.append(areaStr.charAt(i));
+        }
+
+        return formattedArea.toString();
     }
 }

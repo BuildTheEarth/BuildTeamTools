@@ -14,7 +14,7 @@ import net.buildtheearth.modules.generator.modules.road.menu.RoadColorMenu;
 import net.buildtheearth.modules.generator.modules.tree.Tree;
 import net.buildtheearth.modules.updater.DependencyManager;
 import net.buildtheearth.modules.utils.Item;
-import net.buildtheearth.modules.utils.Liste;
+import net.buildtheearth.modules.utils.ListUtil;
 import net.buildtheearth.modules.utils.menus.AbstractMenu;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -48,7 +48,7 @@ public class GeneratorMenu extends AbstractMenu {
     protected void setPreviewItems() {
 
         // HOUSE ITEM
-        ArrayList<String> houseLore = Liste.createList("",
+        ArrayList<String> houseLore = ListUtil.createList("",
                 "§eDescription:",
                 "Generate basic building shells",
                 "with multiple floors, windows and roofs",
@@ -68,7 +68,7 @@ public class GeneratorMenu extends AbstractMenu {
 
 
         // ROAD ITEM
-        ArrayList<String> roadLore = Liste.createList("",
+        ArrayList<String> roadLore = ListUtil.createList("",
                 "§eDescription:",
                 "Generate roads and highways",
                 "with multiple lanes and sidewalks",
@@ -89,7 +89,7 @@ public class GeneratorMenu extends AbstractMenu {
 
 
         // RAILWAY ITEM
-        ArrayList<String> railwayLore = Liste.createList("",
+        ArrayList<String> railwayLore = ListUtil.createList("",
                 "§eDescription:",
                 "Generate railways with multiple tracks",
                 "and many different designs",
@@ -109,7 +109,7 @@ public class GeneratorMenu extends AbstractMenu {
 
         if (!DependencyManager.isSchematicBrushEnabled()) {
             // TREE ITEM
-            ArrayList<String> treeLore = Liste.createList("", "§cPlugin §eSchematicBrush §cis not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
+            ArrayList<String> treeLore = ListUtil.createList("", "§cPlugin §eSchematicBrush §cis not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
 
             ItemStack treeItem = Item.create(Material.SAPLING, "§aGenerate Tree & Forest §c(DISABLED)", treeLore);
 
@@ -117,7 +117,7 @@ public class GeneratorMenu extends AbstractMenu {
             getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
         } else if (!Generator.checkIfTreePackIsInstalled(getMenuPlayer(), false)) {
             // TREE ITEM
-            ArrayList<String> treeLore = Liste.createList("", "§cThe §eTree Pack " + Tree.TREE_PACK_VERSION + " §cis not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
+            ArrayList<String> treeLore = ListUtil.createList("", "§cThe §eTree Pack " + Tree.TREE_PACK_VERSION + " §cis not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
 
             ItemStack treeItem = Item.create(Material.SAPLING, "§aGenerate Tree & Forest §c(DISABLED)", treeLore);
 
@@ -125,7 +125,7 @@ public class GeneratorMenu extends AbstractMenu {
             getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
         } else {
             // TREE ITEM
-            ArrayList<String> treeLore = Liste.createList("",
+            ArrayList<String> treeLore = ListUtil.createList("",
                     "§eDescription:",
                     "Generate trees from a set of",
                     "hundreds of different types",
@@ -144,7 +144,7 @@ public class GeneratorMenu extends AbstractMenu {
 
 
         // FIELD ITEM
-        ArrayList<String> fieldLore = Liste.createList("",
+        ArrayList<String> fieldLore = ListUtil.createList("",
                 "§eDescription:",
                 "Generate fields with different",
                 "crops and plants",

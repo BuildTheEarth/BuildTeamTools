@@ -52,7 +52,7 @@ public class ExploreMenu extends AbstractMenu {
 
                 System.out.println("Continent before creating CountrySelectorMenu: " + continent); // Add this line
 
-                if(continent.equals(Continent.Africa)) {
+                if(continent.equals(Continent.AFRICA)) {
                     // TODO implement that the player gets information about the BTE Africa server when clicking on Africa
                 } else {
                     new CountrySelectorMenu(continent, clickPlayer);

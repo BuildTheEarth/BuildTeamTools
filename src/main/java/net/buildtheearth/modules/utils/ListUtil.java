@@ -2,7 +2,7 @@ package net.buildtheearth.modules.utils;
 
 import java.util.ArrayList;
 
-public class Liste {
+public class ListUtil {
 
     public static ArrayList<String> createStringList(String arg1) {
         ArrayList<String> list = new ArrayList<String>();

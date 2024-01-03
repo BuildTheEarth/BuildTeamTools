@@ -1,9 +1,11 @@
 package net.buildtheearth.modules.warp.commands;
 
 import net.buildtheearth.Main;
+import net.buildtheearth.modules.network.ProxyManager;
 import net.buildtheearth.modules.network.api.NetworkAPI;
-import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
+import net.buildtheearth.modules.network.model.Region;
+import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.geo.projection.Airocean;
 import net.buildtheearth.modules.utils.geo.projection.ModifiedAirocean;
 import net.buildtheearth.modules.utils.io.ConfigPaths;
@@ -17,6 +19,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class WarpCommand implements CommandExecutor {
 
@@ -59,28 +63,37 @@ public class WarpCommand implements CommandExecutor {
             double[] coordinates = projection.toGeo(location.getX(), location.getY());
 
             //Get the country, region & city belonging to the coordinates.
-            String[] locationInfo = new String[]{"Russia", "EAJJTJ", "Moscow"}; // OpenStreetMapAPI.getCountryAndSubRegionsFromLocationAsync(coordinates);
+            String[] locationInfo = new String[0];
+            try {
+                locationInfo = OpenStreetMapAPI.getCountryAndSubRegionsFromLocationAsync(coordinates).get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+
             if (locationInfo == null) {
                 player.sendMessage(ChatHelper.highlight("Failed to get the location of this warp."));
                 return true;
             }
 
-            // Perform a GET request to get the owned countries of this team
-            Collection<String> ownedCountries = NetworkAPI.getCountryCodesByKey(Main.instance.getConfig().getString(ConfigPaths.API_KEY));
+            //Get the owned regions of this team
+            List<Region> ownedRegions = Main.getBuildTeamTools().getProxyManager().getBuildTeam().getRegions();
 
-            // Check if the that list contains the country the warp is in, else return
-            if (ownedCountries == null || locationInfo[0] == null || !ownedCountries.contains(locationInfo[0])) {
+            //Check if the team owns the country they are trying to create a warp in.
+            String[] finalLocationInfo = locationInfo;
+            boolean ownsRegion = ownedRegions.stream().anyMatch(region -> region.getCountryCodeCca2().equals(finalLocationInfo[3]));
+
+            if (!ownsRegion) {
                 player.sendMessage(ChatHelper.highlight("This team does not own the country %s!", locationInfo[0]));
                 return true;
             }
 
             // Create an instance of the warp POJO
             Warp warp = new Warp(
-                    location.getWorld().getName(),
                     key,
-                    locationInfo[0],
-                    locationInfo[1],
-                    locationInfo[2],
+                    finalLocationInfo[3],
+                    finalLocationInfo[1],
+                    finalLocationInfo[2],
+                    location.getWorld().getName(),
                     coordinates[0],
                     coordinates[1],
                     location.getY(),
@@ -89,9 +102,7 @@ public class WarpCommand implements CommandExecutor {
                     highlight
             );
 
-            // TODO Add the warp to the database using a POST request
-
-
+            NetworkAPI.createWarp(warp);
             return true;
         }
 

@@ -1,20 +1,44 @@
 package net.buildtheearth.modules.warp.model;
 
-public class Warp {
-    private final String worldName;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.UUID;
+
+public class Warp {
+
+    @Getter
+    private UUID id;
+
+    @Getter
+    @Setter
     private final String key;
+    @Getter
     private final String countryCode;
+    @Getter
+    private final String countryCodeType = "cca2";
+
+    @Getter
     private final String subRegion;
+    @Getter
     private final String city;
 
+    @Getter
+    private final String worldName;
+
+    @Getter
     private final double lat;
+    @Getter
     private final double lon;
+    @Getter
     private final double y;
 
+    @Getter
     private final float yaw;
+    @Getter
     private final float pitch;
 
+    @Getter
     private final boolean isHighlight;
 
     public Warp(String key, String countryCode, String subRegion, String city, String worldName, double lat, double lon, double y, float pitch, float yaw, boolean isHighlight) {
@@ -35,47 +59,21 @@ public class Warp {
         this.isHighlight = isHighlight;
     }
 
-    public String getWorldName() {
-        return worldName;
-    }
+    public Warp(String key, String countryCode, String countryCodeType, String subRegion, String city, String worldName, double lat, double lon, double y, float pitch, float yaw, boolean isHighlight) {
+        this.worldName = worldName;
 
-    public String getKey() {
-        return key;
-    }
+        this.key = key;
+        this.countryCode = countryCode;
+        this.subRegion = subRegion;
+        this.city = city;
 
-    public String getCountryCode() {
-        return countryCode;
-    }
+        this.lat = lat;
+        this.lon = lon;
+        this.y = y;
 
-    public String getSubRegion() {
-        return subRegion;
-    }
+        this.yaw = yaw;
+        this.pitch = pitch;
 
-    public String getCity() {
-        return city;
-    }
-
-    public double getLat() {
-        return lat;
-    }
-
-    public double getLon() {
-        return lon;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public float getPitch() {
-        return pitch;
-    }
-
-    public float getYaw() {
-        return yaw;
-    }
-
-    public boolean isHighlight() {
-        return isHighlight;
+        this.isHighlight = isHighlight;
     }
 }

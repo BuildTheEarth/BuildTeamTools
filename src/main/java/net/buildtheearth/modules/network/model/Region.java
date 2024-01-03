@@ -1,6 +1,7 @@
 package net.buildtheearth.modules.network.model;
 
 import lombok.Getter;
+import lombok.Setter;
 
 public class Region {
 
@@ -10,6 +11,12 @@ public class Region {
     private final BuildTeam buildTeam;
     @Getter
     private final String name;
+    @Getter
+    @Setter
+    private String countryCodeCca3;
+    @Getter
+    @Setter
+    private String countryCodeCca2;
     @Getter
     private final RegionType type;
     @Getter

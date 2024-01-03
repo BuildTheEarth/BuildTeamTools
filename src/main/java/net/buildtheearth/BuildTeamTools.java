@@ -8,6 +8,7 @@ import net.buildtheearth.modules.generator.commands.GeneratorCommand;
 import net.buildtheearth.modules.navigator.commands.NavigatorCommand;
 import net.buildtheearth.modules.navigator.listeners.NavigatorOpenListener;
 import net.buildtheearth.modules.network.ProxyManager;
+import net.buildtheearth.modules.network.api.NetworkAPI;
 import net.buildtheearth.modules.network.commands.BuildTeamToolsCommand;
 import net.buildtheearth.modules.network.listeners.NetworkJoinListener;
 import net.buildtheearth.modules.network.listeners.NetworkQuitListener;
@@ -71,6 +72,9 @@ public class BuildTeamTools {
         Main.instance.getServer().getMessenger().registerIncomingPluginChannel(Main.instance, "BungeeCord", Main.instance);
         Main.instance.getServer().getMessenger().registerOutgoingPluginChannel(Main.instance, "BuildTeam");
         Main.instance.getServer().getMessenger().registerIncomingPluginChannel(Main.instance, "BuildTeam", Main.instance);
+
+        // Let the network API know the BT-Tools plugin is installed
+        NetworkAPI.setBuildTeamToolsInstalled(true);
 
         //Starts the generator module
         generator = new Generator();

@@ -8,9 +8,15 @@ import net.buildtheearth.Main;
 import net.buildtheearth.modules.network.api.NetworkAPI;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Region;
+import net.buildtheearth.modules.network.model.RegionType;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -87,6 +93,40 @@ public class ProxyManager {
         out.writeUTF(targetServer);
         player.sendPluginMessage(Main.instance, "BungeeCord", out.toByteArray());
     }
+
+    /** Sends a message to the player that the server is not connected to the network yet.
+     *  Instead of the server name the server IP will be displayed so the player can join the other server ip manually.
+     *
+     * @param player The player to send the message to
+     * @param serverIP The IP of the server the player should join
+     */
+    public static void sendNotConnectedMessage(Player player, String serverIP) {
+        TextComponent comp = new TextComponent("§e" + serverIP + " §7(Click to copy)");
+        comp.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, serverIP));
+        comp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§eClick to copy").create()));
+
+        player.closeInventory();
+        player.sendMessage("§cThis server is not connected to the network yet and has a different Server IP:");
+        player.sendMessage("");
+        player.spigot().sendMessage(comp);
+        player.sendMessage("");
+        player.sendMessage("§cClick on the IP to copy it. Then enter it in your Minecraft Server List. (Paste with CTRL + V)");
+    }
+
+    /** Returns all regions of the given region type.
+     *
+     * @param regionType The region type to get the regions of
+     * @return A list of all regions of the given region type
+     */
+    public static ArrayList<Region> getRegionsByRegionType(RegionType regionType){
+        ArrayList<Region> regions = new ArrayList<>();
+        for(Region region : Main.getBuildTeamTools().getProxyManager().getRegions())
+            if(region.getType().equals(regionType))
+                regions.add(region);
+
+        return regions;
+    }
+
 
     // Getters & Setters
 

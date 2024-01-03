@@ -101,17 +101,19 @@ public class NetworkAPI {
                         String regionName = (String) regionObject.get("RegionName");
                         String headBase64 = (String) regionObject.get("Head");
                         RegionType regionType = RegionType.getByLabel((String) regionObject.get("RegionType"));
-                        int area = getArea(regionObject);
 
-                        Region region = new Region(regionName, regionType, continent, buildTeam, headBase64, area);
+
+                        Region region;
 
                         if(regionType.equals(RegionType.COUNTRY)) {
+                            int area = getArea(regionObject);
                             String regionCodeCca3 = (String) regionObject.get("RegionCode");
-                            region.setCountryCodeCca3(regionCodeCca3);
-
                             String regionCodeCca2 = (String) regionObject.get("cca2");
-                            region.setCountryCodeCca2(regionCodeCca2);
-                        }
+
+                            region = new Region(regionName, continent, buildTeam, headBase64, area, regionCodeCca2, regionCodeCca3);
+                        }else
+                            region = new Region(regionName, regionType, continent, buildTeam, headBase64);
+
 
                         continent.getRegions().add(region);
                         buildTeam.getRegions().add(region);

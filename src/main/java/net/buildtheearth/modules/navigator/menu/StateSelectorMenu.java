@@ -2,6 +2,7 @@ package net.buildtheearth.modules.navigator.menu;
 
 import com.alpsbte.alpslib.utils.item.ItemBuilder;
 import lombok.NonNull;
+import net.buildtheearth.Main;
 import net.buildtheearth.modules.network.ProxyManager;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Continent;
@@ -36,12 +37,16 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
         this.states = ProxyManager.getRegionsByRegionType(RegionType.STATE).stream()
                 .filter(region -> region.getContinent() == country.getContinent()).collect(Collectors.toList());
 
+        // Add the New York City region to the states because thats the only city in the USA
+        if(country.getCountryCodeCca3().equalsIgnoreCase("USA"))
+            states.add(Main.buildTeamTools.getProxyManager().getRegions().stream().filter(region -> region.getCountryCodeCca3() != null && region.getCountryCodeCca3().equalsIgnoreCase("NYC")).findFirst().orElse(null));
+
         if(this.states.size() > 0) {
+            // Remove all regions that don't have a build team
+            this.states.removeAll(this.states.stream().filter(region -> region == null || region.getBuildTeam() == null).collect(Collectors.toList()));
+
             // Sort countries by area
             this.states.sort(Comparator.comparing(Region::getName).reversed());
-
-            // Remove all regions that don't have a build team
-            this.states.removeAll(this.states.stream().filter(region -> region.getBuildTeam() == null).collect(Collectors.toList()));
         }
     }
 

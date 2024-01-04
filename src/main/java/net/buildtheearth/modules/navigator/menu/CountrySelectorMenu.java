@@ -41,7 +41,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
                     Continent.NORTH_AMERICA,
                     new BuildTeam(null, null, null, "4 Teams", null, Continent.NORTH_AMERICA, false, false),
                     "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGNhYzk3NzRkYTEyMTcyNDg1MzJjZTE0N2Y3ODMxZjY3YTEyZmRjY2ExY2YwY2I0YjM4NDhkZTZiYzk0YjQifX19"
-                    , 9372610, "USA", "US"
+                    , 9372610, "US", "USA"
                 )
             );
 
@@ -115,9 +115,9 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
                 Region clickedRegion = this.regions.get(_slot);
                 ChatHelper.logDebug("%s", clickedRegion.getName());
 
-                if(clickedRegion.getCountryCodeCca3().equalsIgnoreCase("USA")){
+                if(clickedRegion.getCountryCodeCca3().equalsIgnoreCase("USA"))
                     new StateSelectorMenu(clickedRegion, clickPlayer);
-                }else if (clickedRegion.getBuildTeam().isConnected())
+                else if (clickedRegion.getBuildTeam().isConnected())
                     Utils.sendPlayerToServer(clickPlayer, clickedRegion.getBuildTeam().getServerName());
                 else
                     ProxyManager.sendNotConnectedMessage(clickPlayer, clickedRegion.getBuildTeam().getIP());

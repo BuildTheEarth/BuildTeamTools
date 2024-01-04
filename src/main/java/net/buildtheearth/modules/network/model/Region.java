@@ -53,6 +53,11 @@ public class Region {
      * @param countryCodeCca3 The country code of the country in ISO 3166-1 alpha-3 format
      */
     public Region(String name, Continent continent, BuildTeam buildTeam, String headBase64, int area, String countryCodeCca2, String countryCodeCca3) {
+        if(countryCodeCca2.length() != 2)
+            throw new IllegalArgumentException("Country code must be in ISO 3166-1 alpha-2 format!");
+        if(countryCodeCca3.length() != 3)
+            throw new IllegalArgumentException("Country code must be in ISO 3166-1 alpha-3 format!");
+
         this.type = RegionType.COUNTRY;
 
         this.continent = continent;

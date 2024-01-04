@@ -25,13 +25,8 @@ public class NetworkAPI {
      */
     public static void setBuildTeamToolsInstalled(boolean installed) {
         String apiKey = Main.instance.getConfig().getString(ConfigPaths.API_KEY);
-        String requestBodyString =
-                "[" +
-                    "{" +
-                        "\"hasBuildTeamToolsInstalled\":"+installed +
-                    "}" +
-                "]";
-        RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain"), requestBodyString);
+        String requestBodyString = "{\"hasBuildTeamToolsInstalled\":" + installed + "}";
+        RequestBody requestBody = RequestBody.create(requestBodyString, MediaType.parse("text/plain"));
 
         API.putAsync("https://nwapi.buildtheearth.net/api/teams/" + apiKey + "/hasBuildTeamToolsInstalled", requestBody, new API.ApiResponseCallback() {
             @Override
@@ -208,5 +203,10 @@ public class NetworkAPI {
 
             }
         });
+    }
+
+    public static Warp getWarpByKey(String key) {
+        // TODO implement method
+        return null;
     }
 }

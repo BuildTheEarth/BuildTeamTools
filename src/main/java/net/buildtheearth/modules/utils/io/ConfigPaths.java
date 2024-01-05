@@ -29,6 +29,8 @@ public abstract class ConfigPaths {
     public static final String LANGUAGE = "language";
     public static final String API_KEY = "api-key";
 
+    public static final String DEBUG = "debug";
+
 
     // Navigator.Item
     private static final String NAVIGATOR_ITEM = "navigator-hotbar-item.";

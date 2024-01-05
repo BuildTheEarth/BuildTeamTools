@@ -1,5 +1,7 @@
 package net.buildtheearth.modules.utils;
 
+import net.buildtheearth.Main;
+import net.buildtheearth.modules.utils.io.ConfigPaths;
 import org.bukkit.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -11,12 +13,15 @@ import java.util.logging.Level;
 
 public class ChatHelper {
 
+    public static boolean DEBUG = Main.instance.getConfig().getBoolean(ConfigPaths.DEBUG, false);
+
     public static void logError(String errorMessage, Object... objects) {
         Bukkit.getLogger().log(Level.INFO, ChatHelper.highlight(errorMessage, objects));
     }
 
     public static void logDebug(String errorMessage, Object... objects) {
-        Bukkit.getLogger().log(Level.INFO, ChatHelper.standard(errorMessage, objects));
+        if(DEBUG)
+            Bukkit.getLogger().log(Level.INFO, ChatHelper.standard(errorMessage, objects));
     }
 
     public static String successful(String string, Object... objects) {

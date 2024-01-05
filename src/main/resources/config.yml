@@ -25,24 +25,24 @@ earth-world: world
 # Configures the navigator item in the players hotbar
 navigator-hotbar-item:
   # Enables or disables the navigator hotbar item [true|false]
-  enabled: true
+  nav-enabled: true
   # The hotbar slot into which the navigator item should be placed
-  slot: 8
+  nav-slot: 0
 
 # Specifies which menu items should be enabled
-main_menu_items:
+main-menu-items:
   # Configures the build item inside the navigator
   build-item:
     # Enables or disables the build item inside the navigator [true|false]
-    enabled: true
+    build-enabled: true
     # (Optional) Execute a custom command or send a message when the build item is clicked [/command|message]
-    action: /command
+    build-action: /command
   # Configures the tutorial item inside the navigator
   tutorial-item:
     # Enables or disables the tutorial item inside the navigator [true|false]
-    enabled: false
+    tutorial-enabled: false
     # (Optional) Execute a custom command or send a message when the tutorial item is clicked [/command|message]
-    action: /command
+    tutorial-action: /command
 
 
 

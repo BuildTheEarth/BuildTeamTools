@@ -25,8 +25,12 @@ public class NetworkAPI {
      */
     public static void setBuildTeamToolsInstalled(boolean installed) {
         String apiKey = Main.instance.getConfig().getString(ConfigPaths.API_KEY);
-        String requestBodyString = "{\"hasBuildTeamToolsInstalled\":" + installed + "}";
-        RequestBody requestBody = RequestBody.create(requestBodyString, MediaType.parse("text/plain"));
+
+        JSONObject requestBodyJson = new JSONObject();
+        requestBodyJson.put("hasBuildTeamToolsInstalled", installed);
+        String requestBodyString = requestBodyJson.toString();
+
+        RequestBody requestBody = RequestBody.create(requestBodyString, MediaType.parse("application/json"));
 
         API.putAsync("https://nwapi.buildtheearth.net/api/teams/" + apiKey + "/hasBuildTeamToolsInstalled", requestBody, new API.ApiResponseCallback() {
             @Override

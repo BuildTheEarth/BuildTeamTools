@@ -39,14 +39,18 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
 
         // Add the New York City region to the states because thats the only city in the USA
         if(country.getCountryCodeCca3().equalsIgnoreCase("USA"))
-            states.add(Main.buildTeamTools.getProxyManager().getRegions().stream().filter(region -> region.getCountryCodeCca3() != null && region.getCountryCodeCca3().equalsIgnoreCase("NYC")).findFirst().orElse(null));
+            states.add(Main.buildTeamTools.getProxyManager().getRegions().stream().filter(region -> region.getBuildTeam() != null && region.getBuildTeam().getID().equals("Qy2duN4l")).findFirst().orElse(null));
 
         if(this.states.size() > 0) {
             // Remove all regions that don't have a build team
-            this.states.removeAll(this.states.stream().filter(region -> region == null || region.getBuildTeam() == null).collect(Collectors.toList()));
+            this.states.removeAll(this.states.stream().filter(region ->
+                    region == null
+                    || region.getBuildTeam() == null
+                    || region.getBuildTeam().getID().equals(Main.getBuildTeamTools().getProxyManager().getBuildTeam().getID())
+            ).collect(Collectors.toList()));
 
             // Sort countries by area
-            this.states.sort(Comparator.comparing(Region::getName).reversed());
+            this.states.sort(Comparator.comparing(Region::getName));
         }
     }
 
@@ -101,12 +105,11 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
         List<Region> countries = source.stream().map(l -> (Region) l).collect(Collectors.toList());
 
         int slot = 0;
-        for (Region ignored : countries) {
+        for (Region clickedRegion : countries) {
             final int _slot = slot;
             getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
 
-                Region clickedRegion = this.states.get(_slot);
                 ChatHelper.logDebug("%s", clickedRegion.getName());
 
                 if (clickedRegion.getBuildTeam().isConnected())

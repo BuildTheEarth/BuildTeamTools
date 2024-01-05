@@ -105,8 +105,13 @@ public class ProxyManager {
         comp.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, serverIP));
         comp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§eClick to copy").create()));
 
+        String notConnected = "§cThis server is not connected to the network yet and has a different Server IP:";
+
+        if(!Main.getBuildTeamTools().getProxyManager().getBuildTeam().isConnected())
+            notConnected = "§cThis server has a different Server IP:";
+
         player.closeInventory();
-        player.sendMessage("§cThis server is not connected to the network yet and has a different Server IP:");
+        player.sendMessage(notConnected);
         player.sendMessage("");
         player.spigot().sendMessage(comp);
         player.sendMessage("");

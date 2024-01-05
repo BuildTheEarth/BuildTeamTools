@@ -50,7 +50,11 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
             regions.sort(Comparator.comparing(Region::getArea).reversed());
 
             // Remove all regions that don't have a build team
-            regions.removeAll(regions.stream().filter(region -> region.getBuildTeam() == null || region.getHeadBase64() == null).collect(Collectors.toList()));
+            regions.removeAll(regions.stream().filter(region ->
+                    region.getBuildTeam() == null
+                    || region.getHeadBase64() == null
+                    || region.getBuildTeam().getID().equals(Main.getBuildTeamTools().getProxyManager().getBuildTeam().getID())
+            ).collect(Collectors.toList()));
         }
 
         ChatHelper.logDebug("Continent in constructor: %s", continent);
@@ -107,12 +111,11 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
         List<Region> countries = source.stream().map(l -> (Region) l).collect(Collectors.toList());
 
         int slot = 0;
-        for (Region ignored : countries) {
+        for (Region clickedRegion : countries) {
             final int _slot = slot;
             getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
 
-                Region clickedRegion = this.regions.get(_slot);
                 ChatHelper.logDebug("%s", clickedRegion.getName());
 
                 if(clickedRegion.getCountryCodeCca3().equalsIgnoreCase("USA"))

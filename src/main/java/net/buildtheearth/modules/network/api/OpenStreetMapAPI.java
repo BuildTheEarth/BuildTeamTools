@@ -14,6 +14,7 @@ public class OpenStreetMapAPI extends API {
      * @return A String array with [0] = country, [1] = region & [2] = city/town
      */
     public static CompletableFuture<String[]> getCountryAndSubRegionsFromLocationAsync(double[] coordinates) {
+        System.out.println("coordinates = " + coordinates[0] + " " + coordinates[1]);
         CompletableFuture<String[]> future = new CompletableFuture<>();
         String url = "https://nominatim.openstreetmap.org/reverse?lat=" + coordinates[0] + "&lon=" + coordinates[1] + "&zoom=10&format=jsonv2";
 

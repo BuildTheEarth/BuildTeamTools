@@ -1,14 +1,13 @@
 package net.buildtheearth.modules.warp.commands;
 
 import net.buildtheearth.Main;
-import net.buildtheearth.modules.network.ProxyManager;
+import net.buildtheearth.modules.network.api.API;
 import net.buildtheearth.modules.network.api.NetworkAPI;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.modules.network.model.Region;
+import net.buildtheearth.modules.network.model.RegionType;
 import net.buildtheearth.modules.utils.ChatHelper;
-import net.buildtheearth.modules.utils.geo.projection.Airocean;
-import net.buildtheearth.modules.utils.geo.projection.ModifiedAirocean;
-import net.buildtheearth.modules.utils.io.ConfigPaths;
+import net.buildtheearth.modules.utils.geo.CoordinateConversion;
 import net.buildtheearth.modules.warp.WarpManager;
 import net.buildtheearth.modules.warp.menu.WarpMainMenu;
 import net.buildtheearth.modules.warp.model.Warp;
@@ -18,7 +17,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Collection;
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -59,11 +58,10 @@ public class WarpCommand implements CommandExecutor {
             }
 
             // Get the geographic coordinates of the player's location.
-            Airocean projection = new ModifiedAirocean();
-            double[] coordinates = projection.toGeo(location.getX(), location.getY());
+            double[] coordinates = CoordinateConversion.convertToGeo(location.getX(), location.getZ());
 
             //Get the country, region & city belonging to the coordinates.
-            String[] locationInfo = new String[0];
+            String[] locationInfo = null;
             try {
                 locationInfo = OpenStreetMapAPI.getCountryAndSubRegionsFromLocationAsync(coordinates).get();
             } catch (InterruptedException | ExecutionException e) {
@@ -80,10 +78,12 @@ public class WarpCommand implements CommandExecutor {
 
             //Check if the team owns the country they are trying to create a warp in.
             String[] finalLocationInfo = locationInfo;
-            boolean ownsRegion = ownedRegions.stream().anyMatch(region -> region.getCountryCodeCca2().equals(finalLocationInfo[3]));
+            boolean ownsRegion = ownedRegions.stream()
+                    .filter(region -> region.getType() == RegionType.COUNTRY)
+                    .anyMatch(region -> region.getCountryCodeCca2().equals(finalLocationInfo[3]));
 
             if (!ownsRegion) {
-                player.sendMessage(ChatHelper.highlight("This team does not own the country %s!", locationInfo[0]));
+                player.sendMessage(ChatHelper.highlight("This team does not own the country %s!", finalLocationInfo[0]));
                 return true;
             }
 
@@ -102,7 +102,17 @@ public class WarpCommand implements CommandExecutor {
                     highlight
             );
 
-            NetworkAPI.createWarp(warp);
+            NetworkAPI.createWarp(warp, new API.ApiResponseCallback() {
+                @Override
+                public void onResponse(String response) {
+                    ChatHelper.logDebug(response);
+                }
+
+                @Override
+                public void onFailure(IOException e) {
+                    ChatHelper.logError("Failed to create warp: %s", e);
+                }
+            });
             return true;
         }
 
@@ -121,9 +131,7 @@ public class WarpCommand implements CommandExecutor {
                 return true;
             }
 
-            // TODO Remove the warp from the database using a DELETE request
-
-
+            NetworkAPI.deleteWarp(key);
             return true;
         }
 

@@ -7,7 +7,6 @@ import net.buildtheearth.Main;
 import net.buildtheearth.modules.network.api.NetworkAPI;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.GeometricUtils;
-import net.buildtheearth.modules.utils.geo.LatLng;
 import net.buildtheearth.modules.warp.model.Warp;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -38,7 +37,7 @@ public class WarpManager {
 
             Warp warp = NetworkAPI.getWarpByKey(warpKey);
 
-            Location targetWarpLocation = GeometricUtils.getLocationFromCoordinatesYawPitch(new LatLng(warp.getLat(), warp.getLon()), warp.getYaw(), warp.getPitch());
+            Location targetWarpLocation = GeometricUtils.getLocationFromCoordinatesYawPitch(new double[]{warp.getLat(), warp.getLon()}, warp.getYaw(), warp.getPitch());
             targetWarpLocation.setY(warp.getY());
             targetWarpLocation.setWorld(Bukkit.getWorld(warp.getWorldName()));
 

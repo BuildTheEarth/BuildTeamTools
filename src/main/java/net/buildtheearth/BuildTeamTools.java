@@ -160,7 +160,6 @@ public class BuildTeamTools {
         Main.instance.getCommand("generate").setExecutor(new GeneratorCommand());
         Main.instance.getCommand("warp").setExecutor(new WarpCommand());
         Main.instance.getCommand("navigator").setExecutor(new NavigatorCommand());
-        Main.instance.getCommand("temporary").setExecutor(new TestCommand());
         Main.instance.getCommand("kml").setExecutor(new KmlCommand());
         Main.instance.getCommand("kml").setTabCompleter(new KmlTabCompleter());
     }

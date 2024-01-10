@@ -16,6 +16,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 
 public class NetworkAPI {
 
@@ -46,7 +47,7 @@ public class NetworkAPI {
     }
 
     // Add all currently connected regions to their respective continents
-    public static void getBuildTeamInformation() {
+    public static CompletableFuture<Boolean> getBuildTeamInformation() {
         API.getAsync("https://nwapi.buildtheearth.net/api/teams", new API.ApiResponseCallback() {
             @Override
             public void onResponse(String response) {
@@ -155,6 +156,8 @@ public class NetworkAPI {
                 ChatHelper.logError("Failed to get team & server information from the network API: %s", e);
             }
         });
+
+        return CompletableFuture.completedFuture(true);
     }
 
     public static void setupCurrentServerData() {
@@ -164,9 +167,11 @@ public class NetworkAPI {
                 JSONObject teamObject = APIUtil.createJSONObject(response);
 
                 String teamID = (String) teamObject.get("ID");
+                System.out.println("teamID = " + teamID);
 
                 ProxyManager proxyManager = Main.getBuildTeamTools().getProxyManager();
                 BuildTeam buildTeam = proxyManager.getBuildTeamByID(teamID);
+                System.out.println("buildTeam = " + buildTeam.getName());
                 proxyManager.setBuildTeam(buildTeam);
             }
 
@@ -177,8 +182,9 @@ public class NetworkAPI {
         });
     }
 
-    public static void createWarp(Warp warp) {
+    public static void createWarp(Warp warp, API.ApiResponseCallback callback) {
         String apiKey = Main.instance.getConfig().getString(ConfigPaths.API_KEY);
+
         String requestBodyString = "{" +
                 "\"key\": \"" + warp.getKey() + "\"," +
                 "\"countryCode\": \"" + warp.getCountryCode() + "\"," +
@@ -196,21 +202,15 @@ public class NetworkAPI {
         RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain"), requestBodyString);
 
 
-        API.postAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warps", requestBody, new API.ApiResponseCallback(){
-            @Override
-            public void onResponse(String response) {
+        API.postAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warps", requestBody, callback);
+    }
 
-            }
-
-            @Override
-            public void onFailure(IOException e) {
-
-            }
-        });
+    public static boolean deleteWarp(String key) {
+        return true;
     }
 
     public static Warp getWarpByKey(String key) {
-        // TODO implement method
+        //TODO IMPLEMENT
         return null;
     }
 }

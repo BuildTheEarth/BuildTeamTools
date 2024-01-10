@@ -6,7 +6,6 @@ import com.google.common.io.ByteStreams;
 import net.buildtheearth.Main;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.GeometricUtils;
-import net.buildtheearth.modules.utils.geo.LatLng;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -39,7 +38,7 @@ public class TpllManager {
             //Extracts the coordinates from the plugin message
             double targetLatitude = Double.parseDouble(in.readUTF());
             double targetLongitude = Double.parseDouble(in.readUTF());
-            LatLng coordinates = new LatLng(targetLatitude, targetLongitude);
+            double[] coordinates = new double[]{targetLatitude, targetLongitude};
             ChatHelper.logDebug("The coordinates of the tpll event are: %s %s", targetLatitude, targetLongitude);
 
             // Creates a bukkit location for this tpll target

@@ -80,7 +80,7 @@ public class BuildTeamToolsCommand implements CommandExecutor {
             @Override
             public void run() {
                 String buildTeamID = "-";
-                if (Main.buildTeamTools.getProxyManager().getBuildTeam().getID() != null)
+                if (Main.buildTeamTools.getProxyManager().getBuildTeam().getID() != null) //TODO CAUSES NULLPTR
                     buildTeamID = Main.buildTeamTools.getProxyManager().getBuildTeam().getID();
 
                 String serverName = "-";

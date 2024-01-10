@@ -1,13 +1,10 @@
 package net.buildtheearth.modules.utils;
 
 import net.buildtheearth.Main;
-import net.buildtheearth.modules.utils.geo.LatLng;
-import net.buildtheearth.modules.utils.geo.projection.Airocean;
-import net.buildtheearth.modules.utils.geo.projection.ModifiedAirocean;
+import net.buildtheearth.modules.utils.geo.CoordinateConversion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.configuration.file.FileConfiguration;
 
 public class GeometricUtils {
     /**
@@ -26,15 +23,11 @@ public class GeometricUtils {
      * @param pitch      Player's pitch
      * @return A bukkit location matching the coordinates, yaw and pitch specified. Height is terrain elevation +2.
      */
-    public static Location getLocationFromCoordinatesYawPitch(LatLng coordinates, float yaw, float pitch) {
-        Airocean projection = new ModifiedAirocean();
-        double mpu = projection.metersPerUnit();
+    public static Location getLocationFromCoordinatesYawPitch(double[] coordinates, float yaw, float pitch) {
+        double[] xz = CoordinateConversion.convertFromGeo(coordinates[0], coordinates[1]);
 
-        //fromGeo wamts longitude, then latitude
-        double[] xz = projection.fromGeo(coordinates.getLng(), coordinates.getLat());
-
-        double x = xz[0] * mpu;
-        double z = -xz[1] * mpu;
+        double x = xz[0];
+        double z = -xz[1];
 
         //Creates the location
         Location location;
@@ -61,15 +54,11 @@ public class GeometricUtils {
      * @param coordinates Latitude and longitude of the location
      * @return A bukkit location matching the coordinates. Height is terrain elevation +2.
      */
-    public static Location getLocationFromCoordinates(LatLng coordinates) {
-        Airocean projection = new ModifiedAirocean();
-        double mpu = projection.metersPerUnit();
+    public static Location getLocationFromCoordinates(double[] coordinates) {
+        double[] xz = CoordinateConversion.convertFromGeo(coordinates[0], coordinates[1]);
 
-        //fromGeo wamts longitude, then latitude
-        double[] xz = projection.fromGeo(coordinates.getLng(), coordinates.getLat());
-
-        double x = xz[0] * mpu;
-        double z = -xz[1] * mpu;
+        double x = xz[0];
+        double z = -xz[1];
 
         //Creates the location
         Location location;

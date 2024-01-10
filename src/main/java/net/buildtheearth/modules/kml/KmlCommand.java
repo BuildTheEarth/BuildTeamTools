@@ -6,7 +6,6 @@ import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.GeometricUtils;
 import net.buildtheearth.modules.utils.LineRasterization;
 import net.buildtheearth.modules.utils.PolygonTools;
-import net.buildtheearth.modules.utils.geo.LatLng;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -418,9 +417,9 @@ public class KmlCommand implements CommandExecutor {
         //});
     }
 
-    private Location getLocationFromCoordinates(LatLng latlng, double altitudeFromKML)
+    private Location getLocationFromCoordinates(double[] coordinates, double altitudeFromKML)
     {
-        Location mcLocation = GeometricUtils.getLocationFromCoordinates(latlng);
+        Location mcLocation = GeometricUtils.getLocationFromCoordinates(coordinates);
         //add altitude from kml (altitude from Google Earth is always relative to ground)
         //note: the "-2" is only neccesary because 
         //  getLocationFromCoordinates returns terrain altitude + 2
@@ -444,10 +443,10 @@ public class KmlCommand implements CommandExecutor {
 
             // Create a CompletableFuture for each set of coordinates
             for (Coordinate geocoord : geocoords) {
-                LatLng latlng = new LatLng(geocoord.getLatitude(), geocoord.getLongitude());
+                double[] coordinates = new double[]{geocoord.getLatitude(), geocoord.getLongitude()};
 
                 CompletableFuture<Location> completableFuture = CompletableFuture.supplyAsync(() ->
-                        getLocationFromCoordinates(latlng, geocoord.getAltitude()), executorService);
+                        getLocationFromCoordinates(coordinates, geocoord.getAltitude()), executorService);
                 completableFutureList.add(completableFuture);
             }
 

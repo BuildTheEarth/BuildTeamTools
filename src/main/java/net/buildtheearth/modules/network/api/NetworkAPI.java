@@ -47,7 +47,9 @@ public class NetworkAPI {
     }
 
     // Add all currently connected regions to their respective continents
-    public static CompletableFuture<Boolean> getBuildTeamInformation() {
+    public static CompletableFuture<Void> getBuildTeamInformation() {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
         API.getAsync("https://nwapi.buildtheearth.net/api/teams", new API.ApiResponseCallback() {
             @Override
             public void onResponse(String response) {
@@ -120,6 +122,8 @@ public class NetworkAPI {
                         Main.getBuildTeamTools().getProxyManager().getRegions().add(region);
                     }
                 }
+
+                future.complete(null);
             }
 
 
@@ -154,10 +158,13 @@ public class NetworkAPI {
             @Override
             public void onFailure(IOException e) {
                 ChatHelper.logError("Failed to get team & server information from the network API: %s", e);
+
+                // Handle failure scenario
+                future.completeExceptionally(e);
             }
         });
 
-        return CompletableFuture.completedFuture(true);
+        return future;
     }
 
     public static void setupCurrentServerData() {
@@ -167,11 +174,9 @@ public class NetworkAPI {
                 JSONObject teamObject = APIUtil.createJSONObject(response);
 
                 String teamID = (String) teamObject.get("ID");
-                System.out.println("teamID = " + teamID);
-
                 ProxyManager proxyManager = Main.getBuildTeamTools().getProxyManager();
+
                 BuildTeam buildTeam = proxyManager.getBuildTeamByID(teamID);
-                System.out.println("buildTeam = " + buildTeam.getName());
                 proxyManager.setBuildTeam(buildTeam);
             }
 

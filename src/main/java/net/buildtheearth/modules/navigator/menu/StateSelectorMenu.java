@@ -46,6 +46,7 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
             this.states.removeAll(this.states.stream().filter(region ->
                     region == null
                     || region.getBuildTeam() == null
+                    || region.getBuildTeam().getID() == null
                     || region.getBuildTeam().getID().equals(Main.getBuildTeamTools().getProxyManager().getBuildTeam().getID())
             ).collect(Collectors.toList()));
 

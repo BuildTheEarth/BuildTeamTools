@@ -22,7 +22,7 @@ import java.util.UUID;
 
 public class ProxyManager {
 
-    public static String GLOBAL_PLOT_SYSTEM_SERVER = "Plot1";
+    public static String GLOBAL_PLOT_SYSTEM_SERVER = "NYC-1";
 
     public static int CACHE_UPLOAD_SPEED = 20 * 60 * 10 + 20;
 
@@ -53,8 +53,7 @@ public class ProxyManager {
 
     public ProxyManager() {
         pingAllOnlinePlayers();
-        //TODO L57 IS CALLING SETUPCURRSDATA TOO FAST OR SMTH LIKE THAT
-        NetworkAPI.getBuildTeamInformation().thenAccept(result -> NetworkAPI.setupCurrentServerData());
+        NetworkAPI.getBuildTeamInformation().thenRun(NetworkAPI::setupCurrentServerData);
     }
 
     /**
@@ -140,11 +139,10 @@ public class ProxyManager {
      * @return The BuildTeam with the given ID
      */
     public BuildTeam getBuildTeamByID(String teamID) {
-        for(BuildTeam buildTeam : buildTeams) {
-            if(buildTeam.getID().equals(teamID)) {
+        for(BuildTeam buildTeam : buildTeams)
+            if (buildTeam.getID() != null && buildTeam.getID().equals(teamID))
                 return buildTeam;
-            }
-        }
+
         return null;
     }
 }

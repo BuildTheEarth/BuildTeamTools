@@ -87,8 +87,9 @@ public class MainMenu extends AbstractMenu {
                 clickPlayer.closeInventory();
                 String action = config.getString(ConfigPaths.BUILD_ITEM_ACTION);
 
-                // If no command is set, teleport player to the plot system server
-                if(action == null) {
+                // If no command or message is set, teleport player to the plot system server
+                if(action == null || action.equals("/command") || action.equals("message")) {
+                    clickPlayer.sendMessage(ChatHelper.standard("Teleporting you to the plot system server..."));
                     Utils.sendPlayerToServer(clickPlayer, ProxyManager.GLOBAL_PLOT_SYSTEM_SERVER);
                     return;
                 }
@@ -103,8 +104,8 @@ public class MainMenu extends AbstractMenu {
                 clickPlayer.closeInventory();
                 String action = config.getString(ConfigPaths.TUTORIALS_ITEM_ACTION);
 
-                // If no command is set, open the tutorial menu
-                if(action == null) {
+                // If no command or message is set, open the tutorial menu
+                if(action == null || action.equals("/command") || action.equals("message")) {
                     new TutorialsMenu(clickPlayer);
                     return;
                 }
@@ -157,13 +158,9 @@ public class MainMenu extends AbstractMenu {
 
     private void performClickAction(Player p, String action) {
         // Check if an action is set in the config
-        if(!action.equals("/command")) {
-
-            if (action.startsWith("/"))
-                p.chat(action);
-            else
-                p.performCommand(action);
-        } else
+        if(!action.equals("/command") &&! action.equals("message"))
+            p.chat(action);
+        else
             p.sendMessage(ChatHelper.highlight("No action is set for the %s in the config yet! Please contact an %s.", "build item", "admin"));
     }
 }

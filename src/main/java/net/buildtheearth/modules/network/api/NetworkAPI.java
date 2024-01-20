@@ -1,12 +1,12 @@
 package net.buildtheearth.modules.network.api;
 
+import com.google.gson.Gson;
 import net.buildtheearth.Main;
 import net.buildtheearth.modules.network.ProxyManager;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Continent;
 import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.network.model.RegionType;
-import net.buildtheearth.modules.utils.APIUtil;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.io.ConfigPaths;
 import net.buildtheearth.modules.warp.model.Warp;
@@ -53,7 +53,7 @@ public class NetworkAPI {
         API.getAsync("https://nwapi.buildtheearth.net/api/teams", new API.ApiResponseCallback() {
             @Override
             public void onResponse(String response) {
-                JSONArray responseArray = APIUtil.createJSONArray(response);
+                JSONArray responseArray = API.createJSONArray(response);
 
                 // Clear all regions from the continents
                 for(Continent continent : Continent.values())
@@ -171,7 +171,7 @@ public class NetworkAPI {
         API.getAsync("https://nwapi.buildtheearth.net/api/teams/" + Main.instance.getConfig().getString(ConfigPaths.API_KEY), new API.ApiResponseCallback() {
             @Override
             public void onResponse(String response) {
-                JSONObject teamObject = APIUtil.createJSONObject(response);
+                JSONObject teamObject = API.createJSONObject(response);
 
                 String teamID = (String) teamObject.get("ID");
                 ProxyManager proxyManager = Main.getBuildTeamTools().getProxyManager();
@@ -190,28 +190,15 @@ public class NetworkAPI {
     public static void createWarp(Warp warp, API.ApiResponseCallback callback) {
         String apiKey = Main.instance.getConfig().getString(ConfigPaths.API_KEY);
 
-        String requestBodyString = "{" +
-                "\"key\": \"" + warp.getKey() + "\"," +
-                "\"countryCode\": \"" + warp.getCountryCode() + "\"," +
-                "\"countryCodeType\": \"" + "cca2" + "\"," +
-                "\"subRegion\": \"" + warp.getSubRegion() + "\"," +
-                "\"city\": \"" + warp.getCity() + "\"," +
-                "\"worldName\": \"" + warp.getWorldName() + "\"," +
-                "\"lat\": " + warp.getLat() + "," +
-                "\"lon\": " + warp.getLon() + "," +
-                "\"y\": " + warp.getY() + "," +
-                "\"yaw\": " + warp.getYaw() + "," +
-                "\"pitch\": " + warp.getPitch() + "," +
-                "\"isHighlight\": " + warp.isHighlight() +
-                "}";
-        RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain"), requestBodyString);
-
-
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), new Gson().toJson(warp));
         API.postAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warps", requestBody, callback);
     }
 
-    public static boolean deleteWarp(String key) {
-        return true;
+    public static void deleteWarp(String key, API.ApiResponseCallback callback) {
+        String apiKey = Main.instance.getConfig().getString(ConfigPaths.API_KEY);
+        RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain"), "{\n" + "\"key\":"+key+"\n" + "}");
+
+        API.deleteAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warps", requestBody, callback);
     }
 
     public static Warp getWarpByKey(String key) {

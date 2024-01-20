@@ -4,8 +4,6 @@ import net.buildtheearth.Main;
 import net.buildtheearth.modules.network.api.API;
 import net.buildtheearth.modules.network.api.NetworkAPI;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
-import net.buildtheearth.modules.network.model.Region;
-import net.buildtheearth.modules.network.model.RegionType;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.geo.CoordinateConversion;
 import net.buildtheearth.modules.warp.WarpManager;
@@ -18,8 +16,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class WarpCommand implements CommandExecutor {
 
@@ -38,17 +34,26 @@ public class WarpCommand implements CommandExecutor {
             return true;
         }
 
-        // WARP CREATE <KEY>
+        // WARP CREATE <KEY> <HIGHLIGHT> <GROUP>
         if (args[0].equalsIgnoreCase("create")) {
             // Check if the required arguments are provided & send usage otherwise
-            if (args.length < 2 || args.length > 3) return false;
+            if (args.length < 2) return false;
 
             // Extract the required data from the arguments
             String key = args[1];
             Location location = player.getLocation();
+
             boolean highlight = false;
-            if (args.length == 3) {
-                highlight = Boolean.parseBoolean(args[2]);
+            String group = null;
+            if (args.length >= 3) {
+                if(args[2].equals("true") || args[2].equals("false")) {
+                    highlight = Boolean.parseBoolean(args[2]);
+                } else {
+                    group = args[2];
+                    if(args.length >= 4) {
+                        highlight = Boolean.parseBoolean(args[3]);
+                    }
+                }
             }
 
             // Check if the player has the required permissions
@@ -60,58 +65,38 @@ public class WarpCommand implements CommandExecutor {
             // Get the geographic coordinates of the player's location.
             double[] coordinates = CoordinateConversion.convertToGeo(location.getX(), location.getZ());
 
-            //Get the country, region & city belonging to the coordinates.
-            String[] locationInfo = null;
-            try {
-                locationInfo = OpenStreetMapAPI.getCountryAndSubRegionsFromLocationAsync(coordinates).get();
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-
-            if (locationInfo == null) {
-                player.sendMessage(ChatHelper.highlight("Failed to get the location of this warp."));
-                return true;
-            }
-
-            //Get the owned regions of this team
-            List<Region> ownedRegions = Main.getBuildTeamTools().getProxyManager().getBuildTeam().getRegions();
-
-            //Check if the team owns the country they are trying to create a warp in.
-            String[] finalLocationInfo = locationInfo;
-            boolean ownsRegion = ownedRegions.stream()
-                    .filter(region -> region.getType() == RegionType.COUNTRY)
-                    .anyMatch(region -> region.getCountryCodeCca2().equals(finalLocationInfo[3]));
-
-            if (!ownsRegion) {
-                player.sendMessage(ChatHelper.highlight("This team does not own the country %s!", finalLocationInfo[0]));
-                return true;
-            }
-
-            // Create an instance of the warp POJO
-            Warp warp = new Warp(
-                    key,
-                    finalLocationInfo[3],
-                    finalLocationInfo[1],
-                    finalLocationInfo[2],
-                    location.getWorld().getName(),
-                    coordinates[0],
-                    coordinates[1],
-                    location.getY(),
-                    location.getPitch(),
-                    location.getYaw(),
-                    highlight
-            );
-
-            NetworkAPI.createWarp(warp, new API.ApiResponseCallback() {
-                @Override
-                public void onResponse(String response) {
-                    ChatHelper.logDebug(response);
+            //Get the country belonging to the coordinates
+            String finalGroup = group;
+            boolean finalHighlight = highlight;
+            OpenStreetMapAPI.getCountryFromLocationAsync(coordinates).whenComplete((result, throwable) -> {
+                if(throwable != null) {
+                    player.sendMessage(ChatHelper.highlight("Failed to get the country belonging to your location."));
+                    return;
                 }
 
-                @Override
-                public void onFailure(IOException e) {
-                    ChatHelper.logError("Failed to create warp: %s", e);
+                //Check if the team owns this region/country
+                boolean ownsRegion = Main.getBuildTeamTools().getProxyManager().ownsRegion(result[0], result[1]);
+
+                if(!ownsRegion) {
+                    player.sendMessage(ChatHelper.highlight("This team does not own the country %s!", result[0]));
+                    return;
                 }
+
+                // Create an instance of the warp POJO
+                Warp warp = new Warp(key, result[1], "cca2", finalGroup == null ? "null" : finalGroup, location.getWorld().getName(), coordinates[0], coordinates[1], location.getY(), location.getYaw(), location.getPitch(), finalHighlight);
+
+                // Create the actual warp
+                NetworkAPI.createWarp(warp, new API.ApiResponseCallback() {
+                    @Override
+                    public void onResponse(String response) {
+                        player.sendMessage(ChatHelper.successful("Successfully created the warp %s!", key));
+                    }
+
+                    @Override
+                    public void onFailure(IOException e) {
+                        player.sendMessage(ChatHelper.highlight("Something went wrong while creating the warp %s!", key));
+                    }
+                });
             });
             return true;
         }
@@ -131,7 +116,19 @@ public class WarpCommand implements CommandExecutor {
                 return true;
             }
 
-            NetworkAPI.deleteWarp(key);
+            //TODO CHECK IF THE TEAM OWNS THE WARP WITH THE GIVEN KEY
+
+            NetworkAPI.deleteWarp(key, new API.ApiResponseCallback() {
+                @Override
+                public void onResponse(String response) {
+                    player.sendMessage(ChatHelper.successful("Successfully deleted the warp %s!", key));
+                }
+
+                @Override
+                public void onFailure(IOException e) {
+                    player.sendMessage(ChatHelper.highlight("Something went wrong while deleting the warp %s!", key));
+                }
+            });
             return true;
         }
 

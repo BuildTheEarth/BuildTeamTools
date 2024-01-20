@@ -74,7 +74,7 @@ public class TpllListener implements Listener {
      * @return A CompletableFuture representing whether teleportation interception is required.
      */
     private CompletableFuture<Boolean> shouldIntercept(PlayerCommandPreprocessEvent event) {
-        return OpenStreetMapAPI.getCountryAndSubRegionsFromLocationAsync(new double[]{lat, lon})
+        return OpenStreetMapAPI.getCountryFromLocationAsync(new double[]{lat, lon})
                 .thenComposeAsync(address -> {
                     if (address == null) return CompletableFuture.completedFuture(false);
 

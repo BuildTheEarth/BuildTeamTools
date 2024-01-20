@@ -1,79 +1,58 @@
 package net.buildtheearth.modules.warp.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
+@AllArgsConstructor
 public class Warp {
 
     @Getter
-    private UUID id;
+    private final UUID id = UUID.randomUUID();
 
     @Getter
     @Setter
-    private final String key;
-    @Getter
-    private final String countryCode;
-    @Getter
-    private final String countryCodeType = "cca2";
+    private String key;
 
     @Getter
-    private final String subRegion;
-    @Getter
-    private final String city;
+    @Setter
+    private String countryCode;
 
     @Getter
-    private final String worldName;
+    @Setter
+    private String countryCodeType = "cca2";
 
     @Getter
-    private final double lat;
-    @Getter
-    private final double lon;
-    @Getter
-    private final double y;
+    @Setter
+    private String group = null;
 
     @Getter
-    private final float yaw;
-    @Getter
-    private final float pitch;
+    @Setter
+    private String worldName;
 
     @Getter
-    private final boolean isHighlight;
+    @Setter
+    private double lat;
 
-    public Warp(String key, String countryCode, String subRegion, String city, String worldName, double lat, double lon, double y, float pitch, float yaw, boolean isHighlight) {
-        this.worldName = worldName;
+    @Getter
+    @Setter
+    private double lon;
 
-        this.key = key;
-        this.countryCode = countryCode;
-        this.subRegion = subRegion;
-        this.city = city;
+    @Getter
+    @Setter
+    private double y;
 
-        this.lat = lat;
-        this.lon = lon;
-        this.y = y;
+    @Getter
+    private float yaw;
+    @Getter
+    private float pitch;
 
-        this.yaw = yaw;
-        this.pitch = pitch;
+    @Getter
+    @Setter
+    private boolean isHighlight;
 
-        this.isHighlight = isHighlight;
-    }
 
-    public Warp(String key, String countryCode, String countryCodeType, String subRegion, String city, String worldName, double lat, double lon, double y, float pitch, float yaw, boolean isHighlight) {
-        this.worldName = worldName;
-
-        this.key = key;
-        this.countryCode = countryCode;
-        this.subRegion = subRegion;
-        this.city = city;
-
-        this.lat = lat;
-        this.lon = lon;
-        this.y = y;
-
-        this.yaw = yaw;
-        this.pitch = pitch;
-
-        this.isHighlight = isHighlight;
-    }
 }

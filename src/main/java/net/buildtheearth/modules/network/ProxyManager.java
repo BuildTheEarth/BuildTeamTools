@@ -18,7 +18,9 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ProxyManager {
 
@@ -128,6 +130,15 @@ public class ProxyManager {
                 regions.add(region);
 
         return regions;
+    }
+
+    public boolean ownsRegion(String regionName, String countryCodeCca2) {
+        AtomicBoolean ownsRegion = new AtomicBoolean(false);
+        buildTeam.getRegions().forEach(region -> {
+            if(region.getName().equals(regionName) || region.getCountryCodeCca2().equals(countryCodeCca2)) ownsRegion.set(true);
+        });
+
+        return ownsRegion.get();
     }
 
 

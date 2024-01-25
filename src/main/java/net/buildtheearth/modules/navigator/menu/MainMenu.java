@@ -161,6 +161,6 @@ public class MainMenu extends AbstractMenu {
         if(!action.equals("/command") &&! action.equals("message"))
             p.chat(action);
         else
-            p.sendMessage(ChatHelper.highlight("No action is set for the %s in the config yet! Please contact an %s.", "build item", "admin"));
+            p.sendMessage(ChatHelper.error("No action is set for the %s in the config yet! Please contact an %s.", "build item", "admin"));
     }
 }

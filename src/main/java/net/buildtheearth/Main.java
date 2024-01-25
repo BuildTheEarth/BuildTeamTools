@@ -2,7 +2,6 @@ package net.buildtheearth;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
-import net.buildtheearth.modules.network.ProxyManager;
 import net.buildtheearth.modules.tpll.TpllManager;
 import net.buildtheearth.modules.updater.UpdateChecker;
 import net.buildtheearth.modules.utils.ChatHelper;
@@ -50,7 +49,7 @@ public class Main extends JavaPlugin implements PluginMessageListener {
     @Override
     public void onDisable() {
         buildTeamTools.stop();
-        getLogger().info(ChatHelper.highlight("Plugin stopped."));
+        getLogger().info(ChatHelper.error("Plugin stopped."));
     }
 
     // Methods for managing the configuration file
@@ -85,7 +84,7 @@ public class Main extends JavaPlugin implements PluginMessageListener {
             ByteArrayDataInput in = ByteStreams.newDataInput(message);
             String subChannel = in.readUTF();
 
-            getLogger().info(ChatHelper.standard("Plugin Message received: %s from Player: %s", subChannel, player.getName()));
+            ChatHelper.logDebug("Plugin Message received: %s from Player: %s", subChannel, player.getName());
 
             if (subChannel.equalsIgnoreCase("Ping")) {
                 // Do something? not sure what tbh

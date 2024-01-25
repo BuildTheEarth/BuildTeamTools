@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.utils;
 
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.Main;
 import net.buildtheearth.modules.utils.io.ConfigPaths;
 import org.bukkit.ChatColor;
@@ -16,24 +17,28 @@ public class ChatHelper {
     public static boolean DEBUG = Main.instance.getConfig().getBoolean(ConfigPaths.DEBUG, false);
 
     public static void logError(String errorMessage, Object... objects) {
-        Bukkit.getLogger().log(Level.INFO, ChatHelper.highlight(errorMessage, objects));
+        Bukkit.getLogger().log(Level.INFO, ChatHelper.error(errorMessage, objects));
     }
 
     public static void logDebug(String errorMessage, Object... objects) {
         if(DEBUG)
-            Bukkit.getLogger().log(Level.INFO, ChatHelper.standard(errorMessage, objects));
+            Bukkit.getLogger().log(Level.INFO, console(errorMessage, objects));
+    }
+
+    public static String console(String string, Object... objects) {
+        return BuildTeamTools.CONSOLE_PREFIX + String.format(string, objects);
     }
 
     public static String successful(String string, Object... objects) {
-        return ChatColor.DARK_GREEN + String.format(string.replaceAll("%s", ChatColor.GREEN + "%s" + ChatColor.DARK_GREEN), objects);
+        return BuildTeamTools.PREFIX + ChatColor.GRAY + String.format(string.replaceAll("%s", ChatColor.GREEN + "%s" + ChatColor.GRAY), objects);
     }
 
-    public static String highlight(String string, Object... objects) {
-        return ChatColor.DARK_RED + String.format(string.replaceAll("%s", ChatColor.RED + "%s" + ChatColor.DARK_RED), objects);
+    public static String error(String string, Object... objects) {
+        return ChatColor.RED + String.format(string.replaceAll("%s", ChatColor.YELLOW + "%s" + ChatColor.RED), objects);
     }
 
     public static String standard(String string, Object... objects) {
-        return ChatColor.GOLD + String.format(string.replaceAll("%s", ChatColor.AQUA + "%s" + ChatColor.GOLD), objects);
+        return BuildTeamTools.PREFIX + ChatColor.GRAY + String.format(string.replaceAll("%s", ChatColor.YELLOW + "%s" + ChatColor.GRAY), objects);
     }
 
     public static String colorize(ChatColor color, String string, boolean bold) {

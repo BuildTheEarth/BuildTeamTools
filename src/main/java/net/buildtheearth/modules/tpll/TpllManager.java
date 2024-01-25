@@ -61,7 +61,7 @@ public class TpllManager {
         if (tpllTarget == null) return;
 
         if (tpllTarget.getWorld() == null) {
-            player.sendMessage(ChatHelper.highlight("The %s world of this server is %s.", "earth", "unknown"));
+            player.sendMessage(ChatHelper.error("The %s world of this server is %s.", "earth", "unknown"));
             tpllQueue.remove(player.getUniqueId());
             return;
         }

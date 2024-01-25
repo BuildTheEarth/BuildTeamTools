@@ -3,7 +3,6 @@ package net.buildtheearth.modules.warp.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -11,48 +10,46 @@ import java.util.UUID;
 public class Warp {
 
     @Getter
-    private final UUID id = UUID.randomUUID();
+    private final UUID id;
 
     @Getter
-    @Setter
-    private String key;
+    private UUID warpGroupID;
 
     @Getter
-    @Setter
+    private String name;
+
+    @Getter
     private String countryCode;
 
     @Getter
-    @Setter
     private String countryCodeType = "cca2";
 
     @Getter
-    @Setter
-    private String group = null;
+    private String address;
 
     @Getter
-    @Setter
     private String worldName;
 
     @Getter
-    @Setter
     private double lat;
 
     @Getter
-    @Setter
     private double lon;
 
     @Getter
-    @Setter
     private double y;
 
     @Getter
     private float yaw;
+
     @Getter
     private float pitch;
 
     @Getter
-    @Setter
     private boolean isHighlight;
 
-
+    /** Create a warp with a random warp ID. */
+    public Warp(UUID warpGroupID, String name, String countryCode, String countryCodeType, String address, String worldName, double lat, double lon, double y, float yaw, float pitch, boolean isHighlight) {
+        this(UUID.randomUUID(), warpGroupID, name, countryCode, countryCodeType, address, worldName, lat, lon, y, yaw, pitch, isHighlight);
+    }
 }

@@ -19,6 +19,7 @@ import net.buildtheearth.modules.stats.listeners.StatsListener;
 import net.buildtheearth.modules.tpll.TpllManager;
 import net.buildtheearth.modules.tpll.listeners.TpllJoinListener;
 import net.buildtheearth.modules.tpll.listeners.TpllListener;
+import net.buildtheearth.modules.utils.io.ConfigPaths;
 import net.buildtheearth.modules.utils.io.ConfigUtil;
 import net.buildtheearth.modules.warp.WarpManager;
 import net.buildtheearth.modules.warp.commands.WarpCommand;
@@ -38,6 +39,7 @@ public class BuildTeamTools {
 
     public static int SPIGOT_PROJECT_ID = 101854;
     public static String PREFIX = "§9§lBTE §8> §7";
+    public static String CONSOLE_PREFIX = "[BuildTeamTools] ";
 
     private boolean debug;
     private boolean updateInstalled;
@@ -66,6 +68,7 @@ public class BuildTeamTools {
 
         // Reload the configuration file
         ConfigUtil.getInstance().reloadFiles();
+        debug = Main.instance.getConfig().getBoolean(ConfigPaths.DEBUG, false);
 
         // Register an incoming & outgoing Plugin Messaging Channel
         Main.instance.getServer().getMessenger().registerOutgoingPluginChannel(Main.instance, "BungeeCord");

@@ -60,7 +60,7 @@ public class WarpManager {
         if(player.teleport(targetWarpLocation)) {
             player.sendMessage(ChatHelper.successful("Successfully warped you to the desired location!"));
         } else {
-            player.sendMessage(ChatHelper.highlight("Something went wrong trying to warp you to the desired location."));
+            player.sendMessage(ChatHelper.error("Something went wrong trying to warp you to the desired location."));
         }
 
         warpQueue.remove(player.getUniqueId());
@@ -83,7 +83,7 @@ public class WarpManager {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("UniversalWarps");
         out.writeUTF(targetServer);
-        out.writeUTF(warp.getKey());
+        out.writeUTF(warp.getName());
 
         player.sendPluginMessage(Main.instance, "BuildTeam", out.toByteArray());
 

@@ -12,7 +12,7 @@ public class NavigatorCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatHelper.highlight("You must be a %s to %s this command!", "player", "execute"));
+            sender.sendMessage(ChatHelper.error("You must be a %s to %s this command!", "player", "execute"));
             return true;
         }
 

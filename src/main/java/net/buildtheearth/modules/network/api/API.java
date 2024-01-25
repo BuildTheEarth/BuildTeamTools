@@ -1,11 +1,14 @@
 package net.buildtheearth.modules.network.api;
 
+import net.buildtheearth.Main;
+import net.buildtheearth.modules.utils.ChatHelper;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okio.Buffer;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -159,8 +162,13 @@ public class API {
                 if (response.isSuccessful()) {
                     String responseBody = response.body().string();
                     callback.onResponse(responseBody);
-                } else {
-                    callback.onFailure(new IOException("Unexpected code " + response));
+                } else if(Main.getBuildTeamTools().isDebug()) {
+                    Buffer buffer = new Buffer();
+                    requestBody.writeTo(buffer);
+                    callback.onFailure(new IOException("\nUnexpected code: \n" + response + "\n Request Body:\n" + buffer.readUtf8() +"\n Response Body:\n" + response.body().string()));
+                }else {
+                    ChatHelper.logDebug("TEST IF THIS IS THE PROBLEM");
+                    callback.onFailure(new IOException("Unexpected code: " + response.code()));
                 }
             }
 

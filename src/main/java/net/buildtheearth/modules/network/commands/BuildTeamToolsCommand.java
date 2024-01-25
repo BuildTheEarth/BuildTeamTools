@@ -76,38 +76,43 @@ public class BuildTeamToolsCommand implements CommandExecutor {
             return true;
         }
 
-        ChatHelper.sendMessageBox(sender, "Build Team Tools", new Runnable() {
-            @Override
-            public void run() {
-                String buildTeamID = "-";
-                if (Main.buildTeamTools.getProxyManager().getBuildTeam().getID() != null) //TODO CAUSES NULLPTR
-                    buildTeamID = Main.buildTeamTools.getProxyManager().getBuildTeam().getID();
+        ChatHelper.sendMessageBox(sender, "Build Team Tools", () -> {
 
-                String serverName = "-";
-                if (Main.buildTeamTools.getProxyManager().getBuildTeam().getServerName() != null)
-                    serverName = Main.buildTeamTools.getProxyManager().getBuildTeam().getServerName();
+            String buildTeamID = "-";
+            if (Main.getBuildTeamTools().getProxyManager().getBuildTeam().getID() != null) //TODO CAUSES NULLPTR
+                buildTeamID = Main.getBuildTeamTools().getProxyManager().getBuildTeam().getID();
 
-                String status = "§c§lDISCONNECTED";
-                if (Main.buildTeamTools.getProxyManager().getBuildTeam().isConnected() && !buildTeamID.equals("-") && !serverName.equals("-"))
-                    status = "§a§lCONNECTED";
-                else if (!buildTeamID.equals("-") && !serverName.equals("-"))
-                    status = "§6§lSTANDBY";
+            String serverName = "-";
+            if (Main.getBuildTeamTools().getProxyManager().getBuildTeam().getServerName() != null)
+                serverName = Main.getBuildTeamTools().getProxyManager().getBuildTeam().getServerName();
 
-                sender.sendMessage("§eStatus: " + status);
-                sender.sendMessage("§eVersion: §7" + Main.instance.getDescription().getVersion());
-                sender.sendMessage("§eBuildTeam ID: §7" + buildTeamID);
-                sender.sendMessage("§eServer Name: §7" + serverName);
-                sender.sendMessage("");
-                sender.sendMessage("§eContinent: §7" + Main.getBuildTeamTools().getProxyManager().getBuildTeam().getContinent().getLabel());
-                sender.sendMessage("§eRegions: §7");
+            String status = "§c§lDISCONNECTED";
+            if (Main.getBuildTeamTools().getProxyManager().getBuildTeam().isConnected() && !buildTeamID.equals("-") && !serverName.equals("-"))
+                status = "§a§lCONNECTED";
+            else if (!buildTeamID.equals("-") && !serverName.equals("-"))
+                status = "§6§lSTANDBY";
 
-                for(Region region : Main.getBuildTeamTools().getProxyManager().getBuildTeam().getRegions()) {
-                    sender.sendMessage("§7" + region.getName());
-                }
+            boolean debug = Main.getBuildTeamTools().isDebug();
 
-                sender.sendMessage("");
-                sender.sendMessage("§7Sub-Command list with §e/btt help§7.");
+            sender.sendMessage("§eStatus: " + status);
+            sender.sendMessage("§eVersion: §7" + Main.instance.getDescription().getVersion());
+            sender.sendMessage("§eBuildTeam ID: §7" + buildTeamID);
+            sender.sendMessage("§eServer Name: §7" + serverName);
+
+            if(debug)
+                sender.sendMessage("§eDebug Mode: §a§lON");
+
+            sender.sendMessage("");
+            sender.sendMessage("§eContinent: §7" + Main.getBuildTeamTools().getProxyManager().getBuildTeam().getContinent().getLabel());
+            sender.sendMessage("§eRegions: §7");
+
+            for(Region region : Main.getBuildTeamTools().getProxyManager().getBuildTeam().getRegions()) {
+                sender.sendMessage("§7" + region.getName());
             }
+
+            sender.sendMessage("");
+            sender.sendMessage("§7Sub-Command list with §e/btt help§7.");
+
         });
         return true;
     }

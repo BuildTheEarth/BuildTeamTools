@@ -9,13 +9,16 @@ import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.network.model.RegionType;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.io.ConfigPaths;
+import net.buildtheearth.modules.warp.WarpGroup;
 import net.buildtheearth.modules.warp.model.Warp;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import org.bukkit.Bukkit;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.io.IOException;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class NetworkAPI {
@@ -82,7 +85,17 @@ public class NetworkAPI {
                     if(!(regions instanceof JSONArray)) return;
                     JSONArray regionArray = (JSONArray) regions;
 
-                    // Get some values that will be needed in the for loop
+                    // Extract a JSON array containing the warps belonging to the team
+                    Object warps = teamObject.get("Warps");
+                    if(!(warps instanceof JSONArray)) return;
+                    JSONArray warpArray = (JSONArray) warps;
+
+                    // Extract a JSON array containing the warp groups belonging to the team
+                    Object warpGroups = teamObject.get("WarpGroups");
+                    if(!(warpGroups instanceof JSONArray)) return;
+                    JSONArray warpGroupArray = (JSONArray) warpGroups;
+
+                    // Get some values to add to the build team
                     Continent continent = Continent.getByLabel((String) teamObject.get("Continent"));
                     boolean isConnected = (boolean) teamObject.get("isConnectedToNetwork");
                     boolean hasBuildTeamToolsInstalled = (long) teamObject.get("hasBuildTeamToolsInstalled") == 1;
@@ -95,9 +108,65 @@ public class NetworkAPI {
                     BuildTeam buildTeam = new BuildTeam(teamID, mainServerIP, name, blankName, serverName, continent, isConnected, hasBuildTeamToolsInstalled);
                     Main.getBuildTeamTools().getProxyManager().getBuildTeams().add(buildTeam);
 
+                    // Create an "other" Warp Group for warps that don't belong to a warp group
+                    WarpGroup otherWarpGroup = new WarpGroup("Other", "Other warps");
+                    buildTeam.getWarpGroups().add(otherWarpGroup);
+
+                    // Add all the warp groups of the team to their respective build teams
+                    for(Object warpGroupJSON : warpGroupArray.toArray()) {
+                        if(!(warpGroupJSON instanceof JSONObject)) return;
+                        JSONObject warpGroupObject = (JSONObject) warpGroupJSON;
+
+                        UUID warpGroupID = UUID.fromString((String) warpGroupObject.get("ID"));
+                        String warpGroupName = (String) warpGroupObject.get("Name");
+                        String warpGroupDescription = (String) warpGroupObject.get("Description");
+
+                        WarpGroup warpGroup = new WarpGroup(warpGroupID, warpGroupName, warpGroupDescription);
+
+                        buildTeam.getWarpGroups().add(warpGroup);
+                    }
+
+                    // Add all the warps of the team to their respective warp groups
+                    for(Object warpJSON : warpArray.toArray()) {
+                        if(!(warpJSON instanceof JSONObject)) return;
+                        JSONObject warpObject = (JSONObject) warpJSON;
+
+                        UUID warpID = UUID.fromString((String) warpObject.get("ID"));
+                        UUID warpGroupID = UUID.fromString((String) warpObject.get("WarpGroup"));
+                        String warpName = (String) warpObject.get("Name");
+                        String countryCode = (String) warpObject.get("CountryCode");
+                        String address = (String) warpObject.get("Address");
+                        String warpWorldName = (String) warpObject.get("WorldName");
+                        double warpLat = (double) warpObject.get("Latitude");
+                        double warpLon = (double) warpObject.get("Longitude");
+                        int warpHeight = (int) (long) warpObject.get("Height");
+                        float warpYaw = (float) (double) warpObject.get("Yaw");
+                        float warpPitch = (float) (double) warpObject.get("Pitch");
+                        boolean isHighlight = (boolean) warpObject.get("isHighlight");
+
+                        Warp warp = new Warp(warpID, warpGroupID, warpName, countryCode, "cca3", address, warpWorldName, warpLat, warpLon, warpHeight, warpYaw, warpPitch, isHighlight);
+
+                        // If the warp belongs to a warp group, add it to that, otherwise add it to the "other" warp group.
+                        if(warpGroupID == null) {
+                            otherWarpGroup.getWarps().add(warp);
+                        }else {
+                            boolean added = false;
+
+                            for(WarpGroup warpGroup : buildTeam.getWarpGroups())
+                                if(warpGroup.getId().equals(warpGroupID)) {
+                                    warpGroup.getWarps().add(warp);
+                                    added = true;
+                                    break;
+                                }
+
+                            if(!added)
+                                otherWarpGroup.getWarps().add(warp);
+                        }
+                    }
+
                     // Add all the regions of the team to their respective continents
                     for(Object regionJSON : regionArray.toArray()) {
-                        if(!(regionJSON instanceof JSONObject)) return;
+                        if(!(regionJSON instanceof JSONObject)) continue;
                         JSONObject regionObject = (JSONObject) regionJSON;
 
                         String regionName = (String) regionObject.get("RegionName");
@@ -194,11 +263,25 @@ public class NetworkAPI {
         API.postAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warps", requestBody, callback);
     }
 
+    public static void createWarpGroup(WarpGroup warpGroup, API.ApiResponseCallback callback) {
+        String apiKey = Main.instance.getConfig().getString(ConfigPaths.API_KEY);
+
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), new Gson().toJson(warpGroup));
+        API.postAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warpgroups", requestBody, callback);
+    }
+
     public static void deleteWarp(String key, API.ApiResponseCallback callback) {
         String apiKey = Main.instance.getConfig().getString(ConfigPaths.API_KEY);
         RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain"), "{\n" + "\"key\":"+key+"\n" + "}");
 
         API.deleteAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warps", requestBody, callback);
+    }
+
+    public static void deleteWarpGroup(String key, API.ApiResponseCallback callback) {
+        String apiKey = Main.instance.getConfig().getString(ConfigPaths.API_KEY);
+        RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain"), "{\n" + "\"key\":"+key+"\n" + "}");
+
+        API.deleteAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warpgroups", requestBody, callback);
     }
 
     public static Warp getWarpByKey(String key) {

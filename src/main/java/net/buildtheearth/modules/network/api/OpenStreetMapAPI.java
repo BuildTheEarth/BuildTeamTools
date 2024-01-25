@@ -14,7 +14,7 @@ public class OpenStreetMapAPI extends API {
      */
     public static CompletableFuture<String[]> getCountryFromLocationAsync(double[] coordinates) {
         CompletableFuture<String[]> future = new CompletableFuture<>();
-        String url = "https://nominatim.openstreetmap.org/reverse?lat=" + coordinates[0] + "&lon=" + coordinates[1] + "&zoom=10&format=jsonv2&accept-language=en";
+        String url = "https://nominatim.openstreetmap.org/reverse?lat=" + coordinates[0] + "&lon=" + coordinates[1] + "&zoom=10&format=geocodejson&accept-language=en";
 
         API.getAsync(url, new API.ApiResponseCallback() {
             @Override

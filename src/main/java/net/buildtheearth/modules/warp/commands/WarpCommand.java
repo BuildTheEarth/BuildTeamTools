@@ -7,7 +7,8 @@ import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.geo.CoordinateConversion;
 import net.buildtheearth.modules.warp.WarpManager;
-import net.buildtheearth.modules.warp.menu.WarpMainMenu;
+import net.buildtheearth.modules.warp.menu.WarpGroupMenu;
+import net.buildtheearth.modules.warp.menu.WarpMenu;
 import net.buildtheearth.modules.warp.model.Warp;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -37,8 +38,17 @@ public class WarpCommand implements CommandExecutor {
         Player player = (Player) sender;
 
         // If no arguments were supplied assume the player wants to open the warp menu
-        if (args == null) {
-            new WarpMainMenu(player, null);
+        if (args.length == 0) {
+            int warpGroupCount = Main.getBuildTeamTools().getProxyManager().getBuildTeam().getWarpGroups().size();
+
+            if(warpGroupCount == 0){
+                player.sendMessage(ChatHelper.error("This server does not have any warps yet!"));
+                return true;
+            }else if(warpGroupCount == 1)
+                new WarpMenu(player, Main.getBuildTeamTools().getProxyManager().getBuildTeam().getWarpGroups().get(0), false);
+            else
+                new WarpGroupMenu(player);
+
             return true;
         }
 

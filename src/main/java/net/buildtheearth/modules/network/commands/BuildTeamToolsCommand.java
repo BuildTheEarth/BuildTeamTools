@@ -48,9 +48,10 @@ public class BuildTeamToolsCommand implements CommandExecutor {
             return true;
         }
 
-        if (args.length > 0 && args[0].equalsIgnoreCase("uploadCache")) {
+        if (args.length > 0 && args[0].equalsIgnoreCase("updateCache")) {
             Main.buildTeamTools.getStatsManager().updateAndSave();
-            sender.sendMessage("§7Cache uploaded to the network.");
+            Main.buildTeamTools.getProxyManager().updateCache();
+            sender.sendMessage("§7Cache successfully updated.");
             return true;
         }
 

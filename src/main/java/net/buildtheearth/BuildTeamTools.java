@@ -198,7 +198,7 @@ public class BuildTeamTools {
         if (!updateInstalled)
             return;
 
-        if (p.hasPermission("buildteam.notifyUpdate")) {
+        if (p.hasPermission("btt.notifyUpdate")) {
             p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
             p.sendMessage("");
             p.sendMessage("§6§l[BuildTeam Plugin] §eThe server automatically installed a new update (v" + newVersion + ").");

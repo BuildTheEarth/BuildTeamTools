@@ -1,8 +1,7 @@
 package net.buildtheearth.modules.network.model;
 
 import lombok.Getter;
-import net.buildtheearth.modules.warp.WarpGroup;
-import net.buildtheearth.modules.warp.model.Warp;
+import net.buildtheearth.modules.warp.model.WarpGroup;
 
 import java.util.ArrayList;
 import java.util.List;

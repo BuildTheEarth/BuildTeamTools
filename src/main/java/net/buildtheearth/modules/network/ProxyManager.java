@@ -55,6 +55,11 @@ public class ProxyManager {
 
     public ProxyManager() {
         pingAllOnlinePlayers();
+        updateCache();
+    }
+
+    /** Updates the cache of the proxy. */
+    public void updateCache() {
         NetworkAPI.getBuildTeamInformation().thenRun(NetworkAPI::setupCurrentServerData);
     }
 

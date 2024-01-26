@@ -55,7 +55,10 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
                     || region.getHeadBase64() == null
                     || region.getBuildTeam() == null
                     || region.getBuildTeam().getID() == null
-                    || region.getBuildTeam().getID().equals(Main.getBuildTeamTools().getProxyManager().getBuildTeam().getID())
+                    || (
+                        Main.getBuildTeamTools().getProxyManager().getBuildTeam() != null
+                        && region.getBuildTeam().getID().equals(Main.getBuildTeamTools().getProxyManager().getBuildTeam().getID())
+                    )
             ).collect(Collectors.toList()));
         }
 

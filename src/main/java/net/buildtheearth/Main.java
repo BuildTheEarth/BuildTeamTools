@@ -43,7 +43,7 @@ public class Main extends JavaPlugin implements PluginMessageListener {
         if (!successful) return;
 
         String resultMessage = UpdateChecker.start(this.getFile());
-        getLogger().info(ChatHelper.successful("Plugin with version %s started. %s", getDescription().getVersion(), resultMessage));
+        ChatHelper.logDebug("Plugin with version %s started. %s", getDescription().getVersion(), resultMessage);
     }
 
     @Override

@@ -9,7 +9,7 @@ import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.network.model.RegionType;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.io.ConfigPaths;
-import net.buildtheearth.modules.warp.WarpGroup;
+import net.buildtheearth.modules.warp.model.WarpGroup;
 import net.buildtheearth.modules.warp.model.Warp;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -72,27 +72,26 @@ public class NetworkAPI {
                 // Clear all regions
                 Main.getBuildTeamTools().getProxyManager().getRegions().clear();
 
-
                 // Add all countries to their respective continents
                 for(Object object : responseArray.toArray()) {
 
                     // Check if the object is a JSON object
-                    if(!(object instanceof JSONObject)) return;
+                    if(!(object instanceof JSONObject)) continue;
                     JSONObject teamObject = (JSONObject) object;
 
                     // Extract a JSON array containing the regions belonging to the team
                     Object regions = teamObject.get("Regions");
-                    if(!(regions instanceof JSONArray)) return;
+                    if(!(regions instanceof JSONArray)) continue;
                     JSONArray regionArray = (JSONArray) regions;
 
                     // Extract a JSON array containing the warps belonging to the team
                     Object warps = teamObject.get("Warps");
-                    if(!(warps instanceof JSONArray)) return;
+                    if(!(warps instanceof JSONArray)) continue;
                     JSONArray warpArray = (JSONArray) warps;
 
                     // Extract a JSON array containing the warp groups belonging to the team
                     Object warpGroups = teamObject.get("WarpGroups");
-                    if(!(warpGroups instanceof JSONArray)) return;
+                    if(!(warpGroups instanceof JSONArray)) continue;
                     JSONArray warpGroupArray = (JSONArray) warpGroups;
 
                     // Get some values to add to the build team
@@ -110,11 +109,10 @@ public class NetworkAPI {
 
                     // Create an "other" Warp Group for warps that don't belong to a warp group
                     WarpGroup otherWarpGroup = new WarpGroup("Other", "Other warps");
-                    buildTeam.getWarpGroups().add(otherWarpGroup);
 
                     // Add all the warp groups of the team to their respective build teams
                     for(Object warpGroupJSON : warpGroupArray.toArray()) {
-                        if(!(warpGroupJSON instanceof JSONObject)) return;
+                        if(!(warpGroupJSON instanceof JSONObject)) continue;
                         JSONObject warpGroupObject = (JSONObject) warpGroupJSON;
 
                         UUID warpGroupID = UUID.fromString((String) warpGroupObject.get("ID"));
@@ -128,7 +126,7 @@ public class NetworkAPI {
 
                     // Add all the warps of the team to their respective warp groups
                     for(Object warpJSON : warpArray.toArray()) {
-                        if(!(warpJSON instanceof JSONObject)) return;
+                        if(!(warpJSON instanceof JSONObject)) continue;
                         JSONObject warpObject = (JSONObject) warpJSON;
 
                         UUID warpID = UUID.fromString((String) warpObject.get("ID"));
@@ -163,6 +161,10 @@ public class NetworkAPI {
                                 otherWarpGroup.getWarps().add(warp);
                         }
                     }
+
+                    // Add the "other" warp group to the build team if it contains any warps
+                    if(otherWarpGroup.getWarps().size() > 0)
+                        buildTeam.getWarpGroups().add(otherWarpGroup);
 
                     // Add all the regions of the team to their respective continents
                     for(Object regionJSON : regionArray.toArray()) {
@@ -226,7 +228,7 @@ public class NetworkAPI {
 
             @Override
             public void onFailure(IOException e) {
-                ChatHelper.logError("Failed to get team & server information from the network API: %s", e);
+                ChatHelper.logError("Failed to get teams information from the network API: %s", e);
 
                 // Handle failure scenario
                 future.completeExceptionally(e);

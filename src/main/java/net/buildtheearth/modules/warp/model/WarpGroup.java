@@ -1,4 +1,4 @@
-package net.buildtheearth.modules.warp;
+package net.buildtheearth.modules.warp.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

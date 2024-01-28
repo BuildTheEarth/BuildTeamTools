@@ -6,6 +6,7 @@ import net.buildtheearth.modules.network.ProxyManager;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.ListUtil;
+import net.buildtheearth.modules.utils.Utils;
 import net.buildtheearth.modules.utils.menus.AbstractPaginatedMenu;
 import net.buildtheearth.modules.warp.model.Warp;
 import net.buildtheearth.modules.warp.model.WarpGroup;
@@ -17,7 +18,10 @@ import org.bukkit.inventory.ItemStack;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
 
+import java.sql.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,15 +33,14 @@ public class WarpMenu extends AbstractPaginatedMenu {
     private WarpGroup warpGroup;
 
     public WarpMenu(Player menuPlayer, WarpGroup warpGroup, boolean hasBackItem) {
-        super(4, 3, ChatColor.GREEN + "Warp Menu", menuPlayer);
+        super(4, 3, "Warp Menu", menuPlayer);
         this.hasBackItem = hasBackItem;
         this.warpGroup = warpGroup;
     }
 
     @Override
     protected void setMenuItemsAsync() {
-        if(hasBackItem)
-            setBackItem(BACK_ITEM_SLOT);
+        setBackItem(BACK_ITEM_SLOT, hasBackItem);
     }
 
     @Override
@@ -45,7 +48,7 @@ public class WarpMenu extends AbstractPaginatedMenu {
         if(hasBackItem)
         getMenu().getSlot(BACK_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
             clickPlayer.closeInventory();
-            new WarpGroupMenu(clickPlayer);
+            new WarpGroupMenu(clickPlayer, warpGroup.getBuildTeam(), false);
         });
     }
 
@@ -73,7 +76,10 @@ public class WarpMenu extends AbstractPaginatedMenu {
         int slot = 0;
 
         for (Warp warp : warps) {
-            ArrayList<String> warpLore = ListUtil.createList("", "§eAddress:", warp.getAddress());
+            ArrayList<String> loreLines = new ArrayList<>(Arrays.asList("", "§eAddress:"));
+            loreLines.addAll(Arrays.asList(Utils.splitStringByLineLength(warp.getAddress(), 30)));
+
+            ArrayList<String> warpLore = ListUtil.createList(loreLines.toArray(new String[loreLines.size()]));
             getMenu().getSlot(slot).setItem(
                     Item.createCustomHeadBase64("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19",
                             "§6§l" + warp.getName(),

@@ -148,7 +148,10 @@ public abstract class AbstractMenu {
         }
     }
 
-    public void setBackItem(int slot) {
-        getMenu().getSlot(slot).setItem(MenuItems.getBackItem());
+    public void setBackItem(int slot, boolean isActive) {
+        if(isActive)
+            getMenu().getSlot(slot).setItem(MenuItems.getBackItem());
+        else
+            getMenu().getSlot(slot).setItem(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null));
     }
 }

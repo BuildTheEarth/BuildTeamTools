@@ -76,6 +76,9 @@ public class WarpManager {
         // Get the warp using a GET request
         Warp warp = NetworkAPI.getWarpByKey(key);
 
+        if(warp == null)
+            return;
+
         // Get the server the warp is on
         String targetServer = "Empty"; // NetworkAPI.getServerNameByCountryCode(warp.getCountryCode());
 

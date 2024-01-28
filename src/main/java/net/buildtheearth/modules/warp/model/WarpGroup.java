@@ -1,9 +1,8 @@
 package net.buildtheearth.modules.warp.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import net.buildtheearth.modules.warp.model.Warp;
+import net.buildtheearth.modules.network.model.BuildTeam;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +12,9 @@ public class WarpGroup {
 
     @Getter
     private UUID id = UUID.randomUUID();
+
+    @Getter
+    private BuildTeam buildTeam;
 
     @Getter @Setter
     private String name;
@@ -24,14 +26,16 @@ public class WarpGroup {
     private final List<Warp> warps;
 
 
-    public WarpGroup(String name, String description) {
+    public WarpGroup(BuildTeam buildTeam, String name, String description) {
+        this.buildTeam = buildTeam;
         this.name = name;
         this.description = description;
         this.warps = new ArrayList<>();
     }
 
-    public WarpGroup(UUID id, String name, String description) {
+    public WarpGroup(UUID id, BuildTeam buildTeam, String name, String description) {
         this.id = id;
+        this.buildTeam = buildTeam;
         this.name = name;
         this.description = description;
         this.warps = new ArrayList<>();

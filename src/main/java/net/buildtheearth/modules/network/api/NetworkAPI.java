@@ -108,7 +108,7 @@ public class NetworkAPI {
                     Main.getBuildTeamTools().getProxyManager().getBuildTeams().add(buildTeam);
 
                     // Create an "other" Warp Group for warps that don't belong to a warp group
-                    WarpGroup otherWarpGroup = new WarpGroup("Other", "Other warps");
+                    WarpGroup otherWarpGroup = new WarpGroup(buildTeam, "Other", "Other warps");
 
                     // Add all the warp groups of the team to their respective build teams
                     for(Object warpGroupJSON : warpGroupArray.toArray()) {
@@ -119,7 +119,7 @@ public class NetworkAPI {
                         String warpGroupName = (String) warpGroupObject.get("Name");
                         String warpGroupDescription = (String) warpGroupObject.get("Description");
 
-                        WarpGroup warpGroup = new WarpGroup(warpGroupID, warpGroupName, warpGroupDescription);
+                        WarpGroup warpGroup = new WarpGroup(warpGroupID, buildTeam, warpGroupName, warpGroupDescription);
 
                         buildTeam.getWarpGroups().add(warpGroup);
                     }
@@ -129,8 +129,10 @@ public class NetworkAPI {
                         if(!(warpJSON instanceof JSONObject)) continue;
                         JSONObject warpObject = (JSONObject) warpJSON;
 
-                        UUID warpID = UUID.fromString((String) warpObject.get("ID"));
-                        UUID warpGroupID = UUID.fromString((String) warpObject.get("WarpGroup"));
+                        String warpIDString = (String) warpObject.get("ID");
+                        UUID warpID = warpIDString != null ? UUID.fromString(warpIDString) : null;
+                        String warpGroupIDString = (String) warpObject.get("WarpGroup");
+                        UUID warpGroupID = warpGroupIDString != null ? UUID.fromString(warpGroupIDString) : null;
                         String warpName = (String) warpObject.get("Name");
                         String countryCode = (String) warpObject.get("CountryCode");
                         String address = (String) warpObject.get("Address");
@@ -138,9 +140,9 @@ public class NetworkAPI {
                         double warpLat = (double) warpObject.get("Latitude");
                         double warpLon = (double) warpObject.get("Longitude");
                         int warpHeight = (int) (long) warpObject.get("Height");
-                        float warpYaw = (float) (double) warpObject.get("Yaw");
-                        float warpPitch = (float) (double) warpObject.get("Pitch");
-                        boolean isHighlight = (boolean) warpObject.get("isHighlight");
+                        float warpYaw = Float.valueOf(warpObject.get("Yaw") + "");
+                        float warpPitch = Float.valueOf(warpObject.get("Pitch") + "");
+                        boolean isHighlight = warpObject.get("isHighlight") != null && (long) warpObject.get("isHighlight") == 1;
 
                         Warp warp = new Warp(warpID, warpGroupID, warpName, countryCode, "cca3", address, warpWorldName, warpLat, warpLon, warpHeight, warpYaw, warpPitch, isHighlight);
 
@@ -238,7 +240,9 @@ public class NetworkAPI {
         return future;
     }
 
-    public static void setupCurrentServerData() {
+    public static CompletableFuture<Void> setupCurrentServerData() {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
         API.getAsync("https://nwapi.buildtheearth.net/api/teams/" + Main.instance.getConfig().getString(ConfigPaths.API_KEY), new API.ApiResponseCallback() {
             @Override
             public void onResponse(String response) {
@@ -249,13 +253,19 @@ public class NetworkAPI {
 
                 BuildTeam buildTeam = proxyManager.getBuildTeamByID(teamID);
                 proxyManager.setBuildTeam(buildTeam);
+
+                future.complete(null);
             }
 
             @Override
             public void onFailure(IOException e) {
                 ChatHelper.logError("Failed to get team & server information from the network API: %s", e);
+
+                future.completeExceptionally(e);
             }
         });
+
+        return future;
     }
 
     public static void createWarp(Warp warp, API.ApiResponseCallback callback) {

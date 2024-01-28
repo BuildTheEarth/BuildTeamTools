@@ -57,7 +57,7 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPreviewItems() {
-        setBackItem(BACK_ITEM_SLOT);
+        setBackItem(BACK_ITEM_SLOT, true);
 
         // If there are more than 27 countries, add the switch page items, otherwise add glass panes
         if(states.size() > 27)
@@ -97,7 +97,7 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
 
         getMenu().getSlot(BACK_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
             clickPlayer.closeInventory();
-            new CountrySelectorMenu(country.getContinent(), clickPlayer);
+            new CountrySelectorMenu(clickPlayer, country.getContinent());
         });
     }
 

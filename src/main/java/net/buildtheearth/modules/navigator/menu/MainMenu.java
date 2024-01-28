@@ -31,7 +31,7 @@ import java.util.Collections;
  */
 public class MainMenu extends AbstractMenu {
 
-    private static final String inventoryName = "Build the Earth";
+    private static final String inventoryName = "BuildTheEarth Navigator";
     private static FileConfiguration config;
 
     public MainMenu(Player menuPlayer) {

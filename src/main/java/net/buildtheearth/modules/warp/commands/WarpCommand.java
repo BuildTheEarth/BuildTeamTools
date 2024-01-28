@@ -47,7 +47,7 @@ public class WarpCommand implements CommandExecutor {
             }else if(warpGroupCount == 1)
                 new WarpMenu(player, Main.getBuildTeamTools().getProxyManager().getBuildTeam().getWarpGroups().get(0), false);
             else
-                new WarpGroupMenu(player);
+                new WarpGroupMenu(player, Main.getBuildTeamTools().getProxyManager().getBuildTeam(), false);
 
             return true;
         }
@@ -113,7 +113,10 @@ public class WarpCommand implements CommandExecutor {
                 NetworkAPI.createWarp(warp, new API.ApiResponseCallback() {
                     @Override
                     public void onResponse(String response) {
-                        player.sendMessage(ChatHelper.successful("Successfully created the warp %s!", name));
+                        // Update the cache
+                        Main.buildTeamTools.getProxyManager().updateCache().thenRun(() ->
+                            player.sendMessage(ChatHelper.successful("Successfully created the warp %s!", name))
+                        );
                     }
 
                     @Override

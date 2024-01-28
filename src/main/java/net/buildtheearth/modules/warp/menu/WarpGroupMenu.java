@@ -1,10 +1,15 @@
 package net.buildtheearth.modules.warp.menu;
 
 import net.buildtheearth.Main;
+import net.buildtheearth.modules.navigator.menu.CountrySelectorMenu;
+import net.buildtheearth.modules.navigator.menu.StateSelectorMenu;
+import net.buildtheearth.modules.network.ProxyManager;
+import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.ListUtil;
+import net.buildtheearth.modules.utils.Utils;
 import net.buildtheearth.modules.utils.menus.AbstractPaginatedMenu;
 import net.buildtheearth.modules.warp.model.WarpGroup;
 import org.bukkit.ChatColor;
@@ -21,16 +26,29 @@ import java.util.stream.Collectors;
 
 public class WarpGroupMenu extends AbstractPaginatedMenu {
 
-    public WarpGroupMenu(Player menuPlayer) {
-        super(4, 3, ChatColor.GREEN + "Warp Menu", menuPlayer);
+    public final int BACK_ITEM_SLOT = 27;
+
+    private boolean hasBackItem;
+    private BuildTeam buildTeam;
+
+    public WarpGroupMenu(Player menuPlayer, BuildTeam buildTeam, boolean hasBackItem) {
+        super(4, 3, "Warp Menu", menuPlayer);
+        this.hasBackItem = hasBackItem;
+        this.buildTeam = buildTeam;
     }
 
     @Override
     protected void setMenuItemsAsync() {
+        setBackItem(BACK_ITEM_SLOT, hasBackItem);
     }
 
     @Override
     protected void setItemClickEventsAsync() {
+        if(hasBackItem)
+        getMenu().getSlot(BACK_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
+            clickPlayer.closeInventory();
+            new CountrySelectorMenu(clickPlayer, buildTeam.getContinent());
+        });
     }
 
     @Override
@@ -63,17 +81,28 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
                 .pattern("000000000")
                 .pattern("000000000")
                 .pattern("000000000")
-                .pattern("011111111")
+                .pattern("111111111")
                 .build();
     }
 
     @Override
     protected List<?> getSource() {
-        return Main.getBuildTeamTools().getProxyManager().getBuildTeam().getWarpGroups();
+        return buildTeam.getWarpGroups();
     }
 
     @Override
     protected void setPaginatedItemClickEventsAsync(List<?> source) {
+        List<WarpGroup> warpGroups = source.stream().map(l -> (WarpGroup) l).collect(Collectors.toList());
 
+        int slot = 0;
+        for (WarpGroup warpGroup : warpGroups) {
+            final int _slot = slot;
+            getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
+                clickPlayer.closeInventory();
+
+                new WarpMenu(clickPlayer, warpGroup, true);
+            });
+            slot++;
+        }
     }
 }

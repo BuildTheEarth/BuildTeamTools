@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ProxyManager {
@@ -59,8 +60,14 @@ public class ProxyManager {
     }
 
     /** Updates the cache of the proxy. */
-    public void updateCache() {
-        NetworkAPI.getBuildTeamInformation().thenRun(NetworkAPI::setupCurrentServerData);
+    public CompletableFuture<Void> updateCache() {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
+        NetworkAPI.getBuildTeamInformation().thenRun(() ->
+            NetworkAPI.setupCurrentServerData().thenRun(() ->
+                future.complete(null)));
+
+        return future;
     }
 
     /**

@@ -29,7 +29,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
     public final int BACK_ITEM_SLOT = 27;
     public static int SWITCH_PAGE_ITEM_SLOT = 34;
 
-    public CountrySelectorMenu(@NonNull Continent continent, Player menuPlayer) {
+    public CountrySelectorMenu(Player menuPlayer, @NonNull Continent continent) {
         super(4, 3, continent.getLabel() + " - countries", menuPlayer);
         this.continent = continent;
         this.regions = new ArrayList<>(continent.getCountries());
@@ -67,7 +67,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPreviewItems() {
-        setBackItem(BACK_ITEM_SLOT);
+        setBackItem(BACK_ITEM_SLOT, true);
 
         // If there are more than 27 countries, add the switch page items, otherwise add glass panes
         if(regions.size() > 27)

@@ -10,6 +10,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Utils {
@@ -29,6 +30,26 @@ public class Utils {
                 return true;
 
         return false;
+    }
+
+    public static String[] splitStringByLineLength(String input, int maxLineLength) {
+        String[] parts = input.split(", ");
+        StringBuilder currentLine = new StringBuilder();
+        ArrayList<String> lines = new ArrayList<>();
+
+        for (String part : parts) {
+            if (currentLine.length() + part.length() > maxLineLength) {
+                lines.add(currentLine.toString().trim());
+                currentLine = new StringBuilder();
+            }
+            currentLine.append(part).append(", ");
+        }
+
+        if (currentLine.length() > 0) {
+            lines.add(currentLine.toString().trim());
+        }
+
+        return lines.toArray(new String[0]);
     }
 
     public static int getHighestY(World world, int x, int z) {

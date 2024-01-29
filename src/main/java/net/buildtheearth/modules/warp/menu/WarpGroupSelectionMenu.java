@@ -14,8 +14,9 @@ public class WarpGroupSelectionMenu extends WarpGroupMenu {
     private final Warp warp;
     private final boolean alreadyExists;
 
-    /**
-     * Let the player select a warp group for a warp.
+    /** In this menu the player can select a warp group.
+     * This can be used for example to change the warp group of a warp in the {@link WarpGroupMenu}.
+     * The menu is child of the {@link WarpGroupMenu}.
      *
      * @param menuPlayer  The player that is viewing the menu.
      * @param buildTeam   The build team that the menu is for.
@@ -31,7 +32,7 @@ public class WarpGroupSelectionMenu extends WarpGroupMenu {
     protected void setItemClickEventsAsync() {
         getMenu().getSlot(BACK_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
             clickPlayer.closeInventory();
-            new WarpUpdateMenu(clickPlayer, warp, alreadyExists);
+            new WarpEditMenu(clickPlayer, warp, alreadyExists);
         });
     }
 
@@ -47,7 +48,7 @@ public class WarpGroupSelectionMenu extends WarpGroupMenu {
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
                 warp.setWarpGroup(warpGroup);
-                new WarpUpdateMenu(clickPlayer, warp, alreadyExists);
+                new WarpEditMenu(clickPlayer, warp, alreadyExists);
             });
             slot++;
         }

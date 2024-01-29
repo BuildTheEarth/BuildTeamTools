@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
-public class WarpUpdateMenu extends AbstractMenu {
+public class WarpEditMenu extends AbstractMenu {
 
     public static String WARP_UPDATE_INV_NAME = "Configure the Warp";
 
@@ -34,7 +34,13 @@ public class WarpUpdateMenu extends AbstractMenu {
     private final Warp warp;
     private final boolean alreadyExists;
 
-    public WarpUpdateMenu(Player player, Warp warp, boolean alreadyExists) {
+    /** In this menu the player can update a warp.
+     * This can be used for example to change the name of a warp in the {@link WarpMenu}.
+     *
+     * @param player  The player that is viewing the menu.
+     * @param warp The warp that is being updated.
+     */
+    public WarpEditMenu(Player player, Warp warp, boolean alreadyExists) {
         super(4, WARP_UPDATE_INV_NAME, player);
 
         this.warp = warp;
@@ -147,7 +153,7 @@ public class WarpUpdateMenu extends AbstractMenu {
 
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
-                new WarpUpdateMenu(clickPlayer, warp, alreadyExists);
+                new WarpEditMenu(clickPlayer, warp, alreadyExists);
             }).exceptionally(e -> {
                 clickPlayer.sendMessage(ChatHelper.error("An error occurred while changing the location of the warp!"));
                 e.printStackTrace();
@@ -164,7 +170,7 @@ public class WarpUpdateMenu extends AbstractMenu {
                     .onClose(player -> {
                         player.getPlayer().playSound(clickPlayer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
 
-                        new WarpUpdateMenu(clickPlayer, warp, alreadyExists);
+                        new WarpEditMenu(clickPlayer, warp, alreadyExists);
                     })
                     .onClick((slot, stateSnapshot) -> {
                         if (slot != AnvilGUI.Slot.OUTPUT)
@@ -175,7 +181,7 @@ public class WarpUpdateMenu extends AbstractMenu {
                                 AnvilGUI.ResponseAction.close(),
                                 AnvilGUI.ResponseAction.run(() -> {
                                     warp.setName(stateSnapshot.getText());
-                                    new WarpUpdateMenu(clickPlayer, warp, alreadyExists);
+                                    new WarpEditMenu(clickPlayer, warp, alreadyExists);
                                 })
                         );
                     })
@@ -199,7 +205,7 @@ public class WarpUpdateMenu extends AbstractMenu {
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
 
             warp.setHighlight(!warp.isHighlight());
-            new WarpUpdateMenu(clickPlayer, warp, alreadyExists);
+            new WarpEditMenu(clickPlayer, warp, alreadyExists);
         });
     }
 

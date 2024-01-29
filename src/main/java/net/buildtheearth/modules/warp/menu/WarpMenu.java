@@ -25,6 +25,13 @@ public class WarpMenu extends AbstractPaginatedMenu {
     private final boolean hasBackItem;
     private final WarpGroup warpGroup;
 
+    /** In this menu the player can view the warps in a warp group.
+     * He can then select a warp to edit it or teleport to the warp's location.
+     *
+     * @param menuPlayer The player that is viewing the menu
+     * @param warpGroup The warp group that the menu is for
+     * @param hasBackItem Whether the menu has a back item
+     */
     public WarpMenu(Player menuPlayer, WarpGroup warpGroup, boolean hasBackItem) {
         super(4, 3, "Warp Menu", menuPlayer);
         this.hasBackItem = hasBackItem;
@@ -103,7 +110,7 @@ public class WarpMenu extends AbstractPaginatedMenu {
                 clickPlayer.closeInventory();
 
                 if(clickInformation.getClickType().isRightClick())
-                    new WarpUpdateMenu(clickPlayer, warp, true);
+                    new WarpEditMenu(clickPlayer, warp, true);
                 else if(clickInformation.getClickType().isLeftClick())
                     WarpManager.warpPlayer(clickPlayer, warp);
             });

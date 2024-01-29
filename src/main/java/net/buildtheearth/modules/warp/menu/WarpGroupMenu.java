@@ -1,19 +1,14 @@
 package net.buildtheearth.modules.warp.menu;
 
-import net.buildtheearth.Main;
 import net.buildtheearth.modules.navigator.menu.CountrySelectorMenu;
-import net.buildtheearth.modules.navigator.menu.StateSelectorMenu;
-import net.buildtheearth.modules.network.ProxyManager;
 import net.buildtheearth.modules.network.model.BuildTeam;
-import net.buildtheearth.modules.network.model.Region;
-import net.buildtheearth.modules.utils.*;
+import net.buildtheearth.modules.utils.Item;
+import net.buildtheearth.modules.utils.ListUtil;
+import net.buildtheearth.modules.utils.MenuItems;
 import net.buildtheearth.modules.utils.menus.AbstractPaginatedMenu;
 import net.buildtheearth.modules.warp.model.WarpGroup;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
 
@@ -25,10 +20,10 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
 
     public final int BACK_ITEM_SLOT = 27;
 
-    private boolean hasBackItem;
-    private BuildTeam buildTeam;
+    private final boolean hasBackItem;
+    private final BuildTeam buildTeam;
 
-    /** Create a new warp group menu
+    /** In this menu the player can select a warp group to view the warps in each warp group.
      *
      * @param menuPlayer The player that is viewing the menu
      * @param buildTeam The build team that the menu is for
@@ -48,10 +43,10 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
     @Override
     protected void setItemClickEventsAsync() {
         if(hasBackItem)
-        getMenu().getSlot(BACK_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
-            clickPlayer.closeInventory();
-            new CountrySelectorMenu(clickPlayer, buildTeam.getContinent());
-        });
+            getMenu().getSlot(BACK_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
+                clickPlayer.closeInventory();
+                new CountrySelectorMenu(clickPlayer, buildTeam.getContinent());
+            });
     }
 
     @Override

@@ -1,14 +1,13 @@
 package net.buildtheearth.modules.warp.commands;
 
 import net.buildtheearth.Main;
-import net.buildtheearth.modules.network.ProxyManager;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.geo.CoordinateConversion;
 import net.buildtheearth.modules.warp.WarpManager;
 import net.buildtheearth.modules.warp.menu.WarpGroupMenu;
 import net.buildtheearth.modules.warp.menu.WarpMenu;
-import net.buildtheearth.modules.warp.menu.WarpUpdateMenu;
+import net.buildtheearth.modules.warp.menu.WarpEditMenu;
 import net.buildtheearth.modules.warp.model.Warp;
 import net.buildtheearth.modules.warp.model.WarpGroup;
 import org.bukkit.Location;
@@ -96,7 +95,7 @@ public class WarpCommand implements CommandExecutor {
                 Warp warp = new Warp(group, name, countryCodeCCA2, "cca2", null, location.getWorld().getName(), coordinates[0], coordinates[1], location.getY(), location.getYaw(), location.getPitch(), false);
 
                 // Create the actual warp
-                new WarpUpdateMenu(player, warp, false);
+                new WarpEditMenu(player, warp, false);
 
             }).exceptionally(e -> {
                 player.sendMessage(ChatHelper.error("An error occurred while creating the warp!"));

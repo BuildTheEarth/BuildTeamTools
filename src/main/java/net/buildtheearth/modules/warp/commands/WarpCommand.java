@@ -1,23 +1,22 @@
 package net.buildtheearth.modules.warp.commands;
 
 import net.buildtheearth.Main;
-import net.buildtheearth.modules.network.api.API;
-import net.buildtheearth.modules.network.api.NetworkAPI;
+import net.buildtheearth.modules.network.ProxyManager;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.geo.CoordinateConversion;
 import net.buildtheearth.modules.warp.WarpManager;
 import net.buildtheearth.modules.warp.menu.WarpGroupMenu;
 import net.buildtheearth.modules.warp.menu.WarpMenu;
+import net.buildtheearth.modules.warp.menu.WarpUpdateMenu;
 import net.buildtheearth.modules.warp.model.Warp;
+import net.buildtheearth.modules.warp.model.WarpGroup;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.io.IOException;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class WarpCommand implements CommandExecutor {
@@ -52,11 +51,11 @@ public class WarpCommand implements CommandExecutor {
             return true;
         }
 
-        // WARP CREATE <NAME> <HIGHLIGHT> <GROUP ID>
+        // WARP CREATE
         if (args[0].equalsIgnoreCase("create")) {
-            // Check if the required arguments are provided & send usage otherwise
-            if (args.length < 2){
-                player.sendMessage(ChatHelper.error("Usage: /warp create <name> [highlight] [group_id]"));
+            // Check if the command has only one argument
+            if (args.length > 1){
+                player.sendMessage(ChatHelper.error("Usage: /warp create"));
                 return true;
             }
 
@@ -66,32 +65,13 @@ public class WarpCommand implements CommandExecutor {
                 return true;
             }
 
-            // Extract the required data from the arguments
-            String name = args[1];
-            Location location = player.getLocation();
-
-            boolean highlight = false;
-            UUID groupID = null;
-            if (args.length >= 3) {
-                if(args[2].equals("true") || args[2].equals("false")) {
-                    highlight = Boolean.parseBoolean(args[2]);
-                } else {
-                    groupID = Main.getBuildTeamTools().getProxyManager().getBuildTeam().getWarpGroups().stream().filter(warpGroup -> warpGroup.getId().equals(UUID.fromString(args[2]))).findFirst().orElse(null).getId();
-                    if(args.length >= 4) {
-                        highlight = Boolean.parseBoolean(args[3]);
-                    }
-                }
-            }
-
-            // Send the player a message that the warp is being created
-            player.sendMessage(ChatHelper.standard("Creating the warp %s...", name));
+            player.sendActionBar(ChatHelper.standard(false, "Creating the warp..."));
 
             // Get the geographic coordinates of the player's location.
+            Location location = player.getLocation();
             double[] coordinates = CoordinateConversion.convertToGeo(location.getX(), location.getZ());
 
             //Get the country belonging to the coordinates
-            UUID finalGroup = groupID;
-            boolean finalHighlight = highlight;
             CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(coordinates);
 
             future.thenAccept(result -> {
@@ -106,27 +86,20 @@ public class WarpCommand implements CommandExecutor {
                     return;
                 }
 
+                // Get the Other Group for default warp group
+                WarpGroup group = Main.getBuildTeamTools().getProxyManager().getBuildTeam().getWarpGroups().stream().filter(warpGroup -> warpGroup.getName().equalsIgnoreCase("Other")).findFirst().orElse(null);
+
+                // Create a default name for the warp
+                String name = player.getName() + "'s Warp";
+
                 // Create an instance of the warp POJO
-                Warp warp = new Warp(finalGroup, name, countryCodeCCA2, "cca2", null, location.getWorld().getName(), coordinates[0], coordinates[1], location.getY(), location.getYaw(), location.getPitch(), finalHighlight);
+                Warp warp = new Warp(group, name, countryCodeCCA2, "cca2", null, location.getWorld().getName(), coordinates[0], coordinates[1], location.getY(), location.getYaw(), location.getPitch(), false);
 
                 // Create the actual warp
-                NetworkAPI.createWarp(warp, new API.ApiResponseCallback() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Update the cache
-                        Main.buildTeamTools.getProxyManager().updateCache().thenRun(() ->
-                            player.sendMessage(ChatHelper.successful("Successfully created the warp %s!", name))
-                        );
-                    }
+                new WarpUpdateMenu(player, warp, false);
 
-                    @Override
-                    public void onFailure(IOException e) {
-                        player.sendMessage(ChatHelper.error("Something went wrong while creating the warp %s! Please take a look at the console.", name));
-                        e.printStackTrace();
-                    }
-                });
             }).exceptionally(e -> {
-                player.sendMessage(ChatHelper.error("Failed to get the country belonging to your location while creating the warp %s!", name));
+                player.sendMessage(ChatHelper.error("An error occurred while creating the warp!"));
                 e.printStackTrace();
                 return null;
             });
@@ -148,27 +121,23 @@ public class WarpCommand implements CommandExecutor {
                 return true;
             }
 
-            //TODO CHECK IF THE TEAM OWNS THE WARP WITH THE GIVEN KEY
+            // Find the warp with the given key
+            Warp warp = WarpManager.getWarpByName(key);
 
-            NetworkAPI.deleteWarp(key, new API.ApiResponseCallback() {
-                @Override
-                public void onResponse(String response) {
-                    player.sendMessage(ChatHelper.successful("Successfully deleted the warp %s!", key));
-                }
+            if(warp == null) {
+                player.sendMessage(ChatHelper.error("The warp with the name %s does not exist in this team!", key));
+                return true;
+            }
 
-                @Override
-                public void onFailure(IOException e) {
-                    player.sendMessage(ChatHelper.error("Something went wrong while deleting the warp %s!", key));
-                }
-            });
+            Main.buildTeamTools.getProxyManager().getBuildTeam().deleteWarp(player, warp);
             return true;
         }
 
 
-        if (args.length == 1) {
+        if (args.length >= 1) {
 
-            // Extract the required data from the command arguments
-            String key = args[0];
+            // Combine the args to one warp name
+            String key = String.join(" ", args);
 
             // Check if the player has the required permission
             if (!player.hasPermission("btt.warp.use")) {
@@ -176,7 +145,15 @@ public class WarpCommand implements CommandExecutor {
                 return true;
             }
 
-            WarpManager.warpPlayer(player, key);
+            // Find the warp with the given key
+            Warp warp = WarpManager.getWarpByName(key);
+
+            if(warp == null) {
+                player.sendMessage(ChatHelper.error("The warp with the name %s does not exist in this team!", key));
+                return true;
+            }
+
+            WarpManager.warpPlayer(player, warp);
 
             return true;
         }

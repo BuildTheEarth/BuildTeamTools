@@ -1,27 +1,20 @@
 package net.buildtheearth.modules.warp.menu;
 
-import net.buildtheearth.Main;
-import net.buildtheearth.modules.navigator.menu.ExploreMenu;
-import net.buildtheearth.modules.network.ProxyManager;
-import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.ListUtil;
+import net.buildtheearth.modules.utils.MenuItems;
 import net.buildtheearth.modules.utils.Utils;
 import net.buildtheearth.modules.utils.menus.AbstractPaginatedMenu;
+import net.buildtheearth.modules.warp.WarpManager;
 import net.buildtheearth.modules.warp.model.Warp;
 import net.buildtheearth.modules.warp.model.WarpGroup;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,8 +22,8 @@ public class WarpMenu extends AbstractPaginatedMenu {
 
     public final int BACK_ITEM_SLOT = 27;
 
-    private boolean hasBackItem;
-    private WarpGroup warpGroup;
+    private final boolean hasBackItem;
+    private final WarpGroup warpGroup;
 
     public WarpMenu(Player menuPlayer, WarpGroup warpGroup, boolean hasBackItem) {
         super(4, 3, "Warp Menu", menuPlayer);
@@ -46,10 +39,10 @@ public class WarpMenu extends AbstractPaginatedMenu {
     @Override
     protected void setItemClickEventsAsync() {
         if(hasBackItem)
-        getMenu().getSlot(BACK_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
-            clickPlayer.closeInventory();
-            new WarpGroupMenu(clickPlayer, warpGroup.getBuildTeam(), false);
-        });
+            getMenu().getSlot(BACK_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
+                clickPlayer.closeInventory();
+                new WarpGroupMenu(clickPlayer, warpGroup.getBuildTeam(), false);
+            });
     }
 
     @Override
@@ -65,7 +58,8 @@ public class WarpMenu extends AbstractPaginatedMenu {
 
     @Override
     protected List<?> getSource() {
-        return warpGroup.getWarps();
+        // Return the warps in the warp group sorted by name
+        return warpGroup.getWarps().stream().sorted((warp1, warp2) -> warp1.getName().compareToIgnoreCase(warp2.getName())).collect(Collectors.toList());
     }
 
     @Override
@@ -76,14 +70,18 @@ public class WarpMenu extends AbstractPaginatedMenu {
         int slot = 0;
 
         for (Warp warp : warps) {
-            ArrayList<String> loreLines = new ArrayList<>(Arrays.asList("", "§eAddress:"));
+            ArrayList<String> loreLines = ListUtil.createList("", "§eAddress:");
             loreLines.addAll(Arrays.asList(Utils.splitStringByLineLength(warp.getAddress(), 30)));
+            loreLines.addAll(ListUtil.createList("", "§8Left-Click to warp to this location.", "§8Right-Click to edit this warp."));
 
-            ArrayList<String> warpLore = ListUtil.createList(loreLines.toArray(new String[loreLines.size()]));
+            ArrayList<String> warpLore = ListUtil.createList(loreLines.toArray(new String[0]));
             getMenu().getSlot(slot).setItem(
-                    Item.createCustomHeadBase64("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19",
+                    MenuItems.getLetterHead(
+                            warp.getName().substring(0, 1),
+                            MenuItems.LetterType.STONE,
                             "§6§l" + warp.getName(),
-                            warpLore)
+                            warpLore
+                    )
             );
             slot++;
         }
@@ -96,12 +94,20 @@ public class WarpMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPaginatedItemClickEventsAsync(List<?> source) {
+        List<Warp> warps = source.stream().map(l -> (Warp) l).collect(Collectors.toList());
 
-    }
+        int slot = 0;
+        for (Warp warp : warps) {
+            final int _slot = slot;
+            getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
+                clickPlayer.closeInventory();
 
-    // Methods
-
-    private ItemStack getPlaceHolderItem(String countryCode) {
-        return Item.create(Material.BARRIER, countryCode);
+                if(clickInformation.getClickType().isRightClick())
+                    new WarpUpdateMenu(clickPlayer, warp, true);
+                else if(clickInformation.getClickType().isLeftClick())
+                    WarpManager.warpPlayer(clickPlayer, warp);
+            });
+            slot++;
+        }
     }
 }

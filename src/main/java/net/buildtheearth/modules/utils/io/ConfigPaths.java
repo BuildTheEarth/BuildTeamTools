@@ -28,6 +28,6 @@ public abstract class ConfigPaths {
 
 
     // Earth World
-    private static final String EARTH_WORLD = "earth-world";
+    public static final String EARTH_WORLD = "earth-world";
 
 }

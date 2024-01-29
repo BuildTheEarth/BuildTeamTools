@@ -6,10 +6,7 @@ import net.buildtheearth.modules.navigator.menu.StateSelectorMenu;
 import net.buildtheearth.modules.network.ProxyManager;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Region;
-import net.buildtheearth.modules.utils.ChatHelper;
-import net.buildtheearth.modules.utils.Item;
-import net.buildtheearth.modules.utils.ListUtil;
-import net.buildtheearth.modules.utils.Utils;
+import net.buildtheearth.modules.utils.*;
 import net.buildtheearth.modules.utils.menus.AbstractPaginatedMenu;
 import net.buildtheearth.modules.warp.model.WarpGroup;
 import org.bukkit.ChatColor;
@@ -31,6 +28,12 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
     private boolean hasBackItem;
     private BuildTeam buildTeam;
 
+    /** Create a new warp group menu
+     *
+     * @param menuPlayer The player that is viewing the menu
+     * @param buildTeam The build team that the menu is for
+     * @param hasBackItem Whether the menu has a back item
+     */
     public WarpGroupMenu(Player menuPlayer, BuildTeam buildTeam, boolean hasBackItem) {
         super(4, 3, "Warp Menu", menuPlayer);
         this.hasBackItem = hasBackItem;
@@ -61,9 +64,12 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
         for (WarpGroup warpGroup : warpGroups) {
             ArrayList<String> warpGroupLore = ListUtil.createList("", "§eDescription:", warpGroup.getDescription());
             getMenu().getSlot(slot).setItem(
-                    Item.createCustomHeadBase64("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19",
-                            "§6§l" + warpGroup.getName(),
-                            warpGroupLore)
+                MenuItems.getLetterHead(
+                    warpGroup.getName().substring(0, 1),
+                    MenuItems.LetterType.WOODEN,
+                    "§6§l" + warpGroup.getName(),
+                    warpGroupLore
+                )
             );
             slot++;
         }
@@ -77,17 +83,25 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null))
-                .pattern("000000000")
-                .pattern("000000000")
-                .pattern("000000000")
-                .pattern("111111111")
-                .build();
+            .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null))
+            .pattern("000000000")
+            .pattern("000000000")
+            .pattern("000000000")
+            .pattern("111111111")
+            .build();
     }
 
     @Override
     protected List<?> getSource() {
-        return buildTeam.getWarpGroups();
+        // Get the warp groups in the build team sorted by name
+        List<WarpGroup> warpGroups = buildTeam.getWarpGroups().stream().sorted((warpGroup1, warpGroup2) -> warpGroup1.getName().compareToIgnoreCase(warpGroup2.getName())).collect(Collectors.toList());
+
+        // If the warp group "Other" has no warps, remove it from the list
+        WarpGroup otherWarpGroup = warpGroups.stream().filter(warpGroup -> warpGroup.getName().equalsIgnoreCase("Other")).findFirst().orElse(null);
+        if(otherWarpGroup != null && otherWarpGroup.getWarps().size() == 0)
+            warpGroups.remove(otherWarpGroup);
+
+        return warpGroups;
     }
 
     @Override

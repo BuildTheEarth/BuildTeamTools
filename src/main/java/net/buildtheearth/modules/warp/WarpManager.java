@@ -5,11 +5,13 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.Main;
 import net.buildtheearth.modules.network.api.NetworkAPI;
+import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.GeometricUtils;
 import net.buildtheearth.modules.warp.model.Warp;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -70,14 +72,25 @@ public class WarpManager {
      * Sends a plugin message to add the warp to the queue of the target server
      * Then switches the player to that server
      * @param player The player to warp
-     * @param key The key of the warp to teleport the player to
+     * @param warp The warp to teleport the player to
      */
-    public static void warpPlayer(Player player, String key) {
-        // Get the warp using a GET request
-        Warp warp = NetworkAPI.getWarpByKey(key);
+    public static void warpPlayer(Player player, Warp warp) {
+        // If the warp is in the same team, just teleport the player
+        if(warp.getWarpGroup().getBuildTeam().getID().equals(Main.getBuildTeamTools().getProxyManager().getBuildTeam().getID())) {
+            Location loc = GeometricUtils.getLocationFromCoordinatesYawPitch(new double[]{warp.getLat(), warp.getLon()}, warp.getYaw(), warp.getPitch());
 
-        if(warp == null)
+            if(loc.getWorld() == null) {
+                World world = Bukkit.getWorld(warp.getWorldName()) == null ? player.getWorld() : Bukkit.getWorld(warp.getWorldName());
+                loc.setWorld(world);
+            }
+
+            loc.setY(warp.getY());
+
+            player.teleport(loc);
+            player.sendMessage(ChatHelper.successful("Successfully warped you to %s.", warp.getName()));
+
             return;
+        }
 
         // Get the server the warp is on
         String targetServer = "Empty"; // NetworkAPI.getServerNameByCountryCode(warp.getCountryCode());
@@ -86,11 +99,20 @@ public class WarpManager {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("UniversalWarps");
         out.writeUTF(targetServer);
-        out.writeUTF(warp.getName());
+        out.writeUTF(warp.getId().toString());
 
         player.sendPluginMessage(Main.instance, "BuildTeam", out.toByteArray());
 
         // Switch the player to the target server
         Main.getBuildTeamTools().getProxyManager().switchServer(player, targetServer);
+    }
+
+    public static Warp getWarpByName(String name){
+        return getWarpByName(Main.getBuildTeamTools().getProxyManager().getBuildTeam(), name);
+    }
+
+    public static Warp getWarpByName(BuildTeam buildTeam, String name) {
+        return buildTeam.getWarpGroups().stream().flatMap(warpGroup -> warpGroup.getWarps().stream())
+                .filter(warp1 -> warp1.getName() != null && warp1.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 }

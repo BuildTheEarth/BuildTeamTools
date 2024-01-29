@@ -2,7 +2,6 @@ package net.buildtheearth.modules.utils.menus;
 
 import net.buildtheearth.Main;
 import net.buildtheearth.modules.utils.Item;
-import net.buildtheearth.modules.utils.MenuItem;
 import net.buildtheearth.modules.utils.MenuItems;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -12,8 +11,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.ipvp.canvas.Menu;
 import org.ipvp.canvas.mask.Mask;
 import org.ipvp.canvas.type.ChestMenu;
-
-import java.util.ArrayList;
 
 public abstract class AbstractMenu {
 

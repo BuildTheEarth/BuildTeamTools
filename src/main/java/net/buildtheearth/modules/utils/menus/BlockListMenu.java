@@ -38,7 +38,7 @@ public class BlockListMenu extends AbstractPaginatedMenu {
         setSwitchPageItems(SWITCH_PAGE_ITEM_SLOT);
 
         if (canProceed())
-            getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.getNextItem());
+            getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.getCheckmarkItem("§eNext"));
         else
             getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.ITEM_BACKGROUND);
 

@@ -55,7 +55,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
         createCounter(MenuItems.SliderColor.WHITE, WINDOW_DISTANCE_SLOT, "Window Distance", windowDistance, 1, 6, "Blocks");
 
 
-        getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.getNextItem());
+        getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.getCheckmarkItem("§eNext"));
 
         super.setPreviewItems();
     }

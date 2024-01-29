@@ -2,6 +2,7 @@ package net.buildtheearth.modules.utils;
 
 import net.buildtheearth.Main;
 import net.buildtheearth.modules.utils.geo.CoordinateConversion;
+import net.buildtheearth.modules.utils.io.ConfigPaths;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -27,11 +28,11 @@ public class GeometricUtils {
         double[] xz = CoordinateConversion.convertFromGeo(coordinates[0], coordinates[1]);
 
         double x = xz[0];
-        double z = -xz[1];
+        double z = xz[1];
 
         //Creates the location
         Location location;
-        World tpWorld = Bukkit.getWorld(Main.instance.getConfig().getString("universal_tpll.earth_world"));
+        World tpWorld = Bukkit.getWorld(Main.instance.getConfig().getString(ConfigPaths.EARTH_WORLD));
         if (tpWorld == null)
             location = new Location(null, x, 64, z, yaw, pitch);
         else
@@ -55,14 +56,14 @@ public class GeometricUtils {
      * @return A bukkit location matching the coordinates. Height is terrain elevation +2.
      */
     public static Location getLocationFromCoordinates(double[] coordinates) {
-        double[] xz = CoordinateConversion.convertFromGeo(coordinates[0], coordinates[1]);
+        double[] xz = CoordinateConversion.convertToGeo(coordinates[0], coordinates[1]);
 
         double x = xz[0];
         double z = -xz[1];
 
         //Creates the location
         Location location;
-        World tpWorld = Bukkit.getWorld(Main.instance.getConfig().getString("universal_tpll.earth_world"));
+        World tpWorld = Bukkit.getWorld(Main.instance.getConfig().getString(ConfigPaths.EARTH_WORLD));
 
         if (tpWorld == null)
             location = new Location(null, x, 64, z);

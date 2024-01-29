@@ -41,6 +41,10 @@ public class ChatHelper {
         return BuildTeamTools.PREFIX + ChatColor.GRAY + String.format(string.replaceAll("%s", ChatColor.YELLOW + "%s" + ChatColor.GRAY), objects);
     }
 
+    public static String standard(boolean containsPrefix, String string, Object... objects) {
+        return containsPrefix ? BuildTeamTools.PREFIX : "" + ChatColor.GRAY + String.format(string.replaceAll("%s", ChatColor.YELLOW + "%s" + ChatColor.GRAY), objects);
+    }
+
     public static String colorize(ChatColor color, String string, boolean bold) {
         return bold ? color + "" + ChatColor.BOLD + string : color + string;
     }

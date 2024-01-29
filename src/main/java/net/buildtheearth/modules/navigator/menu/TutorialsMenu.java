@@ -1,7 +1,6 @@
 package net.buildtheearth.modules.navigator.menu;
 
 import net.buildtheearth.Main;
-import net.buildtheearth.modules.utils.MenuItem;
 import net.buildtheearth.modules.utils.menus.AbstractMenu;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -26,7 +25,7 @@ public class TutorialsMenu extends AbstractMenu {
 
     @Override
     protected void setPreviewItems() {
-        getMenu().getSlot(BACK_BUTTON_SLOT).setItem(MenuItem.backButton("Main Menu"));
+        setBackItem(BACK_BUTTON_SLOT, true);
 
         super.setPreviewItems();
     }

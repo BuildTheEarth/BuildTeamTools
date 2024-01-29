@@ -61,7 +61,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
         setColorChoiceItems(MenuItems.SliderColor.LIGHT_GRAY, ROAD_SLAB_SLOT, "Road Elevation Slab", roadSlab);
         setColorChoiceItems(MenuItems.SliderColor.WHITE, SIDEWALK_SLAB_SLOT, "Sidewalk Elevation Slab", sidewalkSlab);
 
-        getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.getNextItem());
+        getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.getCheckmarkItem("§eNext"));
 
         super.setPreviewItems();
     }

@@ -1,0 +1,55 @@
+package net.buildtheearth.modules.warp.menu;
+
+import net.buildtheearth.modules.network.model.BuildTeam;
+import net.buildtheearth.modules.warp.model.Warp;
+import net.buildtheearth.modules.warp.model.WarpGroup;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class WarpGroupSelectionMenu extends WarpGroupMenu {
+
+    private final Warp warp;
+    private final boolean alreadyExists;
+
+    /**
+     * Let the player select a warp group for a warp.
+     *
+     * @param menuPlayer  The player that is viewing the menu.
+     * @param buildTeam   The build team that the menu is for.
+     * @param warp The warp that is being updated with the selected warp group.
+     */
+    public WarpGroupSelectionMenu(Player menuPlayer, BuildTeam buildTeam, Warp warp, boolean alreadyExists) {
+        super(menuPlayer, buildTeam, alreadyExists);
+        this.warp = warp;
+        this.alreadyExists = alreadyExists;
+    }
+
+    @Override
+    protected void setItemClickEventsAsync() {
+        getMenu().getSlot(BACK_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
+            clickPlayer.closeInventory();
+            new WarpUpdateMenu(clickPlayer, warp, alreadyExists);
+        });
+    }
+
+    @Override
+    protected void setPaginatedItemClickEventsAsync(List<?> source) {
+        List<WarpGroup> warpGroups = source.stream().map(l -> (WarpGroup) l).collect(Collectors.toList());
+
+        int slot = 0;
+        for (WarpGroup warpGroup : warpGroups) {
+            final int _slot = slot;
+            getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
+                clickPlayer.closeInventory();
+                clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
+
+                warp.setWarpGroup(warpGroup);
+                new WarpUpdateMenu(clickPlayer, warp, alreadyExists);
+            });
+            slot++;
+        }
+    }
+}

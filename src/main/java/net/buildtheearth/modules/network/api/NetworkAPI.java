@@ -72,7 +72,7 @@ public class NetworkAPI {
                 // Clear all regions
                 Main.getBuildTeamTools().getProxyManager().getRegions().clear();
 
-                // Add all countries to their respective continents
+                // Add all teams to the proxy manager
                 for(Object object : responseArray.toArray()) {
 
                     // Check if the object is a JSON object
@@ -109,6 +109,7 @@ public class NetworkAPI {
 
                     // Create an "other" Warp Group for warps that don't belong to a warp group
                     WarpGroup otherWarpGroup = new WarpGroup(buildTeam, "Other", "Other warps");
+                    buildTeam.getWarpGroups().add(otherWarpGroup);
 
                     // Add all the warp groups of the team to their respective build teams
                     for(Object warpGroupJSON : warpGroupArray.toArray()) {
@@ -144,7 +145,18 @@ public class NetworkAPI {
                         float warpPitch = Float.valueOf(warpObject.get("Pitch") + "");
                         boolean isHighlight = warpObject.get("isHighlight") != null && (long) warpObject.get("isHighlight") == 1;
 
-                        Warp warp = new Warp(warpID, warpGroupID, warpName, countryCode, "cca3", address, warpWorldName, warpLat, warpLon, warpHeight, warpYaw, warpPitch, isHighlight);
+                        WarpGroup warpGroup = null;
+
+                        // If the warp group ID is not null, get the warp group with that ID
+                        if(warpGroupID != null)
+                            warpGroup = buildTeam.getWarpGroups().stream()
+                                    .filter(warpGroup1 -> warpGroup1 != null && warpGroup1.getId() != null && warpGroup1.getId().equals(warpGroupID)).findFirst().orElse(null);
+
+                        // If the warp group is null, set it to the "other" warp group
+                        if(warpGroup == null)
+                            warpGroup = otherWarpGroup;
+
+                        Warp warp = new Warp(warpID, warpGroup, warpName, countryCode, "cca3", address, warpWorldName, warpLat, warpLon, warpHeight, warpYaw, warpPitch, isHighlight);
 
                         // If the warp belongs to a warp group, add it to that, otherwise add it to the "other" warp group.
                         if(warpGroupID == null) {
@@ -152,9 +164,9 @@ public class NetworkAPI {
                         }else {
                             boolean added = false;
 
-                            for(WarpGroup warpGroup : buildTeam.getWarpGroups())
-                                if(warpGroup.getId().equals(warpGroupID)) {
-                                    warpGroup.getWarps().add(warp);
+                            for(WarpGroup wg : buildTeam.getWarpGroups())
+                                if(wg.getId().equals(warpGroupID)) {
+                                    wg.getWarps().add(warp);
                                     added = true;
                                     break;
                                 }
@@ -163,10 +175,6 @@ public class NetworkAPI {
                                 otherWarpGroup.getWarps().add(warp);
                         }
                     }
-
-                    // Add the "other" warp group to the build team if it contains any warps
-                    if(otherWarpGroup.getWarps().size() > 0)
-                        buildTeam.getWarpGroups().add(otherWarpGroup);
 
                     // Add all the regions of the team to their respective continents
                     for(Object regionJSON : regionArray.toArray()) {
@@ -271,7 +279,7 @@ public class NetworkAPI {
     public static void createWarp(Warp warp, API.ApiResponseCallback callback) {
         String apiKey = Main.instance.getConfig().getString(ConfigPaths.API_KEY);
 
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), new Gson().toJson(warp));
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), warp.toJSON().toString());
         API.postAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warps", requestBody, callback);
     }
 
@@ -282,16 +290,30 @@ public class NetworkAPI {
         API.postAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warpgroups", requestBody, callback);
     }
 
-    public static void deleteWarp(String key, API.ApiResponseCallback callback) {
+    public static void updateWarp(Warp warp, API.ApiResponseCallback callback) {
         String apiKey = Main.instance.getConfig().getString(ConfigPaths.API_KEY);
-        RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain"), "{\n" + "\"key\":"+key+"\n" + "}");
+
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), warp.toJSON().toString());
+        API.putAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warps", requestBody, callback);
+    }
+
+    public static void updateWarpGroup(WarpGroup warpGroup, API.ApiResponseCallback callback) {
+        String apiKey = Main.instance.getConfig().getString(ConfigPaths.API_KEY);
+
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), new Gson().toJson(warpGroup));
+        API.putAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warpgroups", requestBody, callback);
+    }
+
+    public static void deleteWarp(Warp warp, API.ApiResponseCallback callback) {
+        String apiKey = Main.instance.getConfig().getString(ConfigPaths.API_KEY);
+        RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain"), "{\n" + "\"key\":" + warp.getName() + "\n" + "}");
 
         API.deleteAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warps", requestBody, callback);
     }
 
-    public static void deleteWarpGroup(String key, API.ApiResponseCallback callback) {
+    public static void deleteWarpGroup(WarpGroup warpGroup, API.ApiResponseCallback callback) {
         String apiKey = Main.instance.getConfig().getString(ConfigPaths.API_KEY);
-        RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain"), "{\n" + "\"key\":"+key+"\n" + "}");
+        RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain"), "{\n" + "\"key\":"+warpGroup.getName()+"\n" + "}");
 
         API.deleteAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warpgroups", requestBody, callback);
     }

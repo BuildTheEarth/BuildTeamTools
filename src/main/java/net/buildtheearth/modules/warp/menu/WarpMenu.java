@@ -1,9 +1,7 @@
 package net.buildtheearth.modules.warp.menu;
 
-import net.buildtheearth.modules.utils.Item;
-import net.buildtheearth.modules.utils.ListUtil;
-import net.buildtheearth.modules.utils.MenuItems;
-import net.buildtheearth.modules.utils.Utils;
+import net.buildtheearth.modules.network.model.Permissions;
+import net.buildtheearth.modules.utils.*;
 import net.buildtheearth.modules.utils.menus.AbstractPaginatedMenu;
 import net.buildtheearth.modules.warp.WarpManager;
 import net.buildtheearth.modules.warp.model.Warp;
@@ -65,8 +63,14 @@ public class WarpMenu extends AbstractPaginatedMenu {
 
     @Override
     protected List<?> getSource() {
-        // Return the warps in the warp group sorted by name
-        return warpGroup.getWarps().stream().sorted((warp1, warp2) -> warp1.getName().compareToIgnoreCase(warp2.getName())).collect(Collectors.toList());
+        // Get the warps in the warp group sorted by name
+        List<Warp> warps = warpGroup.getWarps().stream().sorted((warp1, warp2) -> warp1.getName().compareToIgnoreCase(warp2.getName())).collect(Collectors.toList());
+
+        // Add a create warp item if the player has permission
+        if (getMenuPlayer().hasPermission(Permissions.WARP_CREATE))
+            warps.add(new Warp(null, "%create-warp%", null, null, null, null, 0, 0, 0, 0, 0, false));
+
+        return warps;
     }
 
     @Override
@@ -77,6 +81,14 @@ public class WarpMenu extends AbstractPaginatedMenu {
         int slot = 0;
 
         for (Warp warp : warps) {
+
+            // Create a create warp item if the player has permission
+            if(warp.getName().equals("%create-warp%") && getMenuPlayer().hasPermission(Permissions.WARP_CREATE) && slot == warps.size() - 1){
+                getMenu().getSlot(slot).setItem(Item.createCustomHeadBase64(MenuItems.GREEN_PLUS, "§a§lCreate a new Warp", ListUtil.createList("§8Click to create a new warp.")));
+                slot++;
+                continue;
+            }
+
             ArrayList<String> loreLines = ListUtil.createList("", "§eAddress:");
             loreLines.addAll(Arrays.asList(Utils.splitStringByLineLength(warp.getAddress(), 30)));
             loreLines.addAll(ListUtil.createList("", "§8Left-Click to warp to this location.", "§8Right-Click to edit this warp."));
@@ -92,6 +104,8 @@ public class WarpMenu extends AbstractPaginatedMenu {
             );
             slot++;
         }
+
+
     }
 
     @Override
@@ -108,6 +122,12 @@ public class WarpMenu extends AbstractPaginatedMenu {
             final int _slot = slot;
             getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
+
+                // Create a click action for the "Create Warp" item if the player has permission
+                if(warp.getName().equals("%create-warp%") && getMenuPlayer().hasPermission(Permissions.WARP_CREATE) && _slot == warps.size() - 1){
+                    WarpManager.createWarp(clickPlayer);
+                    return;
+                }
 
                 if(clickInformation.getClickType().isRightClick())
                     new WarpEditMenu(clickPlayer, warp, true);

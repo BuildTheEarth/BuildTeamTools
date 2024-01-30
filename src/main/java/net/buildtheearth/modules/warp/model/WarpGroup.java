@@ -3,8 +3,11 @@ package net.buildtheearth.modules.warp.model;
 import lombok.Getter;
 import lombok.Setter;
 import net.buildtheearth.modules.network.model.BuildTeam;
+import net.buildtheearth.modules.utils.ListUtil;
+import net.buildtheearth.modules.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,5 +42,13 @@ public class WarpGroup {
         this.name = name;
         this.description = description;
         this.warps = new ArrayList<>();
+    }
+
+    public ArrayList<String> getDescriptionLore() {
+        return new ArrayList<String>() {{
+            add("");
+            add("§eDescription:");
+            addAll(ListUtil.createList(Utils.splitStringByLineLength(description, 30)));
+        }};
     }
 }

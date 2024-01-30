@@ -2,10 +2,13 @@ package net.buildtheearth.modules.warp.menu;
 
 import net.buildtheearth.modules.navigator.menu.CountrySelectorMenu;
 import net.buildtheearth.modules.network.model.BuildTeam;
+import net.buildtheearth.modules.network.model.Permissions;
 import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.ListUtil;
 import net.buildtheearth.modules.utils.MenuItems;
 import net.buildtheearth.modules.utils.menus.AbstractPaginatedMenu;
+import net.buildtheearth.modules.warp.WarpManager;
+import net.buildtheearth.modules.warp.model.Warp;
 import net.buildtheearth.modules.warp.model.WarpGroup;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -57,13 +60,19 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
         int slot = 0;
 
         for (WarpGroup warpGroup : warpGroups) {
-            ArrayList<String> warpGroupLore = ListUtil.createList("", "§eDescription:", warpGroup.getDescription());
+            // Create a create warp group item if the player has permission
+            if(warpGroup.getName().equals("%create-warp-group%") && getMenuPlayer().hasPermission(Permissions.WARP_GROUP_CREATE) && slot == warpGroups.size() - 1){
+                getMenu().getSlot(slot).setItem(Item.createCustomHeadBase64(MenuItems.GREEN_PLUS, "§a§lCreate a new Warp Group", ListUtil.createList("§8Click to create a new warp group.")));
+                slot++;
+                continue;
+            }
+
             getMenu().getSlot(slot).setItem(
                 MenuItems.getLetterHead(
                     warpGroup.getName().substring(0, 1),
                     MenuItems.LetterType.WOODEN,
                     "§6§l" + warpGroup.getName(),
-                    warpGroupLore
+                    warpGroup.getDescriptionLore()
                 )
             );
             slot++;
@@ -96,6 +105,11 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
         if(otherWarpGroup != null && otherWarpGroup.getWarps().size() == 0)
             warpGroups.remove(otherWarpGroup);
 
+        // Add a create warp group item if the player has permission
+        if (getMenuPlayer().hasPermission(Permissions.WARP_GROUP_CREATE))
+            warpGroups.add(new WarpGroup(null, "%create-warp-group%", null));
+
+
         return warpGroups;
     }
 
@@ -108,6 +122,12 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
             final int _slot = slot;
             getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
+
+                // Create a click action for the "Create Warp" item if the player has permission
+                if(warpGroup.getName().equals("%create-warp-group%") && getMenuPlayer().hasPermission(Permissions.WARP_GROUP_CREATE) && _slot == warpGroups.size() - 1){
+                    WarpManager.createWarpGroup(clickPlayer);
+                    return;
+                }
 
                 new WarpMenu(clickPlayer, warpGroup, true);
             });

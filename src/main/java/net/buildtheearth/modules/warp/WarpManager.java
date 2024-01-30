@@ -5,10 +5,15 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.Main;
 import net.buildtheearth.modules.network.api.NetworkAPI;
+import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.GeometricUtils;
+import net.buildtheearth.modules.utils.geo.CoordinateConversion;
+import net.buildtheearth.modules.warp.menu.WarpEditMenu;
+import net.buildtheearth.modules.warp.menu.WarpGroupEditMenu;
 import net.buildtheearth.modules.warp.model.Warp;
+import net.buildtheearth.modules.warp.model.WarpGroup;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -16,6 +21,7 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class WarpManager {
 
@@ -68,6 +74,7 @@ public class WarpManager {
         warpQueue.remove(player.getUniqueId());
     }
 
+
     /**
      * Sends a plugin message to add the warp to the queue of the target server
      * Then switches the player to that server
@@ -106,6 +113,67 @@ public class WarpManager {
         // Switch the player to the target server
         Main.getBuildTeamTools().getProxyManager().switchServer(player, targetServer);
     }
+
+
+
+    /** Creates a warp at the player's location and opens the warp edit menu.
+     *
+     * @param creator The player that is creating the warp
+     */
+    public static void createWarp(Player creator){
+        // Get the geographic coordinates of the player's location.
+        Location location = creator.getLocation();
+        double[] coordinates = CoordinateConversion.convertToGeo(location.getX(), location.getZ());
+
+        //Get the country belonging to the coordinates
+        CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(coordinates);
+
+        future.thenAccept(result -> {
+            String regionName = result[0];
+            String countryCodeCCA2 = result[1].toUpperCase();
+
+            //Check if the team owns this region/country
+            boolean ownsRegion = Main.getBuildTeamTools().getProxyManager().ownsRegion(regionName, countryCodeCCA2);
+
+            if(!ownsRegion) {
+                creator.sendMessage(ChatHelper.error("This team does not own the country %s!", result[0]));
+                return;
+            }
+
+            // Get the Other Group for default warp group
+            WarpGroup group = Main.getBuildTeamTools().getProxyManager().getBuildTeam().getWarpGroups().stream().filter(warpGroup -> warpGroup.getName().equalsIgnoreCase("Other")).findFirst().orElse(null);
+
+            // Create a default name for the warp
+            String name = creator.getName() + "'s Warp";
+
+            // Create an instance of the warp POJO
+            Warp warp = new Warp(group, name, countryCodeCCA2, "cca2", null, location.getWorld().getName(), coordinates[0], coordinates[1], location.getY(), location.getYaw(), location.getPitch(), false);
+
+            // Create the actual warp
+            new WarpEditMenu(creator, warp, false);
+
+        }).exceptionally(e -> {
+            creator.sendMessage(ChatHelper.error("An error occurred while creating the warp!"));
+            e.printStackTrace();
+            return null;
+        });
+    }
+
+
+    public static void createWarpGroup(Player creator){
+        // Create a default name for the warp
+        String name = creator.getName() + "'s Warp Group";
+        String description = "This is a warp group.";
+
+        WarpGroup warpGroup = new WarpGroup(Main.getBuildTeamTools().getProxyManager().getBuildTeam(), name, description);
+
+        new WarpGroupEditMenu(creator, warpGroup, false);
+    }
+
+
+    // ------------------------- //
+    //          GETTER           //
+    // ------------------------- //
 
     public static Warp getWarpByName(String name){
         return getWarpByName(Main.getBuildTeamTools().getProxyManager().getBuildTeam(), name);

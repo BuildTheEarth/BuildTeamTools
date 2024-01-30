@@ -2,6 +2,7 @@ package net.buildtheearth.modules.warp.commands;
 
 import net.buildtheearth.Main;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
+import net.buildtheearth.modules.network.model.Permissions;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.geo.CoordinateConversion;
 import net.buildtheearth.modules.warp.WarpManager;
@@ -59,104 +60,37 @@ public class WarpCommand implements CommandExecutor {
             }
 
             // Check if the player has the required permissions
-            if (!player.hasPermission("btt.warp.create")) {
+            if (!player.hasPermission(Permissions.WARP_CREATE)) {
                 player.sendMessage(ChatHelper.error("You don't have the required %s to %s warps.", "permission", "create"));
                 return true;
             }
 
             player.sendActionBar(ChatHelper.standard(false, "Creating the warp..."));
 
-            // Get the geographic coordinates of the player's location.
-            Location location = player.getLocation();
-            double[] coordinates = CoordinateConversion.convertToGeo(location.getX(), location.getZ());
-
-            //Get the country belonging to the coordinates
-            CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(coordinates);
-
-            future.thenAccept(result -> {
-                String regionName = result[0];
-                String countryCodeCCA2 = result[1].toUpperCase();
-
-                //Check if the team owns this region/country
-                boolean ownsRegion = Main.getBuildTeamTools().getProxyManager().ownsRegion(regionName, countryCodeCCA2);
-
-                if(!ownsRegion) {
-                    player.sendMessage(ChatHelper.error("This team does not own the country %s!", result[0]));
-                    return;
-                }
-
-                // Get the Other Group for default warp group
-                WarpGroup group = Main.getBuildTeamTools().getProxyManager().getBuildTeam().getWarpGroups().stream().filter(warpGroup -> warpGroup.getName().equalsIgnoreCase("Other")).findFirst().orElse(null);
-
-                // Create a default name for the warp
-                String name = player.getName() + "'s Warp";
-
-                // Create an instance of the warp POJO
-                Warp warp = new Warp(group, name, countryCodeCCA2, "cca2", null, location.getWorld().getName(), coordinates[0], coordinates[1], location.getY(), location.getYaw(), location.getPitch(), false);
-
-                // Create the actual warp
-                new WarpEditMenu(player, warp, false);
-
-            }).exceptionally(e -> {
-                player.sendMessage(ChatHelper.error("An error occurred while creating the warp!"));
-                e.printStackTrace();
-                return null;
-            });
+            WarpManager.createWarp(player);
             return true;
         }
 
 
-        //WARP DELETE <KEY>
-        if (args[0].equalsIgnoreCase("delete")) {
-            // Check if the required arguments are provided & send usage otherwise
-            if (args.length != 2) return false;
+        // Combine the args to one warp name
+        String key = String.join(" ", args);
 
-            // Extract the required data from the command arguments
-            String key = args[1];
-
-            // Check if the user has the required permission
-            if (!player.hasPermission("btt.warp.delete")) {
-                player.sendMessage(ChatHelper.error("You don't have the required %s to %s warps.", "permission", "delete"));
-                return true;
-            }
-
-            // Find the warp with the given key
-            Warp warp = WarpManager.getWarpByName(key);
-
-            if(warp == null) {
-                player.sendMessage(ChatHelper.error("The warp with the name %s does not exist in this team!", key));
-                return true;
-            }
-
-            Main.buildTeamTools.getProxyManager().getBuildTeam().deleteWarp(player, warp);
+        // Check if the player has the required permission
+        if (!player.hasPermission(Permissions.WARP_USE)) {
+            player.sendMessage(ChatHelper.error("You don't have the required %s to %s warps.", "permission", "use"));
             return true;
         }
 
+        // Find the warp with the given key
+        Warp warp = WarpManager.getWarpByName(key);
 
-        if (args.length >= 1) {
-
-            // Combine the args to one warp name
-            String key = String.join(" ", args);
-
-            // Check if the player has the required permission
-            if (!player.hasPermission("btt.warp.use")) {
-                player.sendMessage(ChatHelper.error("You don't have the required %s to %s warps.", "permission", "use"));
-                return true;
-            }
-
-            // Find the warp with the given key
-            Warp warp = WarpManager.getWarpByName(key);
-
-            if(warp == null) {
-                player.sendMessage(ChatHelper.error("The warp with the name %s does not exist in this team!", key));
-                return true;
-            }
-
-            WarpManager.warpPlayer(player, warp);
-
+        if(warp == null) {
+            player.sendMessage(ChatHelper.error("The warp with the name %s does not exist in this team!", key));
             return true;
         }
 
-        return false;
+        WarpManager.warpPlayer(player, warp);
+
+        return true;
     }
 }

@@ -12,6 +12,7 @@ import net.buildtheearth.modules.network.api.NetworkAPI;
 import net.buildtheearth.modules.network.commands.BuildTeamToolsCommand;
 import net.buildtheearth.modules.network.listeners.NetworkJoinListener;
 import net.buildtheearth.modules.network.listeners.NetworkQuitListener;
+import net.buildtheearth.modules.network.model.Permissions;
 import net.buildtheearth.modules.stats.StatsManager;
 import net.buildtheearth.modules.stats.StatsPlayerType;
 import net.buildtheearth.modules.stats.StatsServerType;
@@ -198,7 +199,7 @@ public class BuildTeamTools {
         if (!updateInstalled)
             return;
 
-        if (p.hasPermission("btt.notifyUpdate")) {
+        if (p.hasPermission(Permissions.NOTIFY_UPDATE)) {
             p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
             p.sendMessage("");
             p.sendMessage("§6§l[BuildTeam Plugin] §eThe server automatically installed a new update (v" + newVersion + ").");

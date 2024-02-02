@@ -158,12 +158,12 @@ public class KmlCommand implements CommandExecutor {
         // player.sendMessage(String.format("§creceived /kml command with blocktypestring %s and and kml length %d: %s",
         //  blocktypeString, kml_content.length(), kml_content));
 
-        Material blockMaterial = Material.getMaterial(blocktypeString);
+        Material blockMaterial = Material.matchMaterial(blocktypeString);
         if (blockMaterial == null){
             player.sendMessage("§cServer received /kml command with invalid blocktype string metadata. Using bricks as fallback.");
             blockMaterial = Material.BRICK;
         }
-        Material extendMaterial = Material.getMaterial(extendToGroundBlockType);
+        Material extendMaterial = Material.matchMaterial(extendToGroundBlockType);
         if (extendMaterial == null){
             player.sendMessage("§cServer received /kml command with invalid blocktype string metadata. Using bricks as fallback.");
             extendMaterial = Material.BRICK;
@@ -308,7 +308,7 @@ public class KmlCommand implements CommandExecutor {
         }
 
         //Delete command block, restore previous type
-        senderBlock.setType(Material.getMaterial(previousCommandBlockType));
+        senderBlock.setType(Material.matchMaterial(previousCommandBlockType));
         return true;
     }
 
@@ -344,14 +344,14 @@ public class KmlCommand implements CommandExecutor {
             if (arg.startsWith(prefix_extendParam)){
                 extendToGround = true;
                 extendToGroundBlockType = arg.substring(prefix_extendParam.length()).toUpperCase();
-                if (Material.getMaterial(extendToGroundBlockType) == null)
+                if (Material.matchMaterial(extendToGroundBlockType) == null)
                 {
                     player.sendMessage(String.format("§cInvalid block type for extend parameter '%s'. Using bricks as fallback.", extendToGroundBlockType));
                     extendToGroundBlockType = "BRICK";
                 }
             }else{
                 blocktype = arg.toUpperCase();
-                if (Material.getMaterial(blocktype) == null)
+                if (Material.matchMaterial(blocktype) == null)
                 {
                     player.sendMessage(String.format("§cInvalid block type '%s'. Using bricks as fallback.", blocktype));
                     blocktype = "BRICK";

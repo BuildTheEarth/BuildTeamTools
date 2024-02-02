@@ -47,8 +47,7 @@ public class Item {
     }
 
     public static ItemStack create(Material material, int amount) {
-        ItemStack item = new ItemStack(material, amount);
-        return item;
+        return new ItemStack(material, amount);
     }
 
     public static ItemStack create(Material material, String name) {
@@ -112,7 +111,7 @@ public class Item {
 
     public static ItemStack create(Material material, String name, ArrayList<String> lore, Enchantment enchnt1, Integer level1) {
         ItemStack item = new ItemStack(material);
-        item.addUnsafeEnchantment(enchnt1, level1.intValue());
+        item.addUnsafeEnchantment(enchnt1, level1);
         ItemMeta itemmeta = item.getItemMeta();
         itemmeta.setDisplayName(name);
         itemmeta.setLore(lore);
@@ -123,8 +122,8 @@ public class Item {
 
     public static ItemStack create(Material material, String name, ArrayList<String> lore, Enchantment enchnt1, Integer level1, Enchantment enchnt2, Integer level2) {
         ItemStack item = new ItemStack(material);
-        item.addUnsafeEnchantment(enchnt1, level1.intValue());
-        item.addUnsafeEnchantment(enchnt2, level2.intValue());
+        item.addUnsafeEnchantment(enchnt1, level1);
+        item.addUnsafeEnchantment(enchnt2, level2);
         ItemMeta itemmeta = item.getItemMeta();
         itemmeta.setDisplayName(name);
         itemmeta.setLore(lore);
@@ -135,9 +134,9 @@ public class Item {
 
     public static ItemStack create(Material material, String name, ArrayList<String> lore, Enchantment enchnt1, Integer level1, Enchantment enchnt2, Integer level2, Enchantment enchnt3, Integer level3) {
         ItemStack item = new ItemStack(material);
-        item.addUnsafeEnchantment(enchnt1, level1.intValue());
-        item.addUnsafeEnchantment(enchnt2, level2.intValue());
-        item.addUnsafeEnchantment(enchnt3, level3.intValue());
+        item.addUnsafeEnchantment(enchnt1, level1);
+        item.addUnsafeEnchantment(enchnt2, level2);
+        item.addUnsafeEnchantment(enchnt3, level3);
         ItemMeta itemmeta = item.getItemMeta();
         itemmeta.setDisplayName(name);
         itemmeta.setLore(lore);
@@ -157,7 +156,7 @@ public class Item {
 
     public static ItemStack createLeatherArmor(Material material, String name, Color color, ArrayList<String> lore, Enchantment enchnt1, Integer level1) {
         ItemStack item = new ItemStack(material);
-        item.addUnsafeEnchantment(enchnt1, level1.intValue());
+        item.addUnsafeEnchantment(enchnt1, level1);
         LeatherArmorMeta itemmeta = (LeatherArmorMeta) item.getItemMeta();
         itemmeta.setDisplayName(name);
         itemmeta.setLore(lore);
@@ -169,8 +168,8 @@ public class Item {
 
     public static ItemStack createLeatherArmor(Material material, String name, Color color, ArrayList<String> lore, Enchantment enchnt1, Integer level1, Enchantment enchnt2, Integer level2) {
         ItemStack item = new ItemStack(material);
-        item.addUnsafeEnchantment(enchnt1, level1.intValue());
-        item.addUnsafeEnchantment(enchnt2, level2.intValue());
+        item.addUnsafeEnchantment(enchnt1, level1);
+        item.addUnsafeEnchantment(enchnt2, level2);
         LeatherArmorMeta itemmeta = (LeatherArmorMeta) item.getItemMeta();
         itemmeta.setDisplayName(name);
         itemmeta.setLore(lore);
@@ -182,9 +181,9 @@ public class Item {
 
     public static ItemStack createLeatherArmor(Material material, String name, Color color, ArrayList<String> lore, Enchantment enchnt1, Integer level1, Enchantment enchnt2, Integer level2, Enchantment enchnt3, Integer level3) {
         ItemStack item = new ItemStack(material);
-        item.addUnsafeEnchantment(enchnt1, level1.intValue());
-        item.addUnsafeEnchantment(enchnt2, level2.intValue());
-        item.addUnsafeEnchantment(enchnt3, level3.intValue());
+        item.addUnsafeEnchantment(enchnt1, level1);
+        item.addUnsafeEnchantment(enchnt2, level2);
+        item.addUnsafeEnchantment(enchnt3, level3);
         LeatherArmorMeta itemmeta = (LeatherArmorMeta) item.getItemMeta();
         itemmeta.setDisplayName(name);
         itemmeta.setLore(lore);
@@ -278,12 +277,18 @@ public class Item {
     }
 
     public static ItemStack createCustomHeadBase64(String base64, String name, ArrayList<String> lore) {
+        if (nonPlayerSkulls.containsKey(base64 + name + lore))
+            return nonPlayerSkulls.get(base64 + name + lore);
+
         ItemStack head = Item.create(Material.SKULL_ITEM, name, (short) 3, lore);
         SkullMeta meta = (SkullMeta) head.getItemMeta();
         mutateItemMeta(meta, base64);
         meta.setDisplayName(name);
         meta.setLore(lore);
         head.setItemMeta(meta);
+
+        nonPlayerSkulls.put(base64 + name + lore, head);
+
         return head;
     }
 
@@ -291,9 +296,9 @@ public class Item {
         return item.getTypeId() + ":" + item.getDurability();
     }
 
-    public static ItemStack fromUniqueMaterialString(String s) {
+    public static ItemStack fromUniqueMaterialString(String materialString) {
         try {
-            String[] split = s.split(":");
+            String[] split = materialString.split(":");
             return new ItemStack(Integer.parseInt(split[0]), 1, Short.parseShort(split[1]));
         } catch (Exception e) {
             return null;
@@ -363,7 +368,7 @@ public class Item {
     }
 
     public Item addEnchantment(Enchantment enchantment, int level) {
-        this.enchantments.put(enchantment, Integer.valueOf(level));
+        this.enchantments.put(enchantment, level);
         return this;
     }
 
@@ -393,14 +398,14 @@ public class Item {
 
         if (item.getEnchantments().keySet().size() == 0)
             for (Enchantment en : this.enchantments.keySet())
-                item.addUnsafeEnchantment(en, this.enchantments.get(en).intValue());
+                item.addUnsafeEnchantment(en, this.enchantments.get(en));
 
         ItemMeta itemmeta = item.getItemMeta();
 
-        if (!itemmeta.hasDisplayName())
+        if (this.displayName != null)
             itemmeta.setDisplayName(this.displayName);
 
-        if (!itemmeta.hasLore())
+        if (this.lore != null)
             itemmeta.setLore(this.lore);
 
         if (this.hideAttributes)

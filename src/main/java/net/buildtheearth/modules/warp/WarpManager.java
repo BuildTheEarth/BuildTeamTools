@@ -45,6 +45,11 @@ public class WarpManager {
 
             Warp warp = NetworkAPI.getWarpByKey(warpKey);
 
+            if (warp == null) {
+                player.sendMessage(ChatHelper.error("The warp you tried to warp to does not exist anymore."));
+                return;
+            }
+
             Location targetWarpLocation = GeometricUtils.getLocationFromCoordinatesYawPitch(new double[]{warp.getLat(), warp.getLon()}, warp.getYaw(), warp.getPitch());
             targetWarpLocation.setY(warp.getY());
             targetWarpLocation.setWorld(Bukkit.getWorld(warp.getWorldName()));
@@ -147,7 +152,7 @@ public class WarpManager {
             String name = creator.getName() + "'s Warp";
 
             // Create an instance of the warp POJO
-            Warp warp = new Warp(group, name, countryCodeCCA2, "cca2", null, location.getWorld().getName(), coordinates[0], coordinates[1], location.getY(), location.getYaw(), location.getPitch(), false);
+            Warp warp = new Warp(group, name, countryCodeCCA2, "cca2", null, null, null, location.getWorld().getName(), coordinates[0], coordinates[1], location.getY(), location.getYaw(), location.getPitch(), false);
 
             // Create the actual warp
             new WarpEditMenu(creator, warp, false);

@@ -48,7 +48,7 @@ public class WarpGroup {
         return new ArrayList<String>() {{
             add("");
             add("§eDescription:");
-            addAll(ListUtil.createList(Utils.splitStringByLineLength(description, 30)));
+            addAll(ListUtil.createList(Utils.splitStringByLineLength(description, 30, ", ")));
         }};
     }
 }

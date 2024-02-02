@@ -26,9 +26,12 @@ public class WarpEditMenu extends AbstractMenu {
 
     public static int WARP_SLOT = 4;
     public static int LOCATION_SLOT = 19;
-    public static int NAME_SLOT = 21;
-    public static int GROUP_SLOT = 23;
-    public static int HIGHLIGHT_SLOT = 25;
+    public static int NAME_SLOT = 20;
+    public static int GROUP_SLOT = 21;
+    public static int ADDRESS_TYPE_SLOT = 22;
+    public static int MATERIAL_SLOT = 23;
+    public static int HIGHLIGHT_SLOT = 24;
+    public static int DELETE_SLOT = 25;
     public static int CONFIRM_SLOT = 35;
 
     private final Warp warp;
@@ -47,16 +50,14 @@ public class WarpEditMenu extends AbstractMenu {
         this.alreadyExists = alreadyExists;
 
         if(!this.alreadyExists){
-            NAME_SLOT = 20;
-            GROUP_SLOT = 22;
-            HIGHLIGHT_SLOT = 24;
+            NAME_SLOT = 18;
+            GROUP_SLOT = 20;
+            HIGHLIGHT_SLOT = 22;
+            ADDRESS_TYPE_SLOT = 24;
+            MATERIAL_SLOT = 26;
         }
     }
 
-    @Override
-    protected void setPreviewItems() {
-        super.setPreviewItems();
-    }
 
     @Override
     protected void setMenuItemsAsync() {
@@ -64,21 +65,7 @@ public class WarpEditMenu extends AbstractMenu {
         getMenu().getSlot(CONFIRM_SLOT).setItem(MenuItems.getCheckmarkItem(alreadyExists ? "§aUpdate" : "§aCreate"));
 
         // Set the warp item
-        ArrayList<String> loreLines = null;
-
-        if(alreadyExists){
-            loreLines = new ArrayList<>(Arrays.asList("", "§eAddress:"));
-            loreLines.addAll(Arrays.asList(Utils.splitStringByLineLength(warp.getAddress(), 30)));
-        }
-
-        getMenu().getSlot(WARP_SLOT).setItem(
-                MenuItems.getLetterHead(
-                        warp.getName().substring(0, 1),
-                        MenuItems.LetterType.STONE,
-                        "§6§l" + warp.getName(),
-                        loreLines
-                )
-        );
+        getMenu().getSlot(WARP_SLOT).setItem(warp.getMaterialItem());
 
         // Set the location item if the warp already exists. Otherwise, the location is set automatically on creation.
         if(alreadyExists){
@@ -100,11 +87,17 @@ public class WarpEditMenu extends AbstractMenu {
                 groupLore
         ));
 
+        // Set the address type item
+        ArrayList<String> addressTypeLore = ListUtil.createList("", "§eAddress Type: ", warp.getAddressType() == null ? "§7City" : warp.getAddressType().getName());
+        getMenu().getSlot(ADDRESS_TYPE_SLOT).setItem(Item.create(Material.PAPER, "§6§lChange Address Type", addressTypeLore));
+
+        // Set the material item
+        ArrayList<String> materialLore = ListUtil.createList("", "§eMaterial: ", warp.getMaterial() == null ? "§7Default" : warp.getMaterial());
+        getMenu().getSlot(MATERIAL_SLOT).setItem(new Item(warp.getMaterialItem()).setDisplayName("§6§lChange Material").setLore(materialLore).build());
 
         // Set the highlight item
         ArrayList<String> highlightLore = ListUtil.createList("", "§eIs Highlight: ", "" + warp.isHighlight());
         getMenu().getSlot(HIGHLIGHT_SLOT).setItem(Item.create(Material.NETHER_STAR, warp.isHighlight() ? "§6§lMake Normal" : "§6§lMake Highlight", highlightLore));
-
     }
 
     @Override
@@ -190,6 +183,22 @@ public class WarpEditMenu extends AbstractMenu {
                     .title("§8Change the warp name")
                     .plugin(Main.instance)
                     .open(clickPlayer);
+        });
+
+        // Set click event for the material item
+        getMenu().getSlot(MATERIAL_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
+            clickPlayer.closeInventory();
+            clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
+
+            new MaterialSelectionMenu(clickPlayer, warp, alreadyExists);
+        });
+
+        // Set click event for the address type item
+        getMenu().getSlot(ADDRESS_TYPE_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
+            clickPlayer.closeInventory();
+            clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
+
+            new AddressTypeSelectionMenu(clickPlayer, warp, alreadyExists);
         });
 
         // Set click event for the group item

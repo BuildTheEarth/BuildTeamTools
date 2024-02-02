@@ -8,14 +8,12 @@ import net.buildtheearth.modules.utils.ListUtil;
 import net.buildtheearth.modules.utils.MenuItems;
 import net.buildtheearth.modules.utils.menus.AbstractPaginatedMenu;
 import net.buildtheearth.modules.warp.WarpManager;
-import net.buildtheearth.modules.warp.model.Warp;
 import net.buildtheearth.modules.warp.model.WarpGroup;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

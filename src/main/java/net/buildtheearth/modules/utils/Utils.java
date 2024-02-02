@@ -32,17 +32,24 @@ public class Utils {
         return false;
     }
 
-    public static String[] splitStringByLineLength(String input, int maxLineLength) {
-        String[] parts = input.split(", ");
+    public static String[] splitStringByLineLength(String input, int maxLineLength, String separator) {
+        String[] parts = input.split(separator);
         StringBuilder currentLine = new StringBuilder();
         ArrayList<String> lines = new ArrayList<>();
 
+        int i = 0;
         for (String part : parts) {
             if (currentLine.length() + part.length() > maxLineLength) {
                 lines.add(currentLine.toString().trim());
                 currentLine = new StringBuilder();
             }
-            currentLine.append(part).append(", ");
+
+            currentLine.append(part);
+
+            if (i != parts.length - 1)
+                currentLine.append(", ");
+
+            i++;
         }
 
         if (currentLine.length() > 0) {

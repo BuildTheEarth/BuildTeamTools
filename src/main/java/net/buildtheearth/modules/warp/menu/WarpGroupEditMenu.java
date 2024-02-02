@@ -1,14 +1,12 @@
 package net.buildtheearth.modules.warp.menu;
 
 import net.buildtheearth.Main;
-import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
-import net.buildtheearth.modules.utils.*;
-import net.buildtheearth.modules.utils.geo.CoordinateConversion;
+import net.buildtheearth.modules.utils.Item;
+import net.buildtheearth.modules.utils.ListUtil;
+import net.buildtheearth.modules.utils.MenuItems;
 import net.buildtheearth.modules.utils.menus.AbstractMenu;
-import net.buildtheearth.modules.warp.model.Warp;
 import net.buildtheearth.modules.warp.model.WarpGroup;
 import net.wesjd.anvilgui.AnvilGUI;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -18,7 +16,6 @@ import org.ipvp.canvas.mask.Mask;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.concurrent.CompletableFuture;
 
 import static net.buildtheearth.modules.warp.menu.WarpEditMenu.CONFIRM_SLOT;
 
@@ -46,11 +43,6 @@ public class WarpGroupEditMenu extends AbstractMenu {
 
         this.warpGroup = warpGroup;
         this.alreadyExists = alreadyExists;
-    }
-
-    @Override
-    protected void setPreviewItems() {
-        super.setPreviewItems();
     }
 
     @Override

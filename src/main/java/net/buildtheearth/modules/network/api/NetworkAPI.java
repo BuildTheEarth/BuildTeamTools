@@ -137,6 +137,8 @@ public class NetworkAPI {
                         String warpName = (String) warpObject.get("Name");
                         String countryCode = (String) warpObject.get("CountryCode");
                         String address = (String) warpObject.get("Address");
+                        Warp.AddressType addressType = Warp.AddressType.fromValue((String) warpObject.get("AddressType"));
+                        String material = (String) warpObject.get("Material");
                         String warpWorldName = (String) warpObject.get("WorldName");
                         double warpLat = (double) warpObject.get("Latitude");
                         double warpLon = (double) warpObject.get("Longitude");
@@ -144,6 +146,9 @@ public class NetworkAPI {
                         float warpYaw = Float.valueOf(warpObject.get("Yaw") + "");
                         float warpPitch = Float.valueOf(warpObject.get("Pitch") + "");
                         boolean isHighlight = warpObject.get("isHighlight") != null && (long) warpObject.get("isHighlight") == 1;
+
+                        if(material != null && material.equals(""))
+                            material = null;
 
                         WarpGroup warpGroup = null;
 
@@ -156,7 +161,7 @@ public class NetworkAPI {
                         if(warpGroup == null)
                             warpGroup = otherWarpGroup;
 
-                        Warp warp = new Warp(warpID, warpGroup, warpName, countryCode, "cca3", address, warpWorldName, warpLat, warpLon, warpHeight, warpYaw, warpPitch, isHighlight);
+                        Warp warp = new Warp(warpID, warpGroup, warpName, countryCode, "cca3", address, addressType, material, warpWorldName, warpLat, warpLon, warpHeight, warpYaw, warpPitch, isHighlight);
 
                         // If the warp belongs to a warp group, add it to that, otherwise add it to the "other" warp group.
                         if(warpGroupID == null) {

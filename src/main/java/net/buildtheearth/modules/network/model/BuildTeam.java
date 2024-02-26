@@ -117,7 +117,11 @@ public class BuildTeam {
                 // Update the cache
                 Main.buildTeamTools.getProxyManager().updateCache().thenRun(() ->
                         updater.sendMessage(ChatHelper.successful("Successfully updated the warp %s!", warp.getName()))
-                );
+                ).exceptionally(e -> {
+                    updater.sendMessage(ChatHelper.error("Something went wrong while updating the warp %s! Please take a look at the console.", warp.getName()));
+                    e.printStackTrace();
+                    return null;
+                });
             }
 
             @Override
@@ -141,7 +145,11 @@ public class BuildTeam {
                 // Update the cache
                 Main.buildTeamTools.getProxyManager().updateCache().thenRun(() ->
                         updater.sendMessage(ChatHelper.successful("Successfully updated the warp group %s!", warpGroup.getName()))
-                );
+                ).exceptionally(e -> {
+                    updater.sendMessage(ChatHelper.error("Something went wrong while updating the warp group %s! Please take a look at the console.", warpGroup.getName()));
+                    e.printStackTrace();
+                    return null;
+                });
             }
 
             @Override

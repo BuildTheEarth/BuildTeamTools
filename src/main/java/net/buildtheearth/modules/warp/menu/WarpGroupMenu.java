@@ -127,7 +127,11 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
                     return;
                 }
 
-                new WarpMenu(clickPlayer, warpGroup, true);
+                if(clickInformation.getClickType().isRightClick() && clickPlayer.hasPermission(Permissions.WARP_GROUP_EDIT))
+                    new WarpGroupEditMenu(clickPlayer, warpGroup, true);
+                else
+                    new WarpMenu(clickPlayer, warpGroup, true);
+
             });
             slot++;
         }

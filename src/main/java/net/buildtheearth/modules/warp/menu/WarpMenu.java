@@ -93,7 +93,6 @@ public class WarpMenu extends AbstractPaginatedMenu {
             loreLines.addAll(Arrays.asList(Utils.splitStringByLineLength(warp.getAddress(), 30, ", ")));
             loreLines.addAll(ListUtil.createList("", "§8Left-Click to warp to this location.", "§8Right-Click to edit this warp."));
 
-            ArrayList<String> warpLore = ListUtil.createList(loreLines.toArray(new String[0]));
             getMenu().getSlot(slot).setItem(warp.getMaterialItem());
             slot++;
         }
@@ -122,9 +121,9 @@ public class WarpMenu extends AbstractPaginatedMenu {
                     return;
                 }
 
-                if(clickInformation.getClickType().isRightClick())
+                if(clickInformation.getClickType().isRightClick() && clickPlayer.hasPermission(Permissions.WARP_EDIT))
                     new WarpEditMenu(clickPlayer, warp, true);
-                else if(clickInformation.getClickType().isLeftClick())
+                else
                     WarpManager.warpPlayer(clickPlayer, warp);
             });
             slot++;

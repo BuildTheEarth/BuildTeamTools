@@ -9,11 +9,10 @@ import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.network.model.RegionType;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.io.ConfigPaths;
-import net.buildtheearth.modules.warp.model.WarpGroup;
 import net.buildtheearth.modules.warp.model.Warp;
+import net.buildtheearth.modules.warp.model.WarpGroup;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
-import org.bukkit.Bukkit;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -143,8 +142,8 @@ public class NetworkAPI {
                         double warpLat = (double) warpObject.get("Latitude");
                         double warpLon = (double) warpObject.get("Longitude");
                         int warpHeight = (int) (long) warpObject.get("Height");
-                        float warpYaw = Float.valueOf(warpObject.get("Yaw") + "");
-                        float warpPitch = Float.valueOf(warpObject.get("Pitch") + "");
+                        float warpYaw = Float.parseFloat(warpObject.get("Yaw") + "");
+                        float warpPitch = Float.parseFloat(warpObject.get("Pitch") + "");
                         boolean isHighlight = warpObject.get("isHighlight") != null && (long) warpObject.get("isHighlight") == 1;
 
                         if(material != null && material.equals(""))
@@ -284,41 +283,50 @@ public class NetworkAPI {
     public static void createWarp(Warp warp, API.ApiResponseCallback callback) {
         String apiKey = Main.instance.getConfig().getString(ConfigPaths.API_KEY);
 
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), warp.toJSON().toString());
+        RequestBody requestBody = RequestBody.create(warp.toJSON().toString(), MediaType.parse("application/json"));
         API.postAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warps", requestBody, callback);
     }
 
     public static void createWarpGroup(WarpGroup warpGroup, API.ApiResponseCallback callback) {
         String apiKey = Main.instance.getConfig().getString(ConfigPaths.API_KEY);
 
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), new Gson().toJson(warpGroup));
+        RequestBody requestBody = RequestBody.create(warpGroup.toJSON().toString(), MediaType.parse("application/json"));
         API.postAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warpgroups", requestBody, callback);
     }
 
     public static void updateWarp(Warp warp, API.ApiResponseCallback callback) {
         String apiKey = Main.instance.getConfig().getString(ConfigPaths.API_KEY);
 
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), warp.toJSON().toString());
+        RequestBody requestBody = RequestBody.create(warp.toJSON().toString(), MediaType.parse("application/json"));
         API.putAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warps", requestBody, callback);
     }
 
     public static void updateWarpGroup(WarpGroup warpGroup, API.ApiResponseCallback callback) {
         String apiKey = Main.instance.getConfig().getString(ConfigPaths.API_KEY);
 
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), new Gson().toJson(warpGroup));
+        RequestBody requestBody = RequestBody.create(warpGroup.toJSON().toString(), MediaType.parse("application/json"));
         API.putAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warpgroups", requestBody, callback);
     }
 
     public static void deleteWarp(Warp warp, API.ApiResponseCallback callback) {
         String apiKey = Main.instance.getConfig().getString(ConfigPaths.API_KEY);
-        RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain"), "{\n" + "\"key\":" + warp.getName() + "\n" + "}");
+
+        JSONObject requestBodyJson = new JSONObject();
+        requestBodyJson.put("key", warp.getId().toString());
+        String requestBodyString = requestBodyJson.toString();
+
+        RequestBody requestBody = RequestBody.create(requestBodyString, MediaType.parse("application/json"));
 
         API.deleteAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warps", requestBody, callback);
     }
 
     public static void deleteWarpGroup(WarpGroup warpGroup, API.ApiResponseCallback callback) {
         String apiKey = Main.instance.getConfig().getString(ConfigPaths.API_KEY);
-        RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain"), "{\n" + "\"key\":"+warpGroup.getName()+"\n" + "}");
+
+        JSONObject requestBodyJson = new JSONObject();
+        requestBodyJson.put("key", warpGroup.getId().toString());
+        String requestBodyString = requestBodyJson.toString();
+        RequestBody requestBody = RequestBody.create(requestBodyString, MediaType.parse("application/json"));
 
         API.deleteAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warpgroups", requestBody, callback);
     }

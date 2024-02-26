@@ -98,6 +98,10 @@ public class WarpEditMenu extends AbstractMenu {
         // Set the highlight item
         ArrayList<String> highlightLore = ListUtil.createList("", "§eIs Highlight: ", "" + warp.isHighlight());
         getMenu().getSlot(HIGHLIGHT_SLOT).setItem(Item.create(Material.NETHER_STAR, warp.isHighlight() ? "§6§lMake Normal" : "§6§lMake Highlight", highlightLore));
+
+        // Set the delete item
+        if(alreadyExists)
+            getMenu().getSlot(DELETE_SLOT).setItem(Item.create(Material.BARRIER, "§c§lDelete Warp", ListUtil.createList("", "§8Click to delete the warp.")));
     }
 
     @Override
@@ -216,6 +220,15 @@ public class WarpEditMenu extends AbstractMenu {
             warp.setHighlight(!warp.isHighlight());
             new WarpEditMenu(clickPlayer, warp, alreadyExists);
         });
+
+        // Set click event for the delete item
+        if(alreadyExists)
+            getMenu().getSlot(DELETE_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
+                clickPlayer.closeInventory();
+                clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
+
+                Main.getBuildTeamTools().getProxyManager().getBuildTeam().deleteWarp(clickPlayer, warp);
+            });
     }
 
     @Override

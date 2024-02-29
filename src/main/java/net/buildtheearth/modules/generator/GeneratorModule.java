@@ -17,6 +17,7 @@ import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.Region;
 import lombok.Getter;
 import net.buildtheearth.Main;
+import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.generator.model.Command;
 import net.buildtheearth.modules.generator.model.History;
 import net.buildtheearth.modules.generator.modules.house.House;
@@ -42,7 +43,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public class Generator {
+public class GeneratorModule implements Module {
 
     public static String WIKI_PAGE = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Generator";
     public static String INSTALL_WIKI = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Installation";
@@ -62,11 +63,22 @@ public class Generator {
     @Getter
     private final Tree tree;
 
-    public Generator() {
+    public GeneratorModule() {
         house = new House();
         road = new Road();
         rail = new Rail();
         tree = new Tree();
+    }
+
+    @Override
+    public void onEnable() {}
+
+    @Override
+    public void onDisable() {}
+
+    @Override
+    public String getModuleName() {
+        return "Generator";
     }
 
     /**
@@ -141,7 +153,7 @@ public class Generator {
      */
     public static Block[][][] analyzeRegion(Player p, World world) {
         // Get WorldEdit selection of player
-        Region polyRegion = Generator.getWorldEditSelection(p);
+        Region polyRegion = GeneratorModule.getWorldEditSelection(p);
 
         Block[][][] blocks = new Block[polyRegion.getWidth()][polyRegion.getHeight()][polyRegion.getLength()];
 
@@ -223,7 +235,7 @@ public class Generator {
 
         for (int i = 0; i < points.size(); i++) {
             Vector point = points.get(i);
-            point = point.setY(Generator.getMaxHeight(blocks, point.getBlockX(), point.getBlockZ(), Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.SNOW));
+            point = point.setY(GeneratorModule.getMaxHeight(blocks, point.getBlockX(), point.getBlockZ(), Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.SNOW));
             points.set(i, point);
         }
 
@@ -393,7 +405,7 @@ public class Generator {
         int maxHeight = vector.getBlockY();
 
         if (blocks != null)
-            maxHeight = Generator.getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL, Material.SNOW);
+            maxHeight = GeneratorModule.getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL, Material.SNOW);
         if (maxHeight == 0)
             maxHeight = vector.getBlockY();
 
@@ -712,7 +724,7 @@ public class Generator {
      */
     public static boolean checkForWorldEditSelection(Player p) {
         // Get WorldEdit selection of player
-        Region polyRegion = Generator.getWorldEditSelection(p);
+        Region polyRegion = GeneratorModule.getWorldEditSelection(p);
 
         if (polyRegion == null) {
             p.sendMessage("§cPlease make a WorldEdit Selection first.");
@@ -733,7 +745,7 @@ public class Generator {
      */
     public static boolean checkForConvexSelection(Player p) {
         // Get WorldEdit selection of player
-        Region polyRegion = Generator.getWorldEditSelection(p);
+        Region polyRegion = GeneratorModule.getWorldEditSelection(p);
 
         if (!(polyRegion instanceof ConvexPolyhedralRegion)) {
             p.sendMessage("§cPlease make a WorldEdit Convex Selection first (//sel convex).");

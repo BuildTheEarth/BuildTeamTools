@@ -1,7 +1,6 @@
 package net.buildtheearth.modules.warp.menu;
 
 import net.buildtheearth.Main;
-import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.ListUtil;
 import net.buildtheearth.modules.utils.MenuItems;
@@ -9,7 +8,6 @@ import net.buildtheearth.modules.utils.menus.AbstractMenu;
 import net.buildtheearth.modules.utils.menus.BookMenu;
 import net.buildtheearth.modules.warp.model.WarpGroup;
 import net.wesjd.anvilgui.AnvilGUI;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -85,9 +83,9 @@ public class WarpGroupEditMenu extends AbstractMenu {
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
             if(alreadyExists)
-                Main.getBuildTeamTools().getProxyManager().getBuildTeam().updateWarpGroup(clickPlayer, warpGroup);
+                Main.getBuildTeamTools().getProxyModule().getBuildTeam().updateWarpGroup(clickPlayer, warpGroup);
             else
-                Main.getBuildTeamTools().getProxyManager().getBuildTeam().createWarpGroup(clickPlayer, warpGroup);
+                Main.getBuildTeamTools().getProxyModule().getBuildTeam().createWarpGroup(clickPlayer, warpGroup);
         });
 
         // Set click event for the name item
@@ -151,7 +149,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
-            Main.getBuildTeamTools().getProxyManager().getBuildTeam().deleteWarpGroup(clickPlayer, warpGroup);
+            Main.getBuildTeamTools().getProxyModule().getBuildTeam().deleteWarpGroup(clickPlayer, warpGroup);
         });
     }
 

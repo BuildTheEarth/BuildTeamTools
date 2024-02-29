@@ -2,7 +2,7 @@ package net.buildtheearth.modules.navigator.listeners;
 
 import net.buildtheearth.modules.navigator.Navigator;
 import net.buildtheearth.modules.navigator.menu.MainMenu;
-import net.buildtheearth.modules.network.ProxyManager;
+import net.buildtheearth.modules.network.ProxyModule;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,10 +14,10 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
 public class NavigatorOpenListener implements Listener {
-    private final ProxyManager proxyManager;
+    private final ProxyModule proxyModule;
 
-    public NavigatorOpenListener(ProxyManager proxyManager) {
-        this.proxyManager = proxyManager;
+    public NavigatorOpenListener(ProxyModule proxyModule) {
+        this.proxyModule = proxyModule;
     }
 
     @EventHandler

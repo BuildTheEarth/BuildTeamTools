@@ -73,7 +73,7 @@ public class RoofTypeMenu extends AbstractMenu {
     }
 
     private void performClickAction(Player p, RoofType roofType) {
-        Settings settings = Main.buildTeamTools.getGenerator().getHouse().getPlayerSettings().get(p.getUniqueId());
+        Settings settings = Main.buildTeamTools.getGeneratorModule().getHouse().getPlayerSettings().get(p.getUniqueId());
 
         if (!(settings instanceof HouseSettings))
             return;

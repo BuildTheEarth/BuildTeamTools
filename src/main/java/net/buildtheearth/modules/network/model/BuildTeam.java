@@ -66,7 +66,7 @@ public class BuildTeam {
             @Override
             public void onResponse(String response) {
                 // Update the cache
-                Main.buildTeamTools.getProxyManager().updateCache().thenRun(() ->
+                Main.buildTeamTools.getProxyModule().updateCache().thenRun(() ->
                         creator.sendMessage(ChatHelper.successful("Successfully created the warp %s!", warp.getName()))
                 );
             }
@@ -90,7 +90,7 @@ public class BuildTeam {
             @Override
             public void onResponse(String response) {
                 // Update the cache
-                Main.buildTeamTools.getProxyManager().updateCache().thenRun(() ->
+                Main.buildTeamTools.getProxyModule().updateCache().thenRun(() ->
                         creator.sendMessage(ChatHelper.successful("Successfully created the warp group %s!", warpGroup.getName()))
                 );
             }
@@ -115,7 +115,7 @@ public class BuildTeam {
             @Override
             public void onResponse(String response) {
                 // Update the cache
-                Main.buildTeamTools.getProxyManager().updateCache().thenRun(() ->
+                Main.buildTeamTools.getProxyModule().updateCache().thenRun(() ->
                         updater.sendMessage(ChatHelper.successful("Successfully updated the warp %s!", warp.getName()))
                 ).exceptionally(e -> {
                     updater.sendMessage(ChatHelper.error("Something went wrong while updating the warp %s! Please take a look at the console.", warp.getName()));
@@ -143,7 +143,7 @@ public class BuildTeam {
             @Override
             public void onResponse(String response) {
                 // Update the cache
-                Main.buildTeamTools.getProxyManager().updateCache().thenRun(() ->
+                Main.buildTeamTools.getProxyModule().updateCache().thenRun(() ->
                         updater.sendMessage(ChatHelper.successful("Successfully updated the warp group %s!", warpGroup.getName()))
                 ).exceptionally(e -> {
                     updater.sendMessage(ChatHelper.error("Something went wrong while updating the warp group %s! Please take a look at the console.", warpGroup.getName()));
@@ -171,7 +171,7 @@ public class BuildTeam {
             @Override
             public void onResponse(String response) {
                 // Update the cache
-                Main.buildTeamTools.getProxyManager().updateCache().thenRun(() ->
+                Main.buildTeamTools.getProxyModule().updateCache().thenRun(() ->
                         deleter.sendMessage(ChatHelper.successful("Successfully deleted the warp %s!", warp.getName()))
                 );
             }
@@ -195,7 +195,7 @@ public class BuildTeam {
             @Override
             public void onResponse(String response) {
                 // Update the cache
-                Main.buildTeamTools.getProxyManager().updateCache().thenRun(() ->
+                Main.buildTeamTools.getProxyModule().updateCache().thenRun(() ->
                         deleter.sendMessage(ChatHelper.successful("Successfully deleted the warp group %s!", warpGroup.getName()))
                 );
             }

@@ -26,7 +26,7 @@ public class SidewalkColorMenu extends BlockListMenu {
         // Set click event for next item
         if (canProceed())
             getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
-                Settings settings = Main.buildTeamTools.getGenerator().getRoad().getPlayerSettings().get(clickPlayer.getUniqueId());
+                Settings settings = Main.buildTeamTools.getGeneratorModule().getRoad().getPlayerSettings().get(clickPlayer.getUniqueId());
 
                 if (!(settings instanceof RoadSettings))
                     return;

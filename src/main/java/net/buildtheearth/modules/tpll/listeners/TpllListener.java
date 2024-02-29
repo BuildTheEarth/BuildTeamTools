@@ -1,10 +1,10 @@
 package net.buildtheearth.modules.tpll.listeners;
 
 import net.buildtheearth.Main;
-import net.buildtheearth.modules.network.ProxyManager;
+import net.buildtheearth.modules.network.ProxyModule;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.modules.network.model.Region;
-import net.buildtheearth.modules.tpll.TpllManager;
+import net.buildtheearth.modules.tpll.TpllModule;
 import net.buildtheearth.modules.utils.ChatHelper;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,7 +21,7 @@ import java.util.concurrent.CompletableFuture;
 public class TpllListener implements Listener {
 
     // Proxy manager to handle network-related operations
-    private final ProxyManager proxyManager = Main.getBuildTeamTools().getProxyManager();
+    private final ProxyModule proxyModule = Main.getBuildTeamTools().getProxyModule();
 
     // Latitude and longitude coordinates for teleportation
     private double lon;
@@ -40,7 +40,7 @@ public class TpllListener implements Listener {
             // If interception is required, cancel the event and perform cross teleportation
             if (shouldIntercept) {
                 event.setCancelled(true);
-                TpllManager.tpllPlayer(event.getPlayer(), new double[]{lat, lon}, targetServerName);
+                TpllModule.tpllPlayer(event.getPlayer(), new double[]{lat, lon}, targetServerName);
             }
         });
     }
@@ -81,12 +81,12 @@ public class TpllListener implements Listener {
                     String countryName = address[0];
                     Region region = Region.getByName(countryName);
 
-                    if (!proxyManager.getBuildTeam().isConnected() || !region.isConnected()) {
+                    if (!proxyModule.getBuildTeam().isConnected() || !region.isConnected()) {
                         event.getPlayer().sendMessage(ChatHelper.error("Either this server or the receiving server isn't connected to the network."));
                         return CompletableFuture.completedFuture(true);
                     }
 
-                    if (region.getBuildTeam().getID() != proxyManager.getBuildTeam().getID()) {
+                    if (region.getBuildTeam().getID() != proxyModule.getBuildTeam().getID()) {
                         targetServerName = region.getBuildTeam().getServerName();
                         return CompletableFuture.completedFuture(true);
                     }

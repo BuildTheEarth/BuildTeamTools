@@ -3,7 +3,8 @@ package net.buildtheearth.modules.stats;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.Main;
-import net.buildtheearth.modules.network.ProxyManager;
+import net.buildtheearth.modules.Module;
+import net.buildtheearth.modules.network.ProxyModule;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.json.JSONArray;
@@ -13,16 +14,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-public class StatsManager {
+public class StatsModule implements Module {
 
-    public static int RATE_LIMIT = ProxyManager.CACHE_UPLOAD_SPEED / 20;
+    public static int RATE_LIMIT = ProxyModule.CACHE_UPLOAD_SPEED / 20;
 
     private StatsServer statsServer;
     private HashMap<UUID, StatsPlayer> statsPlayerList;
 
-    public StatsManager() {
+    public StatsModule() {
         statsServer = new StatsServer();
         statsPlayerList = new HashMap<>();
+    }
+
+    @Override
+    public void onEnable() {}
+
+    @Override
+    public void onDisable() {}
+
+    @Override
+    public String getModuleName() {
+        return "Tpll";
     }
 
     public StatsServer getStatsServer() {
@@ -53,7 +65,7 @@ public class StatsManager {
      * @return true if success, false if failed
      */
     public boolean updateAndSave() {
-        List<UUID> communicators = Main.getBuildTeamTools().getProxyManager().getCommunicators();
+        List<UUID> communicators = Main.getBuildTeamTools().getProxyModule().getCommunicators();
         if (communicators.size() == 0) return false;
 
         if (!Main.instance.isEnabled()) return false;
@@ -72,7 +84,7 @@ public class StatsManager {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Stats");
         out.writeUTF(p.getUniqueId().toString());
-        out.writeUTF(Main.getBuildTeamTools().getStatsManager().getCurrentCache().toJSONString());
+        out.writeUTF(Main.getBuildTeamTools().getStatsModule().getCurrentCache().toJSONString());
 
         p.sendPluginMessage(Main.instance, "BuildTeam", out.toByteArray());
 

@@ -3,14 +3,12 @@ package net.buildtheearth.modules.navigator.menu;
 import com.alpsbte.alpslib.utils.item.ItemBuilder;
 import lombok.NonNull;
 import net.buildtheearth.Main;
-import net.buildtheearth.modules.network.ProxyManager;
+import net.buildtheearth.modules.network.ProxyModule;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Continent;
 import net.buildtheearth.modules.network.model.Region;
-import net.buildtheearth.modules.network.model.RegionType;
 import net.buildtheearth.modules.utils.*;
 import net.buildtheearth.modules.utils.menus.AbstractPaginatedMenu;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
@@ -56,8 +54,8 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
                     || region.getBuildTeam() == null
                     || region.getBuildTeam().getID() == null
                     || (
-                        Main.getBuildTeamTools().getProxyManager().getBuildTeam() != null
-                        && region.getBuildTeam().getID().equals(Main.getBuildTeamTools().getProxyManager().getBuildTeam().getID())
+                        Main.getBuildTeamTools().getProxyModule().getBuildTeam() != null
+                        && region.getBuildTeam().getID().equals(Main.getBuildTeamTools().getProxyModule().getBuildTeam().getID())
                     )
             ).collect(Collectors.toList()));
         }
@@ -128,7 +126,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
                 else if (clickedRegion.getBuildTeam().isConnected())
                     Utils.sendPlayerToServer(clickPlayer, clickedRegion.getBuildTeam().getServerName());
                 else
-                    ProxyManager.sendNotConnectedMessage(clickPlayer, clickedRegion.getBuildTeam().getIP());
+                    ProxyModule.sendNotConnectedMessage(clickPlayer, clickedRegion.getBuildTeam().getIP());
             });
             slot++;
         }

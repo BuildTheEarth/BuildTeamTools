@@ -3,26 +3,28 @@ package net.buildtheearth;
 import com.alpsbte.alpslib.io.YamlFileFactory;
 import com.alpsbte.alpslib.io.config.ConfigNotImplementedException;
 import com.sk89q.worldedit.LocalSession;
-import net.buildtheearth.modules.generator.Generator;
+import lombok.Getter;
+import net.buildtheearth.modules.ModuleHandler;
+import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.commands.GeneratorCommand;
 import net.buildtheearth.modules.navigator.commands.NavigatorCommand;
 import net.buildtheearth.modules.navigator.listeners.NavigatorOpenListener;
-import net.buildtheearth.modules.network.ProxyManager;
+import net.buildtheearth.modules.network.ProxyModule;
 import net.buildtheearth.modules.network.api.NetworkAPI;
 import net.buildtheearth.modules.network.commands.BuildTeamToolsCommand;
 import net.buildtheearth.modules.network.listeners.NetworkJoinListener;
 import net.buildtheearth.modules.network.listeners.NetworkQuitListener;
 import net.buildtheearth.modules.network.model.Permissions;
-import net.buildtheearth.modules.stats.StatsManager;
+import net.buildtheearth.modules.stats.StatsModule;
 import net.buildtheearth.modules.stats.StatsPlayerType;
 import net.buildtheearth.modules.stats.StatsServerType;
 import net.buildtheearth.modules.stats.listeners.StatsListener;
-import net.buildtheearth.modules.tpll.TpllManager;
+import net.buildtheearth.modules.tpll.TpllModule;
 import net.buildtheearth.modules.tpll.listeners.TpllJoinListener;
 import net.buildtheearth.modules.tpll.listeners.TpllListener;
 import net.buildtheearth.modules.utils.io.ConfigPaths;
 import net.buildtheearth.modules.utils.io.ConfigUtil;
-import net.buildtheearth.modules.warp.WarpManager;
+import net.buildtheearth.modules.warp.WarpModule;
 import net.buildtheearth.modules.warp.commands.WarpCommand;
 import net.buildtheearth.modules.warp.listeners.WarpJoinListener;
 import net.buildtheearth.modules.kml.KmlCommand;
@@ -47,13 +49,17 @@ public class BuildTeamTools {
     private String newVersion;
 
     private long time;
-    private Generator generator;
 
-
-    private TpllManager tpllManager;
-    private WarpManager warpManager;
-    private ProxyManager proxyManager;
-    private StatsManager statsManager;
+    @Getter
+    private GeneratorModule generatorModule;
+    @Getter
+    private TpllModule tpllModule;
+    @Getter
+    private WarpModule warpManager;
+    @Getter
+    private ProxyModule proxyModule;
+    @Getter
+    private StatsModule statsModule;
 
     /**
      * Tries to start up an instance of BuildTeamTools
@@ -71,6 +77,21 @@ public class BuildTeamTools {
         ConfigUtil.getInstance().reloadFiles();
         debug = Main.instance.getConfig().getBoolean(ConfigPaths.DEBUG, false);
 
+
+        //Initialize the modules
+        generatorModule = new GeneratorModule();
+        tpllModule = new TpllModule();
+        warpManager = new WarpModule();
+        proxyModule = new ProxyModule();
+        statsModule = new StatsModule();
+
+
+        // Register Modules
+        ModuleHandler.getInstance().registerModules(generatorModule, tpllModule, warpManager, proxyModule, statsModule);
+
+        ModuleHandler.getInstance().enableAll();
+
+
         // Register an incoming & outgoing Plugin Messaging Channel
         Main.instance.getServer().getMessenger().registerOutgoingPluginChannel(Main.instance, "BungeeCord");
         Main.instance.getServer().getMessenger().registerIncomingPluginChannel(Main.instance, "BungeeCord", Main.instance);
@@ -80,13 +101,7 @@ public class BuildTeamTools {
         // Let the network API know the BT-Tools plugin is installed
         NetworkAPI.setBuildTeamToolsInstalled(true);
 
-        //Starts the generator module
-        generator = new Generator();
 
-        tpllManager = new TpllManager();
-        warpManager = new WarpManager();
-        proxyManager = new ProxyManager();
-        statsManager = new StatsManager();
 
         // Register all commands & listeners
         registerCommands();
@@ -104,8 +119,8 @@ public class BuildTeamTools {
      * Stops the instance of BuildTeamTools which is currently running
      */
     public void stop() {
-        if(statsManager != null)
-            statsManager.updateAndSave();
+        if(statsModule != null)
+            statsModule.updateAndSave();
     }
 
     /**
@@ -122,17 +137,17 @@ public class BuildTeamTools {
             }
 
             // Every 10 minutes (+1 second)
-            if (time % (ProxyManager.CACHE_UPLOAD_SPEED) == 0) {
-                statsManager.updateAndSave();
+            if (time % (ProxyModule.CACHE_UPLOAD_SPEED) == 0) {
+                statsModule.updateAndSave();
             }
 
             // Every minute
             if (time % (20 * 60) == 0) {
-                statsManager.getStatsServer().addValue(StatsServerType.UPTIME, 1);
+                statsModule.getStatsServer().addValue(StatsServerType.UPTIME, 1);
 
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    statsManager.getStatsServer().addValue(StatsServerType.PLAYTIME, 1);
-                    statsManager.getStatsPlayer(p.getUniqueId()).addValue(StatsPlayerType.PLAYTIME, 1);
+                    statsModule.getStatsServer().addValue(StatsServerType.PLAYTIME, 1);
+                    statsModule.getStatsPlayer(p.getUniqueId()).addValue(StatsPlayerType.PLAYTIME, 1);
                 }
             }
 
@@ -151,7 +166,7 @@ public class BuildTeamTools {
                 // Do something
             }
 
-            generator.tick();
+            generatorModule.tick();
         }, 0, 0);
     }
 
@@ -182,7 +197,7 @@ public class BuildTeamTools {
 
         Bukkit.getPluginManager().registerEvents(new WarpJoinListener(), Main.instance);
 
-        Bukkit.getPluginManager().registerEvents(new NavigatorOpenListener(proxyManager), Main.instance);
+        Bukkit.getPluginManager().registerEvents(new NavigatorOpenListener(proxyModule), Main.instance);
 
         Bukkit.getPluginManager().registerEvents(new NetworkJoinListener(), Main.instance);
         Bukkit.getPluginManager().registerEvents(new NetworkQuitListener(), Main.instance);
@@ -223,9 +238,6 @@ public class BuildTeamTools {
     }
     // Getters & Setters
 
-    public Generator getGenerator() {
-        return generator;
-    }
 
     public boolean isDebug() {
         return debug;
@@ -235,19 +247,4 @@ public class BuildTeamTools {
         this.debug = debug;
     }
 
-    public TpllManager getTpllManager() {
-        return tpllManager;
-    }
-
-    public WarpManager getWarpManager() {
-        return warpManager;
-    }
-
-    public ProxyManager getProxyManager() {
-        return proxyManager;
-    }
-
-    public StatsManager getStatsManager() {
-        return statsManager;
-    }
 }

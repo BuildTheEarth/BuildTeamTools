@@ -3,7 +3,7 @@ package net.buildtheearth.modules.generator.modules.rail;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import net.buildtheearth.Main;
-import net.buildtheearth.modules.generator.Generator;
+import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.model.Command;
 import net.buildtheearth.modules.generator.model.GeneratorType;
 import net.buildtheearth.modules.generator.model.History;
@@ -30,17 +30,17 @@ public class RailScripts {
 
         // Get the points of the region
         List<Vector> points = new ArrayList<>(region.getVertices());
-        points = Generator.populatePoints(points, 5);
+        points = GeneratorModule.populatePoints(points, 5);
 
         // ----------- PREPARATION 01 ----------
         // Replace all unnecessary blocks with air
 
         List<Vector> polyRegionLine = new ArrayList<>(points);
-        polyRegionLine = Generator.extendPolyLine(polyRegionLine);
-        List<Vector> polyRegionPoints = Generator.shiftPoints(polyRegionLine, railWidth + 2, true);
+        polyRegionLine = GeneratorModule.extendPolyLine(polyRegionLine);
+        List<Vector> polyRegionPoints = GeneratorModule.shiftPoints(polyRegionLine, railWidth + 2, true);
 
         // Create a region from the points
-        Generator.createPolySelection(p, polyRegionPoints, null);
+        GeneratorModule.createPolySelection(p, polyRegionPoints, null);
 
         p.chat("//expand 30 up");
         p.chat("//expand 10 down");
@@ -58,15 +58,15 @@ public class RailScripts {
         p.chat("//gmask");
 
 
-        Block[][][] regionBlocks = Generator.analyzeRegion(p, p.getWorld());
-        points = Generator.adjustHeight(points, regionBlocks);
+        Block[][][] regionBlocks = GeneratorModule.analyzeRegion(p, p.getWorld());
+        points = GeneratorModule.adjustHeight(points, regionBlocks);
 
 
         // ----------- RAILWAY ----------
 
         // Draw the railway curve
 
-        Generator.createConvexSelection(commands, points);
+        GeneratorModule.createConvexSelection(commands, points);
         commands.add("//gmask !solid");
         commands.add("//curve 42");
         operations++;
@@ -74,7 +74,7 @@ public class RailScripts {
 
 
         // Create the railway
-        Generator.createPolySelection(commands, polyRegionPoints);
+        GeneratorModule.createPolySelection(commands, polyRegionPoints);
 
         commands.add("//replace \"0 !>42 =queryRel(0,-1,-1,42,-1)||queryRel(0,-1,1,42,-1)\" 145:1");
         operations++;
@@ -91,9 +91,9 @@ public class RailScripts {
         operations++;
 
         commands.add("//gmask");
-        Generator.createConvexSelection(commands, points);
+        GeneratorModule.createConvexSelection(commands, points);
 
-        Main.buildTeamTools.getGenerator().getCommands().add(new Command(p, rail, commands, operations, regionBlocks));
-        Generator.getPlayerHistory(p).addHistoryEntry(new History.HistoryEntry(GeneratorType.RAILWAY, operations));
+        Main.buildTeamTools.getGeneratorModule().getCommands().add(new Command(p, rail, commands, operations, regionBlocks));
+        GeneratorModule.getPlayerHistory(p).addHistoryEntry(new History.HistoryEntry(GeneratorType.RAILWAY, operations));
     }
 }

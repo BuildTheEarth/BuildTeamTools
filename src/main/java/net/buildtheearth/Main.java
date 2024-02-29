@@ -2,11 +2,11 @@ package net.buildtheearth;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
-import net.buildtheearth.modules.tpll.TpllManager;
+import net.buildtheearth.modules.tpll.TpllModule;
 import net.buildtheearth.modules.updater.UpdateChecker;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.io.ConfigUtil;
-import net.buildtheearth.modules.warp.WarpManager;
+import net.buildtheearth.modules.warp.WarpModule;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -75,7 +75,7 @@ public class Main extends JavaPlugin implements PluginMessageListener {
         if (channel.equals("BuildTeam")) {
 
             // If the player is not on the list of people communicating with the network, add his uuid to that list
-            List<UUID> communicators = Main.getBuildTeamTools().getProxyManager().getCommunicators();
+            List<UUID> communicators = Main.getBuildTeamTools().getProxyModule().getCommunicators();
             if (!communicators.contains(player.getUniqueId())) {
                 communicators.add(player.getUniqueId());
             }
@@ -94,18 +94,18 @@ public class Main extends JavaPlugin implements PluginMessageListener {
             if (subChannel.equalsIgnoreCase("Stats")) {
                 String status = in.readUTF();
                 if (status.equals("OK")) {
-                    buildTeamTools.getStatsManager().resetCache();
+                    buildTeamTools.getStatsModule().resetCache();
                 }
             }
 
             // Add a new universal tpll target to the queue
             if (subChannel.equals("Tpll")) {
-                TpllManager.addTpllToQueue(in, player);
+                TpllModule.addTpllToQueue(in, player);
             }
 
             // Add a new universal warp target to the queue
             if (subChannel.equals("UniversalWarps")) {
-                WarpManager.addWarpToQueue(in, player);
+                WarpModule.addWarpToQueue(in, player);
             }
         }
     }

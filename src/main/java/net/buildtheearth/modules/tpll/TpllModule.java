@@ -4,6 +4,7 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.Main;
+import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.GeometricUtils;
 import org.bukkit.Location;
@@ -15,7 +16,20 @@ import java.util.UUID;
 /**
  * Manages all things related to universal tpll
  */
-public class TpllManager {
+public class TpllModule implements Module {
+
+
+
+    @Override
+    public void onEnable() {}
+
+    @Override
+    public void onDisable() {}
+
+    @Override
+    public String getModuleName() {
+        return "Tpll";
+    }
 
     /**
      * Stores a List of the tpll operations that need to happen on join
@@ -33,7 +47,7 @@ public class TpllManager {
         //Check the target server
         String targetServerName = in.readUTF();
         ChatHelper.logDebug("The name of the target server is: %s", targetServerName);
-        if (targetServerName.equals(Main.buildTeamTools.getProxyManager().getBuildTeam().getServerName())) {
+        if (targetServerName.equals(Main.buildTeamTools.getProxyModule().getBuildTeam().getServerName())) {
             ChatHelper.logDebug("The target server equals the current server");
             //Extracts the coordinates from the plugin message
             double targetLatitude = Double.parseDouble(in.readUTF());
@@ -89,7 +103,7 @@ public class TpllManager {
         player.sendPluginMessage(Main.instance, "BuildTeam", out.toByteArray());
 
         // Switch the player to the target server
-        Main.getBuildTeamTools().getProxyManager().switchServer(player, targetServerName);
+        Main.getBuildTeamTools().getProxyModule().switchServer(player, targetServerName);
         ChatHelper.logDebug("Teleported player to the target server.");
     }
 }

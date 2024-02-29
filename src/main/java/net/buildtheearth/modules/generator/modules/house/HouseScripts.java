@@ -5,7 +5,7 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
-import net.buildtheearth.modules.generator.Generator;
+import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.model.GeneratorType;
 import net.buildtheearth.modules.generator.model.History;
 import net.buildtheearth.modules.utils.MenuItems;
@@ -76,10 +76,10 @@ public class HouseScripts {
         p.chat("//replace 0");
         operations++;
 
-        Block[][][] blocks = Generator.analyzeRegion(p, p.getWorld());
+        Block[][][] blocks = GeneratorModule.analyzeRegion(p, p.getWorld());
 
-        int highestBlock = Generator.getMaxHeight(blocks, Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL);
-        boolean containsRedWool = Generator.containsBlock(blocks, Material.WOOL, (byte) 14);
+        int highestBlock = GeneratorModule.getMaxHeight(blocks, Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL);
+        boolean containsRedWool = GeneratorModule.containsBlock(blocks, Material.WOOL, (byte) 14);
 
 
         // ----------- PREPARATION 02 ----------
@@ -741,7 +741,7 @@ public class HouseScripts {
         for (int i = 1; i < selectionPoints.size(); i++)
             p.chat("//pos2 " + selectionPoints.get(i).getBlockX() + "," + minY + "," + selectionPoints.get(i).getBlockZ());
 
-        Generator.getPlayerHistory(p).addHistoryEntry(new History.HistoryEntry(GeneratorType.HOUSE, operations));
+        GeneratorModule.getPlayerHistory(p).addHistoryEntry(new History.HistoryEntry(GeneratorType.HOUSE, operations));
     }
 
     // Move blue, green and red wool one block up

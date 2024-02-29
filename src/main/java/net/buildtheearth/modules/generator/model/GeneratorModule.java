@@ -2,7 +2,6 @@ package net.buildtheearth.modules.generator.model;
 
 import lombok.Getter;
 import net.buildtheearth.BuildTeamTools;
-import net.buildtheearth.modules.generator.Generator;
 import net.buildtheearth.modules.generator.modules.house.HouseSettings;
 import net.buildtheearth.modules.generator.modules.rail.RailSettings;
 import net.buildtheearth.modules.generator.modules.road.RoadFlag;
@@ -158,8 +157,8 @@ public abstract class GeneratorModule {
      * ROOF_TYPE:  456:78
      */
     protected void convertArgsToSettings(Player p, String[] args, GeneratorType generatorType) {
-        for (String flag : Generator.convertArgsToFlags(args)) {
-            String[] flagAndValue = Generator.convertToFlagAndValue(flag, p);
+        for (String flag : net.buildtheearth.modules.generator.GeneratorModule.convertArgsToFlags(args)) {
+            String[] flagAndValue = net.buildtheearth.modules.generator.GeneratorModule.convertToFlagAndValue(flag, p);
             String flagName = flagAndValue[0];
             String flagValue = flagAndValue[1];
 

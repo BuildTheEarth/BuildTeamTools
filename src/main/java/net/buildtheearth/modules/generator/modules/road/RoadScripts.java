@@ -4,7 +4,7 @@ package net.buildtheearth.modules.generator.modules.road;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import net.buildtheearth.Main;
-import net.buildtheearth.modules.generator.Generator;
+import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.model.Command;
 import net.buildtheearth.modules.generator.model.GeneratorType;
 import net.buildtheearth.modules.generator.model.History;
@@ -50,25 +50,25 @@ public class RoadScripts {
 
         // Get the points of the region
         List<Vector> points = new ArrayList<>(region.getVertices());
-        points = Generator.populatePoints(points, laneWidth);
+        points = GeneratorModule.populatePoints(points, laneWidth);
 
         List<Vector> oneMeterPoints = new ArrayList<>(points);
-        oneMeterPoints = Generator.populatePoints(oneMeterPoints, 1);
+        oneMeterPoints = GeneratorModule.populatePoints(oneMeterPoints, 1);
 
         List<Vector> roadMarkingPoints = new ArrayList<>(oneMeterPoints);
-        roadMarkingPoints = Generator.reducePoints(roadMarkingPoints, markingGap + 1, markingLength - 1);
+        roadMarkingPoints = GeneratorModule.reducePoints(roadMarkingPoints, markingGap + 1, markingLength - 1);
 
 
         // ----------- PREPARATION 01 ----------
         // Replace all unnecessary blocks with air
 
         List<Vector> polyRegionLine = new ArrayList<>(points);
-        polyRegionLine = Generator.extendPolyLine(polyRegionLine);
-        List<Vector> polyRegionPoints = Generator.shiftPoints(polyRegionLine, max_width + 2, true);
-        List<Vector> polyRegionPointsExact = Generator.shiftPoints(polyRegionLine, max_width, true);
+        polyRegionLine = GeneratorModule.extendPolyLine(polyRegionLine);
+        List<Vector> polyRegionPoints = GeneratorModule.shiftPoints(polyRegionLine, max_width + 2, true);
+        List<Vector> polyRegionPointsExact = GeneratorModule.shiftPoints(polyRegionLine, max_width, true);
 
         // Create a region from the points
-        Generator.createPolySelection(p, polyRegionPoints, null);
+        GeneratorModule.createPolySelection(p, polyRegionPoints, null);
 
         p.chat("//expand 30 up");
         p.chat("//expand 10 down");
@@ -86,34 +86,34 @@ public class RoadScripts {
         p.chat("//gmask");
 
 
-        Block[][][] regionBlocks = Generator.analyzeRegion(p, p.getWorld());
-        points = Generator.adjustHeight(points, regionBlocks);
+        Block[][][] regionBlocks = GeneratorModule.analyzeRegion(p, p.getWorld());
+        points = GeneratorModule.adjustHeight(points, regionBlocks);
 
         List<Vector> innerPoints = new ArrayList<>(points);
-        innerPoints = Generator.shortenPolyLine(innerPoints, 2);
+        innerPoints = GeneratorModule.shortenPolyLine(innerPoints, 2);
 
 
         // ----------- ROAD ----------
 
         // Draw the road
 
-        Generator.createConvexSelection(commands, points);
+        GeneratorModule.createConvexSelection(commands, points);
         commands.add("//gmask !solid," + roadMaterial + "," + markingMaterial + "," + sidewalkMaterial + "," + sidewalkSlabMaterial + "," + roadSlabMaterial);
         commands.add("//curve 35:4");
 
         // Add additional yellow wool markings to spread the road material faster and everywhere on the road.
         for (int i = 2; i < laneCount; i += 2) {
-            List<List<Vector>> yellowWoolLine = Generator.shiftPointsAll(innerPoints, (laneWidth * (i - 1)));
+            List<List<Vector>> yellowWoolLine = GeneratorModule.shiftPointsAll(innerPoints, (laneWidth * (i - 1)));
 
             for (List<Vector> path : yellowWoolLine) {
-                Generator.createConvexSelection(commands, path);
+                GeneratorModule.createConvexSelection(commands, path);
                 commands.add("//curve 35:4");
                 operations++;
 
                 // Close the circles (curves are not able to end at the beginning)
                 commands.add("//sel cuboid");
-                commands.add("//pos1 " + Generator.getXYZ(path.get(0)));
-                commands.add("//pos2 " + Generator.getXYZ(path.get(path.size() - 1)));
+                commands.add("//pos1 " + GeneratorModule.getXYZ(path.get(0)));
+                commands.add("//pos2 " + GeneratorModule.getXYZ(path.get(path.size() - 1)));
                 commands.add("//line 35:4");
                 operations++;
             }
@@ -121,9 +121,9 @@ public class RoadScripts {
 
         // Draw another yellow line close to the sidewalk to spread the yellow wool faster and everywhere on the road.
         if (road_width > 10) {
-            List<List<Vector>> yellowWoolLineNearSidewalk = Generator.shiftPointsAll(innerPoints, road_width - 4);
+            List<List<Vector>> yellowWoolLineNearSidewalk = GeneratorModule.shiftPointsAll(innerPoints, road_width - 4);
             for (List<Vector> path : yellowWoolLineNearSidewalk)
-                operations += Generator.createPolyLine(commands, path, "35:4", true, regionBlocks);
+                operations += GeneratorModule.createPolyLine(commands, path, "35:4", true, regionBlocks);
         }
 
         commands.add("//gmask");
@@ -133,39 +133,39 @@ public class RoadScripts {
         // Draw the sidewalk
         if (isSidewalk) {
             // The outer sidewalk edge lines
-            List<List<Vector>> sidewalkPointsOut = Generator.shiftPointsAll(points, road_width + sidewalkWidth * 2);
-            List<List<Vector>> sidewalkPointsMid = Generator.shiftPointsAll(innerPoints, road_width + sidewalkWidth);
-            List<List<Vector>> sidewalkPointsIn = Generator.shiftPointsAll(points, road_width);
+            List<List<Vector>> sidewalkPointsOut = GeneratorModule.shiftPointsAll(points, road_width + sidewalkWidth * 2);
+            List<List<Vector>> sidewalkPointsMid = GeneratorModule.shiftPointsAll(innerPoints, road_width + sidewalkWidth);
+            List<List<Vector>> sidewalkPointsIn = GeneratorModule.shiftPointsAll(points, road_width);
 
 
             // Draw the sidewalk middle lines
             commands.add("//gmask !solid," + roadMaterial + "," + markingMaterial);
             for (List<Vector> path : sidewalkPointsMid)
-                operations += Generator.createPolyLine(commands, path, "35:1", true, regionBlocks);
+                operations += GeneratorModule.createPolyLine(commands, path, "35:1", true, regionBlocks);
 
             commands.add("//gmask !" + roadMaterial + "," + markingMaterial);
             // Create the outer sidewalk edge lines
             for (List<Vector> path : sidewalkPointsOut)
-                operations += Generator.createPolyLine(commands, path, "35:3", true, regionBlocks);
+                operations += GeneratorModule.createPolyLine(commands, path, "35:3", true, regionBlocks);
 
             // Create the inner sidewalk edge lines
             for (List<Vector> path : sidewalkPointsIn)
-                operations += Generator.createPolyLine(commands, path, "35:3", true, regionBlocks);
+                operations += GeneratorModule.createPolyLine(commands, path, "35:3", true, regionBlocks);
             commands.add("//gmask");
 
             if (crosswalk) {
                 // Draw the sidewalk middle lines
                 commands.add("//gmask " + roadMaterial + "," + markingMaterial);
                 for (List<Vector> path : sidewalkPointsMid)
-                    operations += Generator.createPolyLine(commands, path, "35:2", true, regionBlocks);
+                    operations += GeneratorModule.createPolyLine(commands, path, "35:2", true, regionBlocks);
 
                 // Create the outer sidewalk edge lines
                 for (List<Vector> path : sidewalkPointsOut)
-                    operations += Generator.createPolyLine(commands, path, "35:11", true, regionBlocks);
+                    operations += GeneratorModule.createPolyLine(commands, path, "35:11", true, regionBlocks);
 
                 // Create the inner sidewalk edge lines
                 for (List<Vector> path : sidewalkPointsIn)
-                    operations += Generator.createPolyLine(commands, path, "35:11", true, regionBlocks);
+                    operations += GeneratorModule.createPolyLine(commands, path, "35:11", true, regionBlocks);
                 commands.add("//gmask");
             }
         }
@@ -175,7 +175,7 @@ public class RoadScripts {
         // Replace the existing road material with wool
 
         // Create the poly selection
-        Generator.createPolySelection(commands, polyRegionPointsExact);
+        GeneratorModule.createPolySelection(commands, polyRegionPointsExact);
         commands.add("//expand 10 up");
         commands.add("//expand 10 down");
         commands.add("//gmask !air");
@@ -202,7 +202,7 @@ public class RoadScripts {
         // ----------- FILLINGS ----------
         // Fill the road with the materials
 
-        Generator.createPolySelection(commands, polyRegionPoints);
+        GeneratorModule.createPolySelection(commands, polyRegionPoints);
         commands.add("//expand 10 up");
         commands.add("//expand 10 down");
         commands.add("//gmask !air,35:3,35:11");
@@ -346,14 +346,14 @@ public class RoadScripts {
                 for (int i = 0; i < (laneCount - 1) / 2; i++) {
                     int distance = (i + 1) * laneWidth * 2 - (!isEven ? laneWidth : 0);
 
-                    List<List<Vector>> roadMarkingPointsList = Generator.shiftPointsAll(points, distance);
+                    List<List<Vector>> roadMarkingPointsList = GeneratorModule.shiftPointsAll(points, distance);
                     for (List<Vector> path : roadMarkingPointsList) {
 
                         List<Vector> markingsOneMeterPoints = new ArrayList<>(path);
-                        markingsOneMeterPoints = Generator.populatePoints(markingsOneMeterPoints, 1);
+                        markingsOneMeterPoints = GeneratorModule.populatePoints(markingsOneMeterPoints, 1);
 
                         List<Vector> shiftedRoadMarkingPoints = new ArrayList<>(markingsOneMeterPoints);
-                        shiftedRoadMarkingPoints = Generator.reducePoints(shiftedRoadMarkingPoints, markingGap + 1, markingLength - 1);
+                        shiftedRoadMarkingPoints = GeneratorModule.reducePoints(shiftedRoadMarkingPoints, markingGap + 1, markingLength - 1);
 
                         operations += createRoadMarkingLine(commands, shiftedRoadMarkingPoints, markingMaterial, regionBlocks);
                     }
@@ -365,7 +365,7 @@ public class RoadScripts {
 
         // ----------- MATERIAL ----------
         // Replace all light blue wool with the sidwalk material
-        Generator.createPolySelection(commands, polyRegionPoints);
+        GeneratorModule.createPolySelection(commands, polyRegionPoints);
         commands.add("//replace 35:3 " + sidewalkMaterial);
         operations++;
 
@@ -378,10 +378,10 @@ public class RoadScripts {
         operations++;
 
         commands.add("//gmask");
-        Generator.createConvexSelection(commands, points);
+        GeneratorModule.createConvexSelection(commands, points);
 
-        Main.buildTeamTools.getGenerator().getCommands().add(new Command(p, road, commands, operations, regionBlocks));
-        Generator.getPlayerHistory(p).addHistoryEntry(new History.HistoryEntry(GeneratorType.ROAD, operations));
+        Main.buildTeamTools.getGeneratorModule().getCommands().add(new Command(p, road, commands, operations, regionBlocks));
+        GeneratorModule.getPlayerHistory(p).addHistoryEntry(new History.HistoryEntry(GeneratorType.ROAD, operations));
     }
 
 
@@ -391,7 +391,7 @@ public class RoadScripts {
 
         List<String> positions = new ArrayList<>();
         for (int i = 0; i < points.size(); i++)
-            positions.add(Generator.getXYZ(points.get(i), blocks));
+            positions.add(GeneratorModule.getXYZ(points.get(i), blocks));
 
         for (int i = 0; i < points.size(); i++) {
             if (i % 2 == 0)

@@ -37,7 +37,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
 
     @Override
     protected void setPreviewItems() {
-        House house = Main.getBuildTeamTools().getGenerator().getHouse();
+        House house = Main.getBuildTeamTools().getGeneratorModule().getHouse();
         UUID uuid = getMenuPlayer().getUniqueId();
 
         this.floorCount = Integer.parseInt(house.getPlayerSettings().get(uuid).getValues().get(HouseFlag.FLOOR_COUNT));
@@ -79,7 +79,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
 
-            Main.getBuildTeamTools().getGenerator().getHouse().generate(clickPlayer);
+            Main.getBuildTeamTools().getGeneratorModule().getHouse().generate(clickPlayer);
         });
     }
 
@@ -96,7 +96,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
     }
 
     protected void setSliderClickEvents(HouseFlag houseFlag, int slot, int minValue, int maxValue) {
-        House house = Main.getBuildTeamTools().getGenerator().getHouse();
+        House house = Main.getBuildTeamTools().getGeneratorModule().getHouse();
 
         // Set click event for previous page item
         getMenu().getSlot(slot - 1).setClickHandler((clickPlayer, clickInformation) -> {

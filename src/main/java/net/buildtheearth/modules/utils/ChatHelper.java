@@ -20,9 +20,9 @@ public class ChatHelper {
         Bukkit.getLogger().log(Level.INFO, ChatHelper.error(errorMessage, objects));
     }
 
-    public static void logDebug(String errorMessage, Object... objects) {
+    public static void logDebug(String string, Object... objects) {
         if(DEBUG)
-            Bukkit.getLogger().log(Level.INFO, console(errorMessage, objects));
+            Bukkit.getLogger().log(Level.INFO, console(string, objects));
     }
 
     public static String console(String string, Object... objects) {

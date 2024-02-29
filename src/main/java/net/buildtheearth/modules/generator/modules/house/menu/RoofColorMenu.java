@@ -33,7 +33,7 @@ public class RoofColorMenu extends BlockListMenu {
      * @return the roof blocks
      */
     private static List<ItemStack> getRoofBlocks(Player player) {
-        RoofType roofType = RoofType.byString(Main.buildTeamTools.getGenerator().getHouse().getPlayerSettings().get(player.getUniqueId()).getValues().get(HouseFlag.ROOF_TYPE));
+        RoofType roofType = RoofType.byString(Main.buildTeamTools.getGeneratorModule().getHouse().getPlayerSettings().get(player.getUniqueId()).getValues().get(HouseFlag.ROOF_TYPE));
 
         if (roofType == null)
             return new ArrayList<>();
@@ -68,7 +68,7 @@ public class RoofColorMenu extends BlockListMenu {
         // Set click event for next item
         if (canProceed())
             getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
-                Settings settings = Main.buildTeamTools.getGenerator().getHouse().getPlayerSettings().get(clickPlayer.getUniqueId());
+                Settings settings = Main.buildTeamTools.getGeneratorModule().getHouse().getPlayerSettings().get(clickPlayer.getUniqueId());
 
                 if (!(settings instanceof HouseSettings))
                     return;

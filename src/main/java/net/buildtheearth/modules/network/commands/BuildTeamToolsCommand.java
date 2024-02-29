@@ -31,7 +31,7 @@ public class BuildTeamToolsCommand implements CommandExecutor {
             ChatHelper.sendMessageBox(sender, "Build Team Communicators", new Runnable() {
                 @Override
                 public void run() {
-                    for (UUID uuid : Main.getBuildTeamTools().getProxyManager().getCommunicators())
+                    for (UUID uuid : Main.getBuildTeamTools().getProxyModule().getCommunicators())
                         sender.sendMessage("§7- §e" + uuid.toString());
                 }
             });
@@ -42,15 +42,15 @@ public class BuildTeamToolsCommand implements CommandExecutor {
             ChatHelper.sendMessageBox(sender, "Build Team Cache", new Runnable() {
                 @Override
                 public void run() {
-                    sender.sendMessage(Main.buildTeamTools.getStatsManager().getCurrentCache().toJSONString());
+                    sender.sendMessage(Main.buildTeamTools.getStatsModule().getCurrentCache().toJSONString());
                 }
             });
             return true;
         }
 
         if (args.length > 0 && args[0].equalsIgnoreCase("updateCache")) {
-            Main.buildTeamTools.getStatsManager().updateAndSave();
-            Main.buildTeamTools.getProxyManager().updateCache();
+            Main.buildTeamTools.getStatsModule().updateAndSave();
+            Main.buildTeamTools.getProxyModule().updateCache();
             sender.sendMessage("§7Cache successfully updated.");
             return true;
         }
@@ -80,15 +80,15 @@ public class BuildTeamToolsCommand implements CommandExecutor {
         ChatHelper.sendMessageBox(sender, "Build Team Tools", () -> {
 
             String buildTeamID = "-";
-            if (Main.getBuildTeamTools().getProxyManager().getBuildTeam().getID() != null) //TODO CAUSES NULLPTR
-                buildTeamID = Main.getBuildTeamTools().getProxyManager().getBuildTeam().getID();
+            if (Main.getBuildTeamTools().getProxyModule().getBuildTeam().getID() != null) //TODO CAUSES NULLPTR
+                buildTeamID = Main.getBuildTeamTools().getProxyModule().getBuildTeam().getID();
 
             String serverName = "-";
-            if (Main.getBuildTeamTools().getProxyManager().getBuildTeam().getServerName() != null)
-                serverName = Main.getBuildTeamTools().getProxyManager().getBuildTeam().getServerName();
+            if (Main.getBuildTeamTools().getProxyModule().getBuildTeam().getServerName() != null)
+                serverName = Main.getBuildTeamTools().getProxyModule().getBuildTeam().getServerName();
 
             String status = "§c§lDISCONNECTED";
-            if (Main.getBuildTeamTools().getProxyManager().getBuildTeam().isConnected() && !buildTeamID.equals("-") && !serverName.equals("-"))
+            if (Main.getBuildTeamTools().getProxyModule().getBuildTeam().isConnected() && !buildTeamID.equals("-") && !serverName.equals("-"))
                 status = "§a§lCONNECTED";
             else if (!buildTeamID.equals("-") && !serverName.equals("-"))
                 status = "§6§lSTANDBY";
@@ -104,10 +104,10 @@ public class BuildTeamToolsCommand implements CommandExecutor {
                 sender.sendMessage("§eDebug Mode: §a§lON");
 
             sender.sendMessage("");
-            sender.sendMessage("§eContinent: §7" + Main.getBuildTeamTools().getProxyManager().getBuildTeam().getContinent().getLabel());
+            sender.sendMessage("§eContinent: §7" + Main.getBuildTeamTools().getProxyModule().getBuildTeam().getContinent().getLabel());
             sender.sendMessage("§eRegions: §7");
 
-            for(Region region : Main.getBuildTeamTools().getProxyManager().getBuildTeam().getRegions()) {
+            for(Region region : Main.getBuildTeamTools().getProxyModule().getBuildTeam().getRegions()) {
                 sender.sendMessage("§7" + region.getName());
             }
 

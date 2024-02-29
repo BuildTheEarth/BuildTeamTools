@@ -70,8 +70,8 @@ public class Utils {
     }
 
     public static void sendPlayerToServer(Player player, String server) {
-        if(Main.getBuildTeamTools().getProxyManager().getBuildTeam() == null
-        || !Main.getBuildTeamTools().getProxyManager().getBuildTeam().isConnected())
+        if(Main.getBuildTeamTools().getProxyModule().getBuildTeam() == null
+        || !Main.getBuildTeamTools().getProxyModule().getBuildTeam().isConnected())
             return;
 
         ByteArrayDataOutput out = ByteStreams.newDataOutput();

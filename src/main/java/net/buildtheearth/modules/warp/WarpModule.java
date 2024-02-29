@@ -4,6 +4,7 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.Main;
+import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.network.api.NetworkAPI;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.modules.network.model.BuildTeam;
@@ -23,7 +24,19 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public class WarpManager {
+public class WarpModule implements Module {
+
+
+    @Override
+    public void onEnable() {}
+
+    @Override
+    public void onDisable() {}
+
+    @Override
+    public String getModuleName() {
+        return "Warps";
+    }
 
     /**
      * Stores a List of the warp operations that need to happen on join
@@ -39,7 +52,7 @@ public class WarpManager {
     public static void addWarpToQueue(ByteArrayDataInput in, Player player) {
         //Check the target server
         String targetServer = in.readUTF();
-        if (targetServer.equals(Main.getBuildTeamTools().getProxyManager().getBuildTeam().getServerName())) {
+        if (targetServer.equals(Main.getBuildTeamTools().getProxyModule().getBuildTeam().getServerName())) {
             //Extracts the warp key from the plugin message
             String warpKey = in.readUTF();
 
@@ -88,7 +101,7 @@ public class WarpManager {
      */
     public static void warpPlayer(Player player, Warp warp) {
         // If the warp is in the same team, just teleport the player
-        if(warp.getWarpGroup().getBuildTeam().getID().equals(Main.getBuildTeamTools().getProxyManager().getBuildTeam().getID())) {
+        if(warp.getWarpGroup().getBuildTeam().getID().equals(Main.getBuildTeamTools().getProxyModule().getBuildTeam().getID())) {
             Location loc = GeometricUtils.getLocationFromCoordinatesYawPitch(new double[]{warp.getLat(), warp.getLon()}, warp.getYaw(), warp.getPitch());
 
             if(loc.getWorld() == null) {
@@ -116,7 +129,7 @@ public class WarpManager {
         player.sendPluginMessage(Main.instance, "BuildTeam", out.toByteArray());
 
         // Switch the player to the target server
-        Main.getBuildTeamTools().getProxyManager().switchServer(player, targetServer);
+        Main.getBuildTeamTools().getProxyModule().switchServer(player, targetServer);
     }
 
 
@@ -138,7 +151,7 @@ public class WarpManager {
             String countryCodeCCA2 = result[1].toUpperCase();
 
             //Check if the team owns this region/country
-            boolean ownsRegion = Main.getBuildTeamTools().getProxyManager().ownsRegion(regionName, countryCodeCCA2);
+            boolean ownsRegion = Main.getBuildTeamTools().getProxyModule().ownsRegion(regionName, countryCodeCCA2);
 
             if(!ownsRegion) {
                 creator.sendMessage(ChatHelper.error("This team does not own the country %s!", result[0]));
@@ -146,7 +159,7 @@ public class WarpManager {
             }
 
             // Get the Other Group for default warp group
-            WarpGroup group = Main.getBuildTeamTools().getProxyManager().getBuildTeam().getWarpGroups().stream().filter(warpGroup -> warpGroup.getName().equalsIgnoreCase("Other")).findFirst().orElse(null);
+            WarpGroup group = Main.getBuildTeamTools().getProxyModule().getBuildTeam().getWarpGroups().stream().filter(warpGroup -> warpGroup.getName().equalsIgnoreCase("Other")).findFirst().orElse(null);
 
             // Create a default name for the warp
             String name = creator.getName() + "'s Warp";
@@ -170,7 +183,7 @@ public class WarpManager {
         String name = creator.getName() + "'s Warp Group";
         String description = "This is a warp group.";
 
-        WarpGroup warpGroup = new WarpGroup(Main.getBuildTeamTools().getProxyManager().getBuildTeam(), name, description);
+        WarpGroup warpGroup = new WarpGroup(Main.getBuildTeamTools().getProxyModule().getBuildTeam(), name, description);
 
         new WarpGroupEditMenu(creator, warpGroup, false);
     }
@@ -181,7 +194,7 @@ public class WarpManager {
     // ------------------------- //
 
     public static Warp getWarpByName(String name){
-        return getWarpByName(Main.getBuildTeamTools().getProxyManager().getBuildTeam(), name);
+        return getWarpByName(Main.getBuildTeamTools().getProxyModule().getBuildTeam(), name);
     }
 
     public static Warp getWarpByName(BuildTeam buildTeam, String name) {

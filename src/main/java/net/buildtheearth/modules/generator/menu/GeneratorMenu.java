@@ -1,7 +1,7 @@
 package net.buildtheearth.modules.generator.menu;
 
 import net.buildtheearth.Main;
-import net.buildtheearth.modules.generator.Generator;
+import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.modules.house.House;
 import net.buildtheearth.modules.generator.modules.house.HouseSettings;
 import net.buildtheearth.modules.generator.modules.house.RoofType;
@@ -115,7 +115,7 @@ public class GeneratorMenu extends AbstractMenu {
 
             // Set navigator item
             getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
-        } else if (!Generator.checkIfTreePackIsInstalled(getMenuPlayer(), false)) {
+        } else if (!GeneratorModule.checkIfTreePackIsInstalled(getMenuPlayer(), false)) {
             // TREE ITEM
             ArrayList<String> treeLore = ListUtil.createList("", "§cThe §eTree Pack " + Tree.TREE_PACK_VERSION + " §cis not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
 
@@ -173,7 +173,7 @@ public class GeneratorMenu extends AbstractMenu {
     protected void setItemClickEventsAsync() {
         // Set click event for house item
         getMenu().getSlot(HOUSE_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            House house = Main.buildTeamTools.getGenerator().getHouse();
+            House house = Main.buildTeamTools.getGeneratorModule().getHouse();
             house.getPlayerSettings().put(clickPlayer.getUniqueId(), new HouseSettings(clickPlayer));
 
             if (!house.checkPlayer(clickPlayer))
@@ -186,7 +186,7 @@ public class GeneratorMenu extends AbstractMenu {
 
         // Set click event for road item
         getMenu().getSlot(ROAD_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            Road road = Main.buildTeamTools.getGenerator().getRoad();
+            Road road = Main.buildTeamTools.getGeneratorModule().getRoad();
             road.getPlayerSettings().put(clickPlayer.getUniqueId(), new RoadSettings(clickPlayer));
 
             if (!road.checkPlayer(clickPlayer))
@@ -199,7 +199,7 @@ public class GeneratorMenu extends AbstractMenu {
 
         // Set click event for railway item
         getMenu().getSlot(RAILWAY_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            Rail rail = Main.buildTeamTools.getGenerator().getRail();
+            Rail rail = Main.buildTeamTools.getGeneratorModule().getRail();
             rail.getPlayerSettings().put(clickPlayer.getUniqueId(), new RailSettings(clickPlayer));
 
             if (!rail.checkPlayer(clickPlayer))
@@ -208,7 +208,7 @@ public class GeneratorMenu extends AbstractMenu {
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
 
-            Main.getBuildTeamTools().getGenerator().getRail().generate(clickPlayer);
+            Main.getBuildTeamTools().getGeneratorModule().getRail().generate(clickPlayer);
         }));
     }
 

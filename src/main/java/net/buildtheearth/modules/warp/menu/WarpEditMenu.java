@@ -112,9 +112,9 @@ public class WarpEditMenu extends AbstractMenu {
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
             if(alreadyExists)
-                Main.getBuildTeamTools().getProxyManager().getBuildTeam().updateWarp(clickPlayer, warp);
+                Main.getBuildTeamTools().getProxyModule().getBuildTeam().updateWarp(clickPlayer, warp);
             else
-                Main.getBuildTeamTools().getProxyManager().getBuildTeam().createWarp(clickPlayer, warp);
+                Main.getBuildTeamTools().getProxyModule().getBuildTeam().createWarp(clickPlayer, warp);
         });
 
         // Set click event for the location item
@@ -133,7 +133,7 @@ public class WarpEditMenu extends AbstractMenu {
                 String countryCodeCCA2 = result[1].toUpperCase();
 
                 //Check if the team owns this region/country
-                boolean ownsRegion = Main.getBuildTeamTools().getProxyManager().ownsRegion(regionName, countryCodeCCA2);
+                boolean ownsRegion = Main.getBuildTeamTools().getProxyModule().ownsRegion(regionName, countryCodeCCA2);
 
                 if(!ownsRegion) {
                     clickPlayer.sendMessage(ChatHelper.error("This team does not own the country %s!", result[0]));
@@ -227,7 +227,7 @@ public class WarpEditMenu extends AbstractMenu {
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
-                Main.getBuildTeamTools().getProxyManager().getBuildTeam().deleteWarp(clickPlayer, warp);
+                Main.getBuildTeamTools().getProxyModule().getBuildTeam().deleteWarp(clickPlayer, warp);
             });
     }
 

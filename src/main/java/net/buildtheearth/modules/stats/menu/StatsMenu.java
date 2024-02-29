@@ -1,7 +1,7 @@
 package net.buildtheearth.modules.stats.menu;
 
 import net.buildtheearth.Main;
-import net.buildtheearth.modules.stats.StatsManager;
+import net.buildtheearth.modules.stats.StatsModule;
 import net.buildtheearth.modules.stats.StatsPlayer;
 import net.buildtheearth.modules.stats.StatsServer;
 import net.buildtheearth.modules.utils.Item;
@@ -87,12 +87,12 @@ public class StatsMenu extends AbstractMenu {
      * Sets up the correct lores for all items
      */
     private void setupLores() {
-        StatsManager statsManager = Main.buildTeamTools.getStatsManager();
+        StatsModule statsModule = Main.buildTeamTools.getStatsModule();
 
 
         // Set Player Head Lore
 
-        StatsPlayer statsPlayer = statsManager.getStatsPlayer(getMenuPlayer().getUniqueId());
+        StatsPlayer statsPlayer = statsModule.getStatsPlayer(getMenuPlayer().getUniqueId());
         JSONObject playerStats = statsPlayer.toJSON();
 
         ArrayList<String> playerLore = new ArrayList<>();
@@ -107,7 +107,7 @@ public class StatsMenu extends AbstractMenu {
 
         // Set Team Head Lore
 
-        StatsServer statsServer = statsManager.getStatsServer();
+        StatsServer statsServer = statsModule.getStatsServer();
         JSONObject serverStats = statsServer.toJSON();
 
         ArrayList<String> serverLore = new ArrayList<>();

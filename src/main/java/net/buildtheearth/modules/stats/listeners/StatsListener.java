@@ -19,8 +19,8 @@ public class StatsListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onJoin(PlayerJoinEvent e) {
-        Main.buildTeamTools.getStatsManager().getStatsServer().addValue(StatsServerType.JOINS, 1);
-        Main.buildTeamTools.getStatsManager().getStatsPlayer(e.getPlayer().getUniqueId()).addValue(StatsPlayerType.JOINS, 1);
+        Main.buildTeamTools.getStatsModule().getStatsServer().addValue(StatsServerType.JOINS, 1);
+        Main.buildTeamTools.getStatsModule().getStatsPlayer(e.getPlayer().getUniqueId()).addValue(StatsPlayerType.JOINS, 1);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -28,8 +28,8 @@ public class StatsListener implements Listener {
         if (e.isCancelled())
             return;
 
-        Main.buildTeamTools.getStatsManager().getStatsServer().addValue(StatsServerType.BROKEN_BLOCKS, 1);
-        Main.buildTeamTools.getStatsManager().getStatsPlayer(e.getPlayer().getUniqueId()).addValue(StatsPlayerType.BROKEN_BLOCKS, 1);
+        Main.buildTeamTools.getStatsModule().getStatsServer().addValue(StatsServerType.BROKEN_BLOCKS, 1);
+        Main.buildTeamTools.getStatsModule().getStatsPlayer(e.getPlayer().getUniqueId()).addValue(StatsPlayerType.BROKEN_BLOCKS, 1);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -37,14 +37,14 @@ public class StatsListener implements Listener {
         if (e.isCancelled())
             return;
 
-        Main.buildTeamTools.getStatsManager().getStatsServer().addValue(StatsServerType.PLACED_BLOCKS, 1);
-        Main.buildTeamTools.getStatsManager().getStatsPlayer(e.getPlayer().getUniqueId()).addValue(StatsPlayerType.PLACED_BLOCKS, 1);
+        Main.buildTeamTools.getStatsModule().getStatsServer().addValue(StatsServerType.PLACED_BLOCKS, 1);
+        Main.buildTeamTools.getStatsModule().getStatsPlayer(e.getPlayer().getUniqueId()).addValue(StatsPlayerType.PLACED_BLOCKS, 1);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onMessage(AsyncPlayerChatEvent e) {
-        Main.buildTeamTools.getStatsManager().getStatsServer().addValue(StatsServerType.MESSAGES, 1);
-        Main.buildTeamTools.getStatsManager().getStatsPlayer(e.getPlayer().getUniqueId()).addValue(StatsPlayerType.MESSAGES, 1);
+        Main.buildTeamTools.getStatsModule().getStatsServer().addValue(StatsServerType.MESSAGES, 1);
+        Main.buildTeamTools.getStatsModule().getStatsPlayer(e.getPlayer().getUniqueId()).addValue(StatsPlayerType.MESSAGES, 1);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -52,12 +52,12 @@ public class StatsListener implements Listener {
         if (e.isCancelled())
             return;
 
-        Main.buildTeamTools.getStatsManager().getStatsServer().addValue(StatsServerType.COMMANDS, 1);
-        Main.buildTeamTools.getStatsManager().getStatsPlayer(e.getPlayer().getUniqueId()).addValue(StatsPlayerType.COMMANDS, 1);
+        Main.buildTeamTools.getStatsModule().getStatsServer().addValue(StatsServerType.COMMANDS, 1);
+        Main.buildTeamTools.getStatsModule().getStatsPlayer(e.getPlayer().getUniqueId()).addValue(StatsPlayerType.COMMANDS, 1);
 
         if (e.getMessage().startsWith("//")) {
-            Main.buildTeamTools.getStatsManager().getStatsServer().addValue(StatsServerType.WORLD_EDIT_COMMANDS, 1);
-            Main.buildTeamTools.getStatsManager().getStatsPlayer(e.getPlayer().getUniqueId()).addValue(StatsPlayerType.WORLD_EDIT_COMMANDS, 1);
+            Main.buildTeamTools.getStatsModule().getStatsServer().addValue(StatsServerType.WORLD_EDIT_COMMANDS, 1);
+            Main.buildTeamTools.getStatsModule().getStatsPlayer(e.getPlayer().getUniqueId()).addValue(StatsPlayerType.WORLD_EDIT_COMMANDS, 1);
         }
     }
 }

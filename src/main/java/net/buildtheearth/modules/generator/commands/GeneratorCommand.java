@@ -1,7 +1,7 @@
 package net.buildtheearth.modules.generator.commands;
 
 import net.buildtheearth.Main;
-import net.buildtheearth.modules.generator.Generator;
+import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.menu.GeneratorMenu;
 import net.buildtheearth.modules.generator.model.History;
 import net.buildtheearth.modules.updater.DependencyManager;
@@ -38,7 +38,7 @@ public class GeneratorCommand implements CommandExecutor {
         // Check if WorldEdit is enabled
         if (!DependencyManager.isWorldEditEnabled()) {
             p.sendMessage("§cPlease install WorldEdit to use this tool.");
-            Generator.sendMoreInfo(p);
+            GeneratorModule.sendMoreInfo(p);
             p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
             return true;
         }
@@ -46,7 +46,7 @@ public class GeneratorCommand implements CommandExecutor {
 
         // Command Usage: /gen
         if (args.length == 0) {
-            if (!Generator.checkIfWorldEditIsInstalled(p))
+            if (!GeneratorModule.checkIfWorldEditIsInstalled(p))
                 return true;
 
             new GeneratorMenu(p);
@@ -56,38 +56,38 @@ public class GeneratorCommand implements CommandExecutor {
 
         // Command Usage: /gen house ...
         if (args[0].equals("house")) {
-            Main.buildTeamTools.getGenerator().getHouse().analyzeCommand(p, args);
+            Main.buildTeamTools.getGeneratorModule().getHouse().analyzeCommand(p, args);
             return true;
         }
 
         // Command Usage: /gen road ...
         if (args[0].equals("road")) {
-            Main.buildTeamTools.getGenerator().getRoad().analyzeCommand(p, args);
+            Main.buildTeamTools.getGeneratorModule().getRoad().analyzeCommand(p, args);
             return true;
         }
 
         // Command Usage: /gen rail ...
         if (args[0].equals("rail")) {
-            Main.getBuildTeamTools().getGenerator().getRail().analyzeCommand(p, args);
+            Main.getBuildTeamTools().getGeneratorModule().getRail().analyzeCommand(p, args);
             return true;
         }
 
         // Command Usage: /gen tree ...
         if (args[0].equals("tree")) {
-            Main.getBuildTeamTools().getGenerator().getTree().analyzeCommand(p, args);
+            Main.getBuildTeamTools().getGeneratorModule().getTree().analyzeCommand(p, args);
             return true;
         }
 
 
         // Command Usage: /gen history
         if (args[0].equals("history")) {
-            if (Generator.getPlayerHistory(p).getHistoryEntries().size() == 0) {
+            if (GeneratorModule.getPlayerHistory(p).getHistoryEntries().size() == 0) {
                 p.sendMessage("§cYou didn't generate any structures yet. Use /gen to create one.");
                 return true;
             }
 
             ChatHelper.sendMessageBox(sender, "Generator History for " + p.getName(), () -> {
-                for (History.HistoryEntry history : Generator.getPlayerHistory(p).getHistoryEntries()) {
+                for (History.HistoryEntry history : GeneratorModule.getPlayerHistory(p).getHistoryEntries()) {
                     long timeDifference = System.currentTimeMillis() - history.getTimeCreated();
 
                     p.sendMessage("§e- " + history.getGeneratorType().name() + " §7-§e " + Utils.toDate(p, timeDifference) + " ago §7-§e " + history.getWorldEditCommandCount() + " Commands executed");
@@ -97,13 +97,13 @@ public class GeneratorCommand implements CommandExecutor {
         }
 
         if (args[0].equals("undo")) {
-            if (Generator.getPlayerHistory(p).getHistoryEntries().size() == 0) {
+            if (GeneratorModule.getPlayerHistory(p).getHistoryEntries().size() == 0) {
                 p.sendMessage("§cYou didn't generate any structures yet. Use /gen to create one.");
                 return true;
             }
 
             p.chat("//undo 500");
-            Generator.getPlayerHistory(p).getHistoryEntries().clear();
+            GeneratorModule.getPlayerHistory(p).getHistoryEntries().clear();
             return true;
         }
 

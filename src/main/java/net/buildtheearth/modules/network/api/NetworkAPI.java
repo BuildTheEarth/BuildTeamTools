@@ -1,8 +1,7 @@
 package net.buildtheearth.modules.network.api;
 
-import com.google.gson.Gson;
 import net.buildtheearth.Main;
-import net.buildtheearth.modules.network.ProxyManager;
+import net.buildtheearth.modules.network.ProxyModule;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Continent;
 import net.buildtheearth.modules.network.model.Region;
@@ -13,6 +12,8 @@ import net.buildtheearth.modules.warp.model.Warp;
 import net.buildtheearth.modules.warp.model.WarpGroup;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -62,14 +63,14 @@ public class NetworkAPI {
                     continent.getRegions().clear();
 
                 // Clear all regions from the build teams
-                for(BuildTeam buildTeam : Main.getBuildTeamTools().getProxyManager().getBuildTeams())
+                for(BuildTeam buildTeam : Main.getBuildTeamTools().getProxyModule().getBuildTeams())
                     buildTeam.getRegions().clear();
 
                 // Clear all build teams
-                Main.getBuildTeamTools().getProxyManager().getBuildTeams().clear();
+                Main.getBuildTeamTools().getProxyModule().getBuildTeams().clear();
 
                 // Clear all regions
-                Main.getBuildTeamTools().getProxyManager().getRegions().clear();
+                Main.getBuildTeamTools().getProxyModule().getRegions().clear();
 
                 // Add all teams to the proxy manager
                 for(Object object : responseArray.toArray()) {
@@ -104,7 +105,7 @@ public class NetworkAPI {
                     String blankName = (String) teamObject.get("BlankName");
 
                     BuildTeam buildTeam = new BuildTeam(teamID, mainServerIP, name, blankName, serverName, continent, isConnected, hasBuildTeamToolsInstalled);
-                    Main.getBuildTeamTools().getProxyManager().getBuildTeams().add(buildTeam);
+                    Main.getBuildTeamTools().getProxyModule().getBuildTeams().add(buildTeam);
 
                     // Create an "other" Warp Group for warps that don't belong to a warp group
                     WarpGroup otherWarpGroup = new WarpGroup(buildTeam, "Other", "Other warps");
@@ -204,7 +205,7 @@ public class NetworkAPI {
 
                         continent.getRegions().add(region);
                         buildTeam.getRegions().add(region);
-                        Main.getBuildTeamTools().getProxyManager().getRegions().add(region);
+                        Main.getBuildTeamTools().getProxyModule().getRegions().add(region);
                     }
                 }
 
@@ -261,10 +262,10 @@ public class NetworkAPI {
                 JSONObject teamObject = API.createJSONObject(response);
 
                 String teamID = (String) teamObject.get("ID");
-                ProxyManager proxyManager = Main.getBuildTeamTools().getProxyManager();
+                ProxyModule proxyModule = Main.getBuildTeamTools().getProxyModule();
 
-                BuildTeam buildTeam = proxyManager.getBuildTeamByID(teamID);
-                proxyManager.setBuildTeam(buildTeam);
+                BuildTeam buildTeam = proxyModule.getBuildTeamByID(teamID);
+                proxyModule.setBuildTeam(buildTeam);
 
                 future.complete(null);
             }
@@ -329,6 +330,31 @@ public class NetworkAPI {
         RequestBody requestBody = RequestBody.create(requestBodyString, MediaType.parse("application/json"));
 
         API.deleteAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warpgroups", requestBody, callback);
+    }
+
+    public static void syncPlayerList() {
+        if(Main.getBuildTeamTools().getProxyModule().getBuildTeam().isConnected())
+            return;
+
+        String apiKey = Main.instance.getConfig().getString(ConfigPaths.API_KEY);
+
+        JSONArray requestBodyArray = new JSONArray();
+        for (Player player : Bukkit.getOnlinePlayers())
+            requestBodyArray.add(new String[]{player.getUniqueId().toString(), player.getName()});
+
+        RequestBody requestBody = RequestBody.create(requestBodyArray.toString(), MediaType.parse("application/json"));
+
+        API.postAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/playerlist", requestBody, new API.ApiResponseCallback() {
+            @Override
+            public void onResponse(String response) {
+                ChatHelper.logDebug("Synced the player list with the network API: %s", response);
+            }
+
+            @Override
+            public void onFailure(IOException e) {
+                ChatHelper.error("Failed to sync the player list with the network API: %s", e);
+            }
+        });
     }
 
     public static Warp getWarpByKey(String key) {

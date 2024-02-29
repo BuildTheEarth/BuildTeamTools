@@ -1,7 +1,7 @@
 package net.buildtheearth.modules.generator.model;
 
 import lombok.Getter;
-import net.buildtheearth.modules.generator.Generator;
+import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.utils.Item;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -16,7 +16,7 @@ public class Command {
     @Getter
     private final Player player;
     @Getter
-    private final GeneratorModule module;
+    private final net.buildtheearth.modules.generator.model.GeneratorModule module;
     @Getter
     private final List<String> commands;
 
@@ -31,7 +31,7 @@ public class Command {
     @Getter
     private long percentage;
 
-    public Command(Player player, GeneratorModule module, List<String> commands, int operations, Block[][][] blocks) {
+    public Command(Player player, net.buildtheearth.modules.generator.model.GeneratorModule module, List<String> commands, int operations, Block[][][] blocks) {
         this.player = player;
         this.module = module;
         this.commands = commands;
@@ -105,7 +105,7 @@ public class Command {
         int maxHeight = y;
 
         if (blocks != null)
-            maxHeight = Generator.getMaxHeight(blocks, x, z, Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL, Material.SNOW);
+            maxHeight = GeneratorModule.getMaxHeight(blocks, x, z, Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL, Material.SNOW);
         if (maxHeight == 0)
             maxHeight = y;
 

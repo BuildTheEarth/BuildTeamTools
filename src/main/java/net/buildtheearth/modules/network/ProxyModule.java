@@ -5,6 +5,7 @@ import com.google.common.io.ByteStreams;
 import lombok.Getter;
 import lombok.Setter;
 import net.buildtheearth.Main;
+import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.network.api.NetworkAPI;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Region;
@@ -18,12 +19,11 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ProxyManager {
+public class ProxyModule implements Module {
 
     public static String GLOBAL_PLOT_SYSTEM_SERVER = "NYC-1";
 
@@ -54,9 +54,20 @@ public class ProxyManager {
     @Getter
     private final List<Region> regions = new ArrayList<>();
 
-    public ProxyManager() {
+    public ProxyModule() {
         pingAllOnlinePlayers();
         updateCache();
+    }
+
+    @Override
+    public void onEnable() {}
+
+    @Override
+    public void onDisable() {}
+
+    @Override
+    public String getModuleName() {
+        return "Tpll";
     }
 
     /** Updates the cache of the proxy. */
@@ -119,7 +130,7 @@ public class ProxyManager {
 
         String notConnected = "§cThis server is not connected to the network yet and has a different Server IP:";
 
-        if(!Main.getBuildTeamTools().getProxyManager().getBuildTeam().isConnected())
+        if(!Main.getBuildTeamTools().getProxyModule().getBuildTeam().isConnected())
             notConnected = "§cThis server has a different Server IP:";
 
         player.closeInventory();
@@ -137,7 +148,7 @@ public class ProxyManager {
      */
     public static ArrayList<Region> getRegionsByRegionType(RegionType regionType){
         ArrayList<Region> regions = new ArrayList<>();
-        for(Region region : Main.getBuildTeamTools().getProxyManager().getRegions())
+        for(Region region : Main.getBuildTeamTools().getProxyModule().getRegions())
             if(region.getType().equals(regionType))
                 regions.add(region);
 

@@ -7,7 +7,7 @@ import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.ListUtil;
 import net.buildtheearth.modules.utils.MenuItems;
 import net.buildtheearth.modules.utils.menus.AbstractPaginatedMenu;
-import net.buildtheearth.modules.warp.WarpManager;
+import net.buildtheearth.modules.warp.WarpModule;
 import net.buildtheearth.modules.warp.model.WarpGroup;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -123,7 +123,7 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
 
                 // Create a click action for the "Create Warp" item if the player has permission
                 if(warpGroup.getName().equals("%create-warp-group%") && getMenuPlayer().hasPermission(Permissions.WARP_GROUP_CREATE) && _slot == warpGroups.size() - 1){
-                    WarpManager.createWarpGroup(clickPlayer);
+                    WarpModule.createWarpGroup(clickPlayer);
                     return;
                 }
 

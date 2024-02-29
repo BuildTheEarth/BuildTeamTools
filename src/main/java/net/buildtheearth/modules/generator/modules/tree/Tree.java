@@ -1,12 +1,11 @@
 package net.buildtheearth.modules.generator.modules.tree;
 
 import net.buildtheearth.Main;
-import net.buildtheearth.modules.generator.Generator;
-import net.buildtheearth.modules.generator.model.GeneratorModule;
+import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.model.GeneratorType;
 import org.bukkit.entity.Player;
 
-public class Tree extends GeneratorModule {
+public class Tree extends net.buildtheearth.modules.generator.model.GeneratorModule {
 
     public static String TREE_PACK_VERSION = "v2.0";
 
@@ -19,24 +18,24 @@ public class Tree extends GeneratorModule {
 
     @Override
     public boolean checkPlayer(Player p) {
-        if (!Generator.checkIfWorldEditIsInstalled(p))
+        if (!GeneratorModule.checkIfWorldEditIsInstalled(p))
             return false;
 
-        if (!Generator.checkIfTreePackIsInstalled(p, true))
+        if (!GeneratorModule.checkIfTreePackIsInstalled(p, true))
             return false;
 
-        if (!Generator.checkIfSchematicBrushIsInstalled(p))
+        if (!GeneratorModule.checkIfSchematicBrushIsInstalled(p))
             return false;
 
         if (getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
-            getPlayerSettings().get(p.getUniqueId()).setBlocks(Generator.analyzeRegion(p, p.getWorld()));
+            getPlayerSettings().get(p.getUniqueId()).setBlocks(GeneratorModule.analyzeRegion(p, p.getWorld()));
 
         return true;
     }
 
     @Override
     public void generate(Player p) {
-        if (!Main.getBuildTeamTools().getGenerator().getRoad().checkPlayer(p))
+        if (!Main.getBuildTeamTools().getGeneratorModule().getRoad().checkPlayer(p))
             return;
 
         TreeScripts.treescript_v_1_0(p, this);

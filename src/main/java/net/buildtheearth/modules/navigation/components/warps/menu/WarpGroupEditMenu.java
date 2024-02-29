@@ -1,6 +1,6 @@
 package net.buildtheearth.modules.navigation.components.warps.menu;
 
-import net.buildtheearth.Main;
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.ListUtil;
@@ -115,7 +115,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
                     .text("Name")
                     .itemLeft(Item.create(Material.NAME_TAG, "§6§lChange Name"))
                     .title("§8Change the warp name")
-                    .plugin(Main.instance)
+                    .plugin(BuildTeamTools.getInstance())
                     .open(clickPlayer);
         });
 

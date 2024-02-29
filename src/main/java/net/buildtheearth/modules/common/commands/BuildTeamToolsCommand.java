@@ -1,10 +1,10 @@
-package net.buildtheearth.modules.network.commands;
+package net.buildtheearth.modules.common.commands;
 
-import net.buildtheearth.Main;
+import net.buildtheearth.BuildTeamTools;
+import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.stats.StatsModule;
-import net.buildtheearth.modules.updater.UpdateChecker;
 import net.buildtheearth.modules.utils.ChatHelper;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -64,17 +64,17 @@ public class BuildTeamToolsCommand implements CommandExecutor {
             }
             boolean debug = Boolean.parseBoolean(args[1]);
 
-            Main.buildTeamTools.setDebug(debug);
+            BuildTeamTools.getInstance().setDebug(debug);
             sender.sendMessage("§7Debug Mode was set to: " + debug);
             return true;
         }
 
         if (args.length > 0 && args[0].equalsIgnoreCase("checkForUpdates")) {
-            boolean wasDebug = Main.buildTeamTools.isDebug();
+            boolean wasDebug = BuildTeamTools.getInstance().isDebug();
 
-            Main.buildTeamTools.setDebug(true);
-            String result = UpdateChecker.checkForUpdates();
-            Main.buildTeamTools.setDebug(wasDebug);
+            BuildTeamTools.getInstance().setDebug(true);
+            String result = CommonModule.getInstance().getUpdaterComponent().checkForUpdates();
+            BuildTeamTools.getInstance().setDebug(wasDebug);
             sender.sendMessage("§7Checked for updates. " + result + " Please take a look at the console for details.");
             return true;
         }
@@ -95,10 +95,10 @@ public class BuildTeamToolsCommand implements CommandExecutor {
             else if (!buildTeamID.equals("-") && !serverName.equals("-"))
                 status = "§6§lSTANDBY";
 
-            boolean debug = Main.getBuildTeamTools().isDebug();
+            boolean debug = BuildTeamTools.getInstance().isDebug();
 
             sender.sendMessage("§eStatus: " + status);
-            sender.sendMessage("§eVersion: §7" + Main.instance.getDescription().getVersion());
+            sender.sendMessage("§eVersion: §7" + BuildTeamTools.getInstance().getDescription().getVersion());
             sender.sendMessage("§eBuildTeam ID: §7" + buildTeamID);
             sender.sendMessage("§eServer Name: §7" + serverName);
 

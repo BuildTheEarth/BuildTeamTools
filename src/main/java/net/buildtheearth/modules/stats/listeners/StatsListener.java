@@ -1,9 +1,8 @@
 package net.buildtheearth.modules.stats.listeners;
 
-import net.buildtheearth.Main;
 import net.buildtheearth.modules.stats.StatsModule;
-import net.buildtheearth.modules.stats.StatsPlayerType;
-import net.buildtheearth.modules.stats.StatsServerType;
+import net.buildtheearth.modules.stats.model.StatsPlayerType;
+import net.buildtheearth.modules.stats.model.StatsServerType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;

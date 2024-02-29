@@ -1,6 +1,6 @@
 package net.buildtheearth.modules.utils.menus;
 
-import net.buildtheearth.Main;
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.utils.MenuItems;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -19,7 +19,7 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
 
         this.maxItemsPerPage = pagedRows * 9;
 
-        Bukkit.getScheduler().scheduleSyncDelayedTask(Main.instance, () -> {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(BuildTeamTools.getInstance(), () -> {
             reloadMenuAsync();
         });
     }
@@ -135,7 +135,7 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
 
         super.reloadMenuAsync();
 
-        Bukkit.getScheduler().runTaskAsynchronously(Main.instance, () -> {
+        Bukkit.getScheduler().runTaskAsynchronously(BuildTeamTools.getInstance(), () -> {
             setPaginatedMenuItemsAsync(sources);
             setPaginatedItemClickEventsAsync(sources);
         });

@@ -1,72 +1,46 @@
 package net.buildtheearth;
 
-import com.alpsbte.alpslib.io.YamlFileFactory;
-import com.alpsbte.alpslib.io.config.ConfigNotImplementedException;
+import lombok.Getter;
+import lombok.Setter;
 import net.buildtheearth.modules.ModuleHandler;
+import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.GeneratorModule;
-import net.buildtheearth.modules.generator.commands.GeneratorCommand;
-import net.buildtheearth.modules.generator.components.kml.KmlCommand;
-import net.buildtheearth.modules.generator.components.kml.KmlTabCompleter;
-import net.buildtheearth.modules.navigation.components.navigator.commands.NavigatorCommand;
-import net.buildtheearth.modules.navigation.components.navigator.listeners.NavigatorOpenListener;
-import net.buildtheearth.modules.network.NetworkModule;
-import net.buildtheearth.modules.network.commands.BuildTeamToolsCommand;
-import net.buildtheearth.modules.network.listeners.NetworkJoinListener;
-import net.buildtheearth.modules.network.listeners.NetworkQuitListener;
-import net.buildtheearth.modules.network.model.Permissions;
-import net.buildtheearth.modules.stats.StatsModule;
-import net.buildtheearth.modules.stats.StatsPlayerType;
-import net.buildtheearth.modules.stats.StatsServerType;
-import net.buildtheearth.modules.stats.listeners.StatsListener;
 import net.buildtheearth.modules.navigation.NavigationModule;
-import net.buildtheearth.modules.navigation.components.tpll.listeners.TpllJoinListener;
-import net.buildtheearth.modules.navigation.components.tpll.listeners.TpllListener;
+import net.buildtheearth.modules.network.NetworkModule;
+import net.buildtheearth.modules.stats.StatsModule;
 import net.buildtheearth.modules.utils.io.ConfigPaths;
 import net.buildtheearth.modules.utils.io.ConfigUtil;
-import net.buildtheearth.modules.navigation.components.warps.commands.WarpCommand;
-import net.buildtheearth.modules.navigation.components.warps.listeners.WarpJoinListener;
-import org.bukkit.Bukkit;
-import org.bukkit.Sound;
-import org.bukkit.entity.Player;
-import org.ipvp.canvas.MenuFunctionListener;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
 
 /**
  * The parent of all modules of the Build Team Tools plugin
  */
-public class BuildTeamTools {
+public class BuildTeamTools extends JavaPlugin {
 
     public static int SPIGOT_PROJECT_ID = 101854;
     public static String PREFIX = "§9§lBTE §8> §7";
     public static String CONSOLE_PREFIX = "[BuildTeamTools] ";
 
+    @Getter @Setter
     private boolean debug;
-    private boolean updateInstalled;
-    private String newVersion;
 
-    private long time;
-
-
-
-    /**
-     * Tries to start up an instance of BuildTeamTools
-     *
-     * @return true if successful, false if unsuccessful
-     */
-    public boolean start() {
-        // Try to load the configuration, if it throws an exception disable the plugin.
-        try {
-            YamlFileFactory.registerPlugin(Main.instance);
-            ConfigUtil.init();
-        } catch (ConfigNotImplementedException ex) {}
-
-        // Reload the configuration file
-        ConfigUtil.getInstance().reloadFiles();
-        debug = Main.instance.getConfig().getBoolean(ConfigPaths.DEBUG, false);
+    private static BuildTeamTools instance = null;
+    public static BuildTeamTools getInstance() {
+        return instance == null ? instance = new BuildTeamTools() : instance;
+    }
 
 
+
+    @Override
+    public void onEnable() {
+        debug = BuildTeamTools.getInstance().getConfig().getBoolean(ConfigPaths.DEBUG, false);
 
         // Register Modules
         ModuleHandler.getInstance().registerModules(
+                CommonModule.getInstance(),
                 GeneratorModule.getInstance(),
                 NavigationModule.getInstance(),
                 NetworkModule.getInstance(),
@@ -74,159 +48,30 @@ public class BuildTeamTools {
         );
         ModuleHandler.getInstance().enableAll();
 
-
-
-        // Register an incoming & outgoing Plugin Messaging Channel
-        Main.instance.getServer().getMessenger().registerOutgoingPluginChannel(Main.instance, "BungeeCord");
-        Main.instance.getServer().getMessenger().registerIncomingPluginChannel(Main.instance, "BungeeCord", Main.instance);
-        Main.instance.getServer().getMessenger().registerOutgoingPluginChannel(Main.instance, "BuildTeam");
-        Main.instance.getServer().getMessenger().registerIncomingPluginChannel(Main.instance, "BuildTeam", Main.instance);
-
-
-        // Register all commands & listeners
-        registerCommands();
-        registerListeners();
-
-
-        // Start the timer which executes operations every x time units
-        startTimer();
-
-        return true;
     }
 
-    /**
-     * Stops the instance of BuildTeamTools which is currently running
-     */
-    public void stop() {
-        if(StatsModule.getInstance().isEnabled())
-            StatsModule.getInstance().updateAndSave();
-    }
-
-    /**
-     * The main Timer of the plugin that runs once a second.
-     * It calls the tick() function.
-     */
-    private void startTimer() {
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.instance, () -> {
-            time++;
-
-            // Every hour
-            if (time % (20 * 60 * 60) == 0) {
-                // Do something
-            }
-
-            // Every 10 minutes (+1 second)
-            if (time % (NetworkModule.CACHE_UPLOAD_SPEED) == 0) {
-                if(StatsModule.getInstance().isEnabled())
-                    StatsModule.getInstance().updateAndSave();
-            }
-
-            // Every minute
-            if (time % (20 * 60) == 0) {
-                if(StatsModule.getInstance().isEnabled()){
-                    StatsModule.getInstance().getStatsServer().addValue(StatsServerType.UPTIME, 1);
-
-                    for (Player p : Bukkit.getOnlinePlayers()) {
-                        StatsModule.getInstance().getStatsServer().addValue(StatsServerType.PLAYTIME, 1);
-                        StatsModule.getInstance().getStatsPlayer(p.getUniqueId()).addValue(StatsPlayerType.PLAYTIME, 1);
-                    }
-                }
-            }
-
-            // Every 5 seconds
-            if (time % 100 == 0) {
-                // Do something
-            }
-
-            // Every second
-            if (time % 20 == 0) {
-                // Do something
-            }
-
-            // Every 0.25 seconds
-            if (time % 5 == 0) {
-                // Do something
-            }
-
-            GeneratorModule.getInstance().tick();
-        }, 0, 0);
+    @Override
+    public void onDisable() {
+        ModuleHandler.getInstance().disableAll();
     }
 
 
-    /**
-     * Register all commands of the plugin.
-     */
-    private void registerCommands() {
-        Main.instance.getCommand("buildteam").setExecutor(new BuildTeamToolsCommand());
-        Main.instance.getCommand("generate").setExecutor(new GeneratorCommand());
-        Main.instance.getCommand("warp").setExecutor(new WarpCommand());
-        Main.instance.getCommand("navigator").setExecutor(new NavigatorCommand());
-        Main.instance.getCommand("kml").setExecutor(new KmlCommand());
-        Main.instance.getCommand("kml").setTabCompleter(new KmlTabCompleter());
+    @Override
+    public FileConfiguration getConfig() {
+        return ConfigUtil.getInstance().configs[0];
     }
 
-    /**
-     * Register all listeners of the plugin.
-     */
-    private void registerListeners() {
-        // Register the listener for the canvas Gui Library
-        Bukkit.getPluginManager().registerEvents(new MenuFunctionListener(), Main.instance);
-
-        Bukkit.getPluginManager().registerEvents(new StatsListener(), Main.instance);
-
-        Bukkit.getPluginManager().registerEvents(new TpllJoinListener(), Main.instance);
-        Bukkit.getPluginManager().registerEvents(new TpllListener(), Main.instance);
-
-        Bukkit.getPluginManager().registerEvents(new WarpJoinListener(), Main.instance);
-
-        Bukkit.getPluginManager().registerEvents(new NavigatorOpenListener(), Main.instance);
-
-        Bukkit.getPluginManager().registerEvents(new NetworkJoinListener(), Main.instance);
-        Bukkit.getPluginManager().registerEvents(new NetworkQuitListener(), Main.instance);
-
+    @Override
+    public void reloadConfig() {
+        ConfigUtil.getInstance().reloadFiles();
     }
 
-    /**
-     * Notify a player that the plugin was updated to a newer version.
-     * Only if the player has the permission buildteam.notifyUpdate
-     *
-     * @param p The Player to notify
-     */
-    public void notifyUpdate(Player p) {
-        if (!updateInstalled)
-            return;
-
-        if (p.hasPermission(Permissions.NOTIFY_UPDATE)) {
-            p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
-            p.sendMessage("");
-            p.sendMessage("§6§l[BuildTeam Plugin] §eThe server automatically installed a new update (v" + newVersion + ").");
-            p.sendMessage("§6>> §ePlease restart or reload the server to activate it.");
-            p.sendMessage("");
-        }
+    @Override
+    public void saveConfig() {
+        ConfigUtil.getInstance().saveFiles();
     }
 
-    /**
-     * Sets the current version of the plugin that is installed
-     *
-     * @param newVersion The current installed version
-     */
-    public void setUpdateInstalled(String newVersion) {
-        this.newVersion = newVersion;
-        this.updateInstalled = true;
-
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            notifyUpdate(p);
-        }
+    public File getPluginFile() {
+        return this.getFile();
     }
-    // Getters & Setters
-
-
-    public boolean isDebug() {
-        return debug;
-    }
-
-    public void setDebug(boolean debug) {
-        this.debug = debug;
-    }
-
 }

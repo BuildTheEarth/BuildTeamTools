@@ -1,6 +1,6 @@
 package net.buildtheearth.modules.navigation.menu;
 
-import net.buildtheearth.Main;
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.utils.menus.AbstractMenu;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -17,7 +17,7 @@ public class TutorialsMenu extends AbstractMenu {
     private static final int BACK_BUTTON_SLOT = 13;
 
     private static final String inventoryName = "Tutorials Menu";
-    private static final FileConfiguration config = Main.instance.getConfig();
+    private static final FileConfiguration config = BuildTeamTools.getInstance().getConfig();
 
     public TutorialsMenu(Player player) {
         super(3, inventoryName, player);

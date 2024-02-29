@@ -1,6 +1,5 @@
 package net.buildtheearth.modules.generator.components.tree;
 
-import net.buildtheearth.Main;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.modules.generator.model.GeneratorType;

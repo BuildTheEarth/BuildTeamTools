@@ -1,6 +1,6 @@
 package net.buildtheearth.modules.generator.components.kml;
 
-import net.buildtheearth.Main;
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.utils.BlockLocation;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.GeometricUtils;
@@ -376,15 +376,15 @@ public class KmlCommand implements CommandExecutor {
         CommandBlock cmdBlock = (CommandBlock) block.getState();
         
         cmdBlock.setCommand("/kml "); //ready to paste kml content
-        cmdBlock.setMetadata("kmlPlayerName", new FixedMetadataValue(Main.instance, player.getName()));
-        //cmdBlock.setMetadata("kmlPlayerID", new FixedMetadataValue(Main.instance, p.getUniqueId()));
-        cmdBlock.setMetadata("kmlBlocktype", new FixedMetadataValue(Main.instance, blocktype));
-        cmdBlock.setMetadata("kmlExtendToGround", new FixedMetadataValue(Main.instance, extendToGround));
-        cmdBlock.setMetadata("kmlExtendToGroundBlocktype", new FixedMetadataValue(Main.instance, extendToGroundBlockType));
+        cmdBlock.setMetadata("kmlPlayerName", new FixedMetadataValue(BuildTeamTools.getInstance(), player.getName()));
+        //cmdBlock.setMetadata("kmlPlayerID", new FixedMetadataValue(BuildTeamTools.getInstance(), p.getUniqueId()));
+        cmdBlock.setMetadata("kmlBlocktype", new FixedMetadataValue(BuildTeamTools.getInstance(), blocktype));
+        cmdBlock.setMetadata("kmlExtendToGround", new FixedMetadataValue(BuildTeamTools.getInstance(), extendToGround));
+        cmdBlock.setMetadata("kmlExtendToGroundBlocktype", new FixedMetadataValue(BuildTeamTools.getInstance(), extendToGroundBlockType));
         
-        cmdBlock.setMetadata("kmlPreviousBlocktype", new FixedMetadataValue(Main.instance, previousMaterial.toString()));
+        cmdBlock.setMetadata("kmlPreviousBlocktype", new FixedMetadataValue(BuildTeamTools.getInstance(), previousMaterial.toString()));
         
-        cmdBlock.setMetadata("kmlBlockCreationCommand", new FixedMetadataValue(Main.instance, alias));
+        cmdBlock.setMetadata("kmlBlockCreationCommand", new FixedMetadataValue(BuildTeamTools.getInstance(), alias));
         
         cmdBlock.update();
         player.sendMessage("§6Command block created. Right click the block, paste the KML content, set it to 'always on' and confirm");

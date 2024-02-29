@@ -2,9 +2,12 @@ package net.buildtheearth.modules.stats;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import net.buildtheearth.Main;
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.network.NetworkModule;
+import net.buildtheearth.modules.stats.listeners.StatsListener;
+import net.buildtheearth.modules.stats.model.StatsPlayer;
+import net.buildtheearth.modules.stats.model.StatsServer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.json.JSONArray;
@@ -14,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-public class StatsModule implements Module {
+public class StatsModule extends Module {
 
     public static int RATE_LIMIT = NetworkModule.CACHE_UPLOAD_SPEED / 20;
 
@@ -24,33 +27,38 @@ public class StatsModule implements Module {
 
 
     private static StatsModule instance = null;
-    private boolean enabled = false;
+
+    public StatsModule() {
+        super("Stats");
+    }
 
     public static StatsModule getInstance() {
         return instance == null ? instance = new StatsModule() : instance;
     }
 
-    @Override
-    public boolean isEnabled() {
-        return enabled;
-    }
+
 
     @Override
     public void onEnable() {
         statsServer = new StatsServer();
         statsPlayerList = new HashMap<>();
 
-        enabled = true;
+        super.onEnable();
     }
 
     @Override
     public void onDisable() {
-        enabled = false;
+        if(!isEnabled())
+            return;
+
+        updateAndSave();
+
+        super.onDisable();
     }
 
     @Override
-    public String getModuleName() {
-        return "Stats";
+    public void registerListeners() {
+        Bukkit.getPluginManager().registerEvents(new StatsListener(), BuildTeamTools.getInstance());
     }
 
 
@@ -87,7 +95,7 @@ public class StatsModule implements Module {
         List<UUID> communicators = NetworkModule.getInstance().getCommunicators();
         if (communicators.size() == 0) return false;
 
-        if (!Main.instance.isEnabled()) return false;
+        if (!BuildTeamTools.getInstance().isEnabled()) return false;
 
         Player p = Bukkit.getPlayer(communicators.get(0));
 
@@ -105,7 +113,7 @@ public class StatsModule implements Module {
         out.writeUTF(p.getUniqueId().toString());
         out.writeUTF(StatsModule.getInstance().getCurrentCache().toJSONString());
 
-        p.sendPluginMessage(Main.instance, "BuildTeam", out.toByteArray());
+        p.sendPluginMessage(BuildTeamTools.getInstance(), "BuildTeam", out.toByteArray());
 
         return true;
     }

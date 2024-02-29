@@ -1,7 +1,7 @@
 package net.buildtheearth.modules.navigation.menu;
 
 import com.alpsbte.alpslib.utils.item.ItemBuilder;
-import net.buildtheearth.Main;
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.Item;
@@ -40,7 +40,7 @@ public class MainMenu extends AbstractMenu {
 
     @Override
     protected void setPreviewItems() {
-        config = Main.instance.getConfig();
+        config = BuildTeamTools.getInstance().getConfig();
         int[] slots = getSlots();
 
         // Fill the blank slots with glass panes

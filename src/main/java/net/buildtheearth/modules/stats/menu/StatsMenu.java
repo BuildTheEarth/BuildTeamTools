@@ -1,9 +1,8 @@
 package net.buildtheearth.modules.stats.menu;
 
-import net.buildtheearth.Main;
 import net.buildtheearth.modules.stats.StatsModule;
-import net.buildtheearth.modules.stats.StatsPlayer;
-import net.buildtheearth.modules.stats.StatsServer;
+import net.buildtheearth.modules.stats.model.StatsPlayer;
+import net.buildtheearth.modules.stats.model.StatsServer;
 import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.ListUtil;
 import net.buildtheearth.modules.utils.MenuItems;

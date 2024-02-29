@@ -1,6 +1,6 @@
 package net.buildtheearth.modules.navigation.components.navigator;
 
-import net.buildtheearth.Main;
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.io.ConfigPaths;
 import org.bukkit.Material;
@@ -31,7 +31,7 @@ public class NavigatorComponent {
     }
 
     public short getSlot() {
-        return (short) Main.instance.getConfig().getInt(ConfigPaths.NAVIGATOR_ITEM_SLOT);
+        return (short) BuildTeamTools.getInstance().getConfig().getInt(ConfigPaths.NAVIGATOR_ITEM_SLOT);
     }
 
 

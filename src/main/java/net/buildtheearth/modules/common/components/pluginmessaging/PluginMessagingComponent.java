@@ -1,74 +1,26 @@
-package net.buildtheearth;
+package net.buildtheearth.modules.common.components.pluginmessaging;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
+import net.buildtheearth.BuildTeamTools;
+import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.stats.StatsModule;
-import net.buildtheearth.modules.navigation.NavigationModule;
-import net.buildtheearth.modules.updater.UpdateChecker;
 import net.buildtheearth.modules.utils.ChatHelper;
-import net.buildtheearth.modules.utils.io.ConfigUtil;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
 import java.util.List;
 import java.util.UUID;
 
+public class PluginMessagingComponent implements PluginMessageListener {
 
-public class Main extends JavaPlugin implements PluginMessageListener {
-
-    public static Main instance;
-
-    /**
-     * Handles all of the plugin's features
-     */
-    public static BuildTeamTools buildTeamTools;
-
-    public static BuildTeamTools getBuildTeamTools() {
-        return buildTeamTools;
-    }
-
-    public static void setBuildTeamTools(BuildTeamTools buildTeamTools) {
-        Main.buildTeamTools = buildTeamTools;
-    }
-
-    @Override
-    public void onEnable() {
-        instance = this;
-
-        buildTeamTools = new BuildTeamTools();
-        boolean successful = buildTeamTools.start();
-
-        if (!successful) return;
-
-        String resultMessage = UpdateChecker.start(this.getFile());
-        ChatHelper.logDebug("Plugin with version %s started. %s", getDescription().getVersion(), resultMessage);
-    }
-
-    @Override
-    public void onDisable() {
-        buildTeamTools.stop();
-        getLogger().info(ChatHelper.error("Plugin stopped."));
-    }
-
-    // Methods for managing the configuration file
-    @Override
-    public FileConfiguration getConfig() {
-        return ConfigUtil.getInstance().configs[0];
-    }
-
-    @Override
-    public void reloadConfig() {
-        ConfigUtil.getInstance().reloadFiles();
-    }
-
-    // Getters & Setters
-
-    @Override
-    public void saveConfig() {
-        ConfigUtil.getInstance().saveFiles();
+    public PluginMessagingComponent() {
+        // Register an incoming & outgoing Plugin Messaging Channel
+        BuildTeamTools.getInstance().getServer().getMessenger().registerOutgoingPluginChannel(BuildTeamTools.getInstance(), "BungeeCord");
+        BuildTeamTools.getInstance().getServer().getMessenger().registerIncomingPluginChannel(BuildTeamTools.getInstance(), "BungeeCord", this);
+        BuildTeamTools.getInstance().getServer().getMessenger().registerOutgoingPluginChannel(BuildTeamTools.getInstance(), "BuildTeam");
+        BuildTeamTools.getInstance().getServer().getMessenger().registerIncomingPluginChannel(BuildTeamTools.getInstance(), "BuildTeam", this);
     }
 
     @Override

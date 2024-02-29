@@ -1,6 +1,7 @@
-package net.buildtheearth.modules.stats;
+package net.buildtheearth.modules.stats.model;
 
-public enum StatsPlayerType {
+public enum StatsServerType {
+    UPTIME,
     PLAYTIME,
     JOINS,
     MESSAGES,

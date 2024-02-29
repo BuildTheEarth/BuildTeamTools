@@ -3,7 +3,7 @@ package net.buildtheearth.modules.navigation.components.warps;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import net.buildtheearth.Main;
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.api.NetworkAPI;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
@@ -114,7 +114,7 @@ public class WarpsComponent {
         out.writeUTF(targetServer);
         out.writeUTF(warp.getId().toString());
 
-        player.sendPluginMessage(Main.instance, "BuildTeam", out.toByteArray());
+        player.sendPluginMessage(BuildTeamTools.getInstance(), "BuildTeam", out.toByteArray());
 
         // Switch the player to the target server
         NetworkModule.getInstance().switchServer(player, targetServer);

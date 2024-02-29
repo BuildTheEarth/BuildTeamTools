@@ -1,6 +1,6 @@
 package net.buildtheearth.modules.generator.menu;
 
-import net.buildtheearth.Main;
+import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.components.house.House;
 import net.buildtheearth.modules.generator.components.house.HouseSettings;
@@ -12,7 +12,6 @@ import net.buildtheearth.modules.generator.components.road.Road;
 import net.buildtheearth.modules.generator.components.road.RoadSettings;
 import net.buildtheearth.modules.generator.components.road.menu.RoadColorMenu;
 import net.buildtheearth.modules.generator.components.tree.Tree;
-import net.buildtheearth.modules.updater.DependencyManager;
 import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.ListUtil;
 import net.buildtheearth.modules.utils.menus.AbstractMenu;
@@ -107,7 +106,7 @@ public class GeneratorMenu extends AbstractMenu {
         getMenu().getSlot(RAILWAY_ITEM_SLOT).setItem(railwayItem);
 
 
-        if (!DependencyManager.isSchematicBrushEnabled()) {
+        if (!CommonModule.getInstance().getDependencyComponent().isSchematicBrushEnabled()) {
             // TREE ITEM
             ArrayList<String> treeLore = ListUtil.createList("", "§cPlugin §eSchematicBrush §cis not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
 

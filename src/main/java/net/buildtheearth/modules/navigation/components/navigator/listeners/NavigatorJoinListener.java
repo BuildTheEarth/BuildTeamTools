@@ -1,6 +1,6 @@
 package net.buildtheearth.modules.navigation.components.navigator.listeners;
 
-import net.buildtheearth.Main;
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.modules.utils.io.ConfigPaths;
 import org.bukkit.entity.Player;
@@ -12,7 +12,7 @@ public class NavigatorJoinListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        boolean isEnabled = Main.instance.getConfig().getBoolean(ConfigPaths.NAVIGATOR_ITEM_ENABLED, false);
+        boolean isEnabled = BuildTeamTools.getInstance().getConfig().getBoolean(ConfigPaths.NAVIGATOR_ITEM_ENABLED, false);
 
         if(!isEnabled) return;
 

@@ -1,22 +1,20 @@
-package net.buildtheearth.modules.stats;
+package net.buildtheearth.modules.stats.model;
 
+import net.buildtheearth.modules.stats.StatsModule;
 import org.json.simple.JSONObject;
 
 import java.util.HashMap;
-import java.util.UUID;
 
-public class StatsPlayer {
+public class StatsServer {
 
-    private final UUID uuid;
-    private final HashMap<StatsPlayerType, Object> stats;
+    private final HashMap<StatsServerType, Object> stats;
 
-    public StatsPlayer(UUID uuid) {
-        this.uuid = uuid;
-        this.stats = new HashMap<>();
+    public StatsServer() {
+        stats = new HashMap<>();
     }
 
-    public void addValue(StatsPlayerType statsPlayerType, Object value) {
-        Object object = stats.get(statsPlayerType);
+    public void addValue(StatsServerType statsServerType, Object value) {
+        Object object = stats.get(statsServerType);
 
         if (object == null)
             object = value;
@@ -44,17 +42,17 @@ public class StatsPlayer {
             object = value;
         }
 
-        stats.remove(statsPlayerType);
-        stats.put(statsPlayerType, object);
+        stats.remove(statsServerType);
+        stats.put(statsServerType, object);
     }
 
     public JSONObject toJSON() {
         JSONObject jsonObject = new JSONObject();
 
-        jsonObject.put("UUID", uuid);
-        for (StatsPlayerType statsPlayerType : stats.keySet())
-            jsonObject.put(statsPlayerType, stats.get(statsPlayerType));
+        for (StatsServerType statsServerType : stats.keySet())
+            jsonObject.put(statsServerType, stats.get(statsServerType));
 
         return jsonObject;
     }
 }
+

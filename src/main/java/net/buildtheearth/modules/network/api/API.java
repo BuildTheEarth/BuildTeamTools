@@ -1,7 +1,6 @@
 package net.buildtheearth.modules.network.api;
 
-import net.buildtheearth.Main;
-import net.buildtheearth.modules.utils.ChatHelper;
+import net.buildtheearth.BuildTeamTools;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -65,7 +64,7 @@ public class API {
                 if (response.isSuccessful()) {
                     String responseBody = response.body().string();
                     callback.onResponse(responseBody);
-                } else if(Main.getBuildTeamTools().isDebug())
+                } else if(BuildTeamTools.getInstance().isDebug())
                     callback.onFailure(new IOException("\nUnexpected code: \n" + response + "\n Response Body:\n" + response.body().string()));
                 else
                     callback.onFailure(new IOException("Unexpected code " + response.code()));
@@ -115,7 +114,7 @@ public class API {
                 if (response.isSuccessful()) {
                     String responseBody = response.body().string();
                     callback.onResponse(responseBody);
-                } else if(Main.getBuildTeamTools().isDebug()) {
+                } else if(BuildTeamTools.getInstance().isDebug()) {
                     Buffer buffer = new Buffer();
                     requestBody.writeTo(buffer);
                     callback.onFailure(new IOException("\nUnexpected code: \n" + response + "\n Request Body:\n" + buffer.readUtf8() +"\n Response Body:\n" + response.body().string()));
@@ -167,7 +166,7 @@ public class API {
                 if (response.isSuccessful()) {
                     String responseBody = response.body().string();
                     callback.onResponse(responseBody);
-                } else if(Main.getBuildTeamTools().isDebug()) {
+                } else if(BuildTeamTools.getInstance().isDebug()) {
                     Buffer buffer = new Buffer();
                     requestBody.writeTo(buffer);
                     callback.onFailure(new IOException("\nUnexpected code: \n" + response + "\n Request Body:\n" + buffer.readUtf8() +"\n Response Body:\n" + response.body().string()));

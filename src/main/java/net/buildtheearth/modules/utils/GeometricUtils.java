@@ -1,6 +1,6 @@
 package net.buildtheearth.modules.utils;
 
-import net.buildtheearth.Main;
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.utils.geo.CoordinateConversion;
 import net.buildtheearth.modules.utils.io.ConfigPaths;
 import org.bukkit.Bukkit;
@@ -32,7 +32,7 @@ public class GeometricUtils {
 
         //Creates the location
         Location location;
-        World tpWorld = Bukkit.getWorld(Main.instance.getConfig().getString(ConfigPaths.EARTH_WORLD));
+        World tpWorld = Bukkit.getWorld(BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.EARTH_WORLD));
         if (tpWorld == null)
             location = new Location(null, x, 64, z, yaw, pitch);
         else
@@ -63,7 +63,7 @@ public class GeometricUtils {
 
         //Creates the location
         Location location;
-        World tpWorld = Bukkit.getWorld(Main.instance.getConfig().getString(ConfigPaths.EARTH_WORLD));
+        World tpWorld = Bukkit.getWorld(BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.EARTH_WORLD));
 
         if (tpWorld == null)
             location = new Location(null, x, 64, z);

@@ -1,6 +1,5 @@
 package net.buildtheearth.modules.generator.components.house.menu;
 
-import net.buildtheearth.Main;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.model.Settings;
 import net.buildtheearth.modules.generator.components.house.House;

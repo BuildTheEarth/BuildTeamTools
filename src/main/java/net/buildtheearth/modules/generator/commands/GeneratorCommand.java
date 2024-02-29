@@ -1,10 +1,9 @@
 package net.buildtheearth.modules.generator.commands;
 
-import net.buildtheearth.Main;
+import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.menu.GeneratorMenu;
 import net.buildtheearth.modules.generator.model.History;
-import net.buildtheearth.modules.updater.DependencyManager;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.Utils;
 import org.bukkit.Sound;
@@ -36,7 +35,7 @@ public class GeneratorCommand implements CommandExecutor {
         Player p = (Player) sender;
 
         // Check if WorldEdit is enabled
-        if (!DependencyManager.isWorldEditEnabled()) {
+        if (!CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled()) {
             p.sendMessage("§cPlease install WorldEdit to use this tool.");
             GeneratorModule.sendMoreInfo(p);
             p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);

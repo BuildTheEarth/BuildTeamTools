@@ -1,5 +1,5 @@
 name: BuildTeamTools
-main: net.buildtheearth.Main
+main: net.buildtheearth.BuildTeamTools
 api-version: 1.12
 version: 0.1.3-alpha
 author: MineFact, frikandelworst, George112n, ELgamer, SirJodelstein

@@ -1,10 +1,13 @@
-package net.buildtheearth.modules.updater;
+package net.buildtheearth.modules.common.components.updater;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.buildtheearth.Main;
+import net.buildtheearth.modules.network.model.Permissions;
+import org.bukkit.Bukkit;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.io.BufferedInputStream;
@@ -18,7 +21,7 @@ import java.net.URL;
 import java.util.logging.Level;
 
 
-public class Updater {
+public class UpdaterComponent {
     private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36";
     private static final String DOWNLOAD = "/download";
     private static final String VERSIONS = "/versions";
@@ -47,9 +50,18 @@ public class Updater {
     // If true updater is going to log progress to the console.
     private final boolean logger;
     // Updater thread
-    private final Thread thread;
+    private Thread thread;
 
-    public Updater(Plugin plugin, int id, File file, UpdateType updateType, boolean logger) {
+    private File pluginFile;
+
+    private boolean updateInstalled;
+    private String newVersion;
+
+
+
+
+
+    public UpdaterComponent(Plugin plugin, int id, File file, UpdateType updateType, boolean logger) {
         this.plugin = plugin;
         this.updateFolder = plugin.getServer().getUpdateFolderFile();
         this.id = id;
@@ -58,9 +70,72 @@ public class Updater {
         this.logger = logger;
 
         downloadLink = API_RESOURCE + id;
+    }
+
+
+    public String checkForUpdates() {
+        if(thread != null && thread.isAlive())
+            return "Update check is already running.";
 
         thread = new Thread(new UpdaterRunnable());
         thread.start();
+
+        String resultMessage = "";
+        switch (result) {
+            case BAD_ID:
+                resultMessage = "Failed to update the plugin: Wrong Spigot ID.";
+                break;
+            case FAILED:
+                resultMessage = "Failed to update the plugin.";
+                break;
+            case NO_UPDATE:
+                resultMessage = "The plugin is up to date.";
+                break;
+            case SUCCESS:
+                resultMessage = "Plugin successfully updated.";
+                break;
+            case UPDATE_FOUND:
+                resultMessage = "Found an update for the plugin.";
+                break;
+            default:
+                resultMessage = "No result for update search.";
+                break;
+        }
+
+        return resultMessage;
+    }
+
+    /**
+     * Notify a player that the plugin was updated to a newer version.
+     * Only if the player has the permission buildteam.notifyUpdate
+     *
+     * @param p The Player to notify
+     */
+    public void notifyUpdate(Player p) {
+        if (!updateInstalled)
+            return;
+
+        if (p.hasPermission(Permissions.NOTIFY_UPDATE)) {
+            p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
+            p.sendMessage("");
+            p.sendMessage("§6§l[BuildTeam Plugin] §eThe server automatically installed a new update (v" + newVersion + ").");
+            p.sendMessage("§6>> §ePlease restart or reload the server to activate it.");
+            p.sendMessage("");
+        }
+    }
+
+    /**
+     * Sets the current version of the plugin that is installed
+     *
+     * @param newVersion The current installed version
+     */
+    public void setUpdateInstalled(String newVersion) {
+        this.newVersion = newVersion;
+        this.updateInstalled = true;
+
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            notifyUpdate(p);
+        }
     }
 
     /**
@@ -261,7 +336,7 @@ public class Updater {
                 this.plugin.getLogger().log(Level.SEVERE, null, e);
             }
 
-            Main.buildTeamTools.setUpdateInstalled(version);
+            setUpdateInstalled(version);
         }
     }
 

@@ -1,6 +1,6 @@
 package net.buildtheearth.modules.utils.menus;
 
-import net.buildtheearth.Main;
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.MenuItems;
 import org.bukkit.Bukkit;
@@ -61,7 +61,7 @@ public abstract class AbstractMenu {
      */
     protected void reloadMenuAsync() {
         setPreviewItems();
-        Bukkit.getScheduler().runTaskAsynchronously(Main.instance, () -> {
+        Bukkit.getScheduler().runTaskAsynchronously(BuildTeamTools.getInstance(), () -> {
             try{
                 setMenuItemsAsync();
                 setItemClickEventsAsync();

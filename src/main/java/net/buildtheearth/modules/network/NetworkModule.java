@@ -4,9 +4,11 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import lombok.Getter;
 import lombok.Setter;
-import net.buildtheearth.Main;
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.network.api.NetworkAPI;
+import net.buildtheearth.modules.network.listeners.NetworkJoinListener;
+import net.buildtheearth.modules.network.listeners.NetworkQuitListener;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.network.model.RegionType;
@@ -23,7 +25,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class NetworkModule implements Module {
+public class NetworkModule extends Module {
 
     public static String GLOBAL_PLOT_SYSTEM_SERVER = "NYC-1";
 
@@ -48,15 +50,13 @@ public class NetworkModule implements Module {
 
 
     private static NetworkModule instance = null;
-    private boolean enabled = false;
+
+    public NetworkModule() {
+        super("Network");
+    }
 
     public static NetworkModule getInstance() {
         return instance == null ? instance = new NetworkModule() : instance;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return enabled;
     }
 
     @Override
@@ -64,18 +64,15 @@ public class NetworkModule implements Module {
         pingAllOnlinePlayers();
         updateCache();
 
-        enabled = true;
+        super.onEnable();
     }
 
     @Override
-    public void onDisable() {
-        enabled = false;
+    public void registerListeners(){
+        Bukkit.getPluginManager().registerEvents(new NetworkJoinListener(), BuildTeamTools.getInstance());
+        Bukkit.getPluginManager().registerEvents(new NetworkQuitListener(), BuildTeamTools.getInstance());
     }
 
-    @Override
-    public String getModuleName() {
-        return "Proxy";
-    }
 
 
 
@@ -104,8 +101,8 @@ public class NetworkModule implements Module {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Ping");
         out.writeUTF(p.getUniqueId().toString());
-        out.writeUTF("Version: " + Main.instance.getDescription().getVersion());
-        p.sendPluginMessage(Main.instance, "BuildTeam", out.toByteArray());
+        out.writeUTF("Version: " + BuildTeamTools.getInstance().getDescription().getVersion());
+        p.sendPluginMessage(BuildTeamTools.getInstance(), "BuildTeam", out.toByteArray());
     }
 
     /**
@@ -126,7 +123,7 @@ public class NetworkModule implements Module {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Connect");
         out.writeUTF(targetServer);
-        player.sendPluginMessage(Main.instance, "BungeeCord", out.toByteArray());
+        player.sendPluginMessage(BuildTeamTools.getInstance(), "BungeeCord", out.toByteArray());
     }
 
     /** Sends a message to the player that the server is not connected to the network yet.

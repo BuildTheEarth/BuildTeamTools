@@ -1,6 +1,6 @@
 package net.buildtheearth.modules.utils;
 
-import net.buildtheearth.Main;
+import net.buildtheearth.BuildTeamTools;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -21,7 +21,7 @@ public class Config {
 
     public static File getFile(String dir, String file) {
         if (!files.containsKey(dir + file))
-            files.put(dir + file, new File(Main.instance.getDataFolder() + dir, file + ".yml"));
+            files.put(dir + file, new File(BuildTeamTools.getInstance().getDataFolder() + dir, file + ".yml"));
 
         return files.get(dir + file);
     }

@@ -1,6 +1,6 @@
 package net.buildtheearth.modules.navigation.components.warps.menu;
 
-import net.buildtheearth.Main;
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.ListUtil;
 import net.buildtheearth.modules.utils.Utils;
@@ -131,7 +131,7 @@ public class AddressTypeSelectionMenu extends AbstractMenu {
                     .text("Address")
                     .itemLeft(Item.create(Material.NAME_TAG, "§6§lChange Address"))
                     .title("§8Enter the address")
-                    .plugin(Main.instance)
+                    .plugin(BuildTeamTools.getInstance())
                     .open(clickPlayer);
         });
     }

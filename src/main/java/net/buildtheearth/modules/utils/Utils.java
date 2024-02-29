@@ -2,7 +2,7 @@ package net.buildtheearth.modules.utils;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import net.buildtheearth.Main;
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.network.NetworkModule;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -78,7 +78,7 @@ public class Utils {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Connect");
         out.writeUTF(server);
-        player.sendPluginMessage(Main.instance, "BungeeCord", out.toByteArray());
+        player.sendPluginMessage(BuildTeamTools.getInstance(), "BungeeCord", out.toByteArray());
     }
 
     public static int[] range(int start, int stop) {

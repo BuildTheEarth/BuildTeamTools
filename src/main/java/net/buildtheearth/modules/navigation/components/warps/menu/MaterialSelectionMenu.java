@@ -1,6 +1,6 @@
 package net.buildtheearth.modules.navigation.components.warps.menu;
 
-import net.buildtheearth.Main;
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.ListUtil;
@@ -93,7 +93,7 @@ public class MaterialSelectionMenu extends AbstractMenu {
                     .text("Material")
                     .itemLeft(Item.create(Material.NAME_TAG, "§6§lEnter Material Name"))
                     .title("§8Enter Material Name")
-                    .plugin(Main.instance)
+                    .plugin(BuildTeamTools.getInstance())
                     .open(clickPlayer);
         });
 
@@ -136,7 +136,7 @@ public class MaterialSelectionMenu extends AbstractMenu {
                     .text("URL")
                     .itemLeft(Item.create(Material.NAME_TAG, "§6§lEnter Custom Head Texture URL"))
                     .title("§8Enter Custom Head Texture URL")
-                    .plugin(Main.instance)
+                    .plugin(BuildTeamTools.getInstance())
                     .open(clickPlayer);
         });
     }

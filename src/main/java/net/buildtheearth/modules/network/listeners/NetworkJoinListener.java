@@ -1,6 +1,6 @@
 package net.buildtheearth.modules.network.listeners;
 
-import net.buildtheearth.Main;
+import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.api.NetworkAPI;
 import org.bukkit.entity.Player;
@@ -18,7 +18,7 @@ public class NetworkJoinListener implements Listener {
         NetworkModule.getInstance().ping(player);
 
         //Notify the admins if a new update got installed
-        Main.buildTeamTools.notifyUpdate(player);
+        CommonModule.getInstance().getUpdaterComponent().notifyUpdate(player);
 
         // Sync the playerlist
         NetworkAPI.syncPlayerList();

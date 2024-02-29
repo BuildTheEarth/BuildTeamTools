@@ -3,7 +3,6 @@ package net.buildtheearth.modules;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import lombok.Getter;
-import net.buildtheearth.Main;
 import net.buildtheearth.modules.utils.ChatHelper;
 
 import java.util.Map;

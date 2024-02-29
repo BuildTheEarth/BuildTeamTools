@@ -1,7 +1,6 @@
 package net.buildtheearth.modules.utils;
 
 import net.buildtheearth.BuildTeamTools;
-import net.buildtheearth.Main;
 import net.buildtheearth.modules.utils.io.ConfigPaths;
 import org.bukkit.ChatColor;
 import org.bukkit.Bukkit;
@@ -14,7 +13,7 @@ import java.util.logging.Level;
 
 public class ChatHelper {
 
-    public static boolean DEBUG = Main.instance.getConfig().getBoolean(ConfigPaths.DEBUG, false);
+    public static boolean DEBUG = BuildTeamTools.getInstance().getConfig().getBoolean(ConfigPaths.DEBUG, false);
 
     public static void logError(String errorMessage, Object... objects) {
         Bukkit.getLogger().log(Level.INFO, ChatHelper.error(errorMessage, objects));

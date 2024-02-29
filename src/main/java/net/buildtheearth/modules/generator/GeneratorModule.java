@@ -17,15 +17,18 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.Region;
 import lombok.Getter;
-import net.buildtheearth.Main;
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.Module;
+import net.buildtheearth.modules.common.CommonModule;
+import net.buildtheearth.modules.generator.commands.GeneratorCommand;
+import net.buildtheearth.modules.generator.components.kml.KmlCommand;
+import net.buildtheearth.modules.generator.components.kml.KmlTabCompleter;
 import net.buildtheearth.modules.generator.model.Command;
 import net.buildtheearth.modules.generator.model.History;
 import net.buildtheearth.modules.generator.components.house.House;
 import net.buildtheearth.modules.generator.components.rail.Rail;
 import net.buildtheearth.modules.generator.components.road.Road;
 import net.buildtheearth.modules.generator.components.tree.Tree;
-import net.buildtheearth.modules.updater.DependencyManager;
 import net.buildtheearth.modules.utils.Item;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
@@ -44,7 +47,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public class GeneratorModule implements Module {
+public class GeneratorModule extends Module {
 
     public static String WIKI_PAGE = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Generator";
     public static String INSTALL_WIKI = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Installation";
@@ -66,17 +69,13 @@ public class GeneratorModule implements Module {
 
 
     private static GeneratorModule instance = null;
-    private boolean enabled = false;
+
+    public GeneratorModule() {
+        super("Generator");
+    }
 
     public static GeneratorModule getInstance() {
         return instance == null ? instance = new GeneratorModule() : instance;
-    }
-
-    public GeneratorModule() {}
-
-    @Override
-    public boolean isEnabled() {
-        return enabled;
     }
 
     @Override
@@ -88,17 +87,15 @@ public class GeneratorModule implements Module {
 
         LocalSession.MAX_HISTORY_SIZE = 500;
 
-        enabled = true;
+        super.onEnable();
     }
 
     @Override
-    public void onDisable() {
-        enabled = false;
-    }
+    public void registerCommands() {
+        BuildTeamTools.getInstance().getCommand("generate").setExecutor(new GeneratorCommand());
+        BuildTeamTools.getInstance().getCommand("kml").setExecutor(new KmlCommand());
 
-    @Override
-    public String getModuleName() {
-        return "Generator";
+        BuildTeamTools.getInstance().getCommand("kml").setTabCompleter(new KmlTabCompleter());
     }
 
 
@@ -658,7 +655,7 @@ public class GeneratorModule implements Module {
      */
     public static boolean checkIfWorldEditIsInstalled(Player p) {
         // Check if WorldEdit is enabled
-        if (!DependencyManager.isWorldEditEnabled()) {
+        if (!CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled()) {
             p.sendMessage("§cPlease install WorldEdit to use this tool. You can ask the server administrator to install it.");
             p.sendMessage(" ");
             p.sendMessage("§cFor more installation help, please see the wiki:");
@@ -677,7 +674,7 @@ public class GeneratorModule implements Module {
      */
     public static boolean checkIfSchematicBrushIsInstalled(Player p) {
         // Check if WorldEdit is enabled
-        if (!DependencyManager.isSchematicBrushEnabled()) {
+        if (!CommonModule.getInstance().getDependencyComponent().isSchematicBrushEnabled()) {
             p.sendMessage("§cPlease install Schematic Brush to use this tool. You can ask the server administrator to install it.");
             p.sendMessage(" ");
             p.sendMessage("§cFor more installation help, please see the wiki:");
@@ -697,7 +694,7 @@ public class GeneratorModule implements Module {
         // Load the schematic file
         try {
             String filepath = "newtrees/oak41.schematic";
-            File myfile = new File(Main.instance.getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/" + filepath);
+            File myfile = new File(BuildTeamTools.getInstance().getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/" + filepath);
 
             if (!myfile.exists()) {
                 if (sendError)

@@ -3,7 +3,7 @@ package net.buildtheearth.modules.navigation.components.tpll;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import net.buildtheearth.Main;
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.GeometricUtils;
@@ -84,7 +84,7 @@ public class TpllComponent {
         out.writeUTF(targetServerName);
         out.writeUTF(String.valueOf(coordinates[0]));
         out.writeUTF(String.valueOf(coordinates[1]));
-        player.sendPluginMessage(Main.instance, "BuildTeam", out.toByteArray());
+        player.sendPluginMessage(BuildTeamTools.getInstance(), "BuildTeam", out.toByteArray());
 
         // Switch the player to the target server
         NetworkModule.getInstance().switchServer(player, targetServerName);

@@ -1,6 +1,6 @@
 package net.buildtheearth.modules.utils.menus;
 
-import net.buildtheearth.Main;
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.utils.Item;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -50,7 +50,7 @@ public class BookMenu {
     }
 
     private void giveBookToPlayer() {
-        this.task = Bukkit.getScheduler().runTaskTimer(Main.instance, () -> {
+        this.task = Bukkit.getScheduler().runTaskTimer(BuildTeamTools.getInstance(), () -> {
             checkForBookUpdate();
 
             if(time >= maxWaitingTime)

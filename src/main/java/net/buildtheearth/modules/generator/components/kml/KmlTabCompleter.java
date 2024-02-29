@@ -1,4 +1,4 @@
-package net.buildtheearth.modules.kml;
+package net.buildtheearth.modules.generator.components.kml;
 
 import java.util.ArrayList;
 import java.util.Collections;

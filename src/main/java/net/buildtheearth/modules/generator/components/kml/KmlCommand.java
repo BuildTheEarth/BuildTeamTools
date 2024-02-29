@@ -1,4 +1,4 @@
-package net.buildtheearth.modules.kml;
+package net.buildtheearth.modules.generator.components.kml;
 
 import net.buildtheearth.Main;
 import net.buildtheearth.modules.utils.BlockLocation;

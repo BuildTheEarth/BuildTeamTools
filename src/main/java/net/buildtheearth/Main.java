@@ -4,11 +4,10 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.stats.StatsModule;
-import net.buildtheearth.modules.tpll.TpllModule;
+import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.modules.updater.UpdateChecker;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.io.ConfigUtil;
-import net.buildtheearth.modules.warp.WarpModule;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -102,12 +101,12 @@ public class Main extends JavaPlugin implements PluginMessageListener {
 
             // Add a new universal tpll target to the queue
             if (subChannel.equals("Tpll")) {
-                TpllModule.addTpllToQueue(in, player);
+                NavigationModule.getInstance().getTpllComponent().addTpllToQueue(in, player);
             }
 
             // Add a new universal warp target to the queue
             if (subChannel.equals("UniversalWarps")) {
-                WarpModule.addWarpToQueue(in, player);
+                NavigationModule.getInstance().getWarpsComponent().addWarpToQueue(in, player);
             }
         }
     }

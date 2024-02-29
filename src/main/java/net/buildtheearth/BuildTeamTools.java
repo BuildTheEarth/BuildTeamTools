@@ -2,14 +2,13 @@ package net.buildtheearth;
 
 import com.alpsbte.alpslib.io.YamlFileFactory;
 import com.alpsbte.alpslib.io.config.ConfigNotImplementedException;
-import com.sk89q.worldedit.LocalSession;
 import net.buildtheearth.modules.ModuleHandler;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.commands.GeneratorCommand;
-import net.buildtheearth.modules.kml.KmlCommand;
-import net.buildtheearth.modules.kml.KmlTabCompleter;
-import net.buildtheearth.modules.navigator.commands.NavigatorCommand;
-import net.buildtheearth.modules.navigator.listeners.NavigatorOpenListener;
+import net.buildtheearth.modules.generator.components.kml.KmlCommand;
+import net.buildtheearth.modules.generator.components.kml.KmlTabCompleter;
+import net.buildtheearth.modules.navigation.components.navigator.commands.NavigatorCommand;
+import net.buildtheearth.modules.navigation.components.navigator.listeners.NavigatorOpenListener;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.commands.BuildTeamToolsCommand;
 import net.buildtheearth.modules.network.listeners.NetworkJoinListener;
@@ -19,14 +18,13 @@ import net.buildtheearth.modules.stats.StatsModule;
 import net.buildtheearth.modules.stats.StatsPlayerType;
 import net.buildtheearth.modules.stats.StatsServerType;
 import net.buildtheearth.modules.stats.listeners.StatsListener;
-import net.buildtheearth.modules.tpll.TpllModule;
-import net.buildtheearth.modules.tpll.listeners.TpllJoinListener;
-import net.buildtheearth.modules.tpll.listeners.TpllListener;
+import net.buildtheearth.modules.navigation.NavigationModule;
+import net.buildtheearth.modules.navigation.components.tpll.listeners.TpllJoinListener;
+import net.buildtheearth.modules.navigation.components.tpll.listeners.TpllListener;
 import net.buildtheearth.modules.utils.io.ConfigPaths;
 import net.buildtheearth.modules.utils.io.ConfigUtil;
-import net.buildtheearth.modules.warp.WarpModule;
-import net.buildtheearth.modules.warp.commands.WarpCommand;
-import net.buildtheearth.modules.warp.listeners.WarpJoinListener;
+import net.buildtheearth.modules.navigation.components.warps.commands.WarpCommand;
+import net.buildtheearth.modules.navigation.components.warps.listeners.WarpJoinListener;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -70,8 +68,7 @@ public class BuildTeamTools {
         // Register Modules
         ModuleHandler.getInstance().registerModules(
                 GeneratorModule.getInstance(),
-                TpllModule.getInstance(),
-                WarpModule.getInstance(),
+                NavigationModule.getInstance(),
                 NetworkModule.getInstance(),
                 StatsModule.getInstance()
         );

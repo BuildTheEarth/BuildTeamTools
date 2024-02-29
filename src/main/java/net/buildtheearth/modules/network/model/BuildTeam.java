@@ -5,8 +5,8 @@ import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.api.API;
 import net.buildtheearth.modules.network.api.NetworkAPI;
 import net.buildtheearth.modules.utils.ChatHelper;
-import net.buildtheearth.modules.warp.model.Warp;
-import net.buildtheearth.modules.warp.model.WarpGroup;
+import net.buildtheearth.modules.navigation.components.warps.model.Warp;
+import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;

@@ -1,6 +1,7 @@
 package net.buildtheearth.modules.warp.menu;
 
 import net.buildtheearth.Main;
+import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.ListUtil;
 import net.buildtheearth.modules.utils.MenuItems;
@@ -83,9 +84,9 @@ public class WarpGroupEditMenu extends AbstractMenu {
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
             if(alreadyExists)
-                Main.getBuildTeamTools().getProxyModule().getBuildTeam().updateWarpGroup(clickPlayer, warpGroup);
+                NetworkModule.getInstance().getBuildTeam().updateWarpGroup(clickPlayer, warpGroup);
             else
-                Main.getBuildTeamTools().getProxyModule().getBuildTeam().createWarpGroup(clickPlayer, warpGroup);
+                NetworkModule.getInstance().getBuildTeam().createWarpGroup(clickPlayer, warpGroup);
         });
 
         // Set click event for the name item
@@ -149,7 +150,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
-            Main.getBuildTeamTools().getProxyModule().getBuildTeam().deleteWarpGroup(clickPlayer, warpGroup);
+            NetworkModule.getInstance().getBuildTeam().deleteWarpGroup(clickPlayer, warpGroup);
         });
     }
 

@@ -5,6 +5,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.Main;
 import net.buildtheearth.modules.Module;
+import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.GeometricUtils;
 import org.bukkit.Location;
@@ -18,18 +19,37 @@ import java.util.UUID;
  */
 public class TpllModule implements Module {
 
+    private static TpllModule instance = null;
+    private boolean enabled = false;
 
+    public static TpllModule getInstance() {
+        return instance == null ? instance = new TpllModule() : instance;
+    }
 
     @Override
-    public void onEnable() {}
+    public boolean isEnabled() {
+        return enabled;
+    }
 
     @Override
-    public void onDisable() {}
+    public void onEnable() {
+        enabled = true;
+    }
+
+    @Override
+    public void onDisable() {
+        enabled = false;
+    }
 
     @Override
     public String getModuleName() {
         return "Tpll";
     }
+
+
+
+
+
 
     /**
      * Stores a List of the tpll operations that need to happen on join
@@ -47,7 +67,7 @@ public class TpllModule implements Module {
         //Check the target server
         String targetServerName = in.readUTF();
         ChatHelper.logDebug("The name of the target server is: %s", targetServerName);
-        if (targetServerName.equals(Main.buildTeamTools.getProxyModule().getBuildTeam().getServerName())) {
+        if (targetServerName.equals(NetworkModule.getInstance().getBuildTeam().getServerName())) {
             ChatHelper.logDebug("The target server equals the current server");
             //Extracts the coordinates from the plugin message
             double targetLatitude = Double.parseDouble(in.readUTF());
@@ -103,7 +123,7 @@ public class TpllModule implements Module {
         player.sendPluginMessage(Main.instance, "BuildTeam", out.toByteArray());
 
         // Switch the player to the target server
-        Main.getBuildTeamTools().getProxyModule().switchServer(player, targetServerName);
+        NetworkModule.getInstance().switchServer(player, targetServerName);
         ChatHelper.logDebug("Teleported player to the target server.");
     }
 }

@@ -3,14 +3,14 @@ package net.buildtheearth;
 import com.alpsbte.alpslib.io.YamlFileFactory;
 import com.alpsbte.alpslib.io.config.ConfigNotImplementedException;
 import com.sk89q.worldedit.LocalSession;
-import lombok.Getter;
 import net.buildtheearth.modules.ModuleHandler;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.commands.GeneratorCommand;
+import net.buildtheearth.modules.kml.KmlCommand;
+import net.buildtheearth.modules.kml.KmlTabCompleter;
 import net.buildtheearth.modules.navigator.commands.NavigatorCommand;
 import net.buildtheearth.modules.navigator.listeners.NavigatorOpenListener;
-import net.buildtheearth.modules.network.ProxyModule;
-import net.buildtheearth.modules.network.api.NetworkAPI;
+import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.commands.BuildTeamToolsCommand;
 import net.buildtheearth.modules.network.listeners.NetworkJoinListener;
 import net.buildtheearth.modules.network.listeners.NetworkQuitListener;
@@ -27,9 +27,6 @@ import net.buildtheearth.modules.utils.io.ConfigUtil;
 import net.buildtheearth.modules.warp.WarpModule;
 import net.buildtheearth.modules.warp.commands.WarpCommand;
 import net.buildtheearth.modules.warp.listeners.WarpJoinListener;
-import net.buildtheearth.modules.kml.KmlCommand;
-import net.buildtheearth.modules.kml.KmlTabCompleter;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -50,16 +47,7 @@ public class BuildTeamTools {
 
     private long time;
 
-    @Getter
-    private GeneratorModule generatorModule;
-    @Getter
-    private TpllModule tpllModule;
-    @Getter
-    private WarpModule warpManager;
-    @Getter
-    private ProxyModule proxyModule;
-    @Getter
-    private StatsModule statsModule;
+
 
     /**
      * Tries to start up an instance of BuildTeamTools
@@ -78,18 +66,17 @@ public class BuildTeamTools {
         debug = Main.instance.getConfig().getBoolean(ConfigPaths.DEBUG, false);
 
 
-        //Initialize the modules
-        generatorModule = new GeneratorModule();
-        tpllModule = new TpllModule();
-        warpManager = new WarpModule();
-        proxyModule = new ProxyModule();
-        statsModule = new StatsModule();
-
 
         // Register Modules
-        ModuleHandler.getInstance().registerModules(generatorModule, tpllModule, warpManager, proxyModule, statsModule);
-
+        ModuleHandler.getInstance().registerModules(
+                GeneratorModule.getInstance(),
+                TpllModule.getInstance(),
+                WarpModule.getInstance(),
+                NetworkModule.getInstance(),
+                StatsModule.getInstance()
+        );
         ModuleHandler.getInstance().enableAll();
+
 
 
         // Register an incoming & outgoing Plugin Messaging Channel
@@ -98,16 +85,11 @@ public class BuildTeamTools {
         Main.instance.getServer().getMessenger().registerOutgoingPluginChannel(Main.instance, "BuildTeam");
         Main.instance.getServer().getMessenger().registerIncomingPluginChannel(Main.instance, "BuildTeam", Main.instance);
 
-        // Let the network API know the BT-Tools plugin is installed
-        NetworkAPI.setBuildTeamToolsInstalled(true);
-
-
 
         // Register all commands & listeners
         registerCommands();
         registerListeners();
 
-        LocalSession.MAX_HISTORY_SIZE = 500;
 
         // Start the timer which executes operations every x time units
         startTimer();
@@ -119,8 +101,8 @@ public class BuildTeamTools {
      * Stops the instance of BuildTeamTools which is currently running
      */
     public void stop() {
-        if(statsModule != null)
-            statsModule.updateAndSave();
+        if(StatsModule.getInstance().isEnabled())
+            StatsModule.getInstance().updateAndSave();
     }
 
     /**
@@ -137,17 +119,20 @@ public class BuildTeamTools {
             }
 
             // Every 10 minutes (+1 second)
-            if (time % (ProxyModule.CACHE_UPLOAD_SPEED) == 0) {
-                statsModule.updateAndSave();
+            if (time % (NetworkModule.CACHE_UPLOAD_SPEED) == 0) {
+                if(StatsModule.getInstance().isEnabled())
+                    StatsModule.getInstance().updateAndSave();
             }
 
             // Every minute
             if (time % (20 * 60) == 0) {
-                statsModule.getStatsServer().addValue(StatsServerType.UPTIME, 1);
+                if(StatsModule.getInstance().isEnabled()){
+                    StatsModule.getInstance().getStatsServer().addValue(StatsServerType.UPTIME, 1);
 
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    statsModule.getStatsServer().addValue(StatsServerType.PLAYTIME, 1);
-                    statsModule.getStatsPlayer(p.getUniqueId()).addValue(StatsPlayerType.PLAYTIME, 1);
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        StatsModule.getInstance().getStatsServer().addValue(StatsServerType.PLAYTIME, 1);
+                        StatsModule.getInstance().getStatsPlayer(p.getUniqueId()).addValue(StatsPlayerType.PLAYTIME, 1);
+                    }
                 }
             }
 
@@ -166,7 +151,7 @@ public class BuildTeamTools {
                 // Do something
             }
 
-            generatorModule.tick();
+            GeneratorModule.getInstance().tick();
         }, 0, 0);
     }
 
@@ -197,7 +182,7 @@ public class BuildTeamTools {
 
         Bukkit.getPluginManager().registerEvents(new WarpJoinListener(), Main.instance);
 
-        Bukkit.getPluginManager().registerEvents(new NavigatorOpenListener(proxyModule), Main.instance);
+        Bukkit.getPluginManager().registerEvents(new NavigatorOpenListener(), Main.instance);
 
         Bukkit.getPluginManager().registerEvents(new NetworkJoinListener(), Main.instance);
         Bukkit.getPluginManager().registerEvents(new NetworkQuitListener(), Main.instance);

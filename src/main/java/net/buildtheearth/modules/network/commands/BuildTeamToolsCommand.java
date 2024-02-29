@@ -1,7 +1,9 @@
 package net.buildtheearth.modules.network.commands;
 
 import net.buildtheearth.Main;
+import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.Region;
+import net.buildtheearth.modules.stats.StatsModule;
 import net.buildtheearth.modules.updater.UpdateChecker;
 import net.buildtheearth.modules.utils.ChatHelper;
 import org.bukkit.command.Command;
@@ -31,7 +33,7 @@ public class BuildTeamToolsCommand implements CommandExecutor {
             ChatHelper.sendMessageBox(sender, "Build Team Communicators", new Runnable() {
                 @Override
                 public void run() {
-                    for (UUID uuid : Main.getBuildTeamTools().getProxyModule().getCommunicators())
+                    for (UUID uuid : NetworkModule.getInstance().getCommunicators())
                         sender.sendMessage("§7- §e" + uuid.toString());
                 }
             });
@@ -42,15 +44,15 @@ public class BuildTeamToolsCommand implements CommandExecutor {
             ChatHelper.sendMessageBox(sender, "Build Team Cache", new Runnable() {
                 @Override
                 public void run() {
-                    sender.sendMessage(Main.buildTeamTools.getStatsModule().getCurrentCache().toJSONString());
+                    sender.sendMessage(StatsModule.getInstance().getCurrentCache().toJSONString());
                 }
             });
             return true;
         }
 
         if (args.length > 0 && args[0].equalsIgnoreCase("updateCache")) {
-            Main.buildTeamTools.getStatsModule().updateAndSave();
-            Main.buildTeamTools.getProxyModule().updateCache();
+            StatsModule.getInstance().updateAndSave();
+            NetworkModule.getInstance().updateCache();
             sender.sendMessage("§7Cache successfully updated.");
             return true;
         }
@@ -80,15 +82,15 @@ public class BuildTeamToolsCommand implements CommandExecutor {
         ChatHelper.sendMessageBox(sender, "Build Team Tools", () -> {
 
             String buildTeamID = "-";
-            if (Main.getBuildTeamTools().getProxyModule().getBuildTeam().getID() != null) //TODO CAUSES NULLPTR
-                buildTeamID = Main.getBuildTeamTools().getProxyModule().getBuildTeam().getID();
+            if (NetworkModule.getInstance().getBuildTeam().getID() != null) //TODO CAUSES NULLPTR
+                buildTeamID = NetworkModule.getInstance().getBuildTeam().getID();
 
             String serverName = "-";
-            if (Main.getBuildTeamTools().getProxyModule().getBuildTeam().getServerName() != null)
-                serverName = Main.getBuildTeamTools().getProxyModule().getBuildTeam().getServerName();
+            if (NetworkModule.getInstance().getBuildTeam().getServerName() != null)
+                serverName = NetworkModule.getInstance().getBuildTeam().getServerName();
 
             String status = "§c§lDISCONNECTED";
-            if (Main.getBuildTeamTools().getProxyModule().getBuildTeam().isConnected() && !buildTeamID.equals("-") && !serverName.equals("-"))
+            if (NetworkModule.getInstance().getBuildTeam().isConnected() && !buildTeamID.equals("-") && !serverName.equals("-"))
                 status = "§a§lCONNECTED";
             else if (!buildTeamID.equals("-") && !serverName.equals("-"))
                 status = "§6§lSTANDBY";
@@ -104,10 +106,10 @@ public class BuildTeamToolsCommand implements CommandExecutor {
                 sender.sendMessage("§eDebug Mode: §a§lON");
 
             sender.sendMessage("");
-            sender.sendMessage("§eContinent: §7" + Main.getBuildTeamTools().getProxyModule().getBuildTeam().getContinent().getLabel());
+            sender.sendMessage("§eContinent: §7" + NetworkModule.getInstance().getBuildTeam().getContinent().getLabel());
             sender.sendMessage("§eRegions: §7");
 
-            for(Region region : Main.getBuildTeamTools().getProxyModule().getBuildTeam().getRegions()) {
+            for(Region region : NetworkModule.getInstance().getBuildTeam().getRegions()) {
                 sender.sendMessage("§7" + region.getName());
             }
 

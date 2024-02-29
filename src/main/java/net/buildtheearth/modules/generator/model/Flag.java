@@ -1,9 +1,9 @@
 package net.buildtheearth.modules.generator.model;
 
-import net.buildtheearth.modules.generator.modules.house.HouseFlag;
-import net.buildtheearth.modules.generator.modules.rail.RailFlag;
-import net.buildtheearth.modules.generator.modules.road.RoadFlag;
-import net.buildtheearth.modules.generator.modules.tree.TreeFlag;
+import net.buildtheearth.modules.generator.components.house.HouseFlag;
+import net.buildtheearth.modules.generator.components.rail.RailFlag;
+import net.buildtheearth.modules.generator.components.road.RoadFlag;
+import net.buildtheearth.modules.generator.components.tree.TreeFlag;
 
 public interface Flag {
 

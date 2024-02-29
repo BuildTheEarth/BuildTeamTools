@@ -2,8 +2,7 @@ package net.buildtheearth.modules.navigator.menu;
 
 import com.alpsbte.alpslib.utils.item.ItemBuilder;
 import lombok.NonNull;
-import net.buildtheearth.Main;
-import net.buildtheearth.modules.network.ProxyModule;
+import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.network.model.RegionType;
 import net.buildtheearth.modules.utils.ChatHelper;
@@ -32,12 +31,12 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
     public StateSelectorMenu(@NonNull Region country, Player menuPlayer) {
         super(4, 3, country.getName() + " - states", menuPlayer);
         this.country = country;
-        this.states = ProxyModule.getRegionsByRegionType(RegionType.STATE).stream()
+        this.states = NetworkModule.getRegionsByRegionType(RegionType.STATE).stream()
                 .filter(region -> region.getContinent() == country.getContinent()).collect(Collectors.toList());
 
         // Add the New York City region to the states because thats the only city in the USA
         if(country.getCountryCodeCca3().equalsIgnoreCase("USA"))
-            states.add(Main.buildTeamTools.getProxyModule().getRegions().stream().filter(region -> region.getBuildTeam() != null && region.getBuildTeam().getID().equals("Qy2duN4l")).findFirst().orElse(null));
+            states.add(NetworkModule.getInstance().getRegions().stream().filter(region -> region.getBuildTeam() != null && region.getBuildTeam().getID().equals("Qy2duN4l")).findFirst().orElse(null));
 
         if(this.states.size() > 0) {
             // Remove all regions that don't have a build team
@@ -45,7 +44,7 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
                     region == null
                     || region.getBuildTeam() == null
                     || region.getBuildTeam().getID() == null
-                    || region.getBuildTeam().getID().equals(Main.getBuildTeamTools().getProxyModule().getBuildTeam().getID())
+                    || region.getBuildTeam().getID().equals(NetworkModule.getInstance().getBuildTeam().getID())
             ).collect(Collectors.toList()));
 
             // Sort countries by area
@@ -114,7 +113,7 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
                 if (clickedRegion.getBuildTeam().isConnected())
                     Utils.sendPlayerToServer(clickPlayer, clickedRegion.getBuildTeam().getServerName());
                 else
-                    ProxyModule.sendNotConnectedMessage(clickPlayer, clickedRegion.getBuildTeam().getIP());
+                    NetworkModule.sendNotConnectedMessage(clickPlayer, clickedRegion.getBuildTeam().getIP());
             });
             slot++;
         }

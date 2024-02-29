@@ -1,6 +1,6 @@
 package net.buildtheearth.modules.warp.commands;
 
-import net.buildtheearth.Main;
+import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.Permissions;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.warp.WarpModule;
@@ -22,7 +22,7 @@ public class WarpCommand implements CommandExecutor {
         }
 
         // Check if the build team is loaded
-        if(Main.getBuildTeamTools().getProxyModule().getBuildTeam() == null){
+        if(NetworkModule.getInstance().getBuildTeam() == null){
             sender.sendMessage(ChatHelper.error("The Warp Module is currently disabled because the Build Team failed to load!"));
             return true;
         }
@@ -31,15 +31,15 @@ public class WarpCommand implements CommandExecutor {
 
         // If no arguments were supplied assume the player wants to open the warp menu
         if (args.length == 0) {
-            int warpGroupCount = Main.getBuildTeamTools().getProxyModule().getBuildTeam().getWarpGroups().size();
+            int warpGroupCount = NetworkModule.getInstance().getBuildTeam().getWarpGroups().size();
 
             if(warpGroupCount == 0){
                 player.sendMessage(ChatHelper.error("This server does not have any warps yet!"));
                 return true;
             }else if(warpGroupCount == 1)
-                new WarpMenu(player, Main.getBuildTeamTools().getProxyModule().getBuildTeam().getWarpGroups().get(0), false);
+                new WarpMenu(player, NetworkModule.getInstance().getBuildTeam().getWarpGroups().get(0), false);
             else
-                new WarpGroupMenu(player, Main.getBuildTeamTools().getProxyModule().getBuildTeam(), false);
+                new WarpGroupMenu(player, NetworkModule.getInstance().getBuildTeam(), false);
 
             return true;
         }

@@ -1,6 +1,7 @@
 package net.buildtheearth.modules.warp.menu;
 
 import net.buildtheearth.Main;
+import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.modules.utils.*;
 import net.buildtheearth.modules.utils.geo.CoordinateConversion;
@@ -112,9 +113,9 @@ public class WarpEditMenu extends AbstractMenu {
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
             if(alreadyExists)
-                Main.getBuildTeamTools().getProxyModule().getBuildTeam().updateWarp(clickPlayer, warp);
+                NetworkModule.getInstance().getBuildTeam().updateWarp(clickPlayer, warp);
             else
-                Main.getBuildTeamTools().getProxyModule().getBuildTeam().createWarp(clickPlayer, warp);
+                NetworkModule.getInstance().getBuildTeam().createWarp(clickPlayer, warp);
         });
 
         // Set click event for the location item
@@ -133,7 +134,7 @@ public class WarpEditMenu extends AbstractMenu {
                 String countryCodeCCA2 = result[1].toUpperCase();
 
                 //Check if the team owns this region/country
-                boolean ownsRegion = Main.getBuildTeamTools().getProxyModule().ownsRegion(regionName, countryCodeCCA2);
+                boolean ownsRegion = NetworkModule.getInstance().ownsRegion(regionName, countryCodeCCA2);
 
                 if(!ownsRegion) {
                     clickPlayer.sendMessage(ChatHelper.error("This team does not own the country %s!", result[0]));
@@ -227,7 +228,7 @@ public class WarpEditMenu extends AbstractMenu {
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
-                Main.getBuildTeamTools().getProxyModule().getBuildTeam().deleteWarp(clickPlayer, warp);
+                NetworkModule.getInstance().getBuildTeam().deleteWarp(clickPlayer, warp);
             });
     }
 

@@ -1,7 +1,6 @@
 package net.buildtheearth.modules.tpll.listeners;
 
-import net.buildtheearth.Main;
-import net.buildtheearth.modules.network.ProxyModule;
+import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.tpll.TpllModule;
@@ -21,7 +20,7 @@ import java.util.concurrent.CompletableFuture;
 public class TpllListener implements Listener {
 
     // Proxy manager to handle network-related operations
-    private final ProxyModule proxyModule = Main.getBuildTeamTools().getProxyModule();
+    private final NetworkModule networkModule = NetworkModule.getInstance();
 
     // Latitude and longitude coordinates for teleportation
     private double lon;
@@ -81,12 +80,12 @@ public class TpllListener implements Listener {
                     String countryName = address[0];
                     Region region = Region.getByName(countryName);
 
-                    if (!proxyModule.getBuildTeam().isConnected() || !region.isConnected()) {
+                    if (!networkModule.getBuildTeam().isConnected() || !region.isConnected()) {
                         event.getPlayer().sendMessage(ChatHelper.error("Either this server or the receiving server isn't connected to the network."));
                         return CompletableFuture.completedFuture(true);
                     }
 
-                    if (region.getBuildTeam().getID() != proxyModule.getBuildTeam().getID()) {
+                    if (region.getBuildTeam().getID() != networkModule.getBuildTeam().getID()) {
                         targetServerName = region.getBuildTeam().getServerName();
                         return CompletableFuture.completedFuture(true);
                     }

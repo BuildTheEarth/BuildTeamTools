@@ -3,6 +3,7 @@ package net.buildtheearth.modules.utils;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.Main;
+import net.buildtheearth.modules.network.NetworkModule;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -70,8 +71,8 @@ public class Utils {
     }
 
     public static void sendPlayerToServer(Player player, String server) {
-        if(Main.getBuildTeamTools().getProxyModule().getBuildTeam() == null
-        || !Main.getBuildTeamTools().getProxyModule().getBuildTeam().isConnected())
+        if(NetworkModule.getInstance().getBuildTeam() == null
+        || !NetworkModule.getInstance().getBuildTeam().isConnected())
             return;
 
         ByteArrayDataOutput out = ByteStreams.newDataOutput();

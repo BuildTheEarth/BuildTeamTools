@@ -56,25 +56,25 @@ public class GeneratorCommand implements CommandExecutor {
 
         // Command Usage: /gen house ...
         if (args[0].equals("house")) {
-            Main.buildTeamTools.getGeneratorModule().getHouse().analyzeCommand(p, args);
+            GeneratorModule.getInstance().getHouse().analyzeCommand(p, args);
             return true;
         }
 
         // Command Usage: /gen road ...
         if (args[0].equals("road")) {
-            Main.buildTeamTools.getGeneratorModule().getRoad().analyzeCommand(p, args);
+            GeneratorModule.getInstance().getRoad().analyzeCommand(p, args);
             return true;
         }
 
         // Command Usage: /gen rail ...
         if (args[0].equals("rail")) {
-            Main.getBuildTeamTools().getGeneratorModule().getRail().analyzeCommand(p, args);
+            GeneratorModule.getInstance().getRail().analyzeCommand(p, args);
             return true;
         }
 
         // Command Usage: /gen tree ...
         if (args[0].equals("tree")) {
-            Main.getBuildTeamTools().getGeneratorModule().getTree().analyzeCommand(p, args);
+            GeneratorModule.getInstance().getTree().analyzeCommand(p, args);
             return true;
         }
 

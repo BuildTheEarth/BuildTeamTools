@@ -7,6 +7,7 @@ import clipper2.core.Point64;
 import clipper2.offset.EndType;
 import clipper2.offset.JoinType;
 import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
@@ -20,10 +21,10 @@ import net.buildtheearth.Main;
 import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.generator.model.Command;
 import net.buildtheearth.modules.generator.model.History;
-import net.buildtheearth.modules.generator.modules.house.House;
-import net.buildtheearth.modules.generator.modules.rail.Rail;
-import net.buildtheearth.modules.generator.modules.road.Road;
-import net.buildtheearth.modules.generator.modules.tree.Tree;
+import net.buildtheearth.modules.generator.components.house.House;
+import net.buildtheearth.modules.generator.components.rail.Rail;
+import net.buildtheearth.modules.generator.components.road.Road;
+import net.buildtheearth.modules.generator.components.tree.Tree;
 import net.buildtheearth.modules.updater.DependencyManager;
 import net.buildtheearth.modules.utils.Item;
 import org.apache.commons.lang.StringUtils;
@@ -54,32 +55,54 @@ public class GeneratorModule implements Module {
     private final List<Command> commands = new ArrayList<>();
 
     @Getter
-    private final House house;
+    private House house;
     @Getter
-    private final Road road;
+    private Road road;
     @Getter
-    private final Rail rail;
+    private Rail rail;
 
     @Getter
-    private final Tree tree;
+    private Tree tree;
 
-    public GeneratorModule() {
+
+    private static GeneratorModule instance = null;
+    private boolean enabled = false;
+
+    public static GeneratorModule getInstance() {
+        return instance == null ? instance = new GeneratorModule() : instance;
+    }
+
+    public GeneratorModule() {}
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    @Override
+    public void onEnable() {
         house = new House();
         road = new Road();
         rail = new Rail();
         tree = new Tree();
+
+        LocalSession.MAX_HISTORY_SIZE = 500;
+
+        enabled = true;
     }
 
     @Override
-    public void onEnable() {}
-
-    @Override
-    public void onDisable() {}
+    public void onDisable() {
+        enabled = false;
+    }
 
     @Override
     public String getModuleName() {
         return "Generator";
     }
+
+
+
 
     /**
      * Returns the Generator History of a player.

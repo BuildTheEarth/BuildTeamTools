@@ -1,7 +1,7 @@
 package net.buildtheearth.modules.network.api;
 
 import net.buildtheearth.Main;
-import net.buildtheearth.modules.network.ProxyModule;
+import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Continent;
 import net.buildtheearth.modules.network.model.Region;
@@ -63,14 +63,14 @@ public class NetworkAPI {
                     continent.getRegions().clear();
 
                 // Clear all regions from the build teams
-                for(BuildTeam buildTeam : Main.getBuildTeamTools().getProxyModule().getBuildTeams())
+                for(BuildTeam buildTeam : NetworkModule.getInstance().getBuildTeams())
                     buildTeam.getRegions().clear();
 
                 // Clear all build teams
-                Main.getBuildTeamTools().getProxyModule().getBuildTeams().clear();
+                NetworkModule.getInstance().getBuildTeams().clear();
 
                 // Clear all regions
-                Main.getBuildTeamTools().getProxyModule().getRegions().clear();
+                NetworkModule.getInstance().getRegions().clear();
 
                 // Add all teams to the proxy manager
                 for(Object object : responseArray.toArray()) {
@@ -105,7 +105,7 @@ public class NetworkAPI {
                     String blankName = (String) teamObject.get("BlankName");
 
                     BuildTeam buildTeam = new BuildTeam(teamID, mainServerIP, name, blankName, serverName, continent, isConnected, hasBuildTeamToolsInstalled);
-                    Main.getBuildTeamTools().getProxyModule().getBuildTeams().add(buildTeam);
+                    NetworkModule.getInstance().getBuildTeams().add(buildTeam);
 
                     // Create an "other" Warp Group for warps that don't belong to a warp group
                     WarpGroup otherWarpGroup = new WarpGroup(buildTeam, "Other", "Other warps");
@@ -205,7 +205,7 @@ public class NetworkAPI {
 
                         continent.getRegions().add(region);
                         buildTeam.getRegions().add(region);
-                        Main.getBuildTeamTools().getProxyModule().getRegions().add(region);
+                        NetworkModule.getInstance().getRegions().add(region);
                     }
                 }
 
@@ -262,10 +262,10 @@ public class NetworkAPI {
                 JSONObject teamObject = API.createJSONObject(response);
 
                 String teamID = (String) teamObject.get("ID");
-                ProxyModule proxyModule = Main.getBuildTeamTools().getProxyModule();
+                NetworkModule networkModule = NetworkModule.getInstance();
 
-                BuildTeam buildTeam = proxyModule.getBuildTeamByID(teamID);
-                proxyModule.setBuildTeam(buildTeam);
+                BuildTeam buildTeam = networkModule.getBuildTeamByID(teamID);
+                networkModule.setBuildTeam(buildTeam);
 
                 future.complete(null);
             }
@@ -333,7 +333,7 @@ public class NetworkAPI {
     }
 
     public static void syncPlayerList() {
-        if(Main.getBuildTeamTools().getProxyModule().getBuildTeam().isConnected())
+        if(NetworkModule.getInstance().getBuildTeam().isConnected())
             return;
 
         String apiKey = Main.instance.getConfig().getString(ConfigPaths.API_KEY);

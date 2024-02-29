@@ -87,7 +87,7 @@ public class StatsMenu extends AbstractMenu {
      * Sets up the correct lores for all items
      */
     private void setupLores() {
-        StatsModule statsModule = Main.buildTeamTools.getStatsModule();
+        StatsModule statsModule = StatsModule.getInstance();
 
 
         // Set Player Head Lore

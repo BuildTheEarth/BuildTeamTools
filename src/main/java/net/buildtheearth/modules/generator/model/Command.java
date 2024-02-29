@@ -16,7 +16,7 @@ public class Command {
     @Getter
     private final Player player;
     @Getter
-    private final net.buildtheearth.modules.generator.model.GeneratorModule module;
+    private final GeneratorComponent module;
     @Getter
     private final List<String> commands;
 
@@ -31,7 +31,7 @@ public class Command {
     @Getter
     private long percentage;
 
-    public Command(Player player, net.buildtheearth.modules.generator.model.GeneratorModule module, List<String> commands, int operations, Block[][][] blocks) {
+    public Command(Player player, GeneratorComponent module, List<String> commands, int operations, Block[][][] blocks) {
         this.player = player;
         this.module = module;
         this.commands = commands;

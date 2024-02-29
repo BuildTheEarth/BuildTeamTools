@@ -2,8 +2,7 @@ package net.buildtheearth.modules.navigator.menu;
 
 import com.alpsbte.alpslib.utils.item.ItemBuilder;
 import lombok.NonNull;
-import net.buildtheearth.Main;
-import net.buildtheearth.modules.network.ProxyModule;
+import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Continent;
 import net.buildtheearth.modules.network.model.Region;
@@ -54,8 +53,8 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
                     || region.getBuildTeam() == null
                     || region.getBuildTeam().getID() == null
                     || (
-                        Main.getBuildTeamTools().getProxyModule().getBuildTeam() != null
-                        && region.getBuildTeam().getID().equals(Main.getBuildTeamTools().getProxyModule().getBuildTeam().getID())
+                            NetworkModule.getInstance().getBuildTeam() != null
+                        && region.getBuildTeam().getID().equals(NetworkModule.getInstance().getBuildTeam().getID())
                     )
             ).collect(Collectors.toList()));
         }
@@ -126,7 +125,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
                 else if (clickedRegion.getBuildTeam().isConnected())
                     Utils.sendPlayerToServer(clickPlayer, clickedRegion.getBuildTeam().getServerName());
                 else
-                    ProxyModule.sendNotConnectedMessage(clickPlayer, clickedRegion.getBuildTeam().getIP());
+                    NetworkModule.sendNotConnectedMessage(clickPlayer, clickedRegion.getBuildTeam().getIP());
             });
             slot++;
         }

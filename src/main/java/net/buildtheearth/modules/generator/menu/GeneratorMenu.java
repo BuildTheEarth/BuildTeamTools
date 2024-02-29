@@ -2,16 +2,16 @@ package net.buildtheearth.modules.generator.menu;
 
 import net.buildtheearth.Main;
 import net.buildtheearth.modules.generator.GeneratorModule;
-import net.buildtheearth.modules.generator.modules.house.House;
-import net.buildtheearth.modules.generator.modules.house.HouseSettings;
-import net.buildtheearth.modules.generator.modules.house.RoofType;
-import net.buildtheearth.modules.generator.modules.house.menu.WallColorMenu;
-import net.buildtheearth.modules.generator.modules.rail.Rail;
-import net.buildtheearth.modules.generator.modules.rail.RailSettings;
-import net.buildtheearth.modules.generator.modules.road.Road;
-import net.buildtheearth.modules.generator.modules.road.RoadSettings;
-import net.buildtheearth.modules.generator.modules.road.menu.RoadColorMenu;
-import net.buildtheearth.modules.generator.modules.tree.Tree;
+import net.buildtheearth.modules.generator.components.house.House;
+import net.buildtheearth.modules.generator.components.house.HouseSettings;
+import net.buildtheearth.modules.generator.components.house.RoofType;
+import net.buildtheearth.modules.generator.components.house.menu.WallColorMenu;
+import net.buildtheearth.modules.generator.components.rail.Rail;
+import net.buildtheearth.modules.generator.components.rail.RailSettings;
+import net.buildtheearth.modules.generator.components.road.Road;
+import net.buildtheearth.modules.generator.components.road.RoadSettings;
+import net.buildtheearth.modules.generator.components.road.menu.RoadColorMenu;
+import net.buildtheearth.modules.generator.components.tree.Tree;
 import net.buildtheearth.modules.updater.DependencyManager;
 import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.ListUtil;
@@ -173,7 +173,7 @@ public class GeneratorMenu extends AbstractMenu {
     protected void setItemClickEventsAsync() {
         // Set click event for house item
         getMenu().getSlot(HOUSE_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            House house = Main.buildTeamTools.getGeneratorModule().getHouse();
+            House house = GeneratorModule.getInstance().getHouse();
             house.getPlayerSettings().put(clickPlayer.getUniqueId(), new HouseSettings(clickPlayer));
 
             if (!house.checkPlayer(clickPlayer))
@@ -186,7 +186,7 @@ public class GeneratorMenu extends AbstractMenu {
 
         // Set click event for road item
         getMenu().getSlot(ROAD_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            Road road = Main.buildTeamTools.getGeneratorModule().getRoad();
+            Road road = GeneratorModule.getInstance().getRoad();
             road.getPlayerSettings().put(clickPlayer.getUniqueId(), new RoadSettings(clickPlayer));
 
             if (!road.checkPlayer(clickPlayer))
@@ -199,7 +199,7 @@ public class GeneratorMenu extends AbstractMenu {
 
         // Set click event for railway item
         getMenu().getSlot(RAILWAY_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            Rail rail = Main.buildTeamTools.getGeneratorModule().getRail();
+            Rail rail = GeneratorModule.getInstance().getRail();
             rail.getPlayerSettings().put(clickPlayer.getUniqueId(), new RailSettings(clickPlayer));
 
             if (!rail.checkPlayer(clickPlayer))
@@ -208,7 +208,7 @@ public class GeneratorMenu extends AbstractMenu {
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
 
-            Main.getBuildTeamTools().getGeneratorModule().getRail().generate(clickPlayer);
+            GeneratorModule.getInstance().getRail().generate(clickPlayer);
         }));
     }
 

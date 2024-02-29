@@ -2,7 +2,7 @@ package net.buildtheearth.modules.navigator.menu;
 
 import com.alpsbte.alpslib.utils.item.ItemBuilder;
 import net.buildtheearth.Main;
-import net.buildtheearth.modules.network.ProxyModule;
+import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.Utils;
@@ -90,7 +90,7 @@ public class MainMenu extends AbstractMenu {
                 // If no command or message is set, teleport player to the plot system server
                 if(action == null || action.equals("/command") || action.equals("message")) {
                     clickPlayer.sendMessage(ChatHelper.standard("Teleporting you to the plot system server..."));
-                    Utils.sendPlayerToServer(clickPlayer, ProxyModule.GLOBAL_PLOT_SYSTEM_SERVER);
+                    Utils.sendPlayerToServer(clickPlayer, NetworkModule.GLOBAL_PLOT_SYSTEM_SERVER);
                     return;
                 }
 

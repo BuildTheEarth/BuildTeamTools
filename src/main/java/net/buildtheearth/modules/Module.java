@@ -6,9 +6,16 @@ package net.buildtheearth.modules;
  * @author Noah Husby
  */
 public interface Module {
+
+    boolean isEnabled();
+
     void onEnable();
 
     void onDisable();
 
     String getModuleName();
+
+    static Module getInstance() {
+        return null;
+    }
 }

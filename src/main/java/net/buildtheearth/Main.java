@@ -2,6 +2,8 @@ package net.buildtheearth;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
+import net.buildtheearth.modules.network.NetworkModule;
+import net.buildtheearth.modules.stats.StatsModule;
 import net.buildtheearth.modules.tpll.TpllModule;
 import net.buildtheearth.modules.updater.UpdateChecker;
 import net.buildtheearth.modules.utils.ChatHelper;
@@ -75,7 +77,7 @@ public class Main extends JavaPlugin implements PluginMessageListener {
         if (channel.equals("BuildTeam")) {
 
             // If the player is not on the list of people communicating with the network, add his uuid to that list
-            List<UUID> communicators = Main.getBuildTeamTools().getProxyModule().getCommunicators();
+            List<UUID> communicators = NetworkModule.getInstance().getCommunicators();
             if (!communicators.contains(player.getUniqueId())) {
                 communicators.add(player.getUniqueId());
             }
@@ -94,7 +96,7 @@ public class Main extends JavaPlugin implements PluginMessageListener {
             if (subChannel.equalsIgnoreCase("Stats")) {
                 String status = in.readUTF();
                 if (status.equals("OK")) {
-                    buildTeamTools.getStatsModule().resetCache();
+                    StatsModule.getInstance().resetCache();
                 }
             }
 

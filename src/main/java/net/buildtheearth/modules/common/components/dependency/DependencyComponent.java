@@ -2,6 +2,7 @@ package net.buildtheearth.modules.common.components.dependency;
 
 import com.sk89q.worldedit.WorldEdit;
 import net.buildtheearth.BuildTeamTools;
+import net.buildtheearth.modules.Component;
 import org.bukkit.plugin.PluginManager;
 
 import java.util.ArrayList;
@@ -10,10 +11,15 @@ import java.util.List;
 /**
  * This class handles checking if the required dependencies for certain features are present
  */
-public class DependencyComponent {
+public class DependencyComponent extends Component {
 
     // List which contains all missing dependencies
     private final List<String> missingDependencies = new ArrayList<>();
+
+    public DependencyComponent() {
+        super("Dependencies");
+    }
+
 
     /**
      * Check for all required dependencies and inform the console about missing dependencies

@@ -4,6 +4,7 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.BuildTeamTools;
+import net.buildtheearth.modules.Component;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.GeometricUtils;
@@ -13,7 +14,11 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class TpllComponent {
+public class TpllComponent extends Component {
+
+    public TpllComponent() {
+        super("Tpll");
+    }
 
     /**
      * Stores a List of the tpll operations that need to happen on join

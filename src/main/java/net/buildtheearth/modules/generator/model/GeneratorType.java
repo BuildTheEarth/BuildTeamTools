@@ -1,5 +1,7 @@
 package net.buildtheearth.modules.generator.model;
 
+import lombok.Getter;
+
 public enum GeneratorType {
 
     HOUSE("House"),
@@ -7,6 +9,7 @@ public enum GeneratorType {
     RAILWAY("Railway"),
     TREE("Tree");
 
+    @Getter
     private final String name;
 
     GeneratorType(String name) {

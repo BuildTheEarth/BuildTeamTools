@@ -2,6 +2,7 @@ package net.buildtheearth.modules.generator.model;
 
 import lombok.Getter;
 import net.buildtheearth.BuildTeamTools;
+import net.buildtheearth.modules.Component;
 import net.buildtheearth.modules.generator.components.house.HouseSettings;
 import net.buildtheearth.modules.generator.components.rail.RailSettings;
 import net.buildtheearth.modules.generator.components.road.RoadFlag;
@@ -16,7 +17,7 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.UUID;
 
-public abstract class GeneratorComponent {
+public abstract class GeneratorComponent extends Component {
 
 
     public String wikiPage;
@@ -26,6 +27,7 @@ public abstract class GeneratorComponent {
     private final HashMap<UUID, Settings> playerSettings = new HashMap<>();
 
     public GeneratorComponent(GeneratorType type) {
+        super(type.getName());
         generatorType = type;
     }
 

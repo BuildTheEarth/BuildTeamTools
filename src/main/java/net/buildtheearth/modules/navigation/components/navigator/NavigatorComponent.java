@@ -1,6 +1,7 @@
 package net.buildtheearth.modules.navigation.components.navigator;
 
 import net.buildtheearth.BuildTeamTools;
+import net.buildtheearth.modules.Component;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.io.ConfigPaths;
 import org.bukkit.Material;
@@ -8,7 +9,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-public class NavigatorComponent {
+public class NavigatorComponent extends Component {
+
+
+    public NavigatorComponent() {
+        super("Navigator");
+    }
 
     /*
     Toggles the navigator on or off based on the current state

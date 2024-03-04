@@ -1,11 +1,13 @@
 package net.buildtheearth.modules;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import lombok.Getter;
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.utils.ChatHelper;
+import org.bukkit.Bukkit;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
 
 /**
  * @author Noah Husby
@@ -21,7 +23,7 @@ public class ModuleHandler {
     }
 
     @Getter
-    private final Map<Module, Boolean> modules = Maps.newHashMap();
+    private final List<Module> modules = new ArrayList<>();
 
     /**
      * Register a new module
@@ -29,7 +31,7 @@ public class ModuleHandler {
      * @param module {@link Module}
      */
     public void registerModule(Module module) {
-        modules.put(module, false);
+        modules.add(module);
     }
 
     /**
@@ -46,16 +48,57 @@ public class ModuleHandler {
      * Enables a specific module
      *
      * @param module {@link Module}
+     * @param isStarting if the server is starting
      * @return True if successfully enabled, false if not
      */
-    public boolean enable(Module module) {
-        if (modules.get(module)) {
-            return false;
-        }
-        module.onEnable();
-        modules.put(module, true);
+    public boolean enable(Module module, boolean isStarting) {
+        for(Module m : modules)
+            if(m.getModuleName().equals(module.getModuleName()) && m.isEnabled())
+                return false;
 
-        ChatHelper.logDebug("Enabling Module: %s", module.getModuleName());
+        boolean containsDisabledDependencyModule = false;
+        for(Module m : module.getDependsOnModules())
+            if(!m.isEnabled()) {
+                module.checkForModuleDependencies();
+                containsDisabledDependencyModule = true;
+            }
+
+        try{
+            if(!containsDisabledDependencyModule)
+                module.enable();
+        } catch (Exception ex) {
+            if(BuildTeamTools.getInstance().isDebug()){
+                ChatHelper.logError("An error occurred while enabling the %s Module: %s", module.getModuleName(), ex.getMessage());
+                ex.printStackTrace();
+            }
+
+            module.shutdown(ex.getMessage());
+        }
+
+        if(isStarting) {
+            if (module.isEnabled())
+                Bukkit.getLogger().log(Level.INFO, "§7[§a✔§7] Successfully loaded §e" + module.getModuleName() + " Module§7.");
+            else {
+                String reason = "";
+
+                if(module.getError() != null && !module.getError().isEmpty())
+                    reason = " Reason: §c" + module.getError();
+
+                Bukkit.getLogger().log(Level.INFO, "§7[§c✖§7] Failed to load the §e" + module.getModuleName() + " Module§7." + reason);
+            }
+        }else{
+            if (module.isEnabled())
+                ChatHelper.log("Successfully enabled %s Module", module.getModuleName());
+            else {
+                String reason = "";
+
+                if(module.getError() != null && !module.getError().isEmpty())
+                    reason = " Reason: §c" + module.getError();
+
+                ChatHelper.logError("Failed to enable the %s Module%s", module.getModuleName(), reason);
+            }
+        }
+
         return true;
     }
 
@@ -66,43 +109,55 @@ public class ModuleHandler {
      * @return True if successfully disabled, false if not
      */
     public boolean disable(Module module) {
-        if (!modules.get(module)) {
-            return false;
-        }
-        module.onDisable();
-        modules.put(module, false);
+        boolean contains = false;
+        for(Module m : modules)
+            if(m.getModuleName().equals(module.getModuleName()))
+                contains = true;
 
-        ChatHelper.logDebug("Disabling Module: %s", module.getModuleName());
+        if(!contains)
+            return false;
+
+        module.disable();
+
+        if (!module.isEnabled())
+            ChatHelper.log("Successfully disabled %s Module", module.getModuleName());
+        else {
+            String reason = "";
+
+            if(module.getError() != null && !module.getError().isEmpty())
+                reason = " Reason: §c" + module.getError();
+
+            ChatHelper.logError("Failed to disable the %s Module%s", module.getModuleName(), reason);
+        }
+
         return true;
     }
 
-    /**
-     * Enables all modules
+    /** Enables all modules
+     *
+     * @param isStarting if the server is starting
      */
-    public void enableAll() {
-        for (Map.Entry<Module, Boolean> e : ImmutableMap.copyOf(modules).entrySet()) {
-            if (!e.getValue()) {
-                enable(e.getKey());
-            }
-        }
+    public void enableAll(boolean isStarting) {
+        for (Module module : new ArrayList<>(modules))
+            if (!module.isEnabled())
+                enable(module, isStarting);
     }
 
-    /**
-     * Disables all modules
+    /** Disables all modules
+     *
+     * @param isStopping if the server is stopping
      */
-    public void disableAll() {
-        for (Map.Entry<Module, Boolean> e : ImmutableMap.copyOf(modules).entrySet()) {
-            if (e.getValue()) {
-                disable(e.getKey());
-            }
-        }
+    public void disableAll(boolean isStopping) {
+        for (Module module : new ArrayList<>(modules))
+            if (module.isEnabled())
+                disable(module);
     }
 
     /**
      * Reloads all modules
      */
     public void reloadAll() {
-        disableAll();
-        enableAll();
+        disableAll(false);
+        enableAll(false);
     }
 }

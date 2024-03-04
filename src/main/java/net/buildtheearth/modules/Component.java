@@ -19,6 +19,8 @@ public abstract class Component {
 
     public Component(String componentName) {
         this.componentName = componentName;
+
+        onEnable();
     }
 
 

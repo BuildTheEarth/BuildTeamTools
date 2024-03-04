@@ -7,9 +7,10 @@ author: MineFact, frikandelworst, George112n, ELgamer, SirJodelstein
 commands:
   buildteam:
     description: Main command of the Build Team plugin.
-    usage: /buildteamtools
+    usage: /buildteam
     aliases:
       - btt
+      - buildteamtools
   generate:
     description: Allows usage of the Generator Tool.
     usage: /generate

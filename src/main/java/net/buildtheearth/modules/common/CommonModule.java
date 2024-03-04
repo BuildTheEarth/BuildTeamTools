@@ -9,11 +9,13 @@ import net.buildtheearth.modules.common.commands.BuildTeamToolsCommand;
 import net.buildtheearth.modules.common.components.dependency.DependencyComponent;
 import net.buildtheearth.modules.common.components.pluginmessaging.PluginMessagingComponent;
 import net.buildtheearth.modules.common.components.updater.UpdaterComponent;
+import net.buildtheearth.modules.common.listeners.CommandListener;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.stats.StatsModule;
 import net.buildtheearth.modules.stats.model.StatsPlayerType;
 import net.buildtheearth.modules.stats.model.StatsServerType;
+import net.buildtheearth.modules.utils.io.ConfigPaths;
 import net.buildtheearth.modules.utils.io.ConfigUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -45,36 +47,46 @@ public class CommonModule extends Module {
 
 
     @Override
-    public void onEnable() {
+    public void enable() {
+        // Try to load the configuration, if it throws an exception disable the plugin.
+        try {
+            YamlFileFactory.registerPlugin(BuildTeamTools.getInstance());
+            ConfigUtil.init();
+        } catch (ConfigNotImplementedException ex) {
+        }
+
+        // Reload the configuration file
+        ConfigUtil.getInstance().reloadFiles();
+
+        // Set the debug mode
+        BuildTeamTools.getInstance().setDebug(BuildTeamTools.getInstance().getConfig().getBoolean(ConfigPaths.DEBUG, false));
+
         // Initialize the components
         updaterComponent = new UpdaterComponent(BuildTeamTools.getInstance(), BuildTeamTools.SPIGOT_PROJECT_ID, BuildTeamTools.getInstance().getPluginFile(), UpdaterComponent.UpdateType.CHECK_DOWNLOAD, BuildTeamTools.getInstance().isDebug());
         pluginMessagingComponent = new PluginMessagingComponent();
         dependencyComponent = new DependencyComponent();
 
-        // Try to load the configuration, if it throws an exception disable the plugin.
-        try {
-            YamlFileFactory.registerPlugin(BuildTeamTools.getInstance());
-            ConfigUtil.init();
-        } catch (ConfigNotImplementedException ex) {}
 
-        // Reload the configuration file
-        ConfigUtil.getInstance().reloadFiles();
-
+        // Start the timer
         startTimer();
 
-        super.onEnable();
+        super.enable();
     }
 
     @Override
     public void registerCommands() {
-        BuildTeamTools.getInstance().getCommand("buildteam").setExecutor(new BuildTeamToolsCommand());
+        registerCommand("buildteam", new BuildTeamToolsCommand());
     }
 
     @Override
     public void registerListeners() {
-        // Register the listener for the canvas Gui Library
-        Bukkit.getPluginManager().registerEvents(new MenuFunctionListener(), BuildTeamTools.getInstance());
+        super.registerListeners(
+            new MenuFunctionListener(),
+            new CommandListener()
+        );
     }
+
+
 
 
 

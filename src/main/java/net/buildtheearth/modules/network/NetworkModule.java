@@ -12,6 +12,7 @@ import net.buildtheearth.modules.network.listeners.NetworkQuitListener;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.network.model.RegionType;
+import net.buildtheearth.modules.utils.io.ConfigPaths;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -60,17 +61,27 @@ public class NetworkModule extends Module {
     }
 
     @Override
-    public void onEnable() {
+    public void enable() {
+        String API_KEY = BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY);
+        if(API_KEY == null || API_KEY.isEmpty() || API_KEY.equals("00000000-0000-0000-0000-000000000000")){
+            shutdown("The API Key is was not configured in the config.yml file.");
+            return;
+        }
+
         pingAllOnlinePlayers();
         updateCache();
 
-        super.onEnable();
+        if(getBuildTeam() == null) {
+            shutdown("Failed to load the Build Team!");
+            return;
+        }
+
+        super.enable();
     }
 
     @Override
     public void registerListeners(){
-        Bukkit.getPluginManager().registerEvents(new NetworkJoinListener(), BuildTeamTools.getInstance());
-        Bukkit.getPluginManager().registerEvents(new NetworkQuitListener(), BuildTeamTools.getInstance());
+        super.registerListeners(new NetworkJoinListener(), new NetworkQuitListener());
     }
 
 

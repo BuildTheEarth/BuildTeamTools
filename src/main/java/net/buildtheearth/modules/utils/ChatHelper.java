@@ -13,10 +13,14 @@ import java.util.logging.Level;
 
 public class ChatHelper {
 
-    public static boolean DEBUG = BuildTeamTools.getInstance().getConfig().getBoolean(ConfigPaths.DEBUG, false);
+    public static boolean DEBUG = BuildTeamTools.getInstance().getConfig() != null && BuildTeamTools.getInstance().getConfig().getBoolean(ConfigPaths.DEBUG, false);
 
     public static void logError(String errorMessage, Object... objects) {
         Bukkit.getLogger().log(Level.INFO, ChatHelper.error(errorMessage, objects));
+    }
+
+    public static void log(String string, Object... objects) {
+        Bukkit.getLogger().log(Level.INFO, console(string, objects));
     }
 
     public static void logDebug(String string, Object... objects) {

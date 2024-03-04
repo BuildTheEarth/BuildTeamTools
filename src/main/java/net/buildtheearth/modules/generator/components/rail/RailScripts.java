@@ -92,7 +92,7 @@ public class RailScripts {
         commands.add("//gmask");
         GeneratorModule.createConvexSelection(commands, points);
 
-        GeneratorModule.getInstance().getCommands().add(new Command(p, rail, commands, operations, regionBlocks));
+        GeneratorModule.getInstance().getGeneratorCommands().add(new Command(p, rail, commands, operations, regionBlocks));
         GeneratorModule.getPlayerHistory(p).addHistoryEntry(new History.HistoryEntry(GeneratorType.RAILWAY, operations));
     }
 }

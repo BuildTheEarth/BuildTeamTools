@@ -39,26 +39,26 @@ public class StatsModule extends Module {
 
 
     @Override
-    public void onEnable() {
+    public void enable() {
         statsServer = new StatsServer();
         statsPlayerList = new HashMap<>();
 
-        super.onEnable();
+        super.enable();
     }
 
     @Override
-    public void onDisable() {
+    public void disable() {
         if(!isEnabled())
             return;
 
         updateAndSave();
 
-        super.onDisable();
+        super.disable();
     }
 
     @Override
     public void registerListeners() {
-        Bukkit.getPluginManager().registerEvents(new StatsListener(), BuildTeamTools.getInstance());
+        super.registerListeners(new StatsListener());
     }
 
 

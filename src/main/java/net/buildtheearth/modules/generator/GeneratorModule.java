@@ -55,7 +55,7 @@ public class GeneratorModule extends Module {
     private static final HashMap<UUID, History> playerHistory = new HashMap<>();
 
     @Getter
-    private final List<Command> commands = new ArrayList<>();
+    private final List<Command> generatorCommands = new ArrayList<>();
 
     @Getter
     private House house;
@@ -79,7 +79,7 @@ public class GeneratorModule extends Module {
     }
 
     @Override
-    public void onEnable() {
+    public void enable() {
         house = new House();
         road = new Road();
         rail = new Rail();
@@ -87,18 +87,21 @@ public class GeneratorModule extends Module {
 
         LocalSession.MAX_HISTORY_SIZE = 500;
 
-        super.onEnable();
+        super.enable();
     }
 
     @Override
     public void registerCommands() {
-        BuildTeamTools.getInstance().getCommand("generate").setExecutor(new GeneratorCommand());
-        BuildTeamTools.getInstance().getCommand("kml").setExecutor(new KmlCommand());
+        registerCommand("generate", new GeneratorCommand());
+        registerCommand("kml", new KmlCommand());
 
         BuildTeamTools.getInstance().getCommand("kml").setTabCompleter(new KmlTabCompleter());
     }
 
+    @Override
+    public void registerListeners() {
 
+    }
 
 
     /**
@@ -830,30 +833,30 @@ public class GeneratorModule extends Module {
      * @see Command#tick()
      */
     public void tick() {
-        if (commands.size() == 0)
+        if (generatorCommands.size() == 0)
             return;
 
-        if (commands.get(0).getCommands().size() == 0) {
-            commands.remove(0);
+        if (generatorCommands.get(0).getCommands().size() == 0) {
+            generatorCommands.remove(0);
             return;
         }
 
-        for (int i = 1; i < commands.size(); i++) {
+        for (int i = 1; i < generatorCommands.size(); i++) {
             boolean isInQueue = false;
 
             for (int j = i - 1; j > 0; j--)
-                if (commands.get(i).getPlayer().getUniqueId().equals(commands.get(j).getPlayer().getUniqueId()))
+                if (generatorCommands.get(i).getPlayer().getUniqueId().equals(generatorCommands.get(j).getPlayer().getUniqueId()))
                     isInQueue = true;
 
-            if (commands.get(0).getPlayer().getUniqueId().equals(commands.get(i).getPlayer().getUniqueId()))
+            if (generatorCommands.get(0).getPlayer().getUniqueId().equals(generatorCommands.get(i).getPlayer().getUniqueId()))
                 isInQueue = true;
 
             if (isInQueue)
                 continue;
 
-            commands.get(i).getPlayer().sendActionBar("§c§lOther Generation in Progress. Position: §e" + i + "/" + commands.size() + " (" + commands.get(0).getPercentage() + "%)");
+            generatorCommands.get(i).getPlayer().sendActionBar("§c§lOther Generation in Progress. Position: §e" + i + "/" + generatorCommands.size() + " (" + generatorCommands.get(0).getPercentage() + "%)");
         }
 
-        commands.get(0).tick();
+        generatorCommands.get(0).tick();
     }
 }

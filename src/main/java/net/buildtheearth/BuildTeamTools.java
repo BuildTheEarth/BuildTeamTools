@@ -8,12 +8,15 @@ import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.stats.StatsModule;
+import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.io.ConfigPaths;
 import net.buildtheearth.modules.utils.io.ConfigUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.logging.Level;
 
 /**
  * The parent of all modules of the Build Team Tools plugin
@@ -27,37 +30,45 @@ public class BuildTeamTools extends JavaPlugin {
     @Getter @Setter
     private boolean debug;
 
+    @Getter
     private static BuildTeamTools instance = null;
-    public static BuildTeamTools getInstance() {
-        return instance == null ? instance = new BuildTeamTools() : instance;
-    }
-
 
 
     @Override
     public void onEnable() {
-        debug = BuildTeamTools.getInstance().getConfig().getBoolean(ConfigPaths.DEBUG, false);
+        instance = this;
+
+        Bukkit.getLogger().log(Level.INFO, "§e--------------- BuildTeamTools V" + getDescription().getVersion() + " ----------------");
+        Bukkit.getLogger().log(Level.INFO, " ");
 
         // Register Modules
         ModuleHandler.getInstance().registerModules(
                 CommonModule.getInstance(),
+                NetworkModule.getInstance(),
                 GeneratorModule.getInstance(),
                 NavigationModule.getInstance(),
-                NetworkModule.getInstance(),
                 StatsModule.getInstance()
         );
-        ModuleHandler.getInstance().enableAll();
+        ModuleHandler.getInstance().enableAll(true);
 
+        Bukkit.getLogger().log(Level.INFO," ");
+        Bukkit.getLogger().log(Level.INFO,"§e------------------------------------------------------------");
+        Bukkit.getLogger().log(Level.INFO,"§8> §7Made by §bBuildTheEarth");
+        Bukkit.getLogger().log(Level.INFO,"§8> §7GitHub:§f https://github.com/BuildTheEarth/BuildTeamTools");
+        Bukkit.getLogger().log(Level.INFO,"§e------------------------------------------------------------");
     }
 
     @Override
     public void onDisable() {
-        ModuleHandler.getInstance().disableAll();
+        ModuleHandler.getInstance().disableAll(true);
     }
 
 
     @Override
     public FileConfiguration getConfig() {
+        if(ConfigUtil.getInstance() == null)
+            return null;
+
         return ConfigUtil.getInstance().configs[0];
     }
 

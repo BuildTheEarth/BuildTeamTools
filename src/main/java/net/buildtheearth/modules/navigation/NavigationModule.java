@@ -1,7 +1,6 @@
 package net.buildtheearth.modules.navigation;
 
 import lombok.Getter;
-import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.navigation.components.navigator.NavigatorComponent;
 import net.buildtheearth.modules.navigation.components.navigator.commands.NavigatorCommand;
@@ -12,7 +11,7 @@ import net.buildtheearth.modules.navigation.components.tpll.listeners.TpllListen
 import net.buildtheearth.modules.navigation.components.warps.WarpsComponent;
 import net.buildtheearth.modules.navigation.components.warps.commands.WarpCommand;
 import net.buildtheearth.modules.navigation.components.warps.listeners.WarpJoinListener;
-import org.bukkit.Bukkit;
+import net.buildtheearth.modules.network.NetworkModule;
 
 /**
  * Manages all things related to universal tpll
@@ -31,7 +30,7 @@ public class NavigationModule extends Module {
     private static NavigationModule instance = null;
 
     public NavigationModule() {
-        super("Navigation");
+        super("Navigation", NetworkModule.getInstance());
     }
 
     public static NavigationModule getInstance() {
@@ -40,27 +39,32 @@ public class NavigationModule extends Module {
 
 
     @Override
-    public void onEnable() {
+    public void enable() {
+        if(NetworkModule.getInstance().getBuildTeam() == null) {
+            shutdown("The Network Module failed to load the Build Team.");
+            return;
+        }
+
         warpsComponent = new WarpsComponent();
         navigatorComponent = new NavigatorComponent();
         tpllComponent = new TpllComponent();
 
-        super.onEnable();
+        super.enable();
     }
 
     @Override
     public void registerCommands() {
-        BuildTeamTools.getInstance().getCommand("warp").setExecutor(new WarpCommand());
-        BuildTeamTools.getInstance().getCommand("navigator").setExecutor(new NavigatorCommand());
+        registerCommand("warp", new WarpCommand());
+        registerCommand("navigator", new NavigatorCommand());
     }
 
     @Override
     public void registerListeners() {
-        Bukkit.getPluginManager().registerEvents(new TpllJoinListener(), BuildTeamTools.getInstance());
-        Bukkit.getPluginManager().registerEvents(new TpllListener(), BuildTeamTools.getInstance());
-
-        Bukkit.getPluginManager().registerEvents(new WarpJoinListener(), BuildTeamTools.getInstance());
-
-        Bukkit.getPluginManager().registerEvents(new NavigatorOpenListener(), BuildTeamTools.getInstance());
+        super.registerListeners(
+                new TpllJoinListener(),
+                new TpllListener(),
+                new WarpJoinListener(),
+                new NavigatorOpenListener()
+        );
     }
 }

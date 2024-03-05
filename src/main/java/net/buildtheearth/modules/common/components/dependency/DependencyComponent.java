@@ -55,6 +55,15 @@ public class DependencyComponent extends Component {
     }
 
     /**
+     * Checks if the plugin "HeadDatabase" is enabled.
+     *
+     * @return True if HeadDatabase is enabled, false if it is not enabled
+     */
+    public boolean isHeadDatabaseEnabled() {
+        return BuildTeamTools.getInstance().getServer().getPluginManager().isPluginEnabled("HeadDatabase");
+    }
+
+    /**
      * Get an instance of WorldEdit
      *
      * @return An instance of WorldEdit

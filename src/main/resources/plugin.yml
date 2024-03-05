@@ -39,3 +39,14 @@ commands:
      - geopath
      - georing
      - geosurface
+  createplot:
+    description: Creates a new plot for the PlotSystem.
+    usage: /createplot
+    permission: plotsystem.createplot
+  pasteplot:
+    description: Pastes a plot manually with specific ID
+    usage: /pasteplot <ID>
+    permission: plotsystem.pasteplot
+  plotsystemterra:
+    description: Sends info about the plugin
+    usage: /plotsystemterra

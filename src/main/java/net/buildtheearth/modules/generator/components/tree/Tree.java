@@ -3,6 +3,7 @@ package net.buildtheearth.modules.generator.components.tree;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.modules.generator.model.GeneratorType;
+import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import org.bukkit.entity.Player;
 
 public class Tree extends GeneratorComponent {
@@ -18,17 +19,15 @@ public class Tree extends GeneratorComponent {
 
     @Override
     public boolean checkPlayer(Player p) {
-        if (!GeneratorModule.checkIfWorldEditIsInstalled(p))
+
+        if (!GeneratorUtils.checkIfTreePackIsInstalled(p, true))
             return false;
 
-        if (!GeneratorModule.checkIfTreePackIsInstalled(p, true))
-            return false;
-
-        if (!GeneratorModule.checkIfSchematicBrushIsInstalled(p))
+        if (!GeneratorUtils.checkIfSchematicBrushIsInstalled(p))
             return false;
 
         if (getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
-            getPlayerSettings().get(p.getUniqueId()).setBlocks(GeneratorModule.analyzeRegion(p, p.getWorld()));
+            getPlayerSettings().get(p.getUniqueId()).setBlocks(GeneratorUtils.analyzeRegion(p, p.getWorld()));
 
         return true;
     }

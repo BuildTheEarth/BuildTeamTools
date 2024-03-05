@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class NetworkModule extends Module {
@@ -69,11 +70,18 @@ public class NetworkModule extends Module {
         }
 
         pingAllOnlinePlayers();
-        updateCache();
 
-        if(getBuildTeam() == null) {
-            shutdown("Failed to load the Build Team!");
-            return;
+        try {
+            // Updates the network cache and waits for it to complete
+            updateCache().join();
+
+            // After completion check if the build team is loaded
+            if (getBuildTeam() == null) {
+                shutdown("Failed to load the Build Team!");
+                return;
+            }
+        } catch (CompletionException e) {
+            shutdown("Failed to load the Build Team! " + e.getCause().getMessage());
         }
 
         super.enable();
@@ -91,12 +99,27 @@ public class NetworkModule extends Module {
 
 
     /** Updates the cache of the proxy. */
-    public CompletableFuture<Void> updateCache() {
-        CompletableFuture<Void> future = new CompletableFuture<>();
+    public CompletableFuture<Boolean> updateCache() {
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
 
-        NetworkAPI.getBuildTeamInformation().thenRun(() ->
-            NetworkAPI.setupCurrentServerData().thenRun(() ->
-                future.complete(null)));
+        try {
+
+            NetworkAPI.getBuildTeamInformation().thenRun(() -> {
+                NetworkAPI.setupCurrentServerData()
+                    .thenRun(() ->
+                        future.complete(null))
+                    .exceptionally(e -> {
+                        future.completeExceptionally(e);
+                        return null;
+                    });
+            }).exceptionally(e -> {
+                future.completeExceptionally(e);
+                return null;
+            });
+
+        } catch (Exception e) {
+            future.completeExceptionally(e);
+        }
 
         return future;
     }

@@ -34,20 +34,9 @@ public class GeneratorCommand implements CommandExecutor {
 
         Player p = (Player) sender;
 
-        // Check if WorldEdit is enabled
-        if (!CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled()) {
-            p.sendMessage("§cPlease install WorldEdit to use this tool.");
-            GeneratorModule.sendMoreInfo(p);
-            p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-            return true;
-        }
-
 
         // Command Usage: /gen
         if (args.length == 0) {
-            if (!GeneratorModule.checkIfWorldEditIsInstalled(p))
-                return true;
-
             new GeneratorMenu(p);
             return true;
         }
@@ -80,13 +69,13 @@ public class GeneratorCommand implements CommandExecutor {
 
         // Command Usage: /gen history
         if (args[0].equals("history")) {
-            if (GeneratorModule.getPlayerHistory(p).getHistoryEntries().size() == 0) {
+            if (GeneratorModule.getInstance().getPlayerHistory(p).getHistoryEntries().size() == 0) {
                 p.sendMessage("§cYou didn't generate any structures yet. Use /gen to create one.");
                 return true;
             }
 
             ChatHelper.sendMessageBox(sender, "Generator History for " + p.getName(), () -> {
-                for (History.HistoryEntry history : GeneratorModule.getPlayerHistory(p).getHistoryEntries()) {
+                for (History.HistoryEntry history : GeneratorModule.getInstance().getPlayerHistory(p).getHistoryEntries()) {
                     long timeDifference = System.currentTimeMillis() - history.getTimeCreated();
 
                     p.sendMessage("§e- " + history.getGeneratorType().name() + " §7-§e " + Utils.toDate(p, timeDifference) + " ago §7-§e " + history.getWorldEditCommandCount() + " Commands executed");
@@ -96,13 +85,13 @@ public class GeneratorCommand implements CommandExecutor {
         }
 
         if (args[0].equals("undo")) {
-            if (GeneratorModule.getPlayerHistory(p).getHistoryEntries().size() == 0) {
+            if (GeneratorModule.getInstance().getPlayerHistory(p).getHistoryEntries().size() == 0) {
                 p.sendMessage("§cYou didn't generate any structures yet. Use /gen to create one.");
                 return true;
             }
 
             p.chat("//undo 500");
-            GeneratorModule.getPlayerHistory(p).getHistoryEntries().clear();
+            GeneratorModule.getInstance().getPlayerHistory(p).getHistoryEntries().clear();
             return true;
         }
 

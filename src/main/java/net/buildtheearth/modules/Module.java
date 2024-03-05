@@ -1,10 +1,14 @@
 package net.buildtheearth.modules;
 
 import lombok.Getter;
+import lombok.NonNull;
 import net.buildtheearth.BuildTeamTools;
+import net.buildtheearth.modules.utils.ChatHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
@@ -37,7 +41,12 @@ public abstract class Module {
     private final HashMap<PluginCommand, CommandExecutor> commands = new HashMap<>();
 
     @Getter
+    private final HashMap<PluginCommand, TabCompleter> tabCompleter = new HashMap<>();
+
+    @Getter
     private final List<Module> dependsOnModules = new ArrayList<>();
+
+    private final String wikiPage;
 
 
     /** Initializes a new module.
@@ -48,6 +57,7 @@ public abstract class Module {
     protected Module(String moduleName, Module... dependsOnModules) {
         this.moduleName = moduleName;
         this.dependsOnModules.addAll(Arrays.asList(dependsOnModules));
+        this.wikiPage = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/" + moduleName + "-Module";
 
         registerCommands();
         registerListeners();
@@ -79,6 +89,9 @@ public abstract class Module {
     public void shutdown(String reason){
         this.error = reason;
 
+        if(isEnabled())
+            ChatHelper.logError("The %s Module crashed because of following error: " + reason, moduleName);
+
         disable();
     }
 
@@ -95,16 +108,35 @@ public abstract class Module {
      * To load the command, use the loadCommands() method.
      *
      * @param command The command to register
-     * @param executor The executor for the command
+     * @param executor The executor for the command. If the executor is also a TabCompleter, the TabCompleter will be registered as well.
      */
-    protected void registerCommand(String command, CommandExecutor executor){
-        commands.put(BuildTeamTools.getInstance().getCommand(command), executor);
+    protected void registerCommand(@NonNull String command, @NonNull CommandExecutor executor){
+        this.commands.put(BuildTeamTools.getInstance().getCommand(command), executor);
+
+        if(executor instanceof TabCompleter)
+            this.tabCompleter.put(BuildTeamTools.getInstance().getCommand(command), (TabCompleter) executor);
+    }
+
+    /** Registers a command for the module.
+     * Note that this method will only register the command in the module, but it won't load it in Bukkit.
+     * To load the command, use the loadCommands() method.
+     *
+     * @param command The command to register
+     * @param executor The executor for the command.
+     * @param tabCompleter The tab completer for the command. Only needed to specify if the TabCompleter is in a different class than the executor.
+     */
+    protected void registerCommand(@NonNull String command, @NonNull CommandExecutor executor, @NonNull TabCompleter tabCompleter){
+        this.commands.put(BuildTeamTools.getInstance().getCommand(command), executor);
+        this.tabCompleter.put(BuildTeamTools.getInstance().getCommand(command), tabCompleter);
     }
 
     /** Loads the commands for the module into Bukkit */
     private void loadCommands(){
         for(PluginCommand command : commands.keySet())
             command.setExecutor(commands.get(command));
+
+        for(PluginCommand command : tabCompleter.keySet())
+            command.setTabCompleter(tabCompleter.get(command));
     }
 
 
@@ -147,5 +179,18 @@ public abstract class Module {
                 shutdown(error);
                 return;
             }
+    }
+
+
+    /**
+     * Sends more information about the generator to a player.
+     * The WIKI_PAGE varies depending on the generator.
+     *
+     * @param p The player who should receive the information.
+     */
+    public void sendWikiLink(Player p) {
+        p.sendMessage(" ");
+        p.sendMessage("§cFor more information take a look here:");
+        p.sendMessage("§c" + wikiPage);
     }
 }

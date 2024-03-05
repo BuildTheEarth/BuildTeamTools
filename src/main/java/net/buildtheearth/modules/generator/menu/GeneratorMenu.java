@@ -12,6 +12,7 @@ import net.buildtheearth.modules.generator.components.road.Road;
 import net.buildtheearth.modules.generator.components.road.RoadSettings;
 import net.buildtheearth.modules.generator.components.road.menu.RoadColorMenu;
 import net.buildtheearth.modules.generator.components.tree.Tree;
+import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import net.buildtheearth.modules.utils.Item;
 import net.buildtheearth.modules.utils.ListUtil;
 import net.buildtheearth.modules.utils.menus.AbstractMenu;
@@ -114,7 +115,7 @@ public class GeneratorMenu extends AbstractMenu {
 
             // Set navigator item
             getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
-        } else if (!GeneratorModule.checkIfTreePackIsInstalled(getMenuPlayer(), false)) {
+        } else if (!GeneratorUtils.checkIfTreePackIsInstalled(getMenuPlayer(), false)) {
             // TREE ITEM
             ArrayList<String> treeLore = ListUtil.createList("", "§cThe §eTree Pack " + Tree.TREE_PACK_VERSION + " §cis not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
 

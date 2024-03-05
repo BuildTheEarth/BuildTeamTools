@@ -8,6 +8,7 @@ import net.buildtheearth.modules.generator.components.rail.RailSettings;
 import net.buildtheearth.modules.generator.components.road.RoadFlag;
 import net.buildtheearth.modules.generator.components.road.RoadSettings;
 import net.buildtheearth.modules.generator.components.tree.TreeSettings;
+import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -159,8 +160,8 @@ public abstract class GeneratorComponent extends Component {
      * ROOF_TYPE:  456:78
      */
     protected void convertArgsToSettings(Player p, String[] args, GeneratorType generatorType) {
-        for (String flag : net.buildtheearth.modules.generator.GeneratorModule.convertArgsToFlags(args)) {
-            String[] flagAndValue = net.buildtheearth.modules.generator.GeneratorModule.convertToFlagAndValue(flag, p);
+        for (String flag : GeneratorUtils.convertArgsToFlags(args)) {
+            String[] flagAndValue = GeneratorUtils.convertToFlagAndValue(flag, p);
             String flagName = flagAndValue[0];
             String flagValue = flagAndValue[1];
 

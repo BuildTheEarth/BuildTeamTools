@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.navigation.components.navigator.NavigatorComponent;
 import net.buildtheearth.modules.navigation.components.navigator.commands.NavigatorCommand;
+import net.buildtheearth.modules.navigation.components.navigator.listeners.NavigatorJoinListener;
 import net.buildtheearth.modules.navigation.components.navigator.listeners.NavigatorOpenListener;
 import net.buildtheearth.modules.navigation.components.tpll.TpllComponent;
 import net.buildtheearth.modules.navigation.components.tpll.listeners.TpllJoinListener;
@@ -64,6 +65,7 @@ public class NavigationModule extends Module {
                 new TpllJoinListener(),
                 new TpllListener(),
                 new WarpJoinListener(),
+                new NavigatorJoinListener(),
                 new NavigatorOpenListener()
         );
     }

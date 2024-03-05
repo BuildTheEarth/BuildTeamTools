@@ -5,68 +5,113 @@ import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.ModuleHandler;
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.network.NetworkModule;
+import net.buildtheearth.modules.network.model.Permissions;
 import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.stats.StatsModule;
 import net.buildtheearth.modules.utils.ChatHelper;
+import net.buildtheearth.modules.utils.Utils;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import sun.tools.jconsole.Tab;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
-public class BuildTeamToolsCommand implements CommandExecutor {
+public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
-        if (args.length > 0 && args[0].equalsIgnoreCase("help")) {
+        if(!(sender instanceof Player)){
+            sender.sendMessage("§cYou need to be a player to execute this command.");
+            return true;
+        }
+        Player player = (Player) sender;
+
+        if(!player.hasPermission(Permissions.BUILD_TEAM_TOOLS)){
+            sender.sendMessage("§cYou don't have permission to execute this command.");
+            return true;
+        }
+
+
+        if(args.length == 0){
+            sendBuildTeamToolsInfo(sender);
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("help")) {
             ChatHelper.sendMessageBox(sender, "Build Team Help", new Runnable() {
                 @Override
                 public void run() {
-                    sender.sendMessage("§e/btt help - §7List of all sub commands.");
+                    sender.sendMessage("§e/btt cache [upload] - §7View the cache or upload it to the network.");
+                    sender.sendMessage("§/btt checkForUpdates - §7Check for updates.");
                     sender.sendMessage("§e/btt communicators - §7List of players who communicate with the network.");
-                    sender.sendMessage("§e/btt cache - §7View the cache.");
-                    sender.sendMessage("§e/btt uploadCache - §7Upload the cache to the network.");
+                    sender.sendMessage("§e/btt debug <true/false> - §7Enable or disable debug mode.");
+                    sender.sendMessage("§e/btt help - §7List of all sub commands.");
+                    sender.sendMessage("§e/btt reload - §7Reload all modules.");
                 }
             });
             return true;
         }
 
-        if(args.length > 0 && args[0].equalsIgnoreCase("communicators")) {
-            ChatHelper.sendMessageBox(sender, "Build Team Communicators", new Runnable() {
-                @Override
-                public void run() {
-                    for (UUID uuid : NetworkModule.getInstance().getCommunicators())
-                        sender.sendMessage("§7- §e" + uuid.toString());
-                }
+        if(args[0].equalsIgnoreCase("communicators")) {
+            if(!player.hasPermission(Permissions.BUILD_TEAM_TOOLS_COMMUNICATORS)){
+                sender.sendMessage("§cYou don't have permission to execute this command.");
+                return true;
+            }
+
+            ChatHelper.sendMessageBox(sender, "Build Team Communicators", () -> {
+                for (UUID uuid : NetworkModule.getInstance().getCommunicators())
+                    sender.sendMessage("§7- §e" + uuid.toString());
             });
             return true;
         }
 
-        if (args.length > 0 && args[0].equalsIgnoreCase("cache")) {
-            ChatHelper.sendMessageBox(sender, "Build Team Cache", new Runnable() {
-                @Override
-                public void run() {
-                    sender.sendMessage(StatsModule.getInstance().getCurrentCache().toJSONString());
-                }
-            });
+        if (args[0].equalsIgnoreCase("cache")) {
+            if(!player.hasPermission(Permissions.BUILD_TEAM_TOOLS_CACHE)){
+                sender.sendMessage("§cYou don't have permission to execute this command.");
+                return true;
+            }
+
+            if(args.length > 1 && args[1].equalsIgnoreCase("update")) {
+                StatsModule.getInstance().updateAndSave();
+                NetworkModule.getInstance().updateCache();
+                sender.sendMessage("§7Cache successfully updated.");
+                return true;
+            }
+
+            ChatHelper.sendMessageBox(sender, "Build Team Cache", () ->
+                    sender.sendMessage(StatsModule.getInstance().getCurrentCache().toJSONString()));
             return true;
         }
 
-        if (args.length > 0 && args[0].equalsIgnoreCase("updateCache")) {
-            StatsModule.getInstance().updateAndSave();
-            NetworkModule.getInstance().updateCache();
-            sender.sendMessage("§7Cache successfully updated.");
-            return true;
-        }
 
-        if (args.length > 0 && args[0].equalsIgnoreCase("debug")) {
+
+        if (args[0].equalsIgnoreCase("debug")) {
+            if(!player.hasPermission(Permissions.BUILD_TEAM_TOOLS_DEBUG)){
+                sender.sendMessage("§cYou don't have permission to execute this command.");
+                return true;
+            }
+
             if(!(args.length > 1)) {
                 sender.sendMessage("§7You need to add a value: true/false");
                 return true;
             }
+
+            if(!args[1].equalsIgnoreCase("true") && !args[1].equalsIgnoreCase("false")) {
+                sender.sendMessage("§7You need to set the value to true or false.");
+                return true;
+            }
+
             boolean debug = Boolean.parseBoolean(args[1]);
 
             BuildTeamTools.getInstance().setDebug(debug);
@@ -74,7 +119,12 @@ public class BuildTeamToolsCommand implements CommandExecutor {
             return true;
         }
 
-        if (args.length > 0 && args[0].equalsIgnoreCase("checkForUpdates")) {
+        if (args[0].equalsIgnoreCase("checkForUpdates")) {
+            if(!player.hasPermission(Permissions.BUILD_TEAM_TOOLS_CHECK_FOR_UPDATES)){
+                sender.sendMessage("§cYou don't have permission to execute this command.");
+                return true;
+            }
+
             boolean wasDebug = BuildTeamTools.getInstance().isDebug();
 
             BuildTeamTools.getInstance().setDebug(true);
@@ -84,31 +134,67 @@ public class BuildTeamToolsCommand implements CommandExecutor {
             return true;
         }
 
+        if(args[0].equalsIgnoreCase("reload")) {
+            if(!player.hasPermission(Permissions.BUILD_TEAM_TOOLS_RELOAD)){
+                sender.sendMessage("§cYou don't have permission to execute this command.");
+                return true;
+            }
+
+            sender.sendMessage(ChatHelper.standard("§7Reloading all modules..."));
+            ModuleHandler.getInstance().reloadAll(player);
+            sender.sendMessage(ChatHelper.standard("§7All modules have been reloaded."));
+        }
+
+
+
+        return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if(args.length == 1)
+            return Arrays.asList("help", "communicators", "checkForUpdates", "cache", "debug", "reload");
+
+        List<String> debugSuggestions = Utils.getTabCompleterArgs(args, "debug", 2, Arrays.asList("true", "false"));
+        if(debugSuggestions != null)
+            return debugSuggestions;
+
+        List<String> cacheSuggestions = Utils.getTabCompleterArgs(args, "cache", 2, Collections.singletonList("upload"));
+        if(cacheSuggestions != null)
+            return cacheSuggestions;
+
+        return null;
+    }
+
+    public static void sendBuildTeamToolsInfo(CommandSender sender){
         ChatHelper.sendMessageBox(sender, "Build Team Tools", () -> {
 
             String buildTeamID = "-";
             if (NetworkModule.getInstance().getBuildTeam() != null
-             && NetworkModule.getInstance().getBuildTeam().getID() != null)
+                    && NetworkModule.getInstance().getBuildTeam().getID() != null)
                 buildTeamID = NetworkModule.getInstance().getBuildTeam().getID();
 
             String serverName = "-";
             if (NetworkModule.getInstance().getBuildTeam() != null
-             && NetworkModule.getInstance().getBuildTeam().getServerName() != null)
+                    && NetworkModule.getInstance().getBuildTeam().getServerName() != null)
                 serverName = NetworkModule.getInstance().getBuildTeam().getServerName();
 
             String continent = "-";
             if (NetworkModule.getInstance().getBuildTeam() != null
-             && NetworkModule.getInstance().getBuildTeam().getContinent() != null)
+                    && NetworkModule.getInstance().getBuildTeam().getContinent() != null)
                 continent = NetworkModule.getInstance().getBuildTeam().getContinent().getLabel();
 
             String status = "§c§lDISCONNECTED";
             if (NetworkModule.getInstance().getBuildTeam() != null
-            && NetworkModule.getInstance().getBuildTeam().isConnected() && !buildTeamID.equals("-") && !serverName.equals("-"))
+                    && NetworkModule.getInstance().getBuildTeam().isConnected() && !buildTeamID.equals("-") && !serverName.equals("-"))
                 status = "§a§lCONNECTED";
             else if (!buildTeamID.equals("-") && !serverName.equals("-"))
                 status = "§6§lSTANDBY";
 
             boolean debug = BuildTeamTools.getInstance().isDebug();
+
+
+
 
             sender.sendMessage("§eStatus: " + status);
             sender.sendMessage("§eVersion: §7" + BuildTeamTools.getInstance().getDescription().getVersion());
@@ -131,10 +217,9 @@ public class BuildTeamToolsCommand implements CommandExecutor {
             }
 
             if(NetworkModule.getInstance().getBuildTeam() != null){
+                sender.sendMessage("");
                 sender.sendMessage("§eBuildTeam ID: §7" + buildTeamID);
                 sender.sendMessage("§eServer Name: §7" + serverName);
-
-                sender.sendMessage("");
                 sender.sendMessage("§eContinent: §7" + continent);
                 sender.sendMessage("§eRegions: §7");
 
@@ -146,6 +231,5 @@ public class BuildTeamToolsCommand implements CommandExecutor {
             sender.sendMessage("§7Sub-Command list with §e/btt help§7.");
 
         });
-        return true;
     }
 }

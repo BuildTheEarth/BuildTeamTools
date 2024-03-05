@@ -49,7 +49,7 @@ public class BuildTeamTools extends JavaPlugin {
                 NavigationModule.getInstance(),
                 StatsModule.getInstance()
         );
-        ModuleHandler.getInstance().enableAll(true);
+        ModuleHandler.getInstance().enableAll(null, true);
 
         Bukkit.getLogger().log(Level.INFO," ");
         Bukkit.getLogger().log(Level.INFO,"§e------------------------------------------------------------");
@@ -60,7 +60,7 @@ public class BuildTeamTools extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        ModuleHandler.getInstance().disableAll(true);
+        ModuleHandler.getInstance().disableAll(null);
     }
 
 

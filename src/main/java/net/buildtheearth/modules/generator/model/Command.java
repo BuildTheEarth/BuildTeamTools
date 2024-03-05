@@ -1,7 +1,7 @@
 package net.buildtheearth.modules.generator.model;
 
 import lombok.Getter;
-import net.buildtheearth.modules.generator.GeneratorModule;
+import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import net.buildtheearth.modules.utils.Item;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -105,7 +105,7 @@ public class Command {
         int maxHeight = y;
 
         if (blocks != null)
-            maxHeight = GeneratorModule.getMaxHeight(blocks, x, z, Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL, Material.SNOW);
+            maxHeight = GeneratorUtils.getMaxHeight(blocks, x, z, Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL, Material.SNOW);
         if (maxHeight == 0)
             maxHeight = y;
 

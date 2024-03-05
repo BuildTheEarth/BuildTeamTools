@@ -31,6 +31,9 @@ public class TpllListener implements Listener {
     
     @EventHandler
     public void onTpll(PlayerCommandPreprocessEvent event) {
+        // Check if the NavigationModule is enabled
+        if (!NavigationModule.getInstance().isEnabled()) return;
+
         // Check if the command is a TPLL command
         if (!isTpllCommand(event)) return;
 

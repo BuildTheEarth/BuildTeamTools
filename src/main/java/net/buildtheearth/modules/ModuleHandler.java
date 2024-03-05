@@ -4,7 +4,9 @@ import lombok.Getter;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.utils.ChatHelper;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -48,26 +50,27 @@ public class ModuleHandler {
      * Enables a specific module
      *
      * @param module {@link Module}
+     * @param executor the player that executed the command. If null, the command was executed by the system.
      * @param isStarting if the server is starting
      * @return True if successfully enabled, false if not
      */
-    public boolean enable(Module module, boolean isStarting) {
-        for(Module m : modules)
-            if(m.getModuleName().equals(module.getModuleName()) && m.isEnabled())
+    public boolean enable(Module module, Player executor, boolean isStarting) {
+        for (Module m : modules)
+            if (m.getModuleName().equals(module.getModuleName()) && m.isEnabled())
                 return false;
 
         boolean containsDisabledDependencyModule = false;
-        for(Module m : module.getDependsOnModules())
-            if(!m.isEnabled()) {
+        for (Module m : module.getDependsOnModules())
+            if (!m.isEnabled()) {
                 module.checkForModuleDependencies();
                 containsDisabledDependencyModule = true;
             }
 
-        try{
-            if(!containsDisabledDependencyModule)
+        try {
+            if (!containsDisabledDependencyModule)
                 module.enable();
         } catch (Exception ex) {
-            if(BuildTeamTools.getInstance().isDebug()){
+            if (BuildTeamTools.getInstance().isDebug()) {
                 ChatHelper.logError("An error occurred while enabling the %s Module: %s", module.getModuleName(), ex.getMessage());
                 ex.printStackTrace();
             }
@@ -75,13 +78,13 @@ public class ModuleHandler {
             module.shutdown(ex.getMessage());
         }
 
-        if(isStarting) {
+        if (isStarting) {
             if (module.isEnabled())
                 Bukkit.getLogger().log(Level.INFO, "§7[§a✔§7] Successfully loaded §e" + module.getModuleName() + " Module§7.");
             else {
                 String reason = "";
 
-                if(module.getError() != null && !module.getError().isEmpty())
+                if (module.getError() != null && !module.getError().isEmpty())
                     reason = " Reason: §c" + module.getError();
 
                 Bukkit.getLogger().log(Level.INFO, "§7[§c✖§7] Failed to load the §e" + module.getModuleName() + " Module§7." + reason);
@@ -99,6 +102,20 @@ public class ModuleHandler {
             }
         }
 
+        if (executor != null) {
+            if (module.isEnabled())
+                executor.sendMessage("§7[§a✔§7] Successfully§a enabled §7the §e" + module.getModuleName() + " Module§7.");
+            else {
+                String reason = "";
+
+                if (module.getError() != null && !module.getError().isEmpty())
+                    reason = " Reason: §c" + module.getError();
+
+                executor.sendMessage("§7[§c✖§7] Failed to§a enable §7the §e" + module.getModuleName() + " Module§7." + reason);
+            }
+
+        }
+
         return true;
     }
 
@@ -106,9 +123,10 @@ public class ModuleHandler {
      * Disables a specific module
      *
      * @param module {@link Module}
+     * @param executor the player that executed the command. If null, the command was executed by the system.
      * @return True if successfully disabled, false if not
      */
-    public boolean disable(Module module) {
+    public boolean disable(Module module, Player executor) {
         boolean contains = false;
         for(Module m : modules)
             if(m.getModuleName().equals(module.getModuleName()))
@@ -130,34 +148,48 @@ public class ModuleHandler {
             ChatHelper.logError("Failed to disable the %s Module%s", module.getModuleName(), reason);
         }
 
+        if (executor != null) {
+            if (!module.isEnabled())
+                executor.sendMessage("§7[§a✔§7] Successfully§c disabled §7the §e" + module.getModuleName() + " Module§7.");
+            else {
+                String reason = "";
+
+                if (module.getError() != null && !module.getError().isEmpty())
+                    reason = " Reason: §c" + module.getError();
+
+                executor.sendMessage("§7[§c✖§7] Failed to§c disable §7the §e" + module.getModuleName() + " Module§7." + reason);
+            }
+        }
+
         return true;
     }
 
     /** Enables all modules
      *
+     * @param executor the player that executed the command. If null, the command was executed by the system.
      * @param isStarting if the server is starting
      */
-    public void enableAll(boolean isStarting) {
+    public void enableAll(@Nullable Player executor, boolean isStarting) {
         for (Module module : new ArrayList<>(modules))
             if (!module.isEnabled())
-                enable(module, isStarting);
+                enable(module, executor, isStarting);
     }
 
     /** Disables all modules
      *
-     * @param isStopping if the server is stopping
+     * @param executor the player that executed the command. If null, the command was executed by the system.
      */
-    public void disableAll(boolean isStopping) {
+    public void disableAll(@Nullable Player executor) {
         for (Module module : new ArrayList<>(modules))
             if (module.isEnabled())
-                disable(module);
+                disable(module, executor);
     }
 
     /**
      * Reloads all modules
      */
-    public void reloadAll() {
-        disableAll(false);
-        enableAll(false);
+    public void reloadAll(Player executor) {
+        disableAll(executor);
+        enableAll(executor, false);
     }
 }

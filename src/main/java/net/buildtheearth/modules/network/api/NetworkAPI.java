@@ -72,6 +72,8 @@ public class NetworkAPI {
                 // Clear all regions
                 NetworkModule.getInstance().getRegions().clear();
 
+
+
                 // Add all teams to the proxy manager
                 for(Object object : responseArray.toArray()) {
 
@@ -262,10 +264,11 @@ public class NetworkAPI {
                 JSONObject teamObject = API.createJSONObject(response);
 
                 String teamID = (String) teamObject.get("ID");
-                NetworkModule networkModule = NetworkModule.getInstance();
 
+                NetworkModule networkModule = NetworkModule.getInstance();
                 BuildTeam buildTeam = networkModule.getBuildTeamByID(teamID);
                 networkModule.setBuildTeam(buildTeam);
+
 
                 future.complete(null);
             }

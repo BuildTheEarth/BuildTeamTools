@@ -18,7 +18,7 @@ public class NavigatorOpenListener implements Listener {
     public void interactEvent(PlayerInteractEvent event) {
         if (event.getItem() == null) return;
 
-        if (event.getItem().equals(NavigationModule.getInstance().getNavigatorComponent().getItem())) {
+        if (event.getItem().getType() == NavigationModule.getInstance().getNavigatorComponent().getItem().getType()) {
             event.setCancelled(true);
             //Open navigator.
             new MainMenu(event.getPlayer());
@@ -31,7 +31,7 @@ public class NavigatorOpenListener implements Listener {
         if (event.getCurrentItem() == null) return;
 
         //Checks to see if the navigator item was clicked on
-        if (!event.getCurrentItem().equals(NavigationModule.getInstance().getNavigatorComponent().getItem())) return;
+        if (event.getCurrentItem().getType() != NavigationModule.getInstance().getNavigatorComponent().getItem().getType()) return;
 
         //Extract the player
         if (!(event.getWhoClicked() instanceof Player)) return;
@@ -75,6 +75,9 @@ public class NavigatorOpenListener implements Listener {
 
         if (e.getItemDrop().getItemStack().equals(NavigationModule.getInstance().getNavigatorComponent().getItem())) {
             e.setCancelled(true);
+
+            e.getPlayer().getInventory().setItem(NavigationModule.getInstance().getNavigatorComponent().getSlot(), null);
+            e.getPlayer().updateInventory();
         }
 
     }

@@ -1,12 +1,10 @@
 package net.buildtheearth.modules.generator.commands;
 
-import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.menu.GeneratorMenu;
 import net.buildtheearth.modules.generator.model.History;
 import net.buildtheearth.modules.utils.ChatHelper;
 import net.buildtheearth.modules.utils.Utils;
-import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -14,19 +12,8 @@ import org.bukkit.entity.Player;
 
 public class GeneratorCommand implements CommandExecutor {
 
-    public static void sendHelp(CommandSender sender) {
-        ChatHelper.sendMessageBox(sender, "Generator Command", new Runnable() {
-            @Override
-            public void run() {
-                sender.sendMessage("§eHouse Generator:§7 /gen house help");
-                sender.sendMessage("§eRoad Generator:§7 /gen road help");
-                sender.sendMessage("§eRail Generator:§7 /gen rail help");
-                sender.sendMessage("§eTree Generator:§7 /gen tree help");
-            }
-        });
-    }
 
-    public boolean onCommand(CommandSender sender, Command cmd, String cmdlabel, String[] args) {
+    public boolean onCommand(CommandSender sender, Command cmd, String cmdLabel, String[] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage("§cOnly players can execute this command.");
             return true;
@@ -69,7 +56,7 @@ public class GeneratorCommand implements CommandExecutor {
 
         // Command Usage: /gen history
         if (args[0].equals("history")) {
-            if (GeneratorModule.getInstance().getPlayerHistory(p).getHistoryEntries().size() == 0) {
+            if (GeneratorModule.getInstance().getPlayerHistory(p).getHistoryEntries().isEmpty()) {
                 p.sendMessage("§cYou didn't generate any structures yet. Use /gen to create one.");
                 return true;
             }
@@ -85,13 +72,12 @@ public class GeneratorCommand implements CommandExecutor {
         }
 
         if (args[0].equals("undo")) {
-            if (GeneratorModule.getInstance().getPlayerHistory(p).getHistoryEntries().size() == 0) {
-                p.sendMessage("§cYou didn't generate any structures yet. Use /gen to create one.");
-                return true;
-            }
+            GeneratorModule.getInstance().getPlayerHistory(p).undo(p);
+            return true;
+        }
 
-            p.chat("//undo 500");
-            GeneratorModule.getInstance().getPlayerHistory(p).getHistoryEntries().clear();
+        if (args[0].equals("redo")) {
+            GeneratorModule.getInstance().getPlayerHistory(p).redo(p);
             return true;
         }
 
@@ -99,5 +85,14 @@ public class GeneratorCommand implements CommandExecutor {
         return true;
     }
 
+    public static void sendHelp(CommandSender sender) {
+        ChatHelper.sendMessageBox(sender, "Generator Command", () -> {
 
+            sender.sendMessage("§eHouse Generator:§7 /gen house help");
+            sender.sendMessage("§eRoad Generator:§7 /gen road help");
+            sender.sendMessage("§eRail Generator:§7 /gen rail help");
+            sender.sendMessage("§eTree Generator:§7 /gen tree help");
+
+        });
+    }
 }

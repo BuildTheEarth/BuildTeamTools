@@ -6,8 +6,8 @@ import com.google.common.io.ByteStreams;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.Component;
 import net.buildtheearth.modules.network.NetworkModule;
-import net.buildtheearth.modules.utils.ChatHelper;
-import net.buildtheearth.modules.utils.GeometricUtils;
+import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.GeometricUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 

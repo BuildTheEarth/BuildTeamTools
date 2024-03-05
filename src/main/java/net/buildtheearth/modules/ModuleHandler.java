@@ -2,7 +2,7 @@ package net.buildtheearth.modules;
 
 import lombok.Getter;
 import net.buildtheearth.BuildTeamTools;
-import net.buildtheearth.modules.utils.ChatHelper;
+import net.buildtheearth.utils.ChatHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 

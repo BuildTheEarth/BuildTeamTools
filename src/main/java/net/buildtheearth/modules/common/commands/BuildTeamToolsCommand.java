@@ -8,8 +8,8 @@ import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.Permissions;
 import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.stats.StatsModule;
-import net.buildtheearth.modules.utils.ChatHelper;
-import net.buildtheearth.modules.utils.Utils;
+import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.Utils;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -19,13 +19,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import sun.tools.jconsole.Tab;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
 

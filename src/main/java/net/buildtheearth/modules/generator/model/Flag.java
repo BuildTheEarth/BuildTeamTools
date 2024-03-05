@@ -1,5 +1,7 @@
 package net.buildtheearth.modules.generator.model;
 
+import net.buildtheearth.modules.generator.components.FlagType;
+import net.buildtheearth.modules.generator.components.field.FieldFlag;
 import net.buildtheearth.modules.generator.components.house.HouseFlag;
 import net.buildtheearth.modules.generator.components.rail.RailFlag;
 import net.buildtheearth.modules.generator.components.road.RoadFlag;
@@ -7,9 +9,14 @@ import net.buildtheearth.modules.generator.components.tree.TreeFlag;
 
 public interface Flag {
 
-    /**
-     * @return the flag by the given string and generator type
-     */
+    public static final String DISABLED = "OFF";
+    public static final String ENABLED = "ON";
+
+    String getFlag();
+
+    FlagType getFlagType();
+
+    /** @return the flag by the given string and generator type */
     static Flag byString(GeneratorType generatorType, String flag) {
         switch (generatorType) {
             case HOUSE:
@@ -20,9 +27,9 @@ public interface Flag {
                 return TreeFlag.byString(flag);
             case RAILWAY:
                 return RailFlag.byString(flag);
+            case FIELD:
+                return FieldFlag.byString(flag);
         }
         return null;
     }
-
-    String getFlag();
 }

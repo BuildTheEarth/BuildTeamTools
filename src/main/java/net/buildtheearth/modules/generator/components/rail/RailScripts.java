@@ -1,7 +1,11 @@
 package net.buildtheearth.modules.generator.components.rail;
 
+import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Polygonal2DRegion;
+import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.model.Command;
 import net.buildtheearth.modules.generator.model.GeneratorType;
@@ -11,14 +15,13 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class RailScripts {
 
-    public static void railscript_v_1_3(Player p, Rail rail, ConvexPolyhedralRegion region) {
+    public static void railScript_v_1_3(Player p, Rail rail, Region region) {
         List<String> commands = new ArrayList<>();
-        HashMap<Object, String> flags = rail.getPlayerSettings().get(p.getUniqueId()).getValues();
+        //HashMap<Flag, String > flags = rail.getPlayerSettings().get(p.getUniqueId()).getValues();
 
         int xPos = p.getLocation().getBlockX();
         int zPos = p.getLocation().getBlockZ();
@@ -29,7 +32,30 @@ public class RailScripts {
         int railWidth = 5;
 
         // Get the points of the region
-        List<Vector> points = new ArrayList<>(region.getVertices());
+        List<Vector> points = new ArrayList<>();
+        points = GeneratorUtils.populatePoints(points, 5);
+
+        // Add all points of the region to the list no matter what type of region it is
+        if (region instanceof Polygonal2DRegion) {
+            Polygonal2DRegion polyRegion = (Polygonal2DRegion) region;
+
+            for (BlockVector2D blockVector2D : polyRegion.getPoints())
+                points.add(blockVector2D.toVector());
+
+        } else if (region instanceof ConvexPolyhedralRegion) {
+            ConvexPolyhedralRegion convexRegion = (ConvexPolyhedralRegion) region;
+            points.addAll(convexRegion.getVertices());
+
+        }else if (region instanceof CuboidRegion) {
+            CuboidRegion cuboidRegion = (CuboidRegion) region;
+
+            points.add(cuboidRegion.getPos1());
+            points.add(cuboidRegion.getPos2());
+        } else {
+            p.sendMessage("§c§lERROR: §cRegion type not supported!");
+            return;
+        }
+
         points = GeneratorUtils.populatePoints(points, 5);
 
         // ----------- PREPARATION 01 ----------
@@ -59,7 +85,7 @@ public class RailScripts {
 
 
         Block[][][] regionBlocks = GeneratorUtils.analyzeRegion(p, p.getWorld());
-        points = GeneratorUtils.adjustHeight(points, regionBlocks);
+        GeneratorUtils.adjustHeight(points, regionBlocks);
 
 
         // ----------- RAILWAY ----------
@@ -91,7 +117,12 @@ public class RailScripts {
         operations++;
 
         commands.add("//gmask");
-        GeneratorUtils.createConvexSelection(commands, points);
+
+        // Depending on the selection type, the selection needs to be restored correctly
+        if(region instanceof Polygonal2DRegion || region instanceof ConvexPolyhedralRegion)
+            GeneratorUtils.createConvexSelection(commands, points);
+        else if(region instanceof CuboidRegion)
+            GeneratorUtils.createCuboidSelection(commands, ((CuboidRegion) region).getPos1(), ((CuboidRegion) region).getPos2());
 
         GeneratorModule.getInstance().getGeneratorCommands().add(new Command(p, rail, commands, operations, regionBlocks));
         GeneratorModule.getInstance().getPlayerHistory(p).addHistoryEntry(new History.HistoryEntry(GeneratorType.RAILWAY, operations));

@@ -5,11 +5,11 @@ import lombok.NonNull;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.network.model.RegionType;
-import net.buildtheearth.modules.utils.ChatHelper;
-import net.buildtheearth.modules.utils.Item;
-import net.buildtheearth.modules.utils.ListUtil;
-import net.buildtheearth.modules.utils.Utils;
-import net.buildtheearth.modules.utils.menus.AbstractPaginatedMenu;
+import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.ListUtil;
+import net.buildtheearth.utils.Utils;
+import net.buildtheearth.utils.menus.AbstractPaginatedMenu;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
@@ -28,8 +28,8 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
     public final int BACK_ITEM_SLOT = 27;
     public static int SWITCH_PAGE_ITEM_SLOT = 34;
 
-    public StateSelectorMenu(@NonNull Region country, Player menuPlayer) {
-        super(4, 3, country.getName() + " - states", menuPlayer);
+    public StateSelectorMenu(@NonNull Region country, Player menuPlayer, boolean autoLoad) {
+        super(4, 3, country.getName() + " - states", menuPlayer, autoLoad);
         this.country = country;
         this.states = NetworkModule.getRegionsByRegionType(RegionType.STATE).stream()
                 .filter(region -> region.getContinent() == country.getContinent()).collect(Collectors.toList());
@@ -54,7 +54,7 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPreviewItems() {
-        setBackItem(BACK_ITEM_SLOT, true);
+        setBackItem(BACK_ITEM_SLOT, new CountrySelectorMenu(getMenuPlayer(), country.getContinent(), false));
 
         // If there are more than 27 countries, add the switch page items, otherwise add glass panes
         if(states.size() > 27)
@@ -91,11 +91,6 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
     protected void setItemClickEventsAsync() {
         if(states.size() > 27)
             setSwitchPageItemClickEvents(SWITCH_PAGE_ITEM_SLOT);
-
-        getMenu().getSlot(BACK_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
-            clickPlayer.closeInventory();
-            new CountrySelectorMenu(clickPlayer, country.getContinent());
-        });
     }
 
     @Override

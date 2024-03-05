@@ -1,7 +1,7 @@
 package net.buildtheearth.modules.navigation.components.tpll.listeners;
 
 import net.buildtheearth.modules.navigation.NavigationModule;
-import net.buildtheearth.modules.utils.ChatHelper;
+import net.buildtheearth.utils.ChatHelper;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;

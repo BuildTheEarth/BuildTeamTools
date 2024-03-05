@@ -4,9 +4,9 @@ import com.sk89q.worldedit.WorldEdit;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.Component;
 import net.buildtheearth.modules.common.CommonModule;
-import net.buildtheearth.modules.utils.ChatHelper;
-import net.buildtheearth.modules.utils.Item;
-import net.buildtheearth.modules.utils.io.ConfigPaths;
+import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.io.ConfigPaths;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -32,12 +32,8 @@ public class NavigatorComponent extends Component {
         if (!CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled())
             return;
 
-        ChatHelper.log("Navigation Wand: " + WorldEdit.getInstance().getConfiguration().navigationWand);
-
         // Set the navigation wand to nether star
         WorldEdit.getInstance().getConfiguration().navigationWand = 399;
-
-        ChatHelper.log("Navigation Wand: " + WorldEdit.getInstance().getConfiguration().navigationWand);
     }
 
     /*

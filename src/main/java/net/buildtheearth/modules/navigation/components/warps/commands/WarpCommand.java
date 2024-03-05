@@ -6,7 +6,7 @@ import net.buildtheearth.modules.navigation.components.warps.menu.WarpMenu;
 import net.buildtheearth.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.Permissions;
-import net.buildtheearth.modules.utils.ChatHelper;
+import net.buildtheearth.utils.ChatHelper;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -37,9 +37,9 @@ public class WarpCommand implements CommandExecutor {
                 player.sendMessage(ChatHelper.error("This server does not have any warps yet!"));
                 return true;
             }else if(warpGroupCount == 1)
-                new WarpMenu(player, NetworkModule.getInstance().getBuildTeam().getWarpGroups().get(0), false);
+                new WarpMenu(player, NetworkModule.getInstance().getBuildTeam().getWarpGroups().get(0), false, true);
             else
-                new WarpGroupMenu(player, NetworkModule.getInstance().getBuildTeam(), false);
+                new WarpGroupMenu(player, NetworkModule.getInstance().getBuildTeam(), false, true);
 
             return true;
         }

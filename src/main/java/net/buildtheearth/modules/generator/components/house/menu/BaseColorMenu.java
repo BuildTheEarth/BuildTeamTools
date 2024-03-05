@@ -4,18 +4,18 @@ import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.model.Settings;
 import net.buildtheearth.modules.generator.components.house.HouseFlag;
 import net.buildtheearth.modules.generator.components.house.HouseSettings;
-import net.buildtheearth.modules.utils.Item;
-import net.buildtheearth.modules.utils.MenuItems;
-import net.buildtheearth.modules.utils.menus.BlockListMenu;
+import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.MenuItems;
+import net.buildtheearth.utils.menus.BlockListMenu;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 public class BaseColorMenu extends BlockListMenu {
 
-    public static String BASE_TYPE_INV_NAME = "Choose a Base Floor Color";
+    public static final String BASE_TYPE_INV_NAME = "Choose a Base Floor Color";
 
-    public BaseColorMenu(Player player) {
-        super(player, BASE_TYPE_INV_NAME, MenuItems.getBlocksByColor());
+    public BaseColorMenu(Player player, boolean autoLoad) {
+        super(player, BASE_TYPE_INV_NAME, MenuItems.getBlocksByColor(), new RoofColorMenu(player, false), autoLoad);
     }
 
     @Override

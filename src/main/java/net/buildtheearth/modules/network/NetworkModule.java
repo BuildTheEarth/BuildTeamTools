@@ -12,7 +12,7 @@ import net.buildtheearth.modules.network.listeners.NetworkQuitListener;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.network.model.RegionType;
-import net.buildtheearth.modules.utils.io.ConfigPaths;
+import net.buildtheearth.utils.io.ConfigPaths;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;

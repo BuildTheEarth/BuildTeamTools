@@ -1,13 +1,13 @@
 package net.buildtheearth.modules.generator.components.tree.menu;
 
 import net.buildtheearth.modules.generator.GeneratorModule;
+import net.buildtheearth.modules.generator.menu.GeneratorMenu;
 import net.buildtheearth.modules.generator.model.Settings;
 import net.buildtheearth.modules.generator.components.road.RoadFlag;
 import net.buildtheearth.modules.generator.components.road.RoadSettings;
-import net.buildtheearth.modules.generator.components.road.menu.SidewalkColorMenu;
 import net.buildtheearth.modules.generator.components.tree.TreeType;
-import net.buildtheearth.modules.utils.Item;
-import net.buildtheearth.modules.utils.menus.BlockListMenu;
+import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.menus.BlockListMenu;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -19,21 +19,19 @@ import java.util.List;
 
 public class TreeTypeMenu extends BlockListMenu {
 
-    public static String TREE_TYPE_INV_NAME = "Choose a Tree Type";
+    public static final String TREE_TYPE_INV_NAME = "Choose a Tree Type";
 
-    public TreeTypeMenu(Player player) {
-        super(player, TREE_TYPE_INV_NAME, getTreeTypes());
+    public TreeTypeMenu(Player player, boolean autoLoad) {
+        super(player, TREE_TYPE_INV_NAME, getTreeTypes(), new GeneratorMenu(player, false), autoLoad);
     }
 
-    /**
-     * Get a list of all tree types
-     */
+    /** Get a list of all tree types */
     private static List<ItemStack> getTreeTypes() {
         List<ItemStack> treeTypes = new ArrayList<>();
 
         treeTypes.add(Item.create(Material.CONCRETE, "Any", (byte) 5));
 
-        for (TreeType treeType : TreeType.values())
+        for(TreeType treeType : TreeType.values())
             treeTypes.add(Item.create(Material.SAPLING, StringUtils.capitalize(treeType.getName())));
 
         return treeTypes;
@@ -44,11 +42,11 @@ public class TreeTypeMenu extends BlockListMenu {
         super.setItemClickEventsAsync();
 
         // Set click event for next item
-        if (canProceed())
+        if(canProceed())
             getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
                 Settings settings = GeneratorModule.getInstance().getRoad().getPlayerSettings().get(clickPlayer.getUniqueId());
 
-                if (!(settings instanceof RoadSettings))
+                if(!(settings instanceof RoadSettings))
                     return;
 
                 RoadSettings roadSettings = (RoadSettings) settings;
@@ -56,8 +54,6 @@ public class TreeTypeMenu extends BlockListMenu {
 
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
-
-                new SidewalkColorMenu(clickPlayer);
             });
     }
 }

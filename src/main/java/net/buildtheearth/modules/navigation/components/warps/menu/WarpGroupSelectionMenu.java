@@ -23,8 +23,8 @@ public class WarpGroupSelectionMenu extends WarpGroupMenu {
      * @param warp The warp that is being updated with the selected warp group.
      * @param alreadyExists Whether the warp already exists.
      */
-    public WarpGroupSelectionMenu(Player menuPlayer, BuildTeam buildTeam, Warp warp, boolean alreadyExists) {
-        super(menuPlayer, buildTeam, alreadyExists);
+    public WarpGroupSelectionMenu(Player menuPlayer, BuildTeam buildTeam, Warp warp, boolean alreadyExists, boolean autoLoad) {
+        super(menuPlayer, buildTeam, alreadyExists, autoLoad);
         this.warp = warp;
         this.alreadyExists = alreadyExists;
     }

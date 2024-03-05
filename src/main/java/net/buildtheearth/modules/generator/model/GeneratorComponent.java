@@ -3,9 +3,9 @@ package net.buildtheearth.modules.generator.model;
 import lombok.Getter;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.Component;
+import net.buildtheearth.modules.generator.components.field.FieldSettings;
 import net.buildtheearth.modules.generator.components.house.HouseSettings;
 import net.buildtheearth.modules.generator.components.rail.RailSettings;
-import net.buildtheearth.modules.generator.components.road.RoadFlag;
 import net.buildtheearth.modules.generator.components.road.RoadSettings;
 import net.buildtheearth.modules.generator.components.tree.TreeSettings;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
@@ -22,7 +22,7 @@ public abstract class GeneratorComponent extends Component {
 
 
     public String wikiPage;
-    GeneratorType generatorType;
+    final GeneratorType generatorType;
 
     @Getter
     private final HashMap<UUID, Settings> playerSettings = new HashMap<>();
@@ -32,24 +32,24 @@ public abstract class GeneratorComponent extends Component {
         generatorType = type;
     }
 
-    public abstract boolean checkPlayer(Player p);
-
+    public abstract boolean checkForNoPlayer(Player p);
     public abstract void generate(Player p);
 
 
-    public void analyzeCommand(Player p, String[] args) {
+
+    public void analyzeCommand(Player p, String[] args){
         sendHelp(p, args);
-        addPlayerSetting(p, generatorType);
-        convertArgsToSettings(p, args, generatorType);
+        addPlayerSetting(p);
+        convertArgsToSettings(p, args);
         generate(p);
     }
 
-    public void addPlayerSetting(UUID uuid, Settings settings) {
+    public void addPlayerSetting(UUID uuid, Settings settings){
         playerSettings.put(uuid, settings);
     }
 
-    public void addPlayerSetting(Player p, GeneratorType type) {
-        switch (type) {
+    public void addPlayerSetting(Player p){
+        switch (generatorType){
             case HOUSE:
                 addPlayerSetting(p.getUniqueId(), new HouseSettings(p));
                 break;
@@ -62,16 +62,19 @@ public abstract class GeneratorComponent extends Component {
             case TREE:
                 addPlayerSetting(p.getUniqueId(), new TreeSettings(p));
                 break;
+            case FIELD:
+                addPlayerSetting(p.getUniqueId(), new FieldSettings(p));
+                break;
         }
     }
 
-    public void sendHelp(Player p, String[] args) {
+    public void sendHelp(Player p, String[] args){
         if (args.length == 2)
             if (args[1].equals("info") || args[1].equals("help") || args[1].equals("?"))
                 sendHelp(p);
     }
 
-    public void sendHelp(Player p) {
+    public void sendHelp(Player p){
         //TODO send houses help
         p.sendMessage("TODO send Houses Help");
     }
@@ -87,7 +90,7 @@ public abstract class GeneratorComponent extends Component {
     }
 
     public String getCommand(Player p) {
-        HashMap<Object, String> flags = getPlayerSettings().get(p.getUniqueId()).getValues();
+        HashMap<Flag, String> flags = getPlayerSettings().get(p.getUniqueId()).getValues();
 
         String type = "house";
 
@@ -106,26 +109,32 @@ public abstract class GeneratorComponent extends Component {
                 break;
         }
 
-        String command = "/gen " + type;
-        for (Object object : flags.keySet()) {
-            if (!(object instanceof RoadFlag))
-                continue;
+        StringBuilder command = new StringBuilder("/gen " + type);
+        for(Flag flag : flags.keySet())
+            command.append(" -").append(flag.getFlag()).append(" ").append(flags.get(flag));
 
-            RoadFlag roadFlag = (RoadFlag) object;
-            command += " -" + roadFlag.getFlag() + " " + flags.get(roadFlag);
-        }
-
-        return command;
+        return command.toString();
     }
 
-    public void sendSuccessMessage(Player p) {
+    public void sendSuccessMessage(Player p){
         p.sendMessage(" ");
         p.sendMessage(" ");
         p.sendMessage(" ");
 
+        TextComponent tc = getTextComponent();
+        tc.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, getCommand(p)));
+        tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§7Click to copy command").create()));
+
+        p.spigot().sendMessage(tc);
+
+        p.sendMessage(" ");
+        p.sendMessage("§cNote: You can undo the edit with /gen undo.");
+    }
+
+    private TextComponent getTextComponent() {
         String type = "Building";
 
-        switch (generatorType) {
+        switch (generatorType){
             case HOUSE:
                 type = "House";
                 break;
@@ -140,43 +149,75 @@ public abstract class GeneratorComponent extends Component {
                 break;
         }
 
-        TextComponent tc = new TextComponent(BuildTeamTools.PREFIX + type + " §asuccessfully §7generated. §e[Copy Command]");
-        tc.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, getCommand(p)));
-        tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§7Click to copy command").create()));
-
-        p.spigot().sendMessage(tc);
-
-        p.sendMessage(" ");
-        p.sendMessage("§cNote: You can undo the edit with /gen undo.");
+        return new TextComponent(BuildTeamTools.PREFIX + type + "§a successfully §7generated. §e[Copy Command]");
     }
 
-    /**
-     * Conversion:
-     * <p>
+    /** Conversion:
      * Command: /gen house -w 123:12 -r 456:78
      * args: ["-w", "123:12", "-r", "456:78"]
      * HouseSettings:
      * WALL_COLOR: 123:12
      * ROOF_TYPE:  456:78
      */
-    protected void convertArgsToSettings(Player p, String[] args, GeneratorType generatorType) {
-        for (String flag : GeneratorUtils.convertArgsToFlags(args)) {
+    protected void convertArgsToSettings(Player p, String[] args){
+        for(String flag : GeneratorUtils.convertArgsToFlags(args)){
             String[] flagAndValue = GeneratorUtils.convertToFlagAndValue(flag, p);
+
+            if(flagAndValue == null) continue;
+
             String flagName = flagAndValue[0];
             String flagValue = flagAndValue[1];
 
-            if (flagName == null)
-                continue;
+            if(flagName == null) continue;
 
             Flag finalFlag = Flag.byString(generatorType, flagName);
 
-            if (finalFlag == null)
+            if(finalFlag == null) continue;
+
+            String errorMessage = validateFlagType(finalFlag, flagValue);
+
+            if(errorMessage != null){
+                p.sendMessage(errorMessage);
                 continue;
+            }
 
             getPlayerSettings().get(p.getUniqueId()).setValue(finalFlag, flagValue);
         }
 
-        if (getPlayerSettings().get(p.getUniqueId()).getValues().size() == 0 && args.length > 1)
+        if(getPlayerSettings().get(p.getUniqueId()).getValues().isEmpty() && args.length > 1)
             sendHelp(p);
+    }
+
+    /** Validates that the given flag value is of the correct type
+     *
+     * @param flag The flag to validate
+     * @param value The value to validate
+     * @return The error message if the value is invalid, null if the value is valid
+     */
+    private String validateFlagType(Flag flag, String value){
+        switch (flag.getFlagType()){
+            case INTEGER:
+                try {
+                    Integer.parseInt(value);
+                } catch (NumberFormatException e){
+                    return "§cThe value §e" + value + " §cof the flag §e" + flag.getFlag() + " §cis not a valid integer.";
+                }
+                break;
+            case DOUBLE:
+                try {
+                    Double.parseDouble(value);
+                } catch (NumberFormatException e){
+                    return "§cThe value §e" + value + " §cof the flag §e" + flag.getFlag() + " §cis not a valid double.";
+                }
+                break;
+            case BOOLEAN:
+                if(!value.equalsIgnoreCase("true") && !value.equalsIgnoreCase("false"))
+                    return "§cThe value §e" + value + " §cof the flag §e" + flag.getFlag() + " §cis not a valid boolean.";
+                break;
+            default:
+                break;
+        }
+
+        return null;
     }
 }

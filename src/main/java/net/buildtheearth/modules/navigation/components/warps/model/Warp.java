@@ -3,7 +3,7 @@ package net.buildtheearth.modules.navigation.components.warps.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import net.buildtheearth.modules.utils.*;
+import net.buildtheearth.utils.*;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.json.JSONObject;

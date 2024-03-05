@@ -5,9 +5,10 @@ import net.buildtheearth.modules.generator.model.Settings;
 import net.buildtheearth.modules.generator.components.road.Road;
 import net.buildtheearth.modules.generator.components.road.RoadFlag;
 import net.buildtheearth.modules.generator.components.road.RoadSettings;
-import net.buildtheearth.modules.utils.Item;
-import net.buildtheearth.modules.utils.MenuItems;
-import net.buildtheearth.modules.utils.menus.AbstractMenu;
+import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.ListUtil;
+import net.buildtheearth.utils.MenuItems;
+import net.buildtheearth.utils.menus.AbstractMenu;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -15,29 +16,31 @@ import org.bukkit.inventory.ItemStack;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class AdvancedSettingsMenu extends AbstractMenu {
 
-    public static String ADVANCED_SETTINGS_INV_NAME = "Adjust some Advanced Settings";
+    public static final String ADVANCED_SETTINGS_INV_NAME = "Adjust some Advanced Settings";
 
-    public static int LANE_COUNT_SLOT = 11;
-    public static int LANE_WIDTH_SLOT = 20;
-    public static int SIDEWALK_WIDTH_SLOT = 29;
-    public static int MARKINGS_MATERIAL_SLOT = 15;
+    public static final int LANE_COUNT_SLOT = 2;
+    public static final int LANE_WIDTH_SLOT = 11;
+    public static final int SIDEWALK_WIDTH_SLOT = 20;
+    public static final int STREET_LAMP_DISTANCE_SLOT = 29;
 
-    public static int ROAD_SLAB_SLOT = 24;
-    public static int SIDEWALK_SLAB_SLOT = 33;
+    public static final int MARKINGS_MATERIAL_SLOT = 6;
+    public static final int ROAD_SLAB_SLOT = 15;
+    public static final int SIDEWALK_SLAB_SLOT = 24;
+    public static final int STREET_LAMP_TYPE_SLOT = 33;
 
 
-    public static int NEXT_ITEM_SLOT = 44;
+    public static final int NEXT_ITEM_SLOT = 44;
 
-    private int laneCount, laneWidth, sidewalkWidth;
-    private ItemStack markingsMaterial, sidewalkSlab, roadSlab;
+    private static final int BACK_ITEM_SLOT = 36;
 
-    public AdvancedSettingsMenu(Player player) {
-        super(5, ADVANCED_SETTINGS_INV_NAME, player);
+    public AdvancedSettingsMenu(Player player, boolean autoLoad) {
+        super(5, ADVANCED_SETTINGS_INV_NAME, player, autoLoad);
     }
 
     @Override
@@ -45,40 +48,51 @@ public class AdvancedSettingsMenu extends AbstractMenu {
         Road road = GeneratorModule.getInstance().getRoad();
         UUID uuid = getMenuPlayer().getUniqueId();
 
-        this.laneCount = Integer.parseInt(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.LANE_COUNT));
-        this.laneWidth = Integer.parseInt(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.LANE_WIDTH));
-        this.sidewalkWidth = Integer.parseInt(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.SIDEWALK_WIDTH));
+        int laneCount = Integer.parseInt(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.LANE_COUNT));
+        int laneWidth = Integer.parseInt(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.LANE_WIDTH));
+        int sidewalkWidth = Integer.parseInt(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.SIDEWALK_WIDTH));
+        int streetLampDistance = Integer.parseInt(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.STREET_LAMP_DISTANCE));
 
-        this.markingsMaterial = Item.fromUniqueMaterialString(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.MARKING_MATERIAL));
-        this.sidewalkSlab = Item.fromUniqueMaterialString(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.SIDEWALK_SLAB_COLOR));
-        this.roadSlab = Item.fromUniqueMaterialString(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.ROAD_SLAB_COLOR));
+        ItemStack markingsMaterial = Item.fromUniqueMaterialString(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.MARKING_MATERIAL));
+        ItemStack sidewalkSlab = Item.fromUniqueMaterialString(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.SIDEWALK_SLAB_COLOR));
+        ItemStack roadSlab = Item.fromUniqueMaterialString(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.ROAD_SLAB_COLOR));
+        ItemStack streetLampType = getStreetLampItem(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.STREET_LAMP_TYPE));
 
         createCounter(MenuItems.SliderColor.WHITE, LANE_COUNT_SLOT, "Number of Lanes", laneCount, 1, 10, "Lanes");
         createCounter(MenuItems.SliderColor.LIGHT_GRAY, LANE_WIDTH_SLOT, "Lane Width", laneWidth, 1, 30, "Blocks");
         createCounter(MenuItems.SliderColor.WHITE, SIDEWALK_WIDTH_SLOT, "Sidewalk Width", sidewalkWidth, 1, 30, "Blocks");
+        createCounter(MenuItems.SliderColor.LIGHT_GRAY, STREET_LAMP_DISTANCE_SLOT, "Street Lamp Distance", streetLampDistance, 5, 500, "Blocks");
 
-        setColorChoiceItems(MenuItems.SliderColor.WHITE, MARKINGS_MATERIAL_SLOT, "Line Markings Color", markingsMaterial);
-        setColorChoiceItems(MenuItems.SliderColor.LIGHT_GRAY, ROAD_SLAB_SLOT, "Road Elevation Slab", roadSlab);
-        setColorChoiceItems(MenuItems.SliderColor.WHITE, SIDEWALK_SLAB_SLOT, "Sidewalk Elevation Slab", sidewalkSlab);
+        setChoiceItems(MenuItems.SliderColor.WHITE, MARKINGS_MATERIAL_SLOT, "Line Markings Color", markingsMaterial);
+        setChoiceItems(MenuItems.SliderColor.LIGHT_GRAY, ROAD_SLAB_SLOT, "Road Elevation Slab", roadSlab);
+        setChoiceItems(MenuItems.SliderColor.WHITE, SIDEWALK_SLAB_SLOT, "Sidewalk Elevation Slab", sidewalkSlab);
+        setChoiceItems(MenuItems.SliderColor.LIGHT_GRAY, STREET_LAMP_TYPE_SLOT, "Street Lamp Type", streetLampType);
 
         getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.getCheckmarkItem("§eNext"));
+
+        setBackItem(BACK_ITEM_SLOT, new SidewalkColorMenu(getMenuPlayer(), false));
 
         super.setPreviewItems();
     }
 
     @Override
-    protected void setMenuItemsAsync() {
-    }
+    protected void setMenuItemsAsync() {}
 
     @Override
     protected void setItemClickEventsAsync() {
+        List<ItemStack> streetLampTypes = new ArrayList<>();
+        for(String streetLampType : RoadSettings.streetLampTypes)
+            streetLampTypes.add(getStreetLampItem(streetLampType));
+
         setSliderClickEvents(RoadFlag.LANE_COUNT, LANE_COUNT_SLOT, 1, 10);
         setSliderClickEvents(RoadFlag.LANE_WIDTH, LANE_WIDTH_SLOT, 1, 30);
         setSliderClickEvents(RoadFlag.SIDEWALK_WIDTH, SIDEWALK_WIDTH_SLOT, 1, 30);
+        setSliderClickEvents(RoadFlag.STREET_LAMP_TYPE, STREET_LAMP_TYPE_SLOT, 5, 500);
 
-        setColorChoiceClickEvents(RoadFlag.MARKING_MATERIAL, MARKINGS_MATERIAL_SLOT, "Choose a Line Marking Block", MenuItems.getBlocksByColor());
-        setColorChoiceClickEvents(RoadFlag.ROAD_SLAB_COLOR, ROAD_SLAB_SLOT, "Choose a Road Elevation Slab", MenuItems.getSlabs());
-        setColorChoiceClickEvents(RoadFlag.SIDEWALK_SLAB_COLOR, SIDEWALK_SLAB_SLOT, "Choose a Sidewalk Elevation Slab", MenuItems.getSlabs());
+        setChoiceClickEvents(RoadFlag.MARKING_MATERIAL, MARKINGS_MATERIAL_SLOT, "Choose a Line Marking Block", MenuItems.getBlocksByColor());
+        setChoiceClickEvents(RoadFlag.ROAD_SLAB_COLOR, ROAD_SLAB_SLOT, "Choose a Road Elevation Slab", MenuItems.getSlabs());
+        setChoiceClickEvents(RoadFlag.SIDEWALK_SLAB_COLOR, SIDEWALK_SLAB_SLOT, "Choose a Sidewalk Elevation Slab", MenuItems.getSlabs());
+        setChoiceClickEvents(RoadFlag.STREET_LAMP_TYPE, STREET_LAMP_TYPE_SLOT, "Choose a Street Lamp Type", streetLampTypes);
 
         // Set click events items
         getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
@@ -97,7 +111,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
                 .pattern("100010001")
                 .pattern("100010001")
                 .pattern("100010001")
-                .pattern("111111110")
+                .pattern("011111110")
                 .build();
     }
 
@@ -111,7 +125,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
             if (value > minValue) {
                 Settings settings = road.getPlayerSettings().get(clickPlayer.getUniqueId());
 
-                if (!(settings instanceof RoadSettings))
+                if(!(settings instanceof RoadSettings))
                     return;
 
                 RoadSettings roadSettings = (RoadSettings) settings;
@@ -119,7 +133,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
 
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
                 reloadMenuAsync();
-            } else {
+            }else{
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
             }
         });
@@ -131,7 +145,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
             if (value < maxValue) {
                 Settings settings = road.getPlayerSettings().get(clickPlayer.getUniqueId());
 
-                if (!(settings instanceof RoadSettings))
+                if(!(settings instanceof RoadSettings))
                     return;
 
                 RoadSettings roadSettings = (RoadSettings) settings;
@@ -139,7 +153,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
 
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
                 reloadMenuAsync();
-            } else {
+            }else{
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
 
             }
@@ -147,23 +161,17 @@ public class AdvancedSettingsMenu extends AbstractMenu {
     }
 
 
-    protected void setColorChoiceClickEvents(RoadFlag roadFlag, int slot, String choiceInvName, List<ItemStack> choices) {
-        Road road = GeneratorModule.getInstance().getRoad();
-
+    protected void setChoiceClickEvents(RoadFlag roadFlag, int slot, String choiceInvName, List<ItemStack> choices){
         // Set click event for X items
-        getMenu().getSlot(slot - 1).setClickHandler((clickPlayer, clickInformation) -> {
-            turnOffColorChoice(clickPlayer, roadFlag);
-        });
-        getMenu().getSlot(slot + 1).setClickHandler((clickPlayer, clickInformation) -> {
-            turnOffColorChoice(clickPlayer, roadFlag);
-        });
+        getMenu().getSlot(slot - 1).setClickHandler((clickPlayer, clickInformation) -> turnOffColorChoice(clickPlayer, roadFlag));
+        getMenu().getSlot(slot + 1).setClickHandler((clickPlayer, clickInformation) -> turnOffColorChoice(clickPlayer, roadFlag));
 
         // Set click event for color choice items
         getMenu().getSlot(slot).setClickHandler((clickPlayer, clickInformation) -> {
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
 
-            new AdvancedColorMenu(clickPlayer, roadFlag, choiceInvName, choices);
+            new AdvancedColorMenu(clickPlayer, roadFlag, choiceInvName, choices, true);
         });
     }
 
@@ -171,7 +179,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
         Road road = GeneratorModule.getInstance().getRoad();
         Settings settings = road.getPlayerSettings().get(clickPlayer.getUniqueId());
 
-        if (!(settings instanceof RoadSettings))
+        if(!(settings instanceof RoadSettings))
             return;
 
         RoadSettings roadSettings = (RoadSettings) settings;
@@ -179,5 +187,9 @@ public class AdvancedSettingsMenu extends AbstractMenu {
 
         clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
         reloadMenuAsync();
+    }
+
+    protected ItemStack getStreetLampItem(String id){
+        return Item.create(Material.SEA_LANTERN, "§eStreet Lamp #" + id, ListUtil.createList("§7Click to select this street lamp type."));
     }
 }

@@ -6,8 +6,8 @@ import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Continent;
 import net.buildtheearth.modules.network.model.Region;
-import net.buildtheearth.modules.utils.*;
-import net.buildtheearth.modules.utils.menus.AbstractPaginatedMenu;
+import net.buildtheearth.utils.*;
+import net.buildtheearth.utils.menus.AbstractPaginatedMenu;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
@@ -26,8 +26,8 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
     public final int BACK_ITEM_SLOT = 27;
     public static int SWITCH_PAGE_ITEM_SLOT = 34;
 
-    public CountrySelectorMenu(Player menuPlayer, @NonNull Continent continent) {
-        super(4, 3, continent.getLabel() + " - countries", menuPlayer);
+    public CountrySelectorMenu(Player menuPlayer, @NonNull Continent continent, boolean autoLoad) {
+        super(4, 3, continent.getLabel() + " - countries", menuPlayer, autoLoad);
         this.continent = continent;
         this.regions = new ArrayList<>(continent.getCountries());
 
@@ -64,7 +64,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPreviewItems() {
-        setBackItem(BACK_ITEM_SLOT, true);
+        setBackItem(BACK_ITEM_SLOT, new ExploreMenu(getMenuPlayer()));
 
         // If there are more than 27 countries, add the switch page items, otherwise add glass panes
         if(regions.size() > 27)
@@ -101,11 +101,6 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
     protected void setItemClickEventsAsync() {
         if(regions.size() > 27)
             setSwitchPageItemClickEvents(SWITCH_PAGE_ITEM_SLOT);
-
-        getMenu().getSlot(BACK_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
-            clickPlayer.closeInventory();
-            new ExploreMenu(clickPlayer);
-        });
     }
 
     @Override
@@ -121,7 +116,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
                 ChatHelper.logDebug("%s", clickedRegion.getName());
 
                 if(clickedRegion.getCountryCodeCca3().equalsIgnoreCase("USA"))
-                    new StateSelectorMenu(clickedRegion, clickPlayer);
+                    new StateSelectorMenu(clickedRegion, clickPlayer, true);
                 else if (clickedRegion.getBuildTeam().isConnected())
                     Utils.sendPlayerToServer(clickPlayer, clickedRegion.getBuildTeam().getServerName());
                 else

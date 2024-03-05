@@ -10,13 +10,14 @@ import net.buildtheearth.modules.common.components.dependency.DependencyComponen
 import net.buildtheearth.modules.common.components.pluginmessaging.PluginMessagingComponent;
 import net.buildtheearth.modules.common.components.updater.UpdaterComponent;
 import net.buildtheearth.modules.common.listeners.CommandListener;
+import net.buildtheearth.modules.common.listeners.ExceptionListener;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.stats.StatsModule;
 import net.buildtheearth.modules.stats.model.StatsPlayerType;
 import net.buildtheearth.modules.stats.model.StatsServerType;
-import net.buildtheearth.modules.utils.io.ConfigPaths;
-import net.buildtheearth.modules.utils.io.ConfigUtil;
+import net.buildtheearth.utils.io.ConfigPaths;
+import net.buildtheearth.utils.io.ConfigUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.MenuFunctionListener;
@@ -82,7 +83,8 @@ public class CommonModule extends Module {
     public void registerListeners() {
         super.registerListeners(
             new MenuFunctionListener(),
-            new CommandListener()
+            new CommandListener(),
+            new ExceptionListener()
         );
     }
 
@@ -119,6 +121,9 @@ public class CommonModule extends Module {
                         StatsModule.getInstance().getStatsPlayer(p.getUniqueId()).addValue(StatsPlayerType.PLAYTIME, 1);
                     }
                 }
+
+                if(CommonModule.getInstance().isEnabled())
+                    ExceptionListener.limiter = false;
             }
 
             // Every 5 seconds

@@ -2,7 +2,7 @@ package net.buildtheearth.modules.navigation.components.navigator.commands;
 
 import net.buildtheearth.modules.navigation.menu.MainMenu;
 import net.buildtheearth.modules.navigation.NavigationModule;
-import net.buildtheearth.modules.utils.ChatHelper;
+import net.buildtheearth.utils.ChatHelper;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

@@ -2,6 +2,10 @@ package net.buildtheearth.modules.generator.menu;
 
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.GeneratorModule;
+import net.buildtheearth.modules.generator.model.GeneratorCollections;
+import net.buildtheearth.modules.generator.components.field.Field;
+import net.buildtheearth.modules.generator.components.field.FieldSettings;
+import net.buildtheearth.modules.generator.components.field.menu.CropTypeMenu;
 import net.buildtheearth.modules.generator.components.house.House;
 import net.buildtheearth.modules.generator.components.house.HouseSettings;
 import net.buildtheearth.modules.generator.components.house.RoofType;
@@ -12,41 +16,43 @@ import net.buildtheearth.modules.generator.components.road.Road;
 import net.buildtheearth.modules.generator.components.road.RoadSettings;
 import net.buildtheearth.modules.generator.components.road.menu.RoadColorMenu;
 import net.buildtheearth.modules.generator.components.tree.Tree;
-import net.buildtheearth.modules.generator.utils.GeneratorUtils;
-import net.buildtheearth.modules.utils.Item;
-import net.buildtheearth.modules.utils.ListUtil;
-import net.buildtheearth.modules.utils.menus.AbstractMenu;
+import net.buildtheearth.modules.generator.components.tree.TreeSettings;
+import net.buildtheearth.modules.generator.components.tree.menu.TreeTypeMenu;
+import net.buildtheearth.modules.generator.model.GeneratorType;
+import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.ListUtil;
+import net.buildtheearth.utils.menus.AbstractMenu;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
-
 import java.util.ArrayList;
 
 public class GeneratorMenu extends AbstractMenu {
 
-    public static String GENERATOR_INV_NAME = "What do you want to generate?";
+    public static final String GENERATOR_INV_NAME = "What do you want to generate?";
 
-    public static int HOUSE_ITEM_SLOT = 9;
+    public static final int HOUSE_ITEM_SLOT = 9;
 
-    public static int ROAD_ITEM_SLOT = 11;
+    public static final int ROAD_ITEM_SLOT = 11;
 
-    public static int RAILWAY_ITEM_SLOT = 13;
+    public static final int RAILWAY_ITEM_SLOT = 13;
 
-    public static int TREE_ITEM_SLOT = 15;
+    public static final int TREE_ITEM_SLOT = 15;
 
-    public static int FIELD_SLOT = 17;
+    public static int FIELD_ITEM_SLOT = 17;
 
 
-    public GeneratorMenu(Player player) {
-        super(3, GENERATOR_INV_NAME, player);
+    public GeneratorMenu(Player player, boolean autoLoad) {
+        super(3, GENERATOR_INV_NAME, player, autoLoad);
     }
 
     @Override
     protected void setPreviewItems() {
-
         // HOUSE ITEM
         ArrayList<String> houseLore = ListUtil.createList("",
                 "§eDescription:",
@@ -58,8 +64,8 @@ public class GeneratorMenu extends AbstractMenu {
                 "- Custom Wall, Base and Roof Color",
                 "- Custom Floor and Window Sizes",
                 "",
-                "§8Leftclick to generate",
-                "§8Rightclick for Tutorial");
+                "§8Left-click to generate",
+                "§8Right-click for Tutorial");
 
         ItemStack houseItem = Item.create(Material.BIRCH_DOOR_ITEM, "§cGenerate House", houseLore);
 
@@ -78,8 +84,8 @@ public class GeneratorMenu extends AbstractMenu {
                 "- Custom Sidewalk Width and Color",
                 "- Custom Lane Count",
                 "",
-                "§8Leftclick to generate",
-                "§8Rightclick for Tutorial");
+                "§8Left-click to generate",
+                "§8Right-click for Tutorial");
 
 
         ItemStack roadItem = Item.create(Material.STEP, "§bGenerate Road", (short) 0, roadLore);
@@ -98,8 +104,8 @@ public class GeneratorMenu extends AbstractMenu {
                 "- Custom Railway Width and Color (TODO)",
                 "- Custom Track Count (TODO)",
                 "",
-                "§8Leftclick to generate",
-                "§8Rightclick for Tutorial");
+                "§8Left-click to generate",
+                "§8Right-click for Tutorial");
 
         ItemStack railwayItem = Item.create(Material.RAILS, "§9Generate Railway", railwayLore);
 
@@ -115,7 +121,7 @@ public class GeneratorMenu extends AbstractMenu {
 
             // Set navigator item
             getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
-        } else if (!GeneratorUtils.checkIfTreePackIsInstalled(getMenuPlayer(), false)) {
+        }else if(GeneratorCollections.checkIfGeneratorCollectionsIsInstalled(getMenuPlayer())){
             // TREE ITEM
             ArrayList<String> treeLore = ListUtil.createList("", "§cThe §eTree Pack " + Tree.TREE_PACK_VERSION + " §cis not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
 
@@ -123,7 +129,7 @@ public class GeneratorMenu extends AbstractMenu {
 
             // Set navigator item
             getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
-        } else {
+        }else{
             // TREE ITEM
             ArrayList<String> treeLore = ListUtil.createList("",
                     "§eDescription:",
@@ -133,8 +139,8 @@ public class GeneratorMenu extends AbstractMenu {
                     "§eFeatures:",
                     "- Custom Tree Type",
                     "",
-                    "§8Leftclick to generate",
-                    "§8Rightclick for Tutorial");
+                    "§8Left-click to generate",
+                    "§8Right-click for Tutorial");
 
             ItemStack treeItem = Item.create(Material.SAPLING, "§aGenerate Tree & Forest", treeLore);
 
@@ -153,56 +159,70 @@ public class GeneratorMenu extends AbstractMenu {
                 "- Custom Crop Type",
                 "- Custom Crop Size",
                 "",
-                "§8Leftclick to generate",
-                "§8Rightclick for Tutorial");
+                "§8Left-click to generate",
+                "§8Right-click for Tutorial");
 
-        ItemStack fieldItem = Item.create(Material.WHEAT, "§6Generate Field §c(TODO)", fieldLore);
+        ItemStack fieldItem = Item.create(Material.WHEAT, "§6Generate Field", fieldLore);
 
         // Set navigator item
-        getMenu().getSlot(FIELD_SLOT).setItem(fieldItem);
+        getMenu().getSlot(FIELD_ITEM_SLOT).setItem(fieldItem);
 
 
         super.setPreviewItems();
     }
 
     @Override
-    protected void setMenuItemsAsync() {
-    }
+    protected void setMenuItemsAsync() {}
 
     @Override
     protected void setItemClickEventsAsync() {
         // Set click event for house item
         getMenu().getSlot(HOUSE_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
+            if(clickInformation.getClickType().equals(ClickType.RIGHT)) {
+                sendMoreInformation(clickPlayer, GeneratorType.HOUSE);
+                return;
+            }
+
             House house = GeneratorModule.getInstance().getHouse();
             house.getPlayerSettings().put(clickPlayer.getUniqueId(), new HouseSettings(clickPlayer));
 
-            if (!house.checkPlayer(clickPlayer))
+            if(house.checkForNoPlayer(clickPlayer))
                 return;
 
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
-            new WallColorMenu(clickPlayer);
+            new WallColorMenu(clickPlayer, true);
         }));
 
         // Set click event for road item
         getMenu().getSlot(ROAD_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
+            if(clickInformation.getClickType().equals(ClickType.RIGHT)) {
+                sendMoreInformation(clickPlayer, GeneratorType.ROAD);
+                return;
+            }
+
             Road road = GeneratorModule.getInstance().getRoad();
             road.getPlayerSettings().put(clickPlayer.getUniqueId(), new RoadSettings(clickPlayer));
 
-            if (!road.checkPlayer(clickPlayer))
+            if(road.checkForNoPlayer(clickPlayer))
                 return;
 
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
-            new RoadColorMenu(clickPlayer);
+            new RoadColorMenu(clickPlayer, true);
         }));
 
         // Set click event for railway item
         getMenu().getSlot(RAILWAY_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
+            if(clickInformation.getClickType().equals(ClickType.RIGHT)) {
+                sendMoreInformation(clickPlayer, GeneratorType.RAILWAY);
+                return;
+            }
+
             Rail rail = GeneratorModule.getInstance().getRail();
             rail.getPlayerSettings().put(clickPlayer.getUniqueId(), new RailSettings(clickPlayer));
 
-            if (!rail.checkPlayer(clickPlayer))
+            if(rail.checkForNoPlayer(clickPlayer))
                 return;
 
             clickPlayer.closeInventory();
@@ -210,6 +230,59 @@ public class GeneratorMenu extends AbstractMenu {
 
             GeneratorModule.getInstance().getRail().generate(clickPlayer);
         }));
+
+        // Set click event for tree item
+        getMenu().getSlot(TREE_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
+            if(clickInformation.getClickType().equals(ClickType.RIGHT)) {
+                sendMoreInformation(clickPlayer, GeneratorType.TREE);
+                return;
+            }
+
+            Tree tree = GeneratorModule.getInstance().getTree();
+            tree.getPlayerSettings().put(clickPlayer.getUniqueId(), new TreeSettings(clickPlayer));
+
+            if(tree.checkForNoPlayer(clickPlayer))
+                return;
+
+            clickPlayer.closeInventory();
+            clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
+            new TreeTypeMenu(clickPlayer, true);
+        }));
+
+        // Set click event for field item
+        getMenu().getSlot(FIELD_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
+            if(clickInformation.getClickType().equals(ClickType.RIGHT)) {
+                sendMoreInformation(clickPlayer, GeneratorType.FIELD);
+                return;
+            }
+
+            Field field = GeneratorModule.getInstance().getField();
+            field.getPlayerSettings().put(clickPlayer.getUniqueId(), new FieldSettings(clickPlayer));
+
+            if(field.checkForNoPlayer(clickPlayer))
+                return;
+
+            clickPlayer.closeInventory();
+            clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
+            new CropTypeMenu(clickPlayer, true);
+        }));
+    }
+
+    private void sendMoreInformation(Player clickPlayer, GeneratorType generator) {
+        switch (generator) {
+            case FIELD:
+                clickPlayer.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Field-Command");
+                break;
+            case HOUSE:
+                clickPlayer.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/House-Command");
+                break;
+            case RAILWAY:
+                clickPlayer.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Rail-Command");
+                break;
+            case ROAD:
+                clickPlayer.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Road-Command");
+                break;
+        }
     }
 
     @Override

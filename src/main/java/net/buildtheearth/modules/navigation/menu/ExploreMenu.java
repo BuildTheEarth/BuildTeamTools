@@ -3,9 +3,9 @@ package net.buildtheearth.modules.navigation.menu;
 
 import com.alpsbte.alpslib.utils.item.ItemBuilder;
 import net.buildtheearth.modules.network.model.Continent;
-import net.buildtheearth.modules.utils.ChatHelper;
-import net.buildtheearth.modules.utils.Item;
-import net.buildtheearth.modules.utils.menus.AbstractMenu;
+import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.menus.AbstractMenu;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -55,7 +55,7 @@ public class ExploreMenu extends AbstractMenu {
                 if(continent.equals(Continent.AFRICA)) {
                     // TODO implement that the player gets information about the BTE Africa server when clicking on Africa
                 } else {
-                    new CountrySelectorMenu(clickPlayer, continent);
+                    new CountrySelectorMenu(clickPlayer, continent, true);
                 }
             });
         }

@@ -1,11 +1,11 @@
 package net.buildtheearth.modules.navigation.components.warps.menu;
 
 import net.buildtheearth.BuildTeamTools;
-import net.buildtheearth.modules.utils.ChatHelper;
-import net.buildtheearth.modules.utils.Item;
-import net.buildtheearth.modules.utils.ListUtil;
-import net.buildtheearth.modules.utils.MenuItems;
-import net.buildtheearth.modules.utils.menus.AbstractMenu;
+import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.ListUtil;
+import net.buildtheearth.utils.MenuItems;
+import net.buildtheearth.utils.menus.AbstractMenu;
 import net.buildtheearth.modules.navigation.components.warps.model.Warp;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Material;
@@ -45,16 +45,11 @@ public class MaterialSelectionMenu extends AbstractMenu {
         getMenu().getSlot(MATERIAL_SLOT).setItem(Item.create(Material.STONE, "§6§lItem", ListUtil.createList("", "Change the material of the warp", "to a minecraft item.", "", "§eExample:", "Stone")));
         getMenu().getSlot(CUSTOM_HEAD_SLOT).setItem(MenuItems.getLetterHead("?", MenuItems.LetterType.WOODEN, "§6§lCustom Head", ListUtil.createList("", "Change the material of the warp", "to a custom head texture URL.", "", "§eExample:", "https://textures.minecraft.net/texture/...")));
 
-        setBackItem(BACK_ITEM_SLOT, true);
+        setBackItem(BACK_ITEM_SLOT, new WarpEditMenu(getMenuPlayer(), warp, alreadyExists));
     }
 
     @Override
     protected void setItemClickEventsAsync() {
-        getMenu().getSlot(BACK_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
-            clickPlayer.closeInventory();
-            new WarpEditMenu(clickPlayer, warp, alreadyExists);
-        });
-
         getMenu().getSlot(MATERIAL_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
 

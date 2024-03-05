@@ -1,13 +1,15 @@
 package net.buildtheearth.modules.common.listeners;
 
+import com.destroystokyo.paper.event.server.ServerExceptionEvent;
 import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.ModuleHandler;
-import net.buildtheearth.modules.utils.ChatHelper;
+import net.buildtheearth.utils.ChatHelper;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class CommandListener implements Listener {

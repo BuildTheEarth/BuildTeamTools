@@ -4,10 +4,9 @@ import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.model.Settings;
 import net.buildtheearth.modules.generator.components.road.RoadFlag;
 import net.buildtheearth.modules.generator.components.road.RoadSettings;
-import net.buildtheearth.modules.generator.components.road.menu.SidewalkColorMenu;
 import net.buildtheearth.modules.generator.components.tree.TreeWidth;
-import net.buildtheearth.modules.utils.Item;
-import net.buildtheearth.modules.utils.menus.BlockListMenu;
+import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.menus.BlockListMenu;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -19,10 +18,10 @@ import java.util.List;
 
 public class TreeWidthMenu extends BlockListMenu {
 
-    public static String TREE_TYPE_INV_NAME = "Choose a Tree Width";
+    public static final String TREE_TYPE_INV_NAME = "Choose a Tree Width";
 
-    public TreeWidthMenu(Player player) {
-        super(player, TREE_TYPE_INV_NAME, getTreeWidths());
+    public TreeWidthMenu(Player player, boolean autoLoad) {
+        super(player, TREE_TYPE_INV_NAME, getTreeWidths(), new TreeTypeMenu(player, false), autoLoad);
     }
 
     /**
@@ -57,7 +56,7 @@ public class TreeWidthMenu extends BlockListMenu {
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
 
-                new SidewalkColorMenu(clickPlayer);
+                //new SidewalkColorMenu(clickPlayer);
             });
     }
 }

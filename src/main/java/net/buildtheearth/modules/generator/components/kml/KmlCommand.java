@@ -1,11 +1,11 @@
 package net.buildtheearth.modules.generator.components.kml;
 
 import net.buildtheearth.BuildTeamTools;
-import net.buildtheearth.modules.utils.BlockLocation;
-import net.buildtheearth.modules.utils.ChatHelper;
-import net.buildtheearth.modules.utils.GeometricUtils;
-import net.buildtheearth.modules.utils.LineRasterization;
-import net.buildtheearth.modules.utils.PolygonTools;
+import net.buildtheearth.utils.BlockLocation;
+import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.GeometricUtils;
+import net.buildtheearth.utils.LineRasterization;
+import net.buildtheearth.utils.PolygonTools;
 
 import java.util.List;
 import java.util.ArrayList;

@@ -17,12 +17,12 @@ public class Road extends GeneratorComponent {
     }
 
     @Override
-    public boolean checkPlayer(Player p) {
+    public boolean checkForNoPlayer(Player p) {
 
-        if (!GeneratorUtils.checkForWorldEditSelection(p))
+        if (GeneratorUtils.checkForNoWorldEditSelection(p))
             return false;
 
-        if (!GeneratorUtils.checkForConvexSelection(p))
+        if (GeneratorUtils.checkForNoConvexSelection(p))
             return false;
 
         if (getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
@@ -33,7 +33,7 @@ public class Road extends GeneratorComponent {
 
     @Override
     public void generate(Player p) {
-        if (!GeneratorModule.getInstance().getRoad().checkPlayer(p))
+        if (!GeneratorModule.getInstance().getRoad().checkForNoPlayer(p))
             return;
 
         Region region = GeneratorUtils.getWorldEditSelection(p);
@@ -43,6 +43,6 @@ public class Road extends GeneratorComponent {
 
         ConvexPolyhedralRegion convexRegion = (ConvexPolyhedralRegion) region;
 
-        RoadScripts.roadscript_v_2_0(p, this, convexRegion);
+        RoadScripts.roadScript_v_2_0(p, this, convexRegion);
     }
 }

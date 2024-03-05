@@ -264,7 +264,7 @@ public class UpdaterComponent extends Component {
      * @param newVersion remote version
      * @param oldVersion current version
      */
-    private boolean shouldUpdate(String newVersion, String oldVersion) {
+    public boolean shouldUpdate(String newVersion, String oldVersion) {
         // If version has format 1.0.0
         if (newVersion.contains(".")) {
             String[] newVersionSplit = newVersion.split("\\.");

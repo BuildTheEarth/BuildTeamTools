@@ -12,7 +12,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 
-import net.buildtheearth.modules.utils.BlockLocation;
+import net.buildtheearth.utils.BlockLocation;
 
 /**
  * A set of block changes that should be bundled together. 

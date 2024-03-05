@@ -3,9 +3,9 @@ package net.buildtheearth.modules.navigation.components.warps.menu;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
-import net.buildtheearth.modules.utils.*;
-import net.buildtheearth.modules.utils.geo.CoordinateConversion;
-import net.buildtheearth.modules.utils.menus.AbstractMenu;
+import net.buildtheearth.utils.*;
+import net.buildtheearth.utils.geo.CoordinateConversion;
+import net.buildtheearth.utils.menus.AbstractMenu;
 import net.buildtheearth.modules.navigation.components.warps.model.Warp;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Location;
@@ -211,7 +211,7 @@ public class WarpEditMenu extends AbstractMenu {
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
 
-            new WarpGroupSelectionMenu(clickPlayer, warp.getWarpGroup().getBuildTeam(), warp, alreadyExists);
+            new WarpGroupSelectionMenu(clickPlayer, warp.getWarpGroup().getBuildTeam(), warp, alreadyExists, true);
         });
 
         // Set click event for the highlight item

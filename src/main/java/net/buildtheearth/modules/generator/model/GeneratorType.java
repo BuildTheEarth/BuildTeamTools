@@ -7,7 +7,8 @@ public enum GeneratorType {
     HOUSE("House"),
     ROAD("Road"),
     RAILWAY("Railway"),
-    TREE("Tree");
+    TREE("Tree"),
+    FIELD("Field");
 
     @Getter
     private final String name;

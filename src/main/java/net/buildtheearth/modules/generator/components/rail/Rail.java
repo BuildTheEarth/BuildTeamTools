@@ -17,11 +17,11 @@ public class Rail extends GeneratorComponent {
     }
 
     @Override
-    public boolean checkPlayer(Player p) {
-        if (!GeneratorUtils.checkForWorldEditSelection(p))
+    public boolean checkForNoPlayer(Player p) {
+        if (GeneratorUtils.checkForNoWorldEditSelection(p))
             return false;
 
-        if (!GeneratorUtils.checkForConvexSelection(p))
+        if (GeneratorUtils.checkForNoConvexSelection(p))
             return false;
 
         if (getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
@@ -32,7 +32,7 @@ public class Rail extends GeneratorComponent {
 
     @Override
     public void generate(Player p) {
-        if (!GeneratorModule.getInstance().getRail().checkPlayer(p))
+        if (!GeneratorModule.getInstance().getRail().checkForNoPlayer(p))
             return;
 
         Region region = GeneratorUtils.getWorldEditSelection(p);
@@ -42,7 +42,7 @@ public class Rail extends GeneratorComponent {
 
         ConvexPolyhedralRegion convexRegion = (ConvexPolyhedralRegion) region;
 
-        RailScripts.railscript_v_1_3(p, this, convexRegion);
+        RailScripts.railScript_v_1_3(p, this, convexRegion);
 
         sendSuccessMessage(p);
     }

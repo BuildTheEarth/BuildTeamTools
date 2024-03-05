@@ -1,14 +1,13 @@
 package net.buildtheearth.modules.navigation.components.warps.menu;
 
 import net.buildtheearth.modules.navigation.NavigationModule;
-import net.buildtheearth.modules.navigation.components.warps.WarpsComponent;
 import net.buildtheearth.modules.navigation.menu.CountrySelectorMenu;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Permissions;
-import net.buildtheearth.modules.utils.Item;
-import net.buildtheearth.modules.utils.ListUtil;
-import net.buildtheearth.modules.utils.MenuItems;
-import net.buildtheearth.modules.utils.menus.AbstractPaginatedMenu;
+import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.ListUtil;
+import net.buildtheearth.utils.MenuItems;
+import net.buildtheearth.utils.menus.AbstractPaginatedMenu;
 import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -31,15 +30,15 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
      * @param buildTeam The build team that the menu is for
      * @param hasBackItem Whether the menu has a back item
      */
-    public WarpGroupMenu(Player menuPlayer, BuildTeam buildTeam, boolean hasBackItem) {
-        super(4, 3, "Warp Menu", menuPlayer);
+    public WarpGroupMenu(Player menuPlayer, BuildTeam buildTeam, boolean hasBackItem, boolean autoLoad) {
+        super(4, 3, "Warp Menu", menuPlayer, autoLoad);
         this.hasBackItem = hasBackItem;
         this.buildTeam = buildTeam;
     }
 
     @Override
     protected void setMenuItemsAsync() {
-        setBackItem(BACK_ITEM_SLOT, hasBackItem);
+        setBackItem(BACK_ITEM_SLOT, new CountrySelectorMenu(getMenuPlayer(), buildTeam.getContinent(), false));
     }
 
     @Override
@@ -47,7 +46,7 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
         if(hasBackItem)
             getMenu().getSlot(BACK_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
-                new CountrySelectorMenu(clickPlayer, buildTeam.getContinent());
+
             });
     }
 
@@ -131,7 +130,7 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
                 if(clickInformation.getClickType().isRightClick() && clickPlayer.hasPermission(Permissions.WARP_GROUP_EDIT))
                     new WarpGroupEditMenu(clickPlayer, warpGroup, true);
                 else
-                    new WarpMenu(clickPlayer, warpGroup, true);
+                    new WarpMenu(clickPlayer, warpGroup, true, true);
 
             });
             slot++;

@@ -1,10 +1,10 @@
 package net.buildtheearth.modules.navigation.components.warps.menu;
 
 import net.buildtheearth.BuildTeamTools;
-import net.buildtheearth.modules.utils.Item;
-import net.buildtheearth.modules.utils.ListUtil;
-import net.buildtheearth.modules.utils.Utils;
-import net.buildtheearth.modules.utils.menus.AbstractMenu;
+import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.ListUtil;
+import net.buildtheearth.utils.Utils;
+import net.buildtheearth.utils.menus.AbstractMenu;
 import net.buildtheearth.modules.navigation.components.warps.model.Warp;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Material;
@@ -65,17 +65,11 @@ public class AddressTypeSelectionMenu extends AbstractMenu {
         getMenu().getSlot(COUNTRY_SLOT).setItem(Item.create(Material.INK_SACK, "§6§lCountry", (short) 12, countryLore));
         getMenu().getSlot(CUSTOM_SLOT).setItem(Item.create(Material.NAME_TAG, "§6§lCustom Address", ListUtil.createList("", "§7If no other address type fits,", "§7enter a custom address.")));
 
-        setBackItem(BACK_ITEM_SLOT, true);
+        setBackItem(BACK_ITEM_SLOT, new WarpEditMenu(getMenuPlayer(), warp, alreadyExists));
     }
 
     @Override
     protected void setItemClickEventsAsync() {
-        // Set click event for the back item
-        getMenu().getSlot(BACK_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
-            clickPlayer.closeInventory();
-            new WarpEditMenu(clickPlayer, warp, alreadyExists);
-        });
-
         // Set click event for the address type items
         getMenu().getSlot(BUILDING_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
             warp.setAddressType(Warp.AddressType.BUILDING);

@@ -2,8 +2,8 @@ package net.buildtheearth.modules.navigation.components.warps.menu;
 
 import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.modules.network.model.Permissions;
-import net.buildtheearth.modules.utils.*;
-import net.buildtheearth.modules.utils.menus.AbstractPaginatedMenu;
+import net.buildtheearth.utils.*;
+import net.buildtheearth.utils.menus.AbstractPaginatedMenu;
 import net.buildtheearth.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import org.bukkit.Material;
@@ -30,24 +30,20 @@ public class WarpMenu extends AbstractPaginatedMenu {
      * @param warpGroup The warp group that the menu is for
      * @param hasBackItem Whether the menu has a back item
      */
-    public WarpMenu(Player menuPlayer, WarpGroup warpGroup, boolean hasBackItem) {
-        super(4, 3, "Warp Menu", menuPlayer);
+    public WarpMenu(Player menuPlayer, WarpGroup warpGroup, boolean hasBackItem, boolean autoLoad) {
+        super(4, 3, "Warp Menu", menuPlayer, autoLoad);
         this.hasBackItem = hasBackItem;
         this.warpGroup = warpGroup;
     }
 
     @Override
     protected void setMenuItemsAsync() {
-        setBackItem(BACK_ITEM_SLOT, hasBackItem);
+        if(hasBackItem)
+            setBackItem(BACK_ITEM_SLOT, new WarpGroupMenu(getMenuPlayer(), warpGroup.getBuildTeam(), false, false));
     }
 
     @Override
     protected void setItemClickEventsAsync() {
-        if(hasBackItem)
-            getMenu().getSlot(BACK_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
-                clickPlayer.closeInventory();
-                new WarpGroupMenu(clickPlayer, warpGroup.getBuildTeam(), false);
-            });
     }
 
     @Override

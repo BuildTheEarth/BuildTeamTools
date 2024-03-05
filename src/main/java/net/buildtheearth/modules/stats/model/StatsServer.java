@@ -9,14 +9,14 @@ public class StatsServer {
 
     private final HashMap<StatsServerType, Object> stats;
 
-    public StatsServer() {
+    public StatsServer(){
         stats = new HashMap<>();
     }
 
-    public void addValue(StatsServerType statsServerType, Object value) {
+    public void addValue(StatsServerType statsServerType, Object value){
         Object object = stats.get(statsServerType);
 
-        if (object == null)
+        if(object == null)
             object = value;
         else if (object instanceof Integer && value instanceof Integer) {
             if ((Integer) object > StatsModule.RATE_LIMIT)
@@ -38,7 +38,7 @@ public class StatsServer {
                 return;
 
             object = (Long) object + (Long) value;
-        } else {
+        }else {
             object = value;
         }
 
@@ -46,10 +46,10 @@ public class StatsServer {
         stats.put(statsServerType, object);
     }
 
-    public JSONObject toJSON() {
+    public JSONObject toJSON(){
         JSONObject jsonObject = new JSONObject();
 
-        for (StatsServerType statsServerType : stats.keySet())
+        for(StatsServerType statsServerType : stats.keySet())
             jsonObject.put(statsServerType, stats.get(statsServerType));
 
         return jsonObject;

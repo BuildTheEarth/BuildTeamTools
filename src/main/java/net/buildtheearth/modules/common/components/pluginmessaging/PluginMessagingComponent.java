@@ -7,7 +7,7 @@ import net.buildtheearth.modules.Component;
 import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.stats.StatsModule;
-import net.buildtheearth.modules.utils.ChatHelper;
+import net.buildtheearth.utils.ChatHelper;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 

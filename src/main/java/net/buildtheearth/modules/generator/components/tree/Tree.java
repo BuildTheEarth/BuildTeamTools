@@ -1,6 +1,7 @@
 package net.buildtheearth.modules.generator.components.tree;
 
 import net.buildtheearth.modules.generator.GeneratorModule;
+import net.buildtheearth.modules.generator.model.GeneratorCollections;
 import net.buildtheearth.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.modules.generator.model.GeneratorType;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
@@ -18,9 +19,9 @@ public class Tree extends GeneratorComponent {
     }
 
     @Override
-    public boolean checkPlayer(Player p) {
+    public boolean checkForNoPlayer(Player p) {
 
-        if (!GeneratorUtils.checkIfTreePackIsInstalled(p, true))
+        if (!GeneratorCollections.checkIfGeneratorCollectionsIsInstalled(p))
             return false;
 
         if (!GeneratorUtils.checkIfSchematicBrushIsInstalled(p))
@@ -34,7 +35,7 @@ public class Tree extends GeneratorComponent {
 
     @Override
     public void generate(Player p) {
-        if (!GeneratorModule.getInstance().getRoad().checkPlayer(p))
+        if (!GeneratorModule.getInstance().getRoad().checkForNoPlayer(p))
             return;
 
         TreeScripts.treescript_v_1_0(p, this);

@@ -1,39 +1,51 @@
 package net.buildtheearth.modules.generator.components.house;
 
+import net.buildtheearth.modules.generator.components.FlagType;
 import net.buildtheearth.modules.generator.model.Flag;
 
 public enum HouseFlag implements Flag {
-    WALL_COLOR("w"),            // String "123:24,21:3,3,..."
-    ROOF_COLOR("r"),            // String "123:24,21:3,3,..."
-    BASE_COLOR("b"),            // String "123:24,21:3,3,..."
-    WINDOW_COLOR("wd"),         // String "123:24,21:3,3,..."
+    WALL_COLOR("w", FlagType.BLOCKS),
+    ROOF_COLOR("r", FlagType.BLOCKS),
+    BASE_COLOR("b", FlagType.BLOCKS),
+    WINDOW_COLOR("wd", FlagType.BLOCKS),
 
-    ROOF_TYPE("rt"),            // RoofType
-    FLOOR_COUNT("fc"),          // Integer
-    FLOOR_HEIGHT("fh"),         // Integer
-    BASE_HEIGHT("bh"),          // Integer
+    BALCONY_COLOR("bc", FlagType.BLOCKS),
 
-    WINDOW_HEIGHT("wdh"),       // Integer
-    WINDOW_WIDTH("wdw"),        // Integer
-    WINDOW_DISTANCE("wdd"),     // Integer
+    BALCONY_FENCE_COLOR("bfc", FlagType.BLOCKS),
 
-    MAX_ROOF_HEIGHT("mrh");     // Integer
+    ROOF_TYPE("rt", FlagType.ENUM),
+    FLOOR_COUNT("fc", FlagType.INTEGER),
+    FLOOR_HEIGHT("fh", FlagType.INTEGER),
+    BASE_HEIGHT("bh", FlagType.INTEGER),
+
+    WINDOW_HEIGHT("wdh", FlagType.INTEGER),
+    WINDOW_WIDTH("wdw", FlagType.INTEGER),
+    WINDOW_DISTANCE("wdd", FlagType.INTEGER),
+
+    MAX_ROOF_HEIGHT("mrh", FlagType.INTEGER);
 
     private final String flag;
+    private final FlagType flagType;
 
-    HouseFlag(String flag) {
+    HouseFlag(String flag, FlagType flagType){
         this.flag = flag;
+        this.flagType = flagType;
     }
 
-    public static HouseFlag byString(String flag) {
-        for (HouseFlag houseFlag : HouseFlag.values())
-            if (houseFlag.getFlag().equalsIgnoreCase(flag))
-                return houseFlag;
-
-        return null;
-    }
-
+    @Override
     public String getFlag() {
         return flag;
+    }
+
+    @Override
+    public FlagType getFlagType() {
+        return flagType;
+    }
+
+    public static HouseFlag byString(String flag){
+        for(HouseFlag houseFlag : HouseFlag.values())
+            if(houseFlag.getFlag().equalsIgnoreCase(flag))
+                return houseFlag;
+        return null;
     }
 }

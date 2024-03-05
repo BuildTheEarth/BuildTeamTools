@@ -16,10 +16,10 @@ public class StatsPlayer {
         this.stats = new HashMap<>();
     }
 
-    public void addValue(StatsPlayerType statsPlayerType, Object value) {
+    public void addValue(StatsPlayerType statsPlayerType, Object value){
         Object object = stats.get(statsPlayerType);
 
-        if (object == null)
+        if(object == null)
             object = value;
         else if (object instanceof Integer && value instanceof Integer) {
             if ((Integer) object > StatsModule.RATE_LIMIT)
@@ -41,7 +41,7 @@ public class StatsPlayer {
                 return;
 
             object = (Long) object + (Long) value;
-        } else {
+        }else {
             object = value;
         }
 
@@ -49,11 +49,11 @@ public class StatsPlayer {
         stats.put(statsPlayerType, object);
     }
 
-    public JSONObject toJSON() {
+    public JSONObject toJSON(){
         JSONObject jsonObject = new JSONObject();
 
         jsonObject.put("UUID", uuid);
-        for (StatsPlayerType statsPlayerType : stats.keySet())
+        for(StatsPlayerType statsPlayerType : stats.keySet())
             jsonObject.put(statsPlayerType, stats.get(statsPlayerType));
 
         return jsonObject;

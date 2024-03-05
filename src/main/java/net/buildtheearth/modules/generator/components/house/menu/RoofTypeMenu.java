@@ -5,9 +5,9 @@ import net.buildtheearth.modules.generator.model.Settings;
 import net.buildtheearth.modules.generator.components.house.HouseFlag;
 import net.buildtheearth.modules.generator.components.house.HouseSettings;
 import net.buildtheearth.modules.generator.components.house.RoofType;
-import net.buildtheearth.modules.utils.Item;
-import net.buildtheearth.modules.utils.ListUtil;
-import net.buildtheearth.modules.utils.menus.AbstractMenu;
+import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.ListUtil;
+import net.buildtheearth.utils.menus.AbstractMenu;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -17,16 +17,18 @@ import org.ipvp.canvas.mask.Mask;
 
 public class RoofTypeMenu extends AbstractMenu {
 
-    public static String ROOF_COLOR_INV_NAME = "Choose a Roof Type";
+    public static final String ROOF_COLOR_INV_NAME = "Choose a Roof Type";
 
-    public static int FLAT_ROOF_ITEM_SLOT = 9;
-    public static int GABLE_ROOF_ITEM_SLOT = 11;
-    public static int STEEP_SLAB_ROOF_ITEM_SLOT = 13;
-    public static int MEDIUM_SLAB_ROOF_ITEM_SLOT = 15;
-    public static int FLATTER_SLAB_ROOF_ITEM_SLOT = 17;
+    public static final  int FLAT_ROOF_ITEM_SLOT = 9;
+    public static final int GABLE_ROOF_ITEM_SLOT = 11;
+    public static final int STEEP_SLAB_ROOF_ITEM_SLOT = 13;
+    public static final int MEDIUM_SLAB_ROOF_ITEM_SLOT = 15;
+    public static final int FLATTER_SLAB_ROOF_ITEM_SLOT = 17;
 
-    public RoofTypeMenu(Player player) {
-        super(3, ROOF_COLOR_INV_NAME, player);
+    private static final int BACK_ITEM_SLOT = 18;
+
+    public RoofTypeMenu(Player player, boolean autoLoad) {
+        super(3, ROOF_COLOR_INV_NAME, player, autoLoad);
     }
 
     @Override
@@ -45,6 +47,8 @@ public class RoofTypeMenu extends AbstractMenu {
         getMenu().getSlot(MEDIUM_SLAB_ROOF_ITEM_SLOT).setItem(mediumSlabRoofItem);
         getMenu().getSlot(FLATTER_SLAB_ROOF_ITEM_SLOT).setItem(flatterSlabRoofItem);
 
+        setBackItem(BACK_ITEM_SLOT, new WallColorMenu(getMenuPlayer(), false));
+
         super.setPreviewItems();
     }
 
@@ -55,21 +59,16 @@ public class RoofTypeMenu extends AbstractMenu {
     @Override
     protected void setItemClickEventsAsync() {
         // Set click events for the roof type items
-        getMenu().getSlot(FLAT_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            performClickAction(clickPlayer, RoofType.FLAT);
-        }));
-        getMenu().getSlot(GABLE_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            performClickAction(clickPlayer, RoofType.STAIRS);
-        }));
-        getMenu().getSlot(STEEP_SLAB_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            performClickAction(clickPlayer, RoofType.STEEP_SLABS);
-        }));
-        getMenu().getSlot(MEDIUM_SLAB_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            performClickAction(clickPlayer, RoofType.MEDIUM_SLABS);
-        }));
-        getMenu().getSlot(FLATTER_SLAB_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
-            performClickAction(clickPlayer, RoofType.FLATTER_SLABS);
-        }));
+        getMenu().getSlot(FLAT_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) ->
+                performClickAction(clickPlayer, RoofType.FLAT)));
+        getMenu().getSlot(GABLE_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) ->
+                performClickAction(clickPlayer, RoofType.STAIRS)));
+        getMenu().getSlot(STEEP_SLAB_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) ->
+                performClickAction(clickPlayer, RoofType.STEEP_SLABS)));
+        getMenu().getSlot(MEDIUM_SLAB_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) ->
+                performClickAction(clickPlayer, RoofType.MEDIUM_SLABS)));
+        getMenu().getSlot(FLATTER_SLAB_ROOF_ITEM_SLOT).setClickHandler(((clickPlayer, clickInformation) ->
+                performClickAction(clickPlayer, RoofType.FLATTER_SLABS)));
     }
 
     private void performClickAction(Player p, RoofType roofType) {
@@ -83,7 +82,7 @@ public class RoofTypeMenu extends AbstractMenu {
 
         p.closeInventory();
         p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
-        new RoofColorMenu(p);
+        new RoofColorMenu(p, true);
     }
 
     @Override
@@ -92,7 +91,7 @@ public class RoofTypeMenu extends AbstractMenu {
                 .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null))
                 .pattern("111111111")
                 .pattern("010101010")
-                .pattern("111111111")
+                .pattern("011111111")
                 .build();
     }
 }

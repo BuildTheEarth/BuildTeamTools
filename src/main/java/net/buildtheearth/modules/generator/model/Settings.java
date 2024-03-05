@@ -13,13 +13,13 @@ public abstract class Settings {
     private final Player player;
 
     @Getter
-    private final HashMap<Object, String> values;
+    private final HashMap<Flag, String> values;
 
     @Getter
     @Setter
     private Block[][][] blocks;
 
-    public Settings(Player player) {
+    public Settings(Player player){
         this.player = player;
         this.values = new HashMap<>();
 
@@ -28,7 +28,7 @@ public abstract class Settings {
 
     public abstract void setDefaultValues();
 
-    public void setValue(Flag flag, String value) {
+    public void setValue(Flag flag, String value){
         getValues().put(flag, value);
     }
 }

@@ -2,7 +2,7 @@ package net.buildtheearth.modules.navigation.components.navigator.listeners;
 
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.navigation.NavigationModule;
-import net.buildtheearth.modules.utils.io.ConfigPaths;
+import net.buildtheearth.utils.io.ConfigPaths;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

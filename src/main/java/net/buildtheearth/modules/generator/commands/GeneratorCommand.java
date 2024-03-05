@@ -3,8 +3,8 @@ package net.buildtheearth.modules.generator.commands;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.menu.GeneratorMenu;
 import net.buildtheearth.modules.generator.model.History;
-import net.buildtheearth.modules.utils.ChatHelper;
-import net.buildtheearth.modules.utils.Utils;
+import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -24,7 +24,7 @@ public class GeneratorCommand implements CommandExecutor {
 
         // Command Usage: /gen
         if (args.length == 0) {
-            new GeneratorMenu(p);
+            new GeneratorMenu(p, true);
             return true;
         }
 
@@ -50,6 +50,12 @@ public class GeneratorCommand implements CommandExecutor {
         // Command Usage: /gen tree ...
         if (args[0].equals("tree")) {
             GeneratorModule.getInstance().getTree().analyzeCommand(p, args);
+            return true;
+        }
+
+        // Command Usage: /gen field ...
+        if (args[0].equals("field")) {
+            GeneratorModule.getInstance().getField().analyzeCommand(p, args);
             return true;
         }
 

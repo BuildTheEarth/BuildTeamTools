@@ -1,7 +1,7 @@
 package net.buildtheearth.modules.navigation.menu;
 
 import net.buildtheearth.BuildTeamTools;
-import net.buildtheearth.modules.utils.menus.AbstractMenu;
+import net.buildtheearth.utils.menus.AbstractMenu;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.Mask;
@@ -25,7 +25,7 @@ public class TutorialsMenu extends AbstractMenu {
 
     @Override
     protected void setPreviewItems() {
-        setBackItem(BACK_BUTTON_SLOT, true);
+        setBackItem(BACK_BUTTON_SLOT, new MainMenu(getMenuPlayer()));
 
         super.setPreviewItems();
     }
@@ -35,12 +35,7 @@ public class TutorialsMenu extends AbstractMenu {
     protected void setMenuItemsAsync() {}
 
     @Override
-    protected void setItemClickEventsAsync() {
-        getMenu().getSlot(BACK_BUTTON_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
-            clickPlayer.closeInventory();
-            new MainMenu(clickPlayer);
-        });
-    }
+    protected void setItemClickEventsAsync() {}
 
     @Override
     protected Mask getMask() {

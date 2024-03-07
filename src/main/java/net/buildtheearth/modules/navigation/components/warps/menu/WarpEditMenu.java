@@ -44,8 +44,8 @@ public class WarpEditMenu extends AbstractMenu {
      * @param player  The player that is viewing the menu.
      * @param warp The warp that is being updated.
      */
-    public WarpEditMenu(Player player, Warp warp, boolean alreadyExists) {
-        super(4, WARP_UPDATE_INV_NAME, player);
+    public WarpEditMenu(Player player, Warp warp, boolean alreadyExists, boolean autoLoad) {
+        super(4, WARP_UPDATE_INV_NAME, player, autoLoad);
 
         this.warp = warp;
         this.alreadyExists = alreadyExists;
@@ -151,7 +151,7 @@ public class WarpEditMenu extends AbstractMenu {
 
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
-                new WarpEditMenu(clickPlayer, warp, alreadyExists);
+                new WarpEditMenu(clickPlayer, warp, alreadyExists, true);
             }).exceptionally(e -> {
                 clickPlayer.sendMessage(ChatHelper.error("An error occurred while changing the location of the warp!"));
                 e.printStackTrace();
@@ -168,7 +168,7 @@ public class WarpEditMenu extends AbstractMenu {
                     .onClose(player -> {
                         player.getPlayer().playSound(clickPlayer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
 
-                        new WarpEditMenu(clickPlayer, warp, alreadyExists);
+                        new WarpEditMenu(clickPlayer, warp, alreadyExists, true);
                     })
                     .onClick((slot, stateSnapshot) -> {
                         if (slot != AnvilGUI.Slot.OUTPUT)
@@ -179,7 +179,7 @@ public class WarpEditMenu extends AbstractMenu {
                                 AnvilGUI.ResponseAction.close(),
                                 AnvilGUI.ResponseAction.run(() -> {
                                     warp.setName(stateSnapshot.getText());
-                                    new WarpEditMenu(clickPlayer, warp, alreadyExists);
+                                    new WarpEditMenu(clickPlayer, warp, alreadyExists, true);
                                 })
                         );
                     })
@@ -219,7 +219,7 @@ public class WarpEditMenu extends AbstractMenu {
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
 
             warp.setHighlight(!warp.isHighlight());
-            new WarpEditMenu(clickPlayer, warp, alreadyExists);
+            new WarpEditMenu(clickPlayer, warp, alreadyExists, true);
         });
 
         // Set click event for the delete item

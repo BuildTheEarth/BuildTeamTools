@@ -118,7 +118,7 @@ public class WarpMenu extends AbstractPaginatedMenu {
                 }
 
                 if(clickInformation.getClickType().isRightClick() && clickPlayer.hasPermission(Permissions.WARP_EDIT))
-                    new WarpEditMenu(clickPlayer, warp, true);
+                    new WarpEditMenu(clickPlayer, warp, true, true);
                 else
                     NavigationModule.getInstance().getWarpsComponent().warpPlayer(clickPlayer, warp);
             });

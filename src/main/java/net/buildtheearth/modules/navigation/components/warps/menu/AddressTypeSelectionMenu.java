@@ -65,7 +65,7 @@ public class AddressTypeSelectionMenu extends AbstractMenu {
         getMenu().getSlot(COUNTRY_SLOT).setItem(Item.create(Material.INK_SACK, "§6§lCountry", (short) 12, countryLore));
         getMenu().getSlot(CUSTOM_SLOT).setItem(Item.create(Material.NAME_TAG, "§6§lCustom Address", ListUtil.createList("", "§7If no other address type fits,", "§7enter a custom address.")));
 
-        setBackItem(BACK_ITEM_SLOT, new WarpEditMenu(getMenuPlayer(), warp, alreadyExists));
+        setBackItem(BACK_ITEM_SLOT, new WarpEditMenu(getMenuPlayer(), warp, alreadyExists, false));
     }
 
     @Override
@@ -74,27 +74,27 @@ public class AddressTypeSelectionMenu extends AbstractMenu {
         getMenu().getSlot(BUILDING_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
             warp.setAddressType(Warp.AddressType.BUILDING);
             clickPlayer.closeInventory();
-            new WarpEditMenu(clickPlayer, warp, alreadyExists);
+            new WarpEditMenu(clickPlayer, warp, alreadyExists, true);
         });
         getMenu().getSlot(STREET_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
             warp.setAddressType(Warp.AddressType.STREET);
             clickPlayer.closeInventory();
-            new WarpEditMenu(clickPlayer, warp, alreadyExists);
+            new WarpEditMenu(clickPlayer, warp, alreadyExists, true);
         });
         getMenu().getSlot(CITY_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
             warp.setAddressType(Warp.AddressType.CITY);
             clickPlayer.closeInventory();
-            new WarpEditMenu(clickPlayer, warp, alreadyExists);
+            new WarpEditMenu(clickPlayer, warp, alreadyExists, true);
         });
         getMenu().getSlot(STATE_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
             warp.setAddressType(Warp.AddressType.STATE);
             clickPlayer.closeInventory();
-            new WarpEditMenu(clickPlayer, warp, alreadyExists);
+            new WarpEditMenu(clickPlayer, warp, alreadyExists, true);
         });
         getMenu().getSlot(COUNTRY_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
             warp.setAddressType(Warp.AddressType.COUNTRY);
             clickPlayer.closeInventory();
-            new WarpEditMenu(clickPlayer, warp, alreadyExists);
+            new WarpEditMenu(clickPlayer, warp, alreadyExists, true);
         });
 
 
@@ -106,7 +106,7 @@ public class AddressTypeSelectionMenu extends AbstractMenu {
                     .onClose(player -> {
                         player.getPlayer().playSound(clickPlayer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
 
-                        new WarpEditMenu(clickPlayer, warp, alreadyExists);
+                        new WarpEditMenu(clickPlayer, warp, alreadyExists, true);
                     })
                     .onClick((slot, stateSnapshot) -> {
                         if (slot != AnvilGUI.Slot.OUTPUT)
@@ -118,7 +118,7 @@ public class AddressTypeSelectionMenu extends AbstractMenu {
                                 AnvilGUI.ResponseAction.run(() -> {
                                     warp.setAddressType(Warp.AddressType.CUSTOM);
                                     warp.setAddress(stateSnapshot.getText());
-                                    new WarpEditMenu(clickPlayer, warp, alreadyExists);
+                                    new WarpEditMenu(clickPlayer, warp, alreadyExists, true);
                                 })
                         );
                     })

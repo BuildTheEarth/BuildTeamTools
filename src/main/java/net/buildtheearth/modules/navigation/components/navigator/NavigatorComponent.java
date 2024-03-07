@@ -20,10 +20,10 @@ public class NavigatorComponent extends Component {
     }
 
     @Override
-    public void onEnable() {
+    public void enable() {
         disableWorldEditNavigationWand();
 
-        super.onEnable();
+        super.enable();
     }
 
 

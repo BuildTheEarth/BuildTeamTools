@@ -27,8 +27,8 @@ public class ExploreMenu extends AbstractMenu {
     private static final String inventoryName = "Explore Menu";
     private final Player menuPlayer;
 
-    public ExploreMenu(Player menuPlayer) {
-        super(4, inventoryName, menuPlayer);
+    public ExploreMenu(Player menuPlayer, boolean autoLoad) {
+        super(4, inventoryName, menuPlayer, autoLoad);
         this.menuPlayer = menuPlayer;
     }
 

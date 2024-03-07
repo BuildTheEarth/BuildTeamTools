@@ -78,7 +78,7 @@ public class MainMenu extends AbstractMenu {
         // Set Explore Item Click Event
         getMenu().getSlot(slots[0]).setClickHandler((clickPlayer, clickInformation) -> {
             clickPlayer.closeInventory();
-            new ExploreMenu(clickPlayer);
+            new ExploreMenu(clickPlayer, true);
         });
 
         // Set Build Item Click Event

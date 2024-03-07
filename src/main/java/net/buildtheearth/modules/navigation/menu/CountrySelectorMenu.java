@@ -64,7 +64,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPreviewItems() {
-        setBackItem(BACK_ITEM_SLOT, new ExploreMenu(getMenuPlayer()));
+        setBackItem(BACK_ITEM_SLOT, new ExploreMenu(getMenuPlayer(), false));
 
         // If there are more than 27 countries, add the switch page items, otherwise add glass panes
         if(regions.size() > 27)

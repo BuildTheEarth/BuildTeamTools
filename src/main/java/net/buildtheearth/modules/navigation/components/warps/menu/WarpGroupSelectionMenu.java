@@ -33,7 +33,7 @@ public class WarpGroupSelectionMenu extends WarpGroupMenu {
     protected void setItemClickEventsAsync() {
         getMenu().getSlot(BACK_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
             clickPlayer.closeInventory();
-            new WarpEditMenu(clickPlayer, warp, alreadyExists);
+            new WarpEditMenu(clickPlayer, warp, alreadyExists, true);
         });
     }
 
@@ -44,12 +44,12 @@ public class WarpGroupSelectionMenu extends WarpGroupMenu {
         int slot = 0;
         for (WarpGroup warpGroup : warpGroups) {
             final int _slot = slot;
-            getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
+            getMenu().getSlot(getWarpGroupSlot(warpGroup, _slot)).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
                 warp.setWarpGroup(warpGroup);
-                new WarpEditMenu(clickPlayer, warp, alreadyExists);
+                new WarpEditMenu(clickPlayer, warp, alreadyExists, true);
             });
             slot++;
         }

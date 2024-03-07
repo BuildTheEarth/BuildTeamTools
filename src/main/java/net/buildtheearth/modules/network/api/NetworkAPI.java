@@ -56,159 +56,165 @@ public class NetworkAPI {
         API.getAsync("https://nwapi.buildtheearth.net/api/teams", new API.ApiResponseCallback() {
             @Override
             public void onResponse(String response) {
-                JSONArray responseArray = API.createJSONArray(response);
+                try {
+                    JSONArray responseArray = API.createJSONArray(response);
 
-                // Clear all regions from the continents
-                for(Continent continent : Continent.values())
-                    continent.getRegions().clear();
+                    // Clear all regions from the continents
+                    for (Continent continent : Continent.values())
+                        continent.getRegions().clear();
 
-                // Clear all regions from the build teams
-                for(BuildTeam buildTeam : NetworkModule.getInstance().getBuildTeams())
-                    buildTeam.getRegions().clear();
+                    // Clear all regions from the build teams
+                    for (BuildTeam buildTeam : NetworkModule.getInstance().getBuildTeams())
+                        buildTeam.getRegions().clear();
 
-                // Clear all build teams
-                NetworkModule.getInstance().getBuildTeams().clear();
+                    // Clear all build teams
+                    NetworkModule.getInstance().getBuildTeams().clear();
 
-                // Clear all regions
-                NetworkModule.getInstance().getRegions().clear();
+                    // Clear all regions
+                    NetworkModule.getInstance().getRegions().clear();
 
 
+                    // Add all teams to the proxy manager
+                    for (Object object : responseArray.toArray()) {
 
-                // Add all teams to the proxy manager
-                for(Object object : responseArray.toArray()) {
+                        // Check if the object is a JSON object
+                        if (!(object instanceof JSONObject)) continue;
+                        JSONObject teamObject = (JSONObject) object;
 
-                    // Check if the object is a JSON object
-                    if(!(object instanceof JSONObject)) continue;
-                    JSONObject teamObject = (JSONObject) object;
+                        // Extract a JSON array containing the regions belonging to the team
+                        Object regions = teamObject.get("Regions");
+                        if (!(regions instanceof JSONArray)) continue;
+                        JSONArray regionArray = (JSONArray) regions;
 
-                    // Extract a JSON array containing the regions belonging to the team
-                    Object regions = teamObject.get("Regions");
-                    if(!(regions instanceof JSONArray)) continue;
-                    JSONArray regionArray = (JSONArray) regions;
+                        // Extract a JSON array containing the warps belonging to the team
+                        Object warps = teamObject.get("Warps");
+                        if (!(warps instanceof JSONArray)) continue;
+                        JSONArray warpArray = (JSONArray) warps;
 
-                    // Extract a JSON array containing the warps belonging to the team
-                    Object warps = teamObject.get("Warps");
-                    if(!(warps instanceof JSONArray)) continue;
-                    JSONArray warpArray = (JSONArray) warps;
+                        // Extract a JSON array containing the warp groups belonging to the team
+                        Object warpGroups = teamObject.get("WarpGroups");
+                        if (!(warpGroups instanceof JSONArray)) continue;
+                        JSONArray warpGroupArray = (JSONArray) warpGroups;
 
-                    // Extract a JSON array containing the warp groups belonging to the team
-                    Object warpGroups = teamObject.get("WarpGroups");
-                    if(!(warpGroups instanceof JSONArray)) continue;
-                    JSONArray warpGroupArray = (JSONArray) warpGroups;
+                        // Get some values to add to the build team
+                        Continent continent = Continent.getByLabel((String) teamObject.get("Continent"));
+                        boolean isConnected = (boolean) teamObject.get("isConnectedToNetwork");
+                        boolean hasBuildTeamToolsInstalled = (long) teamObject.get("hasBuildTeamToolsInstalled") == 1;
+                        String mainServerIP = (String) teamObject.get("MainServerIP");
+                        String teamID = (String) teamObject.get("ID");
+                        String serverName = getMainServerName(teamObject);
+                        String name = (String) teamObject.get("Name");
+                        String blankName = (String) teamObject.get("BlankName");
 
-                    // Get some values to add to the build team
-                    Continent continent = Continent.getByLabel((String) teamObject.get("Continent"));
-                    boolean isConnected = (boolean) teamObject.get("isConnectedToNetwork");
-                    boolean hasBuildTeamToolsInstalled = (long) teamObject.get("hasBuildTeamToolsInstalled") == 1;
-                    String mainServerIP = (String) teamObject.get("MainServerIP");
-                    String teamID = (String) teamObject.get("ID");
-                    String serverName = getMainServerName(teamObject);
-                    String name = (String) teamObject.get("Name");
-                    String blankName = (String) teamObject.get("BlankName");
+                        BuildTeam buildTeam = new BuildTeam(teamID, mainServerIP, name, blankName, serverName, continent, isConnected, hasBuildTeamToolsInstalled);
+                        NetworkModule.getInstance().getBuildTeams().add(buildTeam);
 
-                    BuildTeam buildTeam = new BuildTeam(teamID, mainServerIP, name, blankName, serverName, continent, isConnected, hasBuildTeamToolsInstalled);
-                    NetworkModule.getInstance().getBuildTeams().add(buildTeam);
+                        // Create an "other" Warp Group for warps that don't belong to a warp group
+                        WarpGroup otherWarpGroup = new WarpGroup(buildTeam, "Other", "Other warps", -1, null);
+                        buildTeam.getWarpGroups().add(otherWarpGroup);
 
-                    // Create an "other" Warp Group for warps that don't belong to a warp group
-                    WarpGroup otherWarpGroup = new WarpGroup(buildTeam, "Other", "Other warps");
-                    buildTeam.getWarpGroups().add(otherWarpGroup);
+                        // Add all the warp groups of the team to their respective build teams
+                        for (Object warpGroupJSON : warpGroupArray.toArray()) {
+                            if (!(warpGroupJSON instanceof JSONObject)) continue;
+                            JSONObject warpGroupObject = (JSONObject) warpGroupJSON;
 
-                    // Add all the warp groups of the team to their respective build teams
-                    for(Object warpGroupJSON : warpGroupArray.toArray()) {
-                        if(!(warpGroupJSON instanceof JSONObject)) continue;
-                        JSONObject warpGroupObject = (JSONObject) warpGroupJSON;
+                            UUID warpGroupID = UUID.fromString((String) warpGroupObject.get("ID"));
+                            String warpGroupName = (String) warpGroupObject.get("Name");
+                            String warpGroupDescription = (String) warpGroupObject.get("Description");
+                            int warpSlot = (int) (long) warpGroupObject.get("Slot");
+                            String warpMaterial = (String) warpGroupObject.get("Material");
 
-                        UUID warpGroupID = UUID.fromString((String) warpGroupObject.get("ID"));
-                        String warpGroupName = (String) warpGroupObject.get("Name");
-                        String warpGroupDescription = (String) warpGroupObject.get("Description");
+                            WarpGroup warpGroup = new WarpGroup(warpGroupID, buildTeam, warpGroupName, warpGroupDescription, warpSlot, warpMaterial);
 
-                        WarpGroup warpGroup = new WarpGroup(warpGroupID, buildTeam, warpGroupName, warpGroupDescription);
+                            buildTeam.getWarpGroups().add(warpGroup);
+                        }
 
-                        buildTeam.getWarpGroups().add(warpGroup);
-                    }
+                        // Add all the warps of the team to their respective warp groups
+                        for (Object warpJSON : warpArray.toArray()) {
+                            if (!(warpJSON instanceof JSONObject)) continue;
+                            JSONObject warpObject = (JSONObject) warpJSON;
 
-                    // Add all the warps of the team to their respective warp groups
-                    for(Object warpJSON : warpArray.toArray()) {
-                        if(!(warpJSON instanceof JSONObject)) continue;
-                        JSONObject warpObject = (JSONObject) warpJSON;
+                            String warpIDString = (String) warpObject.get("ID");
+                            UUID warpID = warpIDString != null ? UUID.fromString(warpIDString) : null;
+                            String warpGroupIDString = (String) warpObject.get("WarpGroup");
+                            UUID warpGroupID = warpGroupIDString != null ? UUID.fromString(warpGroupIDString) : null;
+                            String warpName = (String) warpObject.get("Name");
+                            String countryCode = (String) warpObject.get("CountryCode");
+                            String address = (String) warpObject.get("Address");
+                            Warp.AddressType addressType = Warp.AddressType.fromValue((String) warpObject.get("AddressType"));
+                            String material = (String) warpObject.get("Material");
+                            String warpWorldName = (String) warpObject.get("WorldName");
+                            double warpLat = (double) warpObject.get("Latitude");
+                            double warpLon = (double) warpObject.get("Longitude");
+                            int warpHeight = (int) (long) warpObject.get("Height");
+                            float warpYaw = Float.parseFloat(warpObject.get("Yaw") + "");
+                            float warpPitch = Float.parseFloat(warpObject.get("Pitch") + "");
+                            boolean isHighlight = warpObject.get("isHighlight") != null && (long) warpObject.get("isHighlight") == 1;
 
-                        String warpIDString = (String) warpObject.get("ID");
-                        UUID warpID = warpIDString != null ? UUID.fromString(warpIDString) : null;
-                        String warpGroupIDString = (String) warpObject.get("WarpGroup");
-                        UUID warpGroupID = warpGroupIDString != null ? UUID.fromString(warpGroupIDString) : null;
-                        String warpName = (String) warpObject.get("Name");
-                        String countryCode = (String) warpObject.get("CountryCode");
-                        String address = (String) warpObject.get("Address");
-                        Warp.AddressType addressType = Warp.AddressType.fromValue((String) warpObject.get("AddressType"));
-                        String material = (String) warpObject.get("Material");
-                        String warpWorldName = (String) warpObject.get("WorldName");
-                        double warpLat = (double) warpObject.get("Latitude");
-                        double warpLon = (double) warpObject.get("Longitude");
-                        int warpHeight = (int) (long) warpObject.get("Height");
-                        float warpYaw = Float.parseFloat(warpObject.get("Yaw") + "");
-                        float warpPitch = Float.parseFloat(warpObject.get("Pitch") + "");
-                        boolean isHighlight = warpObject.get("isHighlight") != null && (long) warpObject.get("isHighlight") == 1;
+                            if (material != null && material.equals(""))
+                                material = null;
 
-                        if(material != null && material.equals(""))
-                            material = null;
+                            WarpGroup warpGroup = null;
 
-                        WarpGroup warpGroup = null;
+                            // If the warp group ID is not null, get the warp group with that ID
+                            if (warpGroupID != null)
+                                warpGroup = buildTeam.getWarpGroups().stream()
+                                        .filter(warpGroup1 -> warpGroup1 != null && warpGroup1.getId() != null && warpGroup1.getId().equals(warpGroupID)).findFirst().orElse(null);
 
-                        // If the warp group ID is not null, get the warp group with that ID
-                        if(warpGroupID != null)
-                            warpGroup = buildTeam.getWarpGroups().stream()
-                                    .filter(warpGroup1 -> warpGroup1 != null && warpGroup1.getId() != null && warpGroup1.getId().equals(warpGroupID)).findFirst().orElse(null);
+                            // If the warp group is null, set it to the "other" warp group
+                            if (warpGroup == null)
+                                warpGroup = otherWarpGroup;
 
-                        // If the warp group is null, set it to the "other" warp group
-                        if(warpGroup == null)
-                            warpGroup = otherWarpGroup;
+                            Warp warp = new Warp(warpID, warpGroup, warpName, countryCode, "cca3", address, addressType, material, warpWorldName, warpLat, warpLon, warpHeight, warpYaw, warpPitch, isHighlight);
 
-                        Warp warp = new Warp(warpID, warpGroup, warpName, countryCode, "cca3", address, addressType, material, warpWorldName, warpLat, warpLon, warpHeight, warpYaw, warpPitch, isHighlight);
-
-                        // If the warp belongs to a warp group, add it to that, otherwise add it to the "other" warp group.
-                        if(warpGroupID == null) {
-                            otherWarpGroup.getWarps().add(warp);
-                        }else {
-                            boolean added = false;
-
-                            for(WarpGroup wg : buildTeam.getWarpGroups())
-                                if(wg.getId().equals(warpGroupID)) {
-                                    wg.getWarps().add(warp);
-                                    added = true;
-                                    break;
-                                }
-
-                            if(!added)
+                            // If the warp belongs to a warp group, add it to that, otherwise add it to the "other" warp group.
+                            if (warpGroupID == null) {
                                 otherWarpGroup.getWarps().add(warp);
+                            } else {
+                                boolean added = false;
+
+                                for (WarpGroup wg : buildTeam.getWarpGroups())
+                                    if (wg.getId().equals(warpGroupID)) {
+                                        wg.getWarps().add(warp);
+                                        added = true;
+                                        break;
+                                    }
+
+                                if (!added)
+                                    otherWarpGroup.getWarps().add(warp);
+                            }
+                        }
+
+                        // Add all the regions of the team to their respective continents
+                        for (Object regionJSON : regionArray.toArray()) {
+                            if (!(regionJSON instanceof JSONObject)) continue;
+                            JSONObject regionObject = (JSONObject) regionJSON;
+
+                            String regionName = (String) regionObject.get("RegionName");
+                            String headBase64 = (String) regionObject.get("Head");
+                            RegionType regionType = RegionType.getByLabel((String) regionObject.get("RegionType"));
+
+
+                            Region region;
+
+                            if (regionType.equals(RegionType.COUNTRY)) {
+                                int area = getArea(regionObject);
+                                String regionCodeCca3 = (String) regionObject.get("RegionCode");
+                                String regionCodeCca2 = (String) regionObject.get("cca2");
+
+                                region = new Region(regionName, continent, buildTeam, headBase64, area, regionCodeCca2, regionCodeCca3);
+                            } else
+                                region = new Region(regionName, regionType, continent, buildTeam, headBase64);
+
+
+                            continent.getRegions().add(region);
+                            buildTeam.getRegions().add(region);
+                            NetworkModule.getInstance().getRegions().add(region);
                         }
                     }
-
-                    // Add all the regions of the team to their respective continents
-                    for(Object regionJSON : regionArray.toArray()) {
-                        if(!(regionJSON instanceof JSONObject)) continue;
-                        JSONObject regionObject = (JSONObject) regionJSON;
-
-                        String regionName = (String) regionObject.get("RegionName");
-                        String headBase64 = (String) regionObject.get("Head");
-                        RegionType regionType = RegionType.getByLabel((String) regionObject.get("RegionType"));
-
-
-                        Region region;
-
-                        if(regionType.equals(RegionType.COUNTRY)) {
-                            int area = getArea(regionObject);
-                            String regionCodeCca3 = (String) regionObject.get("RegionCode");
-                            String regionCodeCca2 = (String) regionObject.get("cca2");
-
-                            region = new Region(regionName, continent, buildTeam, headBase64, area, regionCodeCca2, regionCodeCca3);
-                        }else
-                            region = new Region(regionName, regionType, continent, buildTeam, headBase64);
-
-
-                        continent.getRegions().add(region);
-                        buildTeam.getRegions().add(region);
-                        NetworkModule.getInstance().getRegions().add(region);
-                    }
+                }catch (Exception e) {
+                    future.completeExceptionally(e);
+                    return;
                 }
 
                 future.complete(null);
@@ -261,14 +267,18 @@ public class NetworkAPI {
         API.getAsync("https://nwapi.buildtheearth.net/api/teams/" + BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY), new API.ApiResponseCallback() {
             @Override
             public void onResponse(String response) {
-                JSONObject teamObject = API.createJSONObject(response);
+                try {
+                    JSONObject teamObject = API.createJSONObject(response);
 
-                String teamID = (String) teamObject.get("ID");
+                    String teamID = (String) teamObject.get("ID");
 
-                NetworkModule networkModule = NetworkModule.getInstance();
-                BuildTeam buildTeam = networkModule.getBuildTeamByID(teamID);
-                networkModule.setBuildTeam(buildTeam);
-
+                    NetworkModule networkModule = NetworkModule.getInstance();
+                    BuildTeam buildTeam = networkModule.getBuildTeamByID(teamID);
+                    networkModule.setBuildTeam(buildTeam);
+                } catch (Exception e) {
+                    future.completeExceptionally(e);
+                    return;
+                }
 
                 future.complete(null);
             }

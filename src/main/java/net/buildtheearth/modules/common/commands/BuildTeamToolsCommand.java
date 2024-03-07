@@ -101,19 +101,19 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
             }
 
             if(!(args.length > 1)) {
-                sender.sendMessage("§7You need to add a value: true/false");
+                sender.sendMessage("§cYou need to add a value: true/false");
                 return true;
             }
 
             if(!args[1].equalsIgnoreCase("true") && !args[1].equalsIgnoreCase("false")) {
-                sender.sendMessage("§7You need to set the value to true or false.");
+                sender.sendMessage("§cYou need to set the value to true or false.");
                 return true;
             }
 
             boolean debug = Boolean.parseBoolean(args[1]);
 
             BuildTeamTools.getInstance().setDebug(debug);
-            sender.sendMessage("§7Debug Mode was set to: " + debug);
+            player.sendMessage(ChatHelper.standard("§7Debug Mode was set to: %s", debug));
             return true;
         }
 

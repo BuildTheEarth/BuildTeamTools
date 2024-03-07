@@ -28,10 +28,14 @@ public class WarpGroupEditMenu extends AbstractMenu {
 
 
     public static int WARP_GROUP = 4;
-    public static int NAME_SLOT = 20;
-    public static int DESCRIPTION_SLOT = 22;
+    public static int NAME_SLOT = 18;
+    public static int DESCRIPTION_SLOT = 20;
 
-    public static int DELETE_SLOT = 24;
+    public static int SLOT_SLOT = 22;
+
+    public static int MATERIAL_SLOT = 24;
+
+    public static int DELETE_SLOT = 26;
 
 
     private final WarpGroup warpGroup;
@@ -43,8 +47,8 @@ public class WarpGroupEditMenu extends AbstractMenu {
      * @param player  The player that is viewing the menu.
      * @param warpGroup The warp that is being updated.
      */
-    public WarpGroupEditMenu(Player player, WarpGroup warpGroup, boolean alreadyExists) {
-        super(4, WARP_GROUP_UPDATE_INV_NAME, player);
+    public WarpGroupEditMenu(Player player, WarpGroup warpGroup, boolean alreadyExists, boolean autoLoad) {
+        super(4, WARP_GROUP_UPDATE_INV_NAME, player, autoLoad);
 
         this.warpGroup = warpGroup;
         this.alreadyExists = alreadyExists;
@@ -72,6 +76,15 @@ public class WarpGroupEditMenu extends AbstractMenu {
         // Set the Description item
         getMenu().getSlot(DESCRIPTION_SLOT).setItem(Item.create(Material.BOOK, "§6§lChange Description", warpGroup.getDescriptionLore()));
 
+        // Set the Slot item
+        int slot = warpGroup.getSlot();
+        ArrayList<String> slotLore = ListUtil.createList("", "§eSlot: ", slot < 0 || slot >= 27 ? "§7Auto" : String.valueOf(slot));
+        getMenu().getSlot(SLOT_SLOT).setItem(new Item(Material.ITEM_FRAME).setDisplayName("§6§lChange Slot").setLore(slotLore).build());
+
+        // Set the Material item
+        ArrayList<String> materialLore = ListUtil.createList("", "§eMaterial: ", warpGroup.getMaterial() == null ? "§7Default" : warpGroup.getMaterial());
+        getMenu().getSlot(MATERIAL_SLOT).setItem(new Item(warpGroup.getMaterialItem()).setDisplayName("§6§lChange Material").setLore(materialLore).build());
+
         // Set the delete item
         getMenu().getSlot(DELETE_SLOT).setItem(Item.create(Material.BARRIER, "§c§lDelete Warp Group", ListUtil.createList("", "§8Click to delete the warp group.")));
     }
@@ -97,7 +110,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
                     .onClose(player -> {
                         player.getPlayer().playSound(clickPlayer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
 
-                        new WarpGroupEditMenu(clickPlayer, warpGroup, alreadyExists);
+                        new WarpGroupEditMenu(clickPlayer, warpGroup, alreadyExists, true);
                     })
                     .onClick((slot, stateSnapshot) -> {
                         if (slot != AnvilGUI.Slot.OUTPUT)
@@ -108,7 +121,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
                                 AnvilGUI.ResponseAction.close(),
                                 AnvilGUI.ResponseAction.run(() -> {
                                     warpGroup.setName(stateSnapshot.getText());
-                                    new WarpGroupEditMenu(clickPlayer, warpGroup, alreadyExists);
+                                    new WarpGroupEditMenu(clickPlayer, warpGroup, alreadyExists, true);
                                 })
                         );
                     })
@@ -131,18 +144,70 @@ public class WarpGroupEditMenu extends AbstractMenu {
             bookMenu.onComplete((text) -> {
                 if(text == null) {
                     clickPlayer.sendMessage("§cA problem occurred while saving the description.");
-                    new WarpGroupEditMenu(clickPlayer, warpGroup, alreadyExists);
+                    new WarpGroupEditMenu(clickPlayer, warpGroup, alreadyExists, true);
                     return;
                 }
 
                 // Combine the first page to a single string
-                String finalText = text.get(0)[0];
+                StringBuilder finalText = new StringBuilder(text.get(0)[0]);
                 for(int i = 1; i < text.get(0).length; i++)
-                    finalText += "<br>" + text.get(0)[i];
+                    finalText.append("<br>").append(text.get(0)[i]);
 
-                warpGroup.setDescription(finalText);
-                new WarpGroupEditMenu(clickPlayer, warpGroup, alreadyExists);
+                warpGroup.setDescription(finalText.toString());
+                new WarpGroupEditMenu(clickPlayer, warpGroup, alreadyExists, true);
             });
+        });
+
+        // Set click event for the slot item
+        getMenu().getSlot(SLOT_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
+            clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
+
+            new AnvilGUI.Builder()
+                    .onClose(player -> {
+                        player.getPlayer().playSound(clickPlayer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+                        new WarpGroupEditMenu(clickPlayer, warpGroup, alreadyExists, true);
+                    })
+                    .onClick((slot, stateSnapshot) -> {
+                        if (slot != AnvilGUI.Slot.OUTPUT)
+                            return Collections.emptyList();
+
+                        // Make sure that the slot is a valid number and between 0 and 26
+                        if(!stateSnapshot.getText().matches("-?\\d+")
+                        || Integer.parseInt(stateSnapshot.getText()) < -1
+                        || Integer.parseInt(stateSnapshot.getText()) > 26){
+                            return Arrays.asList(
+                                    AnvilGUI.ResponseAction.close(),
+                                    AnvilGUI.ResponseAction.run(() -> {
+                                        clickPlayer.closeInventory();
+                                        stateSnapshot.getPlayer().playSound(clickPlayer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+                                        clickPlayer.sendMessage("§cThis is not a valid slot. Enter a value between -1 and 26.");
+                                        new WarpGroupEditMenu(clickPlayer, warpGroup, alreadyExists, true);
+                                    })
+                            );
+                        }
+
+                        stateSnapshot.getPlayer().playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
+                        return Arrays.asList(
+                                AnvilGUI.ResponseAction.close(),
+                                AnvilGUI.ResponseAction.run(() -> {
+                                    warpGroup.setSlot(Integer.parseInt(stateSnapshot.getText()));
+                                    new WarpGroupEditMenu(clickPlayer, warpGroup, alreadyExists, true);
+                                })
+                        );
+                    })
+                    .text("Enter slot 0-26. Set -1 for auto.")
+                    .itemLeft(Item.create(Material.ITEM_FRAME, "§6§lChange Slot"))
+                    .title("§8Change the warp slot")
+                    .plugin(BuildTeamTools.getInstance())
+                    .open(clickPlayer);
+        });
+
+        // Set click event for the material item
+        getMenu().getSlot(MATERIAL_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
+            clickPlayer.closeInventory();
+            clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
+
+            new MaterialSelectionMenu(clickPlayer, warpGroup, alreadyExists);
         });
 
         // Set click event for the delete item

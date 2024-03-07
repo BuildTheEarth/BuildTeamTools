@@ -15,6 +15,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -274,6 +275,13 @@ public class Item {
         item.setAmount(amount);
         item.getData().setData((byte) data);
         return item;
+    }
+
+    public static ItemStack createCustomHeadTextureURL(String url, String name, ArrayList<String> lore) {
+        byte[] encodedByteData = Base64.getEncoder().encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", new Object[] { url }).getBytes());
+        String encodedData = new String(encodedByteData);
+
+        return createCustomHeadBase64(encodedData, name, lore);
     }
 
     public static ItemStack createCustomHeadBase64(String base64, String name, ArrayList<String> lore) {

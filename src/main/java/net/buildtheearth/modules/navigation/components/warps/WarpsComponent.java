@@ -161,7 +161,7 @@ public class WarpsComponent extends Component {
             Warp warp = new Warp(group, name, countryCodeCCA2, "cca2", null, null, null, location.getWorld().getName(), coordinates[0], coordinates[1], location.getY(), location.getYaw(), location.getPitch(), false);
 
             // Create the actual warp
-            new WarpEditMenu(creator, warp, false);
+            new WarpEditMenu(creator, warp, false, true);
 
         }).exceptionally(e -> {
             creator.sendMessage(ChatHelper.error("An error occurred while creating the warp!"));
@@ -175,10 +175,11 @@ public class WarpsComponent extends Component {
         // Create a default name for the warp
         String name = creator.getName() + "'s Warp Group";
         String description = "This is a warp group.";
+        int slot = -1;
 
-        WarpGroup warpGroup = new WarpGroup(NetworkModule.getInstance().getBuildTeam(), name, description);
+        WarpGroup warpGroup = new WarpGroup(NetworkModule.getInstance().getBuildTeam(), name, description, slot, null);
 
-        new WarpGroupEditMenu(creator, warpGroup, false);
+        new WarpGroupEditMenu(creator, warpGroup, false, true);
     }
 
 

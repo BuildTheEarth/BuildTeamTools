@@ -82,7 +82,7 @@ public class Warp {
                     lore
             );
         else if(material.startsWith("http://textures.minecraft.net/texture/"))
-            return Item.createCustomHeadBase64(material, itemName, lore);
+            return Item.createCustomHeadTextureURL(material, itemName, lore);
 
         Material material = Material.matchMaterial(this.material.split(":")[0]);
 

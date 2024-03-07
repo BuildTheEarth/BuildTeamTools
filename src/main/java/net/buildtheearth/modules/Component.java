@@ -14,25 +14,21 @@ public abstract class Component {
     private boolean enabled = false;
 
     @Getter
-    private String componentName;
+    private final String componentName;
 
 
     public Component(String componentName) {
         this.componentName = componentName;
 
-        onEnable();
+        enable();
     }
 
 
-    public void onEnable(){
+    public void enable(){
         enabled = true;
     }
 
-    public void onDisable(){
+    public void disable(){
         enabled = false;
-    }
-
-    public boolean isEnabled(){
-        return enabled;
     }
 }

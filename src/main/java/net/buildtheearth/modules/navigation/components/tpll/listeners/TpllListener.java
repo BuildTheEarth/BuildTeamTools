@@ -55,11 +55,13 @@ public class TpllListener implements Listener {
      */
     private boolean isTpllCommand(PlayerCommandPreprocessEvent event) {
         // Check if the command starts with "tpll"
-        if (!event.getMessage().startsWith("tpll")) return false;
+        ChatHelper.logDebug(event.getMessage());
+        if (!event.getMessage().startsWith("/tpll")) return false;
         ChatHelper.logDebug("Intercepted tpll command.");
 
         // Split the command to extract coordinates
         String[] splitMessage = event.getMessage().split(" ");
+        splitMessage[1] = splitMessage[1].replaceAll(",", " ").trim();
         if (splitMessage.length < 3) return false;
         ChatHelper.logDebug("Command had the correct length (%s).", splitMessage.length);
 
@@ -85,7 +87,8 @@ public class TpllListener implements Listener {
 
                     if (!networkModule.getBuildTeam().isConnected() || !region.isConnected()) {
                         event.getPlayer().sendMessage(ChatHelper.error("Either this server or the receiving server isn't connected to the network."));
-                        return CompletableFuture.completedFuture(true);
+                        event.setCancelled(true);
+                        return CompletableFuture.completedFuture(false);
                     }
 
                     if (region.getBuildTeam().getID() != networkModule.getBuildTeam().getID()) {

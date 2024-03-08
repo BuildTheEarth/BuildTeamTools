@@ -85,14 +85,13 @@ public class TpllComponent extends Component {
         ChatHelper.logDebug("Starting universal tpll teleportation for %s to %s.", player.getDisplayName(), targetServerName);
         // Send a plugin message to the target server which adds the tpll to the queue
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
-        out.writeUTF("Tpll");
+        out.writeUTF("TPLL");
         out.writeUTF(targetServerName);
-        out.writeUTF(String.valueOf(coordinates[0]));
-        out.writeUTF(String.valueOf(coordinates[1]));
+        out.writeUTF(player.getUniqueId().toString());
+        out.writeUTF(String.valueOf(coordinates[0]) + coordinates[1]);
         player.sendPluginMessage(BuildTeamTools.getInstance(), "BuildTeam", out.toByteArray());
 
         // Switch the player to the target server
-        NetworkModule.getInstance().switchServer(player, targetServerName);
         ChatHelper.logDebug("Teleported player to the target server.");
     }
 

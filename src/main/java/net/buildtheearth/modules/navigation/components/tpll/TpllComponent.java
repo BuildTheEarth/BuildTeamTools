@@ -89,7 +89,7 @@ public class TpllComponent extends Component {
         out.writeUTF(targetServerName);
         out.writeUTF(String.valueOf(coordinates[0]));
         out.writeUTF(String.valueOf(coordinates[1]));
-        player.sendPluginMessage(BuildTeamTools.getInstance(), "BuildTeam", out.toByteArray());
+        player.sendPluginMessage(BuildTeamTools.getInstance(), "buildteamtools:buildteam", out.toByteArray());
 
         // Switch the player to the target server
         NetworkModule.getInstance().switchServer(player, targetServerName);

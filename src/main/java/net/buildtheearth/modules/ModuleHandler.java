@@ -80,14 +80,14 @@ public class ModuleHandler {
 
         if (isStarting) {
             if (module.isEnabled())
-                Bukkit.getLogger().log(Level.INFO, "§7[§a✔§7] Successfully loaded §e" + module.getModuleName() + " Module§7.");
+                Bukkit.getConsoleSender().sendMessage( "§7[§a✔§7] Successfully loaded §e" + module.getModuleName() + " Module§7.");
             else {
                 String reason = "";
 
                 if (module.getError() != null && !module.getError().isEmpty())
                     reason = " Reason: §c" + module.getError();
 
-                Bukkit.getLogger().log(Level.INFO, "§7[§c✖§7] Failed to load the §e" + module.getModuleName() + " Module§7." + reason);
+                Bukkit.getConsoleSender().sendMessage( "§7[§c✖§7] Failed to load the §e" + module.getModuleName() + " Module§7." + reason);
             }
         }else{
             if (module.isEnabled())

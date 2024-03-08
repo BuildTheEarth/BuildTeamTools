@@ -119,7 +119,7 @@ public class WarpsComponent extends Component {
         out.writeUTF(targetServer);
         out.writeUTF(warp.getId().toString());
 
-        player.sendPluginMessage(BuildTeamTools.getInstance(), "BuildTeam", out.toByteArray());
+        player.sendPluginMessage(BuildTeamTools.getInstance(), "buildteamtools:buildteam", out.toByteArray());
 
         // Switch the player to the target server
         NetworkModule.getInstance().switchServer(player, targetServer);

@@ -21,7 +21,7 @@ public class ChatHelper {
     }
 
     public static void log(String string, Object... objects) {
-        Bukkit.getLogger().log(Level.INFO, console(string, objects));
+        Bukkit.getConsoleSender().sendMessage( console(string, objects));
     }
 
     public static void logDebug(String string, Object... objects) {

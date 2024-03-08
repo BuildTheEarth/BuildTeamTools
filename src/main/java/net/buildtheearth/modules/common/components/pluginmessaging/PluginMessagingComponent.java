@@ -22,8 +22,8 @@ public class PluginMessagingComponent extends Component implements PluginMessage
         // Register an incoming & outgoing Plugin Messaging Channel
         BuildTeamTools.getInstance().getServer().getMessenger().registerOutgoingPluginChannel(BuildTeamTools.getInstance(), "BungeeCord");
         BuildTeamTools.getInstance().getServer().getMessenger().registerIncomingPluginChannel(BuildTeamTools.getInstance(), "BungeeCord", this);
-        BuildTeamTools.getInstance().getServer().getMessenger().registerOutgoingPluginChannel(BuildTeamTools.getInstance(), "BuildTeam");
-        BuildTeamTools.getInstance().getServer().getMessenger().registerIncomingPluginChannel(BuildTeamTools.getInstance(), "BuildTeam", this);
+        BuildTeamTools.getInstance().getServer().getMessenger().registerOutgoingPluginChannel(BuildTeamTools.getInstance(), "buildteamtools:buildteam");
+        BuildTeamTools.getInstance().getServer().getMessenger().registerIncomingPluginChannel(BuildTeamTools.getInstance(), "buildteamtools:buildteam", this);
     }
 
     @Override

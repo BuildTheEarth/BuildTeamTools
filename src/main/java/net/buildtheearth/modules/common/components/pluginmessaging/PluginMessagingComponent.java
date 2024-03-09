@@ -55,7 +55,7 @@ public class PluginMessagingComponent extends Component implements PluginMessage
             }
 
             // Add a new universal tpll target to the queue
-            if (subChannel.equals("Tpll")) {
+            if (subChannel.equals("TPLL")) {
                 NavigationModule.getInstance().getTpllComponent().addTpllToQueue(in, player);
             }
 

@@ -11,6 +11,7 @@ import net.buildtheearth.modules.plotsystem.PlotSystemModule;
 import net.buildtheearth.modules.stats.StatsModule;
 import net.buildtheearth.utils.io.ConfigUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -36,9 +37,8 @@ public class BuildTeamTools extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-
-        Bukkit.getLogger().log(Level.INFO, "§e--------------- BuildTeamTools V" + getDescription().getVersion() + " ----------------");
-        Bukkit.getLogger().log(Level.INFO, " ");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "--------------- BuildTeamTools V" + getDescription().getVersion() + " ----------------");
+        Bukkit.getConsoleSender().sendMessage(" ");
 
         // Register Modules
         ModuleHandler.getInstance().registerModules(
@@ -51,11 +51,11 @@ public class BuildTeamTools extends JavaPlugin {
         );
         ModuleHandler.getInstance().enableAll(null, true);
 
-        Bukkit.getLogger().log(Level.INFO," ");
-        Bukkit.getLogger().log(Level.INFO,"§e------------------------------------------------------------");
-        Bukkit.getLogger().log(Level.INFO,"§8> §7Made by §bBuildTheEarth");
-        Bukkit.getLogger().log(Level.INFO,"§8> §7GitHub:§f https://github.com/BuildTheEarth/BuildTeamTools");
-        Bukkit.getLogger().log(Level.INFO,"§e------------------------------------------------------------");
+        Bukkit.getConsoleSender().sendMessage(" ");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "------------------------------------------------------------");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_GRAY + "> " + ChatColor.GRAY + "Made by §bBuildTheEarth");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_GRAY + "> " + ChatColor.GRAY + "GitHub:" + ChatColor.WHITE + " https://github.com/BuildTheEarth/BuildTeamTools");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "------------------------------------------------------------");
     }
 
     @Override

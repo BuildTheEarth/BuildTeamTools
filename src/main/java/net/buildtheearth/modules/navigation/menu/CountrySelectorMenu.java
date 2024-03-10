@@ -1,6 +1,7 @@
 package net.buildtheearth.modules.navigation.menu;
 
 import com.alpsbte.alpslib.utils.item.ItemBuilder;
+import com.cryptomorin.xseries.XMaterial;
 import lombok.NonNull;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.BuildTeam;
@@ -71,7 +72,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
             setSwitchPageItems(SWITCH_PAGE_ITEM_SLOT);
         else
             for(int i = -1; i < 2; i++)
-                getMenu().getSlot(SWITCH_PAGE_ITEM_SLOT + i).setItem(new ItemBuilder(Material.STAINED_GLASS_PANE, 1, (byte) 7).setName(" ").build());
+                getMenu().getSlot(SWITCH_PAGE_ITEM_SLOT + i).setItem(MenuItems.ITEM_BACKGROUND);
 
         super.setPreviewItems();
     }
@@ -130,7 +131,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-                .item(new ItemBuilder(Material.STAINED_GLASS_PANE, 1, (byte) 7).setName(" ").build())
+                .item(MenuItems.ITEM_BACKGROUND)
                 .pattern("000000000")
                 .pattern("000000000")
                 .pattern("000000000")

@@ -1,10 +1,12 @@
 package net.buildtheearth.modules.generator.components.field.menu;
 
+import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.components.field.*;
 import net.buildtheearth.modules.generator.model.Settings;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.ListUtil;
+import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.AbstractMenu;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -37,26 +39,26 @@ public class CropStageMenu extends AbstractMenu {
         Field field = GeneratorModule.getInstance().getField();
         Crop crop = Crop.getByIdentifier(field.getPlayerSettings().get(getMenuPlayer().getUniqueId()).getValues().get(FieldFlag.CROP_TYPE));
 
-        ItemStack itemOne = Item.create(Material.BARRIER);
-        ItemStack itemTwo = Item.create(Material.BARRIER);
+        ItemStack itemOne = Item.create(XMaterial.BARRIER.parseMaterial());
+        ItemStack itemTwo = Item.create(XMaterial.BARRIER.parseMaterial());
 
         switch (crop) {
             case POTATO:
-                itemOne = Item.create(Material.GRASS, "§bLow", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
-                itemTwo = Item.create(Material.LONG_GRASS, "§bTall", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
+                itemOne = new Item(XMaterial.SHORT_GRASS.parseItem()).setDisplayName("§bLow").setLore(ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information")).build();
+                itemTwo = new Item(XMaterial.TALL_GRASS.parseItem()).setDisplayName("§bTall").setLore(ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information")).build();
                 break;
             case WHEAT:
-                itemOne = Item.create(Material.BIRCH_FENCE, "§bLight", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
-                itemTwo = Item.create(Material.DARK_OAK_FENCE, "§bDark", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
+                itemOne = Item.create(XMaterial.BIRCH_FENCE.parseMaterial(), "§bLight", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
+                itemTwo = Item.create(XMaterial.DARK_OAK_FENCE.parseMaterial(), "§bDark", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
                 break;
             case CORN:
-                itemOne = Item.create(Material.GRASS, "§bHarvested", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
-                itemTwo = Item.create(Material.LONG_GRASS, "§bTall", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
+                itemOne = new Item(XMaterial.SHORT_GRASS.parseItem()).setDisplayName("§bHarvested").setLore(ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information")).build();
+                itemTwo = new Item(XMaterial.TALL_GRASS.parseItem()).setDisplayName("§bTall").setLore(ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information")).build();
                 break;
             case HARVESTED:
             case OTHER:
-                itemOne = Item.create(Material.DEAD_BUSH, "§bDry", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
-                itemTwo = Item.create(Material.WATER_BUCKET, "§bWet", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
+                itemOne = Item.create(XMaterial.DEAD_BUSH.parseMaterial(), "§bDry", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
+                itemTwo = Item.create(XMaterial.WATER_BUCKET.parseMaterial(), "§bWet", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
                 break;
         }
 
@@ -169,7 +171,7 @@ public class CropStageMenu extends AbstractMenu {
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null))
+                .item(MenuItems.ITEM_BACKGROUND)
                 .pattern("111111111")
                 .pattern("110111011")
                 .pattern("011111111")

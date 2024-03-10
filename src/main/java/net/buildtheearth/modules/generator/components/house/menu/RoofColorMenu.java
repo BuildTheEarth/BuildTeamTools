@@ -72,9 +72,7 @@ public class RoofColorMenu extends BlockListMenu {
 
             case FLAT:
                 ArrayList<ItemStack> items = new ArrayList<>();
-                for(int i = 0; i <= 15; i++)
-                    items.add(Item.create(Material.CARPET,null, (short) i, null));
-
+                items.addAll(Arrays.asList(MenuItems.CARPETS));
                 items.addAll(Arrays.asList(MenuItems.SLABS));
 
                 return items;

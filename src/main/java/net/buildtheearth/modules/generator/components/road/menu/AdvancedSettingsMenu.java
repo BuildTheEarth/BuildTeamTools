@@ -1,15 +1,16 @@
 package net.buildtheearth.modules.generator.components.road.menu;
 
+import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.model.Settings;
 import net.buildtheearth.modules.generator.components.road.Road;
 import net.buildtheearth.modules.generator.components.road.RoadFlag;
 import net.buildtheearth.modules.generator.components.road.RoadSettings;
+import net.buildtheearth.utils.CustomHeads;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.ListUtil;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.AbstractMenu;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -58,17 +59,17 @@ public class AdvancedSettingsMenu extends AbstractMenu {
         ItemStack roadSlab = Item.fromUniqueMaterialString(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.ROAD_SLAB_COLOR));
         ItemStack streetLampType = getStreetLampItem(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.STREET_LAMP_TYPE));
 
-        createCounter(MenuItems.SliderColor.WHITE, LANE_COUNT_SLOT, "Number of Lanes", laneCount, 1, 10, "Lanes");
-        createCounter(MenuItems.SliderColor.LIGHT_GRAY, LANE_WIDTH_SLOT, "Lane Width", laneWidth, 1, 30, "Blocks");
-        createCounter(MenuItems.SliderColor.WHITE, SIDEWALK_WIDTH_SLOT, "Sidewalk Width", sidewalkWidth, 1, 30, "Blocks");
-        createCounter(MenuItems.SliderColor.LIGHT_GRAY, STREET_LAMP_DISTANCE_SLOT, "Street Lamp Distance", streetLampDistance, 5, 500, "Blocks");
+        createCounter(CustomHeads.SliderColor.WHITE, LANE_COUNT_SLOT, "Number of Lanes", laneCount, 1, 10, "Lanes");
+        createCounter(CustomHeads.SliderColor.LIGHT_GRAY, LANE_WIDTH_SLOT, "Lane Width", laneWidth, 1, 30, "Blocks");
+        createCounter(CustomHeads.SliderColor.WHITE, SIDEWALK_WIDTH_SLOT, "Sidewalk Width", sidewalkWidth, 1, 30, "Blocks");
+        createCounter(CustomHeads.SliderColor.LIGHT_GRAY, STREET_LAMP_DISTANCE_SLOT, "Street Lamp Distance", streetLampDistance, 5, 500, "Blocks");
 
-        setChoiceItems(MenuItems.SliderColor.WHITE, MARKINGS_MATERIAL_SLOT, "Line Markings Color", markingsMaterial);
-        setChoiceItems(MenuItems.SliderColor.LIGHT_GRAY, ROAD_SLAB_SLOT, "Road Elevation Slab", roadSlab);
-        setChoiceItems(MenuItems.SliderColor.WHITE, SIDEWALK_SLAB_SLOT, "Sidewalk Elevation Slab", sidewalkSlab);
-        setChoiceItems(MenuItems.SliderColor.LIGHT_GRAY, STREET_LAMP_TYPE_SLOT, "Street Lamp Type", streetLampType);
+        setChoiceItems(CustomHeads.SliderColor.WHITE, MARKINGS_MATERIAL_SLOT, "Line Markings Color", markingsMaterial);
+        setChoiceItems(CustomHeads.SliderColor.LIGHT_GRAY, ROAD_SLAB_SLOT, "Road Elevation Slab", roadSlab);
+        setChoiceItems(CustomHeads.SliderColor.WHITE, SIDEWALK_SLAB_SLOT, "Sidewalk Elevation Slab", sidewalkSlab);
+        setChoiceItems(CustomHeads.SliderColor.LIGHT_GRAY, STREET_LAMP_TYPE_SLOT, "Street Lamp Type", streetLampType);
 
-        getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.getCheckmarkItem("§eNext"));
+        getMenu().getSlot(NEXT_ITEM_SLOT).setItem(CustomHeads.getCheckmarkItem("§eNext"));
 
         setBackItem(BACK_ITEM_SLOT, new SidewalkColorMenu(getMenuPlayer(), false));
 
@@ -106,7 +107,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null))
+                .item(MenuItems.ITEM_BACKGROUND)
                 .pattern("111111111")
                 .pattern("100010001")
                 .pattern("100010001")
@@ -190,6 +191,6 @@ public class AdvancedSettingsMenu extends AbstractMenu {
     }
 
     protected ItemStack getStreetLampItem(String id){
-        return Item.create(Material.SEA_LANTERN, "§eStreet Lamp #" + id, ListUtil.createList("§7Click to select this street lamp type."));
+        return Item.create(XMaterial.SEA_LANTERN.parseMaterial(), "§eStreet Lamp #" + id, ListUtil.createList("§7Click to select this street lamp type."));
     }
 }

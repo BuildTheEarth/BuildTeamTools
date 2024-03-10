@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.generator.components.house.menu;
 
+import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.model.Settings;
 import net.buildtheearth.modules.generator.components.house.HouseFlag;
@@ -7,6 +8,7 @@ import net.buildtheearth.modules.generator.components.house.HouseSettings;
 import net.buildtheearth.modules.generator.components.house.RoofType;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.ListUtil;
+import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.AbstractMenu;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -34,11 +36,11 @@ public class RoofTypeMenu extends AbstractMenu {
     @Override
     protected void setPreviewItems() {
 
-        ItemStack flatRoofItem = Item.create(Material.CARPET, "§bFlat Roof", ListUtil.createList("", "§eDescription:", "A flat roof for", "skyscrapers using carpets", "or slabs"));
-        ItemStack gableRoofItem = Item.create(Material.COBBLESTONE_STAIRS, "§bGable Roof", ListUtil.createList("", "§eDescription:", "A gable roof for", "residential houses using stairs"));
-        ItemStack steepSlabRoofItem = Item.create(Material.STEP, "§bSteep Slab Roof", (short) 3, ListUtil.createList("", "§eDescription:", "A gable roof for", "residential houses using the", "steepest way you can", "create a roof with slabs"));
-        ItemStack mediumSlabRoofItem = Item.create(Material.STEP, "§bMedium Steep Slab Roof", (short) 3, ListUtil.createList("", "§eDescription:", "A gable roof for", "residential houses by creating", "a medium steep roof with slabs"));
-        ItemStack flatterSlabRoofItem = Item.create(Material.STEP, "§bFlatter Slab Roof", (short) 3, ListUtil.createList("", "§eDescription:", "A flat gable roof for", "residential houses by creating", "a very flat roof with slabs"));
+        ItemStack flatRoofItem = Item.create(XMaterial.WHITE_CARPET.parseMaterial(), "§bFlat Roof", ListUtil.createList("", "§eDescription:", "A flat roof for", "skyscrapers using carpets", "or slabs"));
+        ItemStack gableRoofItem = Item.create(XMaterial.COBBLESTONE_STAIRS.parseMaterial(), "§bGable Roof", ListUtil.createList("", "§eDescription:", "A gable roof for", "residential houses using stairs"));
+        ItemStack steepSlabRoofItem = Item.create(XMaterial.OAK_STAIRS.parseMaterial(), "§bSteep Slab Roof", ListUtil.createList("", "§eDescription:", "A gable roof for", "residential houses using the", "steepest way you can", "create a roof with slabs"));
+        ItemStack mediumSlabRoofItem = Item.create(XMaterial.OAK_STAIRS.parseMaterial(), "§bMedium Steep Slab Roof", ListUtil.createList("", "§eDescription:", "A gable roof for", "residential houses by creating", "a medium steep roof with slabs"));
+        ItemStack flatterSlabRoofItem = Item.create(XMaterial.OAK_STAIRS.parseMaterial(), "§bFlatter Slab Roof", ListUtil.createList("", "§eDescription:", "A flat gable roof for", "residential houses by creating", "a very flat roof with slabs"));
 
         // Set items
         getMenu().getSlot(FLAT_ROOF_ITEM_SLOT).setItem(flatRoofItem);
@@ -88,7 +90,7 @@ public class RoofTypeMenu extends AbstractMenu {
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null))
+                .item(MenuItems.ITEM_BACKGROUND)
                 .pattern("111111111")
                 .pattern("010101010")
                 .pattern("011111111")

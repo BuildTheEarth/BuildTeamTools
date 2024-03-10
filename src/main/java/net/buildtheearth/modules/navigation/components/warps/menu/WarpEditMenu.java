@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.navigation.components.warps.menu;
 
+import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
@@ -9,7 +10,6 @@ import net.buildtheearth.utils.menus.AbstractMenu;
 import net.buildtheearth.modules.navigation.components.warps.model.Warp;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
@@ -63,7 +63,7 @@ public class WarpEditMenu extends AbstractMenu {
     @Override
     protected void setMenuItemsAsync() {
         // Set the confirmation item
-        getMenu().getSlot(CONFIRM_SLOT).setItem(MenuItems.getCheckmarkItem(alreadyExists ? "§aUpdate" : "§aCreate"));
+        getMenu().getSlot(CONFIRM_SLOT).setItem(CustomHeads.getCheckmarkItem(alreadyExists ? "§aUpdate" : "§aCreate"));
 
         // Set the warp item
         getMenu().getSlot(WARP_SLOT).setItem(warp.getMaterialItem());
@@ -71,26 +71,26 @@ public class WarpEditMenu extends AbstractMenu {
         // Set the location item if the warp already exists. Otherwise, the location is set automatically on creation.
         if(alreadyExists){
             ArrayList<String> locationLore = ListUtil.createList("", "§eWorld: §7" + warp.getWorldName(), "§eLatitude: §7" + warp.getLat(), "§eLongitude: §7" + warp.getLon(), "§eElevation: §7" + warp.getY());
-            getMenu().getSlot(LOCATION_SLOT).setItem(Item.create(Material.COMPASS, "§6§lChange Location", locationLore));
+            getMenu().getSlot(LOCATION_SLOT).setItem(Item.create(XMaterial.COMPASS.parseMaterial(), "§6§lChange Location", locationLore));
 
         }
 
         // Set the name item
         ArrayList<String> nameLore = ListUtil.createList("", "§eCurrent Name: ", warp.getName());
-        getMenu().getSlot(NAME_SLOT).setItem(Item.create(Material.NAME_TAG, "§6§lChange Name", nameLore));
+        getMenu().getSlot(NAME_SLOT).setItem(Item.create(XMaterial.NAME_TAG.parseMaterial(), "§6§lChange Name", nameLore));
 
         // Set the group item
         ArrayList<String> groupLore = ListUtil.createList("", "§eCurrent Group: ", warp.getWarpGroup().getName());
-        getMenu().getSlot(GROUP_SLOT).setItem(MenuItems.getLetterHead(
+        getMenu().getSlot(GROUP_SLOT).setItem(CustomHeads.getLetterHead(
                 warp.getWarpGroup().getName().substring(0, 1),
-                MenuItems.LetterType.WOODEN,
+                CustomHeads.LetterType.WOODEN,
                 "§6§lChange Warp Group",
                 groupLore
         ));
 
         // Set the address type item
         ArrayList<String> addressTypeLore = ListUtil.createList("", "§eAddress Type: ", warp.getAddressType() == null ? "§7City" : warp.getAddressType().getName());
-        getMenu().getSlot(ADDRESS_TYPE_SLOT).setItem(Item.create(Material.PAPER, "§6§lChange Address Type", addressTypeLore));
+        getMenu().getSlot(ADDRESS_TYPE_SLOT).setItem(Item.create(XMaterial.PAPER.parseMaterial(), "§6§lChange Address Type", addressTypeLore));
 
         // Set the material item
         ArrayList<String> materialLore = ListUtil.createList("", "§eMaterial: ", warp.getMaterial() == null ? "§7Default" : warp.getMaterial());
@@ -98,11 +98,11 @@ public class WarpEditMenu extends AbstractMenu {
 
         // Set the highlight item
         ArrayList<String> highlightLore = ListUtil.createList("", "§eIs Highlight: ", "" + warp.isHighlight());
-        getMenu().getSlot(HIGHLIGHT_SLOT).setItem(Item.create(Material.NETHER_STAR, warp.isHighlight() ? "§6§lMake Normal" : "§6§lMake Highlight", highlightLore));
+        getMenu().getSlot(HIGHLIGHT_SLOT).setItem(Item.create(XMaterial.NETHER_STAR.parseMaterial(), warp.isHighlight() ? "§6§lMake Normal" : "§6§lMake Highlight", highlightLore));
 
         // Set the delete item
         if(alreadyExists)
-            getMenu().getSlot(DELETE_SLOT).setItem(Item.create(Material.BARRIER, "§c§lDelete Warp", ListUtil.createList("", "§8Click to delete the warp.")));
+            getMenu().getSlot(DELETE_SLOT).setItem(Item.create(XMaterial.BARRIER.parseMaterial(), "§c§lDelete Warp", ListUtil.createList("", "§8Click to delete the warp.")));
     }
 
     @Override
@@ -184,7 +184,7 @@ public class WarpEditMenu extends AbstractMenu {
                         );
                     })
                     .text("Name")
-                    .itemLeft(Item.create(Material.NAME_TAG, "§6§lChange Name"))
+                    .itemLeft(Item.create(XMaterial.NAME_TAG.parseMaterial(), "§6§lChange Name"))
                     .title("§8Change the warp name")
                     .plugin(BuildTeamTools.getInstance())
                     .open(clickPlayer);
@@ -235,7 +235,7 @@ public class WarpEditMenu extends AbstractMenu {
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null))
+                .item(MenuItems.ITEM_BACKGROUND)
                 .pattern("000000000")
                 .pattern("000000000")
                 .pattern("000000000")

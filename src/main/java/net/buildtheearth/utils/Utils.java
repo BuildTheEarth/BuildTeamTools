@@ -16,23 +16,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Utils {
-    public static String getBlockID(ItemStack item) {
-        String blockID = "" + item.getType().getId();
-
-        if (item.getDurability() != 0)
-            blockID += ":" + item.getDurability();
-
-        return blockID;
-    }
-
-
-    public static boolean containsStringFromList(String string, List<String> list) {
-        for (String s : list)
-            if (string.contains(s))
-                return true;
-
-        return false;
-    }
 
     public static String[] splitStringByLineLength(String input, int maxLineLength, String separator) {
         String[] parts = input.split(separator);
@@ -61,16 +44,6 @@ public class Utils {
         return lines.toArray(new String[0]);
     }
 
-    public static int getHighestY(World world, int x, int z) {
-        int y = 255;
-        while (world.getBlockAt(x, y, z).getType() == Material.AIR || world.getBlockAt(x, y, z).getType() == Material.AIR) {
-            y--;
-            if (y == 0)
-                return 0;
-        }
-        return y;
-    }
-
     public static void sendPlayerToServer(Player player, String server) {
         if(NetworkModule.getInstance().getBuildTeam() == null
         || !NetworkModule.getInstance().getBuildTeam().isConnected())
@@ -80,22 +53,6 @@ public class Utils {
         out.writeUTF("Connect");
         out.writeUTF(server);
         player.sendPluginMessage(BuildTeamTools.getInstance(), "BungeeCord", out.toByteArray());
-    }
-
-    public static int[] range(int start, int stop) {
-        int[] result = new int[stop - start];
-
-        for (int i = 0; i < stop - start; i++)
-            result[i] = start + i;
-
-        return result;
-    }
-
-    public static Player getRandomPlayer() {
-        for (Player player : Bukkit.getOnlinePlayers())
-            return player;
-
-        return null;
     }
 
     public static Object pickRandom(Object[] array) {
@@ -168,14 +125,6 @@ public class Utils {
         }
 
         return s;
-    }
-
-    public static String menuIconTitle(String szText) {
-        return (ChatColor.GREEN + "" + ChatColor.BOLD + szText);
-    }
-
-    public static String loreText(String szText) {
-        return (ChatColor.GRAY + "" + szText);
     }
 
     /**

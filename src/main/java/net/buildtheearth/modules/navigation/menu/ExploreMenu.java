@@ -1,10 +1,11 @@
 package net.buildtheearth.modules.navigation.menu;
 
 
-import com.alpsbte.alpslib.utils.item.ItemBuilder;
+import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.modules.network.model.Continent;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.AbstractMenu;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -25,11 +26,9 @@ import java.util.Collections;
  */
 public class ExploreMenu extends AbstractMenu {
     private static final String inventoryName = "Explore Menu";
-    private final Player menuPlayer;
 
     public ExploreMenu(Player menuPlayer, boolean autoLoad) {
         super(4, inventoryName, menuPlayer, autoLoad);
-        this.menuPlayer = menuPlayer;
     }
 
     @Override
@@ -37,7 +36,7 @@ public class ExploreMenu extends AbstractMenu {
         // Create the continent items
         for (Continent continent : Continent.values()) {
             ArrayList<String> continentLore = new ArrayList<>(Collections.singletonList(ChatHelper.colorize(ChatColor.GRAY, ChatColor.GRAY, "Visit countries in %s", continent.getLabel())));
-            getMenu().getSlot(continent.getSlot()).setItem(Item.create(Material.COMPASS,"§e§l" + continent.getLabel(), 1, continentLore));
+            getMenu().getSlot(continent.getSlot()).setItem(Item.create(XMaterial.COMPASS.parseMaterial(),"§e§l" + continent.getLabel(), 1, continentLore));
         }
 
         super.setPreviewItems();
@@ -68,8 +67,10 @@ public class ExploreMenu extends AbstractMenu {
 
     @Override
     protected Mask getMask() {
+
+
         return BinaryMask.builder(getMenu())
-                .item(new ItemBuilder(Material.STAINED_GLASS_PANE, 1, (byte) 7).setName(" ").build())
+                .item(MenuItems.ITEM_BACKGROUND)
                 .pattern("111111111")
                 .pattern("010101010")
                 .pattern("111101111")

@@ -5,10 +5,9 @@ import net.buildtheearth.modules.generator.model.Settings;
 import net.buildtheearth.modules.generator.components.house.House;
 import net.buildtheearth.modules.generator.components.house.HouseFlag;
 import net.buildtheearth.modules.generator.components.house.HouseSettings;
-import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.CustomHeads;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.AbstractMenu;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
@@ -48,15 +47,15 @@ public class AdvancedSettingsMenu extends AbstractMenu {
         this.windowHeight = Integer.parseInt(house.getPlayerSettings().get(uuid).getValues().get(HouseFlag.WINDOW_HEIGHT));
         this.windowDistance = Integer.parseInt(house.getPlayerSettings().get(uuid).getValues().get(HouseFlag.WINDOW_DISTANCE));
 
-        createCounter(MenuItems.SliderColor.WHITE, FLOOR_COUNT_SLOT, "Number of Floors", floorCount, 1, 10, "Floors");
-        createCounter(MenuItems.SliderColor.LIGHT_GRAY, FLOOR_HEIGHT_SLOT, "Floors Height", floorHeight, 1, 10, "Blocks");
-        createCounter(MenuItems.SliderColor.WHITE, BASE_HEIGHT_SLOT, "Basement Height", baseHeight, 0, 10, "Blocks");
-        createCounter(MenuItems.SliderColor.WHITE, WINDOW_WIDTH_SLOT, "Window Width", windowWidth, 1, 5, "Blocks");
-        createCounter(MenuItems.SliderColor.LIGHT_GRAY, WINDOW_HEIGHT_SLOT, "Window Height", windowHeight, 1, 5, "Blocks");
-        createCounter(MenuItems.SliderColor.WHITE, WINDOW_DISTANCE_SLOT, "Window Distance", windowDistance, 1, 6, "Blocks");
+        createCounter(CustomHeads.SliderColor.WHITE, FLOOR_COUNT_SLOT, "Number of Floors", floorCount, 1, 10, "Floors");
+        createCounter(CustomHeads.SliderColor.LIGHT_GRAY, FLOOR_HEIGHT_SLOT, "Floors Height", floorHeight, 1, 10, "Blocks");
+        createCounter(CustomHeads.SliderColor.WHITE, BASE_HEIGHT_SLOT, "Basement Height", baseHeight, 0, 10, "Blocks");
+        createCounter(CustomHeads.SliderColor.WHITE, WINDOW_WIDTH_SLOT, "Window Width", windowWidth, 1, 5, "Blocks");
+        createCounter(CustomHeads.SliderColor.LIGHT_GRAY, WINDOW_HEIGHT_SLOT, "Window Height", windowHeight, 1, 5, "Blocks");
+        createCounter(CustomHeads.SliderColor.WHITE, WINDOW_DISTANCE_SLOT, "Window Distance", windowDistance, 1, 6, "Blocks");
 
 
-        getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.getCheckmarkItem("§eNext"));
+        getMenu().getSlot(NEXT_ITEM_SLOT).setItem(CustomHeads.getCheckmarkItem("§eNext"));
         setBackItem(BACK_ITEM_SLOT, new BaseColorMenu(getMenuPlayer(), false));
 
         super.setPreviewItems();
@@ -87,7 +86,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null))
+                .item(MenuItems.ITEM_BACKGROUND)
                 .pattern("111111111")
                 .pattern("100010001")
                 .pattern("100010001")

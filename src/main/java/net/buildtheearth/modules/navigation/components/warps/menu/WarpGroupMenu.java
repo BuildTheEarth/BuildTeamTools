@@ -4,13 +4,12 @@ import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.modules.navigation.menu.CountrySelectorMenu;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Permissions;
+import net.buildtheearth.utils.CustomHeads;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.ListUtil;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.AbstractPaginatedMenu;
 import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
@@ -58,7 +57,7 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
     protected void setPaginatedPreviewItems(List<?> source) {
         List<WarpGroup> warpGroups = source.stream().map(l -> (WarpGroup) l).collect(Collectors.toList());
 
-        getMenu().getSlot(ALTERNATE_PLUS_SLOT).setItem(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null));
+        getMenu().getSlot(ALTERNATE_PLUS_SLOT).setItem(MenuItems.ITEM_BACKGROUND);
 
         // Create the country items
         int slot = 0;
@@ -68,7 +67,7 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
             if(isPlusItem(warpGroup) && slot == warpGroups.size() - 1){
                 getMenu().getSlot(getPlusSlot(slot)).setItem(
                         Item.createCustomHeadBase64(
-                                MenuItems.GREEN_PLUS, "§a§lCreate a new Warp Group",
+                                CustomHeads.GREEN_PLUS, "§a§lCreate a new Warp Group",
                                 ListUtil.createList("§8Click to create a new warp group.")
                         )
                 );
@@ -89,7 +88,7 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-            .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null))
+            .item(MenuItems.ITEM_BACKGROUND)
             .pattern("000000000")
             .pattern("000000000")
             .pattern("000000000")

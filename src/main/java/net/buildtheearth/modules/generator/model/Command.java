@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.generator.model;
 
+import com.cryptomorin.xseries.XMaterial;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -15,6 +16,7 @@ import lombok.Getter;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.MenuItems;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -67,7 +69,7 @@ public class Command {
         if (player.getInventory().getItem(INVENTORY_SLOT) != null && player.getInventory().getItem(INVENTORY_SLOT).getType() == Material.BARRIER)
             return;
 
-        player.getInventory().setItem(INVENTORY_SLOT, Item.create(Material.BARRIER, "§c§lGenerator processing commands..."));
+        player.getInventory().setItem(INVENTORY_SLOT, Item.create(XMaterial.BARRIER.parseMaterial(), "§c§lGenerator processing commands..."));
 
         percentage = (int) Math.round((double) (totalCommands - commands.size()) / (double) totalCommands * 100);
         player.sendActionBar("§a§lGenerator Progress: §e" + percentage + "%");
@@ -118,7 +120,7 @@ public class Command {
         int maxHeight = y;
 
         if(blocks != null)
-            maxHeight = GeneratorUtils.getMaxHeight(blocks, x, z, Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL, Material.SNOW);
+            maxHeight = GeneratorUtils.getMaxHeight(blocks, x, z, MenuItems.getIgnoredMaterials());
         if(maxHeight == 0)
             maxHeight = y;
 
@@ -149,7 +151,7 @@ public class Command {
         int maxHeight = y;
 
         if(blocks != null)
-            maxHeight = GeneratorUtils.getMaxHeight(blocks, x, z, GeneratorUtils.IGNORED_MATERIALS);
+            maxHeight = GeneratorUtils.getMaxHeight(blocks, x, z, MenuItems.getIgnoredMaterials());
         if(maxHeight == 0)
             maxHeight = y;
 

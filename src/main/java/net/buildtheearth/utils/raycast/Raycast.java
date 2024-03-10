@@ -1,5 +1,6 @@
 package net.buildtheearth.utils.raycast;
 
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -51,7 +52,7 @@ public class Raycast {
     }
 
     public Raycast(World world, double x, double y, double z, double yaw, double pitch, double size) {
-        addPassthroughMaterial(Material.AIR);
+        addPassthroughMaterial(XMaterial.AIR.parseMaterial());
         this.world = world;
         this.x = x;
         this.y = y;

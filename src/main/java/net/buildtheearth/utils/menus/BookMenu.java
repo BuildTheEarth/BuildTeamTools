@@ -1,7 +1,9 @@
 package net.buildtheearth.utils.menus;
 
+import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.MenuItems;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -59,7 +61,7 @@ public class BookMenu {
             time++;
         }, 20, 20);
 
-        ItemStack item = Item.create(Material.BOOK_AND_QUILL, bookTitle);
+        ItemStack item = Item.create(XMaterial.WRITABLE_BOOK.parseMaterial(), bookTitle);
         BookMeta bookMeta = (BookMeta) item.getItemMeta();
         bookMeta.setTitle(bookTitle);
         bookMeta.setAuthor(bookAuthor);
@@ -73,7 +75,7 @@ public class BookMenu {
         player.getInventory().clear();
 
         for(int i = 0; i < 9; i++)
-            player.getInventory().setItem(i, Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null));
+            player.getInventory().setItem(i, MenuItems.ITEM_BACKGROUND);
 
         player.getInventory().setHeldItemSlot(4);
         player.getInventory().setItem(4, item);
@@ -87,14 +89,15 @@ public class BookMenu {
     }
 
     private void checkForBookUpdate(){
-        if(player.getInventory().getItem(4) == null)
-            return;
-
-        if(player.getInventory().getItem(4).getType() != Material.BOOK_AND_QUILL
-        && player.getInventory().getItem(4).getType() != Material.WRITTEN_BOOK)
-            return;
-
         ItemStack item = player.getInventory().getItem(4);
+
+        if(item == null)
+            return;
+
+        if(item.getType() != XMaterial.WRITABLE_BOOK.parseMaterial()
+        && item.getType() != XMaterial.WRITTEN_BOOK.parseMaterial())
+            return;
+
         BookMeta meta = (BookMeta) item.getItemMeta();
 
         boolean hasChanged = false;

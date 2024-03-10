@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.navigation.components.navigator;
 
+import com.cryptomorin.xseries.XMaterial;
 import com.sk89q.worldedit.WorldEdit;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.Component;
@@ -52,7 +53,7 @@ public class NavigatorComponent extends Component {
     }
 
     public ItemStack getItem() {
-        return Item.create(Material.COMPASS, "§aNavigator");
+        return Item.create(XMaterial.COMPASS.parseMaterial(), "§aNavigator");
     }
 
     public short getSlot() {

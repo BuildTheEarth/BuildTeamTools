@@ -3,16 +3,12 @@ package net.buildtheearth.modules.navigation.components.warps.model;
 import lombok.Getter;
 import lombok.Setter;
 import net.buildtheearth.modules.network.model.BuildTeam;
-import net.buildtheearth.utils.Item;
-import net.buildtheearth.utils.ListUtil;
-import net.buildtheearth.utils.MenuItems;
-import net.buildtheearth.utils.Utils;
+import net.buildtheearth.utils.*;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -76,9 +72,9 @@ public class WarpGroup {
         ArrayList<String> lore = getDescriptionLore();
 
         if(material == null)
-            return  MenuItems.getLetterHead(
+            return  CustomHeads.getLetterHead(
                     name.substring(0, 1),
-                    MenuItems.LetterType.WOODEN,
+                    CustomHeads.LetterType.WOODEN,
                     itemName,
                     lore
             );
@@ -88,9 +84,9 @@ public class WarpGroup {
         Material material = Material.matchMaterial(this.material.split(":")[0]);
 
         if(material == null)
-            return MenuItems.getLetterHead(
+            return CustomHeads.getLetterHead(
                     name.substring(0, 1),
-                    MenuItems.LetterType.STONE,
+                    CustomHeads.LetterType.STONE,
                     itemName,
                     lore
             );

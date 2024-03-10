@@ -5,10 +5,7 @@ import lombok.NonNull;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.network.model.RegionType;
-import net.buildtheearth.utils.ChatHelper;
-import net.buildtheearth.utils.Item;
-import net.buildtheearth.utils.ListUtil;
-import net.buildtheearth.utils.Utils;
+import net.buildtheearth.utils.*;
 import net.buildtheearth.utils.menus.AbstractPaginatedMenu;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -61,7 +58,7 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
             setSwitchPageItems(SWITCH_PAGE_ITEM_SLOT);
         else
             for(int i = -1; i < 2; i++)
-                getMenu().getSlot(SWITCH_PAGE_ITEM_SLOT + i).setItem(new ItemBuilder(Material.STAINED_GLASS_PANE, 1, (byte) 7).setName(" ").build());
+                getMenu().getSlot(SWITCH_PAGE_ITEM_SLOT + i).setItem(MenuItems.ITEM_BACKGROUND);
 
         super.setPreviewItems();
     }
@@ -118,7 +115,7 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-                .item(new ItemBuilder(Material.STAINED_GLASS_PANE, 1, (byte) 7).setName(" ").build())
+                .item(MenuItems.ITEM_BACKGROUND)
                 .pattern("000000000")
                 .pattern("000000000")
                 .pattern("000000000")

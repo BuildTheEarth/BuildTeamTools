@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.generator.components.kml;
 
+import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.utils.BlockLocation;
 import net.buildtheearth.utils.ChatHelper;
@@ -307,8 +308,15 @@ public class KmlCommand implements CommandExecutor {
             player.sendMessage("§cSome block changes target blocks too far away from the player and were not applied.");
         }
 
+        Material material = Material.matchMaterial(previousCommandBlockType);
+
+        if (material == null){
+            player.sendMessage("§cServer received /kml command with invalid blocktype string metadata. Using bricks as fallback.");
+            material = Material.BRICK;
+        }
+
         //Delete command block, restore previous type
-        senderBlock.setType(Material.matchMaterial(previousCommandBlockType));
+        senderBlock.setType(material);
         return true;
     }
 
@@ -344,15 +352,15 @@ public class KmlCommand implements CommandExecutor {
             if (arg.startsWith(prefix_extendParam)){
                 extendToGround = true;
                 extendToGroundBlockType = arg.substring(prefix_extendParam.length()).toUpperCase();
-                if (Material.matchMaterial(extendToGroundBlockType) == null)
-                {
+
+                if (Material.matchMaterial(extendToGroundBlockType) == null) {
                     player.sendMessage(String.format("§cInvalid block type for extend parameter '%s'. Using bricks as fallback.", extendToGroundBlockType));
                     extendToGroundBlockType = "BRICK";
                 }
             }else{
                 blocktype = arg.toUpperCase();
-                if (Material.matchMaterial(blocktype) == null)
-                {
+
+                if (Material.matchMaterial(blocktype) == null) {
                     player.sendMessage(String.format("§cInvalid block type '%s'. Using bricks as fallback.", blocktype));
                     blocktype = "BRICK";
                 }
@@ -370,7 +378,9 @@ public class KmlCommand implements CommandExecutor {
         Block block = world.getBlockAt(commandBlockLocation);
 
         Material previousMaterial = block.getType(); //remember old blocktype to replace after command processing
-        block.setType(Material.COMMAND);    
+
+        if(XMaterial.COMMAND_BLOCK.parseMaterial() != null)
+            block.setType(XMaterial.COMMAND_BLOCK.parseMaterial());
         
         //for now, user has to manually set the command to "auto" to get it immediately triggered on confirm
         CommandBlock cmdBlock = (CommandBlock) block.getState();

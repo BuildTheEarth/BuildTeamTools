@@ -1,7 +1,9 @@
 package net.buildtheearth.modules.navigation.components.warps.menu;
 
+import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.network.NetworkModule;
+import net.buildtheearth.utils.CustomHeads;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.ListUtil;
 import net.buildtheearth.utils.MenuItems;
@@ -9,7 +11,6 @@ import net.buildtheearth.utils.menus.AbstractMenu;
 import net.buildtheearth.utils.menus.BookMenu;
 import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import net.wesjd.anvilgui.AnvilGUI;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
@@ -57,13 +58,13 @@ public class WarpGroupEditMenu extends AbstractMenu {
     @Override
     protected void setMenuItemsAsync() {
         // Set the confirmation item
-        getMenu().getSlot(CONFIRM_SLOT).setItem(MenuItems.getCheckmarkItem(alreadyExists ? "§aUpdate" : "§aCreate"));
+        getMenu().getSlot(CONFIRM_SLOT).setItem(CustomHeads.getCheckmarkItem(alreadyExists ? "§aUpdate" : "§aCreate"));
 
         // Set the warp group item
         getMenu().getSlot(WARP_GROUP).setItem(
-                MenuItems.getLetterHead(
+                CustomHeads.getLetterHead(
                         warpGroup.getName().substring(0, 1),
-                        MenuItems.LetterType.WOODEN,
+                        CustomHeads.LetterType.WOODEN,
                         "§6§l" + warpGroup.getName(),
                         warpGroup.getDescriptionLore()
                 )
@@ -71,22 +72,22 @@ public class WarpGroupEditMenu extends AbstractMenu {
 
         // Set the name item
         ArrayList<String> nameLore = ListUtil.createList("", "§eCurrent Name: ", warpGroup.getName());
-        getMenu().getSlot(NAME_SLOT).setItem(Item.create(Material.NAME_TAG, "§6§lChange Name", nameLore));
+        getMenu().getSlot(NAME_SLOT).setItem(Item.create(XMaterial.NAME_TAG.parseMaterial(), "§6§lChange Name", nameLore));
 
         // Set the Description item
-        getMenu().getSlot(DESCRIPTION_SLOT).setItem(Item.create(Material.BOOK, "§6§lChange Description", warpGroup.getDescriptionLore()));
+        getMenu().getSlot(DESCRIPTION_SLOT).setItem(Item.create(XMaterial.BOOK.parseMaterial(), "§6§lChange Description", warpGroup.getDescriptionLore()));
 
         // Set the Slot item
         int slot = warpGroup.getSlot();
         ArrayList<String> slotLore = ListUtil.createList("", "§eSlot: ", slot < 0 || slot >= 27 ? "§7Auto" : String.valueOf(slot));
-        getMenu().getSlot(SLOT_SLOT).setItem(new Item(Material.ITEM_FRAME).setDisplayName("§6§lChange Slot").setLore(slotLore).build());
+        getMenu().getSlot(SLOT_SLOT).setItem(new Item(XMaterial.ITEM_FRAME.parseMaterial()).setDisplayName("§6§lChange Slot").setLore(slotLore).build());
 
         // Set the Material item
         ArrayList<String> materialLore = ListUtil.createList("", "§eMaterial: ", warpGroup.getMaterial() == null ? "§7Default" : warpGroup.getMaterial());
         getMenu().getSlot(MATERIAL_SLOT).setItem(new Item(warpGroup.getMaterialItem()).setDisplayName("§6§lChange Material").setLore(materialLore).build());
 
         // Set the delete item
-        getMenu().getSlot(DELETE_SLOT).setItem(Item.create(Material.BARRIER, "§c§lDelete Warp Group", ListUtil.createList("", "§8Click to delete the warp group.")));
+        getMenu().getSlot(DELETE_SLOT).setItem(Item.create(XMaterial.BARRIER.parseMaterial(), "§c§lDelete Warp Group", ListUtil.createList("", "§8Click to delete the warp group.")));
     }
 
     @Override
@@ -126,7 +127,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
                         );
                     })
                     .text("Name")
-                    .itemLeft(Item.create(Material.NAME_TAG, "§6§lChange Name"))
+                    .itemLeft(Item.create(XMaterial.NAME_TAG.parseMaterial(), "§6§lChange Name"))
                     .title("§8Change the warp name")
                     .plugin(BuildTeamTools.getInstance())
                     .open(clickPlayer);
@@ -196,7 +197,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
                         );
                     })
                     .text("Enter slot 0-26. Set -1 for auto.")
-                    .itemLeft(Item.create(Material.ITEM_FRAME, "§6§lChange Slot"))
+                    .itemLeft(Item.create(XMaterial.ITEM_FRAME.parseMaterial(), "§6§lChange Slot"))
                     .title("§8Change the warp slot")
                     .plugin(BuildTeamTools.getInstance())
                     .open(clickPlayer);
@@ -222,7 +223,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null))
+                .item(MenuItems.ITEM_BACKGROUND)
                 .pattern("000000000")
                 .pattern("000000000")
                 .pattern("000000000")

@@ -1,17 +1,13 @@
 package net.buildtheearth.modules.navigation.components.warps.menu;
 
+import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
-import net.buildtheearth.utils.ChatHelper;
-import net.buildtheearth.utils.Item;
-import net.buildtheearth.utils.ListUtil;
-import net.buildtheearth.utils.MenuItems;
+import net.buildtheearth.utils.*;
 import net.buildtheearth.utils.menus.AbstractMenu;
 import net.buildtheearth.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.utils.menus.BookMenu;
 import net.wesjd.anvilgui.AnvilGUI;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
@@ -47,8 +43,8 @@ public class MaterialSelectionMenu extends AbstractMenu {
 
     @Override
     protected void setMenuItemsAsync() {
-        getMenu().getSlot(MATERIAL_SLOT).setItem(Item.create(Material.STONE, "§6§lItem", ListUtil.createList("", "Change the material of the warp", "to a minecraft item.", "", "§eExample:", "Stone")));
-        getMenu().getSlot(CUSTOM_HEAD_SLOT).setItem(MenuItems.getLetterHead("?", MenuItems.LetterType.WOODEN, "§6§lCustom Head", ListUtil.createList("", "Change the material of the warp", "to a custom head texture URL.", "", "§eExample:", "https://textures.minecraft.net/texture/...")));
+        getMenu().getSlot(MATERIAL_SLOT).setItem(Item.create(XMaterial.STONE.parseMaterial(), "§6§lItem", ListUtil.createList("", "Change the material of the warp", "to a minecraft item.", "", "§eExample:", "Stone")));
+        getMenu().getSlot(CUSTOM_HEAD_SLOT).setItem(CustomHeads.getLetterHead("?", CustomHeads.LetterType.WOODEN, "§6§lCustom Head", ListUtil.createList("", "Change the material of the warp", "to a custom head texture URL.", "", "§eExample:", "https://textures.minecraft.net/texture/...")));
 
         if(object instanceof Warp)
             setBackItem(BACK_ITEM_SLOT, new WarpEditMenu(getMenuPlayer(), (Warp) object, alreadyExists, false));
@@ -72,7 +68,7 @@ public class MaterialSelectionMenu extends AbstractMenu {
                             return Collections.emptyList();
 
                         // Make sure that the material is valid
-                        if(Material.matchMaterial(stateSnapshot.getText().toUpperCase().split(":")[0]) == null){
+                        if(Item.fromUniqueMaterialString(stateSnapshot.getText()) == null){
                             return Arrays.asList(
                                     AnvilGUI.ResponseAction.close(),
                                     AnvilGUI.ResponseAction.run(() -> {
@@ -98,7 +94,7 @@ public class MaterialSelectionMenu extends AbstractMenu {
                         );
                     })
                     .text("Material")
-                    .itemLeft(Item.create(Material.NAME_TAG, "§6§lEnter Material Name"))
+                    .itemLeft(Item.create(XMaterial.NAME_TAG.parseMaterial(), "§6§lEnter Material Name"))
                     .title("§8Enter Material Name")
                     .plugin(BuildTeamTools.getInstance())
                     .open(clickPlayer);
@@ -146,7 +142,7 @@ public class MaterialSelectionMenu extends AbstractMenu {
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null))
+                .item(MenuItems.ITEM_BACKGROUND)
                 .pattern("000000000")
                 .pattern("000000000")
                 .pattern("000000000")

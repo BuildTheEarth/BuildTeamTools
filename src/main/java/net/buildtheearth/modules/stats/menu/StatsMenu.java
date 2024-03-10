@@ -1,13 +1,14 @@
 package net.buildtheearth.modules.stats.menu;
 
+import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.modules.stats.StatsModule;
 import net.buildtheearth.modules.stats.model.StatsPlayer;
 import net.buildtheearth.modules.stats.model.StatsServer;
+import net.buildtheearth.utils.CustomHeads;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.ListUtil;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.AbstractMenu;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.ipvp.canvas.mask.BinaryMask;
@@ -19,14 +20,14 @@ import java.util.UUID;
 
 public class StatsMenu extends AbstractMenu {
 
-    private final static ItemStack GLOBAL_HEAD = Item.createCustomHeadBase64(MenuItems.EARTH, "§eGlobal Statistics", ListUtil.createList("error"));
-    private final static ItemStack ACHIEVEMENTS_HEAD = Item.createCustomHeadBase64(MenuItems.GOLDEN_CUP, "§eAchievements", ListUtil.createList("error"));
+    private final static ItemStack GLOBAL_HEAD = Item.createCustomHeadBase64(CustomHeads.EARTH, "§eGlobal Statistics", ListUtil.createList("error"));
+    private final static ItemStack ACHIEVEMENTS_HEAD = Item.createCustomHeadBase64(CustomHeads.GOLDEN_CUP, "§eAchievements", ListUtil.createList("error"));
     private final byte PLAYER_HEAD_SLOT = 4;
     private final byte TEAM_HEAD_SLOT = 20;
     private final byte GLOBAL_HEAD_SLOT = 22;
     private final byte ACHIEVEMENT_HEAD_SLOT = 24;
     private final ItemStack PLAYER_HEAD = Item.createPlayerHead("&ePersonal Statistics", getMenuPlayer().getName());
-    private final ItemStack TEAM_HEAD = Item.create(Material.STONE, "Placeholder", ListUtil.createList("placeholder")); //TODO GET HEAD BASED ON COUNTRY/TEAM
+    private final ItemStack TEAM_HEAD = Item.create(XMaterial.STONE.parseMaterial(), "Placeholder", ListUtil.createList("placeholder")); //TODO GET HEAD BASED ON COUNTRY/TEAM
 
 
     public StatsMenu(Player p) {
@@ -74,7 +75,7 @@ public class StatsMenu extends AbstractMenu {
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null))
+                .item(MenuItems.ITEM_BACKGROUND)
                 .pattern("111101111")
                 .pattern("110101011")
                 .pattern("111111111")

@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.generator.menu;
 
+import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.model.GeneratorCollections;
@@ -21,6 +22,7 @@ import net.buildtheearth.modules.generator.components.tree.menu.TreeTypeMenu;
 import net.buildtheearth.modules.generator.model.GeneratorType;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.ListUtil;
+import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.AbstractMenu;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -67,7 +69,7 @@ public class GeneratorMenu extends AbstractMenu {
                 "§8Left-click to generate",
                 "§8Right-click for Tutorial");
 
-        ItemStack houseItem = Item.create(Material.BIRCH_DOOR_ITEM, "§cGenerate House", houseLore);
+        ItemStack houseItem = Item.create(XMaterial.BIRCH_DOOR.parseMaterial(), "§cGenerate House", houseLore);
 
         // Set navigator item
         getMenu().getSlot(HOUSE_ITEM_SLOT).setItem(houseItem);
@@ -88,7 +90,7 @@ public class GeneratorMenu extends AbstractMenu {
                 "§8Right-click for Tutorial");
 
 
-        ItemStack roadItem = Item.create(Material.STEP, "§bGenerate Road", (short) 0, roadLore);
+        ItemStack roadItem = new Item(XMaterial.SMOOTH_STONE_SLAB.parseItem()).setDisplayName("§bGenerate Road").setLore(roadLore).build();
 
         // Set navigator item
         getMenu().getSlot(ROAD_ITEM_SLOT).setItem(roadItem);
@@ -107,7 +109,7 @@ public class GeneratorMenu extends AbstractMenu {
                 "§8Left-click to generate",
                 "§8Right-click for Tutorial");
 
-        ItemStack railwayItem = Item.create(Material.RAILS, "§9Generate Railway", railwayLore);
+        ItemStack railwayItem = Item.create(XMaterial.RAIL.parseMaterial(), "§9Generate Railway", railwayLore);
 
         // Set navigator item
         getMenu().getSlot(RAILWAY_ITEM_SLOT).setItem(railwayItem);
@@ -117,7 +119,7 @@ public class GeneratorMenu extends AbstractMenu {
             // TREE ITEM
             ArrayList<String> treeLore = ListUtil.createList("", "§cPlugin §eSchematicBrush §cis not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
 
-            ItemStack treeItem = Item.create(Material.SAPLING, "§aGenerate Tree & Forest §c(DISABLED)", treeLore);
+            ItemStack treeItem = Item.create(XMaterial.OAK_SAPLING.parseMaterial(), "§aGenerate Tree & Forest §c(DISABLED)", treeLore);
 
             // Set navigator item
             getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
@@ -125,7 +127,7 @@ public class GeneratorMenu extends AbstractMenu {
             // TREE ITEM
             ArrayList<String> treeLore = ListUtil.createList("", "§cThe §eTree Pack " + Tree.TREE_PACK_VERSION + " §cis not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
 
-            ItemStack treeItem = Item.create(Material.SAPLING, "§aGenerate Tree & Forest §c(DISABLED)", treeLore);
+            ItemStack treeItem = Item.create(XMaterial.OAK_SAPLING.parseMaterial(), "§aGenerate Tree & Forest §c(DISABLED)", treeLore);
 
             // Set navigator item
             getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
@@ -142,7 +144,7 @@ public class GeneratorMenu extends AbstractMenu {
                     "§8Left-click to generate",
                     "§8Right-click for Tutorial");
 
-            ItemStack treeItem = Item.create(Material.SAPLING, "§aGenerate Tree & Forest", treeLore);
+            ItemStack treeItem = Item.create(XMaterial.OAK_SAPLING.parseMaterial(), "§aGenerate Tree & Forest", treeLore);
 
             // Set navigator item
             getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
@@ -162,7 +164,7 @@ public class GeneratorMenu extends AbstractMenu {
                 "§8Left-click to generate",
                 "§8Right-click for Tutorial");
 
-        ItemStack fieldItem = Item.create(Material.WHEAT, "§6Generate Field", fieldLore);
+        ItemStack fieldItem = Item.create(XMaterial.WHEAT.parseMaterial(), "§6Generate Field", fieldLore);
 
         // Set navigator item
         getMenu().getSlot(FIELD_ITEM_SLOT).setItem(fieldItem);
@@ -288,7 +290,7 @@ public class GeneratorMenu extends AbstractMenu {
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null))
+                .item(MenuItems.ITEM_BACKGROUND)
                 .pattern("111111111")
                 .pattern("010101010")
                 .pattern("111111111")

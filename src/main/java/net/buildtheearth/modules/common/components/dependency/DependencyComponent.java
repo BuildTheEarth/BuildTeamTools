@@ -13,28 +13,12 @@ import java.util.List;
  */
 public class DependencyComponent extends Component {
 
-    // List which contains all missing dependencies
-    private final List<String> missingDependencies = new ArrayList<>();
 
     public DependencyComponent() {
         super("Dependencies");
     }
 
 
-    /**
-     * Check for all required dependencies and inform the console about missing dependencies
-     *
-     * @return True if all dependencies are present
-     */
-    private boolean checkForRequiredDependencies() {
-        PluginManager pluginManager = BuildTeamTools.getInstance().getServer().getPluginManager();
-
-        if (!pluginManager.isPluginEnabled("WorldEdit")) {
-            missingDependencies.add("WorldEdit (V6.1.9)");
-        }
-
-        return missingDependencies.isEmpty();
-    }
 
     /**
      * Checks if the plugin "WorldEdit" is enabled.
@@ -43,6 +27,15 @@ public class DependencyComponent extends Component {
      */
     public boolean isWorldEditEnabled() {
         return BuildTeamTools.getInstance().getServer().getPluginManager().isPluginEnabled("WorldEdit");
+    }
+
+    /**
+     * Checks if the plugin "FastAsyncWorldEdit" is enabled.
+     *
+     * @return True if FastAsyncWorldEdit is enabled, false if it is not enabled
+     */
+    public boolean isFastAsyncWorldEditEnabled() {
+        return BuildTeamTools.getInstance().getServer().getPluginManager().isPluginEnabled("FastAsyncWorldEdit");
     }
 
     /**

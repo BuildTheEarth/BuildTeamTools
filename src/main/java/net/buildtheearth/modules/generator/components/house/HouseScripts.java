@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.generator.components.house;
 
+import com.cryptomorin.xseries.XMaterial;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
@@ -13,8 +14,7 @@ import net.buildtheearth.modules.generator.model.GeneratorType;
 import net.buildtheearth.modules.generator.model.History;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import net.buildtheearth.utils.MenuItems;
-import org.apache.commons.lang.StringUtils;
-import org.bukkit.Material;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -98,9 +98,9 @@ public class HouseScripts {
             return;
         }
 
-        int highestBlock = GeneratorUtils.getMaxHeight(blocks, Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL);
-        boolean containsRedWool = GeneratorUtils.containsBlock(blocks, Material.WOOL, (byte) 14);
-        boolean containsOrangeWool = GeneratorUtils.containsBlock(blocks, Material.WOOL, (byte) 1);
+        int highestBlock = GeneratorUtils.getMaxHeight(blocks, MenuItems.getIgnoredMaterials());
+        boolean containsRedWool = GeneratorUtils.containsBlock(blocks, XMaterial.RED_WOOL);
+        boolean containsOrangeWool = GeneratorUtils.containsBlock(blocks, XMaterial.ORANGE_WOOL);
 
 
         // ----------- PREPARATION 02 ----------

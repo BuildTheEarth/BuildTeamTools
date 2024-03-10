@@ -1,10 +1,12 @@
 package net.buildtheearth.modules.navigation.menu;
 
 import com.alpsbte.alpslib.utils.item.ItemBuilder;
+import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.Utils;
 import net.buildtheearth.utils.io.ConfigPaths;
 import net.buildtheearth.utils.menus.AbstractMenu;
@@ -44,25 +46,25 @@ public class MainMenu extends AbstractMenu {
         int[] slots = getSlots();
 
         // Fill the blank slots with glass panes
-        getMenu().getSlot(11).setItem(new ItemBuilder(Material.STAINED_GLASS_PANE, 1, (byte) 7).setName(" ").build());
-        getMenu().getSlot(13).setItem(new ItemBuilder(Material.STAINED_GLASS_PANE, 1, (byte) 7).setName(" ").build());
-        getMenu().getSlot(15).setItem(new ItemBuilder(Material.STAINED_GLASS_PANE, 1, (byte) 7).setName(" ").build());
+        getMenu().getSlot(11).setItem(MenuItems.ITEM_BACKGROUND);
+        getMenu().getSlot(13).setItem(MenuItems.ITEM_BACKGROUND);
+        getMenu().getSlot(15).setItem(MenuItems.ITEM_BACKGROUND);
 
         // Set Explore Item
         ArrayList<String> exploreLore = new ArrayList<>(Collections.singletonList(ChatHelper.colorize(ChatColor.GRAY, "Click to explore the project!", false)));
-        getMenu().getSlot(slots[0]).setItem(Item.create(Material.BOAT_SPRUCE, ChatHelper.colorize(ChatColor.YELLOW, "Explore", true), 1, exploreLore));
+        getMenu().getSlot(slots[0]).setItem(Item.create(XMaterial.SPRUCE_BOAT.parseMaterial(), ChatHelper.colorize(ChatColor.YELLOW, "Explore", true), 1, exploreLore));
 
 
         // Set Build Item
         if(config.getBoolean(ConfigPaths.BUILD_ITEM_ENABLED)) {
             ArrayList<String> buildLore = new ArrayList<>(Collections.singletonList(ChatHelper.colorize(ChatColor.GRAY, "Click to build for the project!", false)));
-            getMenu().getSlot(slots[1]).setItem(Item.create(Material.DIAMOND_PICKAXE, ChatHelper.colorize(ChatColor.GREEN, "Build", true), 1, buildLore));
+            getMenu().getSlot(slots[1]).setItem(Item.create(XMaterial.DIAMOND_PICKAXE.parseMaterial(), ChatHelper.colorize(ChatColor.GREEN, "Build", true), 1, buildLore));
         }
 
         // Set Tutorials Item
         if(config.getBoolean(ConfigPaths.TUTORIALS_ITEM_ENABLED)) {
             ArrayList<String> tutorialsLore = new ArrayList<>(Collections.singletonList(ChatHelper.colorize(ChatColor.GRAY, "Click to do some tutorials!", false)));
-            getMenu().getSlot(slots[2]).setItem(Item.create(Material.KNOWLEDGE_BOOK, ChatHelper.colorize(ChatColor.AQUA, "Tutorials", true), 1, tutorialsLore));
+            getMenu().getSlot(slots[2]).setItem(Item.create(XMaterial.KNOWLEDGE_BOOK.parseMaterial(), ChatHelper.colorize(ChatColor.AQUA, "Tutorials", true), 1, tutorialsLore));
         }
 
         super.setPreviewItems();
@@ -118,7 +120,7 @@ public class MainMenu extends AbstractMenu {
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-                .item(new ItemBuilder(Material.STAINED_GLASS_PANE, 1, (byte) 7).setName(" ").build())
+                .item(MenuItems.ITEM_BACKGROUND)
                 .pattern("111111111")
                 .pattern("110101011")
                 .pattern("111111111")

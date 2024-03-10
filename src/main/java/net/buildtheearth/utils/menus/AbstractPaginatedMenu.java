@@ -1,7 +1,7 @@
 package net.buildtheearth.utils.menus;
 
 import net.buildtheearth.BuildTeamTools;
-import net.buildtheearth.utils.MenuItems;
+import net.buildtheearth.utils.CustomHeads;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -152,13 +152,13 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
         int currentPage = getPage();
 
         // Set previous page item
-        getMenu().getSlot(switchPageItemSlot - 1).setItem(MenuItems.getPreviousPageItem(currentPage));
+        getMenu().getSlot(switchPageItemSlot - 1).setItem(CustomHeads.getPreviousPageItem(currentPage));
 
         // Set current page item
-        getMenu().getSlot(switchPageItemSlot).setItem(MenuItems.getCurrentPageItem(currentPage));
+        getMenu().getSlot(switchPageItemSlot).setItem(CustomHeads.getCurrentPageItem(currentPage));
 
         // Set next page item
-        getMenu().getSlot(switchPageItemSlot + 1).setItem(MenuItems.getNextPageItem(currentPage, hasNextPage()));
+        getMenu().getSlot(switchPageItemSlot + 1).setItem(CustomHeads.getNextPageItem(currentPage, hasNextPage()));
     }
 
     protected void setSwitchPageItemClickEvents(int switchPageItemSlot){

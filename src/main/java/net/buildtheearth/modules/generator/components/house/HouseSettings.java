@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.generator.components.house;
 
+import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.modules.generator.model.Settings;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
@@ -22,11 +23,11 @@ public class HouseSettings extends Settings {
 
         // Wall Color (Default: Random)
         ItemStack block = (ItemStack) Utils.pickRandom(MenuItems.WALL_BLOCKS);
-        getValues().put(HouseFlag.WALL_COLOR, Utils.getBlockID(block));
+        getValues().put(HouseFlag.WALL_COLOR, XMaterial.matchXMaterial(block).getId() + "");
 
         // Wall Color (Default: Random)
         block = (ItemStack) Utils.pickRandom(MenuItems.WALL_BLOCKS);
-        getValues().put(HouseFlag.BASE_COLOR, Utils.getBlockID(block));
+        getValues().put(HouseFlag.BASE_COLOR, XMaterial.matchXMaterial(block).getId() + "");
 
         // Roof Color (Default: Random)
         block = (ItemStack) Utils.pickRandom(MenuItems.STAIRS);
@@ -38,13 +39,13 @@ public class HouseSettings extends Settings {
         else if(getValues().get(HouseFlag.ROOF_TYPE).equalsIgnoreCase(RoofType.FLAT.getType()))
             block = (ItemStack) Utils.pickRandom(MenuItems.SLABS);
 
-        getValues().put(HouseFlag.ROOF_COLOR, Utils.getBlockID(block));
+        getValues().put(HouseFlag.ROOF_COLOR, XMaterial.matchXMaterial(block).getId() + "");
 
         // Balcony Color (Default: Random)
-        getValues().put(HouseFlag.BALCONY_COLOR, Utils.getBlockID(Item.create(Material.CONCRETE)));
+        getValues().put(HouseFlag.BALCONY_COLOR, XMaterial.BLACK_CONCRETE.getId() + "");
 
         // Balcony Fence Color (Default: Random)
-        getValues().put(HouseFlag.BALCONY_FENCE_COLOR, Utils.getBlockID(Item.create(Material.IRON_FENCE)));
+        getValues().put(HouseFlag.BALCONY_FENCE_COLOR, XMaterial.IRON_TRAPDOOR.getId() + "");
 
 
         // Floor Count (Default: Random)

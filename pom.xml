@@ -42,11 +42,15 @@
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
 
-                            <!-- Relocate Anvil GUI to prevent conflicts with other plugins !-->
+                            <!-- Relocate Anvil GUI and XSeries to prevent conflicts with other plugins !-->
                             <relocations>
                                 <relocation>
                                     <pattern>net.wesjd.anvilgui</pattern>
-                                    <shadedPattern>net.buildtheearth.anvilgui</shadedPattern>
+                                    <shadedPattern>net.buildtheearth.buildteamtools.anvilgui</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.cryptomorin.xseries</pattern>
+                                    <shadedPattern>net.buildtheearth.buildteamtools.xseries</shadedPattern>
                                 </relocation>
                             </relocations>
                             <filters>
@@ -55,6 +59,13 @@
                                     <excludeDefaults>false</excludeDefaults>
                                     <includes>
                                         <include>net/wesjd/anvilgui/**</include>
+                                    </includes>
+                                </filter>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludeDefaults>false</excludeDefaults>
+                                    <includes>
+                                        <includes>com/cryptomorin/xseries/**</includes>
                                     </includes>
                                 </filter>
                             </filters>
@@ -151,27 +162,44 @@
     </repositories>
 
     <dependencies>
-        <!-- KML Parser -->
-        <dependency>
-            <groupId>de.micromata.jak</groupId>
-            <artifactId>JavaAPIforKml</artifactId>
-            <version>2.2.1</version>
-        </dependency>
-
         <!-- Paper -->
         <dependency>
-            <groupId>com.destroystokyo.paper</groupId>
+            <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.12.2-R0.1-SNAPSHOT</version>
+            <version>1.20.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
-        <!-- World Edit -->
+        <!-- Mojang !-->
+        <dependency>
+            <groupId>com.mojang</groupId>
+            <artifactId>authlib</artifactId>
+            <version>1.5.25</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- World Edit for 1.12 -->
         <dependency>
             <groupId>com.sk89q.worldedit</groupId>
             <artifactId>worldedit-bukkit</artifactId>
             <version>6.1.9</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- Fast Async World Edit for 1.13+ -->
+        <dependency>
+            <groupId>com.fastasyncworldedit</groupId>
+            <artifactId>FastAsyncWorldEdit-Core</artifactId>
+            <version>2.9.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+
+        <!-- XSeries -->
+        <dependency>
+            <groupId>com.github.cryptomorin</groupId>
+            <artifactId>XSeries</artifactId>
+            <version>9.9.0</version>
         </dependency>
 
         <!-- Canvas Menu Builder -->
@@ -239,6 +267,13 @@
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
             <version>4.11.0</version>
+        </dependency>
+
+        <!-- KML Parser -->
+        <dependency>
+            <groupId>de.micromata.jak</groupId>
+            <artifactId>JavaAPIforKml</artifactId>
+            <version>2.2.1</version>
         </dependency>
 
         <!-- Anvil GUI -->

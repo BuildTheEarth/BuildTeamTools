@@ -54,7 +54,8 @@ public class GeneratorModule extends Module {
     @Override
     public void enable() {
         // Check if WorldEdit is enabled
-        if (!CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled()) {
+        if (!CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled()
+         && !CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled()) {
             shutdown("§cWorldEdit is not installed.");
             return;
         }

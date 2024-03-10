@@ -9,6 +9,7 @@ import net.buildtheearth.modules.common.commands.BuildTeamToolsCommand;
 import net.buildtheearth.modules.common.components.dependency.DependencyComponent;
 import net.buildtheearth.modules.common.components.pluginmessaging.PluginMessagingComponent;
 import net.buildtheearth.modules.common.components.updater.UpdaterComponent;
+import net.buildtheearth.modules.common.components.version.VersionComponent;
 import net.buildtheearth.modules.common.listeners.CommandListener;
 import net.buildtheearth.modules.common.listeners.ExceptionListener;
 import net.buildtheearth.modules.generator.GeneratorModule;
@@ -31,6 +32,9 @@ public class CommonModule extends Module {
     private PluginMessagingComponent pluginMessagingComponent;
     @Getter
     private DependencyComponent dependencyComponent;
+
+    @Getter
+    private VersionComponent versionComponent;
 
 
     private long time;
@@ -66,6 +70,7 @@ public class CommonModule extends Module {
         updaterComponent = new UpdaterComponent(BuildTeamTools.getInstance(), BuildTeamTools.SPIGOT_PROJECT_ID, BuildTeamTools.getInstance().getPluginFile(), UpdaterComponent.UpdateType.CHECK_DOWNLOAD, BuildTeamTools.getInstance().isDebug());
         pluginMessagingComponent = new PluginMessagingComponent();
         dependencyComponent = new DependencyComponent();
+        versionComponent = new VersionComponent();
 
 
         // Start the timer

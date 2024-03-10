@@ -6,6 +6,7 @@ import clipper2.core.Paths64;
 import clipper2.core.Point64;
 import clipper2.offset.EndType;
 import clipper2.offset.JoinType;
+import com.cryptomorin.xseries.XMaterial;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
@@ -15,7 +16,8 @@ import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.utils.Item;
-import org.apache.commons.lang.StringUtils;
+import net.buildtheearth.utils.MenuItems;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -34,8 +36,6 @@ import java.util.Objects;
  * @author MineFact
  */
 public class GeneratorUtils {
-
-    public static final Material[] IGNORED_MATERIALS = {Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2, Material.WOOL, Material.SNOW};
 
     /**
      * Converts a String[] of arguments to a String[] of flags.
@@ -141,29 +141,31 @@ public class GeneratorUtils {
      * Checks if polygon region contains a block of a certain type
      *
      * @param blocks   List of blocks in polygon region
-     * @param material Material to check for (e.g. Material.WALL_SIGN)
-     * @param data Data value of material to check for (0-15)
+     * @param xMaterial Material to check for (e.g. XMaterial.WALL_SIGN)
      * @return true if polygon region contains the block, false otherwise
      */
-    public static boolean containsBlock(Block[][][] blocks, Material material, byte data){
-        return containsBlock(blocks, material, data, 1);
+    public static boolean containsBlock(Block[][][] blocks, XMaterial xMaterial){
+        return containsBlock(blocks, xMaterial, 1);
     }
 
     /**
      * Checks if polygon region contains a minimum amount of blocks of a certain type
      * @param blocks List of blocks in polygon region
-     * @param material Material to check for (e.g. Material.WALL_SIGN)
-     * @param data Data value of material to check for (0-15)
+     * @param xMaterial Material to check for (e.g. XMaterial.WALL_SIGN)
      * @param requiredAmount The minimum amount required to return true
      * @return true if polygon region contains the required amount of the block, false otherwise
      */
-    public static boolean containsBlock(Block[][][] blocks, Material material, byte data, int requiredAmount){
+    public static boolean containsBlock(Block[][][] blocks, XMaterial xMaterial, int requiredAmount){
         int amountFound = 0;
         for (Block[][] block2D : blocks)
             for (Block[] block1D : block2D)
                 for (Block block : block1D)
-                    if (block != null && block.getType() == material && block.getData() == data)
-                        amountFound++;
+                    if(CommonModule.getInstance().getVersionComponent().is_1_12())
+                        if (block != null && block.getType() == xMaterial.parseMaterial() && block.getData() == xMaterial.getData())
+                            amountFound++;
+                    else
+                        if (block != null && block.getType() == xMaterial.parseMaterial())
+                            amountFound++;
 
         return amountFound >= requiredAmount;
     }
@@ -177,7 +179,7 @@ public class GeneratorUtils {
     public static void adjustHeight(List<Vector> points, Block[][][] blocks){
         for(int i = 0; i < points.size(); i++) {
             Vector point = points.get(i);
-            point = point.setY(getMaxHeight(blocks, point.getBlockX(), point.getBlockZ(), IGNORED_MATERIALS));
+            point = point.setY(getMaxHeight(blocks, point.getBlockX(), point.getBlockZ(), MenuItems.getIgnoredMaterials()));
             points.set(i, point);
         }
     }
@@ -374,7 +376,7 @@ public class GeneratorUtils {
         int maxHeight = vector.getBlockY();
 
         if(blocks != null)
-            maxHeight = getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), IGNORED_MATERIALS);
+            maxHeight = getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), MenuItems.getIgnoredMaterials());
         if(maxHeight == 0)
             maxHeight = vector.getBlockY();
 
@@ -392,7 +394,7 @@ public class GeneratorUtils {
         int maxHeight = vector.getBlockY();
 
         if(blocks != null)
-            maxHeight = getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), IGNORED_MATERIALS) + offset;
+            maxHeight = getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), MenuItems.getIgnoredMaterials()) + offset;
         if(maxHeight == 0)
             maxHeight = vector.getBlockY();
 
@@ -731,7 +733,7 @@ public class GeneratorUtils {
      * @return Whether the player has a brick block in their selection
      */
     public static boolean checkForBrickOutline(Block[][][] blocks, Player p){
-        if(!containsBlock(blocks, Material.BRICK, (byte) 0)){
+        if(!containsBlock(blocks, XMaterial.BRICK)){
             p.sendMessage("§cPlease make a selection around an outline.");
             p.closeInventory();
             p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
@@ -749,13 +751,13 @@ public class GeneratorUtils {
      * @return Whether the player has a yellow wool block in their selection
      */
     public static boolean checkForWoolBlock(Block[][][] blocks, Player p){
-        if(!containsBlock(blocks, Material.WOOL, (byte) 4)){
+        if(!containsBlock(blocks, XMaterial.YELLOW_WOOL)){
             p.sendMessage("§cPlease place a yellow wool block inside the outline.");
             p.closeInventory();
             p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
             GeneratorModule.getInstance().sendWikiLink(p);
 
-            ItemStack yellowWool = Item.create(Material.WOOL, null, (short) 4, null);
+            ItemStack yellowWool = XMaterial.YELLOW_WOOL.parseItem();
             if(!p.getInventory().contains(yellowWool)) {
                 p.getInventory().setItem(4, yellowWool);
                 p.playSound(p.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1.0F, 1.0F);

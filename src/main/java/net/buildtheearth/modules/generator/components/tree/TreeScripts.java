@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.generator.components.tree;
 
+import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.modules.generator.model.Settings;
 import net.buildtheearth.utils.Item;
 import org.bukkit.Material;
@@ -18,7 +19,7 @@ public class TreeScripts {
 
         // In case the player is holding no item, give him a diamond sword
         if(p.getItemOnCursor() == null || p.getInventory().getItemInMainHand().getType() == Material.AIR)
-            p.getInventory().setItem(p.getInventory().getHeldItemSlot(), Item.create(Material.DIAMOND_SWORD));
+            p.getInventory().setItem(p.getInventory().getHeldItemSlot(), Item.create(XMaterial.DIAMOND_SWORD.parseMaterial()));
 
 
         if(args.length == 1) {

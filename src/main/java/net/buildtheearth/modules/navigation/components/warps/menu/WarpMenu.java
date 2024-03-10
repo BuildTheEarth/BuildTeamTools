@@ -6,7 +6,6 @@ import net.buildtheearth.utils.*;
 import net.buildtheearth.utils.menus.AbstractPaginatedMenu;
 import net.buildtheearth.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
@@ -49,7 +48,7 @@ public class WarpMenu extends AbstractPaginatedMenu {
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null))
+                .item(MenuItems.ITEM_BACKGROUND)
                 .pattern("000000000")
                 .pattern("000000000")
                 .pattern("000000000")
@@ -80,7 +79,7 @@ public class WarpMenu extends AbstractPaginatedMenu {
 
             // Create a "create warp" item if the player has permission
             if(warp.getName().equals("%create-warp%") && getMenuPlayer().hasPermission(Permissions.WARP_CREATE) && slot == warps.size() - 1){
-                getMenu().getSlot(slot).setItem(Item.createCustomHeadBase64(MenuItems.GREEN_PLUS, "§a§lCreate a new Warp", ListUtil.createList("§8Click to create a new warp.")));
+                getMenu().getSlot(slot).setItem(Item.createCustomHeadBase64(CustomHeads.GREEN_PLUS, "§a§lCreate a new Warp", ListUtil.createList("§8Click to create a new warp.")));
                 slot++;
                 continue;
             }

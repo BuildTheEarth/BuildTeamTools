@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.generator.components.tree.menu;
 
+import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.menu.GeneratorMenu;
 import net.buildtheearth.modules.generator.model.Settings;
@@ -8,7 +9,7 @@ import net.buildtheearth.modules.generator.components.road.RoadSettings;
 import net.buildtheearth.modules.generator.components.tree.TreeType;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.menus.BlockListMenu;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -29,10 +30,10 @@ public class TreeTypeMenu extends BlockListMenu {
     private static List<ItemStack> getTreeTypes() {
         List<ItemStack> treeTypes = new ArrayList<>();
 
-        treeTypes.add(Item.create(Material.CONCRETE, "Any", (byte) 5));
+        treeTypes.add(new Item(XMaterial.LIME_CONCRETE.parseItem()).setDisplayName("Any").build());
 
         for(TreeType treeType : TreeType.values())
-            treeTypes.add(Item.create(Material.SAPLING, StringUtils.capitalize(treeType.getName())));
+            treeTypes.add(Item.create(XMaterial.OAK_SAPLING.parseMaterial(), StringUtils.capitalize(treeType.getName())));
 
         return treeTypes;
     }

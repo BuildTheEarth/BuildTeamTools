@@ -1,8 +1,8 @@
 package net.buildtheearth.utils.menus;
 
+import net.buildtheearth.utils.CustomHeads;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
-import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -45,7 +45,7 @@ public class BlockListMenu extends AbstractPaginatedMenu {
         setSwitchPageItems(SWITCH_PAGE_ITEM_SLOT);
 
         if(canProceed())
-            getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.getCheckmarkItem("§eNext"));
+            getMenu().getSlot(NEXT_ITEM_SLOT).setItem(CustomHeads.getCheckmarkItem("§eNext"));
         else
             getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.ITEM_BACKGROUND);
 
@@ -65,7 +65,7 @@ public class BlockListMenu extends AbstractPaginatedMenu {
         String backSlot = backMenu == null ? "1" : "0";
 
         return BinaryMask.builder(getMenu())
-                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null))
+                .item(MenuItems.ITEM_BACKGROUND)
                 .pattern("000000000")
                 .pattern("000000000")
                 .pattern("000000000")

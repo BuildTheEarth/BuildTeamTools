@@ -1,8 +1,10 @@
 package net.buildtheearth.modules.navigation.components.warps.menu;
 
+import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.ListUtil;
+import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.Utils;
 import net.buildtheearth.utils.menus.AbstractMenu;
 import net.buildtheearth.modules.navigation.components.warps.model.Warp;
@@ -58,12 +60,12 @@ public class AddressTypeSelectionMenu extends AbstractMenu {
         stateLore.addAll(ListUtil.createList(Utils.splitStringByLineLength(Warp.AddressType.STATE.getExample(), 30, ", ")));
         countryLore.addAll(ListUtil.createList(Utils.splitStringByLineLength(Warp.AddressType.COUNTRY.getExample(), 30, ", ")));
 
-        getMenu().getSlot(BUILDING_SLOT).setItem(Item.create(Material.INK_SACK, "§6§lBuilding", (short) 12, buildingLore));
-        getMenu().getSlot(STREET_SLOT).setItem(Item.create(Material.INK_SACK, "§6§lStreet", (short) 12, streetLore));
-        getMenu().getSlot(CITY_SLOT).setItem(Item.create(Material.INK_SACK, "§6§lCity", (short) 12, cityLore));
-        getMenu().getSlot(STATE_SLOT).setItem(Item.create(Material.INK_SACK, "§6§lState", (short) 12, stateLore));
-        getMenu().getSlot(COUNTRY_SLOT).setItem(Item.create(Material.INK_SACK, "§6§lCountry", (short) 12, countryLore));
-        getMenu().getSlot(CUSTOM_SLOT).setItem(Item.create(Material.NAME_TAG, "§6§lCustom Address", ListUtil.createList("", "§7If no other address type fits,", "§7enter a custom address.")));
+        getMenu().getSlot(BUILDING_SLOT).setItem(new Item(XMaterial.LIGHT_BLUE_DYE.parseItem()).setDisplayName("§6§lBuilding").setLore(buildingLore).build());
+        getMenu().getSlot(STREET_SLOT).setItem(new Item(XMaterial.LIGHT_BLUE_DYE.parseItem()).setDisplayName("§6§lStreet").setLore(streetLore).build());
+        getMenu().getSlot(CITY_SLOT).setItem(new Item(XMaterial.LIGHT_BLUE_DYE.parseItem()).setDisplayName("§6§lCity").setLore(cityLore).build());
+        getMenu().getSlot(STATE_SLOT).setItem(new Item(XMaterial.LIGHT_BLUE_DYE.parseItem()).setDisplayName("§6§lState").setLore(stateLore).build());
+        getMenu().getSlot(COUNTRY_SLOT).setItem(new Item(XMaterial.LIGHT_BLUE_DYE.parseItem()).setDisplayName("§6§lCountry").setLore(countryLore).build());
+        getMenu().getSlot(CUSTOM_SLOT).setItem(Item.create(XMaterial.NAME_TAG.parseMaterial(), "§6§lCustom Address", ListUtil.createList("", "§7If no other address type fits,", "§7enter a custom address.")));
 
         setBackItem(BACK_ITEM_SLOT, new WarpEditMenu(getMenuPlayer(), warp, alreadyExists, false));
     }
@@ -123,7 +125,7 @@ public class AddressTypeSelectionMenu extends AbstractMenu {
                         );
                     })
                     .text("Address")
-                    .itemLeft(Item.create(Material.NAME_TAG, "§6§lChange Address"))
+                    .itemLeft(Item.create(XMaterial.NAME_TAG.parseMaterial(), "§6§lChange Address"))
                     .title("§8Enter the address")
                     .plugin(BuildTeamTools.getInstance())
                     .open(clickPlayer);
@@ -133,7 +135,7 @@ public class AddressTypeSelectionMenu extends AbstractMenu {
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-                .item(Item.create(Material.STAINED_GLASS_PANE, " ", (short) 15, null))
+                .item(MenuItems.ITEM_BACKGROUND)
                 .pattern("000000000")
                 .pattern("000000000")
                 .pattern("000000000")

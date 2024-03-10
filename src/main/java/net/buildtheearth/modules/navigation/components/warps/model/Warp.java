@@ -75,9 +75,9 @@ public class Warp {
         }
 
         if(material == null)
-            return  MenuItems.getLetterHead(
+            return  CustomHeads.getLetterHead(
                     name.substring(0, 1),
-                    MenuItems.LetterType.STONE,
+                    CustomHeads.LetterType.STONE,
                     itemName,
                     lore
             );
@@ -87,9 +87,9 @@ public class Warp {
         Material material = Material.matchMaterial(this.material.split(":")[0]);
 
         if(material == null)
-            return MenuItems.getLetterHead(
+            return CustomHeads.getLetterHead(
                     name.substring(0, 1),
-                    MenuItems.LetterType.STONE,
+                    CustomHeads.LetterType.STONE,
                     itemName,
                     lore
             );

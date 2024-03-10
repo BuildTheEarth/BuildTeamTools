@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.generator.model;
 
+import com.fastasyncworldedit.core.FaweAPI;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
@@ -39,27 +40,43 @@ public class GeneratorCollections {
     public static boolean checkIfGeneratorCollectionsIsInstalled(@Nullable Player p){
         // Load the schematic file
         try {
+            String folder;
+            if(CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled())
+                folder = "/../FastAsyncWorldEdit/schematics/";
+            else if(CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled())
+                folder = "/../WorldEdit/schematics/";
+            else
+                return false;
+
             String filepath = "GeneratorCollections/treepack/oak41.schematic";
-            File myFile = new File(BuildTeamTools.getInstance().getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/" + filepath);
+            File myFile = new File(BuildTeamTools.getInstance().getDataFolder().getAbsolutePath() + folder + filepath);
 
             if(!myFile.exists())
                 return installGeneratorCollections(p, false);
 
-            ClipboardFormat format = ClipboardFormat.findByFile(myFile);
-
-            ClipboardReader reader = null;
-            if (format != null)
-                reader = format.getReader(Files.newInputStream(myFile.toPath()));
-
-            BukkitWorld bukkitWorld;
-            if(p != null)
-                bukkitWorld = new BukkitWorld(p.getWorld());
-            else
-                bukkitWorld = new BukkitWorld(Bukkit.getWorlds().get(0));
-
+            // Load the clipboard with FAWE or WorldEdit
             Clipboard clipboard = null;
-            if (reader != null)
-                clipboard = reader.read(bukkitWorld.getWorldData());
+            if(CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled()) {
+                clipboard = FaweAPI.load(myFile);
+
+            }else if(CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled()) {
+                ClipboardFormat format = ClipboardFormat.findByFile(myFile);
+
+                ClipboardReader reader = null;
+                if (format != null)
+                    reader = format.getReader(Files.newInputStream(myFile.toPath()));
+
+                BukkitWorld bukkitWorld;
+                if(p != null)
+                    bukkitWorld = new BukkitWorld(p.getWorld());
+                else
+                    bukkitWorld = new BukkitWorld(Bukkit.getWorlds().get(0));
+
+
+                if (reader != null)
+                    clipboard = reader.read(bukkitWorld.getWorldData());
+            }else
+                return false;
 
 
             if(clipboard == null)
@@ -128,9 +145,12 @@ public class GeneratorCollections {
         URL url = new URL(parentURL + filename);
 
         File file = new File(path);
-        if(!file.exists())
-            file.mkdir();
+        if(!file.exists()) {
+            boolean created = file.mkdir();
 
+            if(!created)
+                return false;
+        }
         // Open a connection to the URL
         HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
         httpConn.setRequestProperty("User-Agent", "Mozilla/5.0");
@@ -262,9 +282,16 @@ public class GeneratorCollections {
     private static boolean checkIfGeneratorCollectionsIsUpToDate(Player p){
         // Load the schematic file
         try {
-            String filepath = "GeneratorCollections/";
+            String folder;
+            if(CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled())
+                folder = "/../FastAsyncWorldEdit/schematics/";
+            else if(CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled())
+                folder = "/../WorldEdit/schematics/";
+            else
+                return false;
 
-            FileConfiguration cfg = YamlConfiguration.loadConfiguration(new File(BuildTeamTools.getInstance().getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/" + filepath, "config.yml"));
+            String filepath = "GeneratorCollections/";
+            FileConfiguration cfg = YamlConfiguration.loadConfiguration(new File(BuildTeamTools.getInstance().getDataFolder().getAbsolutePath() + folder + filepath, "config.yml"));
 
             if(!cfg.contains("version"))
                 return installGeneratorCollections(p, true);
@@ -307,7 +334,14 @@ public class GeneratorCollections {
         String parentURL = "https://github.com/BuildTheEarth/GeneratorCollections/releases/latest/download/";
         String filename = "GeneratorCollections.zip";
         String fileDirectory = "GeneratorCollections/";
-        String path = "/../WorldEdit/schematics/";
+
+        String path;
+        if(CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled())
+            path = "/../FastAsyncWorldEdit/schematics/";
+        else if(CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled())
+            path = "/../WorldEdit/schematics/";
+        else
+            return false;
 
         if(update) {
             ChatHelper.logPlayerAndConsole(p, "§cThe Generator Collections package is outdated. Updating...", Level.INFO);

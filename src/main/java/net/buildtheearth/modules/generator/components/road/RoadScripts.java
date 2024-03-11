@@ -1,8 +1,6 @@
 package net.buildtheearth.modules.generator.components.road;
 
 
-import com.sk89q.worldedit.BlockVector2D;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.model.Command;
@@ -16,6 +14,7 @@ import com.sk89q.worldedit.regions.Region;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,28 +60,7 @@ public class RoadScripts {
         int road_height = region.getHeight();
 
         // Get the points of the region
-        List<Vector> points = new ArrayList<>();
-
-        // Add all points of the region to the list no matter what type of region it is
-        if (region instanceof Polygonal2DRegion) {
-            Polygonal2DRegion polyRegion = (Polygonal2DRegion) region;
-
-            for (BlockVector2D blockVector2D : polyRegion.getPoints())
-                points.add(blockVector2D.toVector());
-
-        } else if (region instanceof ConvexPolyhedralRegion) {
-            ConvexPolyhedralRegion convexRegion = (ConvexPolyhedralRegion) region;
-            points.addAll(convexRegion.getVertices());
-
-        }else if (region instanceof CuboidRegion) {
-            CuboidRegion cuboidRegion = (CuboidRegion) region;
-
-            points.add(cuboidRegion.getPos1());
-            points.add(cuboidRegion.getPos2());
-        } else {
-            p.sendMessage("§c§lERROR: §cRegion type not supported!");
-            return;
-        }
+        List<Vector> points = GeneratorUtils.getSelectionPointsFromRegion(region);
 
         points = GeneratorUtils.populatePoints(points, laneWidth);
 
@@ -472,9 +450,12 @@ public class RoadScripts {
         // Depending on the selection type, the selection needs to be restored correctly
         if(region instanceof Polygonal2DRegion || region instanceof ConvexPolyhedralRegion)
             GeneratorUtils.createConvexSelection(commands, points);
-        else if(region instanceof CuboidRegion)
-            GeneratorUtils.createCuboidSelection(commands, ((CuboidRegion) region).getPos1(), ((CuboidRegion) region).getPos2());
-
+        else if(region instanceof CuboidRegion){
+            CuboidRegion cuboidRegion = (CuboidRegion) region;
+            Vector pos1 = new Vector(cuboidRegion.getPos1().getX(), cuboidRegion.getPos1().getY(), cuboidRegion.getPos1().getZ());
+            Vector pos2 = new Vector(cuboidRegion.getPos2().getX(), cuboidRegion.getPos2().getY(), cuboidRegion.getPos2().getZ());
+            GeneratorUtils.createCuboidSelection(commands, pos1, pos2);
+        }
 
         GeneratorModule.getInstance().getGeneratorCommands().add(new Command(p, road, commands, operations, regionBlocks));
         GeneratorModule.getInstance().getPlayerHistory(p).addHistoryEntry(new History.HistoryEntry(GeneratorType.ROAD, operations));

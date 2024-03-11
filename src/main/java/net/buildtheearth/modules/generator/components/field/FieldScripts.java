@@ -1,7 +1,5 @@
 package net.buildtheearth.modules.generator.components.field;
 
-import com.sk89q.worldedit.BlockVector2D;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
@@ -15,6 +13,7 @@ import net.buildtheearth.modules.generator.model.History;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,35 +32,13 @@ public class FieldScripts {
         String fence = flags.get(FieldFlag.FENCE);
 
         // Information for later restoring original selection
-        List<Vector> points = new ArrayList<>();
-
-        Vector minPoint = region.getMinimumPoint();
-        Vector maxPoint = region.getMaximumPoint();
+        List<Vector> points = GeneratorUtils.getSelectionPointsFromRegion(region);
 
         float yaw = p.getLocation().getYaw();
         if(yaw < 0) yaw += 360;
         if(yaw > 360) yaw -= 360;
 
-        // Add all points of the region to the list no matter what type of region it is
-        if (region instanceof Polygonal2DRegion) {
-            Polygonal2DRegion polyRegion = (Polygonal2DRegion) region;
 
-            for (BlockVector2D blockVector2D : polyRegion.getPoints())
-                points.add(blockVector2D.toVector());
-
-        } else if (region instanceof ConvexPolyhedralRegion) {
-            ConvexPolyhedralRegion convexRegion = (ConvexPolyhedralRegion) region;
-            points.addAll(convexRegion.getVertices());
-
-        } else if (region instanceof CuboidRegion) {
-            CuboidRegion cuboidRegion = (CuboidRegion) region;
-
-            points.add(cuboidRegion.getMinimumPoint());
-            points.add(cuboidRegion.getMaximumPoint());
-        } else {
-            p.sendMessage("§c§lERROR: §cRegion type not supported!");
-            return;
-        }
 
         // ----------- FIELD GENERATOR SCRIPT ----------
         // Used to generate fields
@@ -75,7 +52,10 @@ public class FieldScripts {
         // Preparing the field area
 
         // Create a cuboid selection of the field area
-        GeneratorUtils.createCuboidSelection(p, maxPoint, minPoint);
+        GeneratorUtils.createCuboidSelection(p,
+                new Vector(region.getMinimumPoint().getX(), region.getMinimumPoint().getY(), region.getMinimumPoint().getZ()),
+                new Vector(region.getMaximumPoint().getX(), region.getMaximumPoint().getY(), region.getMaximumPoint().getZ())
+        );
 
         p.chat("//expand 20 20 up");
         p.chat("//expand 10 10 north");
@@ -384,8 +364,12 @@ public class FieldScripts {
         // Depending on the selection type, the selection needs to be recreated
         if(region instanceof Polygonal2DRegion || region instanceof ConvexPolyhedralRegion)
             GeneratorUtils.createPolySelection(commands, points);
-        else if(region instanceof CuboidRegion)
-            GeneratorUtils.createCuboidSelection(commands, maxPoint, minPoint);
+        else if(region instanceof CuboidRegion){
+            CuboidRegion cuboidRegion = (CuboidRegion) region;
+            Vector pos1 = new Vector(cuboidRegion.getPos1().getX(), cuboidRegion.getPos1().getY(), cuboidRegion.getPos1().getZ());
+            Vector pos2 = new Vector(cuboidRegion.getPos2().getX(), cuboidRegion.getPos2().getY(), cuboidRegion.getPos2().getZ());
+            GeneratorUtils.createCuboidSelection(commands, pos1, pos2);
+        }
 
         GeneratorModule.getInstance().getGeneratorCommands().add(new Command(p, field, commands, operations, blocks));
         GeneratorModule.getInstance().getPlayerHistory(p).addHistoryEntry(new History.HistoryEntry(GeneratorType.FIELD, operations));

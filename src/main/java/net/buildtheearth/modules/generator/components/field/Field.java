@@ -1,7 +1,6 @@
 package net.buildtheearth.modules.generator.components.field;
 
 import com.sk89q.worldedit.regions.Region;
-import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.modules.generator.model.GeneratorType;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
@@ -15,7 +14,7 @@ public class Field extends GeneratorComponent {
     }
 
     @Override
-    public boolean checkForNoPlayer(Player p) {
+    public boolean checkForPlayer(Player p) {
         if (GeneratorUtils.checkForNoWorldEditSelection(p)) {
             return true;
         }
@@ -28,7 +27,7 @@ public class Field extends GeneratorComponent {
 
     @Override
     public void generate(Player p) {
-        if (checkForNoPlayer(p))
+        if (!checkForPlayer(p))
             return;
 
         Region region = GeneratorUtils.getWorldEditSelection(p);

@@ -38,9 +38,9 @@ public class RoofTypeMenu extends AbstractMenu {
 
         ItemStack flatRoofItem = Item.create(XMaterial.WHITE_CARPET.parseMaterial(), "§bFlat Roof", ListUtil.createList("", "§eDescription:", "A flat roof for", "skyscrapers using carpets", "or slabs"));
         ItemStack gableRoofItem = Item.create(XMaterial.COBBLESTONE_STAIRS.parseMaterial(), "§bGable Roof", ListUtil.createList("", "§eDescription:", "A gable roof for", "residential houses using stairs"));
-        ItemStack steepSlabRoofItem = Item.create(XMaterial.OAK_STAIRS.parseMaterial(), "§bSteep Slab Roof", ListUtil.createList("", "§eDescription:", "A gable roof for", "residential houses using the", "steepest way you can", "create a roof with slabs"));
-        ItemStack mediumSlabRoofItem = Item.create(XMaterial.OAK_STAIRS.parseMaterial(), "§bMedium Steep Slab Roof", ListUtil.createList("", "§eDescription:", "A gable roof for", "residential houses by creating", "a medium steep roof with slabs"));
-        ItemStack flatterSlabRoofItem = Item.create(XMaterial.OAK_STAIRS.parseMaterial(), "§bFlatter Slab Roof", ListUtil.createList("", "§eDescription:", "A flat gable roof for", "residential houses by creating", "a very flat roof with slabs"));
+        ItemStack steepSlabRoofItem = Item.create(XMaterial.COBBLESTONE_SLAB.parseMaterial(), "§bSteep Slab Roof", ListUtil.createList("", "§eDescription:", "A gable roof for", "residential houses using the", "steepest way you can", "create a roof with slabs"));
+        ItemStack mediumSlabRoofItem = Item.create(XMaterial.COBBLESTONE_SLAB.parseMaterial(), "§bMedium Steep Slab Roof", ListUtil.createList("", "§eDescription:", "A gable roof for", "residential houses by creating", "a medium steep roof with slabs"));
+        ItemStack flatterSlabRoofItem = Item.create(XMaterial.COBBLESTONE_SLAB.parseMaterial(), "§bFlatter Slab Roof", ListUtil.createList("", "§eDescription:", "A flat gable roof for", "residential houses by creating", "a very flat roof with slabs"));
 
         // Set items
         getMenu().getSlot(FLAT_ROOF_ITEM_SLOT).setItem(flatRoofItem);

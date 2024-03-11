@@ -32,7 +32,7 @@ public abstract class GeneratorComponent extends Component {
         generatorType = type;
     }
 
-    public abstract boolean checkForNoPlayer(Player p);
+    public abstract boolean checkForPlayer(Player p);
     public abstract void generate(Player p);
 
 

@@ -16,7 +16,7 @@ public class SidewalkColorMenu extends BlockListMenu {
 
 
     public SidewalkColorMenu(Player player, boolean autoLoad) {
-        super(player, ROAD_COLOR_INV_NAME, MenuItems.getBlocksByColor(), new RoadColorMenu(player, false), autoLoad);
+        super(player, ROAD_COLOR_INV_NAME, MenuItems.getSolidBlocks(), new RoadColorMenu(player, false), autoLoad);
     }
 
     @Override

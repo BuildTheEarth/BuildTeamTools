@@ -2,10 +2,8 @@ package net.buildtheearth.modules.generator.components.house;
 
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.modules.generator.model.Settings;
-import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.Utils;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -22,22 +20,23 @@ public class HouseSettings extends Settings {
         getValues().put(HouseFlag.ROOF_TYPE, roofType.getType());
 
         // Wall Color (Default: Random)
-        ItemStack block = (ItemStack) Utils.pickRandom(MenuItems.WALL_BLOCKS);
+        ItemStack block = (ItemStack) Utils.pickRandom(MenuItems.getSolidBlocks().toArray());
         getValues().put(HouseFlag.WALL_COLOR, XMaterial.matchXMaterial(block).getId() + "");
 
         // Wall Color (Default: Random)
-        block = (ItemStack) Utils.pickRandom(MenuItems.WALL_BLOCKS);
+        block = (ItemStack) Utils.pickRandom(MenuItems.getSolidBlocks().toArray());
         getValues().put(HouseFlag.BASE_COLOR, XMaterial.matchXMaterial(block).getId() + "");
 
         // Roof Color (Default: Random)
-        block = (ItemStack) Utils.pickRandom(MenuItems.STAIRS);
+        block = (ItemStack) Utils.pickRandom(MenuItems.getStairs().toArray());
 
         if( getValues().get(HouseFlag.ROOF_TYPE).equalsIgnoreCase(RoofType.FLATTER_SLABS.getType()) ||
             getValues().get(HouseFlag.ROOF_TYPE).equalsIgnoreCase(RoofType.MEDIUM_SLABS.getType()) ||
             getValues().get(HouseFlag.ROOF_TYPE).equalsIgnoreCase(RoofType.STEEP_SLABS.getType()))
-            block = (ItemStack) Utils.pickRandom(MenuItems.SLABS);
+            block = (ItemStack) Utils.pickRandom(MenuItems.getSlabs().toArray());
+
         else if(getValues().get(HouseFlag.ROOF_TYPE).equalsIgnoreCase(RoofType.FLAT.getType()))
-            block = (ItemStack) Utils.pickRandom(MenuItems.SLABS);
+            block = (ItemStack) Utils.pickRandom(MenuItems.getSlabs().toArray());
 
         getValues().put(HouseFlag.ROOF_COLOR, XMaterial.matchXMaterial(block).getId() + "");
 

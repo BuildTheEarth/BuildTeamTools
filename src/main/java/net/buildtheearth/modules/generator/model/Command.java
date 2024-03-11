@@ -14,6 +14,8 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 import lombok.Getter;
 import net.buildtheearth.BuildTeamTools;
+import net.buildtheearth.modules.common.CommonModule;
+import net.buildtheearth.modules.common.components.dependency.DependencyComponent;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
@@ -132,11 +134,6 @@ public class Command {
     }
 
     public void pasteSchematic(String command) {
-        WorldEditPlugin worldEditPlugin = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
-        if (worldEditPlugin == null) {
-            throw new IllegalStateException("WorldEdit is not installed or not loaded properly.");
-        }
-
         String schematic = command.split("%%SCHEMATIC/")[1].split("/%%")[0];
 
         String[] schematicSplit = schematic.split(",");
@@ -155,43 +152,46 @@ public class Command {
         if(maxHeight == 0)
             maxHeight = y;
 
-        Vector vector = new Vector(x, maxHeight + offsetY, z);
 
-        World weWorld = new BukkitWorld(world);
-        com.sk89q.worldedit.entity.Player wePlayer = worldEditPlugin.wrapPlayer(player);
 
-        LocalSession localSession = WorldEdit.getInstance().getSessionManager().get(wePlayer);
-        EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(weWorld, -1, wePlayer);
-        File schematicFile = new File(BuildTeamTools.getInstance().getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/" + schematicPath);
+        if(CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled()) {
+            WorldEditPlugin worldEditPlugin = (WorldEditPlugin) Bukkit.getPluginManager().getPlugin("WorldEdit");
+            World weWorld = new BukkitWorld(world);
+            com.sk89q.worldedit.entity.Player wePlayer = worldEditPlugin.wrapPlayer(player);
 
-        ClipboardFormat format = ClipboardFormat.findByFile(schematicFile);
-        ClipboardReader reader;
+            LocalSession localSession = WorldEdit.getInstance().getSessionManager().get(wePlayer);
+            EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(weWorld, -1, wePlayer);
+            File schematicFile = new File(BuildTeamTools.getInstance().getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/" + schematicPath);
 
-        try {
-            reader = format.getReader(new FileInputStream(schematicFile));
-            Clipboard clipboard = reader.read(weWorld.getWorldData());
+            ClipboardFormat format = ClipboardFormat.findByFile(schematicFile);
+            ClipboardReader reader;
 
-            AffineTransform transform = new AffineTransform();
-            transform = transform.rotateY(rotation);
+            try {
+                reader = format.getReader(new FileInputStream(schematicFile));
+                Clipboard clipboard = reader.read(weWorld.getWorldData());
 
-            ClipboardHolder holder = new ClipboardHolder(clipboard, weWorld.getWorldData());
-            holder.setTransform(transform);
+                AffineTransform transform = new AffineTransform();
+                transform = transform.rotateY(rotation);
 
-            Operation operation = holder
-                    .createPaste(editSession, weWorld.getWorldData())
-                    .to(vector)
-                    .ignoreAirBlocks(true)
-                    .build();
-            Operations.complete(operation);
+                ClipboardHolder holder = new ClipboardHolder(clipboard, weWorld.getWorldData());
+                holder.setTransform(transform);
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (WorldEditException e) {
-            throw new RuntimeException(e);
+                Operation operation = holder
+                        .createPaste(editSession, weWorld.getWorldData())
+                        .to(new Vector(x, maxHeight + offsetY, z))
+                        .ignoreAirBlocks(true)
+                        .build();
+                Operations.complete(operation);
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (WorldEditException e) {
+                throw new RuntimeException(e);
+            }
+
+            localSession.remember(editSession);
+            editSession.flushQueue();
         }
-
-        localSession.remember(editSession);
-        editSession.flushQueue();
     }
 
 

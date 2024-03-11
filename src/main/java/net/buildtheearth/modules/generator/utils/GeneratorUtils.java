@@ -8,34 +8,96 @@ import clipper2.offset.EndType;
 import clipper2.offset.JoinType;
 import com.cryptomorin.xseries.XMaterial;
 import com.sk89q.worldedit.IncompleteRegionException;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.GeneratorModule;
-import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.MenuItems;
 import org.apache.commons.lang3.StringUtils;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
 
 /** This class contains static utility methods for the generator module.
  *
  * @author MineFact
  */
 public class GeneratorUtils {
+
+
+    public static List<Vector> getSelectionPointsFromRegion(Region region) {
+        List<Vector> points = new ArrayList<>();
+
+        if (region instanceof Polygonal2DRegion) {
+            Polygonal2DRegion polyRegion = (Polygonal2DRegion) region;
+
+            // In latest FAWE, the points are stored as BlockVector2
+            // In 1.12 WorldEdit, the points are stored as BlockVector2D
+            // Both classes have the same methods, so we can use reflection to get the methods
+            for (Object blockVectorObj : polyRegion.getPoints()) {
+                try {
+                    Class<?> blockVectorClass = blockVectorObj.getClass();
+                    Method getXMethod = blockVectorClass.getMethod("getBlockX");
+                    Method getZMethod = blockVectorClass.getMethod("getBlockZ");
+
+                    double x = (Double) getXMethod.invoke(blockVectorObj);
+                    double z = (Double) getZMethod.invoke(blockVectorObj);
+
+                    points.add(new Vector(x, 0, z));
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        } else if (region instanceof ConvexPolyhedralRegion) {
+            ConvexPolyhedralRegion convexRegion = (ConvexPolyhedralRegion) region;
+
+            // In latest FAWE, the points are stored as BlockVector2
+            // In 1.12 WorldEdit, the points are stored as BlockVector2D
+            // Both classes have the same methods, so we can use reflection to get the methods
+            for (Object blockVectorObj : convexRegion.getVertices()) {
+                try {
+                    Class<?> blockVectorClass = blockVectorObj.getClass();
+                    Method getXMethod = blockVectorClass.getMethod("getBlockX");
+                    Method getYMethod = blockVectorClass.getMethod("getBlockY");
+                    Method getZMethod = blockVectorClass.getMethod("getBlockZ");
+
+                    double x = (Double) getXMethod.invoke(blockVectorObj);
+                    double y = (Double) getYMethod.invoke(blockVectorObj);
+                    double z = (Double) getZMethod.invoke(blockVectorObj);
+
+                    points.add(new Vector(x, y, z));
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }else if (region instanceof CuboidRegion) {
+            CuboidRegion cuboidRegion = (CuboidRegion) region;
+
+            points.add(new Vector(cuboidRegion.getPos1().getX(), cuboidRegion.getPos1().getY(), cuboidRegion.getPos1().getZ()));
+            points.add(new Vector(cuboidRegion.getPos2().getX(), cuboidRegion.getPos2().getY(), cuboidRegion.getPos2().getZ()));
+        } else
+            return null;
+
+        return points;
+    }
 
     /**
      * Converts a String[] of arguments to a String[] of flags.
@@ -88,15 +150,64 @@ public class GeneratorUtils {
 
         Block[][][] blocks = new Block[polyRegion.getWidth()][polyRegion.getHeight()][polyRegion.getLength()];
 
-        for (int i = polyRegion.getMinimumPoint().getBlockX(); i <= polyRegion.getMaximumPoint().getBlockX(); i++)
-            for (int j = polyRegion.getMinimumPoint().getBlockY(); j <= polyRegion.getMaximumPoint().getBlockY(); j++)
-                for (int k = polyRegion.getMinimumPoint().getBlockZ(); k <= polyRegion.getMaximumPoint().getBlockZ(); k++)
-                    if (polyRegion.contains(new Vector(i, j, k))) {
-                        Block block = world.getBlockAt(i, j, k);
-                        blocks[i - polyRegion.getMinimumPoint().getBlockX()][j - polyRegion.getMinimumPoint().getBlockY()][k - polyRegion.getMinimumPoint().getBlockZ()] = block;
+        try {
+            Class<?> regionClass = polyRegion.getClass();
+
+            // Reflectively access the minimum and maximum points
+            Method getMinimumPoint = regionClass.getMethod("getMinimumPoint");
+            Method getMaximumPoint = regionClass.getMethod("getMaximumPoint");
+            Method contains = regionClass.getMethod("contains", Object.class);
+
+            Object minPoint = getMinimumPoint.invoke(polyRegion);
+            Object maxPoint = getMaximumPoint.invoke(polyRegion);
+
+            Class<?> vectorClass = minPoint.getClass();
+
+            // Assume getBlockX/Y/Z methods exist in both Vector and BlockVector3
+            Method getBlockX = vectorClass.getMethod("getBlockX");
+            Method getBlockY = vectorClass.getMethod("getBlockY");
+            Method getBlockZ = vectorClass.getMethod("getBlockZ");
+
+            int minX = (Integer) getBlockX.invoke(minPoint);
+            int minY = (Integer) getBlockY.invoke(minPoint);
+            int minZ = (Integer) getBlockZ.invoke(minPoint);
+            int maxX = (Integer) getBlockX.invoke(maxPoint);
+            int maxY = (Integer) getBlockY.invoke(maxPoint);
+            int maxZ = (Integer) getBlockZ.invoke(maxPoint);
+
+            for (int i = minX; i <= maxX; i++)
+                for (int j = minY; j <= maxY; j++)
+                    for (int k = minZ; k <= maxZ; k++) {
+                        // Dynamically create vector instance to use in contains method
+                        Object vectorInstance;
+
+                        // First, try using BlockVector3.at(int, int, int) - common in FAWE and newer WorldEdit
+                        try {
+                            Class<?> blockVector3Class = Class.forName("com.sk89q.worldedit.math.BlockVector3");
+                            Method atMethod = blockVector3Class.getMethod("at", int.class, int.class, int.class);
+                            vectorInstance = atMethod.invoke(null, i, j, k);
+                        } catch (ClassNotFoundException | NoSuchMethodException e) {
+
+                            // If BlockVector3 or at method is not found, fallback to WorldEdit's Vector
+                            vectorInstance = vectorClass.getConstructor(int.class, int.class, int.class).newInstance(i, j, k);
+                        }
+
+                        if(vectorInstance != null) {
+                            boolean regionContains = (Boolean) contains.invoke(polyRegion, vectorInstance);
+
+                            if (regionContains) {
+                                Block block = world.getBlockAt(i, j, k);
+                                blocks[i - minX][j - minY][k - minZ] = block;
+                            }
+                        }
                     }
 
-        return blocks;
+
+            return blocks;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
@@ -160,12 +271,13 @@ public class GeneratorUtils {
         for (Block[][] block2D : blocks)
             for (Block[] block1D : block2D)
                 for (Block block : block1D)
-                    if(CommonModule.getInstance().getVersionComponent().is_1_12())
+                    if (CommonModule.getInstance().getVersionComponent().is_1_12()) {
                         if (block != null && block.getType() == xMaterial.parseMaterial() && block.getData() == xMaterial.getData())
                             amountFound++;
-                    else
+                    }else {
                         if (block != null && block.getType() == xMaterial.parseMaterial())
                             amountFound++;
+                    }
 
         return amountFound >= requiredAmount;
     }
@@ -733,7 +845,7 @@ public class GeneratorUtils {
      * @return Whether the player has a brick block in their selection
      */
     public static boolean checkForBrickOutline(Block[][][] blocks, Player p){
-        if(!containsBlock(blocks, XMaterial.BRICK)){
+        if(!containsBlock(blocks, XMaterial.BRICKS)){
             p.sendMessage("§cPlease make a selection around an outline.");
             p.closeInventory();
             p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
@@ -741,6 +853,7 @@ public class GeneratorUtils {
 
             return false;
         }
+
         return true;
     }
 

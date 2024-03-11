@@ -90,7 +90,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
         setSliderClickEvents(RoadFlag.SIDEWALK_WIDTH, SIDEWALK_WIDTH_SLOT, 1, 30);
         setSliderClickEvents(RoadFlag.STREET_LAMP_TYPE, STREET_LAMP_TYPE_SLOT, 5, 500);
 
-        setChoiceClickEvents(RoadFlag.MARKING_MATERIAL, MARKINGS_MATERIAL_SLOT, "Choose a Line Marking Block", MenuItems.getBlocksByColor());
+        setChoiceClickEvents(RoadFlag.MARKING_MATERIAL, MARKINGS_MATERIAL_SLOT, "Choose a Line Marking Block", MenuItems.getSolidBlocks());
         setChoiceClickEvents(RoadFlag.ROAD_SLAB_COLOR, ROAD_SLAB_SLOT, "Choose a Road Elevation Slab", MenuItems.getSlabs());
         setChoiceClickEvents(RoadFlag.SIDEWALK_SLAB_COLOR, SIDEWALK_SLAB_SLOT, "Choose a Sidewalk Elevation Slab", MenuItems.getSlabs());
         setChoiceClickEvents(RoadFlag.STREET_LAMP_TYPE, STREET_LAMP_TYPE_SLOT, "Choose a Street Lamp Type", streetLampTypes);

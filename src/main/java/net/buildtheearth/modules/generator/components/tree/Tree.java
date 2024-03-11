@@ -19,7 +19,7 @@ public class Tree extends GeneratorComponent {
     }
 
     @Override
-    public boolean checkForNoPlayer(Player p) {
+    public boolean checkForPlayer(Player p) {
 
         if (!GeneratorCollections.checkIfGeneratorCollectionsIsInstalled(p))
             return false;
@@ -35,7 +35,7 @@ public class Tree extends GeneratorComponent {
 
     @Override
     public void generate(Player p) {
-        if (!GeneratorModule.getInstance().getRoad().checkForNoPlayer(p))
+        if (!GeneratorModule.getInstance().getRoad().checkForPlayer(p))
             return;
 
         TreeScripts.treescript_v_1_0(p, this);

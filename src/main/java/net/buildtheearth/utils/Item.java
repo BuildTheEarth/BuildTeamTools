@@ -92,7 +92,7 @@ public class Item {
 	}
 
 	public ItemStack build() {
-		ItemStack item = new ItemStack(Material.BARRIER);
+		ItemStack item = XMaterial.BARRIER.parseItem();
 
 		if(this.material != null)
 			item.setType(material);

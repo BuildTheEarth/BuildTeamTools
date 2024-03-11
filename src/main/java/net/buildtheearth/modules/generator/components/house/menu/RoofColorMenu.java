@@ -65,15 +65,15 @@ public class RoofColorMenu extends BlockListMenu {
             case FLATTER_SLABS:
             case MEDIUM_SLABS:
             case STEEP_SLABS:
-                return Arrays.asList(MenuItems.SLABS);
+                return MenuItems.getSlabs();
 
             case STAIRS:
-                return Arrays.asList(MenuItems.STAIRS);
+                return MenuItems.getStairs();
 
             case FLAT:
                 ArrayList<ItemStack> items = new ArrayList<>();
-                items.addAll(Arrays.asList(MenuItems.CARPETS));
-                items.addAll(Arrays.asList(MenuItems.SLABS));
+                items.addAll(MenuItems.getCarpets());
+                items.addAll(MenuItems.getSlabs());
 
                 return items;
 

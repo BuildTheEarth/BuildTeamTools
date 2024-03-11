@@ -25,7 +25,6 @@ import net.buildtheearth.utils.ListUtil;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.AbstractMenu;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -188,7 +187,7 @@ public class GeneratorMenu extends AbstractMenu {
             House house = GeneratorModule.getInstance().getHouse();
             house.getPlayerSettings().put(clickPlayer.getUniqueId(), new HouseSettings(clickPlayer));
 
-            if(house.checkForNoPlayer(clickPlayer))
+            if(!house.checkForPlayer(clickPlayer))
                 return;
 
             clickPlayer.closeInventory();
@@ -206,7 +205,7 @@ public class GeneratorMenu extends AbstractMenu {
             Road road = GeneratorModule.getInstance().getRoad();
             road.getPlayerSettings().put(clickPlayer.getUniqueId(), new RoadSettings(clickPlayer));
 
-            if(road.checkForNoPlayer(clickPlayer))
+            if(!road.checkForPlayer(clickPlayer))
                 return;
 
             clickPlayer.closeInventory();
@@ -224,7 +223,7 @@ public class GeneratorMenu extends AbstractMenu {
             Rail rail = GeneratorModule.getInstance().getRail();
             rail.getPlayerSettings().put(clickPlayer.getUniqueId(), new RailSettings(clickPlayer));
 
-            if(rail.checkForNoPlayer(clickPlayer))
+            if(!rail.checkForPlayer(clickPlayer))
                 return;
 
             clickPlayer.closeInventory();
@@ -243,7 +242,7 @@ public class GeneratorMenu extends AbstractMenu {
             Tree tree = GeneratorModule.getInstance().getTree();
             tree.getPlayerSettings().put(clickPlayer.getUniqueId(), new TreeSettings(clickPlayer));
 
-            if(tree.checkForNoPlayer(clickPlayer))
+            if(!tree.checkForPlayer(clickPlayer))
                 return;
 
             clickPlayer.closeInventory();
@@ -261,7 +260,7 @@ public class GeneratorMenu extends AbstractMenu {
             Field field = GeneratorModule.getInstance().getField();
             field.getPlayerSettings().put(clickPlayer.getUniqueId(), new FieldSettings(clickPlayer));
 
-            if(field.checkForNoPlayer(clickPlayer))
+            if(!field.checkForPlayer(clickPlayer))
                 return;
 
             clickPlayer.closeInventory();

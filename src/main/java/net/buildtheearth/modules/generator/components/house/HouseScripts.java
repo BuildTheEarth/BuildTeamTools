@@ -1,8 +1,8 @@
 package net.buildtheearth.modules.generator.components.house;
 
 import com.cryptomorin.xseries.XMaterial;
-import com.sk89q.worldedit.BlockVector2D;
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
@@ -17,6 +17,7 @@ import net.buildtheearth.utils.MenuItems;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,35 +45,9 @@ public class HouseScripts {
         int windowDistance = Integer.parseInt(flags.get(HouseFlag.WINDOW_DISTANCE));
         int maxRoofHeight = Integer.parseInt(flags.get(HouseFlag.MAX_ROOF_HEIGHT));
 
-        List<BlockVector2D> selectionPoints = new ArrayList<>();
+        List<Vector> selectionPoints = GeneratorUtils.getSelectionPointsFromRegion(region);
         int minY = region.getMinimumPoint().getBlockY();
         int maxY = region.getMaximumPoint().getBlockY();
-
-
-        if(region instanceof Polygonal2DRegion){
-            Polygonal2DRegion polyRegion = (Polygonal2DRegion) region;
-            selectionPoints.addAll(polyRegion.getPoints());
-
-        } else if (region instanceof ConvexPolyhedralRegion) {
-            ConvexPolyhedralRegion convexRegion = (ConvexPolyhedralRegion) region;
-
-            for (Vector vector : convexRegion.getVertices())
-                selectionPoints.add(new BlockVector2D(vector.getBlockX(), vector.getBlockZ()));
-
-        }else if(region instanceof CuboidRegion){
-            CuboidRegion cuboidRegion = (CuboidRegion) region;
-            Vector min = cuboidRegion.getMinimumPoint();
-            Vector max = cuboidRegion.getMaximumPoint();
-
-            selectionPoints.add(new BlockVector2D(min.getBlockX(), min.getBlockZ()));
-            selectionPoints.add(new BlockVector2D(max.getBlockX(), max.getBlockZ()));
-        }else{
-            p.sendMessage("§c§lERROR: §cRegion type not supported!");
-            return;
-        }
-
-
-
 
         int operations = 0;
         p.chat("/clearhistory");

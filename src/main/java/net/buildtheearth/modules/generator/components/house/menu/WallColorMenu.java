@@ -16,7 +16,7 @@ public class WallColorMenu extends BlockListMenu {
     public static final String WALL_COLOR_INV_NAME = "Choose a Wall Block";
 
     public WallColorMenu(Player player, boolean autoLoad) {
-        super(player, WALL_COLOR_INV_NAME, MenuItems.getBlocksByColor(), new GeneratorMenu(player, false), autoLoad);
+        super(player, WALL_COLOR_INV_NAME, MenuItems.getWallBlocks(), new GeneratorMenu(player, false), autoLoad);
     }
 
     @Override

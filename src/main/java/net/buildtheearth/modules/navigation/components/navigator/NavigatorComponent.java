@@ -1,6 +1,7 @@
 package net.buildtheearth.modules.navigation.components.navigator;
 
 import com.cryptomorin.xseries.XMaterial;
+import com.fastasyncworldedit.core.FaweAPI;
 import com.sk89q.worldedit.WorldEdit;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.Component;
@@ -12,6 +13,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+
+import java.lang.reflect.Field;
 
 public class NavigatorComponent extends Component {
 
@@ -29,12 +32,25 @@ public class NavigatorComponent extends Component {
 
 
     private void disableWorldEditNavigationWand(){
-        // Check if WorldEdit is enabled
-        if (!CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled())
-            return;
+        try {
+            Object config = WorldEdit.getInstance().getConfiguration();
 
-        // Set the navigation wand to nether star
-        WorldEdit.getInstance().getConfiguration().navigationWand = 399;
+            // Check which version of WorldEdit or FastAsyncWorldEdit is being used
+            if (CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled()) {
+
+                // For FastAsyncWorldEdit, set the navigation wand to a String
+                Field navigationWandField = config.getClass().getField("navigationWand");
+                navigationWandField.set(config, "minecraft:nether_star");
+
+            } else if (CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled()) {
+
+                // For WorldEdit, set the navigation wand to an integer
+                Field navigationWandField = config.getClass().getField("navigationWand");
+                navigationWandField.set(config, 399);
+            }
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace(); // Handle the error properly
+        }
     }
 
     /*

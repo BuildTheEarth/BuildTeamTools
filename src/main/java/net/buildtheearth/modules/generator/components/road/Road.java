@@ -17,7 +17,7 @@ public class Road extends GeneratorComponent {
     }
 
     @Override
-    public boolean checkForNoPlayer(Player p) {
+    public boolean checkForPlayer(Player p) {
 
         if (GeneratorUtils.checkForNoWorldEditSelection(p))
             return false;
@@ -33,7 +33,7 @@ public class Road extends GeneratorComponent {
 
     @Override
     public void generate(Player p) {
-        if (!GeneratorModule.getInstance().getRoad().checkForNoPlayer(p))
+        if (!GeneratorModule.getInstance().getRoad().checkForPlayer(p))
             return;
 
         Region region = GeneratorUtils.getWorldEditSelection(p);

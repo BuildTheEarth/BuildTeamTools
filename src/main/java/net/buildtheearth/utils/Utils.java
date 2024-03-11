@@ -56,8 +56,12 @@ public class Utils {
     }
 
     public static Object pickRandom(Object[] array) {
+        if (array.length == 0)
+            return null;
+
         return array[(int) (Math.random() * array.length)];
     }
+
 
     /**
      * Converts the given Time to a time string

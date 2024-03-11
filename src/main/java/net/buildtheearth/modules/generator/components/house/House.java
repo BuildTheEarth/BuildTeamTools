@@ -15,7 +15,7 @@ public class House extends GeneratorComponent {
     }
 
     @Override
-    public boolean checkForNoPlayer(Player p) {
+    public boolean checkForPlayer(Player p) {
         if (GeneratorUtils.checkForNoWorldEditSelection(p))
             return false;
 
@@ -26,12 +26,13 @@ public class House extends GeneratorComponent {
 
         if (!GeneratorUtils.checkForBrickOutline(blocks, p))
             return false;
+
         return GeneratorUtils.checkForWoolBlock(blocks, p);
     }
 
     @Override
     public void generate(Player p) {
-        if (!checkForNoPlayer(p))
+        if (!checkForPlayer(p))
             return;
 
         Region polyRegion = GeneratorUtils.getWorldEditSelection(p);

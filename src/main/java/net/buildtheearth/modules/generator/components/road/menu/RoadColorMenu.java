@@ -16,7 +16,7 @@ public class RoadColorMenu extends BlockListMenu {
     public static final String ROAD_COLOR_INV_NAME = "Choose a Road Block";
 
     public RoadColorMenu(Player player, boolean autoLoad) {
-        super(player, ROAD_COLOR_INV_NAME, MenuItems.getBlocksByColor(), new GeneratorMenu(player, false), autoLoad);
+        super(player, ROAD_COLOR_INV_NAME, MenuItems.getSolidBlocks(), new GeneratorMenu(player, false), autoLoad);
     }
 
     @Override

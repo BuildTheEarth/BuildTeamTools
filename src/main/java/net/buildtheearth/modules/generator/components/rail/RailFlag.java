@@ -21,7 +21,7 @@ public enum RailFlag implements Flag {
 
     @Override
     public FlagType getFlagType() {
-        return null;
+        return flagType;
     }
 
     public static RailFlag byString(String flag){

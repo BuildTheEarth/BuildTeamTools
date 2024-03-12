@@ -2,11 +2,9 @@ package net.buildtheearth.modules.generator.components.house;
 
 import com.cryptomorin.xseries.XMaterial;
 import com.sk89q.worldedit.regions.Region;
+import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.GeneratorModule;
-import net.buildtheearth.modules.generator.model.Command;
-import net.buildtheearth.modules.generator.model.Flag;
-import net.buildtheearth.modules.generator.model.GeneratorType;
-import net.buildtheearth.modules.generator.model.History;
+import net.buildtheearth.modules.generator.model.*;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import net.buildtheearth.utils.MenuItems;
 import org.apache.commons.lang3.StringUtils;
@@ -18,11 +16,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class HouseScripts {
+public class HouseScripts extends Script {
 
-    public static void buildscript_v_1_2(Player p, House house, Region region){
-        List<String> commands = new ArrayList<>();
-        HashMap<Flag, String> flags = house.getPlayerSettings().get(p.getUniqueId()).getValues();
+    public HouseScripts(Player player, GeneratorComponent generatorComponent) {
+        super(player, generatorComponent);
+
+        buildscript_v_1_2();
+    }
+
+    public void buildscript_v_1_2(){
+        HashMap<Flag, String> flags = getGeneratorComponent().getPlayerSettings().get(getPlayer().getUniqueId()).getValues();
 
         String wallColor = flags.get(HouseFlag.WALL_COLOR);
         String roofColor = flags.get(HouseFlag.ROOF_COLOR);
@@ -40,32 +43,32 @@ public class HouseScripts {
         int windowDistance = Integer.parseInt(flags.get(HouseFlag.WINDOW_DISTANCE));
         int maxRoofHeight = Integer.parseInt(flags.get(HouseFlag.MAX_ROOF_HEIGHT));
 
-        List<Vector> selectionPoints = GeneratorUtils.getSelectionPointsFromRegion(region);
-        Vector[] minMax = GeneratorUtils.getMinMaxPoints(region);
+        List<Vector> selectionPoints = GeneratorUtils.getSelectionPointsFromRegion(getRegion());
+        Vector[] minMax = GeneratorUtils.getMinMaxPoints(getRegion());
         int minY = minMax[0].getBlockY();
         int maxY = minMax[1].getBlockY();
 
         int operations = 0;
-        p.chat("/clearhistory");
+        getPlayer().chat("/clearhistory");
 
         // Disable the current global mask
-        p.chat("//gmask");
+        getPlayer().chat("//gmask");
 
 
         // ----------- PREPARATION 01 ----------
         // Replace all non-solid blocks with air
 
-        p.chat("//expand 10 up");
-        p.chat("//expand 10 down");
+        getPlayer().chat("//expand 10 up");
+        getPlayer().chat("//expand 10 down");
 
-        p.chat("//gmask !#solid");
-        p.chat("//replace 0");
+        getPlayer().chat("//gmask !#solid");
+        getPlayer().chat("//replace 0");
         operations++;
 
-        Block[][][] blocks = GeneratorUtils.analyzeRegion(p, p.getWorld());
+        Block[][][] blocks = GeneratorUtils.analyzeRegion(getPlayer(), getPlayer().getWorld());
 
         if(blocks == null){
-            p.sendMessage("§c§lERROR: §cRegion not readable. Please report this to the developers of the BuildTeamTool plugin.");
+            getPlayer().sendMessage("§c§lERROR: §cRegion not readable. Please report this to the developers of the BuildTeamTool plugin.");
             return;
         }
 
@@ -861,12 +864,13 @@ public class HouseScripts {
         for(int i = 1; i < selectionPoints.size(); i++)
             commands.add("//pos2 " + selectionPoints.get(i).getBlockX() + "," + minY + "," + selectionPoints.get(i).getBlockZ());
 
-        GeneratorModule.getInstance().getGeneratorCommands().add(new Command(p, house, commands, operations, blocks));
-        GeneratorModule.getInstance().getPlayerHistory(p).addHistoryEntry(new History.HistoryEntry(GeneratorType.HOUSE, operations));
+
+        // Finish the script
+        finish(operations, blocks);
     }
 
     // Move blue, green and red wool one block up
-    private static int moveWoolUp(List<String> commands, int operations, int floor) {
+    private int moveWoolUp(List<String> commands, int operations, int floor) {
         commands.add("//gmask");
         commands.add("//replace >35:11 35:11");
         operations++;
@@ -886,14 +890,14 @@ public class HouseScripts {
         return operations;
     }
 
-    private static int raiseYellowWoolFloor(List<String> commands, int operations) {
+    private int raiseYellowWoolFloor(List<String> commands, int operations) {
         commands.add("//gmask");
         commands.add("//replace >35:4 35:4");
         operations++;
         return operations;
     }
 
-    private static int expandGreenWool(List<String> commands){
+    private int expandGreenWool(List<String> commands){
         int operations = 0;
 
         // Replace everything above green wool with temporary purple wool

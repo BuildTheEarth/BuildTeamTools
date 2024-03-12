@@ -6,9 +6,11 @@ import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
@@ -23,10 +25,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 
 public class Command {
@@ -163,34 +167,36 @@ public class Command {
             EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(weWorld, -1, wePlayer);
             File schematicFile = new File(BuildTeamTools.getInstance().getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/" + schematicPath);
 
-            ClipboardFormat format = ClipboardFormat.findByFile(schematicFile);
+            ClipboardFormat format = ClipboardFormats.findByFile(schematicFile);
             ClipboardReader reader;
 
+            if(format == null)
+                return;
+
             try {
-                reader = format.getReader(new FileInputStream(schematicFile));
-                Clipboard clipboard = reader.read(weWorld.getWorldData());
+                reader = format.getReader(Files.newInputStream(schematicFile.toPath()));
+                Clipboard clipboard = reader.read();
 
                 AffineTransform transform = new AffineTransform();
                 transform = transform.rotateY(rotation);
 
-                ClipboardHolder holder = new ClipboardHolder(clipboard, weWorld.getWorldData());
+                ClipboardHolder holder = new ClipboardHolder(clipboard);
                 holder.setTransform(transform);
 
                 Operation operation = holder
-                        .createPaste(editSession, weWorld.getWorldData())
-                        .to(new Vector(x, maxHeight + offsetY, z))
+                        .createPaste(editSession)
+                        .to(BlockVector3.at(x, maxHeight + offsetY, z))
                         .ignoreAirBlocks(true)
                         .build();
                 Operations.complete(operation);
 
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (WorldEditException e) {
+            } catch (IOException | WorldEditException e) {
                 throw new RuntimeException(e);
             }
 
             localSession.remember(editSession);
-            editSession.flushQueue();
+            editSession.commit();
+            editSession.close();
         }
     }
 

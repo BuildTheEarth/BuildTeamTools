@@ -9,18 +9,20 @@ import clipper2.offset.JoinType;
 import com.cryptomorin.xseries.XMaterial;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
+import com.sk89q.worldedit.session.SessionManager;
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.utils.MenuItems;
 import org.apache.commons.lang3.StringUtils;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -56,8 +58,8 @@ public class GeneratorUtils {
                     Method getXMethod = blockVectorClass.getMethod("getBlockX");
                     Method getZMethod = blockVectorClass.getMethod("getBlockZ");
 
-                    double x = (Double) getXMethod.invoke(blockVectorObj);
-                    double z = (Double) getZMethod.invoke(blockVectorObj);
+                    int x = (Integer) getXMethod.invoke(blockVectorObj);
+                    int z = (Integer) getZMethod.invoke(blockVectorObj);
 
                     points.add(new Vector(x, 0, z));
                 } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
@@ -78,9 +80,9 @@ public class GeneratorUtils {
                     Method getYMethod = blockVectorClass.getMethod("getBlockY");
                     Method getZMethod = blockVectorClass.getMethod("getBlockZ");
 
-                    double x = (Double) getXMethod.invoke(blockVectorObj);
-                    double y = (Double) getYMethod.invoke(blockVectorObj);
-                    double z = (Double) getZMethod.invoke(blockVectorObj);
+                    int x = (Integer) getXMethod.invoke(blockVectorObj);
+                    int y = (Integer) getYMethod.invoke(blockVectorObj);
+                    int z = (Integer) getZMethod.invoke(blockVectorObj);
 
                     points.add(new Vector(x, y, z));
                 } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
@@ -219,7 +221,7 @@ public class GeneratorUtils {
             Method contains;
 
             if(CommonModule.getInstance().getDependencyComponent().isLegacyWorldEdit())
-                contains = regionClass.getMethod("contains", com.sk89q.worldedit.Vector.class);
+                contains = regionClass.getMethod("contains", Vector.class);
             else
                 contains = regionClass.getMethod("contains", com.sk89q.worldedit.math.BlockVector3.class);
 
@@ -716,10 +718,21 @@ public class GeneratorUtils {
      * @param vector2 Position 2
      */
     public static void createCuboidSelection(Player p, Vector vector1, Vector vector2){
-        p.chat("//sel cuboid");
+        WorldEditPlugin worldEditPlugin = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
 
-        p.chat("//pos1 " + vector1.getBlockX() + "," + vector1.getBlockY() + "," + vector1.getBlockZ());
-        p.chat("//pos2 " + vector2.getBlockX() + "," + vector2.getBlockY() + "," + vector2.getBlockZ());
+        if(worldEditPlugin == null)
+            return;
+
+        Actor actor = worldEditPlugin.wrapPlayer(p);
+        SessionManager sessionManager = WorldEdit.getInstance().getSessionManager();
+        com.sk89q.worldedit.world.World world = sessionManager.get(actor).getSelectionWorld();
+
+        sessionManager.get(actor).setRegionSelector(world,
+            new CuboidRegionSelector(world,
+                BlockVector3.at(vector1.getBlockX(), vector1.getBlockY(), vector1.getBlockZ()),
+                BlockVector3.at(vector2.getBlockX(), vector2.getBlockY(), vector2.getBlockZ())
+            )
+        );
     }
 
 

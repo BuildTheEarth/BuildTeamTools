@@ -23,7 +23,9 @@ public abstract class GeneratorComponent extends Component {
 
 
     public String wikiPage;
-    final GeneratorType generatorType;
+
+    @Getter
+    private final GeneratorType generatorType;
 
     @Getter
     private final HashMap<UUID, Settings> playerSettings = new HashMap<>();

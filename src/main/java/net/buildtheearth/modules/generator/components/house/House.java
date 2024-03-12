@@ -35,9 +35,9 @@ public class House extends GeneratorComponent {
         if (!checkForPlayer(p))
             return;
 
-        Region polyRegion = GeneratorUtils.getWorldEditSelection(p);
+        Region region = GeneratorUtils.getWorldEditSelection(p);
 
-        HouseScripts.buildscript_v_1_2(p, this, polyRegion);
+        new HouseScripts(p, this);
 
         sendSuccessMessage(p);
     }

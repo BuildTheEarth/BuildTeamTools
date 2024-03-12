@@ -56,30 +56,15 @@ public class GeneratorCollections {
             if(!myFile.exists())
                 return installGeneratorCollections(p, false);
 
-            // Load the clipboard with FAWE or WorldEdit
             Clipboard clipboard = null;
+
+            // For FastAsyncWorldEdit
             if(CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled()) {
                 clipboard = FaweAPI.load(myFile);
 
+            // For Legacy WorldEdit
             }else if(CommonModule.getInstance().getDependencyComponent().isLegacyWorldEdit()) {
-                ClipboardFormat format = ClipboardFormat.findByFile(myFile);
-                ClipboardReader reader = null;
-
-                if (format != null)
-                    reader = format.getReader(Files.newInputStream(myFile.toPath()));
-
-                BukkitWorld bukkitWorld;
-                if(p != null)
-                    bukkitWorld = new BukkitWorld(p.getWorld());
-                else
-                    bukkitWorld = new BukkitWorld(Bukkit.getWorlds().get(0));
-
-
-                if (reader != null)
-                    clipboard = reader.read(bukkitWorld.getWorldData());
-
-            }else if(CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled()) {
-                Class<?> formatClass = ClipboardFormats.class;
+                Class<?> formatClass = ClipboardFormat.class;
                 Method findByFile = formatClass.getMethod("findByFile", File.class);
                 Method getReader = ClipboardFormat.class.getMethod("getReader", InputStream.class);
 
@@ -94,6 +79,18 @@ public class GeneratorCollections {
                     Method read = readerClass.getMethod("read");
                     clipboard = (Clipboard) read.invoke(reader);
                 }
+
+            // For latest WorldEdit
+            }else if(CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled()) {
+
+                ClipboardFormat format = ClipboardFormats.findByFile(myFile);
+                ClipboardReader reader = null;
+
+                if (format != null)
+                    reader = format.getReader(Files.newInputStream(myFile.toPath()));
+
+                if (reader != null)
+                    clipboard = reader.read();
 
             }else{
                 return false;

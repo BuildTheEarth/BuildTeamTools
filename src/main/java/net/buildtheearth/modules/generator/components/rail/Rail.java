@@ -6,6 +6,7 @@ import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.modules.generator.model.GeneratorType;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class Rail extends GeneratorComponent {
@@ -21,9 +22,6 @@ public class Rail extends GeneratorComponent {
         if (GeneratorUtils.checkForNoWorldEditSelection(p))
             return false;
 
-        if (GeneratorUtils.checkForNoConvexSelection(p))
-            return false;
-
         if (getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
             getPlayerSettings().get(p.getUniqueId()).setBlocks(GeneratorUtils.analyzeRegion(p, p.getWorld()));
 
@@ -35,14 +33,7 @@ public class Rail extends GeneratorComponent {
         if (!GeneratorModule.getInstance().getRail().checkForPlayer(p))
             return;
 
-        Region region = GeneratorUtils.getWorldEditSelection(p);
-
-        if (!(region instanceof ConvexPolyhedralRegion))
-            return;
-
-        ConvexPolyhedralRegion convexRegion = (ConvexPolyhedralRegion) region;
-
-        RailScripts.railScript_v_1_3(p, this, convexRegion);
+        new RailScripts(p, this);
 
         sendSuccessMessage(p);
     }

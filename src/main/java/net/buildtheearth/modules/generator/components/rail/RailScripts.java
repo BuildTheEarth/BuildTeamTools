@@ -37,11 +37,13 @@ public class RailScripts extends Script {
 
         // TODO START TEMP
 
-        Vector[] minMax = GeneratorUtils.getMinMaxPoints(getRegion());
-        GeneratorUtils.createCuboidSelection(getPlayer(), minMax[0], minMax[1]);
-        getPlayer().chat("//set redstone_block");
-
         Block[][][] regionBlocks = GeneratorUtils.analyzeRegion(getPlayer(), getPlayer().getWorld());
+        List<Vector> points = GeneratorUtils.getSelectionPointsFromRegion(getRegion());
+        createCuboidSelectionOperation(points.get(0), points.get(1));
+        this.operations.add(new Operation("//set redstone_block"));
+        this.operations.add(new Operation(Operation.OperationType.BREAKPOINT));
+        this.operations.add(new Operation("//set gold_block"));
+
         finish(regionBlocks);
 
 

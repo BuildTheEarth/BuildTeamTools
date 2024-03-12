@@ -11,12 +11,12 @@ import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
-import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.regions.Polygonal2DRegion;
-import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.*;
+import com.sk89q.worldedit.regions.selector.ConvexPolyhedralRegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
+import com.sk89q.worldedit.regions.selector.Polygonal2DRegionSelector;
 import com.sk89q.worldedit.session.SessionManager;
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.GeneratorModule;
@@ -44,6 +44,12 @@ import java.util.Objects;
 public class GeneratorUtils {
 
 
+    /**
+     * Returns the WorldEdit selection Vector from a player no matter which type of selection the player made.
+     *
+     * @param region The WorldEdit region to get the selection from
+     * @return A list of vectors representing the selection
+     */
     public static List<Vector> getSelectionPointsFromRegion(Region region) {
         List<Vector> points = new ArrayList<>();
 
@@ -206,15 +212,15 @@ public class GeneratorUtils {
      */
     public static Block[][][] analyzeRegion(Player p, World world) {
         // Get WorldEdit selection of player
-        Region polyRegion = getWorldEditSelection(p);
+        Region region = getWorldEditSelection(p);
 
-        if(polyRegion == null)
+        if(region == null)
             return null;
 
-        Block[][][] blocks = new Block[polyRegion.getWidth()][polyRegion.getHeight()][polyRegion.getLength()];
+        Block[][][] blocks = new Block[region.getWidth()][region.getHeight()][region.getLength()];
 
         try {
-            Class<?> regionClass = polyRegion.getClass();
+            Class<?> regionClass = region.getClass();
 
             // Reflectively access the minimum and maximum points
             Method getMinimumPoint = regionClass.getMethod("getMinimumPoint");
@@ -226,8 +232,8 @@ public class GeneratorUtils {
             else
                 contains = regionClass.getMethod("contains", com.sk89q.worldedit.math.BlockVector3.class);
 
-            Object minPoint = getMinimumPoint.invoke(polyRegion);
-            Object maxPoint = getMaximumPoint.invoke(polyRegion);
+            Object minPoint = getMinimumPoint.invoke(region);
+            Object maxPoint = getMaximumPoint.invoke(region);
 
             Class<?> vectorClass = minPoint.getClass();
 
@@ -261,7 +267,7 @@ public class GeneratorUtils {
                         }
 
                         if(vectorInstance != null) {
-                            boolean regionContains = (Boolean) contains.invoke(polyRegion, vectorInstance);
+                            boolean regionContains = (Boolean) contains.invoke(region, vectorInstance);
 
                             if (regionContains) {
                                 Block block = world.getBlockAt(i, j, k);
@@ -523,18 +529,6 @@ public class GeneratorUtils {
         return closestVector;
     }
 
-    /** Returns a temporary XYZ String that is used to paste a schematic at a later point at those coordinates with the WorldEdit API
-     *
-     * @param pathToSchematic The path to the schematic file
-     * @param location The location where the schematic should be pasted
-     * @param rotation The rotation at which the schematic should be pasted
-     * @param offsetY The offset in the Y direction at which the schematic should be pasted
-     * @return The temporary XYZ String
-     */
-    public static String getPasteSchematicString(String pathToSchematic, Location location, double rotation, int offsetY){
-        return "%%SCHEMATIC/" + pathToSchematic + "," + location.getWorld().getName() + "," + location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ() + "," + rotation + "," + offsetY + "/%%";
-    }
-
     /**
      * Returns a temporary XYZ String that indicates that the height of the point should be inspected later to match the surface of the terrain.
      *
@@ -697,18 +691,42 @@ public class GeneratorUtils {
         return maxHeight;
     }
 
-    /**
-     * Creates a Cuboid WorldEdit selection from a list of points and adds it to the list of commands to execute.
-     *
-     * @param commands The list of commands to add the selection to
-     * @param vector1 Position 1
-     * @param vector2 Position 2
-     */
-    public static void createCuboidSelection(List<Operation> commands, Vector vector1, Vector vector2){
-        commands.add(new Operation("//sel cuboid"));
 
-        commands.add(new Operation("//pos1 " + vector1.getBlockX() + "," + vector1.getBlockY() + "," + vector1.getBlockZ()));
-        commands.add(new Operation("//pos2 " + vector2.getBlockX() + "," + vector2.getBlockY() + "," + vector2.getBlockZ()));
+    /**
+     * Returns the current WorldEdit selection of a player.
+     *
+     * @param p The player to get the selection from
+     */
+    public static RegionSelector getCurrentSelection(Player p){
+        WorldEditPlugin worldEditPlugin = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
+
+        if(worldEditPlugin == null)
+            return null;
+
+        Actor actor = worldEditPlugin.wrapPlayer(p);
+        SessionManager sessionManager = WorldEdit.getInstance().getSessionManager();
+        com.sk89q.worldedit.world.World world = sessionManager.get(actor).getSelectionWorld();
+
+        return sessionManager.get(actor).getRegionSelector(world);
+    }
+
+    /**
+     * Returns the WorldEdit selection of a player.
+     *
+     * @param p The player to get the selection from
+     * @param regionSelector The region selector to get the selection from
+     */
+    public static void restoreSelection(Player p, RegionSelector regionSelector){
+        WorldEditPlugin worldEditPlugin = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
+
+        if(worldEditPlugin == null)
+            return;
+
+        Actor actor = worldEditPlugin.wrapPlayer(p);
+        SessionManager sessionManager = WorldEdit.getInstance().getSessionManager();
+        com.sk89q.worldedit.world.World world = sessionManager.get(actor).getSelectionWorld();
+
+        sessionManager.get(actor).setRegionSelector(world, regionSelector);
     }
 
     /**
@@ -737,49 +755,57 @@ public class GeneratorUtils {
     }
 
 
-    /** Creates a Convex WorldEdit selection from a list of points and adds it to the list of commands to execute.
-     *
-     * @param commands The list of commands to add the selection to
-     * @param points The list of points to create the selection from
-     */
-    public static void createConvexSelection(List<Operation> commands, List<Vector> points){
-        commands.add(new Operation("//sel convex"));
-        commands.add(new Operation("//pos1 " + getXYZ(points.get(0))));
-
-        for(int i = 1; i < points.size(); i++)
-            commands.add(new Operation("//pos2 " + getXYZ(points.get(i))));
-    }
-
     /**
-     * Creates a Poly WorldEdit selection from a list of points and adds it to the list of commands to execute.
-     * This functions determines the surface height of each location later once it's processed by the command queue.
-     *
-     * @param commands The list of commands to add the selection to
-     * @param points The list of points to create the selection from
-     */
-    public static void createPolySelection(List<Operation> commands, List<Vector> points){
-        commands.add(new Operation("//sel poly"));
-        commands.add(new Operation("//pos1 " + getXYZ(points.get(0))));
-
-        for(int i = 1; i < points.size(); i++)
-            commands.add(new Operation("//pos2 " + getXYZ(points.get(i))));
-    }
-
-    /**
-     * Creates a Poly WorldEdit selection from a list of points and adds it to the list of commands to execute.
-     * This functions determines the surface height of each location directly.
+     * Creates a Polygon WorldEdit selection from a list of points and execute it right away.
+     * This functions determines the current surface height of each vector directly.
      *
      * @param p The player to create the selection for
      * @param points The list of points to create the selection from
-     * @param blocks The blocks to get the surface height from
      */
     public static void createPolySelection(Player p, List<Vector> points, Block[][][] blocks){
-        p.chat("//sel poly");
+        WorldEditPlugin worldEditPlugin = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
+
+        if(worldEditPlugin == null)
+            return;
+
+        Actor actor = worldEditPlugin.wrapPlayer(p);
+        SessionManager sessionManager = WorldEdit.getInstance().getSessionManager();
+        com.sk89q.worldedit.world.World world = sessionManager.get(actor).getSelectionWorld();
+
+        int minY = Integer.MAX_VALUE;
+        int maxY = Integer.MIN_VALUE;
+
+        List<BlockVector2> blockVector2List = new ArrayList<>();
+        for(Vector vector : points) {
+            blockVector2List.add(BlockVector2.at(vector.getBlockX(), vector.getBlockZ()));
+
+            int y = getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), MenuItems.getIgnoredMaterials());
+
+            minY = Math.min(minY, y);
+            maxY = Math.max(maxY, y);
+        }
+
+        sessionManager.get(actor).setRegionSelector(world,
+            new Polygonal2DRegionSelector(world, blockVector2List, minY, maxY)
+        );
+    }
+
+    /**
+     * Creates a Convex WorldEdit selection from a list of points and execute it right away.
+     * This functions determines the current surface height of each vector directly.
+     *
+     * @param p The player to create the selection for
+     * @param points The list of points to create the selection from
+     */
+    public static void createConvexSelection(Player p, List<Vector> points, Block[][][] blocks){
+        p.chat("//sel convex");
         p.chat("//pos1 " + getXYZ(points.get(0), blocks));
 
         for(int i = 1; i < points.size(); i++)
             p.chat("//pos2 " + getXYZ(points.get(i), blocks));
     }
+
+
 
     /**
      * Draws a curved poly line from a list of points and adds it to the list of commands to execute.
@@ -878,44 +904,6 @@ public class GeneratorUtils {
         return true;
     }
 
-    /**
-     * Checks if the player has a WorldEdit 2D Polygonal selection and sends them a message if they don't.
-     *
-     * @param p The player to check for
-     * @return Whether the player has a WorldEdit Poly selection
-     */
-    public static boolean checkForPolySelection(Player p){
-
-        Region polyRegion = getWorldEditSelection(p);
-
-        if(!(polyRegion instanceof Polygonal2DRegion)){
-            p.sendMessage("§cPlease make a WorldEdit 2D Polygonal Selection first (//sel poly).");
-            p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-            GeneratorModule.getInstance().sendWikiLink(p);
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Checks if the player has a WorldEdit Convex selection and sends them a message if they don't.
-     *
-     * @param p The player to check for
-     * @return Whether the player has a WorldEdit Convex selection
-     */
-    public static boolean checkForNoConvexSelection(Player p){
-        // Get WorldEdit selection of player
-        Region polyRegion = getWorldEditSelection(p);
-
-        if(!(polyRegion instanceof ConvexPolyhedralRegion)){
-            p.sendMessage("§cPlease make a WorldEdit Convex Selection first (//sel convex).");
-            p.closeInventory();
-            p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-            GeneratorModule.getInstance().sendWikiLink(p);
-            return true;
-        }
-        return false;
-    }
 
     /**
      * Checks if the player has a brick block in their selection and sends them a message if they don't.

@@ -9,6 +9,8 @@ public class Operation {
 
         BREAKPOINT,
 
+        PASTE_SCHEMATIC,
+
         CUBOID_SELECTION,
 
         POLYGONAL_SELECTION,
@@ -27,9 +29,6 @@ public class Operation {
     }
 
     public Operation(OperationType operationType, String value){
-        if(operationType != OperationType.COMMAND)
-            throw new IllegalArgumentException("OperationType must be COMMAND");
-
         this.value = value;
         this.operationType = operationType;
     }

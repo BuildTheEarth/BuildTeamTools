@@ -5,6 +5,7 @@ import net.buildtheearth.modules.generator.model.*;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import net.buildtheearth.utils.MenuItems;
 import org.apache.commons.lang3.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -85,6 +86,7 @@ public class HouseScripts extends Script {
 
         // Replace air with sponge
         this.operations.add(new Operation( "//replace 0 19"));
+        createBreakPointOperation();
         changes++;
 
         // Replace all sponges with bricks that have bricks below them
@@ -94,10 +96,12 @@ public class HouseScripts extends Script {
             this.operations.add(new Operation( "//replace 19 45"));
             changes++;
         }
+        createBreakPointOperation();
 
         // Replace all left sponges with air
         this.operations.add(new Operation( "//gmask"));
         this.operations.add(new Operation( "//replace 19 0"));
+        createBreakPointOperation();
         changes++;
 
 
@@ -113,6 +117,7 @@ public class HouseScripts extends Script {
                 this.operations.add(new Operation( "//replace 0 " + wool));
                 changes++;
             }
+            createBreakPointOperation();
 
             // Select highest yellow wool block and replace it with sponge
             this.operations.add(new Operation( "//gmask <0"));
@@ -126,6 +131,7 @@ public class HouseScripts extends Script {
 
             // Replace all sponges with yellow wool
             this.operations.add(new Operation( "//replace 19 " + wool));
+            createBreakPointOperation();
             changes++;
         }
 
@@ -138,6 +144,7 @@ public class HouseScripts extends Script {
         for(String wool : woolColorsNoYellow) {
             this.operations.add(new Operation( "//gmask =queryRel(1,0,0,45,0)||queryRel(-1,0,0,45,0)||queryRel(0,0,1,45,0)||queryRel(0,0,-1,45,0)||queryRel(1,0,1,45,0)||queryRel(-1,0,1,45,0)||queryRel(1,0,-1,45,0)||queryRel(-1,0,-1,45,0)"));
             this.operations.add(new Operation( "//replace " + wool + " 19"));
+            createBreakPointOperation();
             changes++;
 
             for(int i = 0; i < 10; i++){
@@ -145,11 +152,13 @@ public class HouseScripts extends Script {
                 this.operations.add(new Operation( "//replace " + wool + " 19"));
                 changes++;
             }
+            createBreakPointOperation();
 
             this.operations.add(new Operation( "//gmask"));
             this.operations.add(new Operation( "//replace >19 " + wool));
             changes++;
             this.operations.add(new Operation( "//replace 19 45"));
+            createBreakPointOperation();
             changes++;
         }
 
@@ -160,11 +169,15 @@ public class HouseScripts extends Script {
 
         // Replace all bricks with sponge
         this.operations.add(new Operation( "//replace 45 19"));
+        createBreakPointOperation();
         changes++;
+
 
         // Replace all sponges with bricks that have air or red wool or blue wool or green wool above them
         this.operations.add(new Operation( "//gmask =(queryRel(0,1,0,0,0)||queryRel(0,1,0,35,11)||queryRel(0,1,0,35,14)||queryRel(0,1,0,35,5))"));
         this.operations.add(new Operation( "//replace 19 45"));
+        createBreakPointOperation();
+
         changes++;
 
         // Disable the global mask
@@ -172,6 +185,7 @@ public class HouseScripts extends Script {
 
         // Replace all left sponges with grass
         this.operations.add(new Operation( "//replace 19 2"));
+        createBreakPointOperation();
         changes++;
 
 
@@ -186,10 +200,12 @@ public class HouseScripts extends Script {
             this.operations.add(new Operation( "//replace >45 35:11"));
             changes++;
         }
+        createBreakPointOperation();
 
         // Place the last blue wool between the green and the blue wool
         this.operations.add(new Operation( "//gmask =queryRel(1,0,0,35,11)||queryRel(-1,0,0,35,11)||queryRel(0,0,1,35,11)||queryRel(0,0,-1,35,11)||queryRel(1,0,1,35,11)||queryRel(-1,0,-1,35,11)||queryRel(-1,0,1,35,11)||queryRel(1,0,-1,35,11)"));
         this.operations.add(new Operation( "//replace >45 35:11"));
+        createBreakPointOperation();
         changes++;
 
 
@@ -216,6 +232,7 @@ public class HouseScripts extends Script {
             this.operations.add(new Operation( "//replace !45 35:4"));
             changes++;
         }
+        createBreakPointOperation();
 
 
         // Make the outline as thin as possible and fill all inner corners with yellow wool that are too thick
@@ -245,6 +262,7 @@ public class HouseScripts extends Script {
             this.operations.add(new Operation( "//replace 45 35:4"));
             changes++;
         }
+        createBreakPointOperation();
 
 
 
@@ -261,6 +279,7 @@ public class HouseScripts extends Script {
                 // Select everything x blocks above bricks. Then replace that with lapislazuli
                 this.operations.add(new Operation( "//gmask =queryRel(0," + (-currentHeight) + ",0,45,-1)"));
                 this.operations.add(new Operation( "//set 22"));
+                createBreakPointOperation();
                 changes++;
 
                 // Raise the yellow wool layer by one block
@@ -280,6 +299,7 @@ public class HouseScripts extends Script {
             // Select everything x blocks above bricks. Then replace that with lapislazuli ore
             this.operations.add(new Operation( "//gmask =queryRel(0," + (-currentHeight) + ",0,45,-1)"));
             this.operations.add(new Operation( "//set 21"));
+            createBreakPointOperation();
             changes++;
 
             // Raise the yellow wool layer by one block
@@ -329,6 +349,7 @@ public class HouseScripts extends Script {
                     // Select everything x blocks above bricks. Then replace that with lapislazuli ore
                     this.operations.add(new Operation( "//gmask =queryRel(0," + (-currentHeight) + ",0,45,-1)"));
                     this.operations.add(new Operation( "//set 21"));
+                    createBreakPointOperation();
                     changes++;
 
                     // Raise the yellow wool layer by one block
@@ -353,6 +374,7 @@ public class HouseScripts extends Script {
         // Remove the red wool
         this.operations.add(new Operation( "//gmask"));
         this.operations.add(new Operation( "//replace 35:14 0"));
+        createBreakPointOperation();
         changes++;
 
 
@@ -364,6 +386,7 @@ public class HouseScripts extends Script {
 
             // Replace all orange wool with air
             this.operations.add(new Operation( "//replace 35:1 0"));
+            createBreakPointOperation();
         }
 
 
@@ -391,6 +414,9 @@ public class HouseScripts extends Script {
         this.operations.add(new Operation( "//replace 95:0 95:7"));
         changes++;
 
+        createBreakPointOperation();
+
+
         // Disable the global mask
         this.operations.add(new Operation( "//gmask"));
 
@@ -402,6 +428,8 @@ public class HouseScripts extends Script {
         // Replace any gray glass with the window color
         this.operations.add(new Operation( "//replace 95:7 " + windowColor));
         changes++;
+
+        createBreakPointOperation();
 
 
 
@@ -424,6 +452,8 @@ public class HouseScripts extends Script {
                 // Replace all green wool with the balcony color
                 this.operations.add(new Operation( "//replace 35:13 " + balconyColor));
             }
+
+            createBreakPointOperation();
         }
 
 
@@ -440,6 +470,7 @@ public class HouseScripts extends Script {
             // Replace the blue wool next to green wool with green wool
             this.operations.add(new Operation( "//gmask =queryRel(1,0,0,35,5)||queryRel(-1,0,0,35,5)||queryRel(0,0,1,35,5)||queryRel(0,0,-1,35,5)||queryRel(1,0,1,35,5)||queryRel(-1,0,-1,35,5)||queryRel(-1,0,1,35,5)||queryRel(1,0,-1,35,5)"));
             this.operations.add(new Operation( "//replace 35:11 35:5"));
+            createBreakPointOperation();
             changes++;
 
             // Create the roof house wall staircase
@@ -458,28 +489,34 @@ public class HouseScripts extends Script {
                 this.operations.add(new Operation( "//gmask 0"));
                 this.operations.add(new Operation( "//replace >35:11 35:11"));
                 changes++;
+
+                createBreakPointOperation();
             }
 
 
             // (One more yellow wool layer) Replace everything above yellow wool with one layer yellow wool
             this.operations.add(new Operation( "//replace >35:4 35:4"));
+            createBreakPointOperation();
             changes++;
 
             // (First Roof Layer) Select only air blocks that are next to yellow wool in any direction and above lapislazuli ore. Then replace them with stone slabs
             this.operations.add(new Operation( "//gmask =queryRel(0,0,0,0,0)&&(queryRel(1,0,0,35,4)||queryRel(1,0,0,35,4)||queryRel(-1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4))"));
             this.operations.add(new Operation( "//replace >21 44"));
+            createBreakPointOperation();
             changes++;
 
             // (Fix First Roof Layer) Select only air blocks that are next to stone slabs and green wool in any direction and above lapislazuli ore. Then replace them with stone slabs
             this.operations.add(new Operation( "//gmask =queryRel(0,0,0,0,0)&&(queryRel(1,0,0,44,0)||queryRel(-1,0,0,44,0)||queryRel(0,0,1,44,0)||queryRel(0,0,-1,44,0))"));
             this.operations.add(new Operation( "//replace >21 44"));
             this.operations.add(new Operation( "//replace >21 44"));
+            createBreakPointOperation();
             changes++;
             changes++;
 
             // (Overhang Roof Layer 1) Select all air blocks next to lapislazuli ores that have a stone slab above them. Then replace them with and upside down stone slab
             this.operations.add(new Operation( "//gmask =(queryRel(1,0,0,21,-1)&&queryRel(1,1,0,44,0))||(queryRel(-1,0,0,21,-1)&&queryRel(-1,1,0,44,0))||(queryRel(0,0,1,21,-1)&&queryRel(0,1,1,44,0))||(queryRel(0,0,-1,21,-1)&&queryRel(0,1,-1,44,0))"));
             this.operations.add(new Operation( "//replace 0 44:8"));
+            createBreakPointOperation();
             changes++;
 
             // (Overhang Roof Layer 2) Select all air blocks next to upside down stone slab and lapislazuli. Then replace them with and upside down stone slab
@@ -490,6 +527,7 @@ public class HouseScripts extends Script {
                     "||(queryRel(0,0,-1,44,8)&&(queryRel(1,0,0,21,0)||queryRel(-1,0,0,21,0)))" +
                     ")"));
             this.operations.add(new Operation( "//replace 0 44:8"));
+            createBreakPointOperation();
             changes++;
 
 
@@ -497,6 +535,7 @@ public class HouseScripts extends Script {
             // Replace the highest yellow wool layer with double slabs
             this.operations.add(new Operation( "//gmask <0"));
             this.operations.add(new Operation( "//replace 35:4 43"));
+            createBreakPointOperation();
             changes++;
 
             maxRoofHeight = maxRoofHeight - 1;
@@ -522,6 +561,7 @@ public class HouseScripts extends Script {
                         this.operations.add(new Operation( "//gmask =!(queryRel(1,-1,0,44,-1)||queryRel(-1,-1,0,44,-1)||queryRel(0,-1,1,44,-1)||queryRel(0,-1,-1,44,-1))"));
 
                     this.operations.add(new Operation( "//replace >43 44"));
+                    createBreakPointOperation();
                     changes++;
 
                     if(roofType == RoofType.FLATTER_SLABS)
@@ -545,12 +585,14 @@ public class HouseScripts extends Script {
                         this.operations.add(new Operation( "//gmask =!(queryRel(1,0,0,0,-1)||queryRel(-1,0,0,0,-1)||queryRel(0,0,1,0,-1)||queryRel(0,0,-1,0,-1))"));
 
                     this.operations.add(new Operation( "//replace 44 43"));
+                    createBreakPointOperation();
                     changes++;
                 }
 
             // Replace everything above upside down stone slabs with purple wool
             this.operations.add(new Operation( "//gmask"));
             this.operations.add(new Operation( "//replace >44:8 35:10"));
+            createBreakPointOperation();
             changes++;
 
             expandGreenWool();
@@ -568,6 +610,7 @@ public class HouseScripts extends Script {
             // Select all green wool that are above & next to upside down stone slabs and replace it with stone slabs
             this.operations.add(new Operation( "//gmask =queryRel(1,-1,0,44,8)||queryRel(-1,-1,0,44,8)||queryRel(0,-1,1,44,8)||queryRel(0,-1,-1,44,8)||queryRel(1,-1,1,44,8)||queryRel(-1,-1,-1,44,8)||queryRel(-1,-1,1,44,8)||queryRel(1,-1,-1,44,8)"));
             this.operations.add(new Operation( "//replace 35:5 44"));
+
             changes++;
 
             // Select all air blocks that are below & next to green wool and under a stone slab and replace it with upside down stone slabs
@@ -580,6 +623,8 @@ public class HouseScripts extends Script {
             this.operations.add(new Operation( "//replace 0 44:8"));
             changes++;
 
+            createBreakPointOperation();
+
             // Select all left over green wool replace it with double stone slabs
             this.operations.add(new Operation( "//gmask"));
             this.operations.add(new Operation( "//replace 35:5 43"));
@@ -588,6 +633,9 @@ public class HouseScripts extends Script {
             // Replace blue wool with lapislazuli ore
             this.operations.add(new Operation( "//replace 35:11 21"));
             changes++;
+
+            createBreakPointOperation();
+
 
 
             // Create the flipped steps
@@ -619,6 +667,8 @@ public class HouseScripts extends Script {
             this.operations.add(new Operation( "//replace 35:4 23"));
             changes++;
 
+            createBreakPointOperation();
+
         } else if(roofType == RoofType.STAIRS){
 
             // Create the roof house wall staircase
@@ -626,11 +676,13 @@ public class HouseScripts extends Script {
                 // Select all air blocks that are above blue wool and next to green wool
                 this.operations.add(new Operation( "//gmask =queryRel(1,-1,0,35,5)||queryRel(-1,-1,0,35,5)||queryRel(0,-1,1,35,5)||queryRel(0,-1,-1,35,5)||queryRel(1,-1,1,35,5)||queryRel(-1,-1,-1,35,5)||queryRel(-1,-1,1,35,5)||queryRel(1,-1,-1,35,5)"));
                 this.operations.add(new Operation( "//replace >35:11 35:5"));
+                createBreakPointOperation();
                 changes++;
 
                 // Select all air blocks that are above blue wool and replace them with blue wool
                 this.operations.add(new Operation( "//gmask 0"));
                 this.operations.add(new Operation( "//replace >35:11 35:11"));
+                createBreakPointOperation();
                 changes++;
             }
 
@@ -655,6 +707,9 @@ public class HouseScripts extends Script {
             this.operations.add(new Operation( "//replace 0 98:8"));
             changes++;
 
+            createBreakPointOperation();
+
+
             maxRoofHeight = maxRoofHeight - 1;
 
             if(maxRoofHeight > 0)
@@ -668,11 +723,13 @@ public class HouseScripts extends Script {
                         this.operations.add(new Operation( "//gmask =(queryRel(1,-1,0,98,-1)||queryRel(-1,-1,0,98,-1)||queryRel(0,-1,1,98,-1)||queryRel(0,-1,-1,98,-1)||queryRel(1,-1,1,98,-1)||queryRel(-1,-1,1,98,-1)||queryRel(-1,-1,-1,98,-1)||queryRel(1,-1,-1,98,-1))"));
 
                     this.operations.add(new Operation( "//replace >35:4 98"));
+                    createBreakPointOperation();
                     changes++;
 
                     //Only select yellow wool with air blocks above them and put yellow wool above them
                     this.operations.add(new Operation( "//gmask air"));
                     this.operations.add(new Operation( "//replace >35:4 35:4"));
+                    createBreakPointOperation();
                     changes++;
                 }
 
@@ -688,6 +745,7 @@ public class HouseScripts extends Script {
 
             // Replace blue wool with lapislazuli ore
             this.operations.add(new Operation( "//replace 35:11 21"));
+            createBreakPointOperation();
             changes++;
 
             // Fill up air blocks surrounded by 3 stone bricks with stone bricks
@@ -703,6 +761,7 @@ public class HouseScripts extends Script {
             this.operations.add(new Operation( "//gmask =queryRel(1,0,0,0,0)&&queryRel(-1,0,0,98,0)&&queryRel(0,0,1,98,0)&&queryRel(0,0,-1,98,0)"));
             this.operations.add(new Operation( "//replace 0 98"));
             changes++;
+            createBreakPointOperation();
 
 
             // ROOF STAIRS
@@ -791,6 +850,8 @@ public class HouseScripts extends Script {
             this.operations.add(new Operation( "//gmask =queryRel(1,0,0,35,4)||queryRel(-1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4)"));
             this.operations.add(new Operation( "//replace 0 98"));
             changes++;
+            createBreakPointOperation();
+
 
             // Disable the gmask
             this.operations.add(new Operation( "//gmask"));
@@ -808,6 +869,7 @@ public class HouseScripts extends Script {
 
             // Replace stone bricks with the correct color
             this.operations.add(new Operation( "//replace 98 " + StringUtils.join(blockColors, ",")));
+            createBreakPointOperation();
             changes++;
 
 
@@ -820,6 +882,7 @@ public class HouseScripts extends Script {
 
                 changes++;
             }
+            createBreakPointOperation();
         }
 
 
@@ -882,11 +945,13 @@ public class HouseScripts extends Script {
                 this.operations.add(new Operation("//replace >35:1,35:13 35:13"));
             changes++;
         }
+        createBreakPointOperation();
     }
 
     private void raiseYellowWoolFloor() {
         this.operations.add(new Operation("//gmask"));
         this.operations.add(new Operation("//replace >35:4 35:4"));
+        createBreakPointOperation();
         changes++;
     }
 

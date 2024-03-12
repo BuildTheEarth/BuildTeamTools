@@ -115,7 +115,7 @@ public class RoadScripts extends Script {
 
         // Draw the road
 
-        GeneratorUtils.createConvexSelection(operations, points);
+        createConvexSelection(operations, points);
         operations.add(new Operation("//gmask !solid," + roadMaterial + "," + markingMaterial + "," + sidewalkMaterial + "," + sidewalkSlabMaterial + "," + roadSlabMaterial));
         operations.add(new Operation("//curve 35:4"));
 
@@ -124,7 +124,7 @@ public class RoadScripts extends Script {
             List<List<Vector>> yellowWoolLine = GeneratorUtils.shiftPointsAll(innerPoints, (laneWidth * (i - 1)));
 
             for (List<Vector> path : yellowWoolLine) {
-                GeneratorUtils.createConvexSelection(operations, path);
+                createConvexSelection(operations, path);
                 operations.add(new Operation("//curve 35:4"));
                 changes++;
 
@@ -195,7 +195,7 @@ public class RoadScripts extends Script {
         // Replace the existing road material with wool
 
         // Create the poly selection
-        GeneratorUtils.createPolySelection(operations, polyRegionPointsExact);
+        createPolySelection(operations, polyRegionPointsExact);
         operations.add(new Operation("//expand 10 up"));
         operations.add(new Operation("//expand 10 down"));
         operations.add(new Operation("//gmask !air"));
@@ -222,7 +222,7 @@ public class RoadScripts extends Script {
         // ----------- FILLINGS ----------
         // Fill the road with the materials
 
-        GeneratorUtils.createPolySelection(operations, polyRegionPoints);
+        createPolySelection(operations, polyRegionPoints);
         operations.add(new Operation("//expand 10 up"));
         operations.add(new Operation("//expand 10 down"));
         operations.add(new Operation("//gmask !air,35:3,35:11"));
@@ -385,7 +385,7 @@ public class RoadScripts extends Script {
 
         // ----------- MATERIAL ----------
         // Replace all light blue wool with the sidewalk material
-        GeneratorUtils.createPolySelection(operations, polyRegionPoints);
+        createPolySelection(operations, polyRegionPoints);
         operations.add(new Operation("//replace 35:3 " + sidewalkMaterial));
         changes++;
 
@@ -442,7 +442,7 @@ public class RoadScripts extends Script {
                     angle = (angle + 360) % 360; // Normalize angle to be between 0 and 360
 
 
-                    operations.add(new Operation(GeneratorUtils.getPasteSchematicString("GeneratorCollections/roadpack/streetlamp" + streetLampType + ".schematic", loc, angle, 1)));
+                    createPasteSchematicOperation("GeneratorCollections/roadpack/streetlamp" + streetLampType + ".schematic", loc, angle);
                     changes++;
                 }
         }
@@ -451,12 +451,12 @@ public class RoadScripts extends Script {
 
         // Depending on the selection type, the selection needs to be restored correctly
         if(getRegion() instanceof Polygonal2DRegion || getRegion() instanceof ConvexPolyhedralRegion)
-            GeneratorUtils.createConvexSelection(operations, points);
+            createConvexSelection(operations, points);
         else if(getRegion() instanceof CuboidRegion){
             CuboidRegion cuboidRegion = (CuboidRegion) getRegion();
             Vector pos1 = new Vector(cuboidRegion.getPos1().getX(), cuboidRegion.getPos1().getY(), cuboidRegion.getPos1().getZ());
             Vector pos2 = new Vector(cuboidRegion.getPos2().getX(), cuboidRegion.getPos2().getY(), cuboidRegion.getPos2().getZ());
-            GeneratorUtils.createCuboidSelection(operations, pos1, pos2);
+            createCuboidSelectionOperation(pos1, pos2);
         }
 
         // Finish the script

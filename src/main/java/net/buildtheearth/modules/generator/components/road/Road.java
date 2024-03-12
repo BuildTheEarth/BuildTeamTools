@@ -18,11 +18,7 @@ public class Road extends GeneratorComponent {
 
     @Override
     public boolean checkForPlayer(Player p) {
-
         if (GeneratorUtils.checkForNoWorldEditSelection(p))
-            return false;
-
-        if (GeneratorUtils.checkForNoConvexSelection(p))
             return false;
 
         if (getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)

@@ -319,7 +319,7 @@ public class FieldScripts extends Script {
             changes += GeneratorUtils.createPolyLine(operations, fencePoints, "41", true, blocks, 1);
             operations.add(new Operation("//gmask"));
 
-            GeneratorUtils.createPolySelection(operations, points);
+            createPolySelection(operations, points);
 
             operations.add(new Operation("//sel cuboid"));
             operations.add(new Operation("//expand 10 10 west"));
@@ -331,7 +331,7 @@ public class FieldScripts extends Script {
                 operations.add(new Operation("//set " + fence));
             }
 
-            GeneratorUtils.createPolySelection(operations, points);
+            createPolySelection(operations, points);
 
             operations.add(new Operation("//sel cuboid"));
             operations.add(new Operation("//gmask"));
@@ -345,7 +345,7 @@ public class FieldScripts extends Script {
             operations.add(new Operation("//replace 41 166"));
             changes++;
 
-            GeneratorUtils.createPolySelection(operations, points);
+            createPolySelection(operations, points);
 
             operations.add(new Operation("//gmask !" + fence + ",77,166"));
             operations.add(new Operation("//expand 10 10 up"));
@@ -364,12 +364,12 @@ public class FieldScripts extends Script {
 
         // Depending on the selection type, the selection needs to be recreated
         if(getRegion() instanceof Polygonal2DRegion || getRegion() instanceof ConvexPolyhedralRegion)
-            GeneratorUtils.createPolySelection(operations, points);
+            createPolySelection(operations, points);
         else if(getRegion() instanceof CuboidRegion){
             CuboidRegion cuboidRegion = (CuboidRegion) getRegion();
             Vector pos1 = new Vector(cuboidRegion.getPos1().getX(), cuboidRegion.getPos1().getY(), cuboidRegion.getPos1().getZ());
             Vector pos2 = new Vector(cuboidRegion.getPos2().getX(), cuboidRegion.getPos2().getY(), cuboidRegion.getPos2().getZ());
-            GeneratorUtils.createCuboidSelection(operations, pos1, pos2);
+            createCuboidSelectionOperation(pos1, pos2);
         }
 
         // Finish the script

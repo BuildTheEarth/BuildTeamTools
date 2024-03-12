@@ -14,6 +14,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
+import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 import lombok.Getter;
@@ -25,11 +26,15 @@ import net.buildtheearth.utils.MenuItems;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Command {
@@ -54,6 +59,12 @@ public class Command {
     @Getter
     private long percentage;
 
+    private Vector[] minMax;
+    private boolean breakPointActive;
+    private RegionSelector tempRegionSelector;
+    private Material oldMaterial;
+    private BlockData oldBlockData;
+
     public Command(Script script, Block[][][] blocks) {
         this.player = script.getPlayer();
         this.generatorComponent = script.getGeneratorComponent();
@@ -62,6 +73,9 @@ public class Command {
         this.blocks = blocks;
 
         this.totalCommands = operations.size();
+        minMax = GeneratorUtils.getMinMaxPoints(script.getRegion());
+
+        player.getInventory().setItem(INVENTORY_SLOT, null);
     }
 
     /** Processes the commands from the command queue to prevent the server from freezing. */
@@ -78,7 +92,11 @@ public class Command {
         player.getInventory().setItem(INVENTORY_SLOT, Item.create(XMaterial.BARRIER.parseMaterial(), "§c§lGenerator processing commands..."));
 
         percentage = (int) Math.round((double) (totalCommands - operations.size()) / (double) totalCommands * 100);
-        player.sendActionBar("§a§lGenerator Progress: §e" + percentage + "%");
+
+        if(!breakPointActive)
+            player.sendActionBar("§a§lGenerator Progress: §e" + percentage + "%");
+        else
+            player.sendActionBar("§a§lGenerator Progress: §e" + percentage + "% §7[§c§lPROCESSING§7]");
 
         // Process commands in batches of MAX_COMMANDS_PER_SERVER_TICK
         for(int i = 0; i < MAX_COMMANDS_PER_SERVER_TICK;){
@@ -87,9 +105,12 @@ public class Command {
                 break;
             }
 
+
             Operation command = operations.get(0);
-            processCommand(command);
-            operations.remove(0);
+            processOperation(command);
+
+            if(breakPointActive)
+                break;
 
             // Skip WorldEdit commands that take no time to execute
             if(command.getOperationType() == Operation.OperationType.COMMAND){
@@ -109,18 +130,69 @@ public class Command {
     }
 
     /** Processes a single command. */
-    public void processCommand(Operation operation){
-        if(operation.getOperationType() == Operation.OperationType.COMMAND){
-            String command = operation.getValue();
+    public void processOperation(Operation operation){
+        switch(operation.getOperationType()){
+            case COMMAND:
+                String command = operation.getValue();
 
-            if(command.contains("%%XYZ/"))
-                command = convertXYZ(command);
+                if(operation.getValue().contains("%%XYZ/"))
+                    command = convertXYZ(command);
 
-            if(command.contains("%%SCHEMATIC/"))
-                pasteSchematic(command);
+                player.chat(command);
+                break;
 
-            player.chat(command);
+            case BREAKPOINT:
+                if(!CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled())
+                    break;
+
+                Vector point = minMax[0];
+                Block block = getPlayer().getWorld().getBlockAt(point.getBlockX(), point.getBlockY(), point.getBlockZ());
+
+                // If the block is a barrier, remove it and continue with the next command
+                if(breakPointActive && block.getType() == Material.BARRIER) {
+                    block.setType(oldMaterial);
+                    block.setBlockData(oldBlockData);
+                    block.getState().update();
+                    GeneratorUtils.restoreSelection(getPlayer(), tempRegionSelector);
+
+                    breakPointActive = false;
+                    break;
+                }
+
+                if(!breakPointActive) {
+                    oldMaterial = block.getType();
+                    oldBlockData = block.getBlockData();
+                    tempRegionSelector = GeneratorUtils.getCurrentSelection(getPlayer());
+                    player.chat("//sel cuboid");
+                    player.chat("//pos1 " + point.getBlockX() + "," + point.getBlockY() + "," + point.getBlockZ());
+                    player.chat("//pos2 " + point.getBlockX() + "," + point.getBlockY() + "," + point.getBlockZ());
+                    player.chat("//gmask");
+                    player.chat("//set barrier");
+                    breakPointActive = true;
+                }
+
+                break;
+
+            case PASTE_SCHEMATIC:
+                pasteSchematic(operation);
+                break;
+
+            case CUBOID_SELECTION:
+                createCuboidSelection(operation);
+                break;
+
+            case POLYGONAL_SELECTION:
+                createPolySelection(operation);
+                break;
+
+            case CONVEX_SELECTION:
+                createConvexSelection(operation);
+                break;
         }
+
+
+        if(!breakPointActive)
+            operations.remove(0);
     }
 
     /** Converts the XYZ coordinates in a command to the highest block at that location while skipping certain blocks. */
@@ -146,8 +218,46 @@ public class Command {
         return command.split("%%XYZ/")[0] + x + "," + maxHeight + "," + z + commandSuffix;
     }
 
-    public void pasteSchematic(String command) {
-        String schematic = command.split("%%SCHEMATIC/")[1].split("/%%")[0];
+    private void createCuboidSelection(Operation operation){
+        String value = operation.getValue();
+        String[] valueSplit = value.split(",");
+
+        Vector vector1 = new Vector(Integer.parseInt(valueSplit[0]), Integer.parseInt(valueSplit[1]), Integer.parseInt(valueSplit[2]));
+        Vector vector2 = new Vector(Integer.parseInt(valueSplit[3]), Integer.parseInt(valueSplit[4]), Integer.parseInt(valueSplit[5]));
+
+        GeneratorUtils.createCuboidSelection(getPlayer(), vector1, vector2);
+    }
+
+    private void createPolySelection(Operation operation){
+        String value = operation.getValue();
+        String[] valueSplit = value.split(";");
+
+        List<Vector> points = new ArrayList<>();
+
+        for(String point : valueSplit){
+            String[] pointSplit = point.split(",");
+            points.add(new Vector(Integer.parseInt(pointSplit[0]), Integer.parseInt(pointSplit[1]), Integer.parseInt(pointSplit[2])));
+        }
+
+        GeneratorUtils.createPolySelection(getPlayer(), points, blocks);
+    }
+
+    private void createConvexSelection(Operation operation){
+        String value = operation.getValue();
+        String[] valueSplit = value.split(";");
+
+        List<Vector> points = new ArrayList<>();
+
+        for(String point : valueSplit){
+            String[] pointSplit = point.split(",");
+            points.add(new Vector(Integer.parseInt(pointSplit[0]), Integer.parseInt(pointSplit[1]), Integer.parseInt(pointSplit[2])));
+        }
+
+        GeneratorUtils.createConvexSelection(getPlayer(), points, blocks);
+    }
+
+    public void pasteSchematic(Operation operation) {
+        String schematic = operation.getValue();
 
         String[] schematicSplit = schematic.split(",");
         String schematicPath = schematicSplit[0];
@@ -192,12 +302,12 @@ public class Command {
                 ClipboardHolder holder = new ClipboardHolder(clipboard);
                 holder.setTransform(transform);
 
-                com.sk89q.worldedit.function.operation.Operation operation = holder
+                com.sk89q.worldedit.function.operation.Operation op = holder
                         .createPaste(editSession)
                         .to(BlockVector3.at(x, maxHeight + offsetY, z))
                         .ignoreAirBlocks(true)
                         .build();
-                Operations.complete(operation);
+                Operations.complete(op);
 
             } catch (IOException | WorldEditException e) {
                 throw new RuntimeException(e);

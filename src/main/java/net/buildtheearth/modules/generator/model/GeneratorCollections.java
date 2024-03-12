@@ -4,6 +4,7 @@ import com.fastasyncworldedit.core.FaweAPI;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.common.CommonModule;
@@ -18,6 +19,7 @@ import org.json.JSONObject;
 
 import javax.annotation.Nullable;
 import java.io.*;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
@@ -59,10 +61,10 @@ public class GeneratorCollections {
             if(CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled()) {
                 clipboard = FaweAPI.load(myFile);
 
-            }else if(CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled()) {
+            }else if(CommonModule.getInstance().getDependencyComponent().isLegacyWorldEdit()) {
                 ClipboardFormat format = ClipboardFormat.findByFile(myFile);
-
                 ClipboardReader reader = null;
+
                 if (format != null)
                     reader = format.getReader(Files.newInputStream(myFile.toPath()));
 
@@ -75,8 +77,28 @@ public class GeneratorCollections {
 
                 if (reader != null)
                     clipboard = reader.read(bukkitWorld.getWorldData());
-            }else
+
+            }else if(CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled()) {
+                Class<?> formatClass = ClipboardFormats.class;
+                Method findByFile = formatClass.getMethod("findByFile", File.class);
+                Method getReader = ClipboardFormat.class.getMethod("getReader", InputStream.class);
+
+                ClipboardFormat format = (ClipboardFormat) findByFile.invoke(null, myFile);
+                ClipboardReader reader = null;
+
+                if (format != null)
+                    reader = (ClipboardReader) getReader.invoke(format, Files.newInputStream(myFile.toPath()));
+
+                if (reader != null){
+                    Class<?> readerClass = reader.getClass();
+                    Method read = readerClass.getMethod("read");
+                    clipboard = (Clipboard) read.invoke(reader);
+                }
+
+            }else{
                 return false;
+            }
+
 
 
             if(clipboard == null)
@@ -85,6 +107,7 @@ public class GeneratorCollections {
                 return checkIfGeneratorCollectionsIsUpToDate(p);
 
         } catch (Exception e) {
+            e.printStackTrace();
             return installGeneratorCollections(p, true);
         }
     }

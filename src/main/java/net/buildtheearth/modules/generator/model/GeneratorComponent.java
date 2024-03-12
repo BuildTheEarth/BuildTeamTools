@@ -3,6 +3,7 @@ package net.buildtheearth.modules.generator.model;
 import lombok.Getter;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.Component;
+import net.buildtheearth.modules.generator.components.FlagType;
 import net.buildtheearth.modules.generator.components.field.FieldSettings;
 import net.buildtheearth.modules.generator.components.house.HouseSettings;
 import net.buildtheearth.modules.generator.components.rail.RailSettings;
@@ -174,7 +175,7 @@ public abstract class GeneratorComponent extends Component {
 
             if(finalFlag == null) continue;
 
-            String errorMessage = validateFlagType(finalFlag, flagValue);
+            String errorMessage = FlagType.validateFlagType(finalFlag, flagValue);
 
             if(errorMessage != null){
                 p.sendMessage(errorMessage);
@@ -186,38 +187,5 @@ public abstract class GeneratorComponent extends Component {
 
         if(getPlayerSettings().get(p.getUniqueId()).getValues().isEmpty() && args.length > 1)
             sendHelp(p);
-    }
-
-    /** Validates that the given flag value is of the correct type
-     *
-     * @param flag The flag to validate
-     * @param value The value to validate
-     * @return The error message if the value is invalid, null if the value is valid
-     */
-    private String validateFlagType(Flag flag, String value){
-        switch (flag.getFlagType()){
-            case INTEGER:
-                try {
-                    Integer.parseInt(value);
-                } catch (NumberFormatException e){
-                    return "§cThe value §e" + value + " §cof the flag §e" + flag.getFlag() + " §cis not a valid integer.";
-                }
-                break;
-            case DOUBLE:
-                try {
-                    Double.parseDouble(value);
-                } catch (NumberFormatException e){
-                    return "§cThe value §e" + value + " §cof the flag §e" + flag.getFlag() + " §cis not a valid double.";
-                }
-                break;
-            case BOOLEAN:
-                if(!value.equalsIgnoreCase("true") && !value.equalsIgnoreCase("false"))
-                    return "§cThe value §e" + value + " §cof the flag §e" + flag.getFlag() + " §cis not a valid boolean.";
-                break;
-            default:
-                break;
-        }
-
-        return null;
     }
 }

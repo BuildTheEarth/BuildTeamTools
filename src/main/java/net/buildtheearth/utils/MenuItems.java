@@ -526,13 +526,6 @@ public class MenuItems {
     public static List<ItemStack> getWallBlocks(){
         List<ItemStack> items = getBlocksByColor();
 
-        List<ItemStack> duplicates = items.stream()
-                .filter(i -> items.stream().filter(x -> x.getType().toString().equals(i.getType().toString())).count() > 1) // Find elements with count > 1
-                .distinct() // Remove duplicates
-                .collect(Collectors.toList());
-
-        duplicates.forEach(duplicate -> Bukkit.broadcastMessage("Duplicate: " + duplicate.getType().toString()));
-
         new ArrayList<>(items).stream().filter(item ->
                 !item.getType().isOccluding() &&! item.getType().toString().endsWith("STAINED_GLASS"))
                 .forEach(items::remove);

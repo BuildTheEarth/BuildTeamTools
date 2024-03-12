@@ -1,11 +1,6 @@
 package net.buildtheearth.modules.generator.components.house;
 
 import com.cryptomorin.xseries.XMaterial;
-import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
-import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.model.Command;
@@ -46,8 +41,9 @@ public class HouseScripts {
         int maxRoofHeight = Integer.parseInt(flags.get(HouseFlag.MAX_ROOF_HEIGHT));
 
         List<Vector> selectionPoints = GeneratorUtils.getSelectionPointsFromRegion(region);
-        int minY = region.getMinimumPoint().getBlockY();
-        int maxY = region.getMaximumPoint().getBlockY();
+        Vector[] minMax = GeneratorUtils.getMinMaxPoints(region);
+        int minY = minMax[0].getBlockY();
+        int maxY = minMax[1].getBlockY();
 
         int operations = 0;
         p.chat("/clearhistory");

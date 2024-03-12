@@ -6,6 +6,7 @@ import com.destroystokyo.paper.Namespaced;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.buildtheearth.modules.common.CommonModule;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -404,15 +405,19 @@ public class Item {
 		if(CommonModule.getInstance().getVersionComponent().is_1_12())
 			return XMaterial.matchXMaterial(item).getId() + ":" + XMaterial.matchXMaterial(item).getData();
 		else
-			return item.getType().getItemTranslationKey();
+			return item.getType().getKey().asString();
 
 	}
 
-	public static String createStringFromItemList(ArrayList<String> items) {
+	public static String createStringFromItemList(ArrayList<String> items) throws IllegalArgumentException {
 		StringBuilder s = new StringBuilder(items.get(0));
 
 		for (int i = 1; i < items.size(); i++)
-			s.append(",").append(items.get(i));
+			if(XMaterial.matchXMaterial(items.get(i)).isPresent()) {
+				XMaterial xMaterial = XMaterial.matchXMaterial(items.get(i)).get();
+
+				s.append(",").append(getUniqueMaterialString(xMaterial.parseItem()));
+			}
 
 		return s.toString();
 	}

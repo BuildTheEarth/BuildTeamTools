@@ -9,18 +9,18 @@ import clipper2.offset.JoinType;
 import com.cryptomorin.xseries.XMaterial;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.GeneratorModule;
-import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.MenuItems;
 import org.apache.commons.lang3.StringUtils;
-import org.bukkit.*;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -91,12 +91,72 @@ public class GeneratorUtils {
         }else if (region instanceof CuboidRegion) {
             CuboidRegion cuboidRegion = (CuboidRegion) region;
 
-            points.add(new Vector(cuboidRegion.getPos1().getX(), cuboidRegion.getPos1().getY(), cuboidRegion.getPos1().getZ()));
-            points.add(new Vector(cuboidRegion.getPos2().getX(), cuboidRegion.getPos2().getY(), cuboidRegion.getPos2().getZ()));
+            try {
+                Class<?> regionClass = cuboidRegion.getClass();
+                Method getPos1Method = regionClass.getMethod("getPos1");
+                Method getPos2Method = regionClass.getMethod("getPos2");
+
+                Class<?> vectorClass = getPos1Method.getReturnType();
+
+                Method getXMethod = vectorClass.getMethod("getBlockX");
+                Method getYMethod = vectorClass.getMethod("getBlockY");
+                Method getZMethod = vectorClass.getMethod("getBlockZ");
+
+                Object pos1 = getPos1Method.invoke(region);
+                Object pos2 = getPos2Method.invoke(region);
+
+                int x1 = (Integer) getXMethod.invoke(pos1);
+                int y1 = (Integer) getYMethod.invoke(pos1);
+                int z1 = (Integer) getZMethod.invoke(pos1);
+
+                int x2 = (Integer) getXMethod.invoke(pos2);
+                int y2 = (Integer) getYMethod.invoke(pos2);
+                int z2 = (Integer) getZMethod.invoke(pos2);
+
+                points.add(new Vector(x1, y1, z1));
+                points.add(new Vector(x2, y2, z2));
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
         } else
             return null;
 
         return points;
+    }
+
+    public static Vector[] getMinMaxPoints(Region region){
+        Vector[] minMax = new Vector[2];
+
+        try{
+            Class<?> regionClass = region.getClass();
+            Method getMinimumPointMethod = regionClass.getMethod("getMinimumPoint");
+            Method getMaximumPointMethod = regionClass.getMethod("getMaximumPoint");
+
+            Class<?> vectorClass = getMinimumPointMethod.getReturnType();
+
+            Method getXMethod = vectorClass.getMethod("getBlockX");
+            Method getYMethod = vectorClass.getMethod("getBlockY");
+            Method getZMethod = vectorClass.getMethod("getBlockZ");
+
+            Object minPoint = getMinimumPointMethod.invoke(region);
+            Object maxPoint = getMaximumPointMethod.invoke(region);
+
+            int minX = (Integer) getXMethod.invoke(minPoint);
+            int minY = (Integer) getYMethod.invoke(minPoint);
+            int minZ = (Integer) getZMethod.invoke(minPoint);
+
+            int maxX = (Integer) getXMethod.invoke(maxPoint);
+            int maxY = (Integer) getYMethod.invoke(maxPoint);
+            int maxZ = (Integer) getZMethod.invoke(maxPoint);
+
+            minMax[0] = new Vector(minX, minY, minZ);
+            minMax[1] = new Vector(maxX, maxY, maxZ);
+
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return minMax;
     }
 
     /**
@@ -156,7 +216,12 @@ public class GeneratorUtils {
             // Reflectively access the minimum and maximum points
             Method getMinimumPoint = regionClass.getMethod("getMinimumPoint");
             Method getMaximumPoint = regionClass.getMethod("getMaximumPoint");
-            Method contains = regionClass.getMethod("contains", Object.class);
+            Method contains;
+
+            if(CommonModule.getInstance().getDependencyComponent().isLegacyWorldEdit())
+                contains = regionClass.getMethod("contains", com.sk89q.worldedit.Vector.class);
+            else
+                contains = regionClass.getMethod("contains", com.sk89q.worldedit.math.BlockVector3.class);
 
             Object minPoint = getMinimumPoint.invoke(polyRegion);
             Object maxPoint = getMaximumPoint.invoke(polyRegion);

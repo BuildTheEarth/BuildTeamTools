@@ -136,7 +136,7 @@ public class NetworkModule extends Module {
         out.writeUTF("Ping");
         out.writeUTF(p.getUniqueId().toString());
         out.writeUTF("Version: " + BuildTeamTools.getInstance().getDescription().getVersion());
-        p.sendPluginMessage(BuildTeamTools.getInstance(), "buildteamtools:buildteam", out.toByteArray());
+        p.sendPluginMessage(BuildTeamTools.getInstance(), "btt:buildteam", out.toByteArray());
     }
 
     /**

@@ -3,6 +3,7 @@ package net.buildtheearth.modules.common.components.dependency;
 import com.sk89q.worldedit.WorldEdit;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 
 import java.util.ArrayList;
@@ -27,6 +28,18 @@ public class DependencyComponent extends Component {
      */
     public boolean isWorldEditEnabled() {
         return BuildTeamTools.getInstance().getServer().getPluginManager().isPluginEnabled("WorldEdit");
+    }
+
+    public boolean isLegacyWorldEdit(){
+        if(isFastAsyncWorldEditEnabled())
+            return false;
+        if(!isWorldEditEnabled())
+            return false;
+
+        String version = BuildTeamTools.getInstance().getServer().getPluginManager().getPlugin("WorldEdit").getDescription().getVersion();
+        int major = Integer.parseInt(version.split("\\.")[0]);
+
+        return major < 7;
     }
 
     /**

@@ -2,6 +2,7 @@ package net.buildtheearth.modules.generator.components.house;
 
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.modules.generator.model.Settings;
+import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.Utils;
 import org.bukkit.entity.Player;
@@ -17,58 +18,59 @@ public class HouseSettings extends Settings {
     public void setDefaultValues() {
         // Roof Type (Default: Random)
         RoofType roofType = (RoofType) Utils.pickRandom(RoofType.values());
-        getValues().put(HouseFlag.ROOF_TYPE, roofType.getType());
+        if(roofType != null)
+            setValue(HouseFlag.ROOF_TYPE, roofType.getType());
 
         // Wall Color (Default: Random)
         ItemStack block = (ItemStack) Utils.pickRandom(MenuItems.getSolidBlocks().toArray());
-        getValues().put(HouseFlag.WALL_COLOR, XMaterial.matchXMaterial(block).getId() + "");
+        if(block != null)
+            setValue(HouseFlag.WALL_COLOR, Item.getUniqueMaterialString(block));
 
         // Wall Color (Default: Random)
         block = (ItemStack) Utils.pickRandom(MenuItems.getSolidBlocks().toArray());
-        getValues().put(HouseFlag.BASE_COLOR, XMaterial.matchXMaterial(block).getId() + "");
+        if(block != null)
+            setValue(HouseFlag.BASE_COLOR, XMaterial.matchXMaterial(block).getId() + "");
 
         // Roof Color (Default: Random)
-        block = (ItemStack) Utils.pickRandom(MenuItems.getStairs().toArray());
-
-        if( getValues().get(HouseFlag.ROOF_TYPE).equalsIgnoreCase(RoofType.FLATTER_SLABS.getType()) ||
-            getValues().get(HouseFlag.ROOF_TYPE).equalsIgnoreCase(RoofType.MEDIUM_SLABS.getType()) ||
-            getValues().get(HouseFlag.ROOF_TYPE).equalsIgnoreCase(RoofType.STEEP_SLABS.getType()))
+        if(roofType == RoofType.STAIRS)
+            block = (ItemStack) Utils.pickRandom(MenuItems.getStairs().toArray());
+        else if(roofType == RoofType.FLATTER_SLABS || roofType == RoofType.MEDIUM_SLABS || roofType == RoofType.STEEP_SLABS)
+            block = (ItemStack) Utils.pickRandom(MenuItems.getSlabs().toArray());
+        else if(roofType == RoofType.FLAT)
             block = (ItemStack) Utils.pickRandom(MenuItems.getSlabs().toArray());
 
-        else if(getValues().get(HouseFlag.ROOF_TYPE).equalsIgnoreCase(RoofType.FLAT.getType()))
-            block = (ItemStack) Utils.pickRandom(MenuItems.getSlabs().toArray());
-
-        getValues().put(HouseFlag.ROOF_COLOR, XMaterial.matchXMaterial(block).getId() + "");
+        if(block != null)
+            setValue(HouseFlag.ROOF_COLOR, Item.getUniqueMaterialString(block));
 
         // Balcony Color (Default: Random)
-        getValues().put(HouseFlag.BALCONY_COLOR, XMaterial.BLACK_CONCRETE.getId() + "");
+        setValue(HouseFlag.BALCONY_COLOR, Item.getUniqueMaterialString(XMaterial.BLACK_CONCRETE.parseItem()));
 
         // Balcony Fence Color (Default: Random)
-        getValues().put(HouseFlag.BALCONY_FENCE_COLOR, XMaterial.IRON_TRAPDOOR.getId() + "");
+        setValue(HouseFlag.BALCONY_FENCE_COLOR, Item.getUniqueMaterialString(XMaterial.IRON_TRAPDOOR.parseItem()));
 
 
         // Floor Count (Default: Random)
-        getValues().put(HouseFlag.FLOOR_COUNT, "" + ((int)(Math.random()*3.0) + 1));
+        setValue(HouseFlag.FLOOR_COUNT, "" + ((int)(Math.random()*3.0) + 1));
 
         // Window Color (Default: Fixed Value)
-        getValues().put(HouseFlag.WINDOW_COLOR, "95:15");
+        setValue(HouseFlag.WINDOW_COLOR, Item.getUniqueMaterialString(XMaterial.BLACK_STAINED_GLASS.parseItem()));
 
         // Floor Height (Default: Fixed Value)
-        getValues().put(HouseFlag.FLOOR_HEIGHT, "3");
+        setValue(HouseFlag.FLOOR_HEIGHT, "3");
 
         // Base Height (Default: Fixed Value)
-        getValues().put(HouseFlag.BASE_HEIGHT, "1");
+        setValue(HouseFlag.BASE_HEIGHT, "1");
 
         // Window Height (Default: Fixed Value)
-        getValues().put(HouseFlag.WINDOW_HEIGHT, "2");
+        setValue(HouseFlag.WINDOW_HEIGHT, "2");
 
         // Window Width (Default: Fixed Value)
-        getValues().put(HouseFlag.WINDOW_WIDTH, "2");
+        setValue(HouseFlag.WINDOW_WIDTH, "2");
 
         // Window Distance (Default: Fixed Value)
-        getValues().put(HouseFlag.WINDOW_DISTANCE, "2");
+        setValue(HouseFlag.WINDOW_DISTANCE, "2");
 
         // Max Roof Height (Default: Fixed Value)
-        getValues().put(HouseFlag.MAX_ROOF_HEIGHT, "10");
+        setValue(HouseFlag.MAX_ROOF_HEIGHT, "10");
     }
 }

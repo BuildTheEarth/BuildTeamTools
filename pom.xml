@@ -186,6 +186,14 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- World Edit
+        <dependency>
+            <groupId>com.sk89q.worldedit</groupId>
+            <artifactId>worldedit-bukkit</artifactId>
+            <version>7.2.9</version>
+            <scope>provided</scope>
+        </dependency> -->
+
         <!-- Fast Async World Edit for 1.13+ -->
         <dependency>
             <groupId>com.fastasyncworldedit</groupId>

@@ -42,7 +42,7 @@ public class RailScripts extends Script {
         getPlayer().chat("//set redstone_block");
 
         Block[][][] regionBlocks = GeneratorUtils.analyzeRegion(getPlayer(), getPlayer().getWorld());
-        finish(operations, regionBlocks);
+        finish(regionBlocks);
 
 
         // TODO END TEMP

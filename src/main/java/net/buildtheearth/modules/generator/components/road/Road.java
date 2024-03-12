@@ -36,13 +36,6 @@ public class Road extends GeneratorComponent {
         if (!GeneratorModule.getInstance().getRoad().checkForPlayer(p))
             return;
 
-        Region region = GeneratorUtils.getWorldEditSelection(p);
-
-        if (region == null || !(region instanceof ConvexPolyhedralRegion))
-            return;
-
-        ConvexPolyhedralRegion convexRegion = (ConvexPolyhedralRegion) region;
-
-        RoadScripts.roadScript_v_2_0(p, this, convexRegion);
+        new RoadScripts(p, this);
     }
 }

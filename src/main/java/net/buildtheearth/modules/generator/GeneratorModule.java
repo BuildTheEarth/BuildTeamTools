@@ -103,7 +103,7 @@ public class GeneratorModule extends Module {
         if (generatorCommands.size() == 0)
             return;
 
-        if (generatorCommands.get(0).getCommands().size() == 0) {
+        if (generatorCommands.get(0).getOperations().size() == 0) {
             generatorCommands.remove(0);
             return;
         }

@@ -35,8 +35,6 @@ public class House extends GeneratorComponent {
         if (!checkForPlayer(p))
             return;
 
-        Region region = GeneratorUtils.getWorldEditSelection(p);
-
         new HouseScripts(p, this);
 
         sendSuccessMessage(p);

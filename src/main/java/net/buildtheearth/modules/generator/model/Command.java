@@ -1,14 +1,16 @@
 package net.buildtheearth.modules.generator.model;
 
 import com.cryptomorin.xseries.XMaterial;
-import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
-import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
@@ -17,7 +19,6 @@ import com.sk89q.worldedit.world.World;
 import lombok.Getter;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.common.CommonModule;
-import net.buildtheearth.modules.common.components.dependency.DependencyComponent;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
@@ -25,10 +26,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
@@ -40,33 +39,34 @@ public class Command {
     @Getter
     private final Player player;
     @Getter
-    private final GeneratorComponent module;
+    private final GeneratorComponent generatorComponent;
     @Getter
-    private final List<String> commands;
+    private final List<Operation> operations;
 
     @Getter
     private final Block[][][] blocks;
 
     @Getter
-    private final int operations;
+    private final int changes;
 
     private final int totalCommands;
 
     @Getter
     private long percentage;
 
-    public Command(Player player, GeneratorComponent module, List<String> commands, int operations, Block[][][] blocks) {
-        this.player = player;
-        this.module = module;
-        this.commands = commands;
-        this.operations = operations;
+    public Command(Script script, Block[][][] blocks) {
+        this.player = script.getPlayer();
+        this.generatorComponent = script.getGeneratorComponent();
+        this.operations = script.getOperations();
+        this.changes = script.getChanges();
         this.blocks = blocks;
-        this.totalCommands = commands.size();
+
+        this.totalCommands = operations.size();
     }
 
     /** Processes the commands from the command queue to prevent the server from freezing. */
     public void tick(){
-        if(commands.isEmpty())
+        if(operations.isEmpty())
             return;
 
         // As long as the player has the barrier in their inventory, we know that the command queue is still processing so we can skip this tick.
@@ -77,41 +77,50 @@ public class Command {
 
         player.getInventory().setItem(INVENTORY_SLOT, Item.create(XMaterial.BARRIER.parseMaterial(), "§c§lGenerator processing commands..."));
 
-        percentage = (int) Math.round((double) (totalCommands - commands.size()) / (double) totalCommands * 100);
+        percentage = (int) Math.round((double) (totalCommands - operations.size()) / (double) totalCommands * 100);
         player.sendActionBar("§a§lGenerator Progress: §e" + percentage + "%");
 
         // Process commands in batches of MAX_COMMANDS_PER_SERVER_TICK
         for(int i = 0; i < MAX_COMMANDS_PER_SERVER_TICK;){
-            if(commands.isEmpty()){
+            if(operations.isEmpty()){
                 finish();
                 break;
             }
 
-            String command = commands.get(0);
+            Operation command = operations.get(0);
             processCommand(command);
-            commands.remove(0);
+            operations.remove(0);
 
             // Skip WorldEdit commands that take no time to execute
-            if(!command.startsWith("//gmask")
-            && !command.startsWith("//mask")
-            && !command.startsWith("//pos")
-            && !command.startsWith("//sel")
-            && !command.startsWith("//expand"))
-                i++;
+            if(command.getOperationType() == Operation.OperationType.COMMAND){
+                String commandString = command.getValue();
+                if(commandString.startsWith("//gmask")
+                || commandString.startsWith("//mask")
+                || commandString.startsWith("//pos")
+                || commandString.startsWith("//sel")
+                || commandString.startsWith("//expand"))
+                    continue;
+            }
+
+            i++;
         }
 
         player.getInventory().setItem(INVENTORY_SLOT, null);
     }
 
     /** Processes a single command. */
-    public void processCommand(String command){
-        if(command.contains("%%XYZ/"))
-            command = convertXYZ(command);
+    public void processCommand(Operation operation){
+        if(operation.getOperationType() == Operation.OperationType.COMMAND){
+            String command = operation.getValue();
 
-        if(command.contains("%%SCHEMATIC/"))
-            pasteSchematic(command);
+            if(command.contains("%%XYZ/"))
+                command = convertXYZ(command);
 
-        player.chat(command);
+            if(command.contains("%%SCHEMATIC/"))
+                pasteSchematic(command);
+
+            player.chat(command);
+        }
     }
 
     /** Converts the XYZ coordinates in a command to the highest block at that location while skipping certain blocks. */
@@ -183,7 +192,7 @@ public class Command {
                 ClipboardHolder holder = new ClipboardHolder(clipboard);
                 holder.setTransform(transform);
 
-                Operation operation = holder
+                com.sk89q.worldedit.function.operation.Operation operation = holder
                         .createPaste(editSession)
                         .to(BlockVector3.at(x, maxHeight + offsetY, z))
                         .ignoreAirBlocks(true)
@@ -203,6 +212,6 @@ public class Command {
 
     /** Called when the command queue is finished. */
     public void finish(){
-        module.sendSuccessMessage(player);
+        generatorComponent.sendSuccessMessage(player);
     }
 }

@@ -30,9 +30,6 @@ public class Field extends GeneratorComponent {
         if (!checkForPlayer(p))
             return;
 
-        Region region = GeneratorUtils.getWorldEditSelection(p);
-
-        if(region != null)
-            FieldScripts.fieldScript_v_1_0(p, this, region);
+        new FieldScripts(p, this);
     }
 }

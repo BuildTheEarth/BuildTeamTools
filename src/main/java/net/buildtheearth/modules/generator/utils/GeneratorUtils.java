@@ -20,6 +20,7 @@ import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.session.SessionManager;
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.GeneratorModule;
+import net.buildtheearth.modules.generator.model.Operation;
 import net.buildtheearth.utils.MenuItems;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
@@ -703,11 +704,11 @@ public class GeneratorUtils {
      * @param vector1 Position 1
      * @param vector2 Position 2
      */
-    public static void createCuboidSelection(List<String> commands, Vector vector1, Vector vector2){
-        commands.add("//sel cuboid");
+    public static void createCuboidSelection(List<Operation> commands, Vector vector1, Vector vector2){
+        commands.add(new Operation("//sel cuboid"));
 
-        commands.add("//pos1 " + vector1.getBlockX() + "," + vector1.getBlockY() + "," + vector1.getBlockZ());
-        commands.add("//pos2 " + vector2.getBlockX() + "," + vector2.getBlockY() + "," + vector2.getBlockZ());
+        commands.add(new Operation("//pos1 " + vector1.getBlockX() + "," + vector1.getBlockY() + "," + vector1.getBlockZ()));
+        commands.add(new Operation("//pos2 " + vector2.getBlockX() + "," + vector2.getBlockY() + "," + vector2.getBlockZ()));
     }
 
     /**
@@ -741,12 +742,12 @@ public class GeneratorUtils {
      * @param commands The list of commands to add the selection to
      * @param points The list of points to create the selection from
      */
-    public static void createConvexSelection(List<String> commands, List<Vector> points){
-        commands.add("//sel convex");
-        commands.add("//pos1 " + getXYZ(points.get(0)));
+    public static void createConvexSelection(List<Operation> commands, List<Vector> points){
+        commands.add(new Operation("//sel convex"));
+        commands.add(new Operation("//pos1 " + getXYZ(points.get(0))));
 
         for(int i = 1; i < points.size(); i++)
-            commands.add("//pos2 " + getXYZ(points.get(i)));
+            commands.add(new Operation("//pos2 " + getXYZ(points.get(i))));
     }
 
     /**
@@ -756,12 +757,12 @@ public class GeneratorUtils {
      * @param commands The list of commands to add the selection to
      * @param points The list of points to create the selection from
      */
-    public static void createPolySelection(List<String> commands, List<Vector> points){
-        commands.add("//sel poly");
-        commands.add("//pos1 " + getXYZ(points.get(0)));
+    public static void createPolySelection(List<Operation> commands, List<Vector> points){
+        commands.add(new Operation("//sel poly"));
+        commands.add(new Operation("//pos1 " + getXYZ(points.get(0))));
 
         for(int i = 1; i < points.size(); i++)
-            commands.add("//pos2 " + getXYZ(points.get(i)));
+            commands.add(new Operation("//pos2 " + getXYZ(points.get(i))));
     }
 
     /**
@@ -792,10 +793,10 @@ public class GeneratorUtils {
      * @param offset The vertical offset you want the PolyLine to be created at
      * @return The amount of operations used to accomplish this
      */
-    public static int createPolyLine(List<String> commands, List<Vector> points, String lineMaterial, boolean connectLineEnds, Block[][][] blocks, int offset){
-        commands.add("//sel cuboid");
+    public static int createPolyLine(List<Operation> commands, List<Vector> points, String lineMaterial, boolean connectLineEnds, Block[][][] blocks, int offset){
+        commands.add(new Operation("//sel cuboid"));
 
-        commands.add("//pos1 " + getXYZWithVerticalOffset(points.get(0), blocks, offset));
+        commands.add(new Operation("//pos1 " + getXYZWithVerticalOffset(points.get(0), blocks, offset)));
 
         int operations = 0;
 
@@ -805,15 +806,15 @@ public class GeneratorUtils {
         String pos2 = getXYZWithVerticalOffset(points.get(0), blocks, offset);
 
         for(int i = 1; i < points.size(); i++){
-            commands.add("//pos2 " + positions.get(i-1));
-            commands.add("//line " + lineMaterial);
+            commands.add(new Operation("//pos2 " + positions.get(i-1)));
+            commands.add(new Operation("//line " + lineMaterial));
             operations++;
-            commands.add("//pos1 " + positions.get(i-1));
+            commands.add(new Operation("//pos1 " + positions.get(i-1)));
         }
 
         if(connectLineEnds){
-            commands.add("//pos2 " + pos2);
-            commands.add("//line " + lineMaterial);
+            commands.add(new Operation("//pos2 " + pos2));
+            commands.add(new Operation("//line " + lineMaterial));
             operations++;
         }
 

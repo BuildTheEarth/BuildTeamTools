@@ -6,7 +6,6 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import net.buildtheearth.modules.generator.model.Flag;
 import net.buildtheearth.modules.generator.model.GeneratorComponent;
-import net.buildtheearth.modules.generator.model.Operation;
 import net.buildtheearth.modules.generator.model.Script;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import org.bukkit.Location;
@@ -116,8 +115,8 @@ public class RoadScripts extends Script {
         // Draw the road
 
         createConvexSelection(operations, points);
-        operations.add(new Operation("//gmask !solid," + roadMaterial + "," + markingMaterial + "," + sidewalkMaterial + "," + sidewalkSlabMaterial + "," + roadSlabMaterial));
-        operations.add(new Operation("//curve 35:4"));
+        createCommand("//gmask !solid," + roadMaterial + "," + markingMaterial + "," + sidewalkMaterial + "," + sidewalkSlabMaterial + "," + roadSlabMaterial);
+        createCommand("//curve 35:4");
 
         // Add additional yellow wool markings to spread the road material faster and everywhere on the road.
         for (int i = 2; i < laneCount; i += 2) {
@@ -125,14 +124,14 @@ public class RoadScripts extends Script {
 
             for (List<Vector> path : yellowWoolLine) {
                 createConvexSelection(operations, path);
-                operations.add(new Operation("//curve 35:4"));
+                createCommand("//curve 35:4");
                 changes++;
 
                 // Close the circles (curves are not able to end at the beginning)
-                operations.add(new Operation("//sel cuboid"));
-                operations.add(new Operation("//pos1 " + GeneratorUtils.getXYZ(path.get(0))));
-                operations.add(new Operation("//pos2 " + GeneratorUtils.getXYZ(path.get(path.size() - 1))));
-                operations.add(new Operation("//line 35:4"));
+                createCommand("//sel cuboid");
+                createCommand("//pos1 " + GeneratorUtils.getXYZ(path.get(0)));
+                createCommand("//pos2 " + GeneratorUtils.getXYZ(path.get(path.size() - 1)));
+                createCommand("//line 35:4");
                 changes++;
             }
         }
@@ -141,10 +140,10 @@ public class RoadScripts extends Script {
         if (road_width > 10) {
             List<List<Vector>> yellowWoolLineNearSidewalk = GeneratorUtils.shiftPointsAll(innerPoints, road_width - 4);
             for (List<Vector> path : yellowWoolLineNearSidewalk)
-                changes += GeneratorUtils.createPolyLine(operations, path, "35:4", true, blocks, 0);
+                changes += GeneratorUtils.createPolyLine(this, path, "35:4", true, blocks, 0);
         }
 
-        operations.add(new Operation("//gmask"));
+        createCommand("//gmask");
 
 
         // ----------- SIDEWALK ----------
@@ -157,34 +156,34 @@ public class RoadScripts extends Script {
 
 
             // Draw the sidewalk middle lines
-            operations.add(new Operation("//gmask !solid," + roadMaterial + "," + markingMaterial));
+            createCommand("//gmask !solid," + roadMaterial + "," + markingMaterial);
             for(List<Vector> path : sidewalkPointsMid)
-                changes += GeneratorUtils.createPolyLine(operations, path, "35:1", true, blocks, 0);
+                changes += GeneratorUtils.createPolyLine(this, path, "35:1", true, blocks, 0);
 
-            operations.add(new Operation("//gmask !" + roadMaterial + "," + markingMaterial));
+            createCommand("//gmask !" + roadMaterial + "," + markingMaterial);
             // Create the outer sidewalk edge lines
             for(List<Vector> path : sidewalkPointsOut)
-                changes += GeneratorUtils.createPolyLine(operations, path, "35:3", true, blocks, 0);
+                changes += GeneratorUtils.createPolyLine(this, path, "35:3", true, blocks, 0);
 
             // Create the inner sidewalk edge lines
             for(List<Vector> path : sidewalkPointsIn)
-                changes += GeneratorUtils.createPolyLine(operations, path, "35:3", true, blocks, 0);
-            operations.add(new Operation("//gmask"));
+                changes += GeneratorUtils.createPolyLine(this, path, "35:3", true, blocks, 0);
+            createCommand("//gmask");
 
             if(isCrosswalk){
                 // Draw the sidewalk middle lines
-                operations.add(new Operation("//gmask " + roadMaterial + "," + markingMaterial));
+                createCommand("//gmask " + roadMaterial + "," + markingMaterial);
                 for(List<Vector> path : sidewalkPointsMid)
-                    changes += GeneratorUtils.createPolyLine(operations, path, "35:2", true, blocks, 0);
+                    changes += GeneratorUtils.createPolyLine(this, path, "35:2", true, blocks, 0);
 
                 // Create the outer sidewalk edge lines
                 for(List<Vector> path : sidewalkPointsOut)
-                    changes += GeneratorUtils.createPolyLine(operations, path, "35:11", true, blocks, 0);
+                    changes += GeneratorUtils.createPolyLine(this, path, "35:11", true, blocks, 0);
 
                 // Create the inner sidewalk edge lines
                 for(List<Vector> path : sidewalkPointsIn)
-                    changes += GeneratorUtils.createPolyLine(operations, path, "35:11", true, blocks, 0);
-                operations.add(new Operation("//gmask"));
+                    changes += GeneratorUtils.createPolyLine(this, path, "35:11", true, blocks, 0);
+                createCommand("//gmask");
             }
         }
 
@@ -196,25 +195,25 @@ public class RoadScripts extends Script {
 
         // Create the poly selection
         createPolySelection(operations, polyRegionPointsExact);
-        operations.add(new Operation("//expand 10 up"));
-        operations.add(new Operation("//expand 10 down"));
-        operations.add(new Operation("//gmask !air"));
+        createCommand("//expand 10 up");
+        createCommand("//expand 10 down");
+        createCommand("//gmask !air");
 
         // Replace the current road material with light green wool
-        operations.add(new Operation("//replace " + roadMaterial + " 35:5"));
+        createCommand("//replace " + roadMaterial + " 35:5");
         changes++;
         if(!roadSlabMaterial.equalsIgnoreCase(Flag.DISABLED)) {
-            operations.add(new Operation("//replace " + roadSlabMaterial + " 35:5"));
+            createCommand("//replace " + roadSlabMaterial + " 35:5");
             changes++;
         }
-        operations.add(new Operation("//replace " + markingMaterial + " 35:5"));
+        createCommand("//replace " + markingMaterial + " 35:5");
         changes++;
 
         // Replace the current sidewalk material with pink wool
-        operations.add(new Operation("//replace " + sidewalkMaterial + " 35:6"));
+        createCommand("//replace " + sidewalkMaterial + " 35:6");
         changes++;
         if(!sidewalkSlabMaterial.equalsIgnoreCase(Flag.DISABLED)) {
-            operations.add(new Operation("//replace " + sidewalkSlabMaterial + " 35:6"));
+            createCommand("//replace " + sidewalkSlabMaterial + " 35:6");
             changes++;
         }
 
@@ -223,81 +222,81 @@ public class RoadScripts extends Script {
         // Fill the road with the materials
 
         createPolySelection(operations, polyRegionPoints);
-        operations.add(new Operation("//expand 10 up"));
-        operations.add(new Operation("//expand 10 down"));
-        operations.add(new Operation("//gmask !air,35:3,35:11"));
+        createCommand("//expand 10 up");
+        createCommand("//expand 10 down");
+        createCommand("//gmask !air,35:3,35:11");
 
         // Bring all lines to the top
         for(int i = 0; i < road_height + 5; i++) {
-            operations.add(new Operation("//replace >35:1 35:1"));
+            createCommand("//replace >35:1 35:1");
             changes++;
-            operations.add(new Operation("//replace >35:2 35:2"));
+            createCommand("//replace >35:2 35:2");
             changes++;
-            operations.add(new Operation("//replace >35:4 35:4"));
+            createCommand("//replace >35:4 35:4");
             changes++;
         }
 
-        operations.add(new Operation("//gmask !air"));
+        createCommand("//gmask !air");
 
         // Bring the light blue and blue wool to the top at last to prevent the others from creating leaks
         for(int i = 0; i < road_height + 5; i++) {
-            operations.add(new Operation("//replace >35:3 35:3"));
+            createCommand("//replace >35:3 35:3");
             changes++;
-            operations.add(new Operation("//replace >35:11 35:11"));
+            createCommand("//replace >35:11 35:11");
             changes++;
         }
 
         // Bring all lines further down
-        operations.add(new Operation("//gmask =queryRel(0,1,0,35,3)"));
+        createCommand("//gmask =queryRel(0,1,0,35,3)");
         for(int i = 0; i < 3; i++){
-            operations.add(new Operation("//set 35:3"));
+            createCommand("//set 35:3");
             changes++;
         }
-        operations.add(new Operation("//gmask =queryRel(0,1,0,35,11)"));
+        createCommand("//gmask =queryRel(0,1,0,35,11)");
         for(int i = 0; i < 3; i++){
-            operations.add(new Operation("//set 35:11"));
+            createCommand("//set 35:11");
             changes++;
         }
 
         // Spread the yellow wool
-        operations.add(new Operation("//gmask =(queryRel(1,0,0,35,4)||queryRel(-1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4)||queryRel(0,-1,0,35,4)||queryRel(0,1,0,35,4))&&queryRel(0,3,0,0,0)"));
+        createCommand("//gmask =(queryRel(1,0,0,35,4)||queryRel(-1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4)||queryRel(0,-1,0,35,4)||queryRel(0,1,0,35,4))&&queryRel(0,3,0,0,0)");
         for(int i = 0; i < laneWidth*2; i++){
             // Replace all blocks around yellow wool with yellow wool until it reaches the light blue wool
-            operations.add(new Operation("//replace !35:3,35:5,35:6,solid 35:4"));
+            createCommand("//replace !35:3,35:5,35:6,solid 35:4");
             changes++;
         }
 
         // Spread the orange wool
-        operations.add(new Operation("//gmask =(queryRel(1,0,0,35,1)||queryRel(-1,0,0,35,1)||queryRel(0,0,1,35,1)||queryRel(0,0,-1,35,1)||queryRel(0,-1,0,35,1)||queryRel(0,1,0,35,1))&&queryRel(0,3,0,0,0)"));
+        createCommand("//gmask =(queryRel(1,0,0,35,1)||queryRel(-1,0,0,35,1)||queryRel(0,0,1,35,1)||queryRel(0,0,-1,35,1)||queryRel(0,-1,0,35,1)||queryRel(0,1,0,35,1))&&queryRel(0,3,0,0,0)");
         for(int i = 0; i < laneWidth*2; i++){
             // Replace all blocks around orange wool with orange wool until it reaches the light blue wool
-            operations.add(new Operation("//replace !35:3,35:2,35:11,35:5,solid 35:1"));
+            createCommand("//replace !35:3,35:2,35:11,35:5,solid 35:1");
             changes++;
         }
 
         // Replace all orange wool with light blue wool
-        operations.add(new Operation("//gmask"));
-        operations.add(new Operation("//replace 35:1 35:3"));
+        createCommand("//gmask");
+        createCommand("//replace 35:1 35:3");
 
 
         // Spread the magenta wool
-        operations.add(new Operation("//gmask =(queryRel(1,0,0,35,2)||queryRel(-1,0,0,35,2)||queryRel(0,0,1,35,2)||queryRel(0,0,-1,35,2)||queryRel(0,-1,0,35,2)||queryRel(0,1,0,35,2))&&queryRel(0,3,0,0,0)"));
+        createCommand("//gmask =(queryRel(1,0,0,35,2)||queryRel(-1,0,0,35,2)||queryRel(0,0,1,35,2)||queryRel(0,0,-1,35,2)||queryRel(0,-1,0,35,2)||queryRel(0,1,0,35,2))&&queryRel(0,3,0,0,0)");
         for(int i = 0; i < laneWidth*2; i++){
             // Replace all blocks around orange wool with orange wool until it reaches the light blue wool
-            operations.add(new Operation("//replace !35:11,35:3,solid 35:2"));
+            createCommand("//replace !35:11,35:3,solid 35:2");
             changes++;
         }
 
         // Replace all magenta wool with pink wool
-        operations.add(new Operation("//gmask"));
-        operations.add(new Operation("//replace 35:2 35:6"));
+        createCommand("//gmask");
+        createCommand("//replace 35:2 35:6");
         changes++;
-        operations.add(new Operation("//replace 35:11 35:6"));
+        createCommand("//replace 35:11 35:6");
         changes++;
 
         // In case there are some un-replaced blocks left, replace everything above light blue wool that is not air or yellow wool with light blue wool
         for(int i = 0; i < road_height; i++) {
-            operations.add(new Operation("//replace >35:3,!air,35:4 35:3"));
+            createCommand("//replace >35:3,!air,35:4 35:3");
             changes++;
         }
 
@@ -306,25 +305,25 @@ public class RoadScripts extends Script {
         // Draw the crosswalk
 
         if(isCrosswalk){
-            operations.add(new Operation("//gmask =queryRel(1,0,0,35,3)||queryRel(-1,0,0,35,3)||queryRel(0,0,1,35,3)||queryRel(0,0,-1,35,3)"));
-            operations.add(new Operation("//replace 35:6 35:9"));
+            createCommand("//gmask =queryRel(1,0,0,35,3)||queryRel(-1,0,0,35,3)||queryRel(0,0,1,35,3)||queryRel(0,0,-1,35,3)");
+            createCommand("//replace 35:6 35:9");
             changes++;
 
             for(int i = 0; i < road_width; i++) {
-                operations.add(new Operation("//gmask =queryRel(1,0,0,35,9)||queryRel(-1,0,0,35,9)||queryRel(0,0,1,35,9)||queryRel(0,0,-1,35,9)"));
-                operations.add(new Operation("//replace 35:6 35:10"));
+                createCommand("//gmask =queryRel(1,0,0,35,9)||queryRel(-1,0,0,35,9)||queryRel(0,0,1,35,9)||queryRel(0,0,-1,35,9)");
+                createCommand("//replace 35:6 35:10");
                 changes++;
 
-                operations.add(new Operation("//gmask =queryRel(1,0,0,35,10)||queryRel(-1,0,0,35,10)||queryRel(0,0,1,35,10)||queryRel(0,0,-1,35,10)"));
-                operations.add(new Operation("//replace 35:6 35:9"));
+                createCommand("//gmask =queryRel(1,0,0,35,10)||queryRel(-1,0,0,35,10)||queryRel(0,0,1,35,10)||queryRel(0,0,-1,35,10)");
+                createCommand("//replace 35:6 35:9");
                 changes++;
             }
         }else{
-            operations.add(new Operation("//replace 35:6 35:4"));
+            createCommand("//replace 35:6 35:4");
             changes++;
         }
 
-        operations.add(new Operation("//gmask"));
+        createCommand("//gmask");
 
 
         // ----------- ROAD AND SIDEWALK SLABS ----------
@@ -332,16 +331,16 @@ public class RoadScripts extends Script {
 
         // Create the road slabs
         if(!roadSlabMaterial.equalsIgnoreCase(Flag.DISABLED)){
-            operations.add(new Operation("//gmask =queryRel(0,-1,0,35,4)&&queryRel(0,0,0,0,0)&&(queryRel(1,0,0,35,4)||queryRel(-1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4))"));
-            operations.add(new Operation("//set " + roadSlabMaterial));
+            createCommand("//gmask =queryRel(0,-1,0,35,4)&&queryRel(0,0,0,0,0)&&(queryRel(1,0,0,35,4)||queryRel(-1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4))");
+            createCommand("//set " + roadSlabMaterial);
             changes++;
         }
 
 
         // Create the sidewalk slabs
         if(!sidewalkSlabMaterial.equalsIgnoreCase(Flag.DISABLED)){
-            operations.add(new Operation("//gmask =queryRel(0,-1,0,35,3)&&queryRel(0,0,0,0,0)&&(queryRel(1,0,0,35,3)||queryRel(-1,0,0,35,3)||queryRel(0,0,1,35,3)||queryRel(0,0,-1,35,3))"));
-            operations.add(new Operation("//set " + sidewalkSlabMaterial));
+            createCommand("//gmask =queryRel(0,-1,0,35,3)&&queryRel(0,0,0,0,0)&&(queryRel(1,0,0,35,3)||queryRel(-1,0,0,35,3)||queryRel(0,0,1,35,3)||queryRel(0,0,-1,35,3))");
+            createCommand("//set " + sidewalkSlabMaterial);
             changes++;
         }
 
@@ -351,7 +350,7 @@ public class RoadScripts extends Script {
 
         if(laneCount > 1) {
 
-            operations.add(new Operation("//gmask 35:4"));
+            createCommand("//gmask 35:4");
 
             // Check if langeCount is even or odd
             boolean isEven = laneCount % 2 == 0;
@@ -379,25 +378,25 @@ public class RoadScripts extends Script {
                     }
                 }
 
-            operations.add(new Operation("//gmask"));
+            createCommand("//gmask");
         }
 
 
         // ----------- MATERIAL ----------
         // Replace all light blue wool with the sidewalk material
         createPolySelection(operations, polyRegionPoints);
-        operations.add(new Operation("//replace 35:3 " + sidewalkMaterial));
+        createCommand("//replace 35:3 " + sidewalkMaterial);
         changes++;
 
         // Replace all yellow,lime and cyan wool with the road material
-        operations.add(new Operation("//replace 35:4,35:5,35:9 " + roadMaterial));
+        createCommand("//replace 35:4,35:5,35:9 " + roadMaterial);
         changes++;
 
         // Replace all purple wool with the marking material
-        operations.add(new Operation("//replace 35:10 " + markingMaterial));
+        createCommand("//replace 35:10 " + markingMaterial);
         changes++;
 
-        operations.add(new Operation("//gmask"));
+        createCommand("//gmask");
 
 
 
@@ -442,7 +441,7 @@ public class RoadScripts extends Script {
                     angle = (angle + 360) % 360; // Normalize angle to be between 0 and 360
 
 
-                    createPasteSchematicOperation("GeneratorCollections/roadpack/streetlamp" + streetLampType + ".schematic", loc, angle);
+                    createPasteSchematic("GeneratorCollections/roadpack/streetlamp" + streetLampType + ".schematic", loc, angle);
                     changes++;
                 }
         }
@@ -456,7 +455,7 @@ public class RoadScripts extends Script {
             CuboidRegion cuboidRegion = (CuboidRegion) getRegion();
             Vector pos1 = new Vector(cuboidRegion.getPos1().getX(), cuboidRegion.getPos1().getY(), cuboidRegion.getPos1().getZ());
             Vector pos2 = new Vector(cuboidRegion.getPos2().getX(), cuboidRegion.getPos2().getY(), cuboidRegion.getPos2().getZ());
-            createCuboidSelectionOperation(pos1, pos2);
+            createCuboidSelection(pos1, pos2);
         }
 
         // Finish the script
@@ -465,7 +464,7 @@ public class RoadScripts extends Script {
 
 
     public int createRoadMarkingLine(List<Vector> points, String lineMaterial, Block[][][] blocks) {
-        operations.add(new Operation("//sel cuboid"));
+        createCommand("//sel cuboid");
         int changes = 0;
 
         List<String> positions = new ArrayList<>();
@@ -473,10 +472,10 @@ public class RoadScripts extends Script {
 
         for(int i = 0; i < points.size(); i++){
             if(i%2 == 0)
-                operations.add(new Operation("//pos1 " + positions.get(i)));
+                createCommand("//pos1 " + positions.get(i));
             else {
-                operations.add(new Operation("//pos2 " + positions.get(i)));
-                operations.add(new Operation("//line " + lineMaterial));
+                createCommand("//pos2 " + positions.get(i));
+                createCommand("//line " + lineMaterial);
                 changes++;
             }
         }

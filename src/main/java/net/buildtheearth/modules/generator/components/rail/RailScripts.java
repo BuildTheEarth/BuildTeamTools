@@ -1,12 +1,7 @@
 package net.buildtheearth.modules.generator.components.rail;
 
-import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
-import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.regions.Polygonal2DRegion;
-import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.model.*;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -39,10 +34,10 @@ public class RailScripts extends Script {
 
         Block[][][] regionBlocks = GeneratorUtils.analyzeRegion(getPlayer(), getPlayer().getWorld());
         List<Vector> points = GeneratorUtils.getSelectionPointsFromRegion(getRegion());
-        createCuboidSelectionOperation(points.get(0), points.get(1));
-        this.operations.add(new Operation("//set redstone_block"));
-        this.operations.add(new Operation(Operation.OperationType.BREAKPOINT));
-        this.operations.add(new Operation("//set gold_block"));
+        createCuboidSelection(points.get(0), points.get(1));
+        createCommand("//set redstone_block");
+        createBreakPoint();
+        createCommand("//set gold_block");
 
         finish(regionBlocks);
 

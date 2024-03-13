@@ -2,10 +2,8 @@ package net.buildtheearth.modules.generator.model;
 
 import com.sk89q.worldedit.regions.Region;
 import lombok.Getter;
-import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -45,6 +43,16 @@ public class Script {
     }
 
     /**
+     * Adds a command to the operations list.
+     * A command can be something like "//set 1", "//replace 1 2", "//copy", "//paste" etc.
+     *
+     * @param command The command to add
+     */
+    public void createCommand(String command){
+        operations.add(new Operation(command));
+    }
+
+    /**
      * Adds a break point to the operations list.
      * When this command is reached, the script will pause and wait for the Operation to finish.
      * <p/>
@@ -57,7 +65,7 @@ public class Script {
      * <p/>
      * <b>Note</b>: This method clears the current gmask of the player so don't use it if you want to keep the current gmask.
      */
-    protected void createBreakPointOperation(){
+    public void createBreakPoint(){
         operations.add(new Operation(Operation.OperationType.BREAKPOINT));
     }
 
@@ -68,10 +76,8 @@ public class Script {
      * @param location        The location where the schematic should be pasted
      * @param rotation        The rotation at which the schematic should be pasted
      */
-    protected void createPasteSchematicOperation(String pathToSchematic, Location location, double rotation){
-        String value = pathToSchematic + "," + location.getWorld().getName() + "," + location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ() + "," + rotation + "," + 1;
-
-        operations.add(new Operation(Operation.OperationType.PASTE_SCHEMATIC, value));
+    public void createPasteSchematic(String pathToSchematic, Location location, double rotation){
+        operations.add(new Operation(Operation.OperationType.PASTE_SCHEMATIC, pathToSchematic, location, rotation));
     }
 
     /**
@@ -80,10 +86,8 @@ public class Script {
      * @param vector1 Position 1
      * @param vector2 Position 2
      */
-    public void createCuboidSelectionOperation(Vector vector1, Vector vector2){
-        String value = vector1.getBlockX() + "," + vector1.getBlockY() + "," + vector1.getBlockZ() + "," + vector2.getBlockX() + "," + vector2.getBlockY() + "," + vector2.getBlockZ();
-
-        operations.add(new Operation(Operation.OperationType.CUBOID_SELECTION, value));
+    public void createCuboidSelection(Vector vector1, Vector vector2){
+        operations.add(new Operation(Operation.OperationType.CUBOID_SELECTION, vector1, vector2));
     }
 
     /**
@@ -93,12 +97,7 @@ public class Script {
      * @param points The list of points to create the selection from
      */
     public void createPolySelection(List<Operation> commands, List<Vector> points){
-        StringBuilder value = new StringBuilder();
-
-        for(Vector point : points)
-            value.append(point.getBlockX()).append(",").append(point.getBlockY()).append(",").append(point.getBlockZ()).append(";");
-
-        commands.add(new Operation(Operation.OperationType.POLYGONAL_SELECTION, value.toString()));
+        commands.add(new Operation(Operation.OperationType.POLYGONAL_SELECTION, points));
     }
 
     /**
@@ -108,11 +107,6 @@ public class Script {
      * @param points The list of points to create the selection from
      */
     public void createConvexSelection(List<Operation> commands, List<Vector> points){
-        StringBuilder value = new StringBuilder();
-
-        for(Vector point : points)
-            value.append(point.getBlockX()).append(",").append(point.getBlockY()).append(",").append(point.getBlockZ()).append(";");
-
-        commands.add(new Operation(Operation.OperationType.CONVEX_SELECTION, value.toString()));
+        commands.add(new Operation(Operation.OperationType.CONVEX_SELECTION, points));
     }
 }

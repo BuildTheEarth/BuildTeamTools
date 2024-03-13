@@ -74,10 +74,20 @@ public class GeneratorCollections {
                 if (format != null)
                     reader = (ClipboardReader) getReader.invoke(format, Files.newInputStream(myFile.toPath()));
 
+                BukkitWorld bukkitWorld;
+                if(p != null)
+                    bukkitWorld = new BukkitWorld(p.getWorld());
+                else
+                    bukkitWorld = new BukkitWorld(Bukkit.getWorlds().get(0));
+
                 if (reader != null){
                     Class<?> readerClass = reader.getClass();
-                    Method read = readerClass.getMethod("read");
-                    clipboard = (Clipboard) read.invoke(reader);
+                    Method read = readerClass.getMethod("read", Class.forName("com.sk89q.worldedit.world.registry.WorldData"));
+
+                    Method getWorldDataMethod = bukkitWorld.getClass().getMethod("getWorldData");
+                    Object worldData = getWorldDataMethod.invoke(bukkitWorld);
+
+                    clipboard = (Clipboard) read.invoke(reader, worldData);
                 }
 
             // For latest WorldEdit

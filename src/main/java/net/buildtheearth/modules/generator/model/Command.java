@@ -1,19 +1,24 @@
 package net.buildtheearth.modules.generator.model;
 
 import com.cryptomorin.xseries.XMaterial;
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.extension.factory.parser.mask.ExpressionMaskParser;
+import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.extension.input.ParserContext;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
@@ -26,7 +31,6 @@ import net.buildtheearth.utils.MenuItems;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -41,6 +45,7 @@ public class Command {
 
     public static final int MAX_COMMANDS_PER_SERVER_TICK = 10;
     public static final int INVENTORY_SLOT = 27;
+
     @Getter
     private final Player player;
     @Getter
@@ -53,6 +58,18 @@ public class Command {
 
     @Getter
     private final int changes;
+
+    @Getter
+    private final Region region;
+
+    @Getter
+    private final World weWorld;
+
+    @Getter
+    private final Actor actor;
+
+    @Getter
+    private final LocalSession localSession;
 
     private final int totalCommands;
 
@@ -70,10 +87,14 @@ public class Command {
         this.generatorComponent = script.getGeneratorComponent();
         this.operations = script.getOperations();
         this.changes = script.getChanges();
+        this.region = script.getRegion();
         this.blocks = blocks;
+        this.weWorld = BukkitAdapter.adapt(getPlayer().getWorld());
+        this.actor = BukkitAdapter.adapt(getPlayer());
+        this.localSession = WorldEdit.getInstance().getSessionManager().get(actor);
 
         this.totalCommands = operations.size();
-        minMax = GeneratorUtils.getMinMaxPoints(script.getRegion());
+        minMax = GeneratorUtils.getMinMaxPoints(getRegion());
 
         player.getInventory().setItem(INVENTORY_SLOT, null);
     }
@@ -162,7 +183,7 @@ public class Command {
                 if(!breakPointActive) {
                     oldMaterial = block.getType();
                     oldBlockData = block.getBlockData();
-                    tempRegionSelector = GeneratorUtils.getCurrentSelection(getPlayer());
+                    tempRegionSelector = GeneratorUtils.getCurrentRegionSelector(getPlayer());
                     player.chat("//sel cuboid");
                     player.chat("//pos1 " + point.getBlockX() + "," + point.getBlockY() + "," + point.getBlockZ());
                     player.chat("//pos2 " + point.getBlockX() + "," + point.getBlockY() + "," + point.getBlockZ());
@@ -171,6 +192,10 @@ public class Command {
                     breakPointActive = true;
                 }
 
+                break;
+
+            case SET_BLOCKS_WITH_EXPRESSION_MASK:
+                setBlocksWithExpressionMask(operation);
                 break;
 
             case PASTE_SCHEMATIC:
@@ -216,6 +241,29 @@ public class Command {
             commandSuffix = command.split("/%%")[1];
 
         return command.split("%%XYZ/")[0] + x + "," + maxHeight + "," + z + commandSuffix;
+    }
+
+    public void setBlocksWithExpressionMask(Operation operation){
+        try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
+            List<Object> values = operation.getValues();
+
+            Region region = WorldEdit.getInstance().getSessionManager().get(actor).getSelection();
+            String mask = (String) values.get(0);
+            Pattern pattern = (Pattern) values.get(1);
+
+            ParserContext parserContext = new ParserContext();
+            parserContext.setActor(actor);
+            parserContext.setWorld(weWorld);
+            parserContext.setSession(localSession);
+            parserContext.setExtent(editSession);
+
+            Mask expMask = new ExpressionMaskParser(WorldEdit.getInstance()).parseFromInput(mask, parserContext);
+
+            editSession.replaceBlocks(region, expMask, pattern);
+            localSession.remember(editSession);
+        } catch (IncompleteRegionException | MaxChangedBlocksException | InputParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void createCuboidSelection(Operation operation){

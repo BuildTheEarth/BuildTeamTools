@@ -9,18 +9,18 @@ import clipper2.offset.JoinType;
 import com.cryptomorin.xseries.XMaterial;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.*;
-import com.sk89q.worldedit.regions.selector.ConvexPolyhedralRegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.regions.selector.Polygonal2DRegionSelector;
 import com.sk89q.worldedit.session.SessionManager;
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.model.Operation;
+import net.buildtheearth.modules.generator.model.Script;
 import net.buildtheearth.utils.MenuItems;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
@@ -228,7 +228,7 @@ public class GeneratorUtils {
             Method contains;
 
             if(CommonModule.getInstance().getDependencyComponent().isLegacyWorldEdit())
-                contains = regionClass.getMethod("contains", Vector.class);
+                contains = regionClass.getMethod("contains", Class.forName("com.sk89q.worldedit.Vector"));
             else
                 contains = regionClass.getMethod("contains", com.sk89q.worldedit.math.BlockVector3.class);
 
@@ -697,13 +697,8 @@ public class GeneratorUtils {
      *
      * @param p The player to get the selection from
      */
-    public static RegionSelector getCurrentSelection(Player p){
-        WorldEditPlugin worldEditPlugin = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
-
-        if(worldEditPlugin == null)
-            return null;
-
-        Actor actor = worldEditPlugin.wrapPlayer(p);
+    public static RegionSelector getCurrentRegionSelector(Player p){
+        Actor actor = BukkitAdapter.adapt(p);
         SessionManager sessionManager = WorldEdit.getInstance().getSessionManager();
         com.sk89q.worldedit.world.World world = sessionManager.get(actor).getSelectionWorld();
 
@@ -717,12 +712,7 @@ public class GeneratorUtils {
      * @param regionSelector The region selector to get the selection from
      */
     public static void restoreSelection(Player p, RegionSelector regionSelector){
-        WorldEditPlugin worldEditPlugin = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
-
-        if(worldEditPlugin == null)
-            return;
-
-        Actor actor = worldEditPlugin.wrapPlayer(p);
+        Actor actor = BukkitAdapter.adapt(p);
         SessionManager sessionManager = WorldEdit.getInstance().getSessionManager();
         com.sk89q.worldedit.world.World world = sessionManager.get(actor).getSelectionWorld();
 
@@ -737,12 +727,7 @@ public class GeneratorUtils {
      * @param vector2 Position 2
      */
     public static void createCuboidSelection(Player p, Vector vector1, Vector vector2){
-        WorldEditPlugin worldEditPlugin = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
-
-        if(worldEditPlugin == null)
-            return;
-
-        Actor actor = worldEditPlugin.wrapPlayer(p);
+        Actor actor = BukkitAdapter.adapt(p);
         SessionManager sessionManager = WorldEdit.getInstance().getSessionManager();
         com.sk89q.worldedit.world.World world = sessionManager.get(actor).getSelectionWorld();
 
@@ -763,12 +748,7 @@ public class GeneratorUtils {
      * @param points The list of points to create the selection from
      */
     public static void createPolySelection(Player p, List<Vector> points, Block[][][] blocks){
-        WorldEditPlugin worldEditPlugin = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
-
-        if(worldEditPlugin == null)
-            return;
-
-        Actor actor = worldEditPlugin.wrapPlayer(p);
+        Actor actor = BukkitAdapter.adapt(p);
         SessionManager sessionManager = WorldEdit.getInstance().getSessionManager();
         com.sk89q.worldedit.world.World world = sessionManager.get(actor).getSelectionWorld();
 
@@ -811,7 +791,7 @@ public class GeneratorUtils {
      * Draws a curved poly line from a list of points and adds it to the list of commands to execute.
      * It draws the curve by drawing a straight line between each of the points.
      *
-     * @param commands The list of commands to add the selection to
+     * @param script The script to add the commands to
      * @param points The list of points to create the selection from
      * @param lineMaterial The material to draw the line with
      * @param connectLineEnds Whether to connect the line ends in case the line is a circle
@@ -819,10 +799,10 @@ public class GeneratorUtils {
      * @param offset The vertical offset you want the PolyLine to be created at
      * @return The amount of operations used to accomplish this
      */
-    public static int createPolyLine(List<Operation> commands, List<Vector> points, String lineMaterial, boolean connectLineEnds, Block[][][] blocks, int offset){
-        commands.add(new Operation("//sel cuboid"));
+    public static int createPolyLine(Script script, List<Vector> points, String lineMaterial, boolean connectLineEnds, Block[][][] blocks, int offset){
+        script.createCommand("//sel cuboid");
 
-        commands.add(new Operation("//pos1 " + getXYZWithVerticalOffset(points.get(0), blocks, offset)));
+        script.createCommand("//pos1 " + getXYZWithVerticalOffset(points.get(0), blocks, offset));
 
         int operations = 0;
 
@@ -832,15 +812,15 @@ public class GeneratorUtils {
         String pos2 = getXYZWithVerticalOffset(points.get(0), blocks, offset);
 
         for(int i = 1; i < points.size(); i++){
-            commands.add(new Operation("//pos2 " + positions.get(i-1)));
-            commands.add(new Operation("//line " + lineMaterial));
+            script.createCommand("//pos2 " + positions.get(i-1));
+            script.createCommand("//line " + lineMaterial);
             operations++;
-            commands.add(new Operation("//pos1 " + positions.get(i-1)));
+            script.createCommand("//pos1 " + positions.get(i-1));
         }
 
         if(connectLineEnds){
-            commands.add(new Operation("//pos2 " + pos2));
-            commands.add(new Operation("//line " + lineMaterial));
+            script.createCommand("//pos2 " + pos2);
+            script.createCommand("//line " + lineMaterial);
             operations++;
         }
 

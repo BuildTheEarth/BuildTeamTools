@@ -6,7 +6,6 @@ import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.generator.model.Flag;
 import net.buildtheearth.modules.generator.model.GeneratorComponent;
-import net.buildtheearth.modules.generator.model.Operation;
 import net.buildtheearth.modules.generator.model.Script;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import org.bukkit.block.Block;
@@ -46,8 +45,8 @@ public class FieldScripts extends Script {
         // ----------- FIELD GENERATOR SCRIPT ----------
         // Used to generate fields
 
-        operations.add(new Operation("/clearhistory"));
-        operations.add(new Operation("//gmask"));
+        createCommand("/clearhistory");
+        createCommand("//gmask");
 
         // ----------- PREPARATION 01 ----------
         // Preparing the field area
@@ -69,17 +68,17 @@ public class FieldScripts extends Script {
         GeneratorUtils.createPolySelection(getPlayer(), points, blocks);
 
 
-        operations.add(new Operation("//expand 10 up"));
-        operations.add(new Operation("//expand 10 down"));
+        createCommand("//expand 10 up");
+        createCommand("//expand 10 down");
 
         // Remove all non-solid blocks
-        operations.add(new Operation("//gmask !#solid"));
-        operations.add(new Operation("//replace 0"));
+        createCommand("//gmask !#solid");
+        createCommand("//replace 0");
         changes++;
 
         // Remove all trees and pumpkins
-        operations.add(new Operation("//gmask"));
-        operations.add(new Operation("//replace leaves,log,pumpkin 0"));
+        createCommand("//gmask");
+        createCommand("//replace leaves,log,pumpkin 0");
         changes++;
 
         // ----------- PREPARATION 02 ----------
@@ -126,54 +125,54 @@ public class FieldScripts extends Script {
                 }
             }
 
-            operations.add(new Operation("//schem load /GeneratorCollections/fieldpack/"+(requiresAlternatingLines ? "striped/" : "normal/")+(directionToUse < 100 ? "0"+directionToUse : directionToUse)+".schematic"));
+            createCommand("//schem load /GeneratorCollections/fieldpack/"+(requiresAlternatingLines ? "striped/" : "normal/")+(directionToUse < 100 ? "0"+directionToUse : directionToUse)+".schematic");
 
-            operations.add(new Operation("//gmask <0"));
-            operations.add(new Operation("//replace #solid #copy"));
+            createCommand("//gmask <0");
+            createCommand("//replace #solid #copy");
             changes++;
         }
 
         // ----------- PLACING CROPS ----------
         // Placing the crops
 
-        operations.add(new Operation("//gmask"));
+        createCommand("//gmask");
 
         if (crop == Crop.POTATO) {
             if (type == CropStage.TALL) {
-                operations.add(new Operation("//replace 251:0 24%3,24%3:1,1%17:4,1%5:1"));
+                createCommand("//replace 251:0 24%3,24%3:1,1%17:4,1%5:1");
                 changes++;
-                operations.add(new Operation("//replace 251:15 1%3,1%3:1,24%17:4,24%5:1"));
-                changes++;
-
-                operations.add(new Operation("//shift 1 up"));
-                operations.add(new Operation("//gmask 0"));
-
-                operations.add(new Operation("//replace >3 251:15,251:4,31:1,31:2"));
+                createCommand("//replace 251:15 1%3,1%3:1,24%17:4,24%5:1");
                 changes++;
 
-                operations.add(new Operation("//gmask"));
+                createCommand("//shift 1 up");
+                createCommand("//gmask 0");
 
-                operations.add(new Operation("//replace 251:15 175:3"));
+                createCommand("//replace >3 251:15,251:4,31:1,31:2");
                 changes++;
-                operations.add(new Operation("//replace 251:4 175:2"));
+
+                createCommand("//gmask");
+
+                createCommand("//replace 251:15 175:3");
+                changes++;
+                createCommand("//replace 251:4 175:2");
                 changes++;
 
-                operations.add(new Operation("//shift 1 up"));
+                createCommand("//shift 1 up");
 
-                operations.add(new Operation("//replace >175:3 175:15"));
-                operations.add(new Operation("//replace >175:2 175:14"));
+                createCommand("//replace >175:3 175:15");
+                createCommand("//replace >175:2 175:14");
                 changes+=2;
 
             } else {
-                operations.add(new Operation("//replace 251:0 208,5"));
+                createCommand("//replace 251:0 208,5");
                 changes++;
-                operations.add(new Operation("//replace 251:15 252:13,2"));
+                createCommand("//replace 251:15 252:13,2");
                 changes++;
 
-                operations.add(new Operation("//shift 1 up"));
-                operations.add(new Operation("//gmask 0"));
+                createCommand("//shift 1 up");
+                createCommand("//gmask 0");
 
-                operations.add(new Operation("//replace >2 31:1,31:2"));
+                createCommand("//replace >2 31:1,31:2");
                 changes++;
 
             }
@@ -181,14 +180,14 @@ public class FieldScripts extends Script {
 
         if (crop == Crop.HARVESTED) {
             if (type == CropStage.DRY) {
-                operations.add(new Operation("//replace 251:0 5%208,95%5"));
-                operations.add(new Operation("//replace 251:15 95%208,5%5"));
+                createCommand("//replace 251:0 5%208,95%5");
+                createCommand("//replace 251:15 95%208,5%5");
                 changes+=2;
 
             } else {
-                operations.add(new Operation("//replace 251:0 47%5:1,47%3:1,5%60"));
+                createCommand("//replace 251:0 47%5:1,47%3:1,5%60");
                 changes++;
-                operations.add(new Operation("//replace 251:15 95%60,2%3:1,2%5:1"));
+                createCommand("//replace 251:15 95%60,2%3:1,2%5:1");
                 changes++;
 
             }
@@ -196,119 +195,119 @@ public class FieldScripts extends Script {
 
         if (crop == Crop.OTHER) {
             if (type == CropStage.DRY) {
-                operations.add(new Operation("//setbiome MESA"));
+                createCommand("//setbiome MESA");
 
-                operations.add(new Operation("//replace 251:0 208,5"));
+                createCommand("//replace 251:0 208,5");
                 changes++;
-                operations.add(new Operation("//replace 251:15 3:1,2"));
+                createCommand("//replace 251:15 3:1,2");
 
-                operations.add(new Operation("//shift 1 up"));
-                operations.add(new Operation("//gmask 0"));
+                createCommand("//shift 1 up");
+                createCommand("//gmask 0");
 
-                operations.add(new Operation("//replace >2 31:1,31:2"));
+                createCommand("//replace >2 31:1,31:2");
                 changes+=2;
 
             } else {
-                operations.add(new Operation("//setbiome SWAMPLAND"));
+                createCommand("//setbiome SWAMPLAND");
 
-                operations.add(new Operation("//replace 251:0 24%3,24%3:1,1%17:4,1%5:1"));
+                createCommand("//replace 251:0 24%3,24%3:1,1%17:4,1%5:1");
                 changes++;
-                operations.add(new Operation("//replace 251:15 1%3,1%3:1,24%17:4,24%5:1"));
-                changes++;
-
-                operations.add(new Operation("//shift 1 up"));
-                operations.add(new Operation("//gmask 0"));
-
-                operations.add(new Operation("//replace >3 251:15,251:4,31:1,31:2"));
+                createCommand("//replace 251:15 1%3,1%3:1,24%17:4,24%5:1");
                 changes++;
 
-                operations.add(new Operation("//gmask"));
+                createCommand("//shift 1 up");
+                createCommand("//gmask 0");
 
-                operations.add(new Operation("//replace 251:15 175:3"));
-                changes++;
-                operations.add(new Operation("//replace 251:4 175:2"));
+                createCommand("//replace >3 251:15,251:4,31:1,31:2");
                 changes++;
 
-                operations.add(new Operation("//shift 1 up"));
+                createCommand("//gmask");
 
-                operations.add(new Operation("//replace >175:3 175:15"));
+                createCommand("//replace 251:15 175:3");
                 changes++;
-                operations.add(new Operation("//replace >175:2 175:14"));
+                createCommand("//replace 251:4 175:2");
+                changes++;
+
+                createCommand("//shift 1 up");
+
+                createCommand("//replace >175:3 175:15");
+                changes++;
+                createCommand("//replace >175:2 175:14");
                 changes++;
 
             }
         }
 
         if (crop == Crop.VINEYARD || crop == Crop.PEAR) {
-            operations.add(new Operation("//replace >251:4 15%188,85%22"));
+            createCommand("//replace >251:4 15%188,85%22");
             changes++;
-            operations.add(new Operation("//replace >188,22 251:13"));
-            changes++;
-
-            operations.add(new Operation("//replace 251:15 5,208:0"));
-            changes++;
-            operations.add(new Operation("//replace 251:0 208:0,5,3,3:1"));
-            changes++;
-            operations.add(new Operation("//replace 251:4 3,3:1"));
+            createCommand("//replace >188,22 251:13");
             changes++;
 
-            operations.add(new Operation("//replace 22 0"));
+            createCommand("//replace 251:15 5,208:0");
             changes++;
-            operations.add(new Operation("//replace 251:13 18,18:2"));
+            createCommand("//replace 251:0 208:0,5,3,3:1");
+            changes++;
+            createCommand("//replace 251:4 3,3:1");
+            changes++;
+
+            createCommand("//replace 22 0");
+            changes++;
+            createCommand("//replace 251:13 18,18:2");
             changes++;
 
         }
 
         if (crop == Crop.CORN) {
             if (type == CropStage.HARVESTED) {
-                operations.add(new Operation("//replace <air 60,3,5:1"));
+                createCommand("//replace <air 60,3,5:1");
                 changes++;
 
-                operations.add(new Operation("//fast"));
-                operations.add(new Operation("//replace >60,3,5:1 104:6,104:7"));
+                createCommand("//fast");
+                createCommand("//replace >60,3,5:1 104:6,104:7");
                 changes++;
 
-                operations.add(new Operation("//fast"));
+                createCommand("//fast");
 
             } else {
-                operations.add(new Operation("//replace <air 60,3,5:1"));
+                createCommand("//replace <air 60,3,5:1");
                 changes++;
 
-                operations.add(new Operation("//fast"));
-                operations.add(new Operation("//replace >60,3,5:1 175"));
+                createCommand("//fast");
+                createCommand("//replace >60,3,5:1 175");
                 changes++;
 
-                operations.add(new Operation("//replace >175 175"));
+                createCommand("//replace >175 175");
                 changes++;
 
-                operations.add(new Operation("//fast"));
+                createCommand("//fast");
 
             }
         }
 
         if (crop == Crop.WHEAT) {
             if (type == CropStage.LIGHT) {
-                operations.add(new Operation("//replace <air 3,3:1"));
+                createCommand("//replace <air 3,3:1");
                 changes++;
 
-                operations.add(new Operation("//replace >3,3:1 107:4,107:5,107:6,107:7,184:4,184:5,184:6,184:7"));
+                createCommand("//replace >3,3:1 107:4,107:5,107:6,107:7,184:4,184:5,184:6,184:7");
                 changes++;
 
             } else {
-                operations.add(new Operation("//replace <air 3,3:1,5,5:3"));
+                createCommand("//replace <air 3,3:1,5,5:3");
                 changes++;
 
-                operations.add(new Operation("//fast"));
+                createCommand("//fast");
 
-                operations.add(new Operation("//replace >3,3:1 31:1,175"));
+                createCommand("//replace >3,3:1 31:1,175");
                 changes++;
 
-                operations.add(new Operation("//fast"));
+                createCommand("//fast");
             }
         }
 
         if (crop == Crop.CATTLE || crop == Crop.MEADOW) {
-            operations.add(new Operation("//gmask !#solid"));
+            createCommand("//gmask !#solid");
 
             List<Vector> oneMeterPoints = new ArrayList<>(points);
             oneMeterPoints.add(points.get(0));
@@ -316,49 +315,49 @@ public class FieldScripts extends Script {
             List<Vector> fencePoints = new ArrayList<>(oneMeterPoints);
             fencePoints = GeneratorUtils.reducePoints(fencePoints, 3 + 1, 3 - 1);
 
-            changes += GeneratorUtils.createPolyLine(operations, fencePoints, "41", true, blocks, 1);
-            operations.add(new Operation("//gmask"));
+            changes += GeneratorUtils.createPolyLine(this, fencePoints, "41", true, blocks, 1);
+            createCommand("//gmask");
 
             createPolySelection(operations, points);
 
-            operations.add(new Operation("//sel cuboid"));
-            operations.add(new Operation("//expand 10 10 west"));
-            operations.add(new Operation("//expand 10 10 north"));
+            createCommand("//sel cuboid");
+            createCommand("//expand 10 10 west");
+            createCommand("//expand 10 10 north");
 
             for (Vector vector : fencePoints) {
-                operations.add(new Operation("//pos1 " + GeneratorUtils.getXYZWithVerticalOffset(vector, blocks, 1)));
-                operations.add(new Operation("//pos2 " + GeneratorUtils.getXYZWithVerticalOffset(vector, blocks, 1)));
-                operations.add(new Operation("//set " + fence));
+                createCommand("//pos1 " + GeneratorUtils.getXYZWithVerticalOffset(vector, blocks, 1));
+                createCommand("//pos2 " + GeneratorUtils.getXYZWithVerticalOffset(vector, blocks, 1));
+                createCommand("//set " + fence);
             }
 
             createPolySelection(operations, points);
 
-            operations.add(new Operation("//sel cuboid"));
-            operations.add(new Operation("//gmask"));
+            createCommand("//sel cuboid");
+            createCommand("//gmask");
 
-            operations.add(new Operation("//expand 10 10 up"));
-            operations.add(new Operation("//expand 10 10 west"));
-            operations.add(new Operation("//expand 10 10 north"));
+            createCommand("//expand 10 10 up");
+            createCommand("//expand 10 10 west");
+            createCommand("//expand 10 10 north");
 
-            operations.add(new Operation("//replace >41 77:5"));
+            createCommand("//replace >41 77:5");
             changes++;
-            operations.add(new Operation("//replace 41 166"));
+            createCommand("//replace 41 166");
             changes++;
 
             createPolySelection(operations, points);
 
-            operations.add(new Operation("//gmask !" + fence + ",77,166"));
-            operations.add(new Operation("//expand 10 10 up"));
+            createCommand("//gmask !" + fence + ",77,166");
+            createCommand("//expand 10 10 up");
 
-            if (crop == Crop.CATTLE) operations.add(new Operation("//replace <air 60%3,20%2,20%3:1"));
-            if (crop == Crop.MEADOW) operations.add(new Operation("//replace <air 70%2,20%3,10%3:1"));
+            if (crop == Crop.CATTLE) createCommand("//replace <air 60%3,20%2,20%3:1");
+            if (crop == Crop.MEADOW) createCommand("//replace <air 70%2,20%3,10%3:1");
             changes++;
 
-            operations.add(new Operation("//replace >#solid 70%0,30%31:1"));
+            createCommand("//replace >#solid 70%0,30%31:1");
             changes++;
 
             // Make sure that the poly selection afterwards is the same as before
-            operations.add(new Operation("//sel cuboid"));
+            createCommand("//sel cuboid");
 
         }
 
@@ -369,7 +368,7 @@ public class FieldScripts extends Script {
             CuboidRegion cuboidRegion = (CuboidRegion) getRegion();
             Vector pos1 = new Vector(cuboidRegion.getPos1().getX(), cuboidRegion.getPos1().getY(), cuboidRegion.getPos1().getZ());
             Vector pos2 = new Vector(cuboidRegion.getPos2().getX(), cuboidRegion.getPos2().getY(), cuboidRegion.getPos2().getZ());
-            createCuboidSelectionOperation(pos1, pos2);
+            createCuboidSelection(pos1, pos2);
         }
 
         // Finish the script

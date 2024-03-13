@@ -4,6 +4,7 @@ import lombok.Getter;
 
 public enum TreeType {
 
+    ANY("any"),
     ACACIA("acacia"),
     AFRICA("africa"),
     ALEXANDER_PALM("alexanderpalm"),

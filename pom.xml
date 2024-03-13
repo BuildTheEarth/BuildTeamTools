@@ -161,6 +161,21 @@
         </repository>
     </repositories>
 
+
+    <dependencyManagement>
+        <!-- FAWE -->
+        <dependencies>
+            <dependency>
+                <groupId>com.intellectualsites.bom</groupId>
+                <artifactId>bom-newest</artifactId> <!--  Ref: https://github.com/IntellectualSites/bom -->
+                <version>1.42</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+
     <dependencies>
         <!-- Paper -->
         <dependency>
@@ -178,6 +193,25 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Fast Async World Edit for 1.13+ -->
+        <dependency>
+            <groupId>com.fastasyncworldedit</groupId>
+            <artifactId>FastAsyncWorldEdit-Core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fastasyncworldedit</groupId>
+            <artifactId>FastAsyncWorldEdit-Bukkit</artifactId>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>FastAsyncWorldEdit-Core</artifactId>
+                    <groupId>*</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
         <!-- World Edit for 1.12
         <dependency>
             <groupId>com.sk89q.worldedit</groupId>
@@ -186,22 +220,13 @@
             <scope>provided</scope>
         </dependency> -->
 
-        <!-- World Edit -->
+        <!-- World Edit
         <dependency>
             <groupId>com.sk89q.worldedit</groupId>
             <artifactId>worldedit-bukkit</artifactId>
             <version>7.2.9</version>
             <scope>provided</scope>
-        </dependency>
-
-        <!-- Fast Async World Edit for 1.13+ -->
-        <dependency>
-            <groupId>com.fastasyncworldedit</groupId>
-            <artifactId>FastAsyncWorldEdit-Core</artifactId>
-            <version>2.9.0</version>
-            <scope>provided</scope>
-        </dependency>
-
+        </dependency> -->
 
         <!-- XSeries -->
         <dependency>

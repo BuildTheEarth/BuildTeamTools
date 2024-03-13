@@ -1,6 +1,7 @@
 package net.buildtheearth.modules.generator.components.road;
 
 
+import com.cryptomorin.xseries.XMaterial;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
@@ -26,25 +27,25 @@ public class RoadScripts extends Script {
     }
 
     public void roadScript_v_2_0() {
-        HashMap <Flag, String > flags = getGeneratorComponent().getPlayerSettings().get(getPlayer().getUniqueId()).getValues();
+        HashMap <Flag, Object> flags = getGeneratorComponent().getPlayerSettings().get(getPlayer().getUniqueId()).getValues();
 
-        String roadMaterial = flags.get(RoadFlag.ROAD_MATERIAL);
-        String markingMaterial = flags.get(RoadFlag.MARKING_MATERIAL);
-        String sidewalkMaterial = flags.get(RoadFlag.SIDEWALK_MATERIAL);
-        String sidewalkSlabMaterial = flags.get(RoadFlag.SIDEWALK_SLAB_COLOR);
-        String roadSlabMaterial = flags.get(RoadFlag.ROAD_SLAB_COLOR);
-        String streetLampType = flags.get(RoadFlag.STREET_LAMP_TYPE);
+        XMaterial roadMaterial = (XMaterial) flags.get(RoadFlag.ROAD_MATERIAL);
+        XMaterial markingMaterial = (XMaterial) flags.get(RoadFlag.MARKING_MATERIAL);
+        XMaterial sidewalkMaterial = (XMaterial) flags.get(RoadFlag.SIDEWALK_MATERIAL);
+        XMaterial sidewalkSlabMaterial = (XMaterial) flags.get(RoadFlag.SIDEWALK_SLAB_COLOR);
+        XMaterial roadSlabMaterial = (XMaterial) flags.get(RoadFlag.ROAD_SLAB_COLOR);
+        XMaterial streetLampType = (XMaterial) flags.get(RoadFlag.STREET_LAMP_TYPE);
 
-        int laneCount = Integer.parseInt(flags.get(RoadFlag.LANE_COUNT));
-        int laneWidth = Integer.parseInt(flags.get(RoadFlag.LANE_WIDTH));
-        int laneGap = Integer.parseInt(flags.get(RoadFlag.LANE_GAP));
-        int markingLength = Integer.parseInt(flags.get(RoadFlag.MARKING_LENGTH));
-        int markingGap = Integer.parseInt(flags.get(RoadFlag.MARKING_GAP));
-        int sidewalkWidth = Integer.parseInt(flags.get(RoadFlag.SIDEWALK_WIDTH));
-        int streetLampDistance = Integer.parseInt(flags.get(RoadFlag.STREET_LAMP_DISTANCE));
-        int roadSide = Integer.parseInt(flags.get(RoadFlag.ROAD_SIDE));
+        int laneCount = (int) flags.get(RoadFlag.LANE_COUNT);
+        int laneWidth = (int) flags.get(RoadFlag.LANE_WIDTH);
+        int laneGap = (int) flags.get(RoadFlag.LANE_GAP);
+        int markingLength = (int) flags.get(RoadFlag.MARKING_LENGTH);
+        int markingGap = (int) flags.get(RoadFlag.MARKING_GAP);
+        int sidewalkWidth = (int) flags.get(RoadFlag.SIDEWALK_WIDTH);
+        int streetLampDistance = (int) flags.get(RoadFlag.STREET_LAMP_DISTANCE);
+        int roadSide = (int) flags.get(RoadFlag.ROAD_SIDE);
 
-        boolean isCrosswalk = flags.get(RoadFlag.CROSSWALK).equals(Flag.ENABLED);
+        boolean isCrosswalk = (boolean) flags.get(RoadFlag.CROSSWALK);
 
 
         getPlayer().chat("/clearhistory");
@@ -53,7 +54,7 @@ public class RoadScripts extends Script {
         boolean isSidewalk = sidewalkWidth > 1;
 
         // Are there streetlamps?
-        boolean isStreetLamp = streetLampType != null && !streetLampType.equalsIgnoreCase(Flag.DISABLED);
+        boolean isStreetLamp = streetLampType != null;
 
         // Calculate current width from centre of road
         int road_width = laneWidth*laneCount;
@@ -202,7 +203,7 @@ public class RoadScripts extends Script {
         // Replace the current road material with light green wool
         createCommand("//replace " + roadMaterial + " 35:5");
         changes++;
-        if(!roadSlabMaterial.equalsIgnoreCase(Flag.DISABLED)) {
+        if(roadSlabMaterial != null) {
             createCommand("//replace " + roadSlabMaterial + " 35:5");
             changes++;
         }
@@ -212,7 +213,7 @@ public class RoadScripts extends Script {
         // Replace the current sidewalk material with pink wool
         createCommand("//replace " + sidewalkMaterial + " 35:6");
         changes++;
-        if(!sidewalkSlabMaterial.equalsIgnoreCase(Flag.DISABLED)) {
+        if(sidewalkSlabMaterial != null) {
             createCommand("//replace " + sidewalkSlabMaterial + " 35:6");
             changes++;
         }
@@ -330,7 +331,7 @@ public class RoadScripts extends Script {
         // Create the road and sidewalk slabs
 
         // Create the road slabs
-        if(!roadSlabMaterial.equalsIgnoreCase(Flag.DISABLED)){
+        if(roadSlabMaterial != null){
             createCommand("//gmask =queryRel(0,-1,0,35,4)&&queryRel(0,0,0,0,0)&&(queryRel(1,0,0,35,4)||queryRel(-1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4))");
             createCommand("//set " + roadSlabMaterial);
             changes++;
@@ -338,7 +339,7 @@ public class RoadScripts extends Script {
 
 
         // Create the sidewalk slabs
-        if(!sidewalkSlabMaterial.equalsIgnoreCase(Flag.DISABLED)){
+        if(sidewalkSlabMaterial != null){
             createCommand("//gmask =queryRel(0,-1,0,35,3)&&queryRel(0,0,0,0,0)&&(queryRel(1,0,0,35,3)||queryRel(-1,0,0,35,3)||queryRel(0,0,1,35,3)||queryRel(0,0,-1,35,3))");
             createCommand("//set " + sidewalkSlabMaterial);
             changes++;
@@ -463,7 +464,7 @@ public class RoadScripts extends Script {
     }
 
 
-    public int createRoadMarkingLine(List<Vector> points, String lineMaterial, Block[][][] blocks) {
+    public int createRoadMarkingLine(List<Vector> points, XMaterial lineMaterial, Block[][][] blocks) {
         createCommand("//sel cuboid");
         int changes = 0;
 

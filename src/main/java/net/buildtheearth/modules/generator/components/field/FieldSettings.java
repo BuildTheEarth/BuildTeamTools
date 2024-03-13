@@ -17,30 +17,30 @@ public class FieldSettings extends Settings {
     @Override
     public void setDefaultValues() {
         // Crop Type (Default: Random)
-        Crop crop = (Crop) Utils.pickRandom(Crop.values());
-        if(crop != null)
-            setValue(FieldFlag.CROP_TYPE, crop.getIdentifier());
+        CropType cropType = (CropType) Utils.pickRandom(CropType.values());
+        if(cropType != null)
+            setValue(FieldFlag.CROP_TYPE, cropType);
 
         // Crop Stage (Default: Random)
         CropStage cropStage = CropStage.FALLBACK;
-        if(crop != null){
-            if (crop.equals(Crop.POTATO)) {
+        if(cropType != null){
+            if (cropType.equals(CropType.POTATO)) {
                 cropStage = (CropStage) Utils.pickRandom(new CropStage[]{CropStage.LOW, CropStage.TALL});
-            } else if (crop.equals(Crop.CORN)) {
+            } else if (cropType.equals(CropType.CORN)) {
                 cropStage = (CropStage) Utils.pickRandom(new CropStage[]{CropStage.TALL, CropStage.HARVESTED});
-            } else if (crop.equals(Crop.WHEAT)) {
+            } else if (cropType.equals(CropType.WHEAT)) {
                 cropStage = (CropStage) Utils.pickRandom(new CropStage[]{CropStage.LIGHT, CropStage.DARK});
-            } else if (crop.equals(Crop.HARVESTED) || crop.equals(Crop.OTHER)) {
+            } else if (cropType.equals(CropType.HARVESTED) || cropType.equals(CropType.OTHER)) {
                 cropStage = (CropStage) Utils.pickRandom(new CropStage[]{CropStage.DRY, CropStage.WET});
             }
         }
         if(cropStage != null)
-            setValue(FieldFlag.CROP_STAGE, cropStage.getIdentifier());
+            setValue(FieldFlag.CROP_STAGE, cropStage);
         
         // Fence (Default: Random)
         ItemStack block = (ItemStack) Utils.pickRandom(MenuItems.getFences().toArray());
         if(block != null)
-            setValue(FieldFlag.FENCE, Item.getUniqueMaterialString(block));
+            setValue(FieldFlag.FENCE, XMaterial.matchXMaterial(block));
     }
 
 }

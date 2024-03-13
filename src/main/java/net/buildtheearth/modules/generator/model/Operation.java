@@ -1,13 +1,13 @@
 package net.buildtheearth.modules.generator.model;
 
 import com.cryptomorin.xseries.XMaterial;
-import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.world.block.BlockState;
 import lombok.Getter;
 import org.bukkit.Location;
+import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Vector;
 
 public class Operation {
 
@@ -21,13 +21,23 @@ public class Operation {
 
         CUBOID_SELECTION(Vector.class, Vector.class),
 
-        POLYGONAL_SELECTION(List.class),
+        POLYGONAL_SELECTION(Vector[].class),
 
-        CONVEX_SELECTION(List.class),
+        CONVEX_SELECTION(Vector[].class),
 
-        SET_BLOCKS_WITH_EXPRESSION_MASK(String.class, XMaterial.class),
+        REPLACE_XMATERIALS(XMaterial.class, XMaterial.class),
 
-        CLEAR_HISTORY;
+        REPLACE_BLOCKSTATES(BlockState.class, BlockState.class),
+
+        REPLACE_XMATERIALS_WITH_MASKS(String[].class, XMaterial.class, XMaterial.class, Integer.class),
+
+        REPLACE_BLOCKSTATES_WITH_MASKS(String[].class, BlockState.class, BlockState.class, Integer.class),
+
+        CLEAR_HISTORY,
+
+        DISABLE_GMASK,
+
+        EXPAND_SELECTION(Vector.class);
 
         @Getter
         private final Object[] valueTypes;
@@ -40,7 +50,6 @@ public class Operation {
     @Getter
     private String value = null;
 
-    @Getter
     private List<Object> values = null;
 
     @Getter
@@ -54,7 +63,7 @@ public class Operation {
         if(operationType.getValueTypes().length != 1)
             throw new IllegalArgumentException("OperationType " + operationType + " must have exactly one value type");
 
-        if(operationType.getValueTypes()[0] != String.class)
+        if(operationType.getValueTypes()[0] != null && !operationType.getValueTypes()[0].equals(String.class))
             throw new IllegalArgumentException("OperationType " + operationType + " must have a value type of String");
 
         this.value = value;
@@ -66,8 +75,8 @@ public class Operation {
             throw new IllegalArgumentException("OperationType " + operationType + " must have " + operationType.getValueTypes().length + " values");
 
         for(int i = 0; i < values.length; i++)
-            if(values[i].getClass() != operationType.getValueTypes()[i])
-                throw new IllegalArgumentException("OperationType " + operationType + " must have a value type of " + operationType.getValueTypes()[i]);
+            if(values[i] != null && !values[i].getClass().equals(operationType.getValueTypes()[i]))
+                throw new IllegalArgumentException("OperationType " + operationType + " must have a value type of " + operationType.getValueTypes()[i] + " at index " + i + ". Provided: " + values[i].getClass());
 
         this.values = Arrays.asList(values);
         this.operationType = operationType;
@@ -78,5 +87,9 @@ public class Operation {
             throw new IllegalArgumentException("OperationType " + operationType + " must have no value types");
 
         this.operationType = operationType;
+    }
+
+    public Object get(int i){
+        return values.get(i);
     }
 }

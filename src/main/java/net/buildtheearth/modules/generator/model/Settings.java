@@ -14,7 +14,7 @@ public abstract class Settings {
     private final Player player;
 
     @Getter
-    private final HashMap<Flag, String> values;
+    private final HashMap<Flag, Object> values;
 
     @Getter
     @Setter
@@ -29,7 +29,7 @@ public abstract class Settings {
 
     public abstract void setDefaultValues();
 
-    public void setValue(Flag flag, String value){
+    public void setValue(Flag flag, Object value){
         String errorMessage = FlagType.validateFlagType(flag, value);
         if(errorMessage != null){
             player.sendMessage(errorMessage);

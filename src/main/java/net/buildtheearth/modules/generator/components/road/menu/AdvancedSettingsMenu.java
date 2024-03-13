@@ -49,24 +49,24 @@ public class AdvancedSettingsMenu extends AbstractMenu {
         Road road = GeneratorModule.getInstance().getRoad();
         UUID uuid = getMenuPlayer().getUniqueId();
 
-        int laneCount = Integer.parseInt(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.LANE_COUNT));
-        int laneWidth = Integer.parseInt(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.LANE_WIDTH));
-        int sidewalkWidth = Integer.parseInt(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.SIDEWALK_WIDTH));
-        int streetLampDistance = Integer.parseInt(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.STREET_LAMP_DISTANCE));
+        int laneCount = (int) road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.LANE_COUNT);
+        int laneWidth = (int) road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.LANE_WIDTH);
+        int sidewalkWidth = (int) road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.SIDEWALK_WIDTH);
+        int streetLampDistance = (int) road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.STREET_LAMP_DISTANCE);
 
-        ItemStack markingsMaterial = Item.fromUniqueMaterialString(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.MARKING_MATERIAL));
-        ItemStack sidewalkSlab = Item.fromUniqueMaterialString(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.SIDEWALK_SLAB_COLOR));
-        ItemStack roadSlab = Item.fromUniqueMaterialString(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.ROAD_SLAB_COLOR));
-        ItemStack streetLampType = getStreetLampItem(road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.STREET_LAMP_TYPE));
+        XMaterial markingsMaterial = (XMaterial) road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.MARKING_MATERIAL);
+        XMaterial sidewalkSlab = (XMaterial) road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.SIDEWALK_SLAB_COLOR);
+        XMaterial roadSlab = (XMaterial) road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.ROAD_SLAB_COLOR);
+        ItemStack streetLampType = getStreetLampItem((String) road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.STREET_LAMP_TYPE));
 
         createCounter(CustomHeads.SliderColor.WHITE, LANE_COUNT_SLOT, "Number of Lanes", laneCount, 1, 10, "Lanes");
         createCounter(CustomHeads.SliderColor.LIGHT_GRAY, LANE_WIDTH_SLOT, "Lane Width", laneWidth, 1, 30, "Blocks");
         createCounter(CustomHeads.SliderColor.WHITE, SIDEWALK_WIDTH_SLOT, "Sidewalk Width", sidewalkWidth, 1, 30, "Blocks");
         createCounter(CustomHeads.SliderColor.LIGHT_GRAY, STREET_LAMP_DISTANCE_SLOT, "Street Lamp Distance", streetLampDistance, 5, 500, "Blocks");
 
-        setChoiceItems(CustomHeads.SliderColor.WHITE, MARKINGS_MATERIAL_SLOT, "Line Markings Color", markingsMaterial);
-        setChoiceItems(CustomHeads.SliderColor.LIGHT_GRAY, ROAD_SLAB_SLOT, "Road Elevation Slab", roadSlab);
-        setChoiceItems(CustomHeads.SliderColor.WHITE, SIDEWALK_SLAB_SLOT, "Sidewalk Elevation Slab", sidewalkSlab);
+        setChoiceItems(CustomHeads.SliderColor.WHITE, MARKINGS_MATERIAL_SLOT, "Line Markings Color", markingsMaterial.parseItem());
+        setChoiceItems(CustomHeads.SliderColor.LIGHT_GRAY, ROAD_SLAB_SLOT, "Road Elevation Slab", roadSlab.parseItem());
+        setChoiceItems(CustomHeads.SliderColor.WHITE, SIDEWALK_SLAB_SLOT, "Sidewalk Elevation Slab", sidewalkSlab.parseItem());
         setChoiceItems(CustomHeads.SliderColor.LIGHT_GRAY, STREET_LAMP_TYPE_SLOT, "Street Lamp Type", streetLampType);
 
         getMenu().getSlot(NEXT_ITEM_SLOT).setItem(CustomHeads.getCheckmarkItem("§eNext"));
@@ -121,7 +121,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
 
         // Set click event for previous page item
         getMenu().getSlot(slot - 1).setClickHandler((clickPlayer, clickInformation) -> {
-            int value = Integer.parseInt(road.getPlayerSettings().get(clickPlayer.getUniqueId()).getValues().get(roadFlag));
+            int value = (int) road.getPlayerSettings().get(clickPlayer.getUniqueId()).getValues().get(roadFlag);
 
             if (value > minValue) {
                 Settings settings = road.getPlayerSettings().get(clickPlayer.getUniqueId());
@@ -130,7 +130,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
                     return;
 
                 RoadSettings roadSettings = (RoadSettings) settings;
-                roadSettings.setValue(roadFlag, "" + (value - 1));
+                roadSettings.setValue(roadFlag, value - 1);
 
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
                 reloadMenuAsync();
@@ -141,7 +141,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
 
         // Set click event for next page item
         getMenu().getSlot(slot + 1).setClickHandler((clickPlayer, clickInformation) -> {
-            int value = Integer.parseInt(road.getPlayerSettings().get(clickPlayer.getUniqueId()).getValues().get(roadFlag));
+            int value = (int) road.getPlayerSettings().get(clickPlayer.getUniqueId()).getValues().get(roadFlag);
 
             if (value < maxValue) {
                 Settings settings = road.getPlayerSettings().get(clickPlayer.getUniqueId());
@@ -150,7 +150,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
                     return;
 
                 RoadSettings roadSettings = (RoadSettings) settings;
-                roadSettings.setValue(roadFlag, "" + (value + 1));
+                roadSettings.setValue(roadFlag, value + 1);
 
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
                 reloadMenuAsync();

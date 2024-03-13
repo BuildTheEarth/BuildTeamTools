@@ -56,7 +56,7 @@ public class RoofColorMenu extends BlockListMenu {
      * @return the roof blocks
      */
     private static List<ItemStack> getRoofBlocks(Player player) {
-        RoofType roofType = RoofType.byString(GeneratorModule.getInstance().getHouse().getPlayerSettings().get(player.getUniqueId()).getValues().get(HouseFlag.ROOF_TYPE));
+        RoofType roofType = (RoofType) GeneratorModule.getInstance().getHouse().getPlayerSettings().get(player.getUniqueId()).getValues().get(HouseFlag.ROOF_TYPE);
 
         if(roofType == null)
             return new ArrayList<>();

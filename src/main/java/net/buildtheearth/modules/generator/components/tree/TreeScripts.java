@@ -12,9 +12,9 @@ public class TreeScripts {
         String[] args = new String[4];
 
         Settings settings = tree.getPlayerSettings().get(p.getUniqueId());
-        args[1] = settings.getValues().get(TreeFlag.TYPE);
-        args[2] = settings.getValues().get(TreeFlag.HEIGHT);
-        args[3] = settings.getValues().get(TreeFlag.WIDTH);
+        args[1] = (String) settings.getValues().get(TreeFlag.TYPE);
+        args[2] = (String) settings.getValues().get(TreeFlag.HEIGHT);
+        args[3] = (String) settings.getValues().get(TreeFlag.WIDTH);
 
 
         // In case the player is holding no item, give him a diamond sword

@@ -5,8 +5,8 @@ import net.buildtheearth.modules.generator.model.Flag;
 
 public enum TreeFlag implements Flag {
 
-    TYPE("t", FlagType.ENUM),
-    WIDTH("w", FlagType.INTEGER),
+    TYPE("t", FlagType.TREE_TYPE),
+    WIDTH("w", FlagType.TREE_WIDTH),
     HEIGHT("h", FlagType.INTEGER);
 
     private final String flag;

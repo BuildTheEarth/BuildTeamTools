@@ -19,17 +19,17 @@ public class HouseSettings extends Settings {
         // Roof Type (Default: Random)
         RoofType roofType = (RoofType) Utils.pickRandom(RoofType.values());
         if(roofType != null)
-            setValue(HouseFlag.ROOF_TYPE, roofType.getType());
+            setValue(HouseFlag.ROOF_TYPE, roofType);
 
         // Wall Color (Default: Random)
         ItemStack block = (ItemStack) Utils.pickRandom(MenuItems.getSolidBlocks().toArray());
         if(block != null)
-            setValue(HouseFlag.WALL_COLOR, Item.getUniqueMaterialString(block));
+            setValue(HouseFlag.WALL_COLOR, XMaterial.matchXMaterial(block));
 
         // Wall Color (Default: Random)
         block = (ItemStack) Utils.pickRandom(MenuItems.getSolidBlocks().toArray());
         if(block != null)
-            setValue(HouseFlag.BASE_COLOR, XMaterial.matchXMaterial(block).getId() + "");
+            setValue(HouseFlag.BASE_COLOR, XMaterial.matchXMaterial(block));
 
         // Roof Color (Default: Random)
         if(roofType == RoofType.STAIRS)
@@ -40,37 +40,37 @@ public class HouseSettings extends Settings {
             block = (ItemStack) Utils.pickRandom(MenuItems.getSlabs().toArray());
 
         if(block != null)
-            setValue(HouseFlag.ROOF_COLOR, Item.getUniqueMaterialString(block));
+            setValue(HouseFlag.ROOF_COLOR, XMaterial.matchXMaterial(block));
 
         // Balcony Color (Default: Random)
-        setValue(HouseFlag.BALCONY_COLOR, Item.getUniqueMaterialString(XMaterial.BLACK_CONCRETE.parseItem()));
+        setValue(HouseFlag.BALCONY_COLOR, XMaterial.BLACK_CONCRETE);
 
         // Balcony Fence Color (Default: Random)
-        setValue(HouseFlag.BALCONY_FENCE_COLOR, Item.getUniqueMaterialString(XMaterial.IRON_TRAPDOOR.parseItem()));
+        setValue(HouseFlag.BALCONY_FENCE_COLOR, XMaterial.IRON_TRAPDOOR);
 
 
         // Floor Count (Default: Random)
-        setValue(HouseFlag.FLOOR_COUNT, "" + ((int)(Math.random()*3.0) + 1));
+        setValue(HouseFlag.FLOOR_COUNT, (int)(Math.random()*3.0) + 1);
 
         // Window Color (Default: Fixed Value)
-        setValue(HouseFlag.WINDOW_COLOR, Item.getUniqueMaterialString(XMaterial.BLACK_STAINED_GLASS.parseItem()));
+        setValue(HouseFlag.WINDOW_COLOR, XMaterial.BLACK_STAINED_GLASS);
 
         // Floor Height (Default: Fixed Value)
-        setValue(HouseFlag.FLOOR_HEIGHT, "3");
+        setValue(HouseFlag.FLOOR_HEIGHT, 3);
 
         // Base Height (Default: Fixed Value)
-        setValue(HouseFlag.BASE_HEIGHT, "1");
+        setValue(HouseFlag.BASE_HEIGHT, 1);
 
         // Window Height (Default: Fixed Value)
-        setValue(HouseFlag.WINDOW_HEIGHT, "2");
+        setValue(HouseFlag.WINDOW_HEIGHT, 2);
 
         // Window Width (Default: Fixed Value)
-        setValue(HouseFlag.WINDOW_WIDTH, "2");
+        setValue(HouseFlag.WINDOW_WIDTH, 2);
 
         // Window Distance (Default: Fixed Value)
-        setValue(HouseFlag.WINDOW_DISTANCE, "2");
+        setValue(HouseFlag.WINDOW_DISTANCE, 2);
 
         // Max Roof Height (Default: Fixed Value)
-        setValue(HouseFlag.MAX_ROOF_HEIGHT, "10");
+        setValue(HouseFlag.MAX_ROOF_HEIGHT, 10);
     }
 }

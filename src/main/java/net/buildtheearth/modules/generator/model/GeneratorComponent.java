@@ -93,7 +93,7 @@ public abstract class GeneratorComponent extends Component {
     }
 
     public String getCommand(Player p) {
-        HashMap<Flag, String> flags = getPlayerSettings().get(p.getUniqueId()).getValues();
+        HashMap<Flag, Object> flags = getPlayerSettings().get(p.getUniqueId()).getValues();
 
         String type = "house";
 
@@ -169,13 +169,14 @@ public abstract class GeneratorComponent extends Component {
             if(flagAndValue == null) continue;
 
             String flagName = flagAndValue[0];
-            String flagValue = flagAndValue[1];
 
             if(flagName == null) continue;
 
             Flag finalFlag = Flag.byString(generatorType, flagName);
 
             if(finalFlag == null) continue;
+
+            Object flagValue = FlagType.convertToFlagType(finalFlag, flagAndValue[1]);
 
             String errorMessage = FlagType.validateFlagType(finalFlag, flagValue);
 

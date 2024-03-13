@@ -5,9 +5,9 @@ import net.buildtheearth.modules.generator.model.Flag;
 
 public enum FieldFlag implements Flag {
 
-    CROP_TYPE("t", FlagType.ENUM),
-    CROP_STAGE("s", FlagType.ENUM),
-    FENCE("f", FlagType.BLOCKS);
+    CROP_TYPE("t", FlagType.CROP_TYPE),
+    CROP_STAGE("s", FlagType.CROP_STAGE),
+    FENCE("f", FlagType.XMATERIAL);
 
 
     private final String flag;

@@ -1,6 +1,7 @@
 package net.buildtheearth.modules.generator;
 
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
 import lombok.Getter;
 import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.common.CommonModule;

@@ -1,44 +1,27 @@
 package net.buildtheearth.modules.generator.model;
 
 import com.cryptomorin.xseries.XMaterial;
-import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.bukkit.BukkitWorld;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.sk89q.worldedit.extension.factory.parser.mask.ExpressionMaskParser;
-import com.sk89q.worldedit.extension.input.InputParseException;
-import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
-import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.operation.Operations;
-import com.sk89q.worldedit.function.pattern.Pattern;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
-import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BlockState;
 import lombok.Getter;
-import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
-import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Command {
@@ -76,7 +59,7 @@ public class Command {
     @Getter
     private long percentage;
 
-    private Vector[] minMax;
+    private final Vector[] minMax;
     private boolean breakPointActive;
     private RegionSelector tempRegionSelector;
     private Material oldMaterial;
@@ -184,34 +167,52 @@ public class Command {
                     oldMaterial = block.getType();
                     oldBlockData = block.getBlockData();
                     tempRegionSelector = GeneratorUtils.getCurrentRegionSelector(getPlayer());
-                    player.chat("//sel cuboid");
-                    player.chat("//pos1 " + point.getBlockX() + "," + point.getBlockY() + "," + point.getBlockZ());
-                    player.chat("//pos2 " + point.getBlockX() + "," + point.getBlockY() + "," + point.getBlockZ());
-                    player.chat("//gmask");
-                    player.chat("//set barrier");
+
+                    GeneratorUtils.createCuboidSelection(getPlayer(), point, point);
+                    GeneratorUtils.replaceBlocks(localSession, actor, weWorld, null, XMaterial.BARRIER);
                     breakPointActive = true;
                 }
 
                 break;
 
-            case SET_BLOCKS_WITH_EXPRESSION_MASK:
-                setBlocksWithExpressionMask(operation);
+            case REPLACE_XMATERIALS_WITH_MASKS:
+                GeneratorUtils.replaceBlocksWithMask(localSession, actor, weWorld, Arrays.asList((String[]) operation.get(0)), (XMaterial) operation.get(1), (XMaterial) operation.get(2), (Integer) operation.get(3));
+                break;
+
+            case REPLACE_BLOCKSTATES_WITH_MASKS:
+                GeneratorUtils.replaceBlocksWithMask(localSession, actor, weWorld, Arrays.asList((String[]) operation.get(0)), (BlockState) operation.get(1), (BlockState) operation.get(2), (Integer) operation.get(3));
+                break;
+
+            case REPLACE_XMATERIALS:
+                GeneratorUtils.replaceBlocks(localSession, actor, weWorld, (XMaterial) operation.get(0), (XMaterial) operation.get(1));
+                break;
+
+            case REPLACE_BLOCKSTATES:
+                GeneratorUtils.replaceBlocks(localSession, actor, weWorld, (BlockState) operation.get(0), (BlockState) operation.get(1));
                 break;
 
             case PASTE_SCHEMATIC:
-                pasteSchematic(operation);
+                GeneratorUtils.pasteSchematic(localSession, actor, weWorld, blocks, (String) operation.get(0), (Location) operation.get(1), (double) operation.get(2));
                 break;
 
             case CUBOID_SELECTION:
-                createCuboidSelection(operation);
+                GeneratorUtils.createCuboidSelection(getPlayer(), (Vector) operation.get(0), (Vector) operation.get(1));
                 break;
 
             case POLYGONAL_SELECTION:
-                createPolySelection(operation);
+                GeneratorUtils.createPolySelection(getPlayer(), Arrays.asList((Vector[]) operation.get(0)), blocks);
                 break;
 
             case CONVEX_SELECTION:
-                createConvexSelection(operation);
+                GeneratorUtils.createConvexSelection(getPlayer(), Arrays.asList((Vector[]) operation.get(0)), blocks);
+                break;
+
+            case CLEAR_HISTORY:
+                GeneratorUtils.clearHistory(localSession);
+                break;
+
+            case EXPAND_SELECTION:
+                GeneratorUtils.expandSelection(localSession, (Vector) operation.get(0));
                 break;
         }
 
@@ -243,129 +244,6 @@ public class Command {
         return command.split("%%XYZ/")[0] + x + "," + maxHeight + "," + z + commandSuffix;
     }
 
-    public void setBlocksWithExpressionMask(Operation operation){
-        try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
-            List<Object> values = operation.getValues();
-
-            Region region = WorldEdit.getInstance().getSessionManager().get(actor).getSelection();
-            String mask = (String) values.get(0);
-            Pattern pattern = (Pattern) values.get(1);
-
-            ParserContext parserContext = new ParserContext();
-            parserContext.setActor(actor);
-            parserContext.setWorld(weWorld);
-            parserContext.setSession(localSession);
-            parserContext.setExtent(editSession);
-
-            Mask expMask = new ExpressionMaskParser(WorldEdit.getInstance()).parseFromInput(mask, parserContext);
-
-            editSession.replaceBlocks(region, expMask, pattern);
-            localSession.remember(editSession);
-        } catch (IncompleteRegionException | MaxChangedBlocksException | InputParseException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void createCuboidSelection(Operation operation){
-        String value = operation.getValue();
-        String[] valueSplit = value.split(",");
-
-        Vector vector1 = new Vector(Integer.parseInt(valueSplit[0]), Integer.parseInt(valueSplit[1]), Integer.parseInt(valueSplit[2]));
-        Vector vector2 = new Vector(Integer.parseInt(valueSplit[3]), Integer.parseInt(valueSplit[4]), Integer.parseInt(valueSplit[5]));
-
-        GeneratorUtils.createCuboidSelection(getPlayer(), vector1, vector2);
-    }
-
-    private void createPolySelection(Operation operation){
-        String value = operation.getValue();
-        String[] valueSplit = value.split(";");
-
-        List<Vector> points = new ArrayList<>();
-
-        for(String point : valueSplit){
-            String[] pointSplit = point.split(",");
-            points.add(new Vector(Integer.parseInt(pointSplit[0]), Integer.parseInt(pointSplit[1]), Integer.parseInt(pointSplit[2])));
-        }
-
-        GeneratorUtils.createPolySelection(getPlayer(), points, blocks);
-    }
-
-    private void createConvexSelection(Operation operation){
-        String value = operation.getValue();
-        String[] valueSplit = value.split(";");
-
-        List<Vector> points = new ArrayList<>();
-
-        for(String point : valueSplit){
-            String[] pointSplit = point.split(",");
-            points.add(new Vector(Integer.parseInt(pointSplit[0]), Integer.parseInt(pointSplit[1]), Integer.parseInt(pointSplit[2])));
-        }
-
-        GeneratorUtils.createConvexSelection(getPlayer(), points, blocks);
-    }
-
-    public void pasteSchematic(Operation operation) {
-        String schematic = operation.getValue();
-
-        String[] schematicSplit = schematic.split(",");
-        String schematicPath = schematicSplit[0];
-        org.bukkit.World world = Bukkit.getWorld(schematicSplit[1]);
-        int x = Integer.parseInt(schematicSplit[2]);
-        int y = Integer.parseInt(schematicSplit[3]);
-        int z = Integer.parseInt(schematicSplit[4]);
-        double rotation = Double.parseDouble(schematicSplit[5]);
-        int offsetY = Integer.parseInt(schematicSplit[6]);
-
-        int maxHeight = y;
-
-        if(blocks != null)
-            maxHeight = GeneratorUtils.getMaxHeight(blocks, x, z, MenuItems.getIgnoredMaterials());
-        if(maxHeight == 0)
-            maxHeight = y;
-
-
-
-        if(CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled()) {
-            WorldEditPlugin worldEditPlugin = (WorldEditPlugin) Bukkit.getPluginManager().getPlugin("WorldEdit");
-            World weWorld = new BukkitWorld(world);
-            com.sk89q.worldedit.entity.Player wePlayer = worldEditPlugin.wrapPlayer(player);
-
-            LocalSession localSession = WorldEdit.getInstance().getSessionManager().get(wePlayer);
-            EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(weWorld, -1, wePlayer);
-            File schematicFile = new File(BuildTeamTools.getInstance().getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/" + schematicPath);
-
-            ClipboardFormat format = ClipboardFormats.findByFile(schematicFile);
-            ClipboardReader reader;
-
-            if(format == null)
-                return;
-
-            try {
-                reader = format.getReader(Files.newInputStream(schematicFile.toPath()));
-                Clipboard clipboard = reader.read();
-
-                AffineTransform transform = new AffineTransform();
-                transform = transform.rotateY(rotation);
-
-                ClipboardHolder holder = new ClipboardHolder(clipboard);
-                holder.setTransform(transform);
-
-                com.sk89q.worldedit.function.operation.Operation op = holder
-                        .createPaste(editSession)
-                        .to(BlockVector3.at(x, maxHeight + offsetY, z))
-                        .ignoreAirBlocks(true)
-                        .build();
-                Operations.complete(op);
-
-            } catch (IOException | WorldEditException e) {
-                throw new RuntimeException(e);
-            }
-
-            localSession.remember(editSession);
-            editSession.commit();
-            editSession.close();
-        }
-    }
 
 
     /** Called when the command queue is finished. */

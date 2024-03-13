@@ -1,6 +1,6 @@
 package net.buildtheearth.modules.generator.components.field;
 
-public enum Crop {
+public enum CropType {
 
     POTATO("POTATO", true, true),
     WHEAT("WHEAT", false, true),
@@ -16,16 +16,16 @@ public enum Crop {
     private final boolean linesRequired;
     private final boolean hasStages;
 
-    Crop(String identifier, boolean linesRequired, boolean hasStages) {
+    CropType(String identifier, boolean linesRequired, boolean hasStages) {
         this.identifier = identifier;
         this.linesRequired = linesRequired;
         this.hasStages = hasStages;
     }
 
-    public static Crop getByIdentifier(String identifier) {
-        for (Crop crop : Crop.values()) {
-            if (crop.getIdentifier().equalsIgnoreCase(identifier)) {
-                return crop;
+    public static CropType getByIdentifier(String identifier) {
+        for (CropType cropType : CropType.values()) {
+            if (cropType.getIdentifier().equalsIgnoreCase(identifier)) {
+                return cropType;
             }
         }
         return POTATO;

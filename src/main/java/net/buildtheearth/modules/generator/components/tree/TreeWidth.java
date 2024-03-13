@@ -4,6 +4,7 @@ import lombok.Getter;
 
 public enum TreeWidth {
 
+    ANY("any"),
     THIN("thin"),
     NORMAL("normal"),
     WIDE("wide"),

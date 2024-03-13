@@ -10,9 +10,6 @@ import net.buildtheearth.modules.generator.components.tree.TreeFlag;
 
 public interface Flag {
 
-    String DISABLED = "OFF";
-    String ENABLED = "ON";
-
     String getFlag();
 
     FlagType getFlagType();

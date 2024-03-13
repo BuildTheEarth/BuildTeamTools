@@ -26,12 +26,12 @@ public class FieldScripts extends Script {
     }
     
     public void fieldScript_v_1_0() {
-        HashMap<Flag, String> flags = getGeneratorComponent().getPlayerSettings().get(getPlayer().getUniqueId()).getValues();
+        HashMap<Flag, Object> flags = getGeneratorComponent().getPlayerSettings().get(getPlayer().getUniqueId()).getValues();
 
         // Settings
-        Crop crop = Crop.getByIdentifier(flags.get(FieldFlag.CROP_TYPE));
-        CropStage type = CropStage.getByIdentifier(flags.get(FieldFlag.CROP_STAGE));
-        String fence = flags.get(FieldFlag.FENCE);
+        CropType cropType = (CropType) flags.get(FieldFlag.CROP_TYPE);
+        CropStage type = (CropStage) flags.get(FieldFlag.CROP_STAGE);
+        String fence = (String) flags.get(FieldFlag.FENCE);
 
         // Information for later restoring original selection
         List<Vector> points = GeneratorUtils.getSelectionPointsFromRegion(getRegion());
@@ -84,9 +84,9 @@ public class FieldScripts extends Script {
         // ----------- PREPARATION 02 ----------
         // Drawing lines if the crop requires it
 
-        if (crop.isLinesRequired()) {
+        if (cropType.isLinesRequired()) {
             // Prepare for line drawing
-            boolean requiresAlternatingLines = crop.equals(Crop.VINEYARD) || crop.equals(Crop.PEAR);
+            boolean requiresAlternatingLines = cropType.equals(CropType.VINEYARD) || cropType.equals(CropType.PEAR);
 
             // Get the directory containing all schematic files.
             File directory = new File(BuildTeamTools.getInstance().getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/GeneratorCollections/fieldpack/" + (requiresAlternatingLines ? "striped/" : "normal/"));
@@ -137,7 +137,7 @@ public class FieldScripts extends Script {
 
         createCommand("//gmask");
 
-        if (crop == Crop.POTATO) {
+        if (cropType == CropType.POTATO) {
             if (type == CropStage.TALL) {
                 createCommand("//replace 251:0 24%3,24%3:1,1%17:4,1%5:1");
                 changes++;
@@ -178,7 +178,7 @@ public class FieldScripts extends Script {
             }
         }
 
-        if (crop == Crop.HARVESTED) {
+        if (cropType == CropType.HARVESTED) {
             if (type == CropStage.DRY) {
                 createCommand("//replace 251:0 5%208,95%5");
                 createCommand("//replace 251:15 95%208,5%5");
@@ -193,7 +193,7 @@ public class FieldScripts extends Script {
             }
         }
 
-        if (crop == Crop.OTHER) {
+        if (cropType == CropType.OTHER) {
             if (type == CropStage.DRY) {
                 createCommand("//setbiome MESA");
 
@@ -238,7 +238,7 @@ public class FieldScripts extends Script {
             }
         }
 
-        if (crop == Crop.VINEYARD || crop == Crop.PEAR) {
+        if (cropType == CropType.VINEYARD || cropType == CropType.PEAR) {
             createCommand("//replace >251:4 15%188,85%22");
             changes++;
             createCommand("//replace >188,22 251:13");
@@ -258,7 +258,7 @@ public class FieldScripts extends Script {
 
         }
 
-        if (crop == Crop.CORN) {
+        if (cropType == CropType.CORN) {
             if (type == CropStage.HARVESTED) {
                 createCommand("//replace <air 60,3,5:1");
                 changes++;
@@ -285,7 +285,7 @@ public class FieldScripts extends Script {
             }
         }
 
-        if (crop == Crop.WHEAT) {
+        if (cropType == CropType.WHEAT) {
             if (type == CropStage.LIGHT) {
                 createCommand("//replace <air 3,3:1");
                 changes++;
@@ -306,7 +306,7 @@ public class FieldScripts extends Script {
             }
         }
 
-        if (crop == Crop.CATTLE || crop == Crop.MEADOW) {
+        if (cropType == CropType.CATTLE || cropType == CropType.MEADOW) {
             createCommand("//gmask !#solid");
 
             List<Vector> oneMeterPoints = new ArrayList<>(points);
@@ -349,8 +349,8 @@ public class FieldScripts extends Script {
             createCommand("//gmask !" + fence + ",77,166");
             createCommand("//expand 10 10 up");
 
-            if (crop == Crop.CATTLE) createCommand("//replace <air 60%3,20%2,20%3:1");
-            if (crop == Crop.MEADOW) createCommand("//replace <air 70%2,20%3,10%3:1");
+            if (cropType == CropType.CATTLE) createCommand("//replace <air 60%3,20%2,20%3:1");
+            if (cropType == CropType.MEADOW) createCommand("//replace <air 70%2,20%3,10%3:1");
             changes++;
 
             createCommand("//replace >#solid 70%0,30%31:1");

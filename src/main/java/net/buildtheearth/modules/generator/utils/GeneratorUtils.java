@@ -7,20 +7,39 @@ import clipper2.core.Point64;
 import clipper2.offset.EndType;
 import clipper2.offset.JoinType;
 import com.cryptomorin.xseries.XMaterial;
-import com.sk89q.worldedit.IncompleteRegionException;
-import com.sk89q.worldedit.WorldEdit;
+import com.fastasyncworldedit.core.limit.FaweLimit;
+import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extension.factory.MaskFactory;
+import com.sk89q.worldedit.extension.factory.parser.mask.ExpressionMaskParser;
+import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.function.mask.BlockMask;
+import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.regions.*;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.regions.selector.Polygonal2DRegionSelector;
+import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.session.SessionManager;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.GeneratorModule;
-import net.buildtheearth.modules.generator.model.Operation;
 import net.buildtheearth.modules.generator.model.Script;
+import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.MenuItems;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
@@ -29,8 +48,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -283,6 +305,212 @@ public class GeneratorUtils {
             return null;
         }
     }
+
+    /**
+     * Replaces all blocks in a region with a given mask and pattern.
+     *
+     * @param localSession The local session of the actor
+     * @param actor The actor who should perform the operation
+     * @param weWorld The WorldEdit world in which the region is located
+     * @param masks The masks to use
+     * @param from The block to replace
+     * @param to The block to replace with
+     * @param iterations The number of iterations to perform
+     */
+    public static void replaceBlocksWithMask(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, List<String> masks, BlockState from, BlockState to, int iterations) {
+        if(to == null)
+            throw new IllegalArgumentException("Invalid block type 'to'");
+
+        for (int i = 0; i < iterations; i++) {
+            try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
+
+                Region region = localSession.getSelection();
+
+                ParserContext parserContext = new ParserContext();
+                parserContext.setActor(actor);
+                parserContext.setWorld(weWorld);
+                parserContext.setSession(localSession);
+                parserContext.setExtent(editSession);
+
+                for (String maskString : masks) {
+                    ChatHelper.logDebug("Replacing blocks with expression mask: " + maskString.replace("%", "'PCT'") + " from " + from + " to " + to + " for " + iterations + " iterations");
+
+                    Mask mask = new MaskFactory(WorldEdit.getInstance()).parseFromInput(maskString, parserContext);
+
+                    if (from != null) {
+                        BlockMask blockMask = new BlockMask(weWorld, from.toBaseBlock());
+                        editSession.setMask(blockMask);
+                    }
+
+                    editSession.replaceBlocks(region, mask, to);
+
+                    saveEditSession(editSession, localSession, actor);
+                }
+            } catch(IncompleteRegionException | MaxChangedBlocksException | InputParseException e){
+                throw new RuntimeException(e);
+            }
+        }
+    }
+    public static void replaceBlocksWithMask(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, List<String> masks, XMaterial from, XMaterial to, int iterations) {
+        replaceBlocksWithMask(localSession, actor, weWorld, masks, getBlockState(from), getBlockState(to), iterations);
+    }
+
+    /**
+     * Replaces all blocks in a region with a given block.
+     *
+     * @param weWorld The WorldEdit world in which the region is located
+     * @param localSession The local session of the actor
+     * @param from The block to replace
+     * @param to The block to replace with
+     */
+    public static void replaceBlocks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, BlockState from, BlockState to) {
+        ChatHelper.logDebug("Replacing blocks from " + from + " to " + to);
+
+        try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
+            Region region = localSession.getSelection();
+
+            if(from != null) {
+                BlockMask blockMask = new BlockMask(weWorld, from.toBaseBlock());
+                BaseBlock toBaseBlock = to.toBaseBlock();
+                editSession.replaceBlocks(region, blockMask, toBaseBlock);
+            }else{
+                BaseBlock toBaseBlock = to.toBaseBlock();
+                editSession.setBlocks(region, toBaseBlock);
+            }
+
+            saveEditSession(editSession, localSession, actor);
+        } catch (IncompleteRegionException | MaxChangedBlocksException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static void replaceBlocks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, XMaterial from, XMaterial to) {
+        replaceBlocks(localSession, actor, weWorld, getBlockState(from), getBlockState(to));
+    }
+
+    /**
+     * Pastes a schematic at a given location.
+     *
+     * @param localSession The local session of the actor
+     * @param weWorld The WorldEdit world in which the region is located
+     * @param blocks The blocks to paste
+     * @param schematicPath The path to the schematic
+     * @param loc The location to paste the schematic
+     * @param rotation The rotation of the schematic
+     */
+    public static void pasteSchematic(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, Block[][][] blocks, String schematicPath, Location loc, double rotation) {
+        int offsetY = 1;
+
+        int maxHeight = loc.getBlockY();
+
+        if(blocks != null)
+            maxHeight = GeneratorUtils.getMaxHeight(blocks, loc.getBlockX(), loc.getBlockZ(), MenuItems.getIgnoredMaterials());
+        if(maxHeight == 0)
+            maxHeight = loc.getBlockY();
+
+
+        try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
+            File schematicFile = new File(BuildTeamTools.getInstance().getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/" + schematicPath);
+
+            ClipboardFormat format = ClipboardFormats.findByFile(schematicFile);
+            ClipboardReader reader;
+
+            if (format == null)
+                return;
+
+            try {
+                reader = format.getReader(Files.newInputStream(schematicFile.toPath()));
+                Clipboard clipboard = reader.read();
+
+                AffineTransform transform = new AffineTransform();
+                transform = transform.rotateY(rotation);
+
+                ClipboardHolder holder = new ClipboardHolder(clipboard);
+                holder.setTransform(transform);
+
+                com.sk89q.worldedit.function.operation.Operation op = holder
+                        .createPaste(editSession)
+                        .to(BlockVector3.at(loc.getBlockX(), maxHeight + offsetY, loc.getBlockZ()))
+                        .ignoreAirBlocks(true)
+                        .build();
+                Operations.complete(op);
+
+            } catch (IOException | WorldEditException e) {
+                throw new RuntimeException(e);
+            }
+
+            saveEditSession(editSession, localSession, actor);
+        }
+    }
+
+    /**
+     * Expands the WorldEdit selection by a given vector.
+     *
+     * @param localSession The local session of the actor
+     * @param vector The vector to expand the selection by
+     */
+    public static void expandSelection(LocalSession localSession, Vector vector){
+        BlockVector3 blockVector3 = BlockVector3.at(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
+
+        try {
+            localSession.getSelection().expand(blockVector3);
+        } catch (IncompleteRegionException | RegionOperationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    /**
+     * Clears the history of a LocalSession.
+     * @param session The local session to clear the history of
+     */
+    public static void clearHistory(LocalSession session){
+        session.clearHistory();
+    }
+
+    /**
+     * Disables the gmask of a LocalSession.
+     *
+     * @param session The local session to disable the gmask of
+     */
+    public static void disableGmask(LocalSession session){
+        session.setMask(null);
+    }
+
+
+    /**
+     * Returns the blockState of a given XMaterial.
+     *
+     * @param xMaterial The XMaterial to get the blockState from
+     * @return The blockState of the XMaterial
+     */
+    public static BlockState getBlockState(XMaterial xMaterial){
+        if(xMaterial == null)
+            return null;
+
+        BlockType blockType = BlockTypes.get(xMaterial.getId() + "");
+
+        if(blockType == null && xMaterial.parseMaterial() != null)
+            blockType = BlockTypes.get(xMaterial.parseMaterial().getKey().asString());
+
+        if(blockType == null)
+            throw new IllegalArgumentException("Invalid block type: " + xMaterial.parseMaterial().name());
+
+        return blockType.getDefaultState();
+    }
+
+    /**
+     * Commits and saves an edit session.
+     *
+     * @param editSession The edit session to commit
+     * @param localSession The local session to save the edit session to
+     */
+    public static void saveEditSession(EditSession editSession, LocalSession localSession, Actor actor){
+        editSession.commit();
+
+        if(CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled())
+            localSession.remember(actor, localSession.getSelectionWorld(), editSession.getChangeSet(), FaweLimit.MAX);
+    }
+
 
     /**
      * Checks the maximum height of a polygon region

@@ -13,10 +13,10 @@ public class TreeSettings extends Settings {
     public void setDefaultValues() {
 
         // Lane Count (Default: Fixed Value)
-        setValue(TreeFlag.TYPE, "any");
+        setValue(TreeFlag.TYPE, TreeType.ANY);
 
         // Lane Count (Default: Fixed Value)
-        setValue(TreeFlag.WIDTH, "any");
+        setValue(TreeFlag.WIDTH, TreeWidth.ANY);
 
         // Lane Count (Default: Fixed Value)
         setValue(RoadFlag.LANE_COUNT, "2");

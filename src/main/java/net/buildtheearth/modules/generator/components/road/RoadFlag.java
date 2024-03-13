@@ -7,23 +7,23 @@ import net.buildtheearth.modules.generator.model.Flag;
 public enum RoadFlag implements Flag {
     LANE_COUNT("c", FlagType.INTEGER),
     LANE_WIDTH("w", FlagType.INTEGER),
-    ROAD_MATERIAL("m", FlagType.BLOCKS),
+    ROAD_MATERIAL("m", FlagType.XMATERIAL),
     LANE_GAP("g", FlagType.INTEGER),
 
     MARKING_LENGTH("ll", FlagType.INTEGER),
     MARKING_GAP("lg", FlagType.INTEGER),
-    MARKING_MATERIAL("lm", FlagType.BLOCKS),
+    MARKING_MATERIAL("lm", FlagType.XMATERIAL),
 
     SIDEWALK_WIDTH("sw", FlagType.INTEGER),
-    SIDEWALK_MATERIAL("sm", FlagType.BLOCKS),
+    SIDEWALK_MATERIAL("sm", FlagType.XMATERIAL),
 
-    SIDEWALK_SLAB_COLOR("ss", FlagType.BLOCKS),
+    SIDEWALK_SLAB_COLOR("ss", FlagType.XMATERIAL),
 
-    ROAD_SLAB_COLOR("rs", FlagType.BLOCKS),
+    ROAD_SLAB_COLOR("rs", FlagType.XMATERIAL),
 
     CROSSWALK("cw", FlagType.BOOLEAN),
 
-    STREET_LAMP_TYPE("st", FlagType.ENUM),
+    STREET_LAMP_TYPE("st", FlagType.STRING),
     STREET_LAMP_DISTANCE("sd", FlagType.INTEGER),
 
     ROAD_SIDE("rs", FlagType.INTEGER);

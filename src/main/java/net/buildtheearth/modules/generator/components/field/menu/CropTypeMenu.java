@@ -2,7 +2,7 @@ package net.buildtheearth.modules.generator.components.field.menu;
 
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.modules.generator.GeneratorModule;
-import net.buildtheearth.modules.generator.components.field.Crop;
+import net.buildtheearth.modules.generator.components.field.CropType;
 import net.buildtheearth.modules.generator.components.field.FieldFlag;
 import net.buildtheearth.modules.generator.components.field.FieldSettings;
 import net.buildtheearth.modules.generator.menu.GeneratorMenu;
@@ -12,7 +12,6 @@ import net.buildtheearth.utils.ListUtil;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.AbstractMenu;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -79,95 +78,95 @@ public class CropTypeMenu extends AbstractMenu {
         // Set click events for the crop type items
         getMenu().getSlot(POTATO_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
             if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
-                sendMoreInformation(clickPlayer, Crop.POTATO);
+                sendMoreInformation(clickPlayer, CropType.POTATO);
                 return;
             }
-            performClickAction(clickPlayer, Crop.POTATO);
+            performClickAction(clickPlayer, CropType.POTATO);
         }));
 
         getMenu().getSlot(WHEAT_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
             if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
-                sendMoreInformation(clickPlayer, Crop.WHEAT);
+                sendMoreInformation(clickPlayer, CropType.WHEAT);
                 return;
             }
-            performClickAction(clickPlayer, Crop.WHEAT);
+            performClickAction(clickPlayer, CropType.WHEAT);
         }));
 
         getMenu().getSlot(CORN_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
             if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
-                sendMoreInformation(clickPlayer, Crop.CORN);
+                sendMoreInformation(clickPlayer, CropType.CORN);
                 return;
             }
-            performClickAction(clickPlayer, Crop.CORN);
+            performClickAction(clickPlayer, CropType.CORN);
         }));
 
         getMenu().getSlot(VINEYARD_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
             if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
-                sendMoreInformation(clickPlayer, Crop.VINEYARD);
+                sendMoreInformation(clickPlayer, CropType.VINEYARD);
                 return;
             }
-            performClickAction(clickPlayer, Crop.VINEYARD);
+            performClickAction(clickPlayer, CropType.VINEYARD);
         }));
 
         getMenu().getSlot(PEAR_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
             if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
-                sendMoreInformation(clickPlayer, Crop.PEAR);
+                sendMoreInformation(clickPlayer, CropType.PEAR);
                 return;
             }
-            performClickAction(clickPlayer, Crop.PEAR);
+            performClickAction(clickPlayer, CropType.PEAR);
         }));
 
         getMenu().getSlot(CATTLE_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
             if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
-                sendMoreInformation(clickPlayer, Crop.CATTLE);
+                sendMoreInformation(clickPlayer, CropType.CATTLE);
                 return;
             }
-            performClickAction(clickPlayer, Crop.CATTLE);
+            performClickAction(clickPlayer, CropType.CATTLE);
         }));
 
         getMenu().getSlot(MEADOW_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
             if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
-                sendMoreInformation(clickPlayer, Crop.MEADOW);
+                sendMoreInformation(clickPlayer, CropType.MEADOW);
                 return;
             }
-            performClickAction(clickPlayer, Crop.MEADOW);
+            performClickAction(clickPlayer, CropType.MEADOW);
         }));
 
         getMenu().getSlot(HARVESTED_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
             if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
-                sendMoreInformation(clickPlayer, Crop.HARVESTED);
+                sendMoreInformation(clickPlayer, CropType.HARVESTED);
                 return;
             }
-            performClickAction(clickPlayer, Crop.HARVESTED);
+            performClickAction(clickPlayer, CropType.HARVESTED);
         }));
 
         getMenu().getSlot(OTHER_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
             if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
-                sendMoreInformation(clickPlayer, Crop.OTHER);
+                sendMoreInformation(clickPlayer, CropType.OTHER);
                 return;
             }
-            performClickAction(clickPlayer, Crop.OTHER);
+            performClickAction(clickPlayer, CropType.OTHER);
         }));
 
 
     }
 
-    private void performClickAction(Player p, Crop crop) {
+    private void performClickAction(Player p, CropType cropType) {
         Settings settings = GeneratorModule.getInstance().getField().getPlayerSettings().get(p.getUniqueId());
 
         if (!(settings instanceof FieldSettings))
             return;
 
         FieldSettings fieldSettings = (FieldSettings) settings;
-        fieldSettings.setValue(FieldFlag.CROP_TYPE, crop.getIdentifier());
+        fieldSettings.setValue(FieldFlag.CROP_TYPE, cropType.getIdentifier());
 
         p.closeInventory();
         p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
-        if (crop.hasStages()) {
-            new CropStageMenu(p, crop);
+        if (cropType.hasStages()) {
+            new CropStageMenu(p, cropType);
             return;
         }
-        if (crop.equals(Crop.CATTLE) || crop.equals(Crop.MEADOW)) {
+        if (cropType.equals(CropType.CATTLE) || cropType.equals(CropType.MEADOW)) {
             new FenceTypeMenu(p, true);
             return;
         }
@@ -175,8 +174,8 @@ public class CropTypeMenu extends AbstractMenu {
         GeneratorModule.getInstance().getField().generate(p);
     }
 
-    private void sendMoreInformation(Player p, Crop crop) {
-        switch (crop) {
+    private void sendMoreInformation(Player p, CropType cropType) {
+        switch (cropType) {
             case POTATO:
                 p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#potato-requires-lines");
                 break;

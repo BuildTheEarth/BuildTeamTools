@@ -1,7 +1,6 @@
 package net.buildtheearth.modules.generator.model;
 
 import lombok.Getter;
-import net.buildtheearth.modules.generator.components.FlagType;
 import net.buildtheearth.modules.generator.components.field.FieldFlag;
 import net.buildtheearth.modules.generator.components.house.HouseFlag;
 import net.buildtheearth.modules.generator.components.rail.RailFlag;

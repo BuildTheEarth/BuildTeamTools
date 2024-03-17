@@ -1,18 +1,15 @@
 package net.buildtheearth.modules.generator.components.house;
 
-import net.buildtheearth.modules.generator.components.FlagType;
+import net.buildtheearth.modules.generator.model.FlagType;
 import net.buildtheearth.modules.generator.model.Flag;
 
 public enum HouseFlag implements Flag {
-    WALL_COLOR("w", FlagType.XMATERIAL),
-    ROOF_COLOR("r", FlagType.XMATERIAL),
-    BASE_COLOR("b", FlagType.XMATERIAL),
-    WINDOW_COLOR("wd", FlagType.XMATERIAL),
-
-    BALCONY_COLOR("bc", FlagType.XMATERIAL),
-
+    WALL_COLOR("w", FlagType.XMATERIAL_LIST),
+    ROOF_COLOR("r", FlagType.XMATERIAL_LIST),
+    BASE_COLOR("b", FlagType.XMATERIAL_LIST),
+    WINDOW_COLOR("wd", FlagType.XMATERIAL_LIST),
+    BALCONY_COLOR("bc", FlagType.XMATERIAL_LIST),
     BALCONY_FENCE_COLOR("bfc", FlagType.XMATERIAL),
-
     ROOF_TYPE("rt", FlagType.ROOF_TYPE),
     FLOOR_COUNT("fc", FlagType.INTEGER),
     FLOOR_HEIGHT("fh", FlagType.INTEGER),

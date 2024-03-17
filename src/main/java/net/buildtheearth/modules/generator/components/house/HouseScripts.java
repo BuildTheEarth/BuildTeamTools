@@ -1,7 +1,6 @@
 package net.buildtheearth.modules.generator.components.house;
 
 import com.cryptomorin.xseries.XMaterial;
-import com.sk89q.worldedit.registry.state.EnumProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -10,16 +9,13 @@ import net.buildtheearth.modules.generator.model.Flag;
 import net.buildtheearth.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.modules.generator.model.Script;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
+import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
-import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class HouseScripts extends Script {
 
@@ -32,12 +28,12 @@ public class HouseScripts extends Script {
     public void buildscript_v_1_2(){
         HashMap<Flag, Object> flags = getGeneratorComponent().getPlayerSettings().get(getPlayer().getUniqueId()).getValues();
 
-        XMaterial wallColor = (XMaterial) flags.get(HouseFlag.WALL_COLOR);
-        XMaterial roofColor = (XMaterial) flags.get(HouseFlag.ROOF_COLOR);
-        XMaterial baseColor = (XMaterial) flags.get(HouseFlag.BASE_COLOR);
-        XMaterial windowColor = (XMaterial) flags.get(HouseFlag.WINDOW_COLOR);
-        XMaterial balconyColor = (XMaterial) flags.get(HouseFlag.BALCONY_COLOR);
-        XMaterial balconyFenceColor = (XMaterial) flags.get(HouseFlag.BALCONY_FENCE_COLOR);
+        XMaterial[] wallColor = (XMaterial[]) flags.get(HouseFlag.WALL_COLOR);
+        XMaterial[] roofColor = (XMaterial[]) flags.get(HouseFlag.ROOF_COLOR);
+        XMaterial[] baseColor = (XMaterial[]) flags.get(HouseFlag.BASE_COLOR);
+        XMaterial[] windowColor = (XMaterial[]) flags.get(HouseFlag.WINDOW_COLOR);
+        XMaterial[] balconyColor = (XMaterial[]) flags.get(HouseFlag.BALCONY_COLOR);
+        XMaterial[] balconyFenceColor = (XMaterial[]) flags.get(HouseFlag.BALCONY_FENCE_COLOR);
         RoofType roofType = (RoofType) flags.get(HouseFlag.ROOF_TYPE);
 
         int floorCount = (int) flags.get(HouseFlag.FLOOR_COUNT);
@@ -54,23 +50,13 @@ public class HouseScripts extends Script {
         int maxY = minMax[1].getBlockY();
 
 
-        getPlayer().chat("/clearhistory");
-
-        // Disable the current global mask
-        getPlayer().chat("//gmask");
 
 
         // ----------- PREPARATION 01 ----------
         // Replace all non-solid blocks with air
 
-        getPlayer().chat("//expand 10 up");
-        getPlayer().chat("//expand 10 down");
-
-        getPlayer().chat("//gmask !#solid");
-        getPlayer().chat("//replace 0");
+        Block[][][] blocks = GeneratorUtils.prepareScriptSession(localSession, actor, getPlayer(),weWorld, 10);
         changes++;
-
-        Block[][][] blocks = GeneratorUtils.analyzeRegion(getPlayer(), getPlayer().getWorld());
 
         if(blocks == null){
             getPlayer().sendMessage("§c§lERROR: §cRegion not readable. Please report this to the developers of the BuildTeamTool plugin.");
@@ -85,7 +71,7 @@ public class HouseScripts extends Script {
         // Disable the global mask
         disableGmask();
 
-        /*
+
         // ----------- PREPARATION 02 ----------
         // Bring the outline on the same height
 
@@ -105,65 +91,57 @@ public class HouseScripts extends Script {
 
         // Replace all sponges with bricks that have bricks below them
         for(int i = 0; i < 20; i++) {
-            replaceBlocksWithExpressionMask(">45", XMaterial.SPONGE, XMaterial.BRICK);
+            replaceBlocksWithMask(">45", XMaterial.SPONGE, XMaterial.BRICKS);
             changes++;
         }
 
         // Replace all left sponges with air
-        createCommand("//gmask");
-        createCommand("//replace 19 0");
+        replaceBlocks(XMaterial.SPONGE, XMaterial.AIR);
         changes++;
 
 
         // ----------- PREPARATION 03 ----------
         // Bring the orange, yellow, green, blue and red wool blocks to the same height
 
-        String[] woolColors = {"35:1", "35:4", "35:11", "35:14", "35:5"};
+        XMaterial[] woolColors = {XMaterial.ORANGE_WOOL, XMaterial.YELLOW_WOOL, XMaterial.BLUE_WOOL, XMaterial.LIME_WOOL};
 
-        for(String wool : woolColors){
+        for(XMaterial wool : woolColors){
             // Replace all blocks above the wool
-            createCommand("//gmask >" + wool);
-            for(int i = 0; i < 20; i++){
-                createCommand("//replace 0 " + wool);
-                changes++;
-            }
+            replaceBlocksWithMask(">" + Item.getUniqueMaterialString(wool), XMaterial.AIR, wool, 20);
 
-            // Select highest yellow wool block and replace it with sponge
-            createCommand("//gmask <0");
-            createCommand("//replace " + wool + " 19");
+            // Select highest wool block and replace it with sponge
+            replaceBlocksWithMask("<0", wool, XMaterial.SPONGE);
             changes++;
 
-            // Replace yellow wool with brick
-            createCommand("//gmask");
-            createCommand("//replace " + wool + " 45");
+            // Replace wool with brick
+            replaceBlocks(wool, XMaterial.BRICKS);
             changes++;
 
             // Replace all sponges with yellow wool
-            createCommand("//replace 19 " + wool);
+            replaceBlocks(XMaterial.SPONGE, wool);
             changes++;
         }
 
         // ----------- PREPARATION 05 ----------
         // Move blue, red and lime wool one block up and replace block below with brick
 
-        createCommand("//expand 1 up");
+        expandSelection(new Vector(0, 1, 0));
 
-        String[] woolColorsNoYellow = {"35:11", "35:14", "35:5"};
-        for(String wool : woolColorsNoYellow) {
-            createCommand("//gmask =queryRel(1,0,0,45,0)||queryRel(-1,0,0,45,0)||queryRel(0,0,1,45,0)||queryRel(0,0,-1,45,0)||queryRel(1,0,1,45,0)||queryRel(-1,0,1,45,0)||queryRel(1,0,-1,45,0)||queryRel(-1,0,-1,45,0)");
-            createCommand("//replace " + wool + " 19");
+        XMaterial[] woolColorsNoYellow = {XMaterial.BLUE_WOOL, XMaterial.BLUE_WOOL, XMaterial.RED_WOOL, XMaterial.LIME_WOOL};
+        for(XMaterial wool : woolColorsNoYellow) {
+            replaceBlocksWithMask("=queryRel(1,0,0,45,0)||queryRel(-1,0,0,45,0)||queryRel(0,0,1,45,0)||queryRel(0,0,-1,45,0)||queryRel(1,0,1,45,0)||queryRel(-1,0,1,45,0)||queryRel(1,0,-1,45,0)||queryRel(-1,0,-1,45,0)",
+                wool, XMaterial.SPONGE);
             changes++;
 
-            for(int i = 0; i < 10; i++){
-                createCommand("//gmask =queryRel(1,0,0,19,0)||queryRel(-1,0,0,19,0)||queryRel(0,0,1,19,0)||queryRel(0,0,-1,19,0)||queryRel(1,0,1,19,0)||queryRel(-1,0,1,19,0)||queryRel(1,0,-1,19,0)||queryRel(-1,0,-1,19,0)");
-                createCommand("//replace " + wool + " 19");
-                changes++;
-            }
 
-            createCommand("//gmask");
-            createCommand("//replace >19 " + wool);
+            replaceBlocksWithMask("=queryRel(1,0,0,19,0)||queryRel(-1,0,0,19,0)||queryRel(0,0,1,19,0)||queryRel(0,0,-1,19,0)||queryRel(1,0,1,19,0)||queryRel(-1,0,1,19,0)||queryRel(1,0,-1,19,0)||queryRel(-1,0,-1,19,0)",
+                    wool, XMaterial.SPONGE, 10);
+            changes+=10;
+
+            setBlocksWithMask(">19", wool);
             changes++;
-            createCommand("//replace 19 45");
+
+            replaceBlocks(XMaterial.SPONGE, XMaterial.BRICKS);
             changes++;
         }
 
@@ -173,46 +151,39 @@ public class HouseScripts extends Script {
         // Replace all bricks underground with grass
 
         // Replace all bricks with sponge
-        createCommand("//replace 45 19");
+        replaceBlocks(XMaterial.BRICKS, XMaterial.SPONGE);
         changes++;
 
 
         // Replace all sponges with bricks that have air or red wool or blue wool or green wool above them
-        createCommand("//gmask =(queryRel(0,1,0,0,0)||queryRel(0,1,0,35,11)||queryRel(0,1,0,35,14)||queryRel(0,1,0,35,5))");
-        createCommand("//replace 19 45");
-
+        replaceBlocksWithMask("=(queryRel(0,1,0,0,0)||queryRel(0,1,0,35,11)||queryRel(0,1,0,35,14)||queryRel(0,1,0,35,5))"
+                , XMaterial.SPONGE, XMaterial.BRICKS);
         changes++;
 
-        // Disable the global mask
-        createCommand("//gmask");
-
         // Replace all left sponges with grass
-        createCommand("//replace 19 2");
+        replaceBlocks(XMaterial.SPONGE, XMaterial.GRASS_BLOCK);
         changes++;
 
 
         // ----------- PREPARATION 07 ----------
         // Expand the blue wool until it reaches the green wool
 
-        // Select all blocks that are next to blue wool
-        createCommand("//gmask =(queryRel(1,0,0,35,11)||queryRel(-1,0,0,35,11)||queryRel(0,0,1,35,11)||queryRel(0,0,-1,35,11)||queryRel(1,0,1,35,11)||queryRel(-1,0,-1,35,11)||queryRel(-1,0,1,35,11)||queryRel(1,0,-1,35,11))&&!(queryRel(1,0,0,35,5)||queryRel(-1,0,0,35,5)||queryRel(0,0,1,35,5)||queryRel(0,0,-1,35,5)||queryRel(1,0,1,35,5)||queryRel(-1,0,-1,35,5)||queryRel(-1,0,1,35,5)||queryRel(1,0,-1,35,5))");
+        // Replace all blocks above bricks with blue wool
+        setBlocksWithMask("=queryRel(0,-1,0,45,0)&&(queryRel(1,0,0,35,11)||queryRel(-1,0,0,35,11)||queryRel(0,0,1,35,11)||queryRel(0,0,-1,35,11)||queryRel(1,0,1,35,11)||queryRel(-1,0,-1,35,11)||queryRel(-1,0,1,35,11)||queryRel(1,0,-1,35,11))&&!(queryRel(1,0,0,35,5)||queryRel(-1,0,0,35,5)||queryRel(0,0,1,35,5)||queryRel(0,0,-1,35,5)||queryRel(1,0,1,35,5)||queryRel(-1,0,-1,35,5)||queryRel(-1,0,1,35,5)||queryRel(1,0,-1,35,5))",
+                XMaterial.BLUE_WOOL, 20);
+        changes+=20;
 
-        for(int i = 0; i < 20; i++) {
-            // Replace all blocks above lapislazuli with blue wool
-            createCommand("//replace >45 35:11");
-            changes++;
-        }
 
         // Place the last blue wool between the green and the blue wool
-        createCommand("//gmask =queryRel(1,0,0,35,11)||queryRel(-1,0,0,35,11)||queryRel(0,0,1,35,11)||queryRel(0,0,-1,35,11)||queryRel(1,0,1,35,11)||queryRel(-1,0,-1,35,11)||queryRel(-1,0,1,35,11)||queryRel(1,0,-1,35,11)");
-        createCommand("//replace >45 35:11");
+        setBlocksWithMask("=queryRel(0,-1,0,45,0)&&(queryRel(1,0,0,35,11)||queryRel(-1,0,0,35,11)||queryRel(0,0,1,35,11)||queryRel(0,0,-1,35,11)||queryRel(1,0,1,35,11)||queryRel(-1,0,-1,35,11)||queryRel(-1,0,1,35,11)||queryRel(1,0,-1,35,11))",
+                XMaterial.BLUE_WOOL);
         changes++;
-        */
+
 
         // ----------- GROUND ----------
 
         // Set pos1 and pos2
-        List<Vector> outlinePoints = new ArrayList<>(selectionPoints);
+        outlinePoints = new ArrayList<>(selectionPoints);
         outlinePoints.get(0).setY(maxY);
         for(Vector point : outlinePoints)
             point.setY(minY);
@@ -264,7 +235,7 @@ public class HouseScripts extends Script {
                 moveWoolUp(0);
 
                 // Select everything x blocks above bricks. Then replace that with lapislazuli
-                setBlocksWithMask("=queryRel(0," + (-currentHeight) + ",0,45,-1)", XMaterial.LAPIS_ORE);
+                setBlocksWithMask("=queryRel(0," + (-currentHeight) + ",0,45,-1)", XMaterial.LAPIS_BLOCK);
                 changes++;
 
                 // Raise the yellow wool layer by one block
@@ -278,14 +249,13 @@ public class HouseScripts extends Script {
         // ----------- FLOORS ----------
         int heightDifference = 0;
         for(int i = 0; i < floorCount; i++) {
-            Bukkit.broadcastMessage("Floor " + i + " of " + floorCount);
 
             currentHeight++;
 
             // Move wool one block up
             moveWoolUp(i+1);
 
-            // Select everything x blocks above bricks. Then replace that with lapislazuli ore
+            // Select everything x blocks above bricks. Then replace that with lapislazuli block
             setBlocksWithMask("=queryRel(0," + (-currentHeight) + ",0,45,-1)", XMaterial.LAPIS_ORE);
             changes++;
 
@@ -303,7 +273,6 @@ public class HouseScripts extends Script {
                 if (!containsRedWool) {
                     // Replace everything with white glass
                     setBlocksWithMask("=queryRel(0," + (-currentHeight) + ",0,45,-1)", XMaterial.WHITE_STAINED_GLASS);
-                    changes++;
                 }else {
                     // Replace red wool with gray glass
                     replaceBlocksWithMask("=queryRel(0," + (-currentHeight) + ",0,45,-1)", XMaterial.RED_WOOL, XMaterial.GRAY_STAINED_GLASS);
@@ -319,8 +288,8 @@ public class HouseScripts extends Script {
 
                     // Replace green wool with lapislazuli ore
                     replaceBlocksWithMask("=queryRel(0," + (-currentHeight) + ",0,45,-1)", XMaterial.GREEN_WOOL, XMaterial.LAPIS_ORE);
-                    changes++;
                 }
+                changes++;
 
 
                 // Raise the yellow wool layer by one block
@@ -363,9 +332,6 @@ public class HouseScripts extends Script {
         // Remove the red wool
         replaceBlocks(XMaterial.RED_WOOL, XMaterial.AIR);
         changes++;
-
-
-        finish(blocks);
 
 
         // ----------- BALCONY 1/2 ----------
@@ -417,7 +383,7 @@ public class HouseScripts extends Script {
             replaceBlocks(XMaterial.GREEN_WOOL, XMaterial.SPONGE);
 
             // Replace all blocks that have sponge below them and have air next to them with the balcony color
-            setBlocksWithMask("//gmask =queryRel(0,-1,0,19)&&(queryRel(-1,-1,0,0,0)||queryRel(1,-1,0,0,0)||queryRel(0,-1,-1,0,0)||queryRel(0,-1,1,0,0))",
+            setBlocksWithMask("=queryRel(0,-1,0,19)&&(queryRel(-1,-1,0,0,0)||queryRel(1,-1,0,0,0)||queryRel(0,-1,-1,0,0)||queryRel(0,-1,1,0,0))",
                     balconyFenceColor);
 
             // If the balcony fence color is enabled, replace sponge with the balcony color
@@ -428,9 +394,6 @@ public class HouseScripts extends Script {
 
         // ----------- ROOF ----------
 
-        XMaterial rm1 = roofColor;
-        XMaterial rm2 = roofColor;
-        XMaterial rm3 = roofColor;
 
         // Replace the lime wool with emerald ore because FAWE doesn't support data values in queryRels in 2.9.1
         replaceBlocks(XMaterial.LIME_WOOL, XMaterial.EMERALD_ORE);
@@ -452,12 +415,18 @@ public class HouseScripts extends Script {
             // Create the roof house wall staircase
             for(int i = 0; i < maxRoofHeight; i++){
                 // Select all air blocks that are above diamond ore and above & next to emerald ore
-                replaceBlocksWithMask("=queryRel(0,-1,0,56,0)&&(queryRel(1,-1,0,129,0)||queryRel(-1,-1,0,129,0)||queryRel(0,-1,1,129,0)||queryRel(0,-1,-1,129,0)||queryRel(1,-1,1,129,0)||queryRel(-1,-1,-1,129,0)||queryRel(-1,-1,1,129,0)||queryRel(1,-1,-1,129,0))",
+                replaceBlocksWithMask("=queryRel(0,-1,0,56,0)&&" +
+                            "(" +
+                                "queryRel(1,-1,0,129,0)||queryRel(-1,-1,0,129,0)||queryRel(0,-1,1,129,0)||queryRel(0,-1,-1,129,0)||queryRel(1,-1,1,129,0)||queryRel(-1,-1,-1,129,0)||queryRel(-1,-1,1,129,0)||queryRel(1,-1,-1,129,0)" +
+                            ")",
                         XMaterial.DIAMOND_ORE, XMaterial.EMERALD_ORE);
                 changes++;
 
                 // Select all air blocks that are above diamond ore and next to emerald ore
-                replaceBlocksWithMask("=queryRel(0,-1,0,56,0)&&(queryRel(1,0,0,129,0)||queryRel(-1,0,0,129,0)||queryRel(0,0,1,129,0)||queryRel(0,0,-1,129,0)||queryRel(1,0,1,129,0)||queryRel(-1,0,-1,129,0)||queryRel(-1,0,1,129,0)||queryRel(1,0,-1,129,0))",
+                replaceBlocksWithMask("=queryRel(0,-1,0,56,0)&&" +
+                                "(" +
+                                    "queryRel(1,0,0,129,0)||queryRel(-1,0,0,129,0)||queryRel(0,0,1,129,0)||queryRel(0,0,-1,129,0)||queryRel(1,0,1,129,0)||queryRel(-1,0,-1,129,0)||queryRel(-1,0,1,129,0)||queryRel(1,0,-1,129,0)" +
+                                ")",
                         XMaterial.DIAMOND_ORE, XMaterial.EMERALD_ORE);
                 changes++;
 
@@ -489,7 +458,7 @@ public class HouseScripts extends Script {
                         "(queryRel(0,0,1,21,-1)&&queryRel(0,1,1,44,0))||" +
                         "(queryRel(0,0,-1,21,-1)&&queryRel(0,1,-1,44,0))" +
                     ")",
-                    getStoneSlab("top"));
+                    getSlab(BlockTypes.STONE_SLAB, "top"));
             changes++;
 
             // (Overhang Roof Layer 2) Select all air blocks next to upside down stone slab and lapislazuli. Then replace them with and upside down stone slab
@@ -500,7 +469,7 @@ public class HouseScripts extends Script {
                         "(queryRel(0,0,1,44,8)&&(queryRel(1,0,0,21,0)||queryRel(-1,0,0,21,0)))||" +
                         "(queryRel(0,0,-1,44,8)&&(queryRel(1,0,0,21,0)||queryRel(-1,0,0,21,0)))" +
                     ")",
-                    getStoneSlab("top"));
+                    getSlab(BlockTypes.STONE_SLAB, "top"));
             changes++;
 
 
@@ -529,11 +498,11 @@ public class HouseScripts extends Script {
                                 "||queryRel(0,0,1,129,0)||queryRel(0,0,1,56,0)" +
                                 "||queryRel(0,0,-1,129,0)||queryRel(0,0,-1,56,0)" +
                             ")",
-                            getStoneSlab("double"), getStoneSlab("bottom")
+                            getSlab(BlockTypes.STONE_SLAB, "double"), getSlab(BlockTypes.STONE_SLAB, "bottom")
                         );
                     else
                         replaceBlocksWithMask("=!(queryRel(1,-1,0,44,-1)||queryRel(-1,-1,0,44,-1)||queryRel(0,-1,1,44,-1)||queryRel(0,-1,-1,44,-1))",
-                                getStoneSlab("double"), getStoneSlab("bottom"));
+                                getSlab(BlockTypes.STONE_SLAB, "double"), getSlab(BlockTypes.STONE_SLAB, "bottom"));
 
                     changes++;
 
@@ -552,11 +521,11 @@ public class HouseScripts extends Script {
                                 "||queryRel(-1,0,0,129,0)||queryRel(-1,0,0,56,0)" +
                                 "||queryRel(0,0,1,129,0)||queryRel(0,0,1,56,0)" +
                                 "||queryRel(0,0,-1,129,0)||queryRel(0,0,-1,56,0)",
-                            getStoneSlab("bottom"), getStoneSlab("double")
+                            getSlab(BlockTypes.STONE_SLAB, "bottom"), getSlab(BlockTypes.STONE_SLAB, "double")
                         );
                     else
                         replaceBlocksWithMask("=!(queryRel(1,0,0,0,-1)||queryRel(-1,0,0,0,-1)||queryRel(0,0,1,0,-1)||queryRel(0,0,-1,0,-1))"
-                            ,getStoneSlab("bottom"), getStoneSlab("double"));
+                            ,getSlab(BlockTypes.STONE_SLAB, "bottom"), getSlab(BlockTypes.STONE_SLAB, "double"));
 
                     changes++;
                 }
@@ -569,7 +538,7 @@ public class HouseScripts extends Script {
 
             // (Overhang Roof Layer 3) Select all air blocks next to two upside down stone slabs. Then replace them with and upside down stone slab
             replaceBlocksWithMask("=(queryRel(1,0,0,44,8)&&queryRel(2,0,0,44,8))||(queryRel(-1,0,0,44,8)&&queryRel(-2,0,0,44,8))||(queryRel(0,0,1,44,8)&&queryRel(0,0,2,44,8))||(queryRel(0,0,-1,44,8)&&queryRel(0,0,-2,44,8))",
-                getAir(), getStoneSlab("top"));
+                getAir(), getSlab(BlockTypes.STONE_SLAB, "top"));
             changes++;
 
             // Select all emerald ore that are above & next to emerald ore and replace it with stone slabs
@@ -585,46 +554,44 @@ public class HouseScripts extends Script {
 
             // Select all air blocks that are below & next to emerald ore and under a stone slab and replace it with upside down stone slabs
             replaceBlocksWithMask("=queryRel(0,1,0,44,0)&&(queryRel(1,1,0,129,0)||queryRel(-1,1,0,129,0)||queryRel(0,1,1,129,0)||queryRel(0,1,-1,129,0)||queryRel(1,1,1,129,0)||queryRel(-1,1,-1,129,0)||queryRel(-1,1,1,129,0)||queryRel(1,1,-1,129,0))",
-                getAir(), getStoneSlab("top"));
+                getAir(), getSlab(BlockTypes.STONE_SLAB, "top"));
             changes++;
 
             // Select all air blocks that are next to emerald ore and under a stone slab and replace it with upside down stone slabs
             replaceBlocksWithMask("=queryRel(0,1,0,44,0)&&(queryRel(1,0,0,129,0)||queryRel(-1,0,0,129,0)||queryRel(0,0,1,129,0)||queryRel(0,0,-1,129,0))",
-                getAir(), getStoneSlab("top"));
+                getAir(), getSlab(BlockTypes.STONE_SLAB, "top"));
             changes++;
 
 
-            // Select all left over emerald ore replace it with double stone slabs
-            replaceBlocks(getEmeraldOre(), getStoneSlab("double"));
+            // Select all leftover emerald ore replace it with double stone slabs
+            replaceBlocks(getEmeraldOre(), getSlab(BlockTypes.STONE_SLAB, "double"));
             changes++;
 
             // Replace diamond ore with lapislazuli ore
             replaceBlocks(XMaterial.DIAMOND_ORE, XMaterial.LAPIS_ORE);
             changes++;
 
+            BlockState[] bottomSlabs = new BlockState[roofColor.length];
+            BlockState[] topSlabs = new BlockState[roofColor.length];
+            BlockState[] doubleSlabs = new BlockState[roofColor.length];
 
+            for(int i = 0; i < roofColor.length; i++){
+                BlockType bt = Item.convertXMaterialToBlockType(roofColor[i]);
 
+                if(bt == null)
+                    continue;
 
-            // Create the flipped steps
-            String[] roofColors = roofColor.split(",");
-            String[] roofColors2 = new String[roofColors.length];
-            String[] roofColors3 = new String[roofColors.length];
-
-            for(int i = 0; i < roofColors.length; i++){
-                String[] values = roofColors[i].split(":");
-                String material = values[0];
-                int data = 0;
-                if(values.length > 1)
-                    data = Integer.parseInt(values[1]);
-                data += 8;
-
-                roofColors2[i] = material + ":" + data;
-                roofColors3[i] = (Integer.parseInt(material)-1) + ":" + data;
+                bottomSlabs[i] = getSlab(bt, "bottom");
+                topSlabs[i] = getSlab(bt, "top");
+                doubleSlabs[i] = getSlab(bt, "double");
             }
 
-            rm1 = StringUtils.join(roofColors, ",");
-            rm2 = StringUtils.join(roofColors2, ",");
-            rm3 = StringUtils.join(roofColors3, ",");
+            replaceBlocks(getSlab(BlockTypes.STONE_SLAB, "bottom"), bottomSlabs);
+            changes++;
+            replaceBlocks(getSlab(BlockTypes.STONE_SLAB, "top"), topSlabs);
+            changes++;
+            replaceBlocks(getSlab(BlockTypes.STONE_SLAB, "double"), doubleSlabs);
+            changes++;
 
         } else if(roofType == RoofType.FLAT){
             replaceBlocksWithMask(">21", XMaterial.AIR, XMaterial.GRAY_CARPET);
@@ -640,7 +607,7 @@ public class HouseScripts extends Script {
                 // Select all air blocks that are above diamond ore and next to emerald ore
                 setBlocksWithMask("=queryRel(0,-1,0,56,0)&&" +
                         "(" +
-                            "queryRel(1,-1,0,129,0)||queryRel(-1,-1,0,129,0)||queryRel(0,-1,1,129,0)||queryRel(0,-1,-1,129,0)||queryRel(1,-1,1,129,0)||queryRel(-1,-1,-1,129,0)||queryRel(-1,-1,1,129,0)||queryRel(1,-1,-1,129,0" +
+                            "queryRel(1,-1,0,129,0)||queryRel(-1,-1,0,129,0)||queryRel(0,-1,1,129,0)||queryRel(0,-1,-1,129,0)||queryRel(1,-1,1,129,0)||queryRel(-1,-1,-1,129,0)||queryRel(-1,-1,1,129,0)||queryRel(1,-1,-1,129,0)" +
                         ")",
                     XMaterial.EMERALD_ORE);
                 changes++;
@@ -665,10 +632,17 @@ public class HouseScripts extends Script {
             changes++;
             changes++;
 
+            // Replace everything around stone bricks with sponge
+            replaceBlocksWithMask("=queryRel(1,0,0,98,0)||queryRel(-1,0,0,98,0)||queryRel(0,0,1,98,0)||queryRel(0,0,-1,98,0)",
+                    XMaterial.AIR, XMaterial.SPONGE);
+
             // (Overhang Roof Layer) Select all air blocks next to lapislazuli ores that have a stone slab above them. Then replace them with stone bricks
-            replaceBlocksWithMask("=(queryRel(1,0,0,21,-1)&&queryRel(1,1,0,98,0))||(queryRel(-1,0,0,21,-1)&&queryRel(-1,1,0,98,0))||(queryRel(0,0,1,21,-1)&&queryRel(0,1,1,98,0))||(queryRel(0,0,-1,21,-1)&&queryRel(0,1,-1,98,0))",
+            replaceBlocksWithMask("<19",
                 XMaterial.AIR, XMaterial.STONE_BRICKS);
             changes++;
+
+            // Replace sponge with air
+            replaceBlocks(XMaterial.SPONGE, XMaterial.AIR);
 
 
             maxRoofHeight = maxRoofHeight - 1;
@@ -713,8 +687,8 @@ public class HouseScripts extends Script {
                     "=queryRel(1,0,0,0,0)&&queryRel(-1,0,0,98,0)&&queryRel(0,0,1,98,0)&&queryRel(0,0,-1,98,0)",
 
                     // Fill the top roof gable that is surrounded by 2 stone bricks and one stone brick on top with stone bricks
-                    "//gmask =queryRel(0,1,0,98,0)&&(queryRel(-1,0,0,98,0)||queryRel(-1,0,1,98,0)||queryRel(-1,0,-1,98,0))&&(queryRel(1,0,0,98,0)||queryRel(1,0,1,98,0)||queryRel(1,0,-1,98,0))",
-                    "//gmask =queryRel(0,1,0,98,0)&&(queryRel(0,0,-1,98,0)||queryRel(1,0,-1,98,0)||queryRel(-1,0,-1,98,0))&&(queryRel(0,0,1,98,0)||queryRel(1,0,1,98,0)||queryRel(-1,0,1,98,0))"
+                    "=queryRel(0,1,0,98,0)&&(queryRel(-1,0,0,98,0)||queryRel(-1,0,1,98,0)||queryRel(-1,0,-1,98,0))&&(queryRel(1,0,0,98,0)||queryRel(1,0,1,98,0)||queryRel(1,0,-1,98,0))",
+                    "=queryRel(0,1,0,98,0)&&(queryRel(0,0,-1,98,0)||queryRel(1,0,-1,98,0)||queryRel(-1,0,-1,98,0))&&(queryRel(0,0,1,98,0)||queryRel(1,0,1,98,0)||queryRel(-1,0,1,98,0))"
             };
             replaceBlocksWithMask(Arrays.asList(queries), XMaterial.AIR, XMaterial.STONE_BRICKS, 1);
 
@@ -723,74 +697,74 @@ public class HouseScripts extends Script {
 
             // Fill the overhang with upside-down stairs which are surrounded by 1 stone brick and one stone brick above them
             replaceBlocksWithMask("=queryRel(0,1,0,98,0)&&queryRel(1,0,0,98,0)",
-                    getAir(), getStoneStair("east", "top", "straight"));
+                    getAir(), getStair(BlockTypes.STONE_STAIRS, "east", "top", "straight"));
             changes++;
             replaceBlocksWithMask("=queryRel(0,1,0,98,0)&&queryRel(-1,0,0,98,0)",
-                    getAir(), getStoneStair("west", "top", "straight"));
+                    getAir(), getStair(BlockTypes.STONE_STAIRS, "west", "top", "straight"));
             changes++;
             replaceBlocksWithMask("=queryRel(0,1,0,98,0)&&queryRel(0,0,1,98,0)",
-                    getAir(), getStoneStair("south", "top", "straight"));
+                    getAir(), getStair(BlockTypes.STONE_STAIRS, "south", "top", "straight"));
             changes++;
             replaceBlocksWithMask("=queryRel(0,1,0,98,0)&&queryRel(0,0,-1,98,0)",
-                    getAir(), getStoneStair("north", "top", "straight"));
+                    getAir(), getStair(BlockTypes.STONE_STAIRS, "north", "top", "straight"));
             changes++;
 
             // Fill the remaining overhang with upside-down stairs which are surrounded by 1 stone brick and one stone brick above them
             replaceBlocksWithMask("=queryRel(0,1,0,98,0)&&(queryRel(1,0,0,98,0)||queryRel(1,0,1,98,0)||queryRel(1,0,-1,98,0))",
-                    getAir(), getStoneStair("east", "top", "straight"));
+                    getAir(), getStair(BlockTypes.STONE_STAIRS, "east", "top", "straight"));
             changes++;
             replaceBlocksWithMask("=queryRel(0,1,0,98,0)&&(queryRel(-1,0,0,98,0)||queryRel(-1,0,1,98,0)||queryRel(-1,0,-1,98,0))",
-                    getAir(), getStoneStair("west", "top", "straight"));
+                    getAir(), getStair(BlockTypes.STONE_STAIRS, "west", "top", "straight"));
             changes++;
             replaceBlocksWithMask("=queryRel(0,1,0,98,0)&&(queryRel(0,0,1,98,0)||queryRel(1,0,1,98,0)||queryRel(-1,0,1,98,0))",
-                    getAir(), getStoneStair("south", "top", "straight"));
+                    getAir(), getStair(BlockTypes.STONE_STAIRS, "south", "top", "straight"));
             changes++;
             replaceBlocksWithMask("=queryRel(0,1,0,98,0)&&(queryRel(0,0,-1,98,0)||queryRel(1,0,-1,98,0)||queryRel(-1,0,-1,98,0))",
-                    getAir(), getStoneStair("north", "top", "straight"));
+                    getAir(), getStair(BlockTypes.STONE_STAIRS, "north", "top", "straight"));
             changes++;
 
 
             // (Normal Stair Roof Layer) Replace all air blocks that have a stone brick on one side, 3 air sides and one stone brick below them with stairs
-            replaceBlocksWithMask("//gmask =queryRel(0,-1,0,98,0)&&(queryRel(1,0,0,98,-1)&&queryRel(-1,0,0,0,-1)&&queryRel(0,0,1,0,-1)&&queryRel(0,0,-1,0,-1))",
-                    getAir(), getStoneStair("east", "bottom", "straight"));
+            replaceBlocksWithMask("=queryRel(0,-1,0,98,0)&&(queryRel(1,0,0,98,-1)&&queryRel(-1,0,0,0,-1)&&queryRel(0,0,1,0,-1)&&queryRel(0,0,-1,0,-1))",
+                    getAir(), getStair(BlockTypes.STONE_STAIRS, "east", "bottom", "straight"));
             changes++;
-            replaceBlocksWithMask("//gmask =queryRel(0,-1,0,98,0)&&(queryRel(1,0,0,0,-1)&&queryRel(-1,0,0,98,-1)&&queryRel(0,0,1,0,-1)&&queryRel(0,0,-1,0,-1))",
-                    getAir(), getStoneStair("west", "bottom", "straight"));
+            replaceBlocksWithMask("=queryRel(0,-1,0,98,0)&&(queryRel(1,0,0,0,-1)&&queryRel(-1,0,0,98,-1)&&queryRel(0,0,1,0,-1)&&queryRel(0,0,-1,0,-1))",
+                    getAir(), getStair(BlockTypes.STONE_STAIRS, "west", "bottom", "straight"));
             changes++;
-            replaceBlocksWithMask("//gmask =queryRel(0,-1,0,98,0)&&(queryRel(1,0,0,0,-1)&&queryRel(-1,0,0,0,-1)&&queryRel(0,0,1,98,-1)&&queryRel(0,0,-1,0,-1))",
-                    getAir(), getStoneStair("south", "bottom", "straight"));
+            replaceBlocksWithMask("=queryRel(0,-1,0,98,0)&&(queryRel(1,0,0,0,-1)&&queryRel(-1,0,0,0,-1)&&queryRel(0,0,1,98,-1)&&queryRel(0,0,-1,0,-1))",
+                    getAir(), getStair(BlockTypes.STONE_STAIRS, "south", "bottom", "straight"));
             changes++;
-            replaceBlocksWithMask("//gmask =queryRel(0,-1,0,98,0)&&(queryRel(1,0,0,0,-1)&&queryRel(-1,0,0,0,-1)&&queryRel(0,0,1,0,-1)&&queryRel(0,0,-1,98,-1))",
-                    getAir(), getStoneStair("north", "bottom", "straight"));
+            replaceBlocksWithMask("=queryRel(0,-1,0,98,0)&&(queryRel(1,0,0,0,-1)&&queryRel(-1,0,0,0,-1)&&queryRel(0,0,1,0,-1)&&queryRel(0,0,-1,98,-1))",
+                    getAir(), getStair(BlockTypes.STONE_STAIRS, "north", "bottom", "straight"));
             changes++;
 
             // (Corner Stair Roof Layer) Replace all air blocks that have stone bricks on 2 sides, 2 air or stair sides and one stone brick below them with stairs
-            replaceBlocksWithMask("//gmask =(queryRel(1,0,0,98,-1)&&queryRel(0,0,1,98,-1)&&(queryRel(-1,0,0,0,-1)||queryRel(-1,0,0,109,-1))&&(queryRel(0,0,-1,0,-1)||queryRel(0,0,-1,109,-1)))",
-                    getAir(), getStoneStair("east", "bottom", "straight"));
+            replaceBlocksWithMask("=(queryRel(1,0,0,98,-1)&&queryRel(0,0,1,98,-1)&&(queryRel(-1,0,0,0,-1)||queryRel(-1,0,0,109,-1))&&(queryRel(0,0,-1,0,-1)||queryRel(0,0,-1,109,-1)))",
+                    getAir(), getStair(BlockTypes.STONE_STAIRS, "east", "bottom", "inner_right"));
             changes++;
-            replaceBlocksWithMask("//gmask =(queryRel(-1,0,0,98,-1)&&queryRel(0,0,-1,98,-1)&&(queryRel(1,0,0,0,-1)||queryRel(1,0,0,109,-1))&&(queryRel(0,0,1,0,-1)||queryRel(0,0,1,109,-1)))",
-                    getAir(), getStoneStair("west", "bottom", "straight"));
+            replaceBlocksWithMask("=(queryRel(-1,0,0,98,-1)&&queryRel(0,0,-1,98,-1)&&(queryRel(1,0,0,0,-1)||queryRel(1,0,0,109,-1))&&(queryRel(0,0,1,0,-1)||queryRel(0,0,1,109,-1)))",
+                    getAir(), getStair(BlockTypes.STONE_STAIRS, "west", "bottom", "inner_right"));
             changes++;
-            replaceBlocksWithMask("//gmask =(queryRel(-1,0,0,98,-1)&&queryRel(0,0,1,98,-1)&&(queryRel(1,0,0,0,-1)||queryRel(1,0,0,109,-1))&&(queryRel(0,0,-1,0,-1)||queryRel(0,0,-1,109,-1)))",
-                    getAir(), getStoneStair("south", "bottom", "straight"));
+            replaceBlocksWithMask("=(queryRel(-1,0,0,98,-1)&&queryRel(0,0,1,98,-1)&&(queryRel(1,0,0,0,-1)||queryRel(1,0,0,109,-1))&&(queryRel(0,0,-1,0,-1)||queryRel(0,0,-1,109,-1)))",
+                    getAir(), getStair(BlockTypes.STONE_STAIRS, "south", "bottom", "inner_right"));
             changes++;
-            replaceBlocksWithMask("//gmask =(queryRel(1,0,0,98,-1)&&queryRel(0,0,-1,98,-1)&&(queryRel(-1,0,0,0,-1)||queryRel(-1,0,0,109,-1))&&(queryRel(0,0,1,0,-1)||queryRel(0,0,1,109,-1)))",
-                    getAir(), getStoneStair("north", "bottom", "straight"));
+            replaceBlocksWithMask("=(queryRel(1,0,0,98,-1)&&queryRel(0,0,-1,98,-1)&&(queryRel(-1,0,0,0,-1)||queryRel(-1,0,0,109,-1))&&(queryRel(0,0,1,0,-1)||queryRel(0,0,1,109,-1)))",
+                    getAir(), getStair(BlockTypes.STONE_STAIRS, "north", "bottom", "inner_right"));
             changes++;
 
 
             // (Corner Stair 2 Roof Layer) Replace all air blocks that have stairs on 2 sides, 2 air sides and one stone brick below them with stairs
             replaceBlocksWithMask("=(queryRel(1,0,0,109,-1)&&queryRel(0,0,1,109,-1)&&queryRel(-1,0,0,0,-1)&&queryRel(0,0,-1,0,-1))",
-                    getAir(), getStoneStair("south", "bottom", "inner_left"));
+                    getAir(), getStair(BlockTypes.STONE_STAIRS, "south", "bottom", "inner_left"));
             changes++;
-            replaceBlocksWithMask("//gmask =(queryRel(1,0,0,109,-1)&&queryRel(0,0,-1,109,-1)&&queryRel(-1,0,0,0,-1)&&queryRel(0,0,1,0,-1))",
-                    getAir(), getStoneStair("north", "bottom", "inner_right"));
+            replaceBlocksWithMask("=(queryRel(1,0,0,109,-1)&&queryRel(0,0,-1,109,-1)&&queryRel(-1,0,0,0,-1)&&queryRel(0,0,1,0,-1))",
+                    getAir(), getStair(BlockTypes.STONE_STAIRS, "north", "bottom", "inner_right"));
             changes++;
-            replaceBlocksWithMask("//gmask =(queryRel(-1,0,0,109,-1)&&queryRel(0,0,1,109,-1)&&queryRel(1,0,0,0,-1)&&queryRel(0,0,-1,0,-1))",
-                    getAir(), getStoneStair("south", "bottom", "inner_right"));
+            replaceBlocksWithMask("=(queryRel(-1,0,0,109,-1)&&queryRel(0,0,1,109,-1)&&queryRel(1,0,0,0,-1)&&queryRel(0,0,-1,0,-1))",
+                    getAir(), getStair(BlockTypes.STONE_STAIRS, "south", "bottom", "inner_right"));
             changes++;
-            replaceBlocksWithMask("//gmask =(queryRel(-1,0,0,109,-1)&&queryRel(0,0,-1,109,-1)&&queryRel(1,0,0,0,-1)&&queryRel(0,0,1,0,-1))",
-                    getAir(), getStoneStair("north", "bottom", "inner_left"));
+            replaceBlocksWithMask("=(queryRel(-1,0,0,109,-1)&&queryRel(0,0,-1,109,-1)&&queryRel(1,0,0,0,-1)&&queryRel(0,0,1,0,-1))",
+                    getAir(), getStair(BlockTypes.STONE_STAIRS, "north", "bottom", "inner_left"));
             changes++;
 
 
@@ -799,64 +773,94 @@ public class HouseScripts extends Script {
                 XMaterial.AIR, XMaterial.STONE_BRICKS);
             changes++;
 
-
-            String[] colors = roofColor.split(",");
-
-            // Remove :X from colors
-            for(int i = 0; i < colors.length; i++)
-                colors[i] = colors[i].split(":")[0];
-
-            String[] blockColors = new String[colors.length];
-            for(int i = 0; i < colors.length; i++)
-                blockColors[i] = MenuItems.convertStairToBlock(colors[i]);
-
+            
+            XMaterial[] stairBlocks = new XMaterial[roofColor.length];
+            for(int i = 0; i < roofColor.length; i++)
+                stairBlocks[i] = MenuItems.convertStairToBlock(roofColor[i]);
 
             // Replace stone bricks with the correct color
-            createCommand("//replace 98 " + StringUtils.join(blockColors, ","));
+            replaceBlocks(XMaterial.STONE_BRICKS, stairBlocks);
             changes++;
 
 
-            // Replace all stairs with the correct color
-            for(int i = 0; i < 12; i++) {
-                if(colors.length == 1)
-                    createCommand("//replace 109:" + i + " " + colors[0] + ":" + i);
-                else
-                    createCommand("//replace 109:" + i + " " + StringUtils.join(colors, ":" + i + ","));
+            // Iterate through all stair block states and replace them with the correct color
+            BlockType blockType = BlockTypes.STONE_STAIRS;
+            if(blockType != null)
+                for(BlockState blockState : blockType.getAllStates()) {
+                    Map<Property<?>, Object> properties = blockState.getStates();
+                    String facing = "";
+                    String half = "";
+                    String shape = "";
 
-                changes++;
-            }
+                    boolean shouldSkip = false;
+                    // Skip waterlogged = true stairs
+                    for(Property<?> property : properties.keySet()){
+                        if (property.getName().equalsIgnoreCase("waterlogged")
+                                && properties.get(property) instanceof Boolean
+                                && (Boolean) properties.get(property))
+                            shouldSkip = true;
+                    }
+
+                    if(shouldSkip)
+                        continue;
+
+                    // Get the properties of the stair
+                    for(Property<?> property : properties.keySet()){
+                        if(property.getName().equalsIgnoreCase("facing"))
+                            facing = properties.get(property).toString();
+                        else if(property.getName().equalsIgnoreCase("half"))
+                            half = properties.get(property).toString();
+                        else if(property.getName().equalsIgnoreCase("shape"))
+                            shape = properties.get(property).toString();
+                    }
+
+                    // Convert all stair blocks to the correct orientation
+                    BlockState[] stairsWithOrientation = new BlockState[roofColor.length];
+                    for(int i = 0; i < roofColor.length; i++){
+                        BlockType bt = Item.convertXMaterialToBlockType(roofColor[i]);
+
+                        if(bt == null)
+                            continue;
+
+                        stairsWithOrientation[i] = getStair(bt, facing, half, shape);
+                    }
+
+                    BlockState stair = getStair(BlockTypes.STONE_STAIRS, facing, half, shape);
+
+                    // Replace all stairs with the correct color
+                    replaceBlocks(stair, stairsWithOrientation);
+                }
         }
 
 
         // ----------- FINAL FINISH ----------
 
-        createCommand("//gmask 0,45,31,37,38,39,40,175");
+        setGmask("0,45,31,37,38,39,40,175");
+        setBlocksWithMask("<22", XMaterial.LAPIS_BLOCK, 5);
+        disableGmask();
+        changes+=5;
 
-        for(int i = 0; i < 5; i++) {
-            createCommand("//replace <22 22");
-            changes++;
+        replaceBlocks(XMaterial.LAPIS_ORE, wallColor);
+        changes++;
+        replaceBlocks(XMaterial.LAPIS_BLOCK, baseColor);
+        changes++;
+        replaceBlocks(XMaterial.GOLD_ORE, XMaterial.GRAY_WOOL);
+        changes++;
+        replaceBlocks(XMaterial.STONE_SLAB, XMaterial.GRAY_WOOL);
+
+
+        BlockState[] doubleSlabs = new BlockState[roofColor.length];
+
+        for(int i = 0; i < roofColor.length; i++){
+            BlockType bt = Item.convertXMaterialToBlockType(roofColor[i]);
+
+            if(bt == null)
+                continue;
+
+            doubleSlabs[i] = getSlab(bt, "double");
         }
 
-        createCommand("//gmask");
-        createCommand("//replace 21 " + wallColor);
-        changes++;
-        createCommand("//replace 22 " + baseColor);
-        changes++;
-        createCommand("//replace 14 35:7");
-        changes++;
-
-
-        createCommand("//gmask");
-
-
-
-        createCommand("//replace 44:0 " + rm1);
-        changes++;
-        createCommand("//replace 44:8 " + rm2);
-        changes++;
-        createCommand("//replace 43:0 " + rm3);
-        changes++;
-        createCommand("//replace 23 " + rm3);
+        replaceBlocks(Item.convertXMaterialToBlockType(XMaterial.DISPENSER).getDefaultState(), doubleSlabs);
         changes++;
 
 
@@ -868,8 +872,6 @@ public class HouseScripts extends Script {
 
         // Finish the script
         finish(blocks);
-
-        */
     }
 
     // Move blue, green and red wool one block up
@@ -914,43 +916,23 @@ public class HouseScripts extends Script {
         replaceBlocks(XMaterial.REDSTONE_ORE, XMaterial.AIR);
     }
 
-    private BlockState getStoneSlab(String type){
-        BlockType blockType = BlockTypes.STONE_SLAB;
-
-        if(blockType == null)
-            return null;
-
-        EnumProperty property = (EnumProperty) (Property<?>) blockType.getProperty("type");
-        BlockState blockState = blockType.getDefaultState();
-        return blockState.with(property, type);
-    }
-
-    /**
-     * Get the block state for a stone stair in the given direction, half and shape
-     *
-     * @param facing The direction the stair is facing (north, east, south, west)
-     * @param half The site of the bigger part of the stair (top, bottom)
-     * @param shape The shape of the stair (straight, inner_left, inner_right, outer_left, outer_right)
-     * @return The block state for the stair
-     */
-    private BlockState getStoneStair(String facing, String half, String shape){
-        BlockType blockType = BlockTypes.STONE_SLAB;
-
-        if(blockType == null)
-            return null;
-
-        EnumProperty facingProperty = (EnumProperty) (Property<?>) blockType.getProperty("facing");
-        EnumProperty halfProperty = (EnumProperty) (Property<?>) blockType.getProperty("half");
-        EnumProperty shapeProperty = (EnumProperty) (Property<?>) blockType.getProperty("shape");
-        BlockState blockState = blockType.getDefaultState();
-        return blockState.with(facingProperty, facing).with(halfProperty, half).with(shapeProperty, shape);
-    }
+    
 
     private BlockState getAir(){
-        return BlockTypes.AIR.getDefaultState();
+        BlockType blockType = BlockTypes.AIR;
+
+        if(blockType == null)
+            return null;
+
+        return blockType.getDefaultState();
     }
 
     private BlockState getEmeraldOre(){
-        return BlockTypes.EMERALD_ORE.getDefaultState();
+        BlockType blockType = BlockTypes.EMERALD_ORE;
+
+        if(blockType == null)
+            return null;
+
+        return blockType.getDefaultState();
     }
 }

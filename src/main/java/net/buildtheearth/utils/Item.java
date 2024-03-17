@@ -5,6 +5,8 @@ import com.cryptomorin.xseries.XMaterial;
 import com.destroystokyo.paper.Namespaced;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import net.buildtheearth.modules.common.CommonModule;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -409,6 +411,38 @@ public class Item {
 
 	}
 
+	public static String getUniqueMaterialString(XMaterial material) {
+		return getUniqueMaterialString(material.parseItem());
+	}
+
+	public static XMaterial convertStringToXMaterial(String materialString) {
+		XMaterial material;
+
+		if(XMaterial.matchXMaterial(materialString).isPresent())
+			material = XMaterial.matchXMaterial(materialString).get();
+		else {
+			Material mat = Material.matchMaterial(materialString);
+
+			if(mat != null)
+				material = XMaterial.matchXMaterial(mat);
+			else
+				return null;
+		}
+
+		return material;
+	}
+
+	public static BlockType convertXMaterialToBlockType(XMaterial material) {
+		String mat = getUniqueMaterialString(material);
+		BlockType bt;
+
+		if(mat.contains("minecraft:"))
+			bt = BlockTypes.parse(mat);
+		else
+			bt = BlockTypes.get(mat);
+
+		return bt;
+	}
 	public static String createStringFromItemList(ArrayList<String> items) throws IllegalArgumentException {
 		StringBuilder s = new StringBuilder(items.get(0));
 

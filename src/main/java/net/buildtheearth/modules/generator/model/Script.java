@@ -1,12 +1,21 @@
 package net.buildtheearth.modules.generator.model;
 
 import com.cryptomorin.xseries.XMaterial;
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockType;
 import lombok.Getter;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -22,10 +31,14 @@ public class Script {
     private final GeneratorComponent generatorComponent;
     @Getter
     private final Region region;
-
     @Getter
     protected final List<Operation> operations = new ArrayList<>();
-
+    @Getter
+    protected final World weWorld;
+    @Getter
+    protected final Actor actor;
+    @Getter
+    protected final LocalSession localSession;
     @Getter
     protected int changes = 0;
 
@@ -34,6 +47,9 @@ public class Script {
         this.player = player;
         this.generatorComponent = generatorComponent;
         this.region = GeneratorUtils.getWorldEditSelection(player);
+        this.weWorld = BukkitAdapter.adapt(getPlayer().getWorld());
+        this.actor = BukkitAdapter.adapt(getPlayer());
+        this.localSession = WorldEdit.getInstance().getSessionManager().get(actor);
     }
 
 
@@ -42,6 +58,43 @@ public class Script {
 
         GeneratorModule.getInstance().getGeneratorCommands().add(new Command(this, blocks));
         GeneratorModule.getInstance().getPlayerHistory(getPlayer()).addHistoryEntry(new History.HistoryEntry(getGeneratorComponent().getGeneratorType(), changes));
+    }
+
+
+    /**
+     * Get the block state for a stair in the given direction, half and shape
+     *
+     * @param blockType The block type of the stair
+     * @param facing The direction the stair is facing (north, east, south, west)
+     * @param half The site of the bigger part of the stair (top, bottom)
+     * @param shape The shape of the stair (straight, inner_left, inner_right, outer_left, outer_right)
+     * @return The block state for the stair
+     */
+    protected BlockState getStair(BlockType blockType, String facing, String half, String shape){
+        if(blockType == null)
+            return null;
+
+        BlockState blockState = blockType.getDefaultState();
+
+        return blockState
+                .with(PropertyKey.FACING, Direction.valueOf(facing.toUpperCase()))
+                .with(PropertyKey.HALF, half)
+                .with(PropertyKey.SHAPE, shape);
+    }
+
+    /**
+     * Get the block state for a slab with the given type
+     *
+     * @param blockType The block type of the slab
+     * @param type The type of the slab (top, bottom, double)
+     * @return The block state for the slab
+     */
+    protected BlockState getSlab(BlockType blockType, String type){
+        if(blockType == null)
+            return null;
+
+        BlockState blockState = blockType.getDefaultState();
+        return blockState.with(PropertyKey.TYPE, type);
     }
 
     /**
@@ -121,7 +174,7 @@ public class Script {
      * @param points The list of points to create the selection from
      */
     public void createPolySelection(List<Operation> commands, List<Vector> points){
-        commands.add(new Operation(Operation.OperationType.POLYGONAL_SELECTION, points.toArray()));
+        commands.add(new Operation(Operation.OperationType.POLYGONAL_SELECTION, (Object) points.toArray(new Vector[0])));
     }
 
     /**
@@ -132,7 +185,7 @@ public class Script {
      * @param points The list of points to create the selection from
      */
     public void createConvexSelection(List<Operation> commands, List<Vector> points){
-        commands.add(new Operation(Operation.OperationType.CONVEX_SELECTION, points.toArray()));
+        commands.add(new Operation(Operation.OperationType.CONVEX_SELECTION, (Object) points.toArray(new Vector[0])));
     }
 
     /**
@@ -152,6 +205,13 @@ public class Script {
     }
 
     /**
+     * This method is used to set the gmask of the player.
+      */
+    public void setGmask(String mask){
+        operations.add(new Operation(Operation.OperationType.SET_GMASK, mask));
+    }
+
+    /**
      * This method is used to expand the selection by a specific amount of blocks.
      * It creates a new Operation with type EXPAND_SELECTION and adds it to the list of operations to execute.
      */
@@ -164,13 +224,19 @@ public class Script {
      * It creates a new Operation with type REPLACE_BLOCKS and adds it to the list of operations to execute.
      *
      * @param from The block type to replace
-     * @param to The block type to replace with
+     * @param to The block types to replace with
      */
+    public void replaceBlocks(BlockState from, BlockState[] to){
+        operations.add(new Operation(Operation.OperationType.REPLACE_BLOCKSTATES, from, to));
+    }
+    public void replaceBlocks(XMaterial from, XMaterial[] to){
+        replaceBlocks(GeneratorUtils.getBlockState(from), GeneratorUtils.getBlockState(to));
+    }
     public void replaceBlocks(XMaterial from, XMaterial to){
-        operations.add(new Operation(Operation.OperationType.REPLACE_XMATERIALS, from, to));
+        replaceBlocks(from, new XMaterial[]{to});
     }
     public void replaceBlocks(BlockState from, BlockState to){
-        operations.add(new Operation(Operation.OperationType.REPLACE_BLOCKSTATES, from, to));
+        replaceBlocks(from, new BlockState[]{to});
     }
 
     /**
@@ -178,27 +244,35 @@ public class Script {
      * It creates a new Operation with type SET_BLOCKS_WITH_EXPRESSION_MASK and adds it to the list of operations to execute.
      *
      * @param masks The expression masks
-     * @param material The material to set the blocks to
+     * @param blockState The blockState to set the blocks to
      * @param iterations The number of iterations to execute
      */
+    public void setBlocksWithMask(List<String> masks, BlockState[] blockState, int iterations) {
+        operations.add(new Operation(Operation.OperationType.REPLACE_BLOCKSTATES_WITH_MASKS, masks.toArray(new String[0]), null, blockState, iterations));
+    }
+    public void setBlocksWithMask(List<String> masks, XMaterial[] blockState, int iterations) {
+        setBlocksWithMask(masks, GeneratorUtils.getBlockState(blockState), iterations);
+    }
+    public void setBlocksWithMask(String mask, XMaterial[] blockState) {
+        List<String> masks = new ArrayList<>();
+        masks.add(mask);
+        setBlocksWithMask(masks, blockState, 1);
+    }
     public void setBlocksWithMask(List<String> masks, XMaterial material, int iterations) {
-        operations.add(new Operation(Operation.OperationType.REPLACE_XMATERIALS_WITH_MASKS, masks.toArray(new String[0]), null, material, iterations));
+        setBlocksWithMask(masks, new XMaterial[]{material}, iterations);
     }
     public void setBlocksWithMask(String mask, XMaterial material, int iterations) {
         List<String> masks = new ArrayList<>();
         masks.add(mask);
-        setBlocksWithMask(masks, material, iterations);
+        setBlocksWithMask(masks, new XMaterial[]{material}, iterations);
     }
     public void setBlocksWithMask(String mask, XMaterial material) {
         setBlocksWithMask(mask, material, 1);
     }
-    public void setBlocksWithMask(List<String> masks, BlockState blockState, int iterations) {
-        operations.add(new Operation(Operation.OperationType.REPLACE_BLOCKSTATES_WITH_MASKS, masks.toArray(new String[0]), null, blockState, iterations));
-    }
     public void setBlocksWithMask(String mask, BlockState blockState, int iterations) {
         List<String> masks = new ArrayList<>();
         masks.add(mask);
-        setBlocksWithMask(masks, blockState, iterations);
+        setBlocksWithMask(masks, new BlockState[]{blockState}, iterations);
     }
     public void setBlocksWithMask(String mask, BlockState blockState) {
         setBlocksWithMask(mask, blockState, 1);
@@ -211,11 +285,20 @@ public class Script {
      *
      * @param masks The expression masks
      * @param from The block type to replace
-     * @param to The block type to replace with
+     * @param to The block types to replace with
      * @param iterations The number of iterations to execute
      */
+    public void replaceBlocksWithMask(List<String> masks, BlockState from, BlockState[] to, int iterations) {
+        operations.add(new Operation(Operation.OperationType.REPLACE_BLOCKSTATES_WITH_MASKS, masks.toArray(new String[0]), from, to, iterations));
+    }
+    public void replaceBlocksWithMask(List<String> masks, XMaterial from, XMaterial[] to, int iterations) {
+        replaceBlocksWithMask(masks, GeneratorUtils.getBlockState(from), GeneratorUtils.getBlockState(to), iterations);
+    }
+    public void replaceBlocksWithMask(List<String> masks, BlockState from, BlockState to, int iterations) {
+        replaceBlocksWithMask(masks, from, new BlockState[]{to}, iterations);
+    }
     public void replaceBlocksWithMask(List<String> masks, XMaterial from, XMaterial to, int iterations) {
-        operations.add(new Operation(Operation.OperationType.REPLACE_XMATERIALS_WITH_MASKS, masks.toArray(new String[0]), from, to, iterations));
+        replaceBlocksWithMask(masks, GeneratorUtils.getBlockState(from), GeneratorUtils.getBlockState(to), iterations);
     }
     public void replaceBlocksWithMask(String mask, XMaterial from, XMaterial to, int iterations) {
         List<String> masks = new ArrayList<>();
@@ -225,9 +308,7 @@ public class Script {
     public void replaceBlocksWithMask(String mask, XMaterial from, XMaterial to) {
         replaceBlocksWithMask(mask, from, to, 1);
     }
-    public void replaceBlocksWithMask(List<String> masks, BlockState from, BlockState to, int iterations) {
-        operations.add(new Operation(Operation.OperationType.REPLACE_BLOCKSTATES_WITH_MASKS, masks.toArray(new String[0]), from, to, iterations));
-    }
+
     public void replaceBlocksWithMask(String mask, BlockState from, BlockState to, int iterations) {
         List<String> masks = new ArrayList<>();
         masks.add(mask);

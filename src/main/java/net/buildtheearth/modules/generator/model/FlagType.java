@@ -1,4 +1,4 @@
-package net.buildtheearth.modules.generator.components;
+package net.buildtheearth.modules.generator.model;
 
 import com.cryptomorin.xseries.XMaterial;
 import lombok.Getter;
@@ -8,6 +8,8 @@ import net.buildtheearth.modules.generator.components.house.RoofType;
 import net.buildtheearth.modules.generator.components.tree.TreeType;
 import net.buildtheearth.modules.generator.components.tree.TreeWidth;
 import net.buildtheearth.modules.generator.model.Flag;
+import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.Item;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
@@ -19,6 +21,7 @@ public enum FlagType {
     FLOAT(Float.class),
     BOOLEAN(Boolean.class),
     XMATERIAL(XMaterial.class),
+    XMATERIAL_LIST(XMaterial[].class),
     ROOF_TYPE(RoofType.class),
     CROP_TYPE(CropType.class),
     CROP_STAGE(CropStage.class),
@@ -43,7 +46,7 @@ public enum FlagType {
             return null;
 
         if(!flag.getFlagType().getClassType().isInstance(value))
-            return String.format("Invalid value for flag %s: expected %s, got %s", flag.getFlag(), flag.getFlagType().getClassType().getSimpleName(), value.getClass().getSimpleName());
+            return ChatHelper.error("Invalid value for flag %s: expected %s, got %s", flag.getFlag(), flag.getFlagType().getClassType().getSimpleName(), value.getClass().getSimpleName());
 
         return null;
     }
@@ -70,20 +73,15 @@ public enum FlagType {
             case BOOLEAN:
                 return Boolean.parseBoolean(value);
             case XMATERIAL:
-                XMaterial material;
+                return Item.convertStringToXMaterial(value);
+            case XMATERIAL_LIST:
+                String[] values = value.split(",");
+                XMaterial[] materials = new XMaterial[values.length];
 
-                if(XMaterial.matchXMaterial(value).isPresent())
-                    material = XMaterial.matchXMaterial(value).get();
-                else {
-                    Material mat = Material.matchMaterial(value);
+                for(int i = 0; i < values.length; i++)
+                    materials[i] = Item.convertStringToXMaterial(values[i]);
 
-                    if(mat != null)
-                        material = XMaterial.matchXMaterial(mat);
-                    else
-                        return null;
-                }
-
-                return material;
+                return materials;
             case ROOF_TYPE:
                 return RoofType.byString(value);
             case CROP_TYPE:

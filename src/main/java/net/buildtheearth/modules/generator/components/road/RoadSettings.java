@@ -36,7 +36,7 @@ public class RoadSettings extends Settings {
         setValue(RoadFlag.LANE_WIDTH, 4);
 
         // Road Material (Default: Fixed Value)
-        setValue(RoadFlag.ROAD_MATERIAL, XMaterial.GRAY_CONCRETE_POWDER);
+        setValue(RoadFlag.ROAD_MATERIAL, new XMaterial[]{XMaterial.GRAY_CONCRETE_POWDER});
 
         // Lane Gap (Default: Fixed Value)
         setValue(RoadFlag.LANE_GAP, 0);
@@ -48,16 +48,16 @@ public class RoadSettings extends Settings {
         setValue(RoadFlag.MARKING_GAP, 5);
 
         // Marking Material (Default: Fixed Value)
-        setValue(RoadFlag.MARKING_MATERIAL, XMaterial.WHITE_CONCRETE);
+        setValue(RoadFlag.MARKING_MATERIAL, new XMaterial[]{XMaterial.WHITE_CONCRETE});
 
         // Sidewalk Width (Default: Fixed Value)
         setValue(RoadFlag.SIDEWALK_WIDTH, 5);
 
         // Sidewalk Material (Default: Fixed Value)
-        setValue(RoadFlag.SIDEWALK_MATERIAL, XMaterial.STONE);
+        setValue(RoadFlag.SIDEWALK_MATERIAL, new XMaterial[]{XMaterial.STONE});
 
         // Sidewalk Slab Material (Default: Fixed Value)
-        setValue(RoadFlag.SIDEWALK_SLAB_COLOR, XMaterial.STONE_SLAB);
+        setValue(RoadFlag.SIDEWALK_SLAB_COLOR, new XMaterial[]{XMaterial.STONE_SLAB});
 
         // Road Slab Material (Default: Fixed Value)
         setValue(RoadFlag.ROAD_SLAB_COLOR, null);

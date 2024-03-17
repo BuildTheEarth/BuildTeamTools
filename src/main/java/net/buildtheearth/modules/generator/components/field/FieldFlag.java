@@ -1,6 +1,6 @@
 package net.buildtheearth.modules.generator.components.field;
 
-import net.buildtheearth.modules.generator.components.FlagType;
+import net.buildtheearth.modules.generator.model.FlagType;
 import net.buildtheearth.modules.generator.model.Flag;
 
 public enum FieldFlag implements Flag {

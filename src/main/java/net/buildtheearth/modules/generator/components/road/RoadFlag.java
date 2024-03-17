@@ -1,7 +1,7 @@
 package net.buildtheearth.modules.generator.components.road;
 
 
-import net.buildtheearth.modules.generator.components.FlagType;
+import net.buildtheearth.modules.generator.model.FlagType;
 import net.buildtheearth.modules.generator.model.Flag;
 
 public enum RoadFlag implements Flag {

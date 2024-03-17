@@ -1,6 +1,6 @@
 package net.buildtheearth.modules.generator.components.rail;
 
-import net.buildtheearth.modules.generator.components.FlagType;
+import net.buildtheearth.modules.generator.model.FlagType;
 import net.buildtheearth.modules.generator.model.Flag;
 
 public enum RailFlag implements Flag {

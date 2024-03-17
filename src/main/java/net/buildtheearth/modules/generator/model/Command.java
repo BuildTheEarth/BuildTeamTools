@@ -2,16 +2,17 @@ package net.buildtheearth.modules.generator.model;
 
 import com.cryptomorin.xseries.XMaterial;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import lombok.Getter;
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
+import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
 import org.bukkit.Location;
@@ -71,10 +72,10 @@ public class Command {
         this.operations = script.getOperations();
         this.changes = script.getChanges();
         this.region = script.getRegion();
+        this.weWorld = script.weWorld;
+        this.actor = script.actor;
+        this.localSession = script.localSession;
         this.blocks = blocks;
-        this.weWorld = BukkitAdapter.adapt(getPlayer().getWorld());
-        this.actor = BukkitAdapter.adapt(getPlayer());
-        this.localSession = WorldEdit.getInstance().getSessionManager().get(actor);
 
         this.totalCommands = operations.size();
         minMax = GeneratorUtils.getMinMaxPoints(getRegion());
@@ -118,7 +119,7 @@ public class Command {
 
             // Skip WorldEdit commands that take no time to execute
             if(command.getOperationType() == Operation.OperationType.COMMAND){
-                String commandString = command.getValue();
+                String commandString = (String) command.getValues().get(0);
                 if(commandString.startsWith("//gmask")
                 || commandString.startsWith("//mask")
                 || commandString.startsWith("//pos")
@@ -135,87 +136,97 @@ public class Command {
 
     /** Processes a single command. */
     public void processOperation(Operation operation){
-        switch(operation.getOperationType()){
-            case COMMAND:
-                String command = operation.getValue();
+        try {
+            switch (operation.getOperationType()) {
+                case COMMAND:
+                    String command = (String) operation.getValues().get(0);
 
-                if(operation.getValue().contains("%%XYZ/"))
-                    command = convertXYZ(command);
+                    if (command.contains("%%XYZ/"))
+                        command = convertXYZ(command);
 
-                player.chat(command);
-                break;
-
-            case BREAKPOINT:
-                if(!CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled())
+                    player.chat(command);
                     break;
 
-                Vector point = minMax[0];
-                Block block = getPlayer().getWorld().getBlockAt(point.getBlockX(), point.getBlockY(), point.getBlockZ());
+                case BREAKPOINT:
+                    if (!CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled())
+                        break;
 
-                // If the block is a barrier, remove it and continue with the next command
-                if(breakPointActive && block.getType() == Material.BARRIER) {
-                    block.setType(oldMaterial);
-                    block.setBlockData(oldBlockData);
-                    block.getState().update();
-                    GeneratorUtils.restoreSelection(getPlayer(), tempRegionSelector);
+                    Vector point = minMax[0];
+                    Block block = getPlayer().getWorld().getBlockAt(point.getBlockX(), point.getBlockY(), point.getBlockZ());
 
-                    breakPointActive = false;
+                    // If the block is a barrier, remove it and continue with the next command
+                    if (breakPointActive && block.getType() == Material.BARRIER) {
+                        block.setType(oldMaterial);
+                        block.setBlockData(oldBlockData);
+                        block.getState().update();
+                        GeneratorUtils.restoreSelection(getPlayer(), tempRegionSelector);
+
+                        breakPointActive = false;
+                        break;
+                    }
+
+                    if (!breakPointActive) {
+                        oldMaterial = block.getType();
+                        oldBlockData = block.getBlockData();
+                        tempRegionSelector = GeneratorUtils.getCurrentRegionSelector(getPlayer());
+                        BlockType blockType = BlockTypes.BARRIER;
+
+                        if(blockType == null)
+                            break;
+
+                        GeneratorUtils.createCuboidSelection(getPlayer(), point, point);
+                        GeneratorUtils.replaceBlocks(localSession, actor, weWorld, null, new BlockState[]{blockType.getDefaultState()});
+                        breakPointActive = true;
+                    }
+
                     break;
-                }
 
-                if(!breakPointActive) {
-                    oldMaterial = block.getType();
-                    oldBlockData = block.getBlockData();
-                    tempRegionSelector = GeneratorUtils.getCurrentRegionSelector(getPlayer());
+                case REPLACE_BLOCKSTATES_WITH_MASKS:
+                    GeneratorUtils.replaceBlocksWithMask(localSession, actor, weWorld, Arrays.asList((String[]) operation.get(0)), (BlockState) operation.get(1), (BlockState[]) operation.get(2), (Integer) operation.get(3));
+                    break;
 
-                    GeneratorUtils.createCuboidSelection(getPlayer(), point, point);
-                    GeneratorUtils.replaceBlocks(localSession, actor, weWorld, null, XMaterial.BARRIER);
-                    breakPointActive = true;
-                }
+                case REPLACE_BLOCKSTATES:
+                    GeneratorUtils.replaceBlocks(localSession, actor, weWorld, (BlockState) operation.get(0), (BlockState[]) operation.get(1));
+                    break;
 
-                break;
+                case PASTE_SCHEMATIC:
+                    GeneratorUtils.pasteSchematic(localSession, actor, weWorld, blocks, (String) operation.get(0), (Location) operation.get(1), (double) operation.get(2));
+                    break;
 
-            case REPLACE_XMATERIALS_WITH_MASKS:
-                GeneratorUtils.replaceBlocksWithMask(localSession, actor, weWorld, Arrays.asList((String[]) operation.get(0)), (XMaterial) operation.get(1), (XMaterial) operation.get(2), (Integer) operation.get(3));
-                break;
+                case CUBOID_SELECTION:
+                    GeneratorUtils.createCuboidSelection(getPlayer(), (Vector) operation.get(0), (Vector) operation.get(1));
+                    break;
 
-            case REPLACE_BLOCKSTATES_WITH_MASKS:
-                GeneratorUtils.replaceBlocksWithMask(localSession, actor, weWorld, Arrays.asList((String[]) operation.get(0)), (BlockState) operation.get(1), (BlockState) operation.get(2), (Integer) operation.get(3));
-                break;
+                case POLYGONAL_SELECTION:
+                    GeneratorUtils.createPolySelection(getPlayer(), Arrays.asList((Vector[]) operation.get(0)), blocks);
+                    break;
 
-            case REPLACE_XMATERIALS:
-                GeneratorUtils.replaceBlocks(localSession, actor, weWorld, (XMaterial) operation.get(0), (XMaterial) operation.get(1));
-                break;
+                case CONVEX_SELECTION:
+                    GeneratorUtils.createConvexSelection(getPlayer(), Arrays.asList((Vector[]) operation.get(0)), blocks);
+                    break;
 
-            case REPLACE_BLOCKSTATES:
-                GeneratorUtils.replaceBlocks(localSession, actor, weWorld, (BlockState) operation.get(0), (BlockState) operation.get(1));
-                break;
+                case CLEAR_HISTORY:
+                    GeneratorUtils.clearHistory(localSession);
+                    break;
 
-            case PASTE_SCHEMATIC:
-                GeneratorUtils.pasteSchematic(localSession, actor, weWorld, blocks, (String) operation.get(0), (Location) operation.get(1), (double) operation.get(2));
-                break;
+                case DISABLE_GMASK:
+                    GeneratorUtils.disableGmask(localSession);
+                    break;
 
-            case CUBOID_SELECTION:
-                GeneratorUtils.createCuboidSelection(getPlayer(), (Vector) operation.get(0), (Vector) operation.get(1));
-                break;
+                case SET_GMASK:
+                    GeneratorUtils.setGmask(localSession, (String) operation.get(0));
+                    break;
 
-            case POLYGONAL_SELECTION:
-                GeneratorUtils.createPolySelection(getPlayer(), Arrays.asList((Vector[]) operation.get(0)), blocks);
-                break;
-
-            case CONVEX_SELECTION:
-                GeneratorUtils.createConvexSelection(getPlayer(), Arrays.asList((Vector[]) operation.get(0)), blocks);
-                break;
-
-            case CLEAR_HISTORY:
-                GeneratorUtils.clearHistory(localSession);
-                break;
-
-            case EXPAND_SELECTION:
-                GeneratorUtils.expandSelection(localSession, (Vector) operation.get(0));
-                break;
+                case EXPAND_SELECTION:
+                    GeneratorUtils.expandSelection(localSession, (Vector) operation.get(0));
+                    break;
+            }
+        }catch (Exception e){
+            StringBuilder operationValues = new StringBuilder();
+            for(Object value : operation.getValues())
+                operationValues.append(value).append(" ");
+            ChatHelper.logError("Error while processing command: " + operation.getOperationType() + " - " + operationValues);
         }
-
 
         if(!breakPointActive)
             operations.remove(0);

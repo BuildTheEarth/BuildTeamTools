@@ -40,7 +40,7 @@ public class FieldSettings extends Settings {
         // Fence (Default: Random)
         ItemStack block = (ItemStack) Utils.pickRandom(MenuItems.getFences().toArray());
         if(block != null)
-            setValue(FieldFlag.FENCE, XMaterial.matchXMaterial(block));
+            setValue(FieldFlag.FENCE, new XMaterial[]{XMaterial.matchXMaterial(block)});
     }
 
 }

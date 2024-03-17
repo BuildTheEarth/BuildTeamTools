@@ -1,12 +1,12 @@
 package net.buildtheearth.modules.generator.model;
 
-import com.cryptomorin.xseries.XMaterial;
 import com.sk89q.worldedit.world.block.BlockState;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Operation {
@@ -25,17 +25,15 @@ public class Operation {
 
         CONVEX_SELECTION(Vector[].class),
 
-        REPLACE_XMATERIALS(XMaterial.class, XMaterial.class),
+        REPLACE_BLOCKSTATES(BlockState.class, BlockState[].class),
 
-        REPLACE_BLOCKSTATES(BlockState.class, BlockState.class),
-
-        REPLACE_XMATERIALS_WITH_MASKS(String[].class, XMaterial.class, XMaterial.class, Integer.class),
-
-        REPLACE_BLOCKSTATES_WITH_MASKS(String[].class, BlockState.class, BlockState.class, Integer.class),
+        REPLACE_BLOCKSTATES_WITH_MASKS(String[].class, BlockState.class, BlockState[].class, Integer.class),
 
         CLEAR_HISTORY,
 
         DISABLE_GMASK,
+
+        SET_GMASK(String.class),
 
         EXPAND_SELECTION(Vector.class);
 
@@ -47,9 +45,9 @@ public class Operation {
         }
     }
 
-    @Getter
-    private String value = null;
 
+
+    @Getter
     private List<Object> values = null;
 
     @Getter
@@ -66,7 +64,7 @@ public class Operation {
         if(operationType.getValueTypes()[0] != null && !operationType.getValueTypes()[0].equals(String.class))
             throw new IllegalArgumentException("OperationType " + operationType + " must have a value type of String");
 
-        this.value = value;
+        this.values = Collections.singletonList(value);
         this.operationType = operationType;
     }
 

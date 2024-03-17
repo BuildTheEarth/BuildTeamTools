@@ -24,12 +24,12 @@ public class HouseSettings extends Settings {
         // Wall Color (Default: Random)
         ItemStack block = (ItemStack) Utils.pickRandom(MenuItems.getSolidBlocks().toArray());
         if(block != null)
-            setValue(HouseFlag.WALL_COLOR, XMaterial.matchXMaterial(block));
+            setValue(HouseFlag.WALL_COLOR, new XMaterial[]{XMaterial.matchXMaterial(block)});
 
         // Wall Color (Default: Random)
         block = (ItemStack) Utils.pickRandom(MenuItems.getSolidBlocks().toArray());
         if(block != null)
-            setValue(HouseFlag.BASE_COLOR, XMaterial.matchXMaterial(block));
+            setValue(HouseFlag.BASE_COLOR, new XMaterial[]{XMaterial.matchXMaterial(block)});
 
         // Roof Color (Default: Random)
         if(roofType == RoofType.STAIRS)
@@ -40,20 +40,20 @@ public class HouseSettings extends Settings {
             block = (ItemStack) Utils.pickRandom(MenuItems.getSlabs().toArray());
 
         if(block != null)
-            setValue(HouseFlag.ROOF_COLOR, XMaterial.matchXMaterial(block));
+            setValue(HouseFlag.ROOF_COLOR, new XMaterial[]{XMaterial.matchXMaterial(block)});
 
         // Balcony Color (Default: Random)
-        setValue(HouseFlag.BALCONY_COLOR, XMaterial.BLACK_CONCRETE);
+        setValue(HouseFlag.BALCONY_COLOR, new XMaterial[]{XMaterial.BLACK_CONCRETE});
 
         // Balcony Fence Color (Default: Random)
-        setValue(HouseFlag.BALCONY_FENCE_COLOR, XMaterial.IRON_TRAPDOOR);
+        setValue(HouseFlag.BALCONY_FENCE_COLOR, new XMaterial[]{XMaterial.IRON_TRAPDOOR});
 
 
         // Floor Count (Default: Random)
         setValue(HouseFlag.FLOOR_COUNT, (int)(Math.random()*3.0) + 1);
 
         // Window Color (Default: Fixed Value)
-        setValue(HouseFlag.WINDOW_COLOR, XMaterial.BLACK_STAINED_GLASS);
+        setValue(HouseFlag.WINDOW_COLOR, new XMaterial[]{XMaterial.BLACK_STAINED_GLASS});
 
         // Floor Height (Default: Fixed Value)
         setValue(HouseFlag.FLOOR_HEIGHT, 3);

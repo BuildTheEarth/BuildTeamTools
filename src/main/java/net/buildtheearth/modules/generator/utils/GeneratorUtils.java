@@ -23,6 +23,7 @@ import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
@@ -53,10 +54,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 
 /** This class contains static utility methods for the generator module.
@@ -190,6 +188,25 @@ public class GeneratorUtils {
         return minMax;
     }
 
+    public static Block[][][] prepareScriptSession(LocalSession localSession, Actor actor, Player player, com.sk89q.worldedit.world.World world, int expandSelection){
+        clearHistory(localSession);
+        disableGmask(localSession);
+
+        if(expandSelection > 0) {
+            expandSelection(localSession, new Vector(0, expandSelection, 0));
+            expandSelection(localSession, new Vector(0, -expandSelection, 0));
+        }
+
+        BlockType blockType = BlockTypes.AIR;
+
+        if(blockType == null)
+            return null;
+
+        replaceBlocksWithMask(localSession, actor, world, Collections.singletonList("!#solid"), null, new BlockState[]{blockType.getDefaultState()}, 1);
+
+        return analyzeRegion(player, player.getWorld());
+    }
+
     /**
      * Converts a String[] of arguments to a String[] of flags.
      *
@@ -314,12 +331,12 @@ public class GeneratorUtils {
      * @param weWorld The WorldEdit world in which the region is located
      * @param masks The masks to use
      * @param from The block to replace
-     * @param to The block to replace with
+     * @param to The blocks to replace with
      * @param iterations The number of iterations to perform
      */
-    public static void replaceBlocksWithMask(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, List<String> masks, BlockState from, BlockState to, int iterations) {
-        if(to == null)
-            throw new IllegalArgumentException("Invalid block type 'to'");
+    public static void replaceBlocksWithMask(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, List<String> masks, BlockState from, BlockState[] to, int iterations) {
+        if(to == null || to.length == 0)
+                throw new IllegalArgumentException("BlockState[] to is empty");
 
         for (int i = 0; i < iterations; i++) {
             try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
@@ -333,7 +350,7 @@ public class GeneratorUtils {
                 parserContext.setExtent(editSession);
 
                 for (String maskString : masks) {
-                    ChatHelper.logDebug("Replacing blocks with expression mask: " + maskString.replace("%", "'PCT'") + " from " + from + " to " + to + " for " + iterations + " iterations");
+                    ChatHelper.logDebug("Replacing blocks with expression mask: " + maskString.replace("%", "'PCT'") + " from " + from + " to " + Arrays.toString(to) + " for " + iterations + " iterations");
 
                     Mask mask = new MaskFactory(WorldEdit.getInstance()).parseFromInput(maskString, parserContext);
 
@@ -342,7 +359,22 @@ public class GeneratorUtils {
                         editSession.setMask(blockMask);
                     }
 
-                    editSession.replaceBlocks(region, mask, to);
+                    Pattern pattern;
+
+                    if(to.length == 1)
+                        pattern = to[0];
+                    else{
+                        RandomPattern randomPattern = new RandomPattern();
+                        double chance = 100.0 / to.length;
+
+                        for(BlockState blockState : to)
+                            randomPattern.add(blockState, chance);
+
+                        pattern = randomPattern;
+                    }
+
+
+                    editSession.replaceBlocks(region, mask, pattern);
 
                     saveEditSession(editSession, localSession, actor);
                 }
@@ -351,9 +383,7 @@ public class GeneratorUtils {
             }
         }
     }
-    public static void replaceBlocksWithMask(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, List<String> masks, XMaterial from, XMaterial to, int iterations) {
-        replaceBlocksWithMask(localSession, actor, weWorld, masks, getBlockState(from), getBlockState(to), iterations);
-    }
+
 
     /**
      * Replaces all blocks in a region with a given block.
@@ -363,29 +393,41 @@ public class GeneratorUtils {
      * @param from The block to replace
      * @param to The block to replace with
      */
-    public static void replaceBlocks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, BlockState from, BlockState to) {
-        ChatHelper.logDebug("Replacing blocks from " + from + " to " + to);
+    public static void replaceBlocks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, BlockState from, BlockState[] to) {
+        if(to.length == 0)
+            throw new IllegalArgumentException("BlockState[] to is empty");
+
+        ChatHelper.logDebug("Replacing blocks from " + from + " to " + Arrays.toString(to));
 
         try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
             Region region = localSession.getSelection();
+            Pattern pattern;
+
+            if(to.length == 1)
+                pattern = to[0];
+            else{
+                RandomPattern randomPattern = new RandomPattern();
+                double chance = 100.0 / to.length;
+
+                for(BlockState blockState : to)
+                    randomPattern.add(blockState, chance);
+
+                pattern = randomPattern;
+            }
 
             if(from != null) {
-                BlockMask blockMask = new BlockMask(weWorld, from.toBaseBlock());
-                BaseBlock toBaseBlock = to.toBaseBlock();
-                editSession.replaceBlocks(region, blockMask, toBaseBlock);
-            }else{
-                BaseBlock toBaseBlock = to.toBaseBlock();
-                editSession.setBlocks(region, toBaseBlock);
-            }
+                BlockMask blockMask = new BlockMask(weWorld).add(from);
+                editSession.replaceBlocks(region, blockMask, pattern);
+            }else
+                editSession.setBlocks(region, pattern);
+
 
             saveEditSession(editSession, localSession, actor);
         } catch (IncompleteRegionException | MaxChangedBlocksException e) {
             throw new RuntimeException(e);
         }
     }
-    public static void replaceBlocks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, XMaterial from, XMaterial to) {
-        replaceBlocks(localSession, actor, weWorld, getBlockState(from), getBlockState(to));
-    }
+
 
     /**
      * Pastes a schematic at a given location.
@@ -478,6 +520,23 @@ public class GeneratorUtils {
 
 
     /**
+     * Sets the gmask of a LocalSession.
+     *
+     * @param session The local session to set the gmask of
+     * @param mask The mask to set
+     */
+    public static void setGmask(LocalSession session, String mask){
+        try {
+            MaskFactory maskFactory = new MaskFactory(WorldEdit.getInstance());
+            Mask newMask = maskFactory.parseFromInput(mask, new ParserContext());
+            session.setMask(newMask);
+        } catch (InputParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    /**
      * Returns the blockState of a given XMaterial.
      *
      * @param xMaterial The XMaterial to get the blockState from
@@ -496,6 +555,17 @@ public class GeneratorUtils {
             throw new IllegalArgumentException("Invalid block type: " + xMaterial.parseMaterial().name());
 
         return blockType.getDefaultState();
+    }
+    public static BlockState[] getBlockState(XMaterial[] xMaterial){
+        if(xMaterial == null)
+            return null;
+
+        BlockState[] blockStates = new BlockState[xMaterial.length];
+
+        for(int i = 0; i < xMaterial.length; i++)
+            blockStates[i] = getBlockState(xMaterial[i]);
+
+        return blockStates;
     }
 
     /**

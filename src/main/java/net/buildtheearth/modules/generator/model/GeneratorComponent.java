@@ -3,7 +3,6 @@ package net.buildtheearth.modules.generator.model;
 import lombok.Getter;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.Component;
-import net.buildtheearth.modules.generator.components.FlagType;
 import net.buildtheearth.modules.generator.components.field.FieldSettings;
 import net.buildtheearth.modules.generator.components.house.HouseSettings;
 import net.buildtheearth.modules.generator.components.rail.RailSettings;
@@ -93,7 +92,7 @@ public abstract class GeneratorComponent extends Component {
     }
 
     public String getCommand(Player p) {
-        HashMap<Flag, Object> flags = getPlayerSettings().get(p.getUniqueId()).getValues();
+        HashMap<Flag, String> flags = getPlayerSettings().get(p.getUniqueId()).getValuesAsString();
 
         String type = "house";
 

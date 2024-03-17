@@ -113,7 +113,7 @@ public class StatsModule extends Module {
         out.writeUTF(p.getUniqueId().toString());
         out.writeUTF(StatsModule.getInstance().getCurrentCache().toJSONString());
 
-        p.sendPluginMessage(BuildTeamTools.getInstance(), "buildteamtools:buildteam", out.toByteArray());
+        p.sendPluginMessage(BuildTeamTools.getInstance(), "btt:buildteam", out.toByteArray());
 
         return true;
     }

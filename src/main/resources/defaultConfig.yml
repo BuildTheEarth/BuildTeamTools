@@ -1,50 +1,3 @@
-# ----------------------------------------------------------------------------------------------
-# |                         BuildTeamTools - by BuildTheEarth
-# ----------------------------------------------------------------------------------------------
-# | [Github Repo]           https://github.com/BuildTheEarth/BuildTeamTools
-# | [Config Documentation]  https://github.com/BuildTheEarth/BuildTeamTools/wiki/Configuration
-# | [Contacts - Discord]    BuildTheEarth Staff Discord, @minefact
-# ----------------------------------------------------------------------------------------------
-
-language: "EN"
-
-# The Build Team API Key used to fetch build team info for display.
-# Find the key on the Minecraft Network at "buildtheearth.net". Navigate: Compass > Build Teams > My Teams > Your Team > API-Key.
-# Without this key, some plugin components won`t function. For assistance, see #server-support on the staff discord.
-api-key: 00000000-0000-0000-0000-000000000000
-
-# The main world using the custom BTE Dynmaxion projection
-earth-world: world
-
-
-
-# -----------------------------------------------------
-# | Navigation: The navigator command that allows the player to navigate through the project
-# -----------------------------------------------------
-
-# Configures the navigator item in the players hotbar
-navigator-hotbar-item:
-  # Enables or disables the navigator hotbar item [true|false]
-  nav-enabled: true
-  # The hotbar slot into which the navigator item should be placed
-  nav-slot: 0
-
-# Specifies which menu items should be enabled
-main-menu-items:
-  # Configures the build item inside the navigator
-  build-item:
-    # Enables or disables the build item inside the navigator [true|false]
-    build-enabled: true
-    # (Optional) Execute a custom command or send a message when the build item is clicked [/command|message]
-    build-action: /command
-  # Configures the tutorial item inside the navigator
-  tutorial-item:
-    # Enables or disables the tutorial item inside the navigator [true|false]
-    tutorial-enabled: false
-    # (Optional) Execute a custom command or send a message when the tutorial item is clicked [/command|message]
-    tutorial-action: /command
-
-
 # -----------------------------------------------------
 # |         Plot System Terra - by Alps BTE
 # -----------------------------------------------------
@@ -125,7 +78,6 @@ message-prefix: §7§l>>
 info-colour: §a
 error-colour: §c
 
-debug: false
 
 # NOTE: Do not change
-config-version: 1.3
+config-version: 1.6

@@ -10,6 +10,12 @@ public abstract class Permissions {
     public static final String BUILD_TEAM_TOOLS_RELOAD = "btt.command.reload";
 
 
+    public static final String GENERATOR_USE = "btt.generator.use";
+
+
+    public static final String NAVIGATOR_USE = "btt.navigator.use";
+
+
     public static final String WARP_USE = "btt.warp.use";
     public static final String WARP_CREATE = "btt.warp.create";
     public static final String WARP_EDIT = "btt.warp.edit";

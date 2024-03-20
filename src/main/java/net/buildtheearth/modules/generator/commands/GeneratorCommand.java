@@ -3,6 +3,7 @@ package net.buildtheearth.modules.generator.commands;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.menu.GeneratorMenu;
 import net.buildtheearth.modules.generator.model.History;
+import net.buildtheearth.modules.network.model.Permissions;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.Utils;
 import org.bukkit.command.Command;
@@ -21,6 +22,10 @@ public class GeneratorCommand implements CommandExecutor {
 
         Player p = (Player) sender;
 
+        if(!p.hasPermission(Permissions.GENERATOR_USE)) {
+            p.sendMessage(ChatHelper.error("You don't have permission to use this command!"));
+            return true;
+        }
 
         // Command Usage: /gen
         if (args.length == 0) {

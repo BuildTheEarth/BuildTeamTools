@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
+import net.buildtheearth.modules.network.model.Permissions;
 import net.buildtheearth.utils.*;
 import net.buildtheearth.utils.geo.CoordinateConversion;
 import net.buildtheearth.utils.menus.AbstractMenu;
@@ -228,7 +229,11 @@ public class WarpEditMenu extends AbstractMenu {
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
-                NetworkModule.getInstance().getBuildTeam().deleteWarp(clickPlayer, warp);
+                if(clickPlayer.hasPermission(Permissions.WARP_DELETE)) {
+                    NetworkModule.getInstance().getBuildTeam().deleteWarp(clickPlayer, warp);
+                } else {
+                    clickPlayer.sendMessage(ChatHelper.error("You don't have the required permission to delete warps!"));
+                }
             });
     }
 

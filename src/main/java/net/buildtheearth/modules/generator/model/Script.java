@@ -53,7 +53,9 @@ public class Script {
     }
 
 
-    protected void finish(Block[][][] blocks){
+    protected void finish(Block[][][] blocks, List<Vector> points){
+        createSelection(points);
+
         this.operations.add(new Operation(Operation.OperationType.BREAKPOINT));
 
         GeneratorModule.getInstance().getGeneratorCommands().add(new Command(this, blocks));

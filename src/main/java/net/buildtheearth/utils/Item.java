@@ -456,13 +456,6 @@ public class Item {
 		return s.toString();
 	}
 
-	public static Material[] asMaterialArray(ItemStack... items) {
-		Material[] materials = new Material[items.length];
-		for (int i = 0; i < items.length; i++)
-			materials[i] = items[i].getType();
-		return materials;
-	}
-
 	public static ItemStack createCustomHeadTextureURL(String url, String name, ArrayList<String> lore) {
 		byte[] encodedByteData = Base64.getEncoder().encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", url).getBytes());
 		String encodedData = new String(encodedByteData);
@@ -491,8 +484,8 @@ public class Item {
 	}
 
 	private static void mutateItemMeta(SkullMeta meta, String b64) {
-		Method metaSetProfileMethod = null;
-		Field metaProfileField = null;
+		Method metaSetProfileMethod;
+		Field metaProfileField;
 		try {
 			metaSetProfileMethod = meta.getClass().getDeclaredMethod("setProfile", GameProfile.class);
 			metaSetProfileMethod.setAccessible(true);

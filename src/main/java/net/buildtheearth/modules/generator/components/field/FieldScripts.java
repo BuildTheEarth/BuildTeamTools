@@ -361,17 +361,7 @@ public class FieldScripts extends Script {
 
         }
 
-        // Depending on the selection type, the selection needs to be recreated
-        if(getRegion() instanceof Polygonal2DRegion || getRegion() instanceof ConvexPolyhedralRegion)
-            createPolySelection(operations, points);
-        else if(getRegion() instanceof CuboidRegion){
-            CuboidRegion cuboidRegion = (CuboidRegion) getRegion();
-            Vector pos1 = new Vector(cuboidRegion.getPos1().getX(), cuboidRegion.getPos1().getY(), cuboidRegion.getPos1().getZ());
-            Vector pos2 = new Vector(cuboidRegion.getPos2().getX(), cuboidRegion.getPos2().getY(), cuboidRegion.getPos2().getZ());
-            createCuboidSelection(pos1, pos2);
-        }
-
         // Finish the script
-        finish(blocks);
+        finish(blocks, points);
     }
 }

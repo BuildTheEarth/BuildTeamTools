@@ -39,7 +39,7 @@ public class RailScripts extends Script {
         createBreakPoint();
         createCommand("//set gold_block");
 
-        finish(regionBlocks);
+        finish(regionBlocks, points);
 
 
         // TODO END TEMP

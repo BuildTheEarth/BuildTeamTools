@@ -154,21 +154,9 @@ public class HouseScripts extends Script {
         replaceBlocks(XMaterial.BRICKS, XMaterial.SPONGE);
         changes++;
 
-        // Replace the lime wool with emerald ore because FAWE doesn't support data values in queryRels in 2.9.1
-        replaceBlocks(XMaterial.LIME_WOOL, XMaterial.EMERALD_ORE);
 
-        // Replace the blue wool with diamond ore because FAWE doesn't support data values in queryRels in 2.9.1
-        replaceBlocks(XMaterial.BLUE_WOOL, XMaterial.DIAMOND_ORE);
-
-        // Replace the yellow wool with gold ore because FAWE doesn't support data values in queryRels in 2.9.1
-        replaceBlocks(XMaterial.YELLOW_WOOL, XMaterial.GOLD_ORE);
-
-        // Replace the red wool with redstone ore because FAWE doesn't support data values in queryRels in 2.9.1
-        replaceBlocks(XMaterial.RED_WOOL, XMaterial.REDSTONE_ORE);
-
-
-        // Replace all sponges with bricks that have air or redstone ore or diamond ore or emerald ore or gold ore above them
-        replaceBlocksWithMask("=(queryRel(0,1,0,0,0)||queryRel(0,1,0,56,0)||queryRel(0,1,0,73,0)||queryRel(0,1,0,129,0)||queryRel(0,1,0,14,0))"
+        // Replace all sponges with bricks that have air or red wool or blue wool or lime wool or yellow wool above them
+        replaceBlocksWithMask("=(queryRel(0,1,0,0,0)||queryRel(0,1,0,35,11)||queryRel(0,1,0,35,14)||queryRel(0,1,0,35,5)||queryRel(0,1,0,35,4))"
                 , XMaterial.SPONGE, XMaterial.BRICKS);
         changes++;
 
@@ -178,19 +166,19 @@ public class HouseScripts extends Script {
 
 
         // ----------- PREPARATION 07 ----------
-        // Expand the diamond ore until it reaches the emerald ore
+        // Expand the blue wool until it reaches the lime wool
 
-        // Replace all air blocks above bricks, next to diamond ore and not next to emerald ore with diamond ore
+        // Replace all air blocks above bricks, next to blue wool and not next to lime wool with blue wool
         setBlocksWithMask("=queryRel(0,-1,0,45,0)" +
-                        "&&(queryRel(1,0,0,56,0)||queryRel(-1,0,0,56,0)||queryRel(0,0,1,56,0)||queryRel(0,0,-1,56,0)||queryRel(1,0,1,56,0)||queryRel(-1,0,-1,56,0)||queryRel(-1,0,1,56,0)||queryRel(1,0,-1,56,0))" +
-                        "&&!(queryRel(1,0,0,129,0)||queryRel(-1,0,0,129,0)||queryRel(0,0,1,129,0)||queryRel(0,0,-1,129,0)||queryRel(1,0,1,129,0)||queryRel(-1,0,-1,129,0)||queryRel(-1,0,1,129,0)||queryRel(1,0,-1,129,0))",
-                XMaterial.DIAMOND_ORE, 20);
+                        "&&(queryRel(1,0,0,35,11)||queryRel(-1,0,0,35,11)||queryRel(0,0,1,35,11)||queryRel(0,0,-1,35,11)||queryRel(1,0,1,35,11)||queryRel(-1,0,-1,35,11)||queryRel(-1,0,1,35,11)||queryRel(1,0,-1,35,11))" +
+                        "&&!(queryRel(1,0,0,35,5)||queryRel(-1,0,0,35,5)||queryRel(0,0,1,35,5)||queryRel(0,0,-1,35,5)||queryRel(1,0,1,35,5)||queryRel(-1,0,-1,35,5)||queryRel(-1,0,1,35,5)||queryRel(1,0,-1,35,5))",
+                XMaterial.BLUE_WOOL, 20);
         changes+=20;
 
 
-        // Place the last diamond ore between the emerald ore and the diamond ore
-        setBlocksWithMask("=queryRel(0,-1,0,45,0)&&(queryRel(1,0,0,56,0)||queryRel(-1,0,0,56,0)||queryRel(0,0,1,56,0)||queryRel(0,0,-1,56,0)||queryRel(1,0,1,56,0)||queryRel(-1,0,-1,56,0)||queryRel(-1,0,1,56,0)||queryRel(1,0,-1,56,0))",
-                XMaterial.DIAMOND_ORE);
+        // Place the last blue wool between the lime wool and the blue wool
+        setBlocksWithMask("=queryRel(0,-1,0,45,0)&&(queryRel(1,0,0,35,11)||queryRel(-1,0,0,35,11)||queryRel(0,0,1,35,11)||queryRel(0,0,-1,35,11)||queryRel(1,0,1,35,11)||queryRel(-1,0,-1,35,11)||queryRel(-1,0,1,35,11)||queryRel(1,0,-1,35,11))",
+                XMaterial.BLUE_WOOL);
         changes++;
 
 
@@ -210,24 +198,24 @@ public class HouseScripts extends Script {
         int up_expand = 5 + maxRoofHeight + baseHeight + (floorCount * floorHeight);
         expandSelection(new Vector(0, up_expand, 0));
 
-        // Replace all blocks that are not bricks around the gold ore with gold ore
-        setBlocksWithMask("=!queryRel(0,0,0,45,0)&&(queryRel(-1,0,0,14,0)||queryRel(1,0,0,14,0)||queryRel(0,0,1,14,0)||queryRel(0,0,-1,14,0))",
-                XMaterial.GOLD_ORE, 20);
+        // Replace all blocks that are not bricks around the yellow wool with yellow wool
+        setBlocksWithMask("=!queryRel(0,0,0,45,0)&&(queryRel(-1,0,0,35,4)||queryRel(1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4))",
+                XMaterial.YELLOW_WOOL, 20);
         changes+=20;
 
 
-        // Make the outline as thin as possible and fill all inner corners with gold ore that are too thick
+        // Make the outline as thin as possible and fill all inner corners with yellow wool that are too thick
         String[] queries = {
-            "=queryRel(-1,0,0,14,0)&&queryRel(0,0,-1,14,0)&&queryRel(0,0,1,45,-1)&&queryRel(1,0,0,45,-1)",
-            "=queryRel(-1,0,0,14,0)&&queryRel(0,0,1,14,0)&&queryRel(0,0,-1,45,-1)&&queryRel(1,0,0,45,-1)",
-            "=queryRel(1,0,0,14,0)&&queryRel(0,0,-1,14,0)&&queryRel(0,0,1,45,-1)&&queryRel(-1,0,0,45,-1)",
-            "=queryRel(1,0,0,14,0)&&queryRel(0,0,1,14,0)&&queryRel(0,0,-1,45,-1)&&queryRel(-1,0,0,45,-1)",
-            "=queryRel(-1,0,0,14,0)&&queryRel(0,0,-1,45,-1)&&queryRel(0,0,1,45,-1)&&queryRel(1,0,0,45,-1)",
-            "=queryRel(1,0,0,14,0)&&queryRel(0,0,1,45,-1)&&queryRel(0,0,-1,45,-1)&&queryRel(-1,0,0,45,-1)",
-            "=queryRel(1,0,0,45,-1)&&queryRel(0,0,-1,14,0)&&queryRel(0,0,1,45,-1)&&queryRel(-1,0,0,45,-1)",
-            "=queryRel(1,0,0,45,-1)&&queryRel(0,0,1,14,0)&&queryRel(0,0,-1,45,-1)&&queryRel(-1,0,0,45,-1)"
+            "=queryRel(-1,0,0,35,4)&&queryRel(0,0,-1,35,4)&&queryRel(0,0,1,45,-1)&&queryRel(1,0,0,45,-1)",
+            "=queryRel(-1,0,0,35,4)&&queryRel(0,0,1,35,4)&&queryRel(0,0,-1,45,-1)&&queryRel(1,0,0,45,-1)",
+            "=queryRel(1,0,0,35,4)&&queryRel(0,0,-1,35,4)&&queryRel(0,0,1,45,-1)&&queryRel(-1,0,0,45,-1)",
+            "=queryRel(1,0,0,35,4)&&queryRel(0,0,1,35,4)&&queryRel(0,0,-1,45,-1)&&queryRel(-1,0,0,45,-1)",
+            "=queryRel(-1,0,0,35,4)&&queryRel(0,0,-1,45,-1)&&queryRel(0,0,1,45,-1)&&queryRel(1,0,0,45,-1)",
+            "=queryRel(1,0,0,35,4)&&queryRel(0,0,1,45,-1)&&queryRel(0,0,-1,45,-1)&&queryRel(-1,0,0,45,-1)",
+            "=queryRel(1,0,0,45,-1)&&queryRel(0,0,-1,35,4)&&queryRel(0,0,1,45,-1)&&queryRel(-1,0,0,45,-1)",
+            "=queryRel(1,0,0,45,-1)&&queryRel(0,0,1,35,4)&&queryRel(0,0,-1,45,-1)&&queryRel(-1,0,0,45,-1)"
         };
-        replaceBlocksWithMask(Arrays.asList(queries), XMaterial.REDSTONE_ORE, XMaterial.GOLD_ORE, 2);
+        replaceBlocksWithMask(Arrays.asList(queries), XMaterial.RED_WOOL, XMaterial.YELLOW_WOOL, 2);
 
 
 
@@ -281,8 +269,8 @@ public class HouseScripts extends Script {
                     // Replace everything with white glass
                     setBlocksWithMask("=queryRel(0," + (-currentHeight) + ",0,45,-1)", XMaterial.WHITE_STAINED_GLASS);
                 }else {
-                    // Replace redstone ore with gray glass
-                    replaceBlocksWithMask("=queryRel(0," + (-currentHeight) + ",0,45,-1)", XMaterial.REDSTONE_ORE, XMaterial.GRAY_STAINED_GLASS);
+                    // Replace red wool with gray glass
+                    replaceBlocksWithMask("=queryRel(0," + (-currentHeight) + ",0,45,-1)", XMaterial.RED_WOOL, XMaterial.GRAY_STAINED_GLASS);
                     changes++;
 
                     // Replace air with lapislazuli ore
@@ -293,8 +281,8 @@ public class HouseScripts extends Script {
                     replaceBlocksWithMask("=queryRel(0," + (-currentHeight) + ",0,45,-1)", XMaterial.LAPIS_ORE, XMaterial.LAPIS_ORE);
                     changes++;
 
-                    // Replace emerald ore with lapislazuli ore
-                    replaceBlocksWithMask("=queryRel(0," + (-currentHeight) + ",0,45,-1)", XMaterial.EMERALD_ORE, XMaterial.LAPIS_ORE);
+                    // Replace lime wool with lapislazuli ore
+                    replaceBlocksWithMask("=queryRel(0," + (-currentHeight) + ",0,45,-1)", XMaterial.LIME_WOOL, XMaterial.LAPIS_ORE);
                 }
                 changes++;
 
@@ -405,45 +393,45 @@ public class HouseScripts extends Script {
 
         if(roofType == RoofType.FLATTER_SLABS || roofType == RoofType.STEEP_SLABS|| roofType == RoofType.MEDIUM_SLABS){
 
-            // Replace the diamond ore next to emerald ore with emerald ore
-            replaceBlocksWithMask("=queryRel(1,0,0,129,0)||queryRel(-1,0,0,129,0)||queryRel(0,0,1,129,0)||queryRel(0,0,-1,129,0)||queryRel(1,0,1,129,0)||queryRel(-1,0,-1,129,0)||queryRel(-1,0,1,129,0)||queryRel(1,0,-1,129,0)",
-                    XMaterial.DIAMOND_ORE, XMaterial.EMERALD_ORE);
+            // Replace the blue wool next to lime wool with lime wool
+            replaceBlocksWithMask("=queryRel(1,0,0,35,5)||queryRel(-1,0,0,35,5)||queryRel(0,0,1,35,5)||queryRel(0,0,-1,35,5)||queryRel(1,0,1,35,5)||queryRel(-1,0,-1,35,5)||queryRel(-1,0,1,35,5)||queryRel(1,0,-1,35,5)",
+                    XMaterial.BLUE_WOOL, XMaterial.LIME_WOOL);
             changes++;
 
             // Create the roof house wall staircase
             for(int i = 0; i < maxRoofHeight; i++){
-                // Select all air blocks that are above diamond ore and above & next to emerald ore
-                replaceBlocksWithMask("=queryRel(0,-1,0,56,0)&&" +
+                // Select all air blocks that are above blue wool and above & next to lime wool
+                replaceBlocksWithMask("=queryRel(0,-1,0,35,11)&&" +
                             "(" +
-                                "queryRel(1,-1,0,129,0)||queryRel(-1,-1,0,129,0)||queryRel(0,-1,1,129,0)||queryRel(0,-1,-1,129,0)||queryRel(1,-1,1,129,0)||queryRel(-1,-1,-1,129,0)||queryRel(-1,-1,1,129,0)||queryRel(1,-1,-1,129,0)" +
+                                "queryRel(1,-1,0,35,5)||queryRel(-1,-1,0,35,5)||queryRel(0,-1,1,35,5)||queryRel(0,-1,-1,35,5)||queryRel(1,-1,1,35,5)||queryRel(-1,-1,-1,35,5)||queryRel(-1,-1,1,35,5)||queryRel(1,-1,-1,35,5)" +
                             ")",
-                        XMaterial.DIAMOND_ORE, XMaterial.EMERALD_ORE);
+                        XMaterial.BLUE_WOOL, XMaterial.LIME_WOOL);
                 changes++;
 
-                // Select all air blocks that are above diamond ore and next to emerald ore
-                replaceBlocksWithMask("=queryRel(0,-1,0,56,0)&&" +
+                // Select all air blocks that are above blue wool and next to lime wool
+                replaceBlocksWithMask("=queryRel(0,-1,0,35,11)&&" +
                                 "(" +
-                                    "queryRel(1,0,0,129,0)||queryRel(-1,0,0,129,0)||queryRel(0,0,1,129,0)||queryRel(0,0,-1,129,0)||queryRel(1,0,1,129,0)||queryRel(-1,0,-1,129,0)||queryRel(-1,0,1,129,0)||queryRel(1,0,-1,129,0)" +
+                                    "queryRel(1,0,0,35,5)||queryRel(-1,0,0,35,5)||queryRel(0,0,1,35,5)||queryRel(0,0,-1,35,5)||queryRel(1,0,1,35,5)||queryRel(-1,0,-1,35,5)||queryRel(-1,0,1,35,5)||queryRel(1,0,-1,35,5)" +
                                 ")",
-                        XMaterial.DIAMOND_ORE, XMaterial.EMERALD_ORE);
+                        XMaterial.BLUE_WOOL, XMaterial.LIME_WOOL);
                 changes++;
 
-                // Select all air blocks that are above diamond ore and replace them with diamond ore
-                setBlocksWithMask(">56", XMaterial.DIAMOND_ORE);
+                // Select all air blocks that are above blue wool and replace them with blue wool
+                setBlocksWithMask(">35:11", XMaterial.BLUE_WOOL);
                 changes++;
             }
 
 
-            // (One more gold ore layer) Replace everything above gold ore with one layer gold ore
-            setBlocksWithMask(">14", XMaterial.GOLD_ORE);
+            // (One more yellow wool layer) Replace everything above yellow wool with one layer yellow wool
+            setBlocksWithMask(">35:4", XMaterial.YELLOW_WOOL);
             changes++;
 
-            // (First Roof Layer) Select only air blocks that are next to gold ore in any direction and above lapislazuli ore. Then replace them with stone slabs
-            replaceBlocksWithMask("=queryRel(0,-1,0,21,0)&&queryRel(0,0,0,0,0)&&(queryRel(1,0,0,14,0)||queryRel(1,0,0,14,0)||queryRel(-1,0,0,14,0)||queryRel(0,0,1,14,0)||queryRel(0,0,-1,14,0))",
+            // (First Roof Layer) Select only air blocks that are next to yellow wool in any direction and above lapislazuli ore. Then replace them with stone slabs
+            replaceBlocksWithMask("=queryRel(0,-1,0,21,0)&&queryRel(0,0,0,0,0)&&(queryRel(1,0,0,35,4)||queryRel(1,0,0,35,4)||queryRel(-1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4))",
                 XMaterial.LAPIS_ORE, XMaterial.STONE_SLAB);
             changes++;
 
-            // (Fix First Roof Layer) Select only air blocks that are next to stone slabs and emerald ore in any direction and above lapislazuli ore. Then replace them with stone slabs
+            // (Fix First Roof Layer) Select only air blocks that are next to stone slabs and lime wool in any direction and above lapislazuli ore. Then replace them with stone slabs
             replaceBlocksWithMask("=queryRel(0,-1,0,21,0)&&queryRel(0,0,0,0,0)&&(queryRel(1,0,0,44,0)||queryRel(-1,0,0,44,0)||queryRel(0,0,1,44,0)||queryRel(0,0,-1,44,0))",
                     XMaterial.LAPIS_ORE, XMaterial.STONE_SLAB, 2);
             changes+=2;
@@ -472,8 +460,8 @@ public class HouseScripts extends Script {
 
 
 
-            // Replace the highest gold ore layer with double slabs
-            replaceBlocksWithMask("<0", XMaterial.GOLD_ORE, XMaterial.STONE);
+            // Replace the highest yellow wool layer with double slabs
+            replaceBlocksWithMask("<0", XMaterial.YELLOW_WOOL, XMaterial.STONE);
             changes++;
 
             maxRoofHeight = maxRoofHeight - 1;
@@ -481,20 +469,20 @@ public class HouseScripts extends Script {
             if(maxRoofHeight > 0)
                 for(int i = 0; i < maxRoofHeight; i++) {
                     if(roofType == RoofType.FLATTER_SLABS || roofType == RoofType.MEDIUM_SLABS)
-                        //Only select air block that are surrounded by other stone slabs below or which are directly neighbors to emerald ore or diamond ore
+                        //Only select air block that are surrounded by other stone slabs below or which are directly neighbors to lime wool or blue wool
                         replaceBlocksWithMask("=queryRel(0,-1,0,43)&&" +
                             "(" +
                                 "(" +
                                     "queryRel(1,-1,0,43,-1)&&queryRel(-1,-1,0,43,-1)&&queryRel(0,-1,1,43,-1)&&queryRel(0,-1,-1,43,-1)" +
-                                    "&&(queryRel(-1,-1,1,43,-1)||queryRel(-1,0,1,129,0)||queryRel(-1,0,1,56,0))" +
-                                    "&&(queryRel(1,-1,-1,43,-1)||queryRel(1,0,-1,129,0)||queryRel(1,0,-1,56,0))" +
-                                    "&&(queryRel(1,-1,1,43,-1)||queryRel(1,0,1,129,0)||queryRel(1,0,1,56,0))" +
-                                    "&&(queryRel(-1,-1,-1,43,-1)||queryRel(-1,0,-1,129,0)||queryRel(-1,0,-1,56,0))" +
+                                    "&&(queryRel(-1,-1,1,43,-1)||queryRel(-1,0,1,35,5)||queryRel(-1,0,1,35,11))" +
+                                    "&&(queryRel(1,-1,-1,43,-1)||queryRel(1,0,-1,35,5)||queryRel(1,0,-1,35,11))" +
+                                    "&&(queryRel(1,-1,1,43,-1)||queryRel(1,0,1,35,5)||queryRel(1,0,1,35,11))" +
+                                    "&&(queryRel(-1,-1,-1,43,-1)||queryRel(-1,0,-1,35,5)||queryRel(-1,0,-1,35,11))" +
                                 ")" +
-                                "||queryRel(1,0,0,129,0)||queryRel(1,0,0,56,0)" +
-                                "||queryRel(-1,0,0,129,0)||queryRel(-1,0,0,56,0)" +
-                                "||queryRel(0,0,1,129,0)||queryRel(0,0,1,56,0)" +
-                                "||queryRel(0,0,-1,129,0)||queryRel(0,0,-1,56,0)" +
+                                "||queryRel(1,0,0,35,5)||queryRel(1,0,0,35,11)" +
+                                "||queryRel(-1,0,0,35,5)||queryRel(-1,0,0,35,11)" +
+                                "||queryRel(0,0,1,35,5)||queryRel(0,0,1,35,11)" +
+                                "||queryRel(0,0,-1,35,5)||queryRel(0,0,-1,35,11)" +
                             ")",
                             getSlab(BlockTypes.STONE_SLAB, "double"), getSlab(BlockTypes.STONE_SLAB, "bottom")
                         );
@@ -506,19 +494,19 @@ public class HouseScripts extends Script {
 
                     if(roofType == RoofType.FLATTER_SLABS)
 
-                        //Only select air block that are surrounded by other stone slabs or which are directly neighbors to emerald ore or diamond ore
+                        //Only select air block that are surrounded by other stone slabs or which are directly neighbors to lime wool or blue wool
                         replaceBlocksWithMask(
                             "(" +
                                     "queryRel(1,0,0,44,-1)&&queryRel(-1,0,0,44,-1)&&queryRel(0,0,1,44,-1)&&queryRel(0,0,-1,44,-1)" +
-                                    "&&(queryRel(-1,0,1,44,-1)||queryRel(-1,0,1,129,0)||queryRel(-1,0,1,56,0))" +
-                                    "&&(queryRel(1,0,-1,44,-1)||queryRel(1,0,-1,129,0)||queryRel(1,0,-1,56,0))" +
-                                    "&&(queryRel(1,0,1,44,-1)||queryRel(1,0,1,129,0)||queryRel(1,0,1,56,0))" +
-                                    "&&(queryRel(-1,0,-1,44,-1)||queryRel(-1,0,-1,129,0)||queryRel(-1,0,-1,56,0))" +
+                                    "&&(queryRel(-1,0,1,44,-1)||queryRel(-1,0,1,35,5)||queryRel(-1,0,1,35,11))" +
+                                    "&&(queryRel(1,0,-1,44,-1)||queryRel(1,0,-1,35,5)||queryRel(1,0,-1,35,11))" +
+                                    "&&(queryRel(1,0,1,44,-1)||queryRel(1,0,1,35,5)||queryRel(1,0,1,35,11))" +
+                                    "&&(queryRel(-1,0,-1,44,-1)||queryRel(-1,0,-1,35,5)||queryRel(-1,0,-1,35,11))" +
                                 ")" +
-                                "||queryRel(1,0,0,129,0)||queryRel(1,0,0,56,0)" +
-                                "||queryRel(-1,0,0,129,0)||queryRel(-1,0,0,56,0)" +
-                                "||queryRel(0,0,1,129,0)||queryRel(0,0,1,56,0)" +
-                                "||queryRel(0,0,-1,129,0)||queryRel(0,0,-1,56,0)",
+                                "||queryRel(1,0,0,35,5)||queryRel(1,0,0,35,11)" +
+                                "||queryRel(-1,0,0,35,5)||queryRel(-1,0,0,35,11)" +
+                                "||queryRel(0,0,1,35,5)||queryRel(0,0,1,35,11)" +
+                                "||queryRel(0,0,-1,35,5)||queryRel(0,0,-1,35,11)",
                             getSlab(BlockTypes.STONE_SLAB, "bottom"), getSlab(BlockTypes.STONE_SLAB, "double")
                         );
                     else
@@ -529,7 +517,7 @@ public class HouseScripts extends Script {
                 }
 
             // Replace everything above upside down stone slabs with purple wool
-            setBlocksWithMask(">44:8", XMaterial.REDSTONE_ORE);
+            setBlocksWithMask(">44:8", XMaterial.RED_WOOL);
             changes++;
 
             expandEmeraldOre();
@@ -539,34 +527,34 @@ public class HouseScripts extends Script {
                 getAir(), getSlab(BlockTypes.STONE_SLAB, "top"));
             changes++;
 
-            // Select all emerald ore that are above & next to emerald ore and replace it with stone slabs
-            replaceBlocksWithMask("=queryRel(1,-1,0,129,0)||queryRel(-1,-1,0,129,0)||queryRel(0,-1,1,129,0)||queryRel(0,-1,-1,129,0)||queryRel(1,-1,1,129,0)||queryRel(-1,-1,-1,129,0)||queryRel(-1,-1,1,129,0)||queryRel(1,-1,-1,129,0)",
-                XMaterial.EMERALD_ORE, XMaterial.STONE_SLAB);
+            // Select all lime wool that are above & next to lime wool and replace it with stone slabs
+            replaceBlocksWithMask("=queryRel(1,-1,0,35,5)||queryRel(-1,-1,0,35,5)||queryRel(0,-1,1,35,5)||queryRel(0,-1,-1,35,5)||queryRel(1,-1,1,35,5)||queryRel(-1,-1,-1,35,5)||queryRel(-1,-1,1,35,5)||queryRel(1,-1,-1,35,5)",
+                XMaterial.LIME_WOOL, XMaterial.STONE_SLAB);
             changes++;
 
-            // Select all emerald ore that are above & next to upside down stone slabs and replace it with stone slabs
+            // Select all lime wool that are above & next to upside down stone slabs and replace it with stone slabs
             replaceBlocksWithMask("=queryRel(1,-1,0,44,8)||queryRel(-1,-1,0,44,8)||queryRel(0,-1,1,44,8)||queryRel(0,-1,-1,44,8)||queryRel(1,-1,1,44,8)||queryRel(-1,-1,-1,44,8)||queryRel(-1,-1,1,44,8)||queryRel(1,-1,-1,44,8)",
-                XMaterial.EMERALD_ORE, XMaterial.STONE_SLAB);
+                XMaterial.LIME_WOOL, XMaterial.STONE_SLAB);
 
             changes++;
 
-            // Select all air blocks that are below & next to emerald ore and under a stone slab and replace it with upside down stone slabs
-            replaceBlocksWithMask("=queryRel(0,1,0,44,0)&&(queryRel(1,1,0,129,0)||queryRel(-1,1,0,129,0)||queryRel(0,1,1,129,0)||queryRel(0,1,-1,129,0)||queryRel(1,1,1,129,0)||queryRel(-1,1,-1,129,0)||queryRel(-1,1,1,129,0)||queryRel(1,1,-1,129,0))",
+            // Select all air blocks that are below & next to lime wool and under a stone slab and replace it with upside down stone slabs
+            replaceBlocksWithMask("=queryRel(0,1,0,44,0)&&(queryRel(1,1,0,35,5)||queryRel(-1,1,0,35,5)||queryRel(0,1,1,35,5)||queryRel(0,1,-1,35,5)||queryRel(1,1,1,35,5)||queryRel(-1,1,-1,35,5)||queryRel(-1,1,1,35,5)||queryRel(1,1,-1,35,5))",
                 getAir(), getSlab(BlockTypes.STONE_SLAB, "top"));
             changes++;
 
-            // Select all air blocks that are next to emerald ore and under a stone slab and replace it with upside down stone slabs
-            replaceBlocksWithMask("=queryRel(0,1,0,44,0)&&(queryRel(1,0,0,129,0)||queryRel(-1,0,0,129,0)||queryRel(0,0,1,129,0)||queryRel(0,0,-1,129,0))",
+            // Select all air blocks that are next to lime wool and under a stone slab and replace it with upside down stone slabs
+            replaceBlocksWithMask("=queryRel(0,1,0,44,0)&&(queryRel(1,0,0,35,5)||queryRel(-1,0,0,35,5)||queryRel(0,0,1,35,5)||queryRel(0,0,-1,35,5))",
                 getAir(), getSlab(BlockTypes.STONE_SLAB, "top"));
             changes++;
 
 
-            // Select all leftover emerald ore replace it with double stone slabs
+            // Select all leftover lime wool replace it with double stone slabs
             replaceBlocks(getEmeraldOre(), getSlab(BlockTypes.STONE_SLAB, "double"));
             changes++;
 
-            // Replace diamond ore with lapislazuli ore
-            replaceBlocks(XMaterial.DIAMOND_ORE, XMaterial.LAPIS_ORE);
+            // Replace blue wool with lapislazuli ore
+            replaceBlocks(XMaterial.BLUE_WOOL, XMaterial.LAPIS_ORE);
             changes++;
 
             BlockState[] bottomSlabs = new BlockState[roofColor.length];
@@ -595,32 +583,32 @@ public class HouseScripts extends Script {
             replaceBlocksWithMask(">21", XMaterial.AIR, XMaterial.GRAY_CARPET);
             changes++;
 
-            replaceBlocksWithMask("<0", XMaterial.GOLD_ORE, XMaterial.DISPENSER);
+            replaceBlocksWithMask("<0", XMaterial.YELLOW_WOOL, XMaterial.DISPENSER);
             changes++;
 
         } else if(roofType == RoofType.STAIRS){
 
             // Create the roof house wall staircase
             for(int i = 0; i < maxRoofHeight; i++){
-                // Select all air blocks that are above diamond ore and next to emerald ore
-                setBlocksWithMask("=queryRel(0,-1,0,56,0)&&" +
+                // Select all air blocks that are above blue wool and next to lime wool
+                setBlocksWithMask("=queryRel(0,-1,0,35,11)&&" +
                         "(" +
-                            "queryRel(1,-1,0,129,0)||queryRel(-1,-1,0,129,0)||queryRel(0,-1,1,129,0)||queryRel(0,-1,-1,129,0)||queryRel(1,-1,1,129,0)||queryRel(-1,-1,-1,129,0)||queryRel(-1,-1,1,129,0)||queryRel(1,-1,-1,129,0)" +
+                            "queryRel(1,-1,0,35,5)||queryRel(-1,-1,0,35,5)||queryRel(0,-1,1,35,5)||queryRel(0,-1,-1,35,5)||queryRel(1,-1,1,35,5)||queryRel(-1,-1,-1,35,5)||queryRel(-1,-1,1,35,5)||queryRel(1,-1,-1,35,5)" +
                         ")",
-                    XMaterial.EMERALD_ORE);
+                    XMaterial.LIME_WOOL);
                 changes++;
 
-                // Select all air blocks that are above diamond ore and replace them with diamond ore
-                replaceBlocksWithMask(">56", XMaterial.AIR, XMaterial.DIAMOND_ORE);
+                // Select all air blocks that are above blue wool and replace them with blue wool
+                replaceBlocksWithMask(">35:11", XMaterial.AIR, XMaterial.BLUE_WOOL);
                 changes++;
             }
 
-            // (One more gold ore layer) Replace everything above gold ore with one layer gold ore
-            setBlocksWithMask(">14", XMaterial.GOLD_ORE);
+            // (One more yellow wool layer) Replace everything above yellow wool with one layer yellow wool
+            setBlocksWithMask(">35:4", XMaterial.YELLOW_WOOL);
             changes++;
 
-            // (First Roof Layer) Select only air blocks that are next to gold ore in any direction and above lapislazuli ore. Then replace them with stone bricks
-            setBlocksWithMask("=queryRel(0,-1,0,21,0)&&queryRel(0,0,0,0,0)&&(queryRel(1,0,0,14,0)||queryRel(1,0,0,14,0)||queryRel(-1,0,0,14,0)||queryRel(0,0,1,14,0)||queryRel(0,0,-1,14,0))",
+            // (First Roof Layer) Select only air blocks that are next to yellow wool in any direction and above lapislazuli ore. Then replace them with stone bricks
+            setBlocksWithMask("=queryRel(0,-1,0,21,0)&&queryRel(0,0,0,0,0)&&(queryRel(1,0,0,35,4)||queryRel(1,0,0,35,4)||queryRel(-1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4))",
                 XMaterial.STONE_BRICKS);
             changes++;
 
@@ -642,7 +630,7 @@ public class HouseScripts extends Script {
             // Replace sponge with air
             replaceBlocks(XMaterial.SPONGE, XMaterial.AIR);
 
-            // Replace all air blocks that are next to lapislazuli ores and next to stone bricks with emerald ore
+            // Replace all air blocks that are next to lapislazuli ores and next to stone bricks with lime wool
             replaceBlocksWithMask("=(queryRel(1,0,0,98,0)&&queryRel(0,0,1,21,0))" +
                             "||(queryRel(1,0,0,98,0)&&queryRel(0,0,-1,21,0))" +
                             "||(queryRel(-1,0,0,98,0)&&queryRel(0,0,-1,21,0))" +
@@ -653,12 +641,12 @@ public class HouseScripts extends Script {
                             "||(queryRel(0,0,1,98,0)&&queryRel(-1,0,0,21,0))",
                     XMaterial.AIR, XMaterial.SPONGE);
 
-            // Replace all air blocks that have sponge with lapislazuli ore behind them with redstone ore
+            // Replace all air blocks that have sponge with lapislazuli ore behind them with red wool
             replaceBlocksWithMask("=(queryRel(1,0,0,19,0)&&queryRel(2,0,0,21,0))||(queryRel(-1,0,0,19,0)&&queryRel(-2,0,0,21,0))||(queryRel(0,0,1,19,0)&&queryRel(0,0,2,21,0))||(queryRel(0,0,-1,19,0)&&queryRel(0,0,-2,21,0))",
-                    XMaterial.AIR, XMaterial.REDSTONE_ORE);
+                    XMaterial.AIR, XMaterial.RED_WOOL);
 
-            // Replace sponge with emerald ore
-            replaceBlocks(XMaterial.SPONGE, XMaterial.EMERALD_ORE);
+            // Replace sponge with lime wool
+            replaceBlocks(XMaterial.SPONGE, XMaterial.LIME_WOOL);
 
 
 
@@ -668,18 +656,18 @@ public class HouseScripts extends Script {
                 for(int i = 0; i < maxRoofHeight; i++) {
                     // Every 2nd layer
                     if(i % 2 == 0)
-                        //Only select air block that have gold ore below them which are surrounded by other stone bricks
-                        setBlocksWithMask("=queryRel(0,-1,0,14,0)&&(queryRel(1,-1,0,98,-1)||queryRel(-1,-1,0,98,-1)||queryRel(0,-1,1,98,-1)||queryRel(0,-1,-1,98,-1))",
+                        //Only select air block that have yellow wool below them which are surrounded by other stone bricks
+                        setBlocksWithMask("=queryRel(0,-1,0,35,4)&&(queryRel(1,-1,0,98,-1)||queryRel(-1,-1,0,98,-1)||queryRel(0,-1,1,98,-1)||queryRel(0,-1,-1,98,-1))",
                                 XMaterial.STONE_BRICKS);
                     else
-                        // Only select air block that have gold ore below them which are completely surrounded by other stone bricks
-                        setBlocksWithMask("=queryRel(0,-1,0,14,0)&&(queryRel(1,-1,0,98,-1)||queryRel(-1,-1,0,98,-1)||queryRel(0,-1,1,98,-1)||queryRel(0,-1,-1,98,-1)||queryRel(1,-1,1,98,-1)||queryRel(-1,-1,1,98,-1)||queryRel(-1,-1,-1,98,-1)||queryRel(1,-1,-1,98,-1))",
+                        // Only select air block that have yellow wool below them which are completely surrounded by other stone bricks
+                        setBlocksWithMask("=queryRel(0,-1,0,35,4)&&(queryRel(1,-1,0,98,-1)||queryRel(-1,-1,0,98,-1)||queryRel(0,-1,1,98,-1)||queryRel(0,-1,-1,98,-1)||queryRel(1,-1,1,98,-1)||queryRel(-1,-1,1,98,-1)||queryRel(-1,-1,-1,98,-1)||queryRel(1,-1,-1,98,-1))",
                                 XMaterial.STONE_BRICKS);
 
                     changes++;
 
-                    //Only select gold ore with air blocks above them and put gold ore above them
-                    replaceBlocksWithMask(">14", XMaterial.AIR, XMaterial.GOLD_ORE);
+                    //Only select yellow wool with air blocks above them and put yellow wool above them
+                    replaceBlocksWithMask(">35:4", XMaterial.AIR, XMaterial.YELLOW_WOOL);
                     changes++;
                 }
 
@@ -688,12 +676,12 @@ public class HouseScripts extends Script {
             expandEmeraldOre();
 
 
-            // Replace emerald ore with stone bricks
-            replaceBlocks(XMaterial.EMERALD_ORE, XMaterial.STONE_BRICKS);
+            // Replace lime wool with stone bricks
+            replaceBlocks(XMaterial.LIME_WOOL, XMaterial.STONE_BRICKS);
             changes++;
 
-            // Replace diamond ore with lapislazuli ore
-            replaceBlocks(XMaterial.DIAMOND_ORE, XMaterial.LAPIS_ORE);
+            // Replace blue wool with lapislazuli ore
+            replaceBlocks(XMaterial.BLUE_WOOL, XMaterial.LAPIS_ORE);
             changes++;
 
             queries = new String[]{
@@ -785,8 +773,8 @@ public class HouseScripts extends Script {
             changes++;
 
 
-            // Cover leaking gold ore blocks with stone bricks
-            replaceBlocksWithMask("=queryRel(1,0,0,14,0)||queryRel(-1,0,0,14,0)||queryRel(0,0,1,14,0)||queryRel(0,0,-1,14,0)",
+            // Cover leaking yellow wool blocks with stone bricks
+            replaceBlocksWithMask("=queryRel(1,0,0,35,4)||queryRel(-1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4)",
                 XMaterial.AIR, XMaterial.STONE_BRICKS);
             changes++;
 
@@ -861,7 +849,7 @@ public class HouseScripts extends Script {
         changes++;
         replaceBlocks(XMaterial.LAPIS_BLOCK, baseColor);
         changes++;
-        replaceBlocks(XMaterial.GOLD_ORE, XMaterial.GRAY_WOOL);
+        replaceBlocks(XMaterial.YELLOW_WOOL, XMaterial.GRAY_WOOL);
         changes++;
         replaceBlocks(XMaterial.STONE_SLAB, XMaterial.GRAY_WOOL);
 
@@ -884,12 +872,12 @@ public class HouseScripts extends Script {
         finish(blocks, selectionPoints);
     }
 
-    // Move lapislazuli ore, emerald ore nad redstone ore one block up
+    // Move lapislazuli ore, lime wool nad red wool one block up
     private void moveOresUp(int floor) {
 
-        setBlocksWithMask(">56", XMaterial.DIAMOND_ORE);
-        setBlocksWithMask(">73", XMaterial.REDSTONE_ORE);
-        setBlocksWithMask(">129", XMaterial.EMERALD_ORE);
+        setBlocksWithMask(">35:11", XMaterial.BLUE_WOOL);
+        setBlocksWithMask(">35:14", XMaterial.RED_WOOL);
+        setBlocksWithMask(">35:5", XMaterial.LIME_WOOL);
         changes+=3;
 
         if(floor >= 0) {
@@ -902,28 +890,28 @@ public class HouseScripts extends Script {
     }
 
     private void raiseGoldFloor() {
-        setBlocksWithMask(">14", XMaterial.GOLD_ORE);
+        setBlocksWithMask(">35:4", XMaterial.YELLOW_WOOL);
         changes++;
     }
 
     private void expandEmeraldOre(){
 
         // Replace everything above green wool with temporary purple wool
-        setBlocksWithMask(">129", XMaterial.REDSTONE_ORE);
+        setBlocksWithMask(">35:5", XMaterial.RED_WOOL);
         changes++;
 
-        // Replace air next to redstone ore with redstone
-        replaceBlocksWithMask("=queryRel(1,0,0,73,0)||queryRel(-1,0,0,73,0)||queryRel(0,0,1,73,0)||queryRel(0,0,-1,73,0)"
-                , XMaterial.AIR, XMaterial.REDSTONE_ORE);
+        // Replace air next to red wool with redstone
+        replaceBlocksWithMask("=queryRel(1,0,0,35,14)||queryRel(-1,0,0,35,14)||queryRel(0,0,1,35,14)||queryRel(0,0,-1,35,14)"
+                , XMaterial.AIR, XMaterial.RED_WOOL);
         changes++;
 
-        // Replace air next to emerald ore with emerald ore
-        replaceBlocksWithMask("=queryRel(1,0,0,129,0)||queryRel(-1,0,0,129,0)||queryRel(0,0,1,129,0)||queryRel(0,0,-1,129,0)"
-                , XMaterial.AIR, XMaterial.EMERALD_ORE);
+        // Replace air next to lime wool with lime wool
+        replaceBlocksWithMask("=queryRel(1,0,0,35,5)||queryRel(-1,0,0,35,5)||queryRel(0,0,1,35,5)||queryRel(0,0,-1,35,5)"
+                , XMaterial.AIR, XMaterial.LIME_WOOL);
         changes++;
 
-        // Replace redstone ore with air
-        replaceBlocks(XMaterial.REDSTONE_ORE, XMaterial.AIR);
+        // Replace red wool with air
+        replaceBlocks(XMaterial.RED_WOOL, XMaterial.AIR);
     }
 
 
@@ -938,7 +926,7 @@ public class HouseScripts extends Script {
     }
 
     private BlockState getEmeraldOre(){
-        BlockType blockType = BlockTypes.EMERALD_ORE;
+        BlockType blockType = BlockTypes.LIME_WOOL;
 
         if(blockType == null)
             return null;

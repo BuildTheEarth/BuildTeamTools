@@ -3,10 +3,8 @@ package net.buildtheearth.modules.navigation.components.warps.menu;
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.network.NetworkModule;
-import net.buildtheearth.utils.CustomHeads;
-import net.buildtheearth.utils.Item;
-import net.buildtheearth.utils.ListUtil;
-import net.buildtheearth.utils.MenuItems;
+import net.buildtheearth.modules.network.model.Permissions;
+import net.buildtheearth.utils.*;
 import net.buildtheearth.utils.menus.AbstractMenu;
 import net.buildtheearth.utils.menus.BookMenu;
 import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
@@ -216,7 +214,12 @@ public class WarpGroupEditMenu extends AbstractMenu {
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
-            NetworkModule.getInstance().getBuildTeam().deleteWarpGroup(clickPlayer, warpGroup);
+            if(clickPlayer.hasPermission(Permissions.WARP_GROUP_DELETE)) {
+                NetworkModule.getInstance().getBuildTeam().deleteWarpGroup(clickPlayer, warpGroup);
+            } else {
+                clickPlayer.sendMessage(ChatHelper.error("You don't have the permission to delete warp groups!"));
+            }
+
         });
     }
 

@@ -182,11 +182,23 @@ public class Command {
                     break;
 
                 case REPLACE_BLOCKSTATES_WITH_MASKS:
-                    GeneratorUtils.replaceBlocksWithMask(localSession, actor, weWorld, Arrays.asList((String[]) operation.get(0)), (BlockState) operation.get(1), (BlockState[]) operation.get(2), (Integer) operation.get(3));
+                    GeneratorUtils.replaceBlocksWithMasks(localSession, actor, weWorld, Arrays.asList((String[]) operation.get(0)), (BlockState) operation.get(1), (BlockState[]) operation.get(2), (Integer) operation.get(3));
                     break;
 
                 case REPLACE_BLOCKSTATES:
                     GeneratorUtils.replaceBlocks(localSession, actor, weWorld, (BlockState) operation.get(0), (BlockState[]) operation.get(1));
+                    break;
+
+                case DRAW_CURVE_WITH_MASKS:
+                    GeneratorUtils.drawCurveWithMasks(localSession, actor, weWorld, blocks, Arrays.asList((String[]) operation.get(0)), Arrays.asList((Vector[]) operation.get(1)), (BlockState[]) operation.get(2), (Boolean) operation.get(3));
+                    break;
+
+                case DRAW_POLY_LINE_WITH_MASKS:
+                    GeneratorUtils.drawPolyLineWithMasks(localSession, actor, weWorld, blocks, Arrays.asList((String[]) operation.get(0)), Arrays.asList((Vector[]) operation.get(1)), (BlockState[]) operation.get(2), (Boolean) operation.get(3));
+                    break;
+
+                case DRAW_LINE_WITH_MASKS:
+                    GeneratorUtils.drawLineWithMasks(localSession, actor, weWorld, blocks, Arrays.asList((String[]) operation.get(0)), (Vector) operation.get(1), (Vector) operation.get(2), (BlockState[]) operation.get(3), (Boolean) operation.get(4));
                     break;
 
                 case PASTE_SCHEMATIC:

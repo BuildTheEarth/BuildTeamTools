@@ -2,7 +2,6 @@ package net.buildtheearth.modules.generator.components.house;
 
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.modules.generator.model.Settings;
-import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.Utils;
 import org.bukkit.entity.Player;
@@ -43,10 +42,10 @@ public class HouseSettings extends Settings {
             setValue(HouseFlag.ROOF_COLOR, new XMaterial[]{XMaterial.matchXMaterial(block)});
 
         // Balcony Color (Default: Random)
-        setValue(HouseFlag.BALCONY_COLOR, new XMaterial[]{XMaterial.BLACK_CONCRETE});
+        setValue(HouseFlag.BALCONY_COLOR, new XMaterial[]{XMaterial.WHITE_CONCRETE});
 
         // Balcony Fence Color (Default: Random)
-        setValue(HouseFlag.BALCONY_FENCE_COLOR, new XMaterial[]{XMaterial.IRON_TRAPDOOR});
+        setValue(HouseFlag.BALCONY_FENCE_COLOR, new XMaterial[]{XMaterial.IRON_BARS});
 
 
         // Floor Count (Default: Random)

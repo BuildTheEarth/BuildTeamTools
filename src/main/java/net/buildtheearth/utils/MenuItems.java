@@ -665,6 +665,7 @@ public class MenuItems {
         items.addAll(getLeaves());
         items.addAll(getWools());
         items.add(SNOW.parseItem());
+        items.add(PUMPKIN.parseItem());
 
         return items.stream().map(ItemStack::getType).toArray(Material[]::new);
     }

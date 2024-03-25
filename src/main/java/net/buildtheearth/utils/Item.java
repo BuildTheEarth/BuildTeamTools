@@ -415,6 +415,15 @@ public class Item {
 		return getUniqueMaterialString(material.parseItem());
 	}
 
+	public static String getUniqueMaterialString(XMaterial[] materials) {
+		StringBuilder s = new StringBuilder(getUniqueMaterialString(materials[0]));
+
+		for (int i = 1; i < materials.length; i++)
+			s.append(",").append(getUniqueMaterialString(materials[i]));
+
+		return s.toString();
+	}
+
 	public static XMaterial convertStringToXMaterial(String materialString) {
 		XMaterial material;
 

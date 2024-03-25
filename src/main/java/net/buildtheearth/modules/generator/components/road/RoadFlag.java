@@ -7,7 +7,7 @@ import net.buildtheearth.modules.generator.model.Flag;
 public enum RoadFlag implements Flag {
     LANE_COUNT("c", FlagType.INTEGER),
     LANE_WIDTH("w", FlagType.INTEGER),
-    ROAD_MATERIAL("m", FlagType.XMATERIAL),
+    ROAD_MATERIAL("m", FlagType.XMATERIAL_LIST),
     LANE_GAP("g", FlagType.INTEGER),
 
     MARKING_LENGTH("ll", FlagType.INTEGER),
@@ -15,11 +15,11 @@ public enum RoadFlag implements Flag {
     MARKING_MATERIAL("lm", FlagType.XMATERIAL),
 
     SIDEWALK_WIDTH("sw", FlagType.INTEGER),
-    SIDEWALK_MATERIAL("sm", FlagType.XMATERIAL),
+    SIDEWALK_MATERIAL("sm", FlagType.XMATERIAL_LIST),
 
-    SIDEWALK_SLAB_COLOR("ss", FlagType.XMATERIAL),
+    SIDEWALK_SLAB_COLOR("ss", FlagType.XMATERIAL_LIST),
 
-    ROAD_SLAB_COLOR("rs", FlagType.XMATERIAL),
+    ROAD_SLAB_COLOR("rs", FlagType.XMATERIAL_LIST),
 
     CROSSWALK("cw", FlagType.BOOLEAN),
 

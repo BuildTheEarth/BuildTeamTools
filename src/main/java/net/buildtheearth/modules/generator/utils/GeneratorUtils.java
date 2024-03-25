@@ -189,21 +189,31 @@ public class GeneratorUtils {
         return minMax;
     }
 
-    public static Block[][][] prepareScriptSession(LocalSession localSession, Actor actor, Player player, com.sk89q.worldedit.world.World world, int expandSelection){
-        clearHistory(localSession);
-        disableGmask(localSession);
-
+    public static Block[][][] prepareScriptSession(LocalSession localSession, Actor actor, Player player, com.sk89q.worldedit.world.World world, int expandSelection, boolean removeIgnoredMaterials){
         if(expandSelection > 0) {
             expandSelection(localSession, new Vector(0, expandSelection, 0));
             expandSelection(localSession, new Vector(0, -expandSelection, 0));
         }
 
-        BlockType blockType = BlockTypes.AIR;
+        BlockType air = BlockTypes.AIR;
 
-        if(blockType == null)
+        if(air == null)
             return null;
 
-        replaceBlocksWithMask(localSession, actor, world, Collections.singletonList("!#solid"), null, new BlockState[]{blockType.getDefaultState()}, 1);
+        replaceBlocksWithMasks(localSession, actor, world, Collections.singletonList("!#solid"), null, new BlockState[]{air.getDefaultState()}, 1);
+
+        if(removeIgnoredMaterials) {
+            Material[] materials = MenuItems.getIgnoredMaterials();
+            for (Material material : materials) {
+                BlockType blockType = BlockTypes.get(material.getKey().asString());
+
+                if (blockType == null)
+                    continue;
+
+                BlockState blockState = blockType.getDefaultState();
+                replaceBlocks(localSession, actor, world, blockState, new BlockState[]{air.getDefaultState()});
+            }
+        }
 
         return analyzeRegion(player, player.getWorld());
     }
@@ -325,7 +335,7 @@ public class GeneratorUtils {
     }
 
     /**
-     * Replaces all blocks in a region with a given mask and pattern.
+     * Replaces all blocks in a region with the given masks and a pattern.
      *
      * @param localSession The local session of the actor
      * @param actor The actor who should perform the operation
@@ -335,7 +345,7 @@ public class GeneratorUtils {
      * @param to The blocks to replace with
      * @param iterations The number of iterations to perform
      */
-    public static void replaceBlocksWithMask(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, List<String> masks, BlockState from, BlockState[] to, int iterations) {
+    public static void replaceBlocksWithMasks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, List<String> masks, BlockState from, BlockState[] to, int iterations) {
         if(to == null || to.length == 0)
                 throw new IllegalArgumentException("BlockState[] to is empty");
 
@@ -425,6 +435,171 @@ public class GeneratorUtils {
 
             saveEditSession(editSession, localSession, actor);
         } catch (IncompleteRegionException | MaxChangedBlocksException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    /**
+     * Draws a spline in a region with the given masks and a pattern.
+     *
+     * @param localSession The local session of the actor
+     * @param actor The actor who should perform the operation
+     * @param weWorld The WorldEdit world in which the region is located
+     * @param regionBlocks The blocks of the region
+     * @param masks The masks to use. If no mask should be used, pass an empty list.
+     * @param points The points of the curve
+     * @param blocks The blocks to use for the curve
+     * @param tension The tension of the curve - <a href="https://en.wikipedia.org/wiki/Kochanek%E2%80%93Bartels_spline">Kochanek–Bartels Spline</a>
+     * @param bias The bias of the curve - <a href="https://en.wikipedia.org/wiki/Kochanek%E2%80%93Bartels_spline">Kochanek–Bartels Spline</a>
+     * @param continuity The continuity of the curve - <a href="https://en.wikipedia.org/wiki/Kochanek%E2%80%93Bartels_spline">Kochanek–Bartels Spline</a>
+     * @param quality The quality of the curve. The higher the quality, the more points the curve will have.
+     * @param radius The radius of the curve. The higher the radius the thicker the curve will be.
+     * @param filled Whether the curve should be filled or not.
+     * @param matchElevation Whether the elevation of the points should be matched to the region
+     */
+    public static void drawSplineWithMask(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, Block[][][] regionBlocks, List<String> masks, List<Vector> points, BlockState[] blocks,
+                                          boolean matchElevation, double tension, double bias, double continuity, double quality, double radius, boolean filled) {
+
+        if(blocks == null || blocks.length == 0)
+            throw new IllegalArgumentException("BlockState[] to is empty");
+
+        // If no mask is provided, add an empty mask
+        if(masks.size() == 0)
+            masks.add("");
+
+        try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
+
+            Region region = localSession.getSelection();
+
+            ParserContext parserContext = new ParserContext();
+            parserContext.setActor(actor);
+            parserContext.setWorld(weWorld);
+            parserContext.setSession(localSession);
+            parserContext.setExtent(editSession);
+
+            for (String maskString : masks) {
+                ChatHelper.logDebug("Drawing spline with expression mask: " + maskString.replace("%", "'PCT'") + " with " + Arrays.toString(blocks));
+
+                // Set the mask
+                if(!maskString.isEmpty()) {
+                    Mask mask = new MaskFactory(WorldEdit.getInstance()).parseFromInput(maskString, parserContext);
+                    editSession.setMask(mask);
+                }
+
+                // Set the pattern
+                Pattern pattern;
+
+                if(blocks.length == 1)
+                    pattern = blocks[0];
+                else{
+                    RandomPattern randomPattern = new RandomPattern();
+                    double chance = 100.0 / blocks.length;
+
+                    for(BlockState blockState : blocks)
+                        randomPattern.add(blockState, chance);
+
+                    pattern = randomPattern;
+                }
+
+                // Set the blockvectors
+                List<BlockVector3> blockVector3s = new ArrayList<>();
+                for(Vector point : points){
+                    if(matchElevation)
+                        point = getXYZ(point, regionBlocks);
+
+                    blockVector3s.add(BlockVector3.at(point.getBlockX(), point.getBlockY(), point.getBlockZ()));
+                }
+
+                editSession.drawSpline(pattern, blockVector3s, tension, bias, continuity, quality, radius, filled);
+
+                saveEditSession(editSession, localSession, actor);
+            }
+        } catch(IncompleteRegionException | MaxChangedBlocksException | InputParseException e){
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public static void drawCurveWithMasks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, Block[][][] regionBlocks, List<String> masks, List<Vector> points, BlockState[] blocks, boolean matchElevation){
+        drawSplineWithMask(localSession, actor, weWorld, regionBlocks, masks, points, blocks, matchElevation, 0, 0, 0, 10, 1, true);
+    }
+
+    public static void drawPolyLineWithMasks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, Block[][][] regionBlocks, List<String> masks, List<Vector> points, BlockState[] blocks, boolean matchElevation){
+        drawSplineWithMask(localSession, actor, weWorld, regionBlocks, masks, points, blocks, matchElevation, 1, 0, -1, 10, 1, true);
+    }
+
+
+
+
+    /**
+     * Draws a Line in a region with the given masks and a pattern.
+     *
+     * @param localSession The local session of the actor
+     * @param actor The actor who should perform the operation
+     * @param weWorld The WorldEdit world in which the region is located
+     * @param regionBlocks The blocks of the region
+     * @param masks The masks to use. If no mask should be used, pass an empty list.
+     * @param point1 The first point of the curve
+     * @param point2 The second point of the curve
+     * @param blocks The blocks to use for the curve
+     * @param matchElevation Whether the elevation of the points should be matched to the region
+     */
+    public static void drawLineWithMasks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, Block[][][] regionBlocks, List<String> masks, Vector point1, Vector point2, BlockState[] blocks, boolean matchElevation) {
+        if(blocks == null || blocks.length == 0)
+            throw new IllegalArgumentException("BlockState[] to is empty");
+
+        // If no mask is provided, add an empty mask
+        if(masks.size() == 0)
+            masks.add("");
+
+        try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
+
+            ParserContext parserContext = new ParserContext();
+            parserContext.setActor(actor);
+            parserContext.setWorld(weWorld);
+            parserContext.setSession(localSession);
+            parserContext.setExtent(editSession);
+
+            for (String maskString : masks) {
+                ChatHelper.logDebug("Drawing spline with expression mask: " + maskString.replace("%", "'PCT'") + " with " + Arrays.toString(blocks));
+
+                // Set the mask
+                if(!maskString.isEmpty()) {
+                    Mask mask = new MaskFactory(WorldEdit.getInstance()).parseFromInput(maskString, parserContext);
+                    editSession.setMask(mask);
+                }
+
+                // Set the pattern
+                Pattern pattern;
+
+                if(blocks.length == 1)
+                    pattern = blocks[0];
+                else{
+                    RandomPattern randomPattern = new RandomPattern();
+                    double chance = 100.0 / blocks.length;
+
+                    for(BlockState blockState : blocks)
+                        randomPattern.add(blockState, chance);
+
+                    pattern = randomPattern;
+                }
+
+                // Adjust the points to the elevation of the region if matchElevation is true
+                if(matchElevation){
+                    point1 = getXYZ(point1, regionBlocks);
+                    point2 = getXYZ(point2, regionBlocks);
+                }
+
+                // Set the blockvectors
+                BlockVector3 point1BlockVector3 = BlockVector3.at(point1.getBlockX(), point1.getBlockY(), point1.getBlockZ());
+                BlockVector3 point2BlockVector3 = BlockVector3.at(point2.getBlockX(), point2.getBlockY(), point2.getBlockZ());
+
+                editSession.drawLine(pattern, point1BlockVector3, point2BlockVector3, 1, true);
+
+                saveEditSession(editSession, localSession, actor);
+            }
+        } catch(IncompleteRegionException | MaxChangedBlocksException | InputParseException e){
             throw new RuntimeException(e);
         }
     }
@@ -829,23 +1004,13 @@ public class GeneratorUtils {
     }
 
     /**
-     * Returns a temporary XYZ String that indicates that the height of the point should be inspected later to match the surface of the terrain.
-     *
-     * @param vector The vector to get the XYZ String from
-     * @return The temporary XYZ String
-     */
-    public static String getXYZ(Vector vector){
-        return "%%XYZ/" + vector.getBlockX() + "," + vector.getBlockY() + "," + vector.getBlockZ() + "/%%";
-    }
-
-    /**
      * Returns a XYZ String with the height of the point matching the surface of the terrain.
      *
      * @param vector The vector to get the XYZ String from
      * @param blocks The dataset to get the height from
      * @return The XYZ String
      */
-    public static String getXYZ(Vector vector, Block[][][] blocks){
+    private static Vector getXYZ(Vector vector, Block[][][] blocks){
         int maxHeight = vector.getBlockY();
 
         if(blocks != null)
@@ -853,7 +1018,7 @@ public class GeneratorUtils {
         if(maxHeight == 0)
             maxHeight = vector.getBlockY();
 
-        return vector.getBlockX() + "," + maxHeight + "," + vector.getBlockZ();
+        return vector.setY(maxHeight);
     }
 
     /**
@@ -874,7 +1039,7 @@ public class GeneratorUtils {
         return vector.getBlockX() + "," + maxHeight + "," + vector.getBlockZ();
     }
 
-    public static Path64 convertVectorListToPath64(List<Vector> vectors, Vector reference){
+    private static Path64 convertVectorListToPath64(List<Vector> vectors, Vector reference){
         List<Point64> points = new ArrayList<>();
         for(Vector vector : vectors)
             points.add(new Point64(vector.getBlockX() - reference.getBlockX(), vector.getBlockZ() - reference.getBlockZ()));
@@ -882,7 +1047,7 @@ public class GeneratorUtils {
         return new Path64(points);
     }
 
-    public static List<List<Vector>> convertPathsToVectorList(Paths64 pathsD, Vector reference, int minHeight, int maxHeight){
+    private static List<List<Vector>> convertPathsToVectorList(Paths64 pathsD, Vector reference, int minHeight, int maxHeight){
         List<List<Vector>> vectors = new ArrayList<>();
 
         for(Path64 path : new ArrayList<>(pathsD)) {
@@ -982,7 +1147,7 @@ public class GeneratorUtils {
      * @param vectors The list of vectors to get the maximum height of
      * @return The maximum height
      */
-    public static int getMaxHeight(List<Vector> vectors){
+    private static int getMaxHeight(List<Vector> vectors){
         int maxHeight = Integer.MIN_VALUE;
         for(Vector vector : vectors)
             maxHeight = Math.max(maxHeight, vector.getBlockY());

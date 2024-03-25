@@ -48,7 +48,7 @@ public class RoadSettings extends Settings {
         setValue(RoadFlag.MARKING_GAP, 5);
 
         // Marking Material (Default: Fixed Value)
-        setValue(RoadFlag.MARKING_MATERIAL, new XMaterial[]{XMaterial.WHITE_CONCRETE});
+        setValue(RoadFlag.MARKING_MATERIAL, XMaterial.WHITE_CONCRETE);
 
         // Sidewalk Width (Default: Fixed Value)
         setValue(RoadFlag.SIDEWALK_WIDTH, 5);

@@ -275,6 +275,13 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.alpsbte.alpslib</groupId>
+            <artifactId>alpslib-libpsterra</artifactId>
+            <version>1.1.0</version>
+            <scope>compile</scope>
+        </dependency>
+
         <!-- PorkLib -->
         <dependency>
             <groupId>net.daporkchop.lib</groupId>

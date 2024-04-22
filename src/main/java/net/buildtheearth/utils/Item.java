@@ -416,6 +416,9 @@ public class Item {
 	}
 
 	public static String getUniqueMaterialString(XMaterial[] materials) {
+		if(materials == null || materials.length == 0)
+			return null;
+
 		StringBuilder s = new StringBuilder(getUniqueMaterialString(materials[0]));
 
 		for (int i = 1; i < materials.length; i++)

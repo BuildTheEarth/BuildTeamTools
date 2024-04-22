@@ -2,9 +2,6 @@ package net.buildtheearth.modules.generator.components.road;
 
 
 import com.cryptomorin.xseries.XMaterial;
-import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
-import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import net.buildtheearth.modules.generator.model.Flag;
 import net.buildtheearth.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.modules.generator.model.Script;
@@ -30,18 +27,18 @@ public class RoadScripts extends Script {
     public void roadScript_v_2_0() {
         HashMap <Flag, Object> flags = getGeneratorComponent().getPlayerSettings().get(getPlayer().getUniqueId()).getValues();
 
-        XMaterial[] roadMaterial = (XMaterial[]) flags.get(RoadFlag.ROAD_MATERIAL);
-        XMaterial[] sidewalkMaterial = (XMaterial[]) flags.get(RoadFlag.SIDEWALK_MATERIAL);
-        XMaterial[] sidewalkSlabMaterial = (XMaterial[]) flags.get(RoadFlag.SIDEWALK_SLAB_COLOR);
-        XMaterial[] roadSlabMaterial = (XMaterial[]) flags.get(RoadFlag.ROAD_SLAB_COLOR);
-        XMaterial[] streetLampType = (XMaterial[]) flags.get(RoadFlag.STREET_LAMP_TYPE);
+        XMaterial[] roadMaterials = (XMaterial[]) flags.get(RoadFlag.ROAD_MATERIAL);
+        XMaterial[] sidewalkMaterials = (XMaterial[]) flags.get(RoadFlag.SIDEWALK_MATERIAL);
+        XMaterial[] sidewalkSlabMaterials = (XMaterial[]) flags.get(RoadFlag.SIDEWALK_SLAB_COLOR);
+        XMaterial[] roadSlabMaterials = (XMaterial[]) flags.get(RoadFlag.ROAD_SLAB_COLOR);
         XMaterial markingMaterial = (XMaterial) flags.get(RoadFlag.MARKING_MATERIAL);
 
-        String roadMaterialIDs = Item.getUniqueMaterialString(roadMaterial);
-        String sidewalkMaterialIDs = Item.getUniqueMaterialString(sidewalkMaterial);
-        String sidewalkSlabMaterialIDs = Item.getUniqueMaterialString(sidewalkSlabMaterial);
-        String roadSlabMaterialIDs = Item.getUniqueMaterialString(roadSlabMaterial);
-        String streetLampTypeIDs = Item.getUniqueMaterialString(streetLampType);
+        String streetLampType = (String) flags.get(RoadFlag.STREET_LAMP_TYPE);
+
+        String roadMaterialIDs = Item.getUniqueMaterialString(roadMaterials);
+        String sidewalkMaterialIDs = Item.getUniqueMaterialString(sidewalkMaterials);
+        String sidewalkSlabMaterialIDs = Item.getUniqueMaterialString(sidewalkSlabMaterials);
+        String roadSlabMaterialIDs = Item.getUniqueMaterialString(roadSlabMaterials);
         String markingMaterialID = Item.getUniqueMaterialString(markingMaterial);
 
         int laneCount = (int) flags.get(RoadFlag.LANE_COUNT);
@@ -95,9 +92,16 @@ public class RoadScripts extends Script {
         // Create a region from the points
         createPolySelection(polyRegionPoints);
 
+        // Draw the road
+        drawCurve(points, XMaterial.YELLOW_WOOL, true);
+
+
         // Prepare the script session
         Block[][][] blocks = GeneratorUtils.prepareScriptSession(localSession, actor, getPlayer(),weWorld, 30, true);
 
+        finish(blocks, points);
+
+        /*
         // Bring all points to the ground
         GeneratorUtils.adjustHeight(points, blocks);
 
@@ -109,8 +113,19 @@ public class RoadScripts extends Script {
         // ----------- ROAD ----------
 
         // Draw the road
-        drawCurveWithMask("!solid," + roadMaterialIDs + "," + markingMaterialID + "," + sidewalkMaterialIDs + "," + sidewalkSlabMaterialIDs + "," + roadSlabMaterialIDs,
-                points, XMaterial.YELLOW_WOOL, true);
+        String mask = "!#solid";
+
+        if(roadMaterialIDs != null)
+            mask += "," + roadMaterialIDs;
+        if(sidewalkMaterialIDs != null)
+            mask += "," + sidewalkMaterialIDs;
+        if(sidewalkSlabMaterialIDs != null)
+            mask += "," + sidewalkSlabMaterialIDs;
+        if(roadSlabMaterialIDs != null)
+            mask += "," + roadSlabMaterialIDs;
+        mask += "," + markingMaterialID;
+
+        drawCurveWithMask(mask, points, XMaterial.YELLOW_WOOL, true);
 
         // Add additional yellow wool markings to spread the road material faster and everywhere on the road.
         for (int i = 2; i < laneCount; i += 2) {
@@ -131,7 +146,6 @@ public class RoadScripts extends Script {
                 drawPolyLine(path, XMaterial.YELLOW_WOOL, true);
         }
 
-        createCommand("//gmask");
 
 
         // ----------- SIDEWALK ----------
@@ -144,34 +158,30 @@ public class RoadScripts extends Script {
 
 
             // Draw the sidewalk middle lines
-            createCommand("//gmask !solid," + roadMaterial + "," + markingMaterial);
             for(List<Vector> path : sidewalkPointsMid)
-                GeneratorUtils.createPolyLine(this, path, "35:1", true, blocks, 0);
+                drawPolyLineWithMask("!#solid," + roadMaterialIDs + "," + markingMaterialID, path, XMaterial.ORANGE_WOOL, true);
 
-            createCommand("//gmask !" + roadMaterial + "," + markingMaterial);
             // Create the outer sidewalk edge lines
             for(List<Vector> path : sidewalkPointsOut)
-                GeneratorUtils.createPolyLine(this, path, "35:3", true, blocks, 0);
+                drawPolyLineWithMask("!" + roadMaterialIDs + "," + markingMaterialID, path, XMaterial.LIGHT_BLUE_WOOL, true);
 
             // Create the inner sidewalk edge lines
             for(List<Vector> path : sidewalkPointsIn)
-                GeneratorUtils.createPolyLine(this, path, "35:3", true, blocks, 0);
-            createCommand("//gmask");
+                drawPolyLineWithMask("!" + roadMaterialIDs + "," + markingMaterialID, path, XMaterial.LIGHT_BLUE_WOOL, true);
+
 
             if(isCrosswalk){
                 // Draw the sidewalk middle lines
-                createCommand("//gmask " + roadMaterial + "," + markingMaterial);
                 for(List<Vector> path : sidewalkPointsMid)
-                    GeneratorUtils.createPolyLine(this, path, "35:2", true, blocks, 0);
+                    drawPolyLineWithMask(roadMaterialIDs + "," + markingMaterialID, path, XMaterial.MAGENTA_WOOL, true);
 
                 // Create the outer sidewalk edge lines
                 for(List<Vector> path : sidewalkPointsOut)
-                    GeneratorUtils.createPolyLine(this, path, "35:11", true, blocks, 0);
+                    drawPolyLineWithMask("!" + roadMaterialIDs + "," + markingMaterialID, path, XMaterial.BLUE_WOOL, true);
 
                 // Create the inner sidewalk edge lines
                 for(List<Vector> path : sidewalkPointsIn)
-                    GeneratorUtils.createPolyLine(this, path, "35:11", true, blocks, 0);
-                createCommand("//gmask");
+                    drawPolyLineWithMask("!" + roadMaterialIDs + "," + markingMaterialID, path, XMaterial.BLUE_WOOL, true);
             }
         }
 
@@ -183,144 +193,147 @@ public class RoadScripts extends Script {
 
         // Create the poly selection
         createPolySelection(polyRegionPointsExact);
-        createCommand("//expand 10 up");
-        createCommand("//expand 10 down");
-        createCommand("//gmask !air");
+        expandSelection(new Vector(0, 10, 0));
+        expandSelection(new Vector(0, -10, 0));
 
-        // Replace the current road material with light green wool
-        createCommand("//replace " + roadMaterial + " 35:5");
+        setGmask("!air");
 
-        if(roadSlabMaterial != null)
-            createCommand("//replace " + roadSlabMaterial + " 35:5");
+        // Replace the current road material with lime wool
+        for(XMaterial roadMaterial : roadMaterials)
+            replaceBlocks(roadMaterial, XMaterial.LIME_WOOL);
 
-        createCommand("//replace " + markingMaterial + " 35:5");
+        for(XMaterial roadSlabMaterial : roadSlabMaterials)
+            replaceBlocks(roadSlabMaterial, XMaterial.LIME_WOOL);
+
+        replaceBlocks(markingMaterial, XMaterial.LIME_WOOL);
 
         // Replace the current sidewalk material with pink wool
-        createCommand("//replace " + sidewalkMaterial + " 35:6");
-        if(sidewalkSlabMaterial != null)
-            createCommand("//replace " + sidewalkSlabMaterial + " 35:6");
+        for(XMaterial sidewalkMaterial : sidewalkMaterials)
+            replaceBlocks(sidewalkMaterial, XMaterial.PINK_WOOL);
+
+        for(XMaterial sidewalkSlabMaterial : sidewalkSlabMaterials)
+            replaceBlocks(sidewalkSlabMaterial, XMaterial.PINK_WOOL);
+
+        setGmask(null);
 
 
         // ----------- FILLINGS ----------
         // Fill the road with the materials
 
         createPolySelection(polyRegionPoints);
-        createCommand("//expand 10 up");
-        createCommand("//expand 10 down");
-        createCommand("//gmask !air,35:3,35:11");
+        expandSelection(new Vector(0, 10, 0));
+        expandSelection(new Vector(0, -10, 0));
+
+
+        setGmask("!air,35:3,35:11");
 
         // Bring all lines to the top
         for(int i = 0; i < road_height + 5; i++) {
-            createCommand("//replace >35:1 35:1");
-            createCommand("//replace >35:2 35:2");
-            createCommand("//replace >35:4 35:4");
+            setBlocksWithMask(">35:1", XMaterial.ORANGE_WOOL);
+            setBlocksWithMask(">35:2", XMaterial.MAGENTA_WOOL);
+            setBlocksWithMask(">35:4", XMaterial.YELLOW_WOOL);
         }
 
-        createCommand("//gmask !air");
+        setGmask("!air");
 
         // Bring the light blue and blue wool to the top at last to prevent the others from creating leaks
         for(int i = 0; i < road_height + 5; i++) {
-            createCommand("//replace >35:3 35:3");
-            createCommand("//replace >35:11 35:11");
+            setBlocksWithMask(">35:3", XMaterial.LIGHT_BLUE_WOOL);
+            setBlocksWithMask(">35:11", XMaterial.BLUE_WOOL);
         }
 
+        setGmask(null);
+
+
         // Bring all lines further down
-        createCommand("//gmask =queryRel(0,1,0,35,3)");
-        for(int i = 0; i < 3; i++){
-            createCommand("//set 35:3");
-        }
-        createCommand("//gmask =queryRel(0,1,0,35,11)");
-        for(int i = 0; i < 3; i++){
-            createCommand("//set 35:11");
+        for(int i = 0; i < 3; i++) {
+            setBlocksWithMask("=queryRel(0,1,0,35,3)", XMaterial.LIGHT_BLUE_WOOL);
+            setBlocksWithMask("=queryRel(0,1,0,35,11)", XMaterial.BLUE_WOOL);
         }
 
         // Spread the yellow wool
-        createCommand("//gmask =(queryRel(1,0,0,35,4)||queryRel(-1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4)||queryRel(0,-1,0,35,4)||queryRel(0,1,0,35,4))&&queryRel(0,3,0,0,0)");
+        setGmask("!35:3,35:5,35:6,#solid");
         for(int i = 0; i < laneWidth*2; i++){
             // Replace all blocks around yellow wool with yellow wool until it reaches the light blue wool
-            createCommand("//replace !35:3,35:5,35:6,solid 35:4");
+            setBlocksWithMask("=(queryRel(1,0,0,35,4)||queryRel(-1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4)||queryRel(0,-1,0,35,4)||queryRel(0,1,0,35,4))&&queryRel(0,3,0,0,0)", XMaterial.YELLOW_WOOL);
         }
 
         // Spread the orange wool
-        createCommand("//gmask =(queryRel(1,0,0,35,1)||queryRel(-1,0,0,35,1)||queryRel(0,0,1,35,1)||queryRel(0,0,-1,35,1)||queryRel(0,-1,0,35,1)||queryRel(0,1,0,35,1))&&queryRel(0,3,0,0,0)");
+        setGmask("!35:3,35:2,35:11,35:5,#solid");
         for(int i = 0; i < laneWidth*2; i++){
             // Replace all blocks around orange wool with orange wool until it reaches the light blue wool
-            createCommand("//replace !35:3,35:2,35:11,35:5,solid 35:1");
+            setBlocksWithMask("=queryRel(0,3,0,0,0)&&(queryRel(1,0,0,35,1)||queryRel(-1,0,0,35,1)||queryRel(0,0,1,35,1)||queryRel(0,0,-1,35,1)||queryRel(0,-1,0,35,1)||queryRel(0,1,0,35,1))", XMaterial.ORANGE_WOOL);
         }
 
         // Replace all orange wool with light blue wool
-        createCommand("//gmask");
-        createCommand("//replace 35:1 35:3");
+        setGmask(null);
+        replaceBlocks(XMaterial.ORANGE_WOOL, XMaterial.LIGHT_BLUE_WOOL);
 
 
         // Spread the magenta wool
-        createCommand("//gmask =(queryRel(1,0,0,35,2)||queryRel(-1,0,0,35,2)||queryRel(0,0,1,35,2)||queryRel(0,0,-1,35,2)||queryRel(0,-1,0,35,2)||queryRel(0,1,0,35,2))&&queryRel(0,3,0,0,0)");
+        setGmask("!35:11,35:3,#solid");
         for(int i = 0; i < laneWidth*2; i++){
             // Replace all blocks around orange wool with orange wool until it reaches the light blue wool
-            createCommand("//replace !35:11,35:3,solid 35:2");
+            setBlocksWithMask("=(queryRel(1,0,0,35,2)||queryRel(-1,0,0,35,2)||queryRel(0,0,1,35,2)||queryRel(0,0,-1,35,2)||queryRel(0,-1,0,35,2)||queryRel(0,1,0,35,2))&&queryRel(0,3,0,0,0)", XMaterial.MAGENTA_WOOL);
         }
 
         // Replace all magenta wool with pink wool
-        createCommand("//gmask");
-        createCommand("//replace 35:2 35:6");
-        createCommand("//replace 35:11 35:6");
+        setGmask(null);
+        replaceBlocks(XMaterial.MAGENTA_WOOL, XMaterial.PINK_WOOL);
+        replaceBlocks(XMaterial.BLUE_WOOL, XMaterial.PINK_WOOL);
+
 
         // In case there are some un-replaced blocks left, replace everything above light blue wool that is not air or yellow wool with light blue wool
         for(int i = 0; i < road_height; i++)
-            createCommand("//replace >35:3,!air,35:4 35:3");
+            setBlocksWithMask(">35:3,!air,35:4", XMaterial.LIGHT_BLUE_WOOL);
+
 
 
         // ----------- CROSSWALK ----------
         // Draw the crosswalk
 
         if(isCrosswalk){
-            createCommand("//gmask =queryRel(1,0,0,35,3)||queryRel(-1,0,0,35,3)||queryRel(0,0,1,35,3)||queryRel(0,0,-1,35,3)");
-            createCommand("//replace 35:6 35:9");
+            replaceBlocksWithMask("=queryRel(1,0,0,35,3)||queryRel(-1,0,0,35,3)||queryRel(0,0,1,35,3)||queryRel(0,0,-1,35,3)",
+                    XMaterial.PINK_WOOL, XMaterial.CYAN_WOOL);
 
             for(int i = 0; i < road_width; i++) {
-                createCommand("//gmask =queryRel(1,0,0,35,9)||queryRel(-1,0,0,35,9)||queryRel(0,0,1,35,9)||queryRel(0,0,-1,35,9)");
-                createCommand("//replace 35:6 35:10");
+                replaceBlocksWithMask("=queryRel(1,0,0,35,9)||queryRel(-1,0,0,35,9)||queryRel(0,0,1,35,9)||queryRel(0,0,-1,35,9)",
+                        XMaterial.PINK_WOOL, XMaterial.PURPLE_WOOL);
 
-                createCommand("//gmask =queryRel(1,0,0,35,10)||queryRel(-1,0,0,35,10)||queryRel(0,0,1,35,10)||queryRel(0,0,-1,35,10)");
-                createCommand("//replace 35:6 35:9");
+                replaceBlocksWithMask("=queryRel(1,0,0,35,10)||queryRel(-1,0,0,35,10)||queryRel(0,0,1,35,10)||queryRel(0,0,-1,35,10)",
+                        XMaterial.PINK_WOOL, XMaterial.PURPLE_WOOL);
             }
         }else
-            createCommand("//replace 35:6 35:4");
+            replaceBlocks(XMaterial.PINK_WOOL, XMaterial.YELLOW_WOOL);
 
-
-        createCommand("//gmask");
 
 
         // ----------- ROAD AND SIDEWALK SLABS ----------
         // Create the road and sidewalk slabs
 
         // Create the road slabs
-        if(roadSlabMaterial != null){
-            createCommand("//gmask =queryRel(0,-1,0,35,4)&&queryRel(0,0,0,0,0)&&(queryRel(1,0,0,35,4)||queryRel(-1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4))");
-            createCommand("//set " + roadSlabMaterial);
-        }
-
+        for(XMaterial roadSlabMaterial : roadSlabMaterials)
+            setBlocksWithMask("=queryRel(0,-1,0,35,4)&&queryRel(0,0,0,0,0)&&(queryRel(1,0,0,35,4)||queryRel(-1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4))",
+                    roadSlabMaterial);
 
         // Create the sidewalk slabs
-        if(sidewalkSlabMaterial != null){
-            createCommand("//gmask =queryRel(0,-1,0,35,3)&&queryRel(0,0,0,0,0)&&(queryRel(1,0,0,35,3)||queryRel(-1,0,0,35,3)||queryRel(0,0,1,35,3)||queryRel(0,0,-1,35,3))");
-            createCommand("//set " + sidewalkSlabMaterial);
-        }
+        for(XMaterial sidewalkSlabMaterial : sidewalkSlabMaterials)
+            setBlocksWithMask("=queryRel(0,-1,0,35,3)&&queryRel(0,0,0,0,0)&&(queryRel(1,0,0,35,3)||queryRel(-1,0,0,35,3)||queryRel(0,0,1,35,3)||queryRel(0,0,-1,35,3))",
+                    sidewalkSlabMaterial);
+
 
 
         // ----------- ROAD MARKINGS ----------
         // Draw the road markings
 
         if(laneCount > 1) {
-
-            createCommand("//gmask 35:4");
-
             // Check if langeCount is even or odd
             boolean isEven = laneCount % 2 == 0;
 
             // Create the road markings in the middle of the road
             if(isEven)
-                createRoadMarkingLine(roadMarkingPoints, markingMaterial, blocks);
+                for(int i = 1; i < roadMarkingPoints.size(); i+=2)
+                    drawLineWithMask("35:4", roadMarkingPoints.get(i-1), roadMarkingPoints.get(i), markingMaterial, true);
 
 
             // Create the road markings for the other lanes
@@ -337,26 +350,26 @@ public class RoadScripts extends Script {
                         List<Vector> shiftedRoadMarkingPoints = new ArrayList<>(markingsOneMeterPoints);
                         shiftedRoadMarkingPoints = GeneratorUtils.reducePoints(shiftedRoadMarkingPoints, markingGap + 1, markingLength - 1);
 
-                        createRoadMarkingLine(shiftedRoadMarkingPoints, markingMaterial, blocks);
+                        for(int i2 = 1; i2 < shiftedRoadMarkingPoints.size(); i2+=2)
+                            drawLineWithMask("35:4", shiftedRoadMarkingPoints.get(i2-1), shiftedRoadMarkingPoints.get(i2), markingMaterial, true);
                     }
                 }
-
-            createCommand("//gmask");
         }
 
 
         // ----------- MATERIAL ----------
         // Replace all light blue wool with the sidewalk material
         createPolySelection(polyRegionPoints);
-        createCommand("//replace 35:3 " + sidewalkMaterial);
+        replaceBlocks(XMaterial.LIGHT_BLUE_WOOL, sidewalkMaterials);
 
         // Replace all yellow,lime and cyan wool with the road material
-        createCommand("//replace 35:4,35:5,35:9 " + roadMaterial);
+        replaceBlocks(XMaterial.YELLOW_WOOL, roadMaterials);
+        replaceBlocks(XMaterial.LIME_WOOL, roadMaterials);
+        replaceBlocks(XMaterial.CYAN_WOOL, roadMaterials);
 
         // Replace all purple wool with the marking material
-        createCommand("//replace 35:10 " + markingMaterial);
+        replaceBlocks(XMaterial.PURPLE_WOOL, markingMaterial);
 
-        createCommand("//gmask");
 
 
 
@@ -401,33 +414,13 @@ public class RoadScripts extends Script {
                     angle = (angle + 360) % 360; // Normalize angle to be between 0 and 360
 
 
-                    createPasteSchematic("GeneratorCollections/roadpack/streetlamp" + streetLampType + ".schematic", loc, angle);
+                    pasteSchematic("GeneratorCollections/roadpack/streetlamp" + streetLampType + ".schematic", loc, angle);
                 }
         }
 
 
         // Finish the script
         finish(blocks, points);
-    }
-
-
-    public int createRoadMarkingLine(List<Vector> points, XMaterial lineMaterial, Block[][][] blocks) {
-        createCommand("//sel cuboid");
-        int changes = 0;
-
-        List<String> positions = new ArrayList<>();
-        for (Vector point : points) positions.add(GeneratorUtils.getXYZ(point, blocks));
-
-        for(int i = 0; i < points.size(); i++){
-            if(i%2 == 0)
-                createCommand("//pos1 " + positions.get(i));
-            else {
-                createCommand("//pos2 " + positions.get(i));
-                createCommand("//line " + lineMaterial);
-                changes++;
-            }
-        }
-
-        return changes;
+        */
     }
 }

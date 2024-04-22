@@ -60,7 +60,7 @@ public class RoadSettings extends Settings {
         setValue(RoadFlag.SIDEWALK_SLAB_COLOR, new XMaterial[]{XMaterial.STONE_SLAB});
 
         // Road Slab Material (Default: Fixed Value)
-        setValue(RoadFlag.ROAD_SLAB_COLOR, null);
+        setValue(RoadFlag.ROAD_SLAB_COLOR, new XMaterial[0]);
 
         // Crosswalk (Default: Fixed Value)
         setValue(RoadFlag.CROSSWALK, true);

@@ -25,7 +25,6 @@ public class Operation {
         DRAW_POLY_LINE_WITH_MASKS(String[].class, Vector[].class, BlockState[].class, Boolean.class),
         DRAW_LINE_WITH_MASKS(String[].class, Vector.class, Vector.class, BlockState[].class, Boolean.class),
         CLEAR_HISTORY,
-        DISABLE_GMASK,
         SET_GMASK(String.class),
         EXPAND_SELECTION(Vector.class);
 
@@ -81,5 +80,35 @@ public class Operation {
 
     public Object get(int i){
         return values.get(i);
+    }
+
+    public String getValuesAsString(){
+        StringBuilder builder = new StringBuilder();
+        for(Object value : values) {
+            if(value == null){
+                builder.append("null, ");
+                continue;
+            }
+
+            String valueString = value.toString();
+
+            if(value instanceof BlockState)
+                valueString = ((BlockState) value).getBlockType().getNamespace();
+            else if(value instanceof Vector[])
+                valueString = Arrays.toString((Vector[]) value);
+            else if(value instanceof BlockState[])
+                valueString = Arrays.toString((BlockState[]) value);
+            else if(value instanceof String[])
+                valueString = Arrays.toString((String[]) value);
+            else if(value instanceof Boolean)
+                valueString = ((Boolean) value) ? "true" : "false";
+            else if(value instanceof Double)
+                valueString = String.valueOf(value);
+            else if(value instanceof Integer)
+                valueString = String.valueOf(value);
+
+            builder.append(valueString).append(", ");
+        }
+        return builder.toString();
     }
 }

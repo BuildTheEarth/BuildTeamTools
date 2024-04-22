@@ -221,10 +221,6 @@ public class Command {
                     GeneratorUtils.clearHistory(localSession);
                     break;
 
-                case DISABLE_GMASK:
-                    GeneratorUtils.disableGmask(localSession);
-                    break;
-
                 case SET_GMASK:
                     GeneratorUtils.setGmask(localSession, (String) operation.get(0));
                     break;
@@ -234,10 +230,8 @@ public class Command {
                     break;
             }
         }catch (Exception e){
-            StringBuilder operationValues = new StringBuilder();
-            for(Object value : operation.getValues())
-                operationValues.append(value).append(" ");
-            ChatHelper.logError("Error while processing command: " + operation.getOperationType() + " - " + operationValues);
+            ChatHelper.logError("Error while processing command: " + operation.getOperationType() + " - " + operation.getValuesAsString());
+            e.printStackTrace();
         }
 
         if(!breakPointActive)

@@ -465,12 +465,12 @@ public class GeneratorUtils {
             throw new IllegalArgumentException("BlockState[] to is empty");
 
         // If no mask is provided, add an empty mask
-        if(masks.size() == 0)
+        if(masks.size() == 0) {
+            masks = new ArrayList<>();
             masks.add("");
+        }
 
         try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
-
-            Region region = localSession.getSelection();
 
             ParserContext parserContext = new ParserContext();
             parserContext.setActor(actor);
@@ -685,26 +685,24 @@ public class GeneratorUtils {
         session.clearHistory();
     }
 
-    /**
-     * Disables the gmask of a LocalSession.
-     *
-     * @param session The local session to disable the gmask of
-     */
-    public static void disableGmask(LocalSession session){
-        session.setMask(null);
-    }
-
 
     /**
      * Sets the gmask of a LocalSession.
      *
      * @param session The local session to set the gmask of
-     * @param mask The mask to set
+     * @param mask The mask to set. If the mask is null or empty, the gmask will be disabled.
      */
     public static void setGmask(LocalSession session, String mask){
+        if(mask == null || mask.isEmpty()) {
+            session.setMask(null);
+            return;
+        }
+
         try {
-            MaskFactory maskFactory = new MaskFactory(WorldEdit.getInstance());
-            Mask newMask = maskFactory.parseFromInput(mask, new ParserContext());
+            ParserContext parserContext = new ParserContext();
+            parserContext.setExtent(session.getSelectionWorld());
+
+            Mask newMask = WorldEdit.getInstance().getMaskFactory().parseFromInput(mask,parserContext);
             session.setMask(newMask);
         } catch (InputParseException e) {
             throw new RuntimeException(e);

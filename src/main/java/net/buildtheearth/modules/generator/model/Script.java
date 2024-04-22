@@ -15,7 +15,6 @@ import lombok.Getter;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -52,7 +51,7 @@ public class Script {
         this.localSession = WorldEdit.getInstance().getSessionManager().get(actor);
 
         clearHistory();
-        disableGmask();
+        setGmask(null);
     }
 
 
@@ -138,7 +137,7 @@ public class Script {
      * @param location        The location where the schematic should be pasted
      * @param rotation        The rotation at which the schematic should be pasted
      */
-    public void createPasteSchematic(String pathToSchematic, Location location, double rotation){
+    public void pasteSchematic(String pathToSchematic, Location location, double rotation){
         operations.add(new Operation(Operation.OperationType.PASTE_SCHEMATIC, pathToSchematic, location, rotation));
     }
 
@@ -200,15 +199,9 @@ public class Script {
     }
 
     /**
-     * This method is used to disable the gmask of the player.
-     * It creates a new Operation with type DISABLE_GMASK and adds it to the list of operations to execute.
-     */
-    public void disableGmask(){
-        operations.add(new Operation(Operation.OperationType.DISABLE_GMASK));
-    }
-
-    /**
      * This method is used to set the gmask of the player.
+     *
+     * @param mask The mask to set. If the mask is null, the gmask will be disabled.
       */
     public void setGmask(String mask){
         operations.add(new Operation(Operation.OperationType.SET_GMASK, mask));

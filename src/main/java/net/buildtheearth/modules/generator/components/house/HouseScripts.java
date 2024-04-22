@@ -11,6 +11,7 @@ import net.buildtheearth.modules.generator.model.Script;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -96,6 +97,7 @@ public class HouseScripts extends Script {
         replaceBlocks(XMaterial.SPONGE, XMaterial.AIR);
 
 
+
         // ----------- PREPARATION 03 ----------
         // Bring the orange, yellow, green, blue and red wool blocks to the same height
 
@@ -146,6 +148,7 @@ public class HouseScripts extends Script {
 
         // Replace all left sponges with grass
         replaceBlocks(XMaterial.SPONGE, XMaterial.GRASS_BLOCK);
+
 
 
         // ----------- PREPARATION 07 ----------
@@ -746,7 +749,7 @@ public class HouseScripts extends Script {
 
         setGmask("0,45,31,37,38,39,40,175");
         setBlocksWithMask("<22", XMaterial.LAPIS_BLOCK, 5);
-        disableGmask();
+        setGmask(null);
 
         replaceBlocks(XMaterial.LAPIS_ORE, wallColor);
         replaceBlocks(XMaterial.LAPIS_BLOCK, baseColor);

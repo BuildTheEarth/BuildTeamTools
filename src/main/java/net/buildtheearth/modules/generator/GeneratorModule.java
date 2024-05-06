@@ -13,9 +13,15 @@ import net.buildtheearth.modules.generator.components.kml.KmlTabCompleter;
 import net.buildtheearth.modules.generator.components.rail.Rail;
 import net.buildtheearth.modules.generator.components.road.Road;
 import net.buildtheearth.modules.generator.components.tree.Tree;
+import net.buildtheearth.modules.generator.listeners.GeneratorListener;
 import net.buildtheearth.modules.generator.model.Command;
 import net.buildtheearth.modules.generator.model.GeneratorCollections;
 import net.buildtheearth.modules.generator.model.History;
+import net.buildtheearth.modules.navigation.components.navigator.listeners.NavigatorJoinListener;
+import net.buildtheearth.modules.navigation.components.navigator.listeners.NavigatorOpenListener;
+import net.buildtheearth.modules.navigation.components.tpll.listeners.TpllJoinListener;
+import net.buildtheearth.modules.navigation.components.tpll.listeners.TpllListener;
+import net.buildtheearth.modules.navigation.components.warps.listeners.WarpJoinListener;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -89,7 +95,9 @@ public class GeneratorModule extends Module {
 
     @Override
     public void registerListeners() {
-
+        super.registerListeners(
+            new GeneratorListener()
+        );
     }
 
     /**
@@ -105,6 +113,9 @@ public class GeneratorModule extends Module {
             return;
 
         if (generatorCommands.get(0).getOperations().size() == 0) {
+            if(!generatorCommands.get(0).isFinished())
+                generatorCommands.get(0).finish();
+
             generatorCommands.remove(0);
             return;
         }
@@ -139,5 +150,18 @@ public class GeneratorModule extends Module {
             playerHistory.put(p.getUniqueId(), new History(p));
 
         return playerHistory.get(p.getUniqueId());
+    }
+
+    /**
+     * Checks if a player is currently generating.
+     * @param p The player to check.
+     * @return True if the player is currently generating, false otherwise.
+     */
+    public boolean isGenerating(Player p){
+        for (Command command : generatorCommands)
+            if (command.getPlayer().getUniqueId().equals(p.getUniqueId()))
+                return true;
+
+        return false;
     }
 }

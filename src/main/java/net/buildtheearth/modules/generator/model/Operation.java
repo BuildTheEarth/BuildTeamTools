@@ -22,7 +22,7 @@ public class Operation {
         REPLACE_BLOCKSTATES(BlockState.class, BlockState[].class),
         REPLACE_BLOCKSTATES_WITH_MASKS(String[].class, BlockState.class, BlockState[].class, Integer.class),
         DRAW_CURVE_WITH_MASKS(String[].class, Vector[].class, BlockState[].class, Boolean.class),
-        DRAW_POLY_LINE_WITH_MASKS(String[].class, Vector[].class, BlockState[].class, Boolean.class),
+        DRAW_POLY_LINE_WITH_MASKS(String[].class, Vector[].class, BlockState[].class, Boolean.class, Boolean.class),
         DRAW_LINE_WITH_MASKS(String[].class, Vector.class, Vector.class, BlockState[].class, Boolean.class),
         CLEAR_HISTORY,
         SET_GMASK(String.class),

@@ -1,6 +1,5 @@
 package net.buildtheearth.modules.generator.model;
 
-import com.cryptomorin.xseries.XMaterial;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.regions.Region;
@@ -13,7 +12,6 @@ import lombok.Getter;
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import net.buildtheearth.utils.ChatHelper;
-import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,11 +22,11 @@ import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class Command {
 
     public static final int MAX_COMMANDS_PER_SERVER_TICK = 10;
-    public static final int INVENTORY_SLOT = 27;
 
     @Getter
     private final Player player;
@@ -62,9 +60,13 @@ public class Command {
 
     private final Vector[] minMax;
     private boolean breakPointActive;
+    private boolean threadActive;
     private RegionSelector tempRegionSelector;
     private Material oldMaterial;
     private BlockData oldBlockData;
+
+    @Getter
+    private boolean isFinished;
 
     public Command(Script script, Block[][][] blocks) {
         this.player = script.getPlayer();
@@ -79,34 +81,33 @@ public class Command {
 
         this.totalCommands = operations.size();
         minMax = GeneratorUtils.getMinMaxPoints(getRegion());
-
-        player.getInventory().setItem(INVENTORY_SLOT, null);
     }
 
     /** Processes the commands from the command queue to prevent the server from freezing. */
     public void tick(){
-        if(operations.isEmpty())
+        if(operations.isEmpty()) {
+            if(!isFinished)
+                finish();
             return;
-
-        // As long as the player has the barrier in their inventory, we know that the command queue is still processing so we can skip this tick.
-        // Reason for using the inventory is that the server can only remove the item if its not frozen. That way we can ensure that the server is ready for more commands once the item is removed.
-        // TODO: This is a bit of a hacky way to do this, but it works for the beta. We should find a better way to find out if the command queue is still processing without letting the server freeze because of too many commands.
-        if (player.getInventory().getItem(INVENTORY_SLOT) != null && player.getInventory().getItem(INVENTORY_SLOT).getType() == Material.BARRIER)
-            return;
-
-        player.getInventory().setItem(INVENTORY_SLOT, Item.create(XMaterial.BARRIER.parseMaterial(), "§c§lGenerator processing commands..."));
+        }
 
         percentage = (int) Math.round((double) (totalCommands - operations.size()) / (double) totalCommands * 100);
 
-        if(!breakPointActive)
-            player.sendActionBar("§a§lGenerator Progress: §e" + percentage + "%");
+        if(!breakPointActive &&! threadActive)
+            player.sendActionBar("§a§lGenerator Progress: §7" + percentage + "%");
         else
-            player.sendActionBar("§a§lGenerator Progress: §e" + percentage + "% §7[§c§lPROCESSING§7]");
+            player.sendActionBar("§e§lGenerator Progress: §7" + percentage + "%");
+
+        if(threadActive)
+            return;
+
+
 
         // Process commands in batches of MAX_COMMANDS_PER_SERVER_TICK
         for(int i = 0; i < MAX_COMMANDS_PER_SERVER_TICK;){
             if(operations.isEmpty()){
-                finish();
+                if(!isFinished)
+                    finish();
                 break;
             }
 
@@ -114,7 +115,7 @@ public class Command {
             Operation command = operations.get(0);
             processOperation(command);
 
-            if(breakPointActive)
+            if(breakPointActive || threadActive)
                 break;
 
             // Skip WorldEdit commands that take no time to execute
@@ -130,12 +131,12 @@ public class Command {
 
             i++;
         }
-
-        player.getInventory().setItem(INVENTORY_SLOT, null);
     }
 
     /** Processes a single command. */
     public void processOperation(Operation operation){
+        CompletableFuture<Void> future = null;
+
         try {
             switch (operation.getOperationType()) {
                 case COMMAND:
@@ -175,34 +176,34 @@ public class Command {
                             break;
 
                         GeneratorUtils.createCuboidSelection(getPlayer(), point, point);
-                        GeneratorUtils.replaceBlocks(localSession, actor, weWorld, null, new BlockState[]{blockType.getDefaultState()});
+                        future = GeneratorUtils.replaceBlocks(localSession, actor, weWorld, null, new BlockState[]{blockType.getDefaultState()});
                         breakPointActive = true;
                     }
 
                     break;
 
                 case REPLACE_BLOCKSTATES_WITH_MASKS:
-                    GeneratorUtils.replaceBlocksWithMasks(localSession, actor, weWorld, Arrays.asList((String[]) operation.get(0)), (BlockState) operation.get(1), (BlockState[]) operation.get(2), (Integer) operation.get(3));
+                    future = GeneratorUtils.replaceBlocksWithMasks(localSession, actor, weWorld, Arrays.asList((String[]) operation.get(0)), (BlockState) operation.get(1), (BlockState[]) operation.get(2), (Integer) operation.get(3));
                     break;
 
                 case REPLACE_BLOCKSTATES:
-                    GeneratorUtils.replaceBlocks(localSession, actor, weWorld, (BlockState) operation.get(0), (BlockState[]) operation.get(1));
+                    future = GeneratorUtils.replaceBlocks(localSession, actor, weWorld, (BlockState) operation.get(0), (BlockState[]) operation.get(1));
                     break;
 
                 case DRAW_CURVE_WITH_MASKS:
-                    GeneratorUtils.drawCurveWithMasks(localSession, actor, weWorld, blocks, Arrays.asList((String[]) operation.get(0)), Arrays.asList((Vector[]) operation.get(1)), (BlockState[]) operation.get(2), (Boolean) operation.get(3));
+                    future = GeneratorUtils.drawCurveWithMasks(localSession, actor, weWorld, blocks, Arrays.asList((String[]) operation.get(0)), Arrays.asList((Vector[]) operation.get(1)), (BlockState[]) operation.get(2), (Boolean) operation.get(3));
                     break;
 
                 case DRAW_POLY_LINE_WITH_MASKS:
-                    GeneratorUtils.drawPolyLineWithMasks(localSession, actor, weWorld, blocks, Arrays.asList((String[]) operation.get(0)), Arrays.asList((Vector[]) operation.get(1)), (BlockState[]) operation.get(2), (Boolean) operation.get(3));
+                    future = GeneratorUtils.drawPolyLineWithMasks(localSession, actor, weWorld, blocks, Arrays.asList((String[]) operation.get(0)), Arrays.asList((Vector[]) operation.get(1)), (BlockState[]) operation.get(2), (Boolean) operation.get(3), (Boolean) operation.get(4));
                     break;
 
                 case DRAW_LINE_WITH_MASKS:
-                    GeneratorUtils.drawLineWithMasks(localSession, actor, weWorld, blocks, Arrays.asList((String[]) operation.get(0)), (Vector) operation.get(1), (Vector) operation.get(2), (BlockState[]) operation.get(3), (Boolean) operation.get(4));
+                    future = GeneratorUtils.drawLineWithMasks(localSession, actor, weWorld, blocks, Arrays.asList((String[]) operation.get(0)), (Vector) operation.get(1), (Vector) operation.get(2), (BlockState[]) operation.get(3), (Boolean) operation.get(4));
                     break;
 
                 case PASTE_SCHEMATIC:
-                    GeneratorUtils.pasteSchematic(localSession, actor, weWorld, blocks, (String) operation.get(0), (Location) operation.get(1), (double) operation.get(2));
+                    future = GeneratorUtils.pasteSchematic(localSession, actor, weWorld, blocks, (String) operation.get(0), (Location) operation.get(1), (double) operation.get(2));
                     break;
 
                 case CUBOID_SELECTION:
@@ -230,11 +231,21 @@ public class Command {
                     break;
             }
         }catch (Exception e){
-            ChatHelper.logError("Error while processing command: " + operation.getOperationType() + " - " + operation.getValuesAsString());
+            if(operation != null)
+                ChatHelper.logError("Error while processing command: " + operation.getOperationType() + " - " + operation.getValuesAsString());
+            else
+                ChatHelper.logError("Error while processing command.");
             e.printStackTrace();
         }
 
-        if(!breakPointActive)
+        if(future != null){
+            threadActive = true;
+            future.thenRun(() -> {
+                threadActive = false;
+                operations.remove(0);
+            });
+
+        }else if(!breakPointActive)
             operations.remove(0);
     }
 
@@ -265,6 +276,8 @@ public class Command {
 
     /** Called when the command queue is finished. */
     public void finish(){
+        player.sendActionBar("§a§lGenerator Progress: §7100%");
+        isFinished = true;
         generatorComponent.sendSuccessMessage(player);
     }
 }

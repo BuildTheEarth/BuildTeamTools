@@ -36,7 +36,5 @@ public class House extends GeneratorComponent {
             return;
 
         new HouseScripts(p, this);
-
-        sendSuccessMessage(p);
     }
 }

@@ -50,8 +50,8 @@ public class Script {
         this.actor = BukkitAdapter.adapt(getPlayer());
         this.localSession = WorldEdit.getInstance().getSessionManager().get(actor);
 
-        clearHistory();
-        setGmask(null);
+        GeneratorUtils.clearHistory(localSession);
+        GeneratorUtils.setGmask(localSession, null);
     }
 
 
@@ -61,7 +61,7 @@ public class Script {
         this.operations.add(new Operation(Operation.OperationType.BREAKPOINT));
 
         GeneratorModule.getInstance().getGeneratorCommands().add(new Command(this, blocks));
-        GeneratorModule.getInstance().getPlayerHistory(getPlayer()).addHistoryEntry(new History.HistoryEntry(getGeneratorComponent().getGeneratorType(), changes));
+        GeneratorModule.getInstance().getPlayerHistory(getPlayer()).addHistoryEntry(new History.HistoryEntry(getGeneratorComponent().getGeneratorType(), this));
     }
 
 
@@ -139,6 +139,7 @@ public class Script {
      */
     public void pasteSchematic(String pathToSchematic, Location location, double rotation){
         operations.add(new Operation(Operation.OperationType.PASTE_SCHEMATIC, pathToSchematic, location, rotation));
+        changes++;
     }
 
 
@@ -246,7 +247,7 @@ public class Script {
      */
     public void setBlocksWithMask(List<String> masks, BlockState[] blockState, int iterations) {
         operations.add(new Operation(Operation.OperationType.REPLACE_BLOCKSTATES_WITH_MASKS, masks.toArray(new String[0]), null, blockState, iterations));
-        changes += masks.size()*iterations;
+        changes += masks.size();
     }
     public void setBlocksWithMask(List<String> masks, XMaterial[] blockState, int iterations) {
         setBlocksWithMask(masks, GeneratorUtils.getBlockState(blockState), iterations);
@@ -288,7 +289,7 @@ public class Script {
      */
     public void replaceBlocksWithMask(List<String> masks, BlockState from, BlockState[] to, int iterations) {
         operations.add(new Operation(Operation.OperationType.REPLACE_BLOCKSTATES_WITH_MASKS, masks.toArray(new String[0]), from, to, iterations));
-        changes += masks.size()*iterations;
+        changes += masks.size();
     }
     public void replaceBlocksWithMask(List<String> masks, XMaterial from, XMaterial[] to, int iterations) {
         replaceBlocksWithMask(masks, GeneratorUtils.getBlockState(from), GeneratorUtils.getBlockState(to), iterations);
@@ -365,31 +366,31 @@ public class Script {
      * @param blocks The block states to set the blocks to
      * @param matchElevation Whether the elevation of the points should be matched to the region
      */
-    public void drawPolyLineWithMask(List<String> masks, List<Vector> points, BlockState[] blocks, boolean matchElevation) {
-        operations.add(new Operation(Operation.OperationType.DRAW_POLY_LINE_WITH_MASKS, masks.toArray(new String[0]), points.toArray(new Vector[0]), blocks, matchElevation));
+    public void drawPolyLineWithMask(List<String> masks, List<Vector> points, BlockState[] blocks, boolean matchElevation, boolean connectLineEnds) {
+        operations.add(new Operation(Operation.OperationType.DRAW_POLY_LINE_WITH_MASKS, masks.toArray(new String[0]), points.toArray(new Vector[0]), blocks, matchElevation, connectLineEnds));
         changes += masks.size();
     }
 
-    public void drawPolyLineWithMask(List<String> masks, List<Vector> points, XMaterial[] blocks, boolean matchElevation) {
-        drawPolyLineWithMask(masks, points, GeneratorUtils.getBlockState(blocks), matchElevation);
+    public void drawPolyLineWithMask(List<String> masks, List<Vector> points, XMaterial[] blocks, boolean matchElevation, boolean connectLineEnds) {
+        drawPolyLineWithMask(masks, points, GeneratorUtils.getBlockState(blocks), matchElevation, connectLineEnds);
     }
 
-    public void drawPolyLineWithMask(String mask, List<Vector> points, XMaterial[] blocks, boolean matchElevation) {
+    public void drawPolyLineWithMask(String mask, List<Vector> points, XMaterial[] blocks, boolean matchElevation, boolean connectLineEnds) {
         List<String> masks = new ArrayList<>();
         masks.add(mask);
-        drawPolyLineWithMask(masks, points, blocks, matchElevation);
+        drawPolyLineWithMask(masks, points, blocks, matchElevation, connectLineEnds);
     }
 
-    public void drawPolyLineWithMask(String mask, List<Vector> points, XMaterial block, boolean matchElevation) {
-        drawPolyLineWithMask(mask, points, new XMaterial[]{block}, matchElevation);
+    public void drawPolyLineWithMask(String mask, List<Vector> points, XMaterial block, boolean matchElevation, boolean connectLineEnds) {
+        drawPolyLineWithMask(mask, points, new XMaterial[]{block}, matchElevation, connectLineEnds);
     }
 
-    public void drawPolyLine(List<Vector> points, XMaterial[] blocks, boolean matchElevation) {
-        drawPolyLineWithMask(new ArrayList<>(), points, blocks, matchElevation);
+    public void drawPolyLine(List<Vector> points, XMaterial[] blocks, boolean matchElevation, boolean connectLineEnds) {
+        drawPolyLineWithMask(new ArrayList<>(), points, blocks, matchElevation, connectLineEnds);
     }
 
-    public void drawPolyLine(List<Vector> points, XMaterial block, boolean matchElevation) {
-        drawPolyLineWithMask(new ArrayList<>(), points, new XMaterial[]{block}, matchElevation);
+    public void drawPolyLine(List<Vector> points, XMaterial block, boolean matchElevation, boolean connectLineEnds) {
+        drawPolyLineWithMask(new ArrayList<>(), points, new XMaterial[]{block}, matchElevation, connectLineEnds);
     }
 
 

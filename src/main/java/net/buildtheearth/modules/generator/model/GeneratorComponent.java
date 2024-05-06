@@ -13,6 +13,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -131,6 +132,7 @@ public abstract class GeneratorComponent extends Component {
 
         p.sendMessage(" ");
         p.sendMessage("§cNote: You can undo the edit with /gen undo.");
+        p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
     }
 
     private TextComponent getTextComponent() {

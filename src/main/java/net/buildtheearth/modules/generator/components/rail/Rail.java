@@ -34,7 +34,5 @@ public class Rail extends GeneratorComponent {
             return;
 
         new RailScripts(p, this);
-
-        sendSuccessMessage(p);
     }
 }

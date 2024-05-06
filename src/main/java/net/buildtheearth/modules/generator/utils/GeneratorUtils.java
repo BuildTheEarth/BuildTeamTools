@@ -18,6 +18,7 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
@@ -56,6 +57,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 
 /** This class contains static utility methods for the generator module.
@@ -76,11 +78,12 @@ public class GeneratorUtils {
 
         if (region instanceof Polygonal2DRegion) {
             Polygonal2DRegion polyRegion = (Polygonal2DRegion) region;
-
+            ChatHelper.logDebug("Polygonal2DRegion found");
             // In latest FAWE, the points are stored as BlockVector2
             // In 1.12 WorldEdit, the points are stored as BlockVector2D
             // Both classes have the same methods, so we can use reflection to get the methods
             for (Object blockVectorObj : polyRegion.getPoints()) {
+                ChatHelper.logDebug("BlockVector2:" + blockVectorObj);
                 try {
                     Class<?> blockVectorClass = blockVectorObj.getClass();
                     Method getXMethod = blockVectorClass.getMethod("getBlockX");
@@ -200,7 +203,8 @@ public class GeneratorUtils {
         if(air == null)
             return null;
 
-        replaceBlocksWithMasks(localSession, actor, world, Collections.singletonList("!#solid"), null, new BlockState[]{air.getDefaultState()}, 1);
+        replaceBlocksWithMasks(localSession, actor, world, Collections.singletonList("!#solid"), null, new BlockState[]{air.getDefaultState()}, 1)
+            .join();
 
         if(removeIgnoredMaterials) {
             Material[] materials = MenuItems.getIgnoredMaterials();
@@ -211,7 +215,8 @@ public class GeneratorUtils {
                     continue;
 
                 BlockState blockState = blockType.getDefaultState();
-                replaceBlocks(localSession, actor, world, blockState, new BlockState[]{air.getDefaultState()});
+                replaceBlocks(localSession, actor, world, blockState, new BlockState[]{air.getDefaultState()})
+                    .join();
             }
         }
 
@@ -344,55 +349,65 @@ public class GeneratorUtils {
      * @param from The block to replace
      * @param to The blocks to replace with
      * @param iterations The number of iterations to perform
+     *
+     * @return A CompletableFuture that completes when the operation is finished
      */
-    public static void replaceBlocksWithMasks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, List<String> masks, BlockState from, BlockState[] to, int iterations) {
+    public static CompletableFuture<Void> replaceBlocksWithMasks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, List<String> masks, BlockState from, BlockState[] to, int iterations) {
         if(to == null || to.length == 0)
                 throw new IllegalArgumentException("BlockState[] to is empty");
 
-        for (int i = 0; i < iterations; i++) {
-            try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+        Thread thread = new Thread(() -> {
+            for (int i = 0; i < iterations; i++) {
+                try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
 
-                Region region = localSession.getSelection();
+                    Region region = localSession.getSelection();
 
-                ParserContext parserContext = new ParserContext();
-                parserContext.setActor(actor);
-                parserContext.setWorld(weWorld);
-                parserContext.setSession(localSession);
-                parserContext.setExtent(editSession);
+                    ParserContext parserContext = new ParserContext();
+                    parserContext.setActor(actor);
+                    parserContext.setWorld(weWorld);
+                    parserContext.setSession(localSession);
+                    parserContext.setExtent(editSession);
 
-                for (String maskString : masks) {
-                    ChatHelper.logDebug("Replacing blocks with expression mask: " + maskString.replace("%", "'PCT'") + " from " + from + " to " + Arrays.toString(to) + " for " + iterations + " iterations");
+                    for (String maskString : masks) {
+                        ChatHelper.logDebug("Replacing blocks with expression mask: " + maskString.replace("%", "'PCT'") + " from " + from + " to " + Arrays.toString(to) + " for " + iterations + " iterations");
 
-                    Mask mask = new MaskFactory(WorldEdit.getInstance()).parseFromInput(maskString, parserContext);
+                        Mask mask = new MaskFactory(WorldEdit.getInstance()).parseFromInput(maskString, parserContext);
 
-                    if (from != null) {
-                        BlockMask blockMask = new BlockMask(weWorld, from.toBaseBlock());
-                        editSession.setMask(blockMask);
+                        if (from != null) {
+                            BlockMask blockMask = new BlockMask(weWorld, from.toBaseBlock());
+                            editSession.setMask(blockMask);
+                        }
+
+                        Pattern pattern;
+
+                        if(to.length == 1)
+                            pattern = to[0];
+                        else{
+                            RandomPattern randomPattern = new RandomPattern();
+                            double chance = 100.0 / to.length;
+
+                            for(BlockState blockState : to)
+                                randomPattern.add(blockState, chance);
+
+                            pattern = randomPattern;
+                        }
+
+
+                        editSession.replaceBlocks(region, mask, pattern);
+
+                        saveEditSession(editSession, localSession, actor);
                     }
-
-                    Pattern pattern;
-
-                    if(to.length == 1)
-                        pattern = to[0];
-                    else{
-                        RandomPattern randomPattern = new RandomPattern();
-                        double chance = 100.0 / to.length;
-
-                        for(BlockState blockState : to)
-                            randomPattern.add(blockState, chance);
-
-                        pattern = randomPattern;
-                    }
-
-
-                    editSession.replaceBlocks(region, mask, pattern);
-
-                    saveEditSession(editSession, localSession, actor);
+                } catch(IncompleteRegionException | MaxChangedBlocksException | InputParseException e){
+                    future.completeExceptionally(new RuntimeException(e));
                 }
-            } catch(IncompleteRegionException | MaxChangedBlocksException | InputParseException e){
-                throw new RuntimeException(e);
             }
-        }
+
+            future.complete(null);
+        });
+
+        thread.start();
+        return future;
     }
 
 
@@ -403,40 +418,49 @@ public class GeneratorUtils {
      * @param localSession The local session of the actor
      * @param from The block to replace
      * @param to The block to replace with
+     *
+     * @return A CompletableFuture that completes when the operation is finished
      */
-    public static void replaceBlocks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, BlockState from, BlockState[] to) {
+    public static CompletableFuture<Void> replaceBlocks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, BlockState from, BlockState[] to) {
         if(to.length == 0)
             throw new IllegalArgumentException("BlockState[] to is empty");
 
-        ChatHelper.logDebug("Replacing blocks from " + from + " to " + Arrays.toString(to));
+        CompletableFuture<Void> future = new CompletableFuture<>();
+        Thread thread = new Thread(() -> {
+            ChatHelper.logDebug("Replacing blocks from " + from + " to " + Arrays.toString(to));
 
-        try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
-            Region region = localSession.getSelection();
-            Pattern pattern;
+            try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
+                Region region = localSession.getSelection();
+                Pattern pattern;
 
-            if(to.length == 1)
-                pattern = to[0];
-            else{
-                RandomPattern randomPattern = new RandomPattern();
-                double chance = 100.0 / to.length;
+                if(to.length == 1)
+                    pattern = to[0];
+                else{
+                    RandomPattern randomPattern = new RandomPattern();
+                    double chance = 100.0 / to.length;
 
-                for(BlockState blockState : to)
-                    randomPattern.add(blockState, chance);
+                    for(BlockState blockState : to)
+                        randomPattern.add(blockState, chance);
 
-                pattern = randomPattern;
+                    pattern = randomPattern;
+                }
+
+                if(from != null) {
+                    BlockMask blockMask = new BlockMask(weWorld).add(from);
+                    editSession.replaceBlocks(region, blockMask, pattern);
+                }else
+                    editSession.setBlocks(region, pattern);
+
+
+                saveEditSession(editSession, localSession, actor);
+            } catch (IncompleteRegionException | MaxChangedBlocksException e) {
+                future.completeExceptionally(new RuntimeException(e));
             }
 
-            if(from != null) {
-                BlockMask blockMask = new BlockMask(weWorld).add(from);
-                editSession.replaceBlocks(region, blockMask, pattern);
-            }else
-                editSession.setBlocks(region, pattern);
-
-
-            saveEditSession(editSession, localSession, actor);
-        } catch (IncompleteRegionException | MaxChangedBlocksException e) {
-            throw new RuntimeException(e);
-        }
+            future.complete(null);
+        });
+        thread.start();
+        return future;
     }
 
 
@@ -458,75 +482,86 @@ public class GeneratorUtils {
      * @param filled Whether the curve should be filled or not.
      * @param matchElevation Whether the elevation of the points should be matched to the region
      */
-    public static void drawSplineWithMask(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, Block[][][] regionBlocks, List<String> masks, List<Vector> points, BlockState[] blocks,
-                                          boolean matchElevation, double tension, double bias, double continuity, double quality, double radius, boolean filled) {
-
+    public static CompletableFuture<Void> drawSplineWithMask(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, Block[][][] regionBlocks, List<String> masks, List<Vector> points, BlockState[] blocks,
+                                                             boolean matchElevation, double tension, double bias, double continuity, double quality, double radius, boolean filled, boolean connectLineEnds) {
         if(blocks == null || blocks.length == 0)
             throw new IllegalArgumentException("BlockState[] to is empty");
 
         // If no mask is provided, add an empty mask
-        if(masks.size() == 0) {
+        if (masks.size() == 0) {
             masks = new ArrayList<>();
             masks.add("");
         }
 
-        try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
+        List<String> finalMasks = masks;
+        CompletableFuture<Void> future = new CompletableFuture<>();
+        Thread thread = new Thread(() -> {
 
-            ParserContext parserContext = new ParserContext();
-            parserContext.setActor(actor);
-            parserContext.setWorld(weWorld);
-            parserContext.setSession(localSession);
-            parserContext.setExtent(editSession);
+            try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
 
-            for (String maskString : masks) {
-                ChatHelper.logDebug("Drawing spline with expression mask: " + maskString.replace("%", "'PCT'") + " with " + Arrays.toString(blocks));
+                ParserContext parserContext = new ParserContext();
+                parserContext.setActor(actor);
+                parserContext.setWorld(weWorld);
+                parserContext.setSession(localSession);
+                parserContext.setExtent(editSession);
 
-                // Set the mask
-                if(!maskString.isEmpty()) {
-                    Mask mask = new MaskFactory(WorldEdit.getInstance()).parseFromInput(maskString, parserContext);
-                    editSession.setMask(mask);
+                for (String maskString : finalMasks) {
+                    ChatHelper.logDebug("Drawing spline with expression mask: " + maskString.replace("%", "'PCT'") + " with " + Arrays.toString(blocks));
+
+                    // Set the mask
+                    if (!maskString.isEmpty()) {
+                        Mask mask = new MaskFactory(WorldEdit.getInstance()).parseFromInput(maskString, parserContext);
+                        editSession.setMask(mask);
+                    }
+
+                    // Set the pattern
+                    Pattern pattern;
+
+                    if (blocks.length == 1)
+                        pattern = blocks[0];
+                    else {
+                        RandomPattern randomPattern = new RandomPattern();
+                        double chance = 100.0 / blocks.length;
+
+                        for (BlockState blockState : blocks)
+                            randomPattern.add(blockState, chance);
+
+                        pattern = randomPattern;
+                    }
+
+                    // Set the blockvectors
+                    List<BlockVector3> blockVector3s = new ArrayList<>();
+                    for (Vector point : points) {
+                        if (matchElevation)
+                            point = getXYZ(point, regionBlocks);
+
+                        blockVector3s.add(BlockVector3.at(point.getBlockX(), point.getBlockY(), point.getBlockZ()));
+                    }
+
+                    editSession.drawSpline(pattern, blockVector3s, tension, bias, continuity, quality, radius, filled);
+
+                    if (connectLineEnds && blockVector3s.size() > 1)
+                        editSession.drawLine(pattern, blockVector3s.get(0), blockVector3s.get(blockVector3s.size() - 1), 1, true);
+
+                    saveEditSession(editSession, localSession, actor);
                 }
-
-                // Set the pattern
-                Pattern pattern;
-
-                if(blocks.length == 1)
-                    pattern = blocks[0];
-                else{
-                    RandomPattern randomPattern = new RandomPattern();
-                    double chance = 100.0 / blocks.length;
-
-                    for(BlockState blockState : blocks)
-                        randomPattern.add(blockState, chance);
-
-                    pattern = randomPattern;
-                }
-
-                // Set the blockvectors
-                List<BlockVector3> blockVector3s = new ArrayList<>();
-                for(Vector point : points){
-                    if(matchElevation)
-                        point = getXYZ(point, regionBlocks);
-
-                    blockVector3s.add(BlockVector3.at(point.getBlockX(), point.getBlockY(), point.getBlockZ()));
-                }
-
-                editSession.drawSpline(pattern, blockVector3s, tension, bias, continuity, quality, radius, filled);
-
-                saveEditSession(editSession, localSession, actor);
+            } catch (IncompleteRegionException | MaxChangedBlocksException | InputParseException e) {
+                throw new RuntimeException(e);
             }
-        } catch(IncompleteRegionException | MaxChangedBlocksException | InputParseException e){
-            throw new RuntimeException(e);
-        }
 
+            future.complete(null);
+        });
+
+        thread.start();
+        return future;
     }
 
-    public static void drawCurveWithMasks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, Block[][][] regionBlocks, List<String> masks, List<Vector> points, BlockState[] blocks, boolean matchElevation){
-        drawSplineWithMask(localSession, actor, weWorld, regionBlocks, masks, points, blocks, matchElevation, 0, 0, 0, 10, 1, true);
+    public static CompletableFuture<Void> drawCurveWithMasks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, Block[][][] regionBlocks, List<String> masks, List<Vector> points, BlockState[] blocks, boolean matchElevation){
+        return drawSplineWithMask(localSession, actor, weWorld, regionBlocks, masks, points, blocks, matchElevation, 0, 0, 0, 10, 1, true, false);
     }
 
-    public static void drawPolyLineWithMasks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, Block[][][] regionBlocks, List<String> masks, List<Vector> points, BlockState[] blocks, boolean matchElevation){
-        drawSplineWithMask(localSession, actor, weWorld, regionBlocks, masks, points, blocks, matchElevation, 1, 0, -1, 10, 1, true);
+    public static CompletableFuture<Void> drawPolyLineWithMasks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, Block[][][] regionBlocks, List<String> masks, List<Vector> points, BlockState[] blocks, boolean matchElevation, boolean connectLineEnds){
+        return drawSplineWithMask(localSession, actor, weWorld, regionBlocks, masks, points, blocks, matchElevation, 1, 0, -1, 10, 1, true, connectLineEnds);
     }
 
 
@@ -545,7 +580,7 @@ public class GeneratorUtils {
      * @param blocks The blocks to use for the curve
      * @param matchElevation Whether the elevation of the points should be matched to the region
      */
-    public static void drawLineWithMasks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, Block[][][] regionBlocks, List<String> masks, Vector point1, Vector point2, BlockState[] blocks, boolean matchElevation) {
+    public static CompletableFuture<Void> drawLineWithMasks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, Block[][][] regionBlocks, List<String> masks, Vector point1, Vector point2, BlockState[] blocks, boolean matchElevation) {
         if(blocks == null || blocks.length == 0)
             throw new IllegalArgumentException("BlockState[] to is empty");
 
@@ -553,55 +588,66 @@ public class GeneratorUtils {
         if(masks.size() == 0)
             masks.add("");
 
-        try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+        Thread thread = new Thread(() -> {
+            try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
 
-            ParserContext parserContext = new ParserContext();
-            parserContext.setActor(actor);
-            parserContext.setWorld(weWorld);
-            parserContext.setSession(localSession);
-            parserContext.setExtent(editSession);
+                ParserContext parserContext = new ParserContext();
+                parserContext.setActor(actor);
+                parserContext.setWorld(weWorld);
+                parserContext.setSession(localSession);
+                parserContext.setExtent(editSession);
 
-            for (String maskString : masks) {
-                ChatHelper.logDebug("Drawing spline with expression mask: " + maskString.replace("%", "'PCT'") + " with " + Arrays.toString(blocks));
+                for (String maskString : masks) {
+                    ChatHelper.logDebug("Drawing spline with expression mask: " + maskString.replace("%", "'PCT'") + " with " + Arrays.toString(blocks));
 
-                // Set the mask
-                if(!maskString.isEmpty()) {
-                    Mask mask = new MaskFactory(WorldEdit.getInstance()).parseFromInput(maskString, parserContext);
-                    editSession.setMask(mask);
+                    // Set the mask
+                    if(!maskString.isEmpty()) {
+                        Mask mask = new MaskFactory(WorldEdit.getInstance()).parseFromInput(maskString, parserContext);
+                        editSession.setMask(mask);
+                    }
+
+                    // Set the pattern
+                    Pattern pattern;
+
+                    if(blocks.length == 1)
+                        pattern = blocks[0];
+                    else{
+                        RandomPattern randomPattern = new RandomPattern();
+                        double chance = 100.0 / blocks.length;
+
+                        for(BlockState blockState : blocks)
+                            randomPattern.add(blockState, chance);
+
+                        pattern = randomPattern;
+                    }
+
+                    Vector newPoint1 = point1;
+                    Vector newPoint2 = point2;
+
+                    // Adjust the points to the elevation of the region if matchElevation is true
+                    if(matchElevation){
+                        newPoint1 = getXYZ(point1, regionBlocks);
+                        newPoint2 = getXYZ(point1, regionBlocks);
+                    }
+
+                    // Set the blockvectors
+                    BlockVector3 point1BlockVector3 = BlockVector3.at(newPoint1.getBlockX(), newPoint1.getBlockY(), newPoint1.getBlockZ());
+                    BlockVector3 point2BlockVector3 = BlockVector3.at(newPoint2.getBlockX(), newPoint2.getBlockY(), newPoint2.getBlockZ());
+
+                    editSession.drawLine(pattern, point1BlockVector3, point2BlockVector3, 1, true);
+
+                    saveEditSession(editSession, localSession, actor);
                 }
-
-                // Set the pattern
-                Pattern pattern;
-
-                if(blocks.length == 1)
-                    pattern = blocks[0];
-                else{
-                    RandomPattern randomPattern = new RandomPattern();
-                    double chance = 100.0 / blocks.length;
-
-                    for(BlockState blockState : blocks)
-                        randomPattern.add(blockState, chance);
-
-                    pattern = randomPattern;
-                }
-
-                // Adjust the points to the elevation of the region if matchElevation is true
-                if(matchElevation){
-                    point1 = getXYZ(point1, regionBlocks);
-                    point2 = getXYZ(point2, regionBlocks);
-                }
-
-                // Set the blockvectors
-                BlockVector3 point1BlockVector3 = BlockVector3.at(point1.getBlockX(), point1.getBlockY(), point1.getBlockZ());
-                BlockVector3 point2BlockVector3 = BlockVector3.at(point2.getBlockX(), point2.getBlockY(), point2.getBlockZ());
-
-                editSession.drawLine(pattern, point1BlockVector3, point2BlockVector3, 1, true);
-
-                saveEditSession(editSession, localSession, actor);
+            } catch(IncompleteRegionException | MaxChangedBlocksException | InputParseException e){
+                throw new RuntimeException(e);
             }
-        } catch(IncompleteRegionException | MaxChangedBlocksException | InputParseException e){
-            throw new RuntimeException(e);
-        }
+
+            future.complete(null);
+        });
+
+        thread.start();
+        return future;
     }
 
 
@@ -615,7 +661,7 @@ public class GeneratorUtils {
      * @param loc The location to paste the schematic
      * @param rotation The rotation of the schematic
      */
-    public static void pasteSchematic(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, Block[][][] blocks, String schematicPath, Location loc, double rotation) {
+    public static CompletableFuture<Void> pasteSchematic(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, Block[][][] blocks, String schematicPath, Location loc, double rotation) {
         int offsetY = 1;
 
         int maxHeight = loc.getBlockY();
@@ -625,39 +671,48 @@ public class GeneratorUtils {
         if(maxHeight == 0)
             maxHeight = loc.getBlockY();
 
+        CompletableFuture<Void> future = new CompletableFuture<>();
+        int finalMaxHeight = maxHeight;
+        Thread thread = new Thread(() -> {
+            try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
+                File schematicFile = new File(BuildTeamTools.getInstance().getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/" + schematicPath);
 
-        try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
-            File schematicFile = new File(BuildTeamTools.getInstance().getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/" + schematicPath);
+                ClipboardFormat format = ClipboardFormats.findByFile(schematicFile);
+                ClipboardReader reader;
 
-            ClipboardFormat format = ClipboardFormats.findByFile(schematicFile);
-            ClipboardReader reader;
+                if (format == null)
+                    return;
 
-            if (format == null)
-                return;
+                try {
+                    reader = format.getReader(Files.newInputStream(schematicFile.toPath()));
+                    Clipboard clipboard = reader.read();
 
-            try {
-                reader = format.getReader(Files.newInputStream(schematicFile.toPath()));
-                Clipboard clipboard = reader.read();
+                    AffineTransform transform = new AffineTransform();
+                    transform = transform.rotateY(rotation);
 
-                AffineTransform transform = new AffineTransform();
-                transform = transform.rotateY(rotation);
+                    ClipboardHolder holder = new ClipboardHolder(clipboard);
+                    holder.setTransform(transform);
 
-                ClipboardHolder holder = new ClipboardHolder(clipboard);
-                holder.setTransform(transform);
+                    com.sk89q.worldedit.function.operation.Operation op = holder
+                            .createPaste(editSession)
+                            .to(BlockVector3.at(loc.getBlockX(), finalMaxHeight + offsetY, loc.getBlockZ()))
+                            .ignoreAirBlocks(true)
+                            .build();
+                    Operations.complete(op);
+                } catch (IOException | WorldEditException e) {
+                    throw new RuntimeException(e);
+                }
 
-                com.sk89q.worldedit.function.operation.Operation op = holder
-                        .createPaste(editSession)
-                        .to(BlockVector3.at(loc.getBlockX(), maxHeight + offsetY, loc.getBlockZ()))
-                        .ignoreAirBlocks(true)
-                        .build();
-                Operations.complete(op);
+                saveEditSession(editSession, localSession, actor);
 
-            } catch (IOException | WorldEditException e) {
-                throw new RuntimeException(e);
+                ChatHelper.logDebug("Pasted schematic: " + schematicPath + " at " + loc + " with rotation " + rotation);
             }
 
-            saveEditSession(editSession, localSession, actor);
-        }
+            future.complete(null);
+        });
+
+        thread.start();
+        return future;
     }
 
     /**
@@ -674,6 +729,8 @@ public class GeneratorUtils {
         } catch (IncompleteRegionException | RegionOperationException e) {
             throw new RuntimeException(e);
         }
+
+        ChatHelper.logDebug("Expanded selection by: " + vector);
     }
 
 
@@ -683,7 +740,49 @@ public class GeneratorUtils {
      */
     public static void clearHistory(LocalSession session){
         session.clearHistory();
+        ChatHelper.logDebug("Cleared history");
     }
+
+    /**
+     * Undoes the last action of a LocalSession.
+     * @param session The local session to undo the last action of
+     * @param player The player who created the structure
+     * @param amount The amount of actions to undo
+     */
+    public static void undo(LocalSession session, Player player, Actor actor, int amount){
+        com.sk89q.worldedit.entity.Player wePlayer = BukkitAdapter.adapt(player);
+
+        for(int i = 0; i < amount; i++) {
+            BlockBag blockBag = session.getBlockBag(wePlayer);
+            EditSession undoSession = session.undo(blockBag, wePlayer);
+
+            if (undoSession != null)
+                WorldEdit.getInstance().flushBlockBag(actor, undoSession);
+            else
+                break;
+        }
+    }
+
+    /**
+    * Redoes the last action of a LocalSession.
+    * @param session The local session to redo the last action of
+    * @param player The player who created the structure
+    * @param amount The amount of actions to redo
+    */
+    public static void redo(LocalSession session, Player player, Actor actor, int amount){
+        com.sk89q.worldedit.entity.Player wePlayer = BukkitAdapter.adapt(player);
+
+        for(int i = 0; i < amount; i++) {
+            BlockBag blockBag = session.getBlockBag(wePlayer);
+            EditSession redoSession = session.redo(blockBag, wePlayer);
+
+            if (redoSession != null)
+                WorldEdit.getInstance().flushBlockBag(actor, redoSession);
+            else
+                break;
+        }
+    }
+
 
 
     /**
@@ -695,6 +794,7 @@ public class GeneratorUtils {
     public static void setGmask(LocalSession session, String mask){
         if(mask == null || mask.isEmpty()) {
             session.setMask(null);
+            ChatHelper.logDebug("Disabled gmask");
             return;
         }
 
@@ -707,6 +807,8 @@ public class GeneratorUtils {
         } catch (InputParseException e) {
             throw new RuntimeException(e);
         }
+
+        ChatHelper.logDebug("Set gmask to: " + mask);
     }
 
 
@@ -753,6 +855,8 @@ public class GeneratorUtils {
 
         if(CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled())
             localSession.remember(actor, localSession.getSelectionWorld(), editSession.getChangeSet(), FaweLimit.MAX);
+
+        editSession.close();
     }
 
 
@@ -854,22 +958,29 @@ public class GeneratorUtils {
         boolean found = true;
         while(found){
             found = false;
+
+            // Go through all vectors
             for (int i = 0; i < points.size() - 1; i++) {
-                Vector p1 = points.get(i);
-                Vector p2 = points.get(i+1);
+
+                // Get the two neighboring vectors
+                Vector p1 = points.get(i).clone();
+                Vector p2 = points.get(i+1).clone();
+
+                //ChatHelper.logDebug("p1: " + p1 + " p2: " + p2 + " distance: " + distance);
 
                 // Add the first point
                 result.add(p1);
 
                 // If the distance between the two points is greater than the given distance, add a new point in between them
                 if(p1.distance(p2) > distance){
-                    Vector v1 = p2.subtract(p1);
-                    Vector v2 = v1.multiply(0.5);
-                    Vector v3 = p1.add(v2);
+                    Vector v1 = p2.clone().subtract(p1);
+                    Vector v2 = v1.clone().multiply(0.5);
+                    Vector v3 = p1.clone().add(v2);
 
                     // Add the new point
                     result.add(v3);
                     found = true;
+                    //ChatHelper.logDebug("Adding new point in between: " + v3);
                 }
             }
 
@@ -931,12 +1042,12 @@ public class GeneratorUtils {
         Vector p4 = vectors.get(vectors.size()-1);
 
         // Get the vectors between the points
-        Vector v1 = p1.subtract(p2);
-        Vector v2 = p4.subtract(p3);
+        Vector v1 = p1.clone().subtract(p2);
+        Vector v2 = p4.clone().subtract(p3);
 
-        result.add(p1.add(v1));
+        result.add(p1.clone().add(v1));
         result.addAll(vectors);
-        result.add(p4.add(v2));
+        result.add(p4.clone().add(v2));
 
         return result;
     }
@@ -961,21 +1072,21 @@ public class GeneratorUtils {
         Vector p4 = vectors.get(vectors.size()-1);
 
         // Get the vectors between the points
-        Vector v1 = p2.subtract(p1);
-        Vector v2 = p3.subtract(p4);
+        Vector v1 = p2.clone().subtract(p1);
+        Vector v2 = p3.clone().subtract(p4);
 
         // Shorten the vectors
-        v1 = v1.normalize().multiply(distance);
-        v2 = v2.normalize().multiply(distance);
+        v1 = v1.clone().normalize().multiply(distance);
+        v2 = v2.clone().normalize().multiply(distance);
 
         // Remove the first and last points
         vectors.remove(0);
         vectors.remove(vectors.size() - 1);
 
         // Add the shortened vectors
-        result.add(p1.add(v1));
+        result.add(p1.clone().add(v1));
         result.addAll(vectors);
-        result.add(p4.add(v2));
+        result.add(p4.clone().add(v2));
 
         return result;
     }
@@ -1179,6 +1290,8 @@ public class GeneratorUtils {
         com.sk89q.worldedit.world.World world = sessionManager.get(actor).getSelectionWorld();
 
         sessionManager.get(actor).setRegionSelector(world, regionSelector);
+
+        ChatHelper.logDebug("Restored selection");
     }
 
     /**
@@ -1199,6 +1312,8 @@ public class GeneratorUtils {
                 BlockVector3.at(vector2.getBlockX(), vector2.getBlockY(), vector2.getBlockZ())
             )
         );
+
+        ChatHelper.logDebug("Created cuboid selection");
     }
 
 
@@ -1210,26 +1325,44 @@ public class GeneratorUtils {
      * @param points The list of points to create the selection from
      */
     public static void createPolySelection(Player p, List<Vector> points, Block[][][] blocks){
-        Actor actor = BukkitAdapter.adapt(p);
-        SessionManager sessionManager = WorldEdit.getInstance().getSessionManager();
-        com.sk89q.worldedit.world.World world = sessionManager.get(actor).getSelectionWorld();
-
         int minY = Integer.MAX_VALUE;
         int maxY = Integer.MIN_VALUE;
 
-        List<BlockVector2> blockVector2List = new ArrayList<>();
         for(Vector vector : points) {
-            blockVector2List.add(BlockVector2.at(vector.getBlockX(), vector.getBlockZ()));
-
             int y = getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), MenuItems.getIgnoredMaterials());
 
             minY = Math.min(minY, y);
             maxY = Math.max(maxY, y);
         }
 
+        createPolySelection(p, points, minY, maxY);
+    }
+
+    /**
+     * Creates a Polygon WorldEdit selection from a list of points and execute it right away.
+     * This functions determines the current surface height of each vector directly.
+     *
+     * @param p The player to create the selection for
+     * @param points The list of points to create the selection from
+     * @param minY The minimum Y value of the selection
+     * @param maxY The maximum Y value of the selection
+     */
+    public static void createPolySelection(Player p, List<Vector> points, int minY, int maxY) {
+        Actor actor = BukkitAdapter.adapt(p);
+        SessionManager sessionManager = WorldEdit.getInstance().getSessionManager();
+        com.sk89q.worldedit.world.World world = sessionManager.get(actor).getSelectionWorld();
+
+        List<BlockVector2> blockVector2List = new ArrayList<>();
+        for (Vector vector : points){
+            blockVector2List.add(BlockVector2.at(vector.getBlockX(), vector.getBlockZ()));
+            ChatHelper.logDebug("Added point: " + vector);
+        }
+
         sessionManager.get(actor).setRegionSelector(world,
-            new Polygonal2DRegionSelector(world, blockVector2List, minY, maxY)
+                new Polygonal2DRegionSelector(world, blockVector2List, minY, maxY)
         );
+
+        ChatHelper.logDebug("Created polygonal selection with " + points.size() + " points. minY: " + minY + " maxY: " + maxY);
     }
 
     /**
@@ -1245,6 +1378,8 @@ public class GeneratorUtils {
 
         for(int i = 1; i < points.size(); i++)
             p.chat("//pos2 " + getXYZ(points.get(i), blocks));
+
+        ChatHelper.logDebug("Created convex selection with " + points.size() + " points");
     }
 
 
@@ -1285,6 +1420,8 @@ public class GeneratorUtils {
             script.createCommand("//line " + lineMaterial);
             operations++;
         }
+
+        ChatHelper.logDebug("Created poly line with " + points.size() + " points");
 
         return operations;
     }

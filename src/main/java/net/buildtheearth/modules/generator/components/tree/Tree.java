@@ -39,7 +39,5 @@ public class Tree extends GeneratorComponent {
             return;
 
         TreeScripts.treescript_v_1_0(p, this);
-
-        sendSuccessMessage(p);
     }
 }

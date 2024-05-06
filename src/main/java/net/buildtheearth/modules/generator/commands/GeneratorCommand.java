@@ -83,12 +83,12 @@ public class GeneratorCommand implements CommandExecutor {
         }
 
         if (args[0].equals("undo")) {
-            GeneratorModule.getInstance().getPlayerHistory(p).undo(p);
+            GeneratorModule.getInstance().getPlayerHistory(p).undoCommand(p);
             return true;
         }
 
         if (args[0].equals("redo")) {
-            GeneratorModule.getInstance().getPlayerHistory(p).redo(p);
+            GeneratorModule.getInstance().getPlayerHistory(p).redoCommand(p);
             return true;
         }
 

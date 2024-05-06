@@ -1,8 +1,11 @@
 package net.buildtheearth.modules.generator.model;
 
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.extension.platform.Actor;
 import lombok.Getter;
 import net.buildtheearth.BuildTeamTools;
+import net.buildtheearth.modules.generator.utils.GeneratorUtils;
+import net.buildtheearth.utils.ChatHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -29,35 +32,45 @@ public class History {
         historyEntries.add(entry);
     }
 
-    public void undo(Player p){
+    public void undoCommand(Player p){
         if(getHistoryEntries().isEmpty()){
-            p.sendMessage("§cYou didn't generate any structures yet. Use /gen to create one.");
+            p.sendMessage("§cYou didn't generate any structures yet. Use /gen to create one. You can only undo the last structure.");
             return;
         }
 
-        p.chat("//undo " + LocalSession.MAX_HISTORY_SIZE);
-        undoHistoryEntries.addAll(getHistoryEntries());
+        LocalSession session = getHistoryEntries().get(0).getScript().getLocalSession();
+        Actor actor = getHistoryEntries().get(0).getScript().getActor();
+        int worldEditCommandCount = getHistoryEntries().get(0).getWorldEditCommandCount();
+
+        GeneratorUtils.undo(session, p, actor, worldEditCommandCount);
+
+        getUndoHistoryEntries().add(getHistoryEntries().get(0));
         getHistoryEntries().clear();
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(BuildTeamTools.getInstance(), () -> {
-            p.sendMessage("§7Successfully undid the last structure.");
-            p.sendMessage("§7Use /gen redo to redo it.");
+            p.sendMessage(ChatHelper.standard("Successfully %s the last structure.", "undid"));
+            p.sendMessage(ChatHelper.standard("Use %s to redo it.", "/gen redo"));
         }, 20L);
     }
 
-    public void redo(Player p){
+    public void redoCommand(Player p){
         if(getUndoHistoryEntries().isEmpty()){
-            p.sendMessage("§cYou didn't undo any structures yet. Use /gen undo to undo one.");
+            p.sendMessage("§cYou didn't undo any structures yet. Use /gen undo to undo one. You can only redo the last structure.");
             return;
         }
 
-        p.chat("//redo " + LocalSession.MAX_HISTORY_SIZE);
-        historyEntries.addAll(getUndoHistoryEntries());
+        LocalSession session = getUndoHistoryEntries().get(0).getScript().getLocalSession();
+        Actor actor = getUndoHistoryEntries().get(0).getScript().getActor();
+        int worldEditCommandCount = getUndoHistoryEntries().get(0).getWorldEditCommandCount();
+
+        GeneratorUtils.redo(session, p, actor, worldEditCommandCount);
+
+        getHistoryEntries().add(getUndoHistoryEntries().get(0));
         getUndoHistoryEntries().clear();
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(BuildTeamTools.getInstance(), () -> {
-            p.sendMessage("§7Successfully redid the last structure.");
-            p.sendMessage("§7Use /gen undo to undo it.");
+            p.sendMessage(ChatHelper.standard("Successfully %s the last structure.", "redid"));
+            p.sendMessage(ChatHelper.standard("Use %s to undo it.", "/gen undo"));
         }, 20L);
     }
 
@@ -68,12 +81,15 @@ public class History {
         @Getter
         private final long timeCreated;
         @Getter
+        private final Script script;
+        @Getter
         private final int worldEditCommandCount;
 
-        public HistoryEntry(GeneratorType generatorType, int worldEditCommandCount) {
+        public HistoryEntry(GeneratorType generatorType, Script script) {
             this.generatorType = generatorType;
             this.timeCreated = System.currentTimeMillis();
-            this.worldEditCommandCount = worldEditCommandCount;
+            this.worldEditCommandCount = script.getChanges();
+            this.script = script;
         }
     }
 }

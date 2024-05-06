@@ -6,6 +6,7 @@ import net.buildtheearth.modules.generator.model.Flag;
 import net.buildtheearth.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.modules.generator.model.Script;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
+import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.Item;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -66,8 +67,8 @@ public class RoadScripts extends Script {
 
         // Get the points of the region
         List<Vector> points = GeneratorUtils.getSelectionPointsFromRegion(getRegion());
-
-        points = GeneratorUtils.populatePoints(points, laneWidth);
+        int minY = getRegion().getMinimumY();
+        int maxY = getRegion().getMaximumY();
 
         List<Vector> oneMeterPoints = new ArrayList<>(points);
         oneMeterPoints = GeneratorUtils.populatePoints(oneMeterPoints, 1);
@@ -85,25 +86,22 @@ public class RoadScripts extends Script {
         List<Vector> polyRegionPointsExact = GeneratorUtils.shiftPoints(polyRegionLine, max_width, true);
 
 
-
         // ----------- PREPARATION 01 ----------
         // Replace all unnecessary blocks with air
 
         // Create a region from the points
-        createPolySelection(polyRegionPoints);
-
-        // Draw the road
-        drawCurve(points, XMaterial.YELLOW_WOOL, true);
-
+        GeneratorUtils.createPolySelection(getPlayer(), polyRegionPoints, minY, maxY);
 
         // Prepare the script session
         Block[][][] blocks = GeneratorUtils.prepareScriptSession(localSession, actor, getPlayer(),weWorld, 30, true);
 
-        finish(blocks, points);
-
-        /*
         // Bring all points to the ground
         GeneratorUtils.adjustHeight(points, blocks);
+        GeneratorUtils.adjustHeight(oneMeterPoints, blocks);
+        GeneratorUtils.adjustHeight(roadMarkingPoints, blocks);
+        GeneratorUtils.adjustHeight(streetLampPointsMid, blocks);
+        GeneratorUtils.adjustHeight(polyRegionPoints, blocks);
+        GeneratorUtils.adjustHeight(polyRegionPointsExact, blocks);
 
         // Shorten the points to prevent the road from being too long
         List<Vector> innerPoints = new ArrayList<>(points);
@@ -113,7 +111,7 @@ public class RoadScripts extends Script {
         // ----------- ROAD ----------
 
         // Draw the road
-        String mask = "!#solid";
+        String mask = "#solid,!minecraft:air," + markingMaterialID;
 
         if(roadMaterialIDs != null)
             mask += "," + roadMaterialIDs;
@@ -123,7 +121,7 @@ public class RoadScripts extends Script {
             mask += "," + sidewalkSlabMaterialIDs;
         if(roadSlabMaterialIDs != null)
             mask += "," + roadSlabMaterialIDs;
-        mask += "," + markingMaterialID;
+
 
         drawCurveWithMask(mask, points, XMaterial.YELLOW_WOOL, true);
 
@@ -132,10 +130,10 @@ public class RoadScripts extends Script {
             List<List<Vector>> yellowWoolLine = GeneratorUtils.shiftPointsAll(innerPoints, (laneWidth * (i - 1)));
 
             for (List<Vector> path : yellowWoolLine) {
-                drawCurve(path, XMaterial.YELLOW_WOOL, true);
+                drawCurveWithMask(mask, path, XMaterial.YELLOW_WOOL, true);
 
                 // Close the circles (curves are not able to end at the beginning)
-                drawLine(path.get(0), path.get(path.size() - 1), XMaterial.YELLOW_WOOL, true);
+                drawLineWithMask(mask, path.get(0), path.get(path.size() - 1), XMaterial.YELLOW_WOOL, true);
             }
         }
 
@@ -143,9 +141,8 @@ public class RoadScripts extends Script {
         if (road_width > 10) {
             List<List<Vector>> yellowWoolLineNearSidewalk = GeneratorUtils.shiftPointsAll(innerPoints, road_width - 4);
             for (List<Vector> path : yellowWoolLineNearSidewalk)
-                drawPolyLine(path, XMaterial.YELLOW_WOOL, true);
+                drawPolyLineWithMask(mask, path, XMaterial.YELLOW_WOOL, true, true);
         }
-
 
 
         // ----------- SIDEWALK ----------
@@ -159,29 +156,29 @@ public class RoadScripts extends Script {
 
             // Draw the sidewalk middle lines
             for(List<Vector> path : sidewalkPointsMid)
-                drawPolyLineWithMask("!#solid," + roadMaterialIDs + "," + markingMaterialID, path, XMaterial.ORANGE_WOOL, true);
+                drawPolyLineWithMask("#solid,!air," + roadMaterialIDs + "," + markingMaterialID, path, XMaterial.ORANGE_WOOL, true, true);
 
             // Create the outer sidewalk edge lines
             for(List<Vector> path : sidewalkPointsOut)
-                drawPolyLineWithMask("!" + roadMaterialIDs + "," + markingMaterialID, path, XMaterial.LIGHT_BLUE_WOOL, true);
+                drawPolyLineWithMask("#solid,!air," + roadMaterialIDs + "," + markingMaterialID, path, XMaterial.LIGHT_BLUE_WOOL, true, true);
 
             // Create the inner sidewalk edge lines
             for(List<Vector> path : sidewalkPointsIn)
-                drawPolyLineWithMask("!" + roadMaterialIDs + "," + markingMaterialID, path, XMaterial.LIGHT_BLUE_WOOL, true);
+                drawPolyLineWithMask("#solid,!air," + roadMaterialIDs + "," + markingMaterialID, path, XMaterial.LIGHT_BLUE_WOOL, true, true);
 
 
             if(isCrosswalk){
                 // Draw the sidewalk middle lines
                 for(List<Vector> path : sidewalkPointsMid)
-                    drawPolyLineWithMask(roadMaterialIDs + "," + markingMaterialID, path, XMaterial.MAGENTA_WOOL, true);
+                    drawPolyLineWithMask("#solid,!air," + roadMaterialIDs + "," + markingMaterialID, path, XMaterial.MAGENTA_WOOL, true, true);
 
                 // Create the outer sidewalk edge lines
                 for(List<Vector> path : sidewalkPointsOut)
-                    drawPolyLineWithMask("!" + roadMaterialIDs + "," + markingMaterialID, path, XMaterial.BLUE_WOOL, true);
+                    drawPolyLineWithMask("#solid,!air," + roadMaterialIDs + "," + markingMaterialID, path, XMaterial.BLUE_WOOL, true, true);
 
                 // Create the inner sidewalk edge lines
                 for(List<Vector> path : sidewalkPointsIn)
-                    drawPolyLineWithMask("!" + roadMaterialIDs + "," + markingMaterialID, path, XMaterial.BLUE_WOOL, true);
+                    drawPolyLineWithMask("#solid,!air," + roadMaterialIDs + "," + markingMaterialID, path, XMaterial.BLUE_WOOL, true, true);
             }
         }
 
@@ -225,7 +222,7 @@ public class RoadScripts extends Script {
         expandSelection(new Vector(0, -10, 0));
 
 
-        setGmask("!air,35:3,35:11");
+        setGmask("#solid,!minecraft:air,35:3,35:11");
 
         // Bring all lines to the top
         for(int i = 0; i < road_height + 5; i++) {
@@ -234,7 +231,7 @@ public class RoadScripts extends Script {
             setBlocksWithMask(">35:4", XMaterial.YELLOW_WOOL);
         }
 
-        setGmask("!air");
+        setGmask("#solid,!minecraft:air");
 
         // Bring the light blue and blue wool to the top at last to prevent the others from creating leaks
         for(int i = 0; i < road_height + 5; i++) {
@@ -252,14 +249,14 @@ public class RoadScripts extends Script {
         }
 
         // Spread the yellow wool
-        setGmask("!35:3,35:5,35:6,#solid");
+        setGmask("#solid,!35:3,35:5,35:6");
         for(int i = 0; i < laneWidth*2; i++){
             // Replace all blocks around yellow wool with yellow wool until it reaches the light blue wool
             setBlocksWithMask("=(queryRel(1,0,0,35,4)||queryRel(-1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4)||queryRel(0,-1,0,35,4)||queryRel(0,1,0,35,4))&&queryRel(0,3,0,0,0)", XMaterial.YELLOW_WOOL);
         }
 
         // Spread the orange wool
-        setGmask("!35:3,35:2,35:11,35:5,#solid");
+        setGmask("#solid,!35:3,35:2,35:11,35:5");
         for(int i = 0; i < laneWidth*2; i++){
             // Replace all blocks around orange wool with orange wool until it reaches the light blue wool
             setBlocksWithMask("=queryRel(0,3,0,0,0)&&(queryRel(1,0,0,35,1)||queryRel(-1,0,0,35,1)||queryRel(0,0,1,35,1)||queryRel(0,0,-1,35,1)||queryRel(0,-1,0,35,1)||queryRel(0,1,0,35,1))", XMaterial.ORANGE_WOOL);
@@ -271,7 +268,7 @@ public class RoadScripts extends Script {
 
 
         // Spread the magenta wool
-        setGmask("!35:11,35:3,#solid");
+        setGmask("#solid,!35:11,35:3");
         for(int i = 0; i < laneWidth*2; i++){
             // Replace all blocks around orange wool with orange wool until it reaches the light blue wool
             setBlocksWithMask("=(queryRel(1,0,0,35,2)||queryRel(-1,0,0,35,2)||queryRel(0,0,1,35,2)||queryRel(0,0,-1,35,2)||queryRel(0,-1,0,35,2)||queryRel(0,1,0,35,2))&&queryRel(0,3,0,0,0)", XMaterial.MAGENTA_WOOL);
@@ -421,6 +418,5 @@ public class RoadScripts extends Script {
 
         // Finish the script
         finish(blocks, points);
-        */
     }
 }

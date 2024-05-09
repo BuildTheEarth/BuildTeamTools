@@ -541,7 +541,7 @@ public class GeneratorUtils {
                     editSession.drawSpline(pattern, blockVector3s, tension, bias, continuity, quality, radius, filled);
 
                     if (connectLineEnds && blockVector3s.size() > 1)
-                        editSession.drawLine(pattern, blockVector3s.get(0), blockVector3s.get(blockVector3s.size() - 1), 1, true);
+                        editSession.drawLine(pattern, blockVector3s.get(0), blockVector3s.get(blockVector3s.size() - 1), radius, true);
 
                     saveEditSession(editSession, localSession, actor);
                 }

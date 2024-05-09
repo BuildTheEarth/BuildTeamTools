@@ -169,15 +169,15 @@ public class RoadScripts extends Script {
             if(isCrosswalk){
                 // Draw the sidewalk middle lines
                 for(List<Vector> path : sidewalkPointsMid)
-                    drawPolyLineWithMask("#solid,!air," + roadMaterialIDs + "," + markingMaterialID, path, XMaterial.MAGENTA_WOOL, true, true);
+                    drawPolyLineWithMask(roadMaterialIDs + "," + markingMaterialID, path, XMaterial.MAGENTA_WOOL, true, true);
 
                 // Create the outer sidewalk edge lines
                 for(List<Vector> path : sidewalkPointsOut)
-                    drawPolyLineWithMask("#solid,!air," + roadMaterialIDs + "," + markingMaterialID, path, XMaterial.BLUE_WOOL, true, true);
+                    drawPolyLineWithMask(roadMaterialIDs + "," + markingMaterialID, path, XMaterial.BLUE_WOOL, true, true);
 
                 // Create the inner sidewalk edge lines
                 for(List<Vector> path : sidewalkPointsIn)
-                    drawPolyLineWithMask("#solid,!air," + roadMaterialIDs + "," + markingMaterialID, path, XMaterial.BLUE_WOOL, true, true);
+                    drawPolyLineWithMask(roadMaterialIDs + "," + markingMaterialID, path, XMaterial.BLUE_WOOL, true, true);
             }
         }
 
@@ -228,24 +228,22 @@ public class RoadScripts extends Script {
         setBlocksWithMask("=queryRel(0,-1,0,35,2)&&!queryRel(0,0,0,0,0)&&!queryRel(0,0,0,35,3)&&!queryRel(0,0,0,35,11)", XMaterial.MAGENTA_WOOL, road_height + 5);
         setBlocksWithMask("=queryRel(0,-1,0,35,4)&&!queryRel(0,0,0,0,0)&&!queryRel(0,0,0,35,3)&&!queryRel(0,0,0,35,11)", XMaterial.YELLOW_WOOL, road_height + 5);
 
-        finish(blocks, points);
-
-
-        setGmask("#solid,!minecraft:air");
 
         // Bring the light blue and blue wool to the top at last to prevent the others from creating leaks
         for(int i = 0; i < road_height + 5; i++) {
-            setBlocksWithMask(">35:3", XMaterial.LIGHT_BLUE_WOOL);
-            setBlocksWithMask(">35:11", XMaterial.BLUE_WOOL);
+            setBlocksWithMask("=queryRel(0,-1,0,35,3)&&!queryRel(0,0,0,0,0)", XMaterial.LIGHT_BLUE_WOOL);
+            setBlocksWithMask("=queryRel(0,-1,0,35,11)&&!queryRel(0,0,0,0,0)", XMaterial.BLUE_WOOL);
         }
 
 
-/*
         // Bring all lines further down
         for(int i = 0; i < 3; i++) {
             setBlocksWithMask("=queryRel(0,1,0,35,3)", XMaterial.LIGHT_BLUE_WOOL);
             setBlocksWithMask("=queryRel(0,1,0,35,11)", XMaterial.BLUE_WOOL);
         }
+
+        finish(blocks, points);
+        /*
 
         // Spread the yellow wool
         setGmask("#solid,!35:3,35:5,35:6");

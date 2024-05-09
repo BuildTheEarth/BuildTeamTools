@@ -557,11 +557,11 @@ public class GeneratorUtils {
     }
 
     public static CompletableFuture<Void> drawCurveWithMasks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, Block[][][] regionBlocks, List<String> masks, List<Vector> points, BlockState[] blocks, boolean matchElevation){
-        return drawSplineWithMask(localSession, actor, weWorld, regionBlocks, masks, points, blocks, matchElevation, 0, 0, 0, 10, 1, true, false);
+        return drawSplineWithMask(localSession, actor, weWorld, regionBlocks, masks, points, blocks, matchElevation, 0, 0, 0, 10, 0, true, false);
     }
 
     public static CompletableFuture<Void> drawPolyLineWithMasks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, Block[][][] regionBlocks, List<String> masks, List<Vector> points, BlockState[] blocks, boolean matchElevation, boolean connectLineEnds){
-        return drawSplineWithMask(localSession, actor, weWorld, regionBlocks, masks, points, blocks, matchElevation, 1, 0, -1, 10, 1, true, connectLineEnds);
+        return drawSplineWithMask(localSession, actor, weWorld, regionBlocks, masks, points, blocks, matchElevation, 1, 0, -1, 10, 0, true, connectLineEnds);
     }
 
 

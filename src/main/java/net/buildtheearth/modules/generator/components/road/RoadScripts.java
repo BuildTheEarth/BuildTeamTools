@@ -6,7 +6,6 @@ import net.buildtheearth.modules.generator.model.Flag;
 import net.buildtheearth.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.modules.generator.model.Script;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
-import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.Item;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -222,14 +221,15 @@ public class RoadScripts extends Script {
         expandSelection(new Vector(0, -10, 0));
 
 
-        setGmask("#solid,!minecraft:air,35:3,35:11");
+        //setGmask("#solid,!minecraft:air,35:3,35:11");
 
         // Bring all lines to the top
-        for(int i = 0; i < road_height + 5; i++) {
-            setBlocksWithMask(">35:1", XMaterial.ORANGE_WOOL);
-            setBlocksWithMask(">35:2", XMaterial.MAGENTA_WOOL);
-            setBlocksWithMask(">35:4", XMaterial.YELLOW_WOOL);
-        }
+        setBlocksWithMask("=queryRel(0,-1,0,35,1)&&!queryRel(0,0,0,0,0)&&!queryRel(0,0,0,35,3)&&!queryRel(0,0,0,35,11)", XMaterial.ORANGE_WOOL, road_height + 5);
+        setBlocksWithMask("=queryRel(0,-1,0,35,2)&&!queryRel(0,0,0,0,0)&&!queryRel(0,0,0,35,3)&&!queryRel(0,0,0,35,11)", XMaterial.MAGENTA_WOOL, road_height + 5);
+        setBlocksWithMask("=queryRel(0,-1,0,35,4)&&!queryRel(0,0,0,0,0)&&!queryRel(0,0,0,35,3)&&!queryRel(0,0,0,35,11)", XMaterial.YELLOW_WOOL, road_height + 5);
+
+        finish(blocks, points);
+
 
         setGmask("#solid,!minecraft:air");
 
@@ -239,9 +239,8 @@ public class RoadScripts extends Script {
             setBlocksWithMask(">35:11", XMaterial.BLUE_WOOL);
         }
 
-        setGmask(null);
 
-
+/*
         // Bring all lines further down
         for(int i = 0; i < 3; i++) {
             setBlocksWithMask("=queryRel(0,1,0,35,3)", XMaterial.LIGHT_BLUE_WOOL);
@@ -418,5 +417,7 @@ public class RoadScripts extends Script {
 
         // Finish the script
         finish(blocks, points);
+
+         */
     }
 }

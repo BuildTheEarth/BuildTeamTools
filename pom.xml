@@ -177,6 +177,9 @@
 
 
     <dependencies>
+
+        <!--==========  GENERAL  ==========-->
+
         <!-- Paper -->
         <dependency>
             <groupId>io.papermc.paper</groupId>
@@ -192,6 +195,36 @@
             <version>1.5.25</version>
             <scope>provided</scope>
         </dependency>
+
+
+
+        <!--==========  BUILD THE EARTH  ==========-->
+
+        <!-- Alps BTE Lib -->
+        <dependency>
+            <groupId>com.alpsbte.alpslib</groupId>
+            <artifactId>alpslib-io</artifactId>
+            <version>1.0.34</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.alpsbte.alpslib</groupId>
+            <artifactId>alpslib-libpsterra</artifactId>
+            <version>1.0</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- PorkLib -->
+        <dependency>
+            <groupId>net.daporkchop.lib</groupId>
+            <artifactId>binary</artifactId>
+            <version>0.5.7-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+
+
+
+        <!--==========  WORLD EDIT  ==========-->
 
         <!-- Fast Async World Edit for 1.13+ -->
         <dependency>
@@ -212,30 +245,20 @@
             </exclusions>
         </dependency>
 
-        <!-- World Edit for 1.12
-        <dependency>
-            <groupId>com.sk89q.worldedit</groupId>
-            <artifactId>worldedit-bukkit</artifactId>
-            <version>6.1.9</version>
-            <scope>provided</scope>
-        </dependency> -->
 
-        <!-- World Edit
-        <dependency>
-            <groupId>com.sk89q.worldedit</groupId>
-            <artifactId>worldedit-bukkit</artifactId>
-            <version>7.2.9</version>
-            <scope>provided</scope>
-        </dependency> -->
 
-        <!-- XSeries -->
+        <!--==========  MINECRAFT LIBRARIES  ==========-->
+
+        <!-- XSeries (Version Independent Materials) -->
+        <!-- Ref: https://github.com/CryptoMorin/XSeries -->
         <dependency>
             <groupId>com.github.cryptomorin</groupId>
             <artifactId>XSeries</artifactId>
             <version>9.9.0</version>
         </dependency>
 
-        <!-- Canvas Menu Builder -->
+        <!-- Canvas Menu Builder (Inventory GUI Library) -->
+        <!-- Ref: https://github.com/IPVP-MC/canvas -->
         <dependency>
             <groupId>com.github.IPVP-MC</groupId>
             <artifactId>canvas</artifactId>
@@ -243,19 +266,36 @@
             <scope>compile</scope>
         </dependency>
 
-        <!-- Clipper2 -->
+        <!-- Anvil GUI (Anvil Inventory GUI Library)-->
+        <!-- Ref: https://github.com/WesJD/AnvilGUI -->
+        <dependency>
+            <groupId>net.wesjd</groupId>
+            <artifactId>anvilgui</artifactId>
+            <version>1.9.2-SNAPSHOT</version>
+        </dependency>
+
+        <!-- Adventure API (Text Component Library) -->
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-api</artifactId>
+            <version>4.17.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-text-serializer-legacy</artifactId>
+            <version>4.17.0</version>
+        </dependency>
+
+
+
+        <!--==========  UTILITIES  ==========-->
+
+        <!-- Clipper2 (Polygon Clipping and Offsetting Library) -->
+        <!-- Ref: https://github.com/micycle1/Clipper2-java -->
         <dependency>
             <groupId>micycle</groupId>
             <artifactId>clipper2</artifactId>
             <version>1.2.2</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <!-- Lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.30</version>
             <scope>compile</scope>
         </dependency>
 
@@ -267,42 +307,21 @@
             <scope>compile</scope>
         </dependency>
 
-        <!-- Alps BTE Lib -->
-        <dependency>
-            <groupId>com.alpsbte.alpslib</groupId>
-            <artifactId>alpslib-io</artifactId>
-            <version>1.0.34</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.alpsbte.alpslib</groupId>
-            <artifactId>alpslib-libpsterra</artifactId>
-            <version>1.0</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <!-- PorkLib -->
-        <dependency>
-            <groupId>net.daporkchop.lib</groupId>
-            <artifactId>binary</artifactId>
-            <version>0.5.7-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-
+        <!-- Google Gson -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.10.1</version>
         </dependency>
 
+        <!-- Google Guava -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>31.1-jre</version>
         </dependency>
 
-        <!-- OkHttp -->
+        <!-- OkHttp (HTTP Client) -->
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
@@ -316,11 +335,16 @@
             <version>2.2.1</version>
         </dependency>
 
-        <!-- Anvil GUI -->
+
+
+        <!--==========  JAVA EXTENSIONS  ==========-->
+
+        <!-- Lombok -->
         <dependency>
-            <groupId>net.wesjd</groupId>
-            <artifactId>anvilgui</artifactId>
-            <version>1.9.2-SNAPSHOT</version>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.30</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

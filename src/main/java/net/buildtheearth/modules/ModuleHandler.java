@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 /**
  * @author Noah Husby
@@ -80,14 +79,14 @@ public class ModuleHandler {
 
         if (isStarting) {
             if (module.isEnabled())
-                Bukkit.getConsoleSender().sendMessage( "§7[§a✔§7] Successfully loaded §e" + module.getModuleName() + " Module§7.");
+                Bukkit.getConsoleSender().sendMessage("§7[§aOK§7] Successfully loaded §e" + module.getModuleName() + " Module§7.");
             else {
                 String reason = "";
 
                 if (module.getError() != null && !module.getError().isEmpty())
                     reason = " Reason: §c" + module.getError();
 
-                Bukkit.getConsoleSender().sendMessage( "§7[§c✖§7] Failed to load the §e" + module.getModuleName() + " Module§7." + reason);
+                Bukkit.getConsoleSender().sendMessage( "§7[§cX§7]  Failed to load the §e" + module.getModuleName() + " Module§7." + reason);
             }
         }else{
             if (module.isEnabled())

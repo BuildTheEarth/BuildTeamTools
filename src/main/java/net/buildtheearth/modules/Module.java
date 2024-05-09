@@ -153,13 +153,15 @@ public abstract class Module {
     /** Loads the listeners for the module into Bukkit */
     private void loadListeners(){
         for(Listener listener : listeners)
-            Bukkit.getPluginManager().registerEvents(listener, BuildTeamTools.getInstance());
+            if(listener != null)
+                Bukkit.getPluginManager().registerEvents(listener, BuildTeamTools.getInstance());
     }
 
     /** Unregisters all listeners from Bukkit and removes them from the module */
     private void unregisterListeners(){
         for(Listener listener : listeners)
-            HandlerList.unregisterAll(listener);
+            if(listener != null)
+                HandlerList.unregisterAll(listener);
 
         listeners.clear();
     }

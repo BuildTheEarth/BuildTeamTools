@@ -38,6 +38,36 @@ public class DependencyComponent extends ModuleComponent {
     }
 
     /**
+     * Checks if the server is running on a Paper-based server.
+     *
+     * @return True if the server is running on a Paper-based server, false if it is not
+     */
+    public boolean isPaper(){
+        try {
+            // Try to load a Paper-specific class
+            Class.forName("com.destroystokyo.paper.PaperConfig");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Checks if the server is running on a Spigot-based server.
+     *
+     * @return True if the server is running on a Spigot-based server, false if it is not
+     */
+    public boolean isSpigot(){
+        try {
+            // Try to load a Spigot-specific class
+            Class.forName("org.spigotmc.SpigotConfig");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
+
+    /**
      * Checks if the plugin "FastAsyncWorldEdit" is enabled.
      *
      * @return True if FastAsyncWorldEdit is enabled, false if it is not enabled

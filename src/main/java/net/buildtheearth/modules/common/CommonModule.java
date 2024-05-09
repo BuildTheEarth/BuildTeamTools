@@ -88,9 +88,13 @@ public class CommonModule extends Module {
     public void registerListeners() {
         super.registerListeners(
             new MenuFunctionListener(),
-            new CommandListener(),
-            new ExceptionListener()
+            new CommandListener()
         );
+
+        // The ServerExceptionEvent only exists in Paper not in Spigot
+        try{
+            getListeners().add(new ExceptionListener());
+        }catch (Exception ignored){}
     }
 
 

@@ -4,7 +4,7 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.BuildTeamTools;
-import net.buildtheearth.modules.Component;
+import net.buildtheearth.modules.ModuleComponent;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.GeometricUtils;
@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class TpllComponent extends Component {
+public class TpllComponent extends ModuleComponent {
 
     public TpllComponent() {
         super("Tpll");

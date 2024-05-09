@@ -3,7 +3,7 @@ package net.buildtheearth.modules.navigation.components.navigator;
 import com.cryptomorin.xseries.XMaterial;
 import com.sk89q.worldedit.WorldEdit;
 import net.buildtheearth.BuildTeamTools;
-import net.buildtheearth.modules.Component;
+import net.buildtheearth.modules.ModuleComponent;
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.Item;
@@ -14,7 +14,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Field;
 
-public class NavigatorComponent extends Component {
+public class NavigatorComponent extends ModuleComponent {
 
 
     public NavigatorComponent() {

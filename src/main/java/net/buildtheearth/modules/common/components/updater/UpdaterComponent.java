@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.buildtheearth.modules.Component;
+import net.buildtheearth.modules.ModuleComponent;
 import net.buildtheearth.modules.network.model.Permissions;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -22,7 +22,7 @@ import java.net.URL;
 import java.util.logging.Level;
 
 
-public class UpdaterComponent extends Component {
+public class UpdaterComponent extends ModuleComponent {
     private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36";
     private static final String DOWNLOAD = "/download";
     private static final String VERSIONS = "/versions";

@@ -4,7 +4,7 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.BuildTeamTools;
-import net.buildtheearth.modules.Component;
+import net.buildtheearth.modules.ModuleComponent;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.api.NetworkAPI;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public class WarpsComponent extends Component {
+public class WarpsComponent extends ModuleComponent {
 
     public WarpsComponent() {
         super("Warps");

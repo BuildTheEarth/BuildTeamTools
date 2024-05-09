@@ -34,7 +34,7 @@ public class ExploreMenu extends AbstractMenu {
     protected void setPreviewItems() {
         // Create the continent items
         for (Continent continent : Continent.values()) {
-            ArrayList<String> continentLore = new ArrayList<>(Collections.singletonList(ChatHelper.getColorizedString(NamedTextColor.GRAY, NamedTextColor.GRAY, "Visit countries in %s", continent.getLabel())));
+            ArrayList<String> continentLore = new ArrayList<>(Collections.singletonList(ChatHelper.getStandardString("Visit countries in %s", continent.getLabel())));
             getMenu().getSlot(continent.getSlot()).setItem(Item.create(XMaterial.COMPASS.parseMaterial(),"§e§l" + continent.getLabel(), 1, continentLore));
         }
 

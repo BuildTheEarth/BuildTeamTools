@@ -1,10 +1,10 @@
 package net.buildtheearth.modules.common.components.version;
 
 import lombok.Getter;
-import net.buildtheearth.modules.Component;
+import net.buildtheearth.modules.ModuleComponent;
 import org.bukkit.Bukkit;
 
-public class VersionComponent extends Component {
+public class VersionComponent extends ModuleComponent {
 
 
     public VersionComponent() {

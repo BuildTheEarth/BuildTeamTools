@@ -2,9 +2,11 @@ package net.buildtheearth.utils;
 
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.utils.io.ConfigPaths;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -16,12 +18,17 @@ import java.util.logging.Level;
 
 public class ChatHelper {
 
+    public static TextComponent PREFIX_COMPONENT = LegacyComponentSerializer.legacyAmpersand().deserialize(BuildTeamTools.PREFIX);
+
     public static boolean DEBUG;
 
     static {
         BuildTeamTools.getInstance().getConfig();
         DEBUG = BuildTeamTools.getInstance().getConfig().getBoolean(ConfigPaths.DEBUG, false);
     }
+
+
+    // ------------------ LOGGING ------------------
 
     public static void logError(String errorMessage, Object... objects) {
         Bukkit.getLogger().log(Level.INFO, ChatHelper.getErrorString(errorMessage, objects));
@@ -40,37 +47,79 @@ public class ChatHelper {
         return BuildTeamTools.CONSOLE_PREFIX + String.format(string, objects);
     }
 
-    public static String getSuccessfulString(String string, Object... objects) {
-        return BuildTeamTools.PREFIX + NamedTextColor.GRAY + String.format(string.replaceAll("%s", NamedTextColor.GREEN + "%s" + NamedTextColor.GRAY), objects);
+
+
+    // ------------------ STANDARD TEXT (Gray & Yellow) ------------------
+
+    public static Component getStandardComponent(boolean containsPrefix, String string, Object... objects) {
+        Component component = LegacyComponentSerializer.legacyAmpersand().deserialize(
+                String.format(string.replaceAll("%s", "&e%s&7"), objects)
+        ).color(NamedTextColor.GRAY);
+
+        return containsPrefix ? PREFIX_COMPONENT.append(component) : component;
+    }
+
+    public static String getStandardString(boolean containsPrefix, String string, Object... objects) {
+        return convertComponentToLegacyString(getStandardComponent(containsPrefix, string, objects));
+    }
+
+    public static String getStandardString(String string, Object... objects) {
+        return getStandardString(true, string, objects);
+    }
+
+    public static void sendStandardMessage(Player player, String string, Object... objects) {
+        player.sendMessage(getStandardComponent(true, string, objects));
+    }
+
+    public static void sendStandardMessage(Player player, boolean containsPrefix, String string, Object... objects) {
+        player.sendMessage(getStandardComponent(containsPrefix, string, objects));
+    }
+
+
+    // ------------------ SUCCESS TEXT (Gray & Green Text) ------------------
+
+    public static Component getSuccessComponent(String string, Object... objects) {
+        return PREFIX_COMPONENT.append(
+                LegacyComponentSerializer.legacyAmpersand().deserialize(
+                        String.format(string.replaceAll("%s", "&a%s&7"), objects)
+                ).color(NamedTextColor.GRAY)
+        );
     }
 
     public static void sendSuccessfulMessage(Player player, String string, Object... objects) {
-        player.sendMessage(getSuccessfulString(string, objects));
+        player.sendMessage(getSuccessComponent(string, objects));
+    }
+
+
+
+    // ------------------ ERROR TEXT (Red & Yellow Text) ------------------
+
+    public static Component getErrorComponent(String string, Object... objects) {
+        return LegacyComponentSerializer.legacyAmpersand().deserialize(
+                String.format(string.replaceAll("%s", "&e%s&c"), objects)
+        ).color(NamedTextColor.RED);
     }
 
     public static String getErrorString(String string, Object... objects) {
-        return NamedTextColor.RED + String.format(string.replaceAll("%s", NamedTextColor.YELLOW + "%s" + NamedTextColor.RED), objects);
+        return convertComponentToLegacyString(getErrorComponent(string, objects));
     }
 
     public static void sendErrorMessage(Player player, String string, Object... objects) {
         player.sendMessage(getErrorString(string, objects));
     }
 
-    public static String getStandardString(String string, Object... objects) {
-        return BuildTeamTools.PREFIX + NamedTextColor.GRAY + String.format(string.replaceAll("%s", NamedTextColor.YELLOW + "%s" + NamedTextColor.GRAY), objects);
-    }
 
-    public static String getStandardString(boolean containsPrefix, String string, Object... objects) {
-        return containsPrefix ? BuildTeamTools.PREFIX : "" + NamedTextColor.GRAY + String.format(string.replaceAll("%s", NamedTextColor.YELLOW + "%s" + ChatColor.GRAY), objects);
+    // ------------------ COLORIZED TEXT ------------------
+
+    public static Component getColorizedComponent(NamedTextColor color, String string, boolean bold) {
+        return Component.text(string).color(color).decoration(TextDecoration.BOLD, bold);
     }
 
     public static String getColorizedString(NamedTextColor color, String string, boolean bold) {
-        return bold ? color + "" + TextDecoration.BOLD + string : color + string;
+        return convertComponentToLegacyString(getColorizedComponent(color, string, bold));
     }
 
-    public static String getColorizedString(NamedTextColor color, NamedTextColor secondColor, String string, Object... objects) {
-        return color + String.format(string.replaceAll("%s", secondColor + "%s" + color), objects);
-    }
+
 
     /** Sends the given message to the given player and the console
      *
@@ -104,5 +153,9 @@ public class ChatHelper {
         for (Player player : location.getWorld().getNearbyEntitiesByType(Player.class, location, maxDistance)) {
             player.sendMessage(message);
         }
+    }
+
+    private static String convertComponentToLegacyString(Component component) {
+        return LegacyComponentSerializer.legacyAmpersand().serialize(component).replace("&", "§");
     }
 }

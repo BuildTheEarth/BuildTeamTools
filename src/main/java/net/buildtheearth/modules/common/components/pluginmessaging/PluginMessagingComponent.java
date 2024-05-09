@@ -3,7 +3,7 @@ package net.buildtheearth.modules.common.components.pluginmessaging;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.BuildTeamTools;
-import net.buildtheearth.modules.Component;
+import net.buildtheearth.modules.ModuleComponent;
 import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.stats.StatsModule;
@@ -14,7 +14,7 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 import java.util.List;
 import java.util.UUID;
 
-public class PluginMessagingComponent extends Component implements PluginMessageListener {
+public class PluginMessagingComponent extends ModuleComponent implements PluginMessageListener {
 
     public PluginMessagingComponent() {
         super("Plugin Messages");

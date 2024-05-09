@@ -2,17 +2,12 @@ package net.buildtheearth.modules.common.components.dependency;
 
 import com.sk89q.worldedit.WorldEdit;
 import net.buildtheearth.BuildTeamTools;
-import net.buildtheearth.modules.Component;
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.PluginManager;
-
-import java.util.ArrayList;
-import java.util.List;
+import net.buildtheearth.modules.ModuleComponent;
 
 /**
  * This class handles checking if the required dependencies for certain features are present
  */
-public class DependencyComponent extends Component {
+public class DependencyComponent extends ModuleComponent {
 
 
     public DependencyComponent() {

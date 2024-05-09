@@ -8,7 +8,7 @@ import lombok.Getter;
  *
  * @author MineFact
  */
-public abstract class Component {
+public abstract class ModuleComponent {
 
     @Getter
     private boolean enabled = false;
@@ -17,7 +17,7 @@ public abstract class Component {
     private final String componentName;
 
 
-    public Component(String componentName) {
+    public ModuleComponent(String componentName) {
         this.componentName = componentName;
 
         enable();

@@ -2,24 +2,27 @@ package net.buildtheearth.modules.generator.model;
 
 import lombok.Getter;
 import net.buildtheearth.BuildTeamTools;
-import net.buildtheearth.modules.Component;
+import net.buildtheearth.modules.ModuleComponent;
 import net.buildtheearth.modules.generator.components.field.FieldSettings;
 import net.buildtheearth.modules.generator.components.house.HouseSettings;
 import net.buildtheearth.modules.generator.components.rail.RailSettings;
 import net.buildtheearth.modules.generator.components.road.RoadSettings;
 import net.buildtheearth.modules.generator.components.tree.TreeSettings;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.UUID;
 
-public abstract class GeneratorComponent extends Component {
+public abstract class GeneratorComponent extends ModuleComponent {
 
 
     public String wikiPage;
@@ -120,22 +123,21 @@ public abstract class GeneratorComponent extends Component {
     }
 
     public void sendSuccessMessage(Player p){
-        p.sendMessage(" ");
-        p.sendMessage(" ");
-        p.sendMessage(" ");
+        TextComponent copyCommand = Component.text("[COPY]", NamedTextColor.YELLOW, TextDecoration.BOLD)
+                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.SUGGEST_COMMAND, getCommand(p)))
+                .hoverEvent(HoverEvent.showText(Component.text("Click to copy command", NamedTextColor.GRAY)));
 
-        TextComponent tc = getTextComponent();
-        tc.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, getCommand(p)));
-        tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§7Click to copy command").create()));
+        TextComponent undo = Component.text("[UNDO]", NamedTextColor.RED, TextDecoration.BOLD)
+                .clickEvent(ClickEvent.runCommand("/gen undo"))
+                .hoverEvent(HoverEvent.showText(Component.text("Click to undo last generation", NamedTextColor.GRAY)));
 
-        p.spigot().sendMessage(tc);
+        TextComponent message = getMessage().append(Component.text(" ")).append(copyCommand).append(Component.text(" ")).append(undo);
 
-        p.sendMessage(" ");
-        p.sendMessage("§cNote: You can undo the edit with /gen undo.");
+        p.sendMessage(message);
         p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
     }
 
-    private TextComponent getTextComponent() {
+    private TextComponent getMessage() {
         String type = "Building";
 
         switch (generatorType){
@@ -153,7 +155,7 @@ public abstract class GeneratorComponent extends Component {
                 break;
         }
 
-        return new TextComponent(BuildTeamTools.PREFIX + type + "§a successfully §7generated. §e[Copy Command]");
+        return LegacyComponentSerializer.legacyAmpersand().deserialize(BuildTeamTools.PREFIX + type + "§a successfully §7generated.");
     }
 
     /** Conversion:

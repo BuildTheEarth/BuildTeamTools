@@ -1,7 +1,6 @@
 package net.buildtheearth.modules.navigation.components.navigator;
 
 import com.cryptomorin.xseries.XMaterial;
-import com.fastasyncworldedit.core.FaweAPI;
 import com.sk89q.worldedit.WorldEdit;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.Component;
@@ -9,7 +8,6 @@ import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.io.ConfigPaths;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -62,10 +60,10 @@ public class NavigatorComponent extends Component {
 
         if(!inventory.contains(getItem())) {
             inventory.setItem(getSlot(), getItem());
-            player.sendMessage(ChatHelper.successful("You turned the navigator %s.", "on"));
+            ChatHelper.sendSuccessfulMessage(player, "You turned the navigator %s.", "on");
         } else {
             inventory.remove(getItem());
-            player.sendMessage(ChatHelper.successful("You turned the navigator %s.", "off"));
+            ChatHelper.sendSuccessfulMessage(player, "You turned the navigator %s.", "off");
         }
     }
 

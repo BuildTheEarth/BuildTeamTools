@@ -17,13 +17,13 @@ public class WarpCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatHelper.error("This command can only be used by a player!"));
+            sender.sendMessage(ChatHelper.getErrorString("This command can only be used by a player!"));
             return true;
         }
 
         // Check if the build team is loaded
         if(NetworkModule.getInstance().getBuildTeam() == null){
-            sender.sendMessage(ChatHelper.error("The Warp Module is currently disabled because the Build Team failed to load!"));
+            sender.sendMessage(ChatHelper.getErrorString("The Warp Module is currently disabled because the Build Team failed to load!"));
             return true;
         }
 
@@ -34,7 +34,7 @@ public class WarpCommand implements CommandExecutor {
             int warpGroupCount = NetworkModule.getInstance().getBuildTeam().getWarpGroups().size();
 
             if(warpGroupCount == 0){
-                player.sendMessage(ChatHelper.error("This server does not have any warps yet!"));
+                player.sendMessage(ChatHelper.getErrorString("This server does not have any warps yet!"));
                 return true;
             }else if(warpGroupCount == 1)
                 new WarpMenu(player, NetworkModule.getInstance().getBuildTeam().getWarpGroups().get(0), false, true);
@@ -48,17 +48,17 @@ public class WarpCommand implements CommandExecutor {
         if (args[0].equalsIgnoreCase("create")) {
             // Check if the command has only one argument
             if (args.length > 1){
-                player.sendMessage(ChatHelper.error("Usage: /warp create"));
+                player.sendMessage(ChatHelper.getErrorString("Usage: /warp create"));
                 return true;
             }
 
             // Check if the player has the required permissions
             if (!player.hasPermission(Permissions.WARP_CREATE)) {
-                player.sendMessage(ChatHelper.error("You don't have the required %s to %s warps.", "permission", "create"));
+                player.sendMessage(ChatHelper.getErrorString("You don't have the required %s to %s warps.", "permission", "create"));
                 return true;
             }
 
-            player.sendActionBar(ChatHelper.standard(false, "Creating the warp..."));
+            player.sendActionBar(ChatHelper.getStandardString(false, "Creating the warp..."));
 
             NavigationModule.getInstance().getWarpsComponent().createWarp(player);
             return true;
@@ -70,7 +70,7 @@ public class WarpCommand implements CommandExecutor {
 
         // Check if the player has the required permission
         if (!player.hasPermission(Permissions.WARP_USE)) {
-            player.sendMessage(ChatHelper.error("You don't have the required %s to %s warps.", "permission", "use"));
+            player.sendMessage(ChatHelper.getErrorString("You don't have the required %s to %s warps.", "permission", "use"));
             return true;
         }
 
@@ -78,7 +78,7 @@ public class WarpCommand implements CommandExecutor {
         Warp warp = NavigationModule.getInstance().getWarpsComponent().getWarpByName(key);
 
         if(warp == null) {
-            player.sendMessage(ChatHelper.error("The warp with the name %s does not exist in this team!", key));
+            player.sendMessage(ChatHelper.getErrorString("The warp with the name %s does not exist in this team!", key));
             return true;
         }
 

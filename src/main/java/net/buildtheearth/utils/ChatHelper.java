@@ -2,6 +2,8 @@ package net.buildtheearth.utils;
 
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.utils.io.ConfigPaths;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -22,43 +24,51 @@ public class ChatHelper {
     }
 
     public static void logError(String errorMessage, Object... objects) {
-        Bukkit.getLogger().log(Level.INFO, ChatHelper.error(errorMessage, objects));
+        Bukkit.getLogger().log(Level.INFO, ChatHelper.getErrorString(errorMessage, objects));
     }
 
     public static void log(String string, Object... objects) {
-        Bukkit.getConsoleSender().sendMessage( console(string, objects));
+        Bukkit.getConsoleSender().sendMessage( getConsoleString(string, objects));
     }
 
     public static void logDebug(String string, Object... objects) {
         if(DEBUG || BuildTeamTools.getInstance().isDebug())
-            Bukkit.getLogger().log(Level.INFO, console(string, objects));
+            Bukkit.getLogger().log(Level.INFO, getConsoleString(string, objects));
     }
 
-    public static String console(String string, Object... objects) {
+    public static String getConsoleString(String string, Object... objects) {
         return BuildTeamTools.CONSOLE_PREFIX + String.format(string, objects);
     }
 
-    public static String successful(String string, Object... objects) {
-        return BuildTeamTools.PREFIX + ChatColor.GRAY + String.format(string.replaceAll("%s", ChatColor.GREEN + "%s" + ChatColor.GRAY), objects);
+    public static String getSuccessfulString(String string, Object... objects) {
+        return BuildTeamTools.PREFIX + NamedTextColor.GRAY + String.format(string.replaceAll("%s", NamedTextColor.GREEN + "%s" + NamedTextColor.GRAY), objects);
     }
 
-    public static String error(String string, Object... objects) {
-        return ChatColor.RED + String.format(string.replaceAll("%s", ChatColor.YELLOW + "%s" + ChatColor.RED), objects);
+    public static void sendSuccessfulMessage(Player player, String string, Object... objects) {
+        player.sendMessage(getSuccessfulString(string, objects));
     }
 
-    public static String standard(String string, Object... objects) {
-        return BuildTeamTools.PREFIX + ChatColor.GRAY + String.format(string.replaceAll("%s", ChatColor.YELLOW + "%s" + ChatColor.GRAY), objects);
+    public static String getErrorString(String string, Object... objects) {
+        return NamedTextColor.RED + String.format(string.replaceAll("%s", NamedTextColor.YELLOW + "%s" + NamedTextColor.RED), objects);
     }
 
-    public static String standard(boolean containsPrefix, String string, Object... objects) {
-        return containsPrefix ? BuildTeamTools.PREFIX : "" + ChatColor.GRAY + String.format(string.replaceAll("%s", ChatColor.YELLOW + "%s" + ChatColor.GRAY), objects);
+    public static void sendErrorMessage(Player player, String string, Object... objects) {
+        player.sendMessage(getErrorString(string, objects));
     }
 
-    public static String colorize(ChatColor color, String string, boolean bold) {
-        return bold ? color + "" + ChatColor.BOLD + string : color + string;
+    public static String getStandardString(String string, Object... objects) {
+        return BuildTeamTools.PREFIX + NamedTextColor.GRAY + String.format(string.replaceAll("%s", NamedTextColor.YELLOW + "%s" + NamedTextColor.GRAY), objects);
     }
 
-    public static String colorize(ChatColor color, ChatColor secondColor, String string, Object... objects) {
+    public static String getStandardString(boolean containsPrefix, String string, Object... objects) {
+        return containsPrefix ? BuildTeamTools.PREFIX : "" + NamedTextColor.GRAY + String.format(string.replaceAll("%s", NamedTextColor.YELLOW + "%s" + ChatColor.GRAY), objects);
+    }
+
+    public static String getColorizedString(NamedTextColor color, String string, boolean bold) {
+        return bold ? color + "" + TextDecoration.BOLD + string : color + string;
+    }
+
+    public static String getColorizedString(NamedTextColor color, NamedTextColor secondColor, String string, Object... objects) {
         return color + String.format(string.replaceAll("%s", secondColor + "%s" + color), objects);
     }
 

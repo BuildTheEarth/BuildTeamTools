@@ -1,6 +1,5 @@
 package net.buildtheearth.modules.common.listeners;
 
-import com.destroystokyo.paper.event.server.ServerExceptionEvent;
 import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.ModuleHandler;
 import net.buildtheearth.utils.ChatHelper;
@@ -9,7 +8,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class CommandListener implements Listener {
@@ -32,7 +30,7 @@ public class CommandListener implements Listener {
                             if (module.getError() != null && !module.getError().isEmpty())
                                 reason = " Reason: " + module.getError();
 
-                            e.getPlayer().sendMessage(ChatHelper.error("The Module " + module.getModuleName() + " is currently disabled." + reason));
+                            ChatHelper.sendErrorMessage(e.getPlayer(), "The Module " + module.getModuleName() + " is currently disabled." + reason);
                             e.setCancelled(true);
                             return;
                         }

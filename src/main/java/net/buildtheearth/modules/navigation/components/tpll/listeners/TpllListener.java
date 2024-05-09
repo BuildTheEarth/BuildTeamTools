@@ -86,7 +86,7 @@ public class TpllListener implements Listener {
                     Region region = Region.getByName(countryName);
 
                     if (!networkModule.getBuildTeam().isConnected() || !region.isConnected()) {
-                        event.getPlayer().sendMessage(ChatHelper.error("Either this server or the receiving server isn't connected to the network."));
+                        event.getPlayer().sendMessage(ChatHelper.getErrorString("Either this server or the receiving server isn't connected to the network."));
                         event.setCancelled(true);
                         return CompletableFuture.completedFuture(false);
                     }

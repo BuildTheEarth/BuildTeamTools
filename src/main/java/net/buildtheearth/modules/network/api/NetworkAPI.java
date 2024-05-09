@@ -365,7 +365,7 @@ public class NetworkAPI {
 
             @Override
             public void onFailure(IOException e) {
-                ChatHelper.error("Failed to sync the player list with the network API: %s", e);
+                ChatHelper.getErrorString("Failed to sync the player list with the network API: %s", e);
             }
         });
     }

@@ -113,7 +113,7 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
             boolean debug = Boolean.parseBoolean(args[1]);
 
             BuildTeamTools.getInstance().setDebug(debug);
-            player.sendMessage(ChatHelper.standard("§7Debug Mode was set to: %s", debug));
+            player.sendMessage(ChatHelper.getStandardString("§7Debug Mode was set to: %s", debug));
             return true;
         }
 
@@ -138,9 +138,9 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
 
-            sender.sendMessage(ChatHelper.standard("§7Reloading all modules..."));
+            sender.sendMessage(ChatHelper.getStandardString("§7Reloading all modules..."));
             ModuleHandler.getInstance().reloadAll(player);
-            sender.sendMessage(ChatHelper.standard("§7All modules have been reloaded."));
+            sender.sendMessage(ChatHelper.getStandardString("§7All modules have been reloaded."));
         }
 
 

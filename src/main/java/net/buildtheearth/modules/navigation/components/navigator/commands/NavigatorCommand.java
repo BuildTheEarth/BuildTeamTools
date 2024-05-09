@@ -13,14 +13,14 @@ public class NavigatorCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatHelper.error("You must be a %s to %s this command!", "player", "execute"));
+            sender.sendMessage(ChatHelper.getErrorString("You must be a %s to %s this command!", "player", "execute"));
             return true;
         }
 
         Player player = (Player) sender;
 
         if(!player.hasPermission(Permissions.NAVIGATOR_USE)) {
-            player.sendMessage(ChatHelper.error("You don't have permission to use this command!"));
+            player.sendMessage(ChatHelper.getErrorString("You don't have permission to use this command!"));
             return true;
         }
 

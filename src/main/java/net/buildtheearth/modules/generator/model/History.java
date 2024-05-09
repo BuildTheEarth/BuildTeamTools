@@ -48,8 +48,8 @@ public class History {
         getHistoryEntries().clear();
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(BuildTeamTools.getInstance(), () -> {
-            p.sendMessage(ChatHelper.standard("Successfully %s the last structure.", "undid"));
-            p.sendMessage(ChatHelper.standard("Use %s to redo it.", "/gen redo"));
+            p.sendMessage(ChatHelper.getStandardString("Successfully %s the last structure.", "undid"));
+            p.sendMessage(ChatHelper.getStandardString("Use %s to redo it.", "/gen redo"));
         }, 20L);
     }
 
@@ -69,8 +69,8 @@ public class History {
         getUndoHistoryEntries().clear();
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(BuildTeamTools.getInstance(), () -> {
-            p.sendMessage(ChatHelper.standard("Successfully %s the last structure.", "redid"));
-            p.sendMessage(ChatHelper.standard("Use %s to undo it.", "/gen undo"));
+            p.sendMessage(ChatHelper.getStandardString("Successfully %s the last structure.", "redid"));
+            p.sendMessage(ChatHelper.getStandardString("Use %s to undo it.", "/gen undo"));
         }, 20L);
     }
 

@@ -217,7 +217,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
             if(clickPlayer.hasPermission(Permissions.WARP_GROUP_DELETE)) {
                 NetworkModule.getInstance().getBuildTeam().deleteWarpGroup(clickPlayer, warpGroup);
             } else {
-                clickPlayer.sendMessage(ChatHelper.error("You don't have the permission to delete warp groups!"));
+                clickPlayer.sendMessage(ChatHelper.getErrorString("You don't have the permission to delete warp groups!"));
             }
 
         });

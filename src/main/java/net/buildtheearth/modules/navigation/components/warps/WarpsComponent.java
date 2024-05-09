@@ -52,7 +52,7 @@ public class WarpsComponent extends Component {
             Warp warp = NetworkAPI.getWarpByKey(warpKey);
 
             if (warp == null) {
-                player.sendMessage(ChatHelper.error("The warp you tried to warp to does not exist anymore."));
+                player.sendMessage(ChatHelper.getErrorString("The warp you tried to warp to does not exist anymore."));
                 return;
             }
 
@@ -77,9 +77,9 @@ public class WarpsComponent extends Component {
         }
 
         if(player.teleport(targetWarpLocation)) {
-            player.sendMessage(ChatHelper.successful("Successfully warped you to the desired location!"));
+            ChatHelper.sendSuccessfulMessage(player, "Successfully warped you to the desired location!");
         } else {
-            player.sendMessage(ChatHelper.error("Something went wrong trying to warp you to the desired location."));
+            player.sendMessage(ChatHelper.getErrorString("Something went wrong trying to warp you to the desired location."));
         }
 
         warpQueue.remove(player.getUniqueId());
@@ -105,7 +105,7 @@ public class WarpsComponent extends Component {
             loc.setY(warp.getY());
 
             player.teleport(loc);
-            player.sendMessage(ChatHelper.successful("Successfully warped you to %s.", warp.getName()));
+            ChatHelper.sendSuccessfulMessage(player, "Successfully warped you to %s.", warp.getName());
 
             return;
         }
@@ -147,7 +147,7 @@ public class WarpsComponent extends Component {
             boolean ownsRegion = NetworkModule.getInstance().ownsRegion(regionName, countryCodeCCA2);
 
             if(!ownsRegion) {
-                creator.sendMessage(ChatHelper.error("This team does not own the country %s!", result[0]));
+                creator.sendMessage(ChatHelper.getErrorString("This team does not own the country %s!", result[0]));
                 return;
             }
 
@@ -164,7 +164,7 @@ public class WarpsComponent extends Component {
             new WarpEditMenu(creator, warp, false, true);
 
         }).exceptionally(e -> {
-            creator.sendMessage(ChatHelper.error("An error occurred while creating the warp!"));
+            creator.sendMessage(ChatHelper.getErrorString("An error occurred while creating the warp!"));
             e.printStackTrace();
             return null;
         });

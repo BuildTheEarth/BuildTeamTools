@@ -64,7 +64,7 @@ public class TpllComponent extends Component {
         if (tpllTarget == null) return;
 
         if (tpllTarget.getWorld() == null) {
-            player.sendMessage(ChatHelper.error("The %s world of this server is %s.", "earth", "unknown"));
+            player.sendMessage(ChatHelper.getErrorString("The %s world of this server is %s.", "earth", "unknown"));
             tpllQueue.remove(player.getUniqueId());
             return;
         }

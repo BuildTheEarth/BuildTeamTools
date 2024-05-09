@@ -23,7 +23,7 @@ public class GeneratorCommand implements CommandExecutor {
         Player p = (Player) sender;
 
         if(!p.hasPermission(Permissions.GENERATOR_USE)) {
-            p.sendMessage(ChatHelper.error("You don't have permission to use this command!"));
+            p.sendMessage(ChatHelper.getErrorString("You don't have permission to use this command!"));
             return true;
         }
 

@@ -7,11 +7,8 @@ import net.buildtheearth.modules.generator.components.field.CropType;
 import net.buildtheearth.modules.generator.components.house.RoofType;
 import net.buildtheearth.modules.generator.components.tree.TreeType;
 import net.buildtheearth.modules.generator.components.tree.TreeWidth;
-import net.buildtheearth.modules.generator.model.Flag;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.Item;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 
 public enum FlagType {
 
@@ -46,7 +43,7 @@ public enum FlagType {
             return null;
 
         if(!flag.getFlagType().getClassType().isInstance(value))
-            return ChatHelper.error("Invalid value for flag %s: expected %s, got %s", flag.getFlag(), flag.getFlagType().getClassType().getSimpleName(), value.getClass().getSimpleName());
+            return ChatHelper.getErrorString("Invalid value for flag %s: expected %s, got %s", flag.getFlag(), flag.getFlagType().getClassType().getSimpleName(), value.getClass().getSimpleName());
 
         return null;
     }

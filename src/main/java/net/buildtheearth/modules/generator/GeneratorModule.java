@@ -16,6 +16,7 @@ import net.buildtheearth.modules.generator.components.tree.Tree;
 import net.buildtheearth.modules.generator.listeners.GeneratorListener;
 import net.buildtheearth.modules.generator.model.Command;
 import net.buildtheearth.modules.generator.model.GeneratorCollections;
+import net.buildtheearth.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.modules.generator.model.History;
 import net.buildtheearth.modules.navigation.components.navigator.listeners.NavigatorJoinListener;
 import net.buildtheearth.modules.navigation.components.navigator.listeners.NavigatorOpenListener;
@@ -112,31 +113,17 @@ public class GeneratorModule extends Module {
         if (generatorCommands.size() == 0)
             return;
 
-        if (generatorCommands.get(0).getOperations().size() == 0) {
-            if(!generatorCommands.get(0).isFinished())
-                generatorCommands.get(0).finish();
-
-            generatorCommands.remove(0);
-            return;
-        }
-
-        for (int i = 1; i < generatorCommands.size(); i++) {
-            boolean isInQueue = false;
-
-            for (int j = i - 1; j > 0; j--)
-                if (generatorCommands.get(i).getPlayer().getUniqueId().equals(generatorCommands.get(j).getPlayer().getUniqueId()))
-                    isInQueue = true;
-
-            if (generatorCommands.get(0).getPlayer().getUniqueId().equals(generatorCommands.get(i).getPlayer().getUniqueId()))
-                isInQueue = true;
-
-            if (isInQueue)
+        // Tick all commands in the queue
+        for(Command command : generatorCommands){
+            if(command.getOperations().size() == 0){
+                if(!command.isFinished())
+                    command.finish();
+                generatorCommands.remove(command);
                 continue;
+            }
 
-            generatorCommands.get(i).getPlayer().sendActionBar("§c§lOther Generation in Progress. Position: §e" + i + "/" + generatorCommands.size() + " (" + generatorCommands.get(0).getPercentage() + "%)");
+            command.tick();
         }
-
-        generatorCommands.get(0).tick();
     }
 
     /**

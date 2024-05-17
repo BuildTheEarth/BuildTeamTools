@@ -40,6 +40,7 @@ public class BuildTeamTools extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+        Bukkit.getConsoleSender().sendMessage(" ");
         Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "--------------- BuildTeamTools V" + getDescription().getVersion() + " ----------------");
         Bukkit.getConsoleSender().sendMessage(" ");
 
@@ -59,6 +60,7 @@ public class BuildTeamTools extends JavaPlugin {
         Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_GRAY + "> " + ChatColor.GRAY + "Made by §bBuildTheEarth");
         Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_GRAY + "> " + ChatColor.GRAY + "GitHub:" + ChatColor.WHITE + " https://github.com/BuildTheEarth/BuildTeamTools");
         Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "------------------------------------------------------------");
+        Bukkit.getConsoleSender().sendMessage(" ");
     }
 
     @Override

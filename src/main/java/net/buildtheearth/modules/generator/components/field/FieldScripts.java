@@ -263,7 +263,7 @@ public class FieldScripts extends Script {
 
             List<Vector> oneMeterPoints = new ArrayList<>(points);
             oneMeterPoints.add(points.get(0));
-            oneMeterPoints = GeneratorUtils.populatePoints(oneMeterPoints, 1);
+            oneMeterPoints = GeneratorUtils.populatePoints(blocks, oneMeterPoints, 1, true);
             List<Vector> fencePoints = new ArrayList<>(oneMeterPoints);
             fencePoints = GeneratorUtils.reducePoints(fencePoints, 3 + 1, 3 - 1);
 

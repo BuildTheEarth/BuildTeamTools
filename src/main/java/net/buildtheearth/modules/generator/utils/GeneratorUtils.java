@@ -47,6 +47,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -948,10 +949,13 @@ public class GeneratorUtils {
 
     /** As long as two neighboring vectors are further than a given distance of blocks apart, add a new vector in between them
      *
+     * @param blocks   The blocks to check
      * @param points   The points to populate
+     * @param distance The distance between the points
+     * @param adjustHeight Whether the height of the points should be adjusted
      * @return         The populated points
      */
-    public static List<Vector> populatePoints(List<Vector> points, int distance){
+    public static List<Vector> populatePoints(Block[][][] blocks, List<Vector> points, int distance, boolean adjustHeight){
         List<Vector> result = new ArrayList<>();
 
         // Go through all points
@@ -976,6 +980,10 @@ public class GeneratorUtils {
                     Vector v1 = p2.clone().subtract(p1);
                     Vector v2 = v1.clone().multiply(0.5);
                     Vector v3 = p1.clone().add(v2);
+
+                    // Adjust height
+                    if(adjustHeight)
+                        v3 = getXYZ(v3, blocks);
 
                     // Add the new point
                     result.add(v3);
@@ -1113,11 +1121,11 @@ public class GeneratorUtils {
     }
 
     /**
-     * Returns a XYZ String with the height of the point matching the surface of the terrain.
+     * Returns the given vector with the height of the point matching the surface of the terrain.
      *
-     * @param vector The vector to get the XYZ String from
+     * @param vector The vector to get the height from
      * @param blocks The dataset to get the height from
-     * @return The XYZ String
+     * @return The vector with the height matching the surface of the terrain
      */
     private static Vector getXYZ(Vector vector, Block[][][] blocks){
         int maxHeight = vector.getBlockY();

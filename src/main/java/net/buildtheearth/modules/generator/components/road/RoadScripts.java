@@ -6,6 +6,7 @@ import net.buildtheearth.modules.generator.model.Flag;
 import net.buildtheearth.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.modules.generator.model.Script;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
+import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.Item;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -18,10 +19,51 @@ import java.util.List;
 
 public class RoadScripts extends Script {
 
+    private Block[][][] blocks;
+    private List<Vector> points;
+    private List<Vector> polyRegionLine;
+    private List<Vector> polyRegionPoints;
+
     public RoadScripts(Player player, GeneratorComponent generatorComponent) {
         super(player, generatorComponent);
-        
-        roadScript_v_2_0();
+
+        Thread thread = new Thread(() -> {
+            prepareSession();
+            roadScript_v_2_0();
+        });
+        thread.start();
+    }
+
+    public void prepareSession(){
+        HashMap <Flag, Object> flags = getGeneratorComponent().getPlayerSettings().get(getPlayer().getUniqueId()).getValues();
+
+        int laneCount = (int) flags.get(RoadFlag.LANE_COUNT);
+        int laneWidth = (int) flags.get(RoadFlag.LANE_WIDTH);
+        int laneGap = (int) flags.get(RoadFlag.LANE_GAP);
+        int sidewalkWidth = (int) flags.get(RoadFlag.SIDEWALK_WIDTH);
+        int roadSide = (int) flags.get(RoadFlag.ROAD_SIDE);
+
+        int road_width = laneWidth*laneCount;
+        int max_width = road_width + sidewalkWidth*2 + laneGap + roadSide;
+
+        // Get the points of the region
+        points = GeneratorUtils.getSelectionPointsFromRegion(getRegion());
+        int minY = getRegion().getMinimumY();
+        int maxY = getRegion().getMaximumY();
+
+        polyRegionLine = new ArrayList<>(points);
+        polyRegionLine = GeneratorUtils.extendPolyLine(polyRegionLine);
+        polyRegionPoints = GeneratorUtils.shiftPoints(polyRegionLine, max_width + 2, true);
+
+
+
+        // Create a region from the points
+        GeneratorUtils.createPolySelection(getPlayer(), polyRegionPoints, minY, maxY);
+
+
+        // Prepare the script session
+        blocks = GeneratorUtils.prepareScriptSession(localSession, actor, getPlayer(),weWorld, 30, true);
+
     }
 
     public void roadScript_v_2_0() {
@@ -64,13 +106,17 @@ public class RoadScripts extends Script {
         int max_width = road_width + sidewalkWidth*2 + laneGap + roadSide;
         int road_height = getRegion().getHeight();
 
-        // Get the points of the region
-        List<Vector> points = GeneratorUtils.getSelectionPointsFromRegion(getRegion());
-        int minY = getRegion().getMinimumY();
-        int maxY = getRegion().getMaximumY();
 
+        List<Vector> polyRegionPointsExact = GeneratorUtils.shiftPoints(polyRegionLine, max_width, true);
+
+
+        // ----------- PREPARATION 01 ----------
+        // Replace all unnecessary blocks with air
+
+
+        // Create the road and streetlamp points
         List<Vector> oneMeterPoints = new ArrayList<>(points);
-        oneMeterPoints = GeneratorUtils.populatePoints(oneMeterPoints, 1);
+        oneMeterPoints = GeneratorUtils.populatePoints(blocks, oneMeterPoints, 1, true);
 
         List<Vector> roadMarkingPoints = new ArrayList<>(oneMeterPoints);
         roadMarkingPoints = GeneratorUtils.reducePoints(roadMarkingPoints, markingGap + 1, markingLength - 1);
@@ -79,20 +125,9 @@ public class RoadScripts extends Script {
         streetLampPointsMid = GeneratorUtils.reducePoints(streetLampPointsMid, streetLampDistance + 1, streetLampDistance + 1);
         List<List<Vector>> streetLampPoints = GeneratorUtils.shiftPointsAll(streetLampPointsMid, road_width + sidewalkWidth*2);
 
-        List<Vector> polyRegionLine = new ArrayList<>(points);
-        polyRegionLine = GeneratorUtils.extendPolyLine(polyRegionLine);
-        List<Vector> polyRegionPoints = GeneratorUtils.shiftPoints(polyRegionLine, max_width + 2, true);
-        List<Vector> polyRegionPointsExact = GeneratorUtils.shiftPoints(polyRegionLine, max_width, true);
 
+        ChatHelper.logDebug("Preparing the script session 2...");
 
-        // ----------- PREPARATION 01 ----------
-        // Replace all unnecessary blocks with air
-
-        // Create a region from the points
-        GeneratorUtils.createPolySelection(getPlayer(), polyRegionPoints, minY, maxY);
-
-        // Prepare the script session
-        Block[][][] blocks = GeneratorUtils.prepareScriptSession(localSession, actor, getPlayer(),weWorld, 30, true);
 
         // Bring all points to the ground
         GeneratorUtils.adjustHeight(points, blocks);
@@ -242,21 +277,18 @@ public class RoadScripts extends Script {
             setBlocksWithMask("=queryRel(0,1,0,35,11)", XMaterial.BLUE_WOOL);
         }
 
-        finish(blocks, points);
-        /*
+
 
         // Spread the yellow wool
-        setGmask("#solid,!35:3,35:5,35:6");
         for(int i = 0; i < laneWidth*2; i++){
             // Replace all blocks around yellow wool with yellow wool until it reaches the light blue wool
-            setBlocksWithMask("=(queryRel(1,0,0,35,4)||queryRel(-1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4)||queryRel(0,-1,0,35,4)||queryRel(0,1,0,35,4))&&queryRel(0,3,0,0,0)", XMaterial.YELLOW_WOOL);
+            setBlocksWithMask("=!queryRel(0,0,0,0,0)&&!queryRel(0,0,0,35,3)&&!queryRel(0,0,0,35,5)&&!queryRel(0,0,0,35,6)&&queryRel(0,3,0,0,0)&&(queryRel(1,0,0,35,4)||queryRel(-1,0,0,35,4)||queryRel(0,0,1,35,4)||queryRel(0,0,-1,35,4)||queryRel(0,-1,0,35,4)||queryRel(0,1,0,35,4))", XMaterial.YELLOW_WOOL);
         }
 
         // Spread the orange wool
-        setGmask("#solid,!35:3,35:2,35:11,35:5");
         for(int i = 0; i < laneWidth*2; i++){
             // Replace all blocks around orange wool with orange wool until it reaches the light blue wool
-            setBlocksWithMask("=queryRel(0,3,0,0,0)&&(queryRel(1,0,0,35,1)||queryRel(-1,0,0,35,1)||queryRel(0,0,1,35,1)||queryRel(0,0,-1,35,1)||queryRel(0,-1,0,35,1)||queryRel(0,1,0,35,1))", XMaterial.ORANGE_WOOL);
+            setBlocksWithMask("=!queryRel(0,0,0,0,0)&&!queryRel(0,0,0,35,3)&&!queryRel(0,0,0,35,2)&&!queryRel(0,0,0,35,11)&&!queryRel(0,0,0,35,5)&&queryRel(0,3,0,0,0)&&(queryRel(1,0,0,35,1)||queryRel(-1,0,0,35,1)||queryRel(0,0,1,35,1)||queryRel(0,0,-1,35,1)||queryRel(0,-1,0,35,1)||queryRel(0,1,0,35,1))", XMaterial.ORANGE_WOOL);
         }
 
         // Replace all orange wool with light blue wool
@@ -265,14 +297,12 @@ public class RoadScripts extends Script {
 
 
         // Spread the magenta wool
-        setGmask("#solid,!35:11,35:3");
         for(int i = 0; i < laneWidth*2; i++){
             // Replace all blocks around orange wool with orange wool until it reaches the light blue wool
-            setBlocksWithMask("=(queryRel(1,0,0,35,2)||queryRel(-1,0,0,35,2)||queryRel(0,0,1,35,2)||queryRel(0,0,-1,35,2)||queryRel(0,-1,0,35,2)||queryRel(0,1,0,35,2))&&queryRel(0,3,0,0,0)", XMaterial.MAGENTA_WOOL);
+            setBlocksWithMask("=!queryRel(0,0,0,0,0)&&!queryRel(0,0,0,35,11)&&!queryRel(0,0,0,35,3)&&queryRel(0,3,0,0,0)&&(queryRel(1,0,0,35,2)||queryRel(-1,0,0,35,2)||queryRel(0,0,1,35,2)||queryRel(0,0,-1,35,2)||queryRel(0,-1,0,35,2)||queryRel(0,1,0,35,2))", XMaterial.MAGENTA_WOOL);
         }
 
         // Replace all magenta wool with pink wool
-        setGmask(null);
         replaceBlocks(XMaterial.MAGENTA_WOOL, XMaterial.PINK_WOOL);
         replaceBlocks(XMaterial.BLUE_WOOL, XMaterial.PINK_WOOL);
 
@@ -339,7 +369,7 @@ public class RoadScripts extends Script {
                     for(List<Vector> path : roadMarkingPointsList) {
 
                         List<Vector> markingsOneMeterPoints = new ArrayList<>(path);
-                        markingsOneMeterPoints = GeneratorUtils.populatePoints(markingsOneMeterPoints, 1);
+                        markingsOneMeterPoints = GeneratorUtils.populatePoints(blocks, markingsOneMeterPoints, 1, true);
 
                         List<Vector> shiftedRoadMarkingPoints = new ArrayList<>(markingsOneMeterPoints);
                         shiftedRoadMarkingPoints = GeneratorUtils.reducePoints(shiftedRoadMarkingPoints, markingGap + 1, markingLength - 1);
@@ -415,7 +445,5 @@ public class RoadScripts extends Script {
 
         // Finish the script
         finish(blocks, points);
-
-         */
     }
 }

@@ -215,8 +215,9 @@ public class GeneratorUtils {
                 if (blockType == null)
                     continue;
 
-                BlockState blockState = blockType.getDefaultState();
-                replaceBlocks(localSession, actor, world, blockState, new BlockState[]{air.getDefaultState()})
+                List<BlockState> blockStates = blockType.getAllStates();
+                BlockState[] blockStatesArray = blockStates.toArray(new BlockState[0]);
+                replaceBlocks(localSession, actor, world, blockStatesArray, new BlockState[]{air.getDefaultState()})
                     .join();
             }
         }
@@ -382,13 +383,13 @@ public class GeneratorUtils {
 
                         Pattern pattern;
 
-                        if(to.length == 1)
+                        if (to.length == 1)
                             pattern = to[0];
-                        else{
+                        else {
                             RandomPattern randomPattern = new RandomPattern();
                             double chance = 100.0 / to.length;
 
-                            for(BlockState blockState : to)
+                            for (BlockState blockState : to)
                                 randomPattern.add(blockState, chance);
 
                             pattern = randomPattern;
@@ -399,7 +400,7 @@ public class GeneratorUtils {
 
                         saveEditSession(editSession, localSession, actor);
                     }
-                } catch(IncompleteRegionException | MaxChangedBlocksException | InputParseException e){
+                } catch (IncompleteRegionException | MaxChangedBlocksException | InputParseException e) {
                     future.completeExceptionally(new RuntimeException(e));
                 }
             }
@@ -422,13 +423,13 @@ public class GeneratorUtils {
      *
      * @return A CompletableFuture that completes when the operation is finished
      */
-    public static CompletableFuture<Void> replaceBlocks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, BlockState from, BlockState[] to) {
+    public static CompletableFuture<Void> replaceBlocks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, BlockState[] from, BlockState[] to) {
         if(to.length == 0)
             throw new IllegalArgumentException("BlockState[] to is empty");
 
         CompletableFuture<Void> future = new CompletableFuture<>();
         Thread thread = new Thread(() -> {
-            ChatHelper.logDebug("Replacing blocks from " + from + " to " + Arrays.toString(to));
+            ChatHelper.logDebug("Replacing blocks from " + Arrays.toString(from) + " to " + Arrays.toString(to));
 
             try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
                 Region region = localSession.getSelection();
@@ -853,6 +854,7 @@ public class GeneratorUtils {
      */
     public static void saveEditSession(EditSession editSession, LocalSession localSession, Actor actor){
         editSession.commit();
+        editSession.flushQueue();
 
         if(CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled())
             localSession.remember(actor, localSession.getSelectionWorld(), editSession.getChangeSet(), FaweLimit.MAX);
@@ -942,20 +944,17 @@ public class GeneratorUtils {
     public static void adjustHeight(List<Vector> points, Block[][][] blocks){
         for(int i = 0; i < points.size(); i++) {
             Vector point = points.get(i);
-            point = point.setY(getMaxHeight(blocks, point.getBlockX(), point.getBlockZ(), MenuItems.getIgnoredMaterials()));
-            points.set(i, point);
+            point.setY(getMaxHeight(blocks, point.getBlockX(), point.getBlockZ(), MenuItems.getIgnoredMaterials()));
         }
     }
 
     /** As long as two neighboring vectors are further than a given distance of blocks apart, add a new vector in between them
      *
-     * @param blocks   The blocks to check
      * @param points   The points to populate
      * @param distance The distance between the points
-     * @param adjustHeight Whether the height of the points should be adjusted
      * @return         The populated points
      */
-    public static List<Vector> populatePoints(Block[][][] blocks, List<Vector> points, int distance, boolean adjustHeight){
+    public static List<Vector> populatePoints(List<Vector> points, int distance){
         List<Vector> result = new ArrayList<>();
 
         // Go through all points
@@ -980,10 +979,6 @@ public class GeneratorUtils {
                     Vector v1 = p2.clone().subtract(p1);
                     Vector v2 = v1.clone().multiply(0.5);
                     Vector v3 = p1.clone().add(v2);
-
-                    // Adjust height
-                    if(adjustHeight)
-                        v3 = getXYZ(v3, blocks);
 
                     // Add the new point
                     result.add(v3);
@@ -1117,7 +1112,10 @@ public class GeneratorUtils {
             }
         }
 
-        return closestVector;
+        if(closestVector == null)
+            return null;
+
+        return closestVector.clone();
     }
 
     /**

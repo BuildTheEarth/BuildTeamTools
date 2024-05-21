@@ -181,6 +181,7 @@
         <!--==========  GENERAL  ==========-->
 
         <!-- Paper -->
+        <!-- Ref: https://github.com/PaperMC/Paper -->
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>

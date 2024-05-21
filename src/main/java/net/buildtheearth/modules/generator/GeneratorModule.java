@@ -114,7 +114,7 @@ public class GeneratorModule extends Module {
             return;
 
         // Tick all commands in the queue
-        for(Command command : generatorCommands){
+        for(Command command : new ArrayList<>(generatorCommands)){
             if(command.getOperations().size() == 0){
                 if(!command.isFinished())
                     command.finish();

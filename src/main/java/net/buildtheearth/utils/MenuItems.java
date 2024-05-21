@@ -465,6 +465,7 @@ public class MenuItems {
             BROWN_STAINED_GLASS.parseItem(),
             PODZOL.parseItem(),
             OAK_WOOD.parseItem(),
+            OAK_LOG.parseItem(),
             SPRUCE_PLANKS.parseItem(),
             SPRUCE_DOOR.parseItem(),
             SPRUCE_STAIRS.parseItem(),

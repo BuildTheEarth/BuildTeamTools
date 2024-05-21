@@ -82,14 +82,18 @@ public class GeneratorCommand implements CommandExecutor {
             return true;
         }
 
-        if (args[0].equals("undo")) {
+        if(args[0].equals("undo")) {
             GeneratorModule.getInstance().getPlayerHistory(p).undoCommand(p);
             return true;
         }
 
-        if (args[0].equals("redo")) {
+        if(args[0].equals("redo")) {
             GeneratorModule.getInstance().getPlayerHistory(p).redoCommand(p);
             return true;
+        }
+
+        if(args[0].equals("cancel")){
+
         }
 
         sendHelp(p);
@@ -103,6 +107,11 @@ public class GeneratorCommand implements CommandExecutor {
             sender.sendMessage("§eRoad Generator:§7 /gen road help");
             sender.sendMessage("§eRail Generator:§7 /gen rail help");
             sender.sendMessage("§eTree Generator:§7 /gen tree help");
+            sender.sendMessage("§eField Generator:§7 /gen field help");
+            sender.sendMessage("§7----------------------");
+            sender.sendMessage("§eGenerator History:§7 /gen history");
+            sender.sendMessage("§eUndo last command:§7 /gen undo");
+            sender.sendMessage("§eRedo last command:§7 /gen redo");
 
         });
     }

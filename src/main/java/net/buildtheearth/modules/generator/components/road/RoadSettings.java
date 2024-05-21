@@ -54,10 +54,10 @@ public class RoadSettings extends Settings {
         setValue(RoadFlag.SIDEWALK_WIDTH, 5);
 
         // Sidewalk Material (Default: Fixed Value)
-        setValue(RoadFlag.SIDEWALK_MATERIAL, new XMaterial[]{XMaterial.STONE});
+        setValue(RoadFlag.SIDEWALK_MATERIAL, new XMaterial[]{XMaterial.POLISHED_ANDESITE});
 
         // Sidewalk Slab Material (Default: Fixed Value)
-        setValue(RoadFlag.SIDEWALK_SLAB_COLOR, new XMaterial[]{XMaterial.STONE_SLAB});
+        setValue(RoadFlag.SIDEWALK_SLAB_COLOR, new XMaterial[]{XMaterial.POLISHED_ANDESITE_SLAB});
 
         // Road Slab Material (Default: Fixed Value)
         setValue(RoadFlag.ROAD_SLAB_COLOR, new XMaterial[0]);

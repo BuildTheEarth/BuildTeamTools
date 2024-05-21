@@ -222,18 +222,24 @@ public class Script {
      * @param from The block type to replace
      * @param to The block types to replace with
      */
-    public void replaceBlocks(BlockState from, BlockState[] to){
+    public void replaceBlocks(BlockState[] from, BlockState[] to){
         operations.add(new Operation(Operation.OperationType.REPLACE_BLOCKSTATES, from, to));
         changes++;
     }
+    public void replaceBlocks(BlockState[] from, BlockState to){
+        replaceBlocks(from, new BlockState[]{to});
+    }
+    public void replaceBlocks(BlockState from, BlockState[] to){
+        replaceBlocks(new BlockState[]{from}, to);
+    }
     public void replaceBlocks(XMaterial from, XMaterial[] to){
-        replaceBlocks(GeneratorUtils.getBlockState(from), GeneratorUtils.getBlockState(to));
+        replaceBlocks(new BlockState[]{GeneratorUtils.getBlockState(from)}, GeneratorUtils.getBlockState(to));
     }
     public void replaceBlocks(XMaterial from, XMaterial to){
         replaceBlocks(from, new XMaterial[]{to});
     }
     public void replaceBlocks(BlockState from, BlockState to){
-        replaceBlocks(from, new BlockState[]{to});
+        replaceBlocks(new BlockState[]{from}, new BlockState[]{to});
     }
 
     /**

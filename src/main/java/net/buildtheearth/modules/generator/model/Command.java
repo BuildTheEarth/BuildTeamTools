@@ -187,7 +187,7 @@ public class Command {
                     break;
 
                 case REPLACE_BLOCKSTATES:
-                    future = GeneratorUtils.replaceBlocks(localSession, actor, weWorld, (BlockState) operation.get(0), (BlockState[]) operation.get(1));
+                    future = GeneratorUtils.replaceBlocks(localSession, actor, weWorld, (BlockState[]) operation.get(0), (BlockState[]) operation.get(1));
                     break;
 
                 case DRAW_CURVE_WITH_MASKS:

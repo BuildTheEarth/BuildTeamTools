@@ -2,16 +2,12 @@ package net.buildtheearth.modules.generator.components.road;
 
 
 import com.cryptomorin.xseries.XMaterial;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.model.Flag;
 import net.buildtheearth.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.modules.generator.model.Script;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import net.buildtheearth.utils.Item;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -66,7 +62,7 @@ public class RoadScripts extends Script {
 
 
         // Prepare the script session
-        blocks = GeneratorUtils.prepareScriptSession(localSession, actor, getPlayer(),weWorld, 30, true);
+        blocks = GeneratorUtils.prepareScriptSession(localSession, actor, getPlayer(),weWorld, 30, true, true, true);
 
     }
 

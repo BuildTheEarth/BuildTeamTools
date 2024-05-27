@@ -47,7 +47,6 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -193,7 +192,21 @@ public class GeneratorUtils {
         return minMax;
     }
 
-    public static Block[][][] prepareScriptSession(LocalSession localSession, Actor actor, Player player, com.sk89q.worldedit.world.World world, int expandSelection, boolean removeIgnoredMaterials){
+    /**
+     * Prepares a script session by expanding the selection, removing non-solid blocks and ignored materials.
+     * The blocks of the region are also analyzed and returned.
+     *
+     * @param localSession The local session of the actor
+     * @param actor The actor who should perform the operation
+     * @param player The player who should receive an error message if the flag value is invalid
+     * @param world The world in which the region is located
+     * @param expandSelection The amount of blocks to expand the selection
+     * @param readBlocks Whether the blocks of the region should be read and returned
+     * @param removeNonSolidBlocks Whether non-solid blocks should be removed
+     * @param removeIgnoredMaterials Whether ignored materials should be removed
+     * @return A three-dimensional array of all blocks in the region
+     */
+    public static Block[][][] prepareScriptSession(LocalSession localSession, Actor actor, Player player, com.sk89q.worldedit.world.World world, int expandSelection, boolean readBlocks, boolean removeNonSolidBlocks, boolean removeIgnoredMaterials){
         if(expandSelection > 0) {
             expandSelection(localSession, new Vector(0, expandSelection, 0));
             expandSelection(localSession, new Vector(0, -expandSelection, 0));
@@ -204,8 +217,9 @@ public class GeneratorUtils {
         if(air == null)
             return null;
 
-        replaceBlocksWithMasks(localSession, actor, world, Collections.singletonList("!#solid"), null, new BlockState[]{air.getDefaultState()}, 1)
-            .join();
+        if(removeNonSolidBlocks)
+            replaceBlocksWithMasks(localSession, actor, world, Collections.singletonList("!#solid"), null, new BlockState[]{air.getDefaultState()}, 1)
+                .join();
 
         if(removeIgnoredMaterials) {
             Material[] materials = MenuItems.getIgnoredMaterials();
@@ -222,7 +236,12 @@ public class GeneratorUtils {
             }
         }
 
-        return analyzeRegion(player, player.getWorld());
+        Block[][][] regionBlocks = null;
+
+        if(readBlocks)
+            regionBlocks = analyzeRegion(player, player.getWorld());
+
+        return regionBlocks;
     }
 
     /**

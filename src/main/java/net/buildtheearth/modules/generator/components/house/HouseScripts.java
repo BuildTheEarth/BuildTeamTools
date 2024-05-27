@@ -57,7 +57,7 @@ public class HouseScripts extends Script {
         // Replace all non-solid blocks with air
 
         // Prepare the script session
-        Block[][][] blocks = GeneratorUtils.prepareScriptSession(localSession, actor, getPlayer(),weWorld, 10, false);
+        Block[][][] blocks = GeneratorUtils.prepareScriptSession(localSession, actor, getPlayer(),weWorld, 10, true, true, false);
 
         if(blocks == null){
             getPlayer().sendMessage("§c§lERROR: §cRegion not readable. Please report this to the developers of the BuildTeamTool plugin.");

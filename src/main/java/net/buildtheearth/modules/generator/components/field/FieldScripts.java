@@ -1,7 +1,12 @@
 package net.buildtheearth.modules.generator.components.field;
 
+import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.BuildTeamTools;
+import net.buildtheearth.modules.common.CommonModule;
+import net.buildtheearth.modules.common.components.dependency.DependencyComponent;
+import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.model.Flag;
+import net.buildtheearth.modules.generator.model.GeneratorCollections;
 import net.buildtheearth.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.modules.generator.model.Script;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
@@ -39,44 +44,35 @@ public class FieldScripts extends Script {
 
 
 
-        // ----------- FIELD GENERATOR SCRIPT ----------
-        // Used to generate fields
-
-        createCommand("/clearhistory");
-        createCommand("//gmask");
-
         // ----------- PREPARATION 01 ----------
         // Preparing the field area
 
-        // Create a cuboid selection of the field area
+        // Create a cuboid selection of the field area to scan enough blocks
         GeneratorUtils.createCuboidSelection(getPlayer(),
                 new Vector(getRegion().getMinimumPoint().getX(), getRegion().getMinimumPoint().getY(), getRegion().getMinimumPoint().getZ()),
                 new Vector(getRegion().getMaximumPoint().getX(), getRegion().getMaximumPoint().getY(), getRegion().getMaximumPoint().getZ())
         );
 
-        getPlayer().chat("//expand 20 20 up");
-        getPlayer().chat("//expand 10 10 north");
-        getPlayer().chat("//expand 10 10 west");
+        // Expand the selection to make sure the field is big enough
+        expandSelection(new Vector(10, 0, 10));
+        expandSelection(new Vector(-10, 0, -10));
 
-        Block[][][] blocks = GeneratorUtils.analyzeRegion(getPlayer(), getPlayer().getWorld());
+        // Scan the blocks in the selection without replacing anything
+        Block[][][] blocks = GeneratorUtils.prepareScriptSession(localSession, actor, getPlayer(),weWorld, 20, true, false, false);
 
+
+        // ----------- PREPARATION 02 ----------
+        // Replace all unnecessary blocks with air
 
         // Recreate the original polygon selection
         GeneratorUtils.createPolySelection(getPlayer(), points, blocks);
 
+        // Replace all unnecessary blocks with air without reading any blocks
+        GeneratorUtils.prepareScriptSession(localSession, actor, getPlayer(),weWorld, 20, false, true, true);
 
-        createCommand("//expand 10 up");
-        createCommand("//expand 10 down");
 
-        // Remove all non-solid blocks
-        createCommand("//gmask !#solid");
-        createCommand("//replace 0");
 
-        // Remove all trees and pumpkins
-        createCommand("//gmask");
-        createCommand("//replace leaves,log,pumpkin 0");
-
-        // ----------- PREPARATION 02 ----------
+        // ----------- PREPARATION 03 ----------
         // Drawing lines if the crop requires it
 
         if (cropType.isLinesRequired()) {
@@ -89,7 +85,7 @@ public class FieldScripts extends Script {
             File[] schematics = directory.getAbsoluteFile().listFiles();
 
             if(schematics == null) {
-                getPlayer().sendMessage("§c§lERROR: §cNo schematics found!");
+                getPlayer().sendMessage("§c§lERROR: §cNo schematics found! If this error persists, you might need to reinstall the GeneratorCollections.");
                 return;
             }
 
@@ -98,9 +94,8 @@ public class FieldScripts extends Script {
             short[] availableDirections = new short[schematicAmount];
 
             // Get an array with all available schematic line directions
-            for(int i = 0; i < schematicAmount; i++) {
+            for(int i = 0; i < schematicAmount; i++)
                 availableDirections[i] = Short.parseShort(schematics[i].getName().replace(".schematic", ""));
-            }
 
             // Calculate which direction should be used
             short directionToUse = availableDirections[0]; // Assume the first element is the closest initially

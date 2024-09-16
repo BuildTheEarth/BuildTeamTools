@@ -1,7 +1,9 @@
 package net.buildtheearth.modules.plotsystem;
 
+import java.util.Arrays;
 import java.util.logging.Level;
 
+import net.buildtheearth.utils.ChatHelper;
 import org.bukkit.Bukkit;
 
 import com.alpsbte.alpslib.libpsterra.core.Connection;
@@ -49,24 +51,26 @@ public class PlotSystemModule extends Module {
         }
 
         // Check if HeadDatabase is enabled
-        if (!CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled()) {
+        if (!CommonModule.getInstance().getDependencyComponent().isHeadDatabaseEnabled()) {
             shutdown("§cHeadDatabase is not installed.");
             return;
         }
+
         BuildTeamTools plugin = BuildTeamTools.getInstance();
         System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog"); // Disable Logging
 
         version = plugin.getDescription().getVersion();
 
         try {
-            PSTerraSetup setup = PSTerraSetup.setupPlugin(plugin, version);
+            PSTerraSetup setup = PSTerraSetup.setupPlugin(plugin, version, false);
             this.connection = setup.connection;
             this.plotCreator = setup.plotCreator;
             this.plotPaster = setup.plotPaster;
             this.configManager = setup.configManager;
         } catch (Exception ex) {
-            Bukkit.getConsoleSender().sendMessage("Error setting up PlotSystemTerra: " + ex.getMessage());
-            Bukkit.getLogger().log(Level.SEVERE, ex.getMessage(), ex);
+            ChatHelper.logDebug("Error setting up PlotSystemTerra: " + ex.getMessage());
+            if(BuildTeamTools.getInstance().isDebug())
+                ex.printStackTrace();
 
             shutdown("Error setting up PlotSystemTerra from AlpsLib.");
             return;

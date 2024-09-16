@@ -444,7 +444,7 @@ public class RoadScripts extends Script {
                     if(CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled())
                         angle = normalizeAngle((int) angle); // Normalize angle to be 0, 90, 180, 270 or 360
 
-                    pasteSchematic("GeneratorCollections/roadpack/streetlamp" + streetLampType + ".schematic", loc, angle);
+                    pasteSchematic("/GeneratorCollections/roadpack/streetlamp" + streetLampType + ".schematic", loc, angle);
                 }
 
             // Fix streetlamp schematics for versions above 1.12

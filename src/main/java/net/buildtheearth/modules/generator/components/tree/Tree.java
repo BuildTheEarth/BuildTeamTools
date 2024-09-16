@@ -20,17 +20,14 @@ public class Tree extends GeneratorComponent {
 
     @Override
     public boolean checkForPlayer(Player p) {
-
         if (!GeneratorCollections.checkIfGeneratorCollectionsIsInstalled(p))
             return false;
 
-        if (!GeneratorUtils.checkIfSchematicBrushIsInstalled(p))
-            return false;
-
+        /* Only needed if block checks are made afterwards like in House Generator
         if (getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
-            getPlayerSettings().get(p.getUniqueId()).setBlocks(GeneratorUtils.analyzeRegion(p, p.getWorld()));
+            getPlayerSettings().get(p.getUniqueId()).setBlocks(GeneratorUtils.analyzeRegion(p, p.getWorld()));*/
 
-        return true;
+        return GeneratorUtils.checkIfSchematicBrushIsInstalled(p);
     }
 
     @Override

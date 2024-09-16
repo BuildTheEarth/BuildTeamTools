@@ -15,14 +15,11 @@ public class Field extends GeneratorComponent {
 
     @Override
     public boolean checkForPlayer(Player p) {
-        if (GeneratorUtils.checkForNoWorldEditSelection(p)) {
-            return true;
-        }
+        return GeneratorUtils.checkForNoWorldEditSelection(p);
 
+        /* Only needed if block checks are made afterwards like in House Generator
         if (getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
-            getPlayerSettings().get(p.getUniqueId()).setBlocks(GeneratorUtils.analyzeRegion(p, p.getWorld()));
-
-        return false;
+            getPlayerSettings().get(p.getUniqueId()).setBlocks(GeneratorUtils.analyzeRegion(p, p.getWorld()));*/
     }
 
     @Override

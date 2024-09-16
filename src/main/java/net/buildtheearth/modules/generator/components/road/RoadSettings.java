@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.generator.model.Flag;
 import net.buildtheearth.modules.generator.model.Settings;
+import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import net.buildtheearth.utils.Item;
 import org.bukkit.entity.Player;
 
@@ -19,7 +20,7 @@ public class RoadSettings extends Settings {
     public RoadSettings(Player player){
         super(player);
 
-        File directory = new File(BuildTeamTools.getInstance().getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/GeneratorCollections/roadpack/");
+        File directory = new File(GeneratorUtils.getWorldEditSchematicsFolderPath() + "/GeneratorCollections/roadpack/");
         File[] files = directory.listFiles();
 
         for(File file : files)

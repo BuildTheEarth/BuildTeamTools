@@ -18,7 +18,6 @@ public class Operation {
         PASTE_SCHEMATIC(String.class, Location.class, Double.class),
         CUBOID_SELECTION(Vector.class, Vector.class),
         POLYGONAL_SELECTION(Vector[].class),
-        CONVEX_SELECTION(Vector[].class),
         REPLACE_BLOCKSTATES(BlockState[].class, BlockState[].class),
         REPLACE_BLOCKSTATES_WITH_MASKS(String[].class, BlockState.class, BlockState[].class, Integer.class),
         DRAW_CURVE_WITH_MASKS(String[].class, Vector[].class, BlockState[].class, Boolean.class),

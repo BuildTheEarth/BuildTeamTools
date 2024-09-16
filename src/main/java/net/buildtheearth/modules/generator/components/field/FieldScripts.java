@@ -76,11 +76,12 @@ public class FieldScripts extends Script {
         // Drawing lines if the crop requires it
 
         if (cropType.isLinesRequired()) {
+
             // Prepare for line drawing
             boolean requiresAlternatingLines = cropType.equals(CropType.VINEYARD) || cropType.equals(CropType.PEAR);
 
             // Get the directory containing all schematic files.
-            File directory = new File(BuildTeamTools.getInstance().getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/GeneratorCollections/fieldpack/" + (requiresAlternatingLines ? "striped/" : "normal/"));
+            File directory = new File(GeneratorUtils.getWorldEditSchematicsFolderPath() + "/GeneratorCollections/fieldpack/" + (requiresAlternatingLines ? "striped/" : "normal/"));
 
             File[] schematics = directory.getAbsoluteFile().listFiles();
 
@@ -115,11 +116,19 @@ public class FieldScripts extends Script {
                 }
             }
 
-            createCommand("//schem load /GeneratorCollections/fieldpack/"+(requiresAlternatingLines ? "striped/" : "normal/")+(directionToUse < 100 ? "0"+directionToUse : directionToUse)+".schematic");
+            setGmask("<0");
+            String path = "/GeneratorCollections/fieldpack/" + (requiresAlternatingLines ? "striped/" : "normal/") + (directionToUse < 100 ? "0" + directionToUse : directionToUse) + ".schematic";
+            createCommand("//schem load " + path);
+            createCommand("//replace #solid #copy");
+            setGmask(null);
+
 
             createCommand("//gmask <0");
-            createCommand("//replace #solid #copy");
+
         }
+
+        finish(blocks, points);
+        /*
 
         // ----------- PLACING CROPS ----------
         // Placing the crops
@@ -308,5 +317,6 @@ public class FieldScripts extends Script {
 
         // Finish the script
         finish(blocks, points);
+        */
     }
 }

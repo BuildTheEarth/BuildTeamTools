@@ -180,15 +180,6 @@ public class Script {
         operations.add(new Operation(Operation.OperationType.POLYGONAL_SELECTION, (Object) points.toArray(new Vector[0])));
     }
 
-    /**
-     * This method is uesd to create a new convex selection.
-     * It creates a new Operation with type CONVEX_SELECTION and adds it to the list of operations to execute.
-     *
-     * @param points The list of points to create the selection from
-     */
-    public void createConvexSelection(List<Vector> points){
-        operations.add(new Operation(Operation.OperationType.CONVEX_SELECTION, (Object) points.toArray(new Vector[0])));
-    }
 
     /**
      * This method is used to clear the history of the LocalSession.

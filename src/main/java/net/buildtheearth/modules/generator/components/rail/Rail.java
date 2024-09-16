@@ -19,13 +19,11 @@ public class Rail extends GeneratorComponent {
 
     @Override
     public boolean checkForPlayer(Player p) {
-        if (GeneratorUtils.checkForNoWorldEditSelection(p))
-            return false;
+        return !GeneratorUtils.checkForNoWorldEditSelection(p);
 
+        /* Only needed if block checks are made afterwards like in House Generator
         if (getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
-            getPlayerSettings().get(p.getUniqueId()).setBlocks(GeneratorUtils.analyzeRegion(p, p.getWorld()));
-
-        return true;
+            getPlayerSettings().get(p.getUniqueId()).setBlocks(GeneratorUtils.analyzeRegion(p, p.getWorld()));*/
     }
 
     @Override

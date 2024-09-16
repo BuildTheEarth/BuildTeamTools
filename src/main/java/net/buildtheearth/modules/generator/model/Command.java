@@ -169,7 +169,6 @@ public class Command {
                     if (!breakPointActive) {
                         oldMaterial = block.getType();
                         oldBlockData = block.getBlockData();
-                        tempRegionSelector = GeneratorUtils.getCurrentRegionSelector(getPlayer());
                         BlockType blockType = BlockTypes.BARRIER;
 
                         if(blockType == null)
@@ -212,10 +211,6 @@ public class Command {
 
                 case POLYGONAL_SELECTION:
                     GeneratorUtils.createPolySelection(getPlayer(), Arrays.asList((Vector[]) operation.get(0)), blocks);
-                    break;
-
-                case CONVEX_SELECTION:
-                    GeneratorUtils.createConvexSelection(getPlayer(), Arrays.asList((Vector[]) operation.get(0)), blocks);
                     break;
 
                 case CLEAR_HISTORY:

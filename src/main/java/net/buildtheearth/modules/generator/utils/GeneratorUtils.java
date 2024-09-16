@@ -22,6 +22,7 @@ import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.function.pattern.ClipboardPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -37,8 +38,8 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.common.CommonModule;
+import net.buildtheearth.modules.common.components.dependency.DependencyComponent;
 import net.buildtheearth.modules.generator.GeneratorModule;
-import net.buildtheearth.modules.generator.model.Script;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.MenuItems;
 import org.apache.commons.lang3.StringUtils;
@@ -56,17 +57,191 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 
-/** This class contains static utility methods for the generator module.
+/** This class contains static utility methods for the generator module.<br>
+ * It is categorized into the following sections:
+ *
+ * <br><br><b>Script Helper Functions</b>:
+ * <br>• {@link #convertArgsToFlags(String[])}
+ * <br>• {@link #convertToFlagAndValue(String, Player)}
+ * <br>• {@link #getBlockState(XMaterial)}
+ *
+ * <br><br><b>WorldEdit Helper Functions</b>:
+ * <br>• {@link #getWorldEditSchematicsFolderPath()}
+ *
+ * <br><br><b>WorldEdit Region Functions</b>:
+ * <br>• {@link #getSelectionPointsFromRegion(Region)}
+ * <br>• {@link #getMinMaxPoints(Region)}
+ * <br>• {@link #getMaxHeight(Block[][][], Material...)}
+ * <br>• {@link #getMaxHeight(Block[][][], int, int, Material...)}
+ * <br>• {@link #containsBlock(Block[][][], XMaterial)}
+ * <br>• {@link #containsBlock(Block[][][], XMaterial, int)}
+ * <br>• {@link #getWorldEditSelection(Player)}
+ * <br>• {@link #restoreSelection(Player, RegionSelector)}
+ * <br>• {@link #createCuboidSelection(Player, Vector, Vector)}
+ * <br>• {@link #createPolySelection(Player, List, Block[][][])}
+ * <br>• {@link #createPolySelection(Player, List, int, int)}
+ *
+ * <br><br><b>WorldEdit Operation Functions</b>:
+ * <br>• {@link #prepareScriptSession(LocalSession, Actor, Player, com.sk89q.worldedit.world.World, int, boolean, boolean, boolean)}
+ * <br>• {@link #analyzeRegion(Player, World)}
+ * <br>• {@link #replaceBlocksWithMasks(LocalSession, Actor, com.sk89q.worldedit.world.World, List, BlockState, BlockState[], int)}
+ * <br>• {@link #replaceBlocksWithSchematic(LocalSession, Actor, com.sk89q.worldedit.world.World, BlockState[], String)}
+ * <br>• {@link #replaceBlocks(LocalSession, Actor, com.sk89q.worldedit.world.World, BlockState[], BlockState[])}
+ * <br>• {@link #drawSplineWithMasks(LocalSession, Actor, com.sk89q.worldedit.world.World, Block[][][], List, List, BlockState[], boolean, double, double, double, double, double, boolean, boolean)}
+ * <br>• {@link #drawCurveWithMasks(LocalSession, Actor, com.sk89q.worldedit.world.World, Block[][][], List, List, BlockState[], boolean)}
+ * <br>• {@link #drawPolyLineWithMasks(LocalSession, Actor, com.sk89q.worldedit.world.World, Block[][][], List, List, BlockState[], boolean, boolean)}
+ * <br>• {@link #drawLineWithMasks(LocalSession, Actor, com.sk89q.worldedit.world.World, Block[][][], List, Vector, Vector, BlockState[], boolean)}
+ * <br>• {@link #pasteSchematicWithMasks(LocalSession, Actor, com.sk89q.worldedit.world.World, Block[][][], List, String, Location, double)}
+ * <br>• {@link #pasteSchematic(LocalSession, Actor, com.sk89q.worldedit.world.World, Block[][][], String, Location, double)}
+ * <br>• {@link #expandSelection(LocalSession, Vector)}
+ * <br>• {@link #clearHistory(LocalSession)}
+ * <br>• {@link #undo(LocalSession, Player, Actor, int)}
+ * <br>• {@link #redo(LocalSession, Player, Actor, int)}
+ * <br>• {@link #setGmask(LocalSession, String)}
+ * <br>• {@link #saveEditSession(EditSession, LocalSession, Actor)}
+ *
+ * <br><br><b>Vector Helper Functions</b>:
+ * <br>• {@link #adjustHeight(List, Block[][][])}
+ * <br>• {@link #populatePoints(List, int)}
+ * <br>• {@link #reducePoints(List, int, int)}
+ * <br>• {@link #extendPolyLine(List)}
+ * <br>• {@link #shortenPolyLine(List, int)}
+ * <br>• {@link #getClosestVector(List, Vector)}
+ * <br>• {@link #getXYZ(Vector, Block[][][])}
+ * <br>• {@link #getXYZWithVerticalOffset(Vector, Block[][][], int)}
+ * <br>• {@link #convertVectorListToPath64(List, Vector)}
+ * <br>• {@link #convertPathsToVectorList(Paths64, Vector, int, int)}
+ * <br>• {@link #shiftPoints(List, double, boolean)}
+ * <br>• {@link #shiftPointsAll(List, double)}
+ * <br>• {@link #getMinHeight(List)}
+ * <br>• {@link #getMaxHeight(List)}
+ *
+ * <br><br><b>Preparation Check Functions</b>:
+ * <br>• {@link #checkIfSchematicBrushIsInstalled(Player)}
+ * <br>• {@link #checkForNoWorldEditSelection(Player)}
+ * <br>• {@link #checkForBrickOutline(Block[][][], Player)}
+ * <br>• {@link #checkForWoolBlock(Block[][][], Player)}
  *
  * @author MineFact
  */
 public class GeneratorUtils {
 
 
+    
+    /*=============================================**
+    
+                SCRIPT HELPER FUNCTIONS
+    
+     **=============================================*/
+
+    /**
+     * Converts a String[] of arguments to a String[] of flags.
+     *
+     * @param args The arguments to be converted.
+     * @return The converted flags.
+     */
+    public static String[] convertArgsToFlags(String[] args) {
+        String argsString = " " + StringUtils.join(Arrays.copyOfRange(args, 1, args.length), " ");
+        String[] argsArray = argsString.split(" -");
+
+        return Arrays.copyOfRange(argsArray, 1, argsArray.length);
+    }
+
+    /** Converts a string with all flags and values to a string array with the flag name and the flag value.
+     *
+     * @param flagAndValue The string with all flags and values. Example is a command like /gen house -w 10 -h 10
+     * @param p The player who should receive an error message if the flag value is invalid.
+     * @return The string array with the flag name and the flag value.
+     */
+    public static String[] convertToFlagAndValue(String flagAndValue, Player p){
+        String[] values = flagAndValue.split(" ");
+        String flagName = values[0];
+        String flagValue;
+
+        try {
+            flagValue = StringUtils.join(Arrays.copyOfRange(values, 1, values.length), " ");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            p.sendMessage("§cInvalid flag value: -" + flagName + "§n§c ???");
+            return null;
+        }
+
+        return new String[]{flagName, flagValue};
+    }
+
+    /**
+     * Returns the blockState of a given XMaterial.
+     *
+     * @param xMaterial The XMaterial to get the blockState from
+     * @return The blockState of the XMaterial
+     */
+    public static BlockState getBlockState(XMaterial xMaterial){
+        if(xMaterial == null)
+            return null;
+
+        BlockType blockType = BlockTypes.get(xMaterial.getId() + "");
+
+        if(blockType == null && xMaterial.parseMaterial() != null)
+            blockType = BlockTypes.get(xMaterial.parseMaterial().getKey().asString());
+
+        if(blockType == null)
+            throw new IllegalArgumentException("Invalid block type: " + xMaterial.parseMaterial().name());
+
+        return blockType.getDefaultState();
+    }
+    public static BlockState[] getBlockState(XMaterial[] xMaterial){
+        if(xMaterial == null)
+            return null;
+
+        BlockState[] blockStates = new BlockState[xMaterial.length];
+
+        for(int i = 0; i < xMaterial.length; i++)
+            blockStates[i] = getBlockState(xMaterial[i]);
+
+        return blockStates;
+    }
+    
+
+
+    /*=============================================**
+
+                WORLDEDIT HELPER FUNCTIONS
+
+     **=============================================*/
+
+
+    /**
+     * Returns the path to the WorldEdit schematics folder.
+     *
+     * @return The path to the WorldEdit schematics folder
+     */
+    public static String getWorldEditSchematicsFolderPath(){
+        String worldEditFolder = "WorldEdit";
+
+        if(CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled())
+            worldEditFolder = "FastAsyncWorldEdit";
+
+        return BuildTeamTools.getInstance().getDataFolder().getAbsolutePath() + "/../" + worldEditFolder + "/schematics";
+    }
+
+
+    
+    
+    
+    /*=============================================**
+    
+               WORLDEDIT REGION FUNCTIONS
+    
+     **=============================================*/
+    
+    
+    
     /**
      * Returns the WorldEdit selection Vector from a player no matter which type of selection the player made.
      *
@@ -157,6 +332,12 @@ public class GeneratorUtils {
         return points;
     }
 
+    /**
+     * Returns the minimum and maximum points of a region as a Vector array.
+     * 
+     * @param region The region to get the minimum and maximum points from
+     * @return A Vector array with the minimum vector at index 0 and the maximum vector at index 1             
+     */
     public static Vector[] getMinMaxPoints(Region region){
         Vector[] minMax = new Vector[2];
 
@@ -191,6 +372,197 @@ public class GeneratorUtils {
 
         return minMax;
     }
+
+    /**
+     * Checks the maximum height of a polygon region
+     *
+     * @param blocks List of blocks in polygon region
+     * @return Maximum height of polygon region
+     */
+    public static int getMaxHeight(Block[][][] blocks, Material... ignoreMaterials){
+        int maxHeight = 0;
+        List<Material> ignoreMaterialsList = Arrays.asList(ignoreMaterials);
+
+        for (Block[][] block2D : blocks)
+            for (Block[] block1D : block2D)
+                for (Block block : block1D)
+                    if (block != null && !ignoreMaterialsList.contains(block.getType()) && block.getType().isSolid() && !block.isLiquid() && block.getY() > maxHeight)
+                        maxHeight = block.getY();
+
+        return maxHeight;
+    }
+
+    /**
+     * Checks the max height of a polygon region given a certain x and z coordinate
+     *
+     * @param blocks List of blocks in polygon region
+     * @return Maximum height of polygon region
+     */
+    public static int getMaxHeight(Block[][][] blocks, int x, int z, Material... ignoreMaterials){
+        int maxHeight = 0;
+        List<Material> ignoreMaterialsList = Arrays.asList(ignoreMaterials);
+
+        for (Block[][] block2D : blocks)
+            for (Block[] block1D : block2D)
+                for (Block block : block1D)
+                    if (block != null && block.getX() == x && block.getZ() == z && block.getY() > maxHeight && !ignoreMaterialsList.contains(block.getType()) && block.getType().isSolid() && !block.isLiquid())
+                        maxHeight = block.getY();
+
+        return maxHeight;
+    }
+
+    /**
+     * Checks if polygon region contains a block of a certain type
+     *
+     * @param blocks   List of blocks in polygon region
+     * @param xMaterial Material to check for (e.g. XMaterial.WALL_SIGN)
+     * @return true if polygon region contains the block, false otherwise
+     */
+    public static boolean containsBlock(Block[][][] blocks, XMaterial xMaterial){
+        return containsBlock(blocks, xMaterial, 1);
+    }
+
+    /**
+     * Checks if polygon region contains a minimum amount of blocks of a certain type
+     * @param blocks List of blocks in polygon region
+     * @param xMaterial Material to check for (e.g. XMaterial.WALL_SIGN)
+     * @param requiredAmount The minimum amount required to return true
+     * @return true if polygon region contains the required amount of the block, false otherwise
+     */
+    public static boolean containsBlock(Block[][][] blocks, XMaterial xMaterial, int requiredAmount){
+        int amountFound = 0;
+        for (Block[][] block2D : blocks)
+            for (Block[] block1D : block2D)
+                for (Block block : block1D)
+                    if (CommonModule.getInstance().getVersionComponent().is_1_12()) {
+                        if (block != null && block.getType() == xMaterial.parseMaterial() && block.getData() == xMaterial.getData())
+                            amountFound++;
+                    }else {
+                        if (block != null && block.getType() == xMaterial.parseMaterial())
+                            amountFound++;
+                    }
+
+        return amountFound >= requiredAmount;
+    }
+
+    /**
+     * Returns the current WorldEdit selection of a player.
+     *
+     * @param p The player whose selection should be returned.
+     * @return The current WorldEdit selection of the player.
+     */
+    public static Region getWorldEditSelection(Player p){
+        try {
+            Actor actor = BukkitAdapter.adapt(p);
+            SessionManager sessionManager = WorldEdit.getInstance().getSessionManager();
+            com.sk89q.worldedit.world.World world = sessionManager.get(actor).getSelectionWorld();
+
+            return sessionManager.get(actor).getSelection(world);
+        } catch (NullPointerException | IncompleteRegionException ex) {
+            return null;
+        }
+    }
+
+    /**
+     * Returns the WorldEdit selection of a player.
+     *
+     * @param p The player to get the selection from
+     * @param regionSelector The region selector to get the selection from
+     */
+    public static void restoreSelection(Player p, RegionSelector regionSelector){
+        Actor actor = BukkitAdapter.adapt(p);
+        SessionManager sessionManager = WorldEdit.getInstance().getSessionManager();
+        com.sk89q.worldedit.world.World world = sessionManager.get(actor).getSelectionWorld();
+
+        sessionManager.get(actor).setRegionSelector(world, regionSelector);
+
+        ChatHelper.logDebug("Restored selection");
+    }
+
+    /**
+     * Creates a Cuboid WorldEdit selection from a list of points and execute it right away.
+     *
+     * @param p The player to create the selection for
+     * @param vector1 Position 1
+     * @param vector2 Position 2
+     */
+    public static void createCuboidSelection(Player p, Vector vector1, Vector vector2){
+        Actor actor = BukkitAdapter.adapt(p);
+        SessionManager sessionManager = WorldEdit.getInstance().getSessionManager();
+        com.sk89q.worldedit.world.World world = sessionManager.get(actor).getSelectionWorld();
+
+        sessionManager.get(actor).setRegionSelector(world,
+                new CuboidRegionSelector(world,
+                        BlockVector3.at(vector1.getBlockX(), vector1.getBlockY(), vector1.getBlockZ()),
+                        BlockVector3.at(vector2.getBlockX(), vector2.getBlockY(), vector2.getBlockZ())
+                )
+        );
+
+        ChatHelper.logDebug("Created cuboid selection");
+    }
+
+
+    /**
+     * Creates a Polygon WorldEdit selection from a list of points and execute it right away.
+     * This functions determines the current surface height of each vector directly.
+     *
+     * @param p The player to create the selection for
+     * @param points The list of points to create the selection from
+     */
+    public static void createPolySelection(Player p, List<Vector> points, Block[][][] blocks){
+        int minY = Integer.MAX_VALUE;
+        int maxY = Integer.MIN_VALUE;
+
+        for(Vector vector : points) {
+            int y = getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), MenuItems.getIgnoredMaterials());
+
+            minY = Math.min(minY, y);
+            maxY = Math.max(maxY, y);
+        }
+
+        createPolySelection(p, points, minY, maxY);
+    }
+
+    /**
+     * Creates a Polygon WorldEdit selection from a list of points and execute it right away.
+     * This functions determines the current surface height of each vector directly.
+     *
+     * @param p The player to create the selection for
+     * @param points The list of points to create the selection from
+     * @param minY The minimum Y value of the selection
+     * @param maxY The maximum Y value of the selection
+     */
+    public static void createPolySelection(Player p, List<Vector> points, int minY, int maxY) {
+        Actor actor = BukkitAdapter.adapt(p);
+        SessionManager sessionManager = WorldEdit.getInstance().getSessionManager();
+        com.sk89q.worldedit.world.World world = sessionManager.get(actor).getSelectionWorld();
+
+        List<BlockVector2> blockVector2List = new ArrayList<>();
+        for (Vector vector : points){
+            blockVector2List.add(BlockVector2.at(vector.getBlockX(), vector.getBlockZ()));
+            ChatHelper.logDebug("Added point: " + vector);
+        }
+
+        sessionManager.get(actor).setRegionSelector(world,
+                new Polygonal2DRegionSelector(world, blockVector2List, minY, maxY)
+        );
+
+        ChatHelper.logDebug("Created polygonal selection with " + points.size() + " points. minY: " + minY + " maxY: " + maxY);
+    }
+    
+    
+    
+    
+    
+    
+    
+    /*=============================================**
+    
+                WORLDEDIT OPERATION FUNCTIONS
+    
+     **=============================================*/
+    
+    
 
     /**
      * Prepares a script session by expanding the selection, removing non-solid blocks and ignored materials.
@@ -244,39 +616,7 @@ public class GeneratorUtils {
         return regionBlocks;
     }
 
-    /**
-     * Converts a String[] of arguments to a String[] of flags.
-     *
-     * @param args The arguments to be converted.
-     * @return The converted flags.
-     */
-    public static String[] convertArgsToFlags(String[] args) {
-        String argsString = " " + StringUtils.join(Arrays.copyOfRange(args, 1, args.length), " ");
-        String[] argsArray = argsString.split(" -");
-
-        return Arrays.copyOfRange(argsArray, 1, argsArray.length);
-    }
-
-    /** Converts a string with all flags and values to a string array with the flag name and the flag value.
-     *
-     * @param flagAndValue The string with all flags and values. Example is a command like /gen house -w 10 -h 10
-     * @param p The player who should receive an error message if the flag value is invalid.
-     * @return The string array with the flag name and the flag value.
-     */
-    public static String[] convertToFlagAndValue(String flagAndValue, Player p){
-        String[] values = flagAndValue.split(" ");
-        String flagName = values[0];
-        String flagValue;
-
-        try {
-            flagValue = StringUtils.join(Arrays.copyOfRange(values, 1, values.length), " ");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            p.sendMessage("§cInvalid flag value: -" + flagName + "§n§c ???");
-            return null;
-        }
-
-        return new String[]{flagName, flagValue};
-    }
+    
 
     /** Analyzes a region and returns a three-dimensional array of all blocks in the region.
      * The size of the array is defined by the width, height and length of the region from WorldEdit of the player.
@@ -433,6 +773,60 @@ public class GeneratorUtils {
 
 
     /**
+     * Replaces all blocks in a region with a schematic pattern.
+     *
+     * @param weWorld The WorldEdit world in which the region is located
+     * @param localSession The local session of the actor
+     * @param from The block to replace
+     * @param schematicPath The path of the schematic to replace with
+     *
+     * @return A CompletableFuture that completes when the operation is finished
+     */
+    public static CompletableFuture<Void> replaceBlocksWithSchematic(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, BlockState[] from, String schematicPath) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+        Thread thread = new Thread(() -> {
+            ChatHelper.logDebug("Replacing blocks from " + Arrays.toString(from) + " to " + schematicPath);
+
+            try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
+                Region region = localSession.getSelection();
+
+                File schematicFile = new File(GeneratorUtils.getWorldEditSchematicsFolderPath() + schematicPath);
+
+                ClipboardFormat format = ClipboardFormats.findByFile(schematicFile);
+                ClipboardReader reader;
+
+                if (format == null)
+                    return;
+
+                try {
+                    reader = format.getReader(Files.newInputStream(schematicFile.toPath()));
+                    Clipboard clipboard = reader.read();
+
+                    Pattern pattern = new ClipboardPattern(clipboard);
+
+                    if(from != null) {
+                        BlockMask blockMask = new BlockMask(weWorld).add(from);
+                        editSession.replaceBlocks(region, blockMask, pattern);
+                    }else
+                        editSession.setBlocks(region, pattern);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return;
+                }
+
+                saveEditSession(editSession, localSession, actor);
+            } catch (IncompleteRegionException | MaxChangedBlocksException e) {
+                future.completeExceptionally(new RuntimeException(e));
+            }
+
+            future.complete(null);
+        });
+        thread.start();
+        return future;
+    }
+
+
+    /**
      * Replaces all blocks in a region with a given block.
      *
      * @param weWorld The WorldEdit world in which the region is located
@@ -503,8 +897,8 @@ public class GeneratorUtils {
      * @param filled Whether the curve should be filled or not.
      * @param matchElevation Whether the elevation of the points should be matched to the region
      */
-    public static CompletableFuture<Void> drawSplineWithMask(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, Block[][][] regionBlocks, List<String> masks, List<Vector> points, BlockState[] blocks,
-                                                             boolean matchElevation, double tension, double bias, double continuity, double quality, double radius, boolean filled, boolean connectLineEnds) {
+    public static CompletableFuture<Void> drawSplineWithMasks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, Block[][][] regionBlocks, List<String> masks, List<Vector> points, BlockState[] blocks,
+                                                              boolean matchElevation, double tension, double bias, double continuity, double quality, double radius, boolean filled, boolean connectLineEnds) {
         if(blocks == null || blocks.length == 0)
             throw new IllegalArgumentException("BlockState[] to is empty");
 
@@ -550,7 +944,7 @@ public class GeneratorUtils {
                         pattern = randomPattern;
                     }
 
-                    // Set the blockvectors
+                    // Set the block vectors
                     List<BlockVector3> blockVector3s = new ArrayList<>();
                     for (Vector point : points) {
                         if (matchElevation)
@@ -578,11 +972,11 @@ public class GeneratorUtils {
     }
 
     public static CompletableFuture<Void> drawCurveWithMasks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, Block[][][] regionBlocks, List<String> masks, List<Vector> points, BlockState[] blocks, boolean matchElevation){
-        return drawSplineWithMask(localSession, actor, weWorld, regionBlocks, masks, points, blocks, matchElevation, 0, 0, 0, 10, 0, true, false);
+        return drawSplineWithMasks(localSession, actor, weWorld, regionBlocks, masks, points, blocks, matchElevation, 0, 0, 0, 10, 0, true, false);
     }
 
     public static CompletableFuture<Void> drawPolyLineWithMasks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, Block[][][] regionBlocks, List<String> masks, List<Vector> points, BlockState[] blocks, boolean matchElevation, boolean connectLineEnds){
-        return drawSplineWithMask(localSession, actor, weWorld, regionBlocks, masks, points, blocks, matchElevation, 1, 0, -1, 10, 0, true, connectLineEnds);
+        return drawSplineWithMasks(localSession, actor, weWorld, regionBlocks, masks, points, blocks, matchElevation, 1, 0, -1, 10, 0, true, connectLineEnds);
     }
 
 
@@ -652,7 +1046,7 @@ public class GeneratorUtils {
                         newPoint2 = getXYZ(point1, regionBlocks);
                     }
 
-                    // Set the blockvectors
+                    // Set the block vectors
                     BlockVector3 point1BlockVector3 = BlockVector3.at(newPoint1.getBlockX(), newPoint1.getBlockY(), newPoint1.getBlockZ());
                     BlockVector3 point2BlockVector3 = BlockVector3.at(newPoint2.getBlockX(), newPoint2.getBlockY(), newPoint2.getBlockZ());
 
@@ -678,12 +1072,19 @@ public class GeneratorUtils {
      * @param localSession The local session of the actor
      * @param weWorld The WorldEdit world in which the region is located
      * @param blocks The blocks to paste
+     * @param masks The masks to use
      * @param schematicPath The path to the schematic
      * @param loc The location to paste the schematic
      * @param rotation The rotation of the schematic
      */
-    public static CompletableFuture<Void> pasteSchematic(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, Block[][][] blocks, String schematicPath, Location loc, double rotation) {
+    public static CompletableFuture<Void> pasteSchematicWithMasks(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, Block[][][] blocks, List<String> masks, String schematicPath, Location loc, double rotation) {
         int offsetY = 1;
+
+        // If no mask is provided, add an empty mask
+        if (masks.size() == 0) {
+            masks = new ArrayList<>();
+            masks.add("");
+        }
 
         int maxHeight = loc.getBlockY();
 
@@ -694,9 +1095,10 @@ public class GeneratorUtils {
 
         CompletableFuture<Void> future = new CompletableFuture<>();
         int finalMaxHeight = maxHeight;
+        final List<String> finalMasks = masks;
         Thread thread = new Thread(() -> {
             try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
-                File schematicFile = new File(BuildTeamTools.getInstance().getDataFolder().getAbsolutePath() + "/../WorldEdit/schematics/" + schematicPath);
+                File schematicFile = new File(getWorldEditSchematicsFolderPath() + schematicPath);
 
                 ClipboardFormat format = ClipboardFormats.findByFile(schematicFile);
                 ClipboardReader reader;
@@ -714,12 +1116,26 @@ public class GeneratorUtils {
                     ClipboardHolder holder = new ClipboardHolder(clipboard);
                     holder.setTransform(transform);
 
-                    com.sk89q.worldedit.function.operation.Operation op = holder
-                            .createPaste(editSession)
-                            .to(BlockVector3.at(loc.getBlockX(), finalMaxHeight + offsetY, loc.getBlockZ()))
-                            .ignoreAirBlocks(true)
-                            .build();
-                    Operations.complete(op);
+                    ParserContext parserContext = new ParserContext();
+                    parserContext.setActor(actor);
+                    parserContext.setWorld(weWorld);
+                    parserContext.setSession(localSession);
+                    parserContext.setExtent(editSession);
+
+                    for (String maskString : finalMasks) {
+                        // Set the mask
+                        Mask mask = null;
+                        if(!maskString.isEmpty())
+                            mask = new MaskFactory(WorldEdit.getInstance()).parseFromInput(maskString, parserContext);
+
+                        com.sk89q.worldedit.function.operation.Operation op = holder
+                                .createPaste(editSession)
+                                .to(BlockVector3.at(loc.getBlockX(), finalMaxHeight + offsetY, loc.getBlockZ()))
+                                .ignoreAirBlocks(true)
+                                .maskSource(mask)
+                                .build();
+                        Operations.complete(op);
+                    }
                 } catch (IOException | WorldEditException e) {
                     throw new RuntimeException(e);
                 }
@@ -735,6 +1151,11 @@ public class GeneratorUtils {
         thread.start();
         return future;
     }
+
+    public static CompletableFuture<Void> pasteSchematic(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, Block[][][] blocks, String schematicPath, Location loc, double rotation){
+        return pasteSchematicWithMasks(localSession, actor, weWorld, blocks, new ArrayList<>(), schematicPath, loc, rotation);
+    }
+
 
     /**
      * Expands the WorldEdit selection by a given vector.
@@ -833,37 +1254,7 @@ public class GeneratorUtils {
     }
 
 
-    /**
-     * Returns the blockState of a given XMaterial.
-     *
-     * @param xMaterial The XMaterial to get the blockState from
-     * @return The blockState of the XMaterial
-     */
-    public static BlockState getBlockState(XMaterial xMaterial){
-        if(xMaterial == null)
-            return null;
 
-        BlockType blockType = BlockTypes.get(xMaterial.getId() + "");
-
-        if(blockType == null && xMaterial.parseMaterial() != null)
-            blockType = BlockTypes.get(xMaterial.parseMaterial().getKey().asString());
-
-        if(blockType == null)
-            throw new IllegalArgumentException("Invalid block type: " + xMaterial.parseMaterial().name());
-
-        return blockType.getDefaultState();
-    }
-    public static BlockState[] getBlockState(XMaterial[] xMaterial){
-        if(xMaterial == null)
-            return null;
-
-        BlockState[] blockStates = new BlockState[xMaterial.length];
-
-        for(int i = 0; i < xMaterial.length; i++)
-            blockStates[i] = getBlockState(xMaterial[i]);
-
-        return blockStates;
-    }
 
     /**
      * Commits and saves an edit session.
@@ -882,77 +1273,18 @@ public class GeneratorUtils {
     }
 
 
-    /**
-     * Checks the maximum height of a polygon region
-     *
-     * @param blocks List of blocks in polygon region
-     * @return Maximum height of polygon region
-     */
-    public static int getMaxHeight(Block[][][] blocks, Material... ignoreMaterials){
-        int maxHeight = 0;
-        List<Material> ignoreMaterialsList = Arrays.asList(ignoreMaterials);
 
-        for (Block[][] block2D : blocks)
-            for (Block[] block1D : block2D)
-                for (Block block : block1D)
-                    if (block != null && !ignoreMaterialsList.contains(block.getType()) && block.getType().isSolid() && !block.isLiquid() && block.getY() > maxHeight)
-                        maxHeight = block.getY();
 
-        return maxHeight;
-    }
 
-    /**
-     * Checks the max height of a polygon region given a certain x and z coordinate
-     *
-     * @param blocks List of blocks in polygon region
-     * @return Maximum height of polygon region
-     */
-    public static int getMaxHeight(Block[][][] blocks, int x, int z, Material... ignoreMaterials){
-        int maxHeight = 0;
-        List<Material> ignoreMaterialsList = Arrays.asList(ignoreMaterials);
 
-        for (Block[][] block2D : blocks)
-            for (Block[] block1D : block2D)
-                for (Block block : block1D)
-                    if (block != null && block.getX() == x && block.getZ() == z && block.getY() > maxHeight && !ignoreMaterialsList.contains(block.getType()) && block.getType().isSolid() && !block.isLiquid())
-                        maxHeight = block.getY();
 
-        return maxHeight;
-    }
+    /*=============================================**
 
-    /**
-     * Checks if polygon region contains a block of a certain type
-     *
-     * @param blocks   List of blocks in polygon region
-     * @param xMaterial Material to check for (e.g. XMaterial.WALL_SIGN)
-     * @return true if polygon region contains the block, false otherwise
-     */
-    public static boolean containsBlock(Block[][][] blocks, XMaterial xMaterial){
-        return containsBlock(blocks, xMaterial, 1);
-    }
+                VECTOR HELPER FUNCTIONS
 
-    /**
-     * Checks if polygon region contains a minimum amount of blocks of a certain type
-     * @param blocks List of blocks in polygon region
-     * @param xMaterial Material to check for (e.g. XMaterial.WALL_SIGN)
-     * @param requiredAmount The minimum amount required to return true
-     * @return true if polygon region contains the required amount of the block, false otherwise
-     */
-    public static boolean containsBlock(Block[][][] blocks, XMaterial xMaterial, int requiredAmount){
-        int amountFound = 0;
-        for (Block[][] block2D : blocks)
-            for (Block[] block1D : block2D)
-                for (Block block : block1D)
-                    if (CommonModule.getInstance().getVersionComponent().is_1_12()) {
-                        if (block != null && block.getType() == xMaterial.parseMaterial() && block.getData() == xMaterial.getData())
-                            amountFound++;
-                    }else {
-                        if (block != null && block.getType() == xMaterial.parseMaterial())
-                            amountFound++;
-                    }
+     **=============================================*/
 
-        return amountFound >= requiredAmount;
-    }
+
 
     /**
      * Adjusts the height of a list of vectors so that they are on the surface of the terrain.
@@ -961,10 +1293,8 @@ public class GeneratorUtils {
      * @param blocks List of blocks in polygon region
      */
     public static void adjustHeight(List<Vector> points, Block[][][] blocks){
-        for(int i = 0; i < points.size(); i++) {
-            Vector point = points.get(i);
+        for (Vector point : points)
             point.setY(getMaxHeight(blocks, point.getBlockX(), point.getBlockZ(), MenuItems.getIgnoredMaterials()));
-        }
     }
 
     /** As long as two neighboring vectors are further than a given distance of blocks apart, add a new vector in between them
@@ -1290,185 +1620,16 @@ public class GeneratorUtils {
     }
 
 
-    /**
-     * Returns the current WorldEdit selection of a player.
-     *
-     * @param p The player to get the selection from
-     */
-    public static RegionSelector getCurrentRegionSelector(Player p){
-        Actor actor = BukkitAdapter.adapt(p);
-        SessionManager sessionManager = WorldEdit.getInstance().getSessionManager();
-        com.sk89q.worldedit.world.World world = sessionManager.get(actor).getSelectionWorld();
-
-        return sessionManager.get(actor).getRegionSelector(world);
-    }
-
-    /**
-     * Returns the WorldEdit selection of a player.
-     *
-     * @param p The player to get the selection from
-     * @param regionSelector The region selector to get the selection from
-     */
-    public static void restoreSelection(Player p, RegionSelector regionSelector){
-        Actor actor = BukkitAdapter.adapt(p);
-        SessionManager sessionManager = WorldEdit.getInstance().getSessionManager();
-        com.sk89q.worldedit.world.World world = sessionManager.get(actor).getSelectionWorld();
-
-        sessionManager.get(actor).setRegionSelector(world, regionSelector);
-
-        ChatHelper.logDebug("Restored selection");
-    }
-
-    /**
-     * Creates a Cuboid WorldEdit selection from a list of points and execute it right away.
-     *
-     * @param p The player to create the selection for
-     * @param vector1 Position 1
-     * @param vector2 Position 2
-     */
-    public static void createCuboidSelection(Player p, Vector vector1, Vector vector2){
-        Actor actor = BukkitAdapter.adapt(p);
-        SessionManager sessionManager = WorldEdit.getInstance().getSessionManager();
-        com.sk89q.worldedit.world.World world = sessionManager.get(actor).getSelectionWorld();
-
-        sessionManager.get(actor).setRegionSelector(world,
-            new CuboidRegionSelector(world,
-                BlockVector3.at(vector1.getBlockX(), vector1.getBlockY(), vector1.getBlockZ()),
-                BlockVector3.at(vector2.getBlockX(), vector2.getBlockY(), vector2.getBlockZ())
-            )
-        );
-
-        ChatHelper.logDebug("Created cuboid selection");
-    }
-
-
-    /**
-     * Creates a Polygon WorldEdit selection from a list of points and execute it right away.
-     * This functions determines the current surface height of each vector directly.
-     *
-     * @param p The player to create the selection for
-     * @param points The list of points to create the selection from
-     */
-    public static void createPolySelection(Player p, List<Vector> points, Block[][][] blocks){
-        int minY = Integer.MAX_VALUE;
-        int maxY = Integer.MIN_VALUE;
-
-        for(Vector vector : points) {
-            int y = getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), MenuItems.getIgnoredMaterials());
-
-            minY = Math.min(minY, y);
-            maxY = Math.max(maxY, y);
-        }
-
-        createPolySelection(p, points, minY, maxY);
-    }
-
-    /**
-     * Creates a Polygon WorldEdit selection from a list of points and execute it right away.
-     * This functions determines the current surface height of each vector directly.
-     *
-     * @param p The player to create the selection for
-     * @param points The list of points to create the selection from
-     * @param minY The minimum Y value of the selection
-     * @param maxY The maximum Y value of the selection
-     */
-    public static void createPolySelection(Player p, List<Vector> points, int minY, int maxY) {
-        Actor actor = BukkitAdapter.adapt(p);
-        SessionManager sessionManager = WorldEdit.getInstance().getSessionManager();
-        com.sk89q.worldedit.world.World world = sessionManager.get(actor).getSelectionWorld();
-
-        List<BlockVector2> blockVector2List = new ArrayList<>();
-        for (Vector vector : points){
-            blockVector2List.add(BlockVector2.at(vector.getBlockX(), vector.getBlockZ()));
-            ChatHelper.logDebug("Added point: " + vector);
-        }
-
-        sessionManager.get(actor).setRegionSelector(world,
-                new Polygonal2DRegionSelector(world, blockVector2List, minY, maxY)
-        );
-
-        ChatHelper.logDebug("Created polygonal selection with " + points.size() + " points. minY: " + minY + " maxY: " + maxY);
-    }
-
-    /**
-     * Creates a Convex WorldEdit selection from a list of points and execute it right away.
-     * This functions determines the current surface height of each vector directly.
-     *
-     * @param p The player to create the selection for
-     * @param points The list of points to create the selection from
-     */
-    public static void createConvexSelection(Player p, List<Vector> points, Block[][][] blocks){
-        p.chat("//sel convex");
-        p.chat("//pos1 " + getXYZ(points.get(0), blocks));
-
-        for(int i = 1; i < points.size(); i++)
-            p.chat("//pos2 " + getXYZ(points.get(i), blocks));
-
-        ChatHelper.logDebug("Created convex selection with " + points.size() + " points");
-    }
 
 
 
-    /**
-     * Draws a curved poly line from a list of points and adds it to the list of commands to execute.
-     * It draws the curve by drawing a straight line between each of the points.
-     *
-     * @param script The script to add the commands to
-     * @param points The list of points to create the selection from
-     * @param lineMaterial The material to draw the line with
-     * @param connectLineEnds Whether to connect the line ends in case the line is a circle
-     * @param blocks The blocks to get the surface height from
-     * @param offset The vertical offset you want the PolyLine to be created at
-     * @return The amount of operations used to accomplish this
-     */
-    public static int createPolyLine(Script script, List<Vector> points, String lineMaterial, boolean connectLineEnds, Block[][][] blocks, int offset){
-        script.createCommand("//sel cuboid");
+    /*=============================================**
 
-        script.createCommand("//pos1 " + getXYZWithVerticalOffset(points.get(0), blocks, offset));
+                PREPARATION CHECK FUNCTIONS
 
-        int operations = 0;
+     **=============================================*/
 
-        List<String> positions = new ArrayList<>();
-        for(int i = 1; i < points.size(); i++)
-            positions.add(getXYZWithVerticalOffset(points.get(i), blocks, offset));
-        String pos2 = getXYZWithVerticalOffset(points.get(0), blocks, offset);
 
-        for(int i = 1; i < points.size(); i++){
-            script.createCommand("//pos2 " + positions.get(i-1));
-            script.createCommand("//line " + lineMaterial);
-            operations++;
-            script.createCommand("//pos1 " + positions.get(i-1));
-        }
-
-        if(connectLineEnds){
-            script.createCommand("//pos2 " + pos2);
-            script.createCommand("//line " + lineMaterial);
-            operations++;
-        }
-
-        ChatHelper.logDebug("Created poly line with " + points.size() + " points");
-
-        return operations;
-    }
-
-    /**
-     * Returns the current WorldEdit selection of a player.
-     *
-     * @param p The player whose selection should be returned.
-     * @return The current WorldEdit selection of the player.
-     */
-    public static Region getWorldEditSelection(Player p){
-        Region plotRegion;
-
-        try {
-            plotRegion = Objects.requireNonNull(WorldEdit.getInstance().getSessionManager().findByName(p.getName())).getSelection(
-                    Objects.requireNonNull(WorldEdit.getInstance().getSessionManager().findByName(p.getName())).getSelectionWorld());
-        } catch (NullPointerException | IncompleteRegionException ex) {
-            return null;
-        }
-
-        return plotRegion;
-    }
 
     /**
      * Checks if Schematic Brush is installed and sends the player a message if it isn't.

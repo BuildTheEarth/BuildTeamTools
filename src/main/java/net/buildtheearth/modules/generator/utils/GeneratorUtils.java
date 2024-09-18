@@ -38,15 +38,11 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.common.CommonModule;
-import net.buildtheearth.modules.common.components.dependency.DependencyComponent;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.MenuItems;
 import org.apache.commons.lang3.StringUtils;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -903,7 +899,7 @@ public class GeneratorUtils {
             throw new IllegalArgumentException("BlockState[] to is empty");
 
         // If no mask is provided, add an empty mask
-        if (masks.size() == 0) {
+        if(masks.size() == 0) {
             masks = new ArrayList<>();
             masks.add("");
         }
@@ -1000,10 +996,13 @@ public class GeneratorUtils {
             throw new IllegalArgumentException("BlockState[] to is empty");
 
         // If no mask is provided, add an empty mask
-        if(masks.size() == 0)
+        if(masks.size() == 0) {
+            masks = new ArrayList<>();
             masks.add("");
+        }
 
         CompletableFuture<Void> future = new CompletableFuture<>();
+        List<String> finalMasks = masks;
         Thread thread = new Thread(() -> {
             try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
 
@@ -1013,8 +1012,8 @@ public class GeneratorUtils {
                 parserContext.setSession(localSession);
                 parserContext.setExtent(editSession);
 
-                for (String maskString : masks) {
-                    ChatHelper.logDebug("Drawing spline with expression mask: " + maskString.replace("%", "'PCT'") + " with " + Arrays.toString(blocks));
+                for (String maskString : finalMasks) {
+                    ChatHelper.logDebug("Drawing line with expression mask: " + maskString.replace("%", "'PCT'") + " with " + Arrays.toString(blocks) + " from " + point1 + " to " + point2);
 
                     // Set the mask
                     if(!maskString.isEmpty()) {
@@ -1043,14 +1042,14 @@ public class GeneratorUtils {
                     // Adjust the points to the elevation of the region if matchElevation is true
                     if(matchElevation){
                         newPoint1 = getXYZ(point1, regionBlocks);
-                        newPoint2 = getXYZ(point1, regionBlocks);
+                        newPoint2 = getXYZ(point2, regionBlocks);
                     }
 
                     // Set the block vectors
                     BlockVector3 point1BlockVector3 = BlockVector3.at(newPoint1.getBlockX(), newPoint1.getBlockY(), newPoint1.getBlockZ());
                     BlockVector3 point2BlockVector3 = BlockVector3.at(newPoint2.getBlockX(), newPoint2.getBlockY(), newPoint2.getBlockZ());
 
-                    editSession.drawLine(pattern, point1BlockVector3, point2BlockVector3, 1, true);
+                    editSession.drawLine(pattern, point1BlockVector3, point2BlockVector3, 0, true);
 
                     saveEditSession(editSession, localSession, actor);
                 }

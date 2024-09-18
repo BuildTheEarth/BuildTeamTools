@@ -160,7 +160,6 @@ public class RoadScripts extends Script {
         if(roadSlabMaterialIDs != null)
             mask += "," + roadSlabMaterialIDs;
 
-
         drawCurveWithMask(mask, fiveMeterPoints, XMaterial.YELLOW_WOOL, true);
 
         // Add additional yellow wool markings to spread the road material faster and everywhere on the road.
@@ -351,14 +350,15 @@ public class RoadScripts extends Script {
         // Draw the road markings
 
         if(laneCount > 1) {
+            replaceBlocks(XMaterial.YELLOW_WOOL, XMaterial.YELLOW_CONCRETE);
+
             // Check if langeCount is even or odd
             boolean isEven = laneCount % 2 == 0;
 
             // Create the road markings in the middle of the road
             if(isEven)
                 for(int i = 1; i < roadMarkingPoints.size(); i+=2)
-                    drawLineWithMask("35:4", roadMarkingPoints.get(i-1), roadMarkingPoints.get(i), markingMaterial, true);
-
+                    drawLineWithMask("251:4", roadMarkingPoints.get(i-1), roadMarkingPoints.get(i), markingMaterial, true);
 
             // Create the road markings for the other lanes
             if(laneCount >= 3)
@@ -368,6 +368,9 @@ public class RoadScripts extends Script {
                     List<List<Vector>> roadMarkingPointsList = GeneratorUtils.shiftPointsAll(points, distance);
                     for(List<Vector> path : roadMarkingPointsList) {
 
+                        // Connect the line ends to prevent gaps
+                        path.add(path.get(0));
+
                         List<Vector> markingsOneMeterPoints = new ArrayList<>(path);
                         markingsOneMeterPoints = GeneratorUtils.populatePoints(markingsOneMeterPoints, 1);
 
@@ -375,9 +378,11 @@ public class RoadScripts extends Script {
                         shiftedRoadMarkingPoints = GeneratorUtils.reducePoints(shiftedRoadMarkingPoints, markingGap + 1, markingLength - 1);
 
                         for(int i2 = 1; i2 < shiftedRoadMarkingPoints.size(); i2+=2)
-                            drawLineWithMask("35:4", shiftedRoadMarkingPoints.get(i2-1), shiftedRoadMarkingPoints.get(i2), markingMaterial, true);
+                            drawLineWithMask("251:4", shiftedRoadMarkingPoints.get(i2-1), shiftedRoadMarkingPoints.get(i2), markingMaterial, true);
                     }
                 }
+
+            replaceBlocks(XMaterial.YELLOW_CONCRETE, XMaterial.YELLOW_WOOL);
         }
 
 

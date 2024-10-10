@@ -67,18 +67,15 @@ public class PlotSystemModule extends Module {
             this.plotCreator = setup.plotCreator;
             this.plotPaster = setup.plotPaster;
             this.configManager = setup.configManager;
-        } catch (Exception ex) {
+        } catch (Exception | NoClassDefFoundError ex) {
             ChatHelper.logDebug("Error setting up PlotSystemTerra: " + ex.getMessage());
             if(BuildTeamTools.getInstance().isDebug())
                 ex.printStackTrace();
 
-            shutdown("Error setting up PlotSystemTerra from AlpsLib.");
+            shutdown("Error setting up PlotSystemTerra from AlpsLib: " + ex.getMessage());
             return;
         }
 
-
-
-        
 
         Bukkit.getConsoleSender().sendMessage("Enabled Plot-System-Terra module of BuildTeamTools.");
 

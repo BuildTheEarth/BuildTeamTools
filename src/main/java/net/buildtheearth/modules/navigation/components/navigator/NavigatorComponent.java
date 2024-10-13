@@ -72,7 +72,7 @@ public class NavigatorComponent extends ModuleComponent {
     }
 
     public short getSlot() {
-        return (short) BuildTeamTools.getInstance().getConfig().getInt(ConfigPaths.NAVIGATOR_ITEM_SLOT);
+        return (short) BuildTeamTools.getInstance().getConfig().getInt(ConfigPaths.Navigation.NAVIGATOR_ITEM_SLOT);
     }
 
 

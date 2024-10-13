@@ -12,7 +12,7 @@ public class NavigatorJoinListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        boolean isEnabled = BuildTeamTools.getInstance().getConfig().getBoolean(ConfigPaths.NAVIGATOR_ITEM_ENABLED, false);
+        boolean isEnabled = BuildTeamTools.getInstance().getConfig().getBoolean(ConfigPaths.Navigation.NAVIGATOR_ITEM_ENABLED, false);
 
         if(!isEnabled) return;
 

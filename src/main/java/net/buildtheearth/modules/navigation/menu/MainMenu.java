@@ -54,13 +54,13 @@ public class MainMenu extends AbstractMenu {
 
 
         // Set Build Item
-        if(config.getBoolean(ConfigPaths.BUILD_ITEM_ENABLED)) {
+        if(config.getBoolean(ConfigPaths.Navigation.BUILD_ITEM_ENABLED)) {
             ArrayList<String> buildLore = new ArrayList<>(Collections.singletonList(ChatHelper.getColorizedString(NamedTextColor.GRAY, "Click to build for the project!", false)));
             getMenu().getSlot(slots[1]).setItem(Item.create(XMaterial.DIAMOND_PICKAXE.parseMaterial(), ChatHelper.getColorizedString(NamedTextColor.GREEN, "Build", true), 1, buildLore));
         }
 
         // Set Tutorials Item
-        if(config.getBoolean(ConfigPaths.TUTORIALS_ITEM_ENABLED)) {
+        if(config.getBoolean(ConfigPaths.Navigation.TUTORIALS_ITEM_ENABLED)) {
             ArrayList<String> tutorialsLore = new ArrayList<>(Collections.singletonList(ChatHelper.getColorizedString(NamedTextColor.GRAY, "Click to do some tutorials!", false)));
             getMenu().getSlot(slots[2]).setItem(Item.create(XMaterial.KNOWLEDGE_BOOK.parseMaterial(), ChatHelper.getColorizedString(NamedTextColor.AQUA, "Tutorials", true), 1, tutorialsLore));
         }
@@ -82,10 +82,10 @@ public class MainMenu extends AbstractMenu {
         });
 
         // Set Build Item Click Event
-        if(config.getBoolean(ConfigPaths.BUILD_ITEM_ENABLED)) {
+        if(config.getBoolean(ConfigPaths.Navigation.BUILD_ITEM_ENABLED)) {
             getMenu().getSlot(slots[1]).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
-                String action = config.getString(ConfigPaths.BUILD_ITEM_ACTION);
+                String action = config.getString(ConfigPaths.Navigation.BUILD_ITEM_ACTION);
 
                 // If no command or message is set, teleport player to the plot system server
                 if(action == null || action.equals("/command") || action.equals("message")) {
@@ -99,10 +99,10 @@ public class MainMenu extends AbstractMenu {
         }
 
         // Set Tutorials Item Click Event
-        if(config.getBoolean(ConfigPaths.TUTORIALS_ITEM_ENABLED)) {
+        if(config.getBoolean(ConfigPaths.Navigation.TUTORIALS_ITEM_ENABLED)) {
             getMenu().getSlot(slots[2]).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
-                String action = config.getString(ConfigPaths.TUTORIALS_ITEM_ACTION);
+                String action = config.getString(ConfigPaths.Navigation.TUTORIALS_ITEM_ACTION);
 
                 // If no command or message is set, open the tutorial menu
                 if(action == null || action.equals("/command") || action.equals("message")) {
@@ -132,8 +132,8 @@ public class MainMenu extends AbstractMenu {
     private int[] getSlots() {
         int[] slots = new int[3];
 
-        boolean buildEnabled = config.getBoolean(ConfigPaths.BUILD_ITEM_ENABLED);
-        boolean tutorialsEnabled = config.getBoolean(ConfigPaths.TUTORIALS_ITEM_ENABLED);
+        boolean buildEnabled = config.getBoolean(ConfigPaths.Navigation.BUILD_ITEM_ENABLED);
+        boolean tutorialsEnabled = config.getBoolean(ConfigPaths.Navigation.TUTORIALS_ITEM_ENABLED);
 
         int exploreSlot = 11;
         int buildSlot = 13;

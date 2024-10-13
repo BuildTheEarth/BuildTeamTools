@@ -62,7 +62,7 @@ public class PlotSystemModule extends Module {
         version = plugin.getDescription().getVersion();
 
         try {
-            PSTerraSetup setup = PSTerraSetup.setupPlugin(plugin, version, false);
+            PSTerraSetup setup = PSTerraSetup.setupPlugin(plugin, version, false , "module/plotsystem", "config.yml", "config.yml");
             this.connection = setup.connection;
             this.plotCreator = setup.plotCreator;
             this.plotPaster = setup.plotPaster;
@@ -78,8 +78,6 @@ public class PlotSystemModule extends Module {
 
 
         Bukkit.getConsoleSender().sendMessage("Enabled Plot-System-Terra module of BuildTeamTools.");
-
-
         super.enable();
     }
 

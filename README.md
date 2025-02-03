@@ -25,7 +25,7 @@
 <p align="center">
     <a href="https://www.spigotmc.org/resources/buildteamtools.101854/"><img src="https://img.shields.io/spiget/downloads/101854?color=green&label=Downloads" alt="Downloads Count"></a>
     <a href="https://www.spigotmc.org/resources/buildteamtools.101854/"><img src="https://img.shields.io/spiget/version/101854?label=Version" alt="Latest Version"></a>
-    <a href="https://github.com/BuildTheEarth/BuildTeamTools"><img src="https://img.shields.io/tokei/lines/github/BuildTheEarth/BuildTeamTools" alt="Total Lines"></a>
+    <a href="https://github.com/BuildTheEarth/BuildTeamTools"><img src="https://tokei.rs/b1/github/BuildTheEarth/BuildTeamTools" alt="Total Lines"></a>
     <a href="https://github.com/BuildTheEarth/BuildTeamTools"><img src="https://img.shields.io/github/repo-size/BuildTheEarth/BuildTeamTools" alt="Repo Size"></a>
 </p>  
 
@@ -34,19 +34,18 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Plugin
 
-BuildTeamTools provides a large set of tools for builders which improve the building process in BTE. The plugin is designed for both casual and experienced builders, with features including  shell generation, road generation, railway generation and tree generation. 
+BuildTeamTools offers a comprehensive suite of tools designed to enhance the building and exploration experience in BuildTheEarth.<br> Whether you're a casual creator or an experienced builder, the plugin provides powerful features such as Generators, Navigators, Warps, PlotSystem, Statistics and more to streamline your workflow.
 
-The goal of the plugin is to massively accelerate the building process by eliminating many of the repetitive tasks that come with building in BuildTheEarth, while simultaneously providing an easy way for people to get started in the project.
+Its primary goal is to significantly speed up the building process by eliminating repetitive tasks while also providing an intuitive entry point for newcomers to the project.
 
 <!-- FEATURES -->
 ## Features
-🔨 **Easy-to-use** tools for everything around BuildTheEarth<br/>
-⏱ **Multi-Version** support from `1.12` - `1.20` (PLANNED)<br/>
-✔️ **User-friendly** GUIs and commands<br/>
+🔨 **Easy-to-use** Tools for everything around BuildTheEarth<br/>
+⏱ **Multi-Version** support from `1.12` - `1.21` (PLANNED)<br/>
+✔️ **User-friendly** GUIs and Commands<br/>
 💬 **Multi-Language** Support (PLANNED)<br/>
-📆 **Automatic** updates<br/>
+📆 **Automatic** Updates<br/>
 🔌 **Easy setup** and configuration<br/>
-📡 **BTE Network** improvements (PLANNED).
 
 <!-- COMPONENTS -->
 ## Components
@@ -64,18 +63,18 @@ The **\*** symbol shows that this feature is still being developed or under main
 <!-- INSTALLATION -->
 ## Installation
 💻 **Requirements:**
-- A server running Minecraft 1.12.2.
-- The WorldEdit Plugin.
-- (OPTIONAL) Be connected to the BuildTheEarth networkManager.
+- A Server running Minecraft `1.12` - `1.21`.
 
 🚩 **How to install:**
 1. Download BuildTeamTools [here](https://www.spigotmc.org/resources/buildteamtools.101854/).
 2. Place the downloaded plugin in your server's **../plugins** folder.
-3. Some of the modules require dependencies so if you want to use them you need to install them:
-  - To activate the **Generators**, please install the [WorldEdit 6.1.9](https://dev.bukkit.org/projects/worldedit/files/2597538) plugin.
-  - To activate the **Tree Generator**, install the [SchematicBrush 0.5.2](https://dev.bukkit.org/projects/schematicbrush) plugin.
-5. Restart your server.
-6. Done!
+3. *(Optional)* Some of the modules require intial configuration or dependencies to run:
+>  - To activate the **Navigation Module**, please configure an **API Key** in the config.yml file.
+>  - To activate the **Network Module**, please configure an **API Key** in the config.yml file.
+>  - To activate the **Generator Module**, please install the [WorldEdit](https://dev.bukkit.org/projects/worldedit) or [AsyncWorldEdit](https://www.spigotmc.org/resources/asyncworldedit.327/) plugin.
+>  - To activate the **Tree Generator Component**, install the [SchematicBrush 0.5.2](https://dev.bukkit.org/projects/schematicbrush) plugin.
+4. Restart your server.
+5. Done!
 
 **For more help, please see the [wiki](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Installation).**
 
@@ -104,4 +103,3 @@ Click the links below for more information, or see the [wiki](https://github.com
 - Plot System (PLANNED)
 - Tutorials (PLANNED)
 - Security (PLANNED)
-

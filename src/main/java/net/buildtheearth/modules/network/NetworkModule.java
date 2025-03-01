@@ -13,6 +13,8 @@ import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.network.model.RegionType;
 import net.buildtheearth.utils.io.ConfigPaths;
+import net.buildtheearth.utils.io.Constants;
+import net.buildtheearth.utils.io.Errors;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -64,8 +66,8 @@ public class NetworkModule extends Module {
     @Override
     public void enable() {
         String API_KEY = BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY);
-        if(API_KEY == null || API_KEY.isEmpty() || API_KEY.equals("00000000-0000-0000-0000-000000000000")){
-            shutdown("The API Key is was not configured in the config.yml file.");
+        if(API_KEY == null || API_KEY.isEmpty() || API_KEY.equals(Constants.DEFAULT_API_KEY)){
+            shutdown(Errors.API_KEY_NOT_CONFIGURED);
             return;
         }
 
@@ -77,11 +79,11 @@ public class NetworkModule extends Module {
 
             // After completion check if the build team is loaded
             if (getBuildTeam() == null) {
-                shutdown("Failed to load the Build Team!");
+                shutdown(Errors.BUILD_TEAM_NOT_LOADED);
                 return;
             }
         } catch (CompletionException e) {
-            shutdown("Failed to load the Build Team! " + e.getCause().getMessage());
+            shutdown(Errors.BUILD_TEAM_NOT_LOADED + " " + e.getCause().getMessage());
         }
 
         super.enable();

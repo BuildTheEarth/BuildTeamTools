@@ -29,7 +29,11 @@ import com.alpsbte.alpslib.io.config.ConfigurationUtil;
 
 import java.nio.file.Paths;
 
-public class ConfigUtil {
+public enum ConfigUtil {
+    MAIN,
+    PLOTSYSTEM,
+    NAVIGATION;
+
     private static ConfigurationUtil configUtilInstance;
 
     public static void init() throws ConfigNotImplementedException {
@@ -37,8 +41,8 @@ public class ConfigUtil {
 
         configUtilInstance = new ConfigurationUtil(new ConfigurationUtil.ConfigFile[]{
                 new ConfigurationUtil.ConfigFile(Paths.get("config.yml"), 1.4, false),
-                new ConfigurationUtil.ConfigFile(Paths.get("modules/plotsystem/config.yml"), 1.4, false),
-                new ConfigurationUtil.ConfigFile(Paths.get("modules/navigation/config.yml"), 1.4, false),
+                new ConfigurationUtil.ConfigFile(Paths.get("modules", "plotsystem", "config.yml"), 1.6, false),
+                new ConfigurationUtil.ConfigFile(Paths.get("modules", "navigation", "config.yml"), 1.6, false),
         });
     }
 

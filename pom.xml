@@ -189,14 +189,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Mojang !-->
-        <dependency>
-            <groupId>com.mojang</groupId>
-            <artifactId>authlib</artifactId>
-            <version>1.5.25</version>
-            <scope>provided</scope>
-        </dependency>
-
 
 
         <!--==========  BUILD THE EARTH  ==========-->
@@ -205,14 +197,8 @@
         <!-- Ref: https://github.com/AlpsBTE/Alps-Lib -->
         <dependency>
             <groupId>com.alpsbte.alpslib</groupId>
-            <artifactId>alpslib-io</artifactId>
-            <version>1.0.34</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.alpsbte.alpslib</groupId>
             <artifactId>alpslib-libpsterra</artifactId>
-            <version>1.1.1</version>
+            <version>1.1.2</version>
             <scope>compile</scope>
         </dependency>
 

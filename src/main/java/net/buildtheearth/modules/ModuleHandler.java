@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.utils.ChatHelper;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
@@ -77,19 +78,8 @@ public class ModuleHandler {
             module.shutdown(ex.getMessage());
         }
 
-        if (isStarting) {
-            if (module.isEnabled())
-                Bukkit.getConsoleSender().sendMessage("§7[§aOK§7] Successfully loaded §e" + module.getModuleName() + " Module§7.");
-            else {
-                String reason = "";
-
-                if (module.getError() != null && !module.getError().isEmpty())
-                    reason = " Reason: §c" + module.getError();
-
-                Bukkit.getConsoleSender().sendMessage( "§7[§cX§7]  Failed to load the §e" + module.getModuleName() + " Module§7." + reason);
-            }
-        }else{
-            if (module.isEnabled())
+        if (!isStarting) {
+            if (module.isEnabled() && BuildTeamTools.getInstance().isDebug())
                 ChatHelper.log("Successfully enabled %s Module", module.getModuleName());
             else {
                 String reason = "";
@@ -128,17 +118,20 @@ public class ModuleHandler {
     public boolean disable(Module module, Player executor) {
         boolean contains = false;
         for(Module m : modules)
-            if(m.getModuleName().equals(module.getModuleName()))
+            if (m.getModuleName().equals(module.getModuleName())) {
                 contains = true;
+                break;
+            }
 
         if(!contains)
             return false;
 
         module.disable();
 
-        if (!module.isEnabled())
-            ChatHelper.log("Successfully disabled %s Module", module.getModuleName());
-        else {
+        if (!module.isEnabled()) {
+            if(BuildTeamTools.getInstance().isDebug())
+                ChatHelper.log("Successfully disabled %s Module", module.getModuleName());
+        }else {
             String reason = "";
 
             if(module.getError() != null && !module.getError().isEmpty())
@@ -172,6 +165,9 @@ public class ModuleHandler {
         for (Module module : new ArrayList<>(modules))
             if (!module.isEnabled())
                 enable(module, executor, isStarting);
+
+        if(isStarting)
+            sendBuildTeamToolsConsoleStartupMessage();
     }
 
     /** Disables all modules
@@ -190,5 +186,30 @@ public class ModuleHandler {
     public void reloadAll(Player executor) {
         disableAll(executor);
         enableAll(executor, false);
+    }
+
+    private void sendBuildTeamToolsConsoleStartupMessage(){
+        Bukkit.getConsoleSender().sendMessage(" ");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "--------------- BuildTeamTools V" + BuildTeamTools.getInstance().getDescription().getVersion() + " ----------------");
+        Bukkit.getConsoleSender().sendMessage(" ");
+
+        for (Module module : new ArrayList<>(modules))
+            if (module.isEnabled())
+                Bukkit.getConsoleSender().sendMessage("§7[§aOK§7] Successfully loaded §e" + module.getModuleName() + " Module§7.");
+            else {
+                String reason = "";
+
+                if (module.getError() != null && !module.getError().isEmpty())
+                    reason = " Reason: §c" + module.getError();
+
+                Bukkit.getConsoleSender().sendMessage( "§7[§cX§7]  Failed to load the §e" + module.getModuleName() + " Module§7." + reason);
+            }
+
+        Bukkit.getConsoleSender().sendMessage(" ");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "------------------------------------------------------------");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_GRAY + "> " + ChatColor.GRAY + "Made by §bBuildTheEarth");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_GRAY + "> " + ChatColor.GRAY + "GitHub:" + ChatColor.WHITE + " https://github.com/BuildTheEarth/BuildTeamTools");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "------------------------------------------------------------");
+        Bukkit.getConsoleSender().sendMessage(" ");
     }
 }

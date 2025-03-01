@@ -6,27 +6,18 @@
 # | [Contacts - Discord] R3tuxn#7169, Coppertine#1718
 # -----------------------------------------------------
 
-# Keep updated about newer versions
-check-for-updates: true
-
-# Enables special dev tools and features for development
-# NOTE: Do not change if you do not know what you are doing
-dev-mode: false
-
+message-prefix: §7§l>>
+info-colour: §a
+error-colour: §c
 
 # -----------------------------------------------------
 # | Data Mode (API or Database)
 # -----------------------------------------------------
 
 # The data mode in which the plugin should run. Possible values: DATABASE, API
-data-mode: API
-
-# If the data mode is set to API, the plugin will use the PlotSystem API to get the plot data
+# If the data mode is set to API, the plugin will use the PlotSystem API to get the plot data with the API Key that is configured in the BuildTeamTools config.
 # Documentation for the PlotSystem API: https://github.com/BuildTheEarth/PlotSystemAPI
-api:
-  api-url: nwapi.buildtheearth.net
-  port: 8080
-  api-key: ffffffff-ffff-ffff-ffff-ffffffffffff
+data-mode: API
 
 # If the data mode is set to DATABASE, the plugin will use a database to get the plot data
 # The database must be a MariaDB/MySQL database
@@ -56,9 +47,6 @@ environment:
 # Read more here: https://github.com/AlpsBTE/Plot-System-Terra/wiki
 server-name: default
 
-# The world name of the terra server in which the schematic should be pasted
-world-name: world
-
 # Use fast mode for WorldEdit when pasting plots
 # Read more here: https://minecraft-worldedit.fandom.com/wiki///fast
 fast-mode: true
@@ -69,14 +57,6 @@ pasting-interval: 300
 
 # Send a server info message to all players informing them how many plots have been placed
 broadcast-info: true
-
-
-# -----------------------------------------------------
-# | Formatting: Info/Error message outputs
-# -----------------------------------------------------
-message-prefix: §7§l>>
-info-colour: §a
-error-colour: §c
 
 
 # NOTE: Do not change

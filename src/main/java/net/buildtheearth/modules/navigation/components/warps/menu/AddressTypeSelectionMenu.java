@@ -2,14 +2,13 @@ package net.buildtheearth.modules.navigation.components.warps.menu;
 
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.BuildTeamTools;
+import net.buildtheearth.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.ListUtil;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.Utils;
 import net.buildtheearth.utils.menus.AbstractMenu;
-import net.buildtheearth.modules.navigation.components.warps.model.Warp;
 import net.wesjd.anvilgui.AnvilGUI;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;

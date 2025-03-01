@@ -1,12 +1,6 @@
 package net.buildtheearth.modules.generator.components.field;
 
-import com.cryptomorin.xseries.XMaterial;
-import net.buildtheearth.BuildTeamTools;
-import net.buildtheearth.modules.common.CommonModule;
-import net.buildtheearth.modules.common.components.dependency.DependencyComponent;
-import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.model.Flag;
-import net.buildtheearth.modules.generator.model.GeneratorCollections;
 import net.buildtheearth.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.modules.generator.model.Script;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
@@ -15,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 

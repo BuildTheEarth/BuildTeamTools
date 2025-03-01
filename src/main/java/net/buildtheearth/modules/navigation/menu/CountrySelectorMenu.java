@@ -1,7 +1,5 @@
 package net.buildtheearth.modules.navigation.menu;
 
-import com.alpsbte.alpslib.utils.item.ItemBuilder;
-import com.cryptomorin.xseries.XMaterial;
 import lombok.NonNull;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.BuildTeam;
@@ -9,7 +7,6 @@ import net.buildtheearth.modules.network.model.Continent;
 import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.utils.*;
 import net.buildtheearth.utils.menus.AbstractPaginatedMenu;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;

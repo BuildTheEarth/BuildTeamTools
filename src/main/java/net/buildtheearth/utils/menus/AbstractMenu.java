@@ -2,8 +2,11 @@ package net.buildtheearth.utils.menus;
 
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.BuildTeamTools;
+import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.CustomHeads;
 import net.buildtheearth.utils.Item;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -23,7 +26,9 @@ public abstract class AbstractMenu {
 
     public AbstractMenu(int rows, String title, Player menuPlayer, boolean reload) {
         this.menuPlayer = menuPlayer;
-        this.menu = ChestMenu.builder(rows).title(title).redraw(true).build();
+
+        Component titleComponent = LegacyComponentSerializer.legacyAmpersand().deserialize(title);
+        this.menu = ChestMenu.builder(rows).title(titleComponent).redraw(true).build();
 
         if (reload) reloadMenuAsync();
     }

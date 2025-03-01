@@ -40,9 +40,6 @@ public class BuildTeamTools extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-        Bukkit.getConsoleSender().sendMessage(" ");
-        Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "--------------- BuildTeamTools V" + getDescription().getVersion() + " ----------------");
-        Bukkit.getConsoleSender().sendMessage(" ");
 
         // Register Modules
         ModuleHandler.getInstance().registerModules(
@@ -54,27 +51,26 @@ public class BuildTeamTools extends JavaPlugin {
             StatsModule.getInstance()
         );
         ModuleHandler.getInstance().enableAll(null, true);
-
-        Bukkit.getConsoleSender().sendMessage(" ");
-        Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "------------------------------------------------------------");
-        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_GRAY + "> " + ChatColor.GRAY + "Made by §bBuildTheEarth");
-        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_GRAY + "> " + ChatColor.GRAY + "GitHub:" + ChatColor.WHITE + " https://github.com/BuildTheEarth/BuildTeamTools");
-        Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "------------------------------------------------------------");
-        Bukkit.getConsoleSender().sendMessage(" ");
     }
 
     @Override
     public void onDisable() {
-        ModuleHandler.getInstance().disableAll(null);
+        try {
+            ModuleHandler.getInstance().disableAll(null);
+        } catch (NoClassDefFoundError ignored) {}
     }
 
 
     @Override
     public FileConfiguration getConfig() {
+        return getConfig(ConfigUtil.MAIN);
+    }
+
+    public FileConfiguration getConfig(ConfigUtil configType) {
         if(ConfigUtil.getInstance() == null)
             return null;
 
-        return ConfigUtil.getInstance().configs[0];
+        return ConfigUtil.getInstance().configs[configType.ordinal()];
     }
 
     @Override

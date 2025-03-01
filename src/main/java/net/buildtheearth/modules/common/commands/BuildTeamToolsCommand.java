@@ -47,19 +47,17 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args[0].equalsIgnoreCase("help")) {
-            ChatHelper.sendMessageBox(sender, "Build Team Help", new Runnable() {
-                @Override
-                public void run() {
-                    sender.sendMessage("§e/btt cache [upload] - §7View the cache or upload it to the network.");
-                    sender.sendMessage("§/btt checkForUpdates - §7Check for updates.");
-                    sender.sendMessage("§e/btt communicators - §7List of players who communicate with the network.");
-                    sender.sendMessage("§e/btt debug <true/false> - §7Enable or disable debug mode.");
-                    sender.sendMessage("§e/btt help - §7List of all sub commands.");
-                    sender.sendMessage("§e/btt reload - §7Reload all modules.");
-                }
+            ChatHelper.sendMessageBox(sender, "Build Team Help", () -> {
+                sender.sendMessage("§e/btt cache [upload] §8- §7View the cache or upload it to the network.");
+                sender.sendMessage("§e/btt checkForUpdates §8- §7Check for updates.");
+                sender.sendMessage("§e/btt communicators §8- §7List of players who communicate with the network.");
+                sender.sendMessage("§e/btt debug <true/false> §8- §7Enable or disable debug mode.");
+                sender.sendMessage("§e/btt help §8- §7List of all sub commands.");
+                sender.sendMessage("§e/btt reload §8- §7Reload all modules.");
             });
             return true;
         }
+
 
         if(args[0].equalsIgnoreCase("communicators")) {
             if(!player.hasPermission(Permissions.BUILD_TEAM_TOOLS_COMMUNICATORS)){

@@ -1,17 +1,13 @@
 package net.buildtheearth.utils;
 
-import com.cryptomorin.xseries.XItemStack;
 import com.cryptomorin.xseries.XMaterial;
-import com.destroystokyo.paper.Namespaced;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import net.buildtheearth.modules.common.CommonModule;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -127,18 +123,20 @@ public class Item {
 		if (this.hideEnchantments)
 			itemmeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 
-		if(canDestroyItems.size() > 0){
-			Set<Namespaced> nameSpacedKeySet = new HashSet<>();
-			for(String itemName : canDestroyItems)
-				nameSpacedKeySet.add(NamespacedKey.minecraft(itemName));
-			itemmeta.setDestroyableKeys(nameSpacedKeySet);
+		if(!canDestroyItems.isEmpty()){
+			// TODO Marked for removal in 1.20.6, not fixed yet.
+			//Set<Namespaced> nameSpacedKeySet = new HashSet<>();
+			//for(String itemName : canDestroyItems)
+			//	nameSpacedKeySet.add(NamespacedKey.minecraft(itemName));
+			//itemmeta.setDestroyableKeys(nameSpacedKeySet);
 		}
 
-		if(canPlaceItems.size() > 0){
-			Set<Namespaced> nameSpacedKeySet = new HashSet<>();
-			for(String itemName : canPlaceItems)
-				nameSpacedKeySet.add(NamespacedKey.minecraft(itemName));
-			itemmeta.setPlaceableKeys(nameSpacedKeySet);
+		if(!canPlaceItems.isEmpty()){
+			// TODO Marked for removal in 1.20.6, not fixed yet.
+			//Set<Namespaced> nameSpacedKeySet = new HashSet<>();
+			//for(String itemName : canPlaceItems)
+			//	nameSpacedKeySet.add(NamespacedKey.minecraft(itemName));
+			//itemmeta.setPlaceableKeys(nameSpacedKeySet);
 		}
 
 		item.setItemMeta(itemmeta);
@@ -382,12 +380,6 @@ public class Item {
 		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		itemmeta.setLore(lore);
 		item.setItemMeta(itemmeta);
-		return item;
-	}
-
-	public static ItemStack edit(ItemStack item, int amount, int data) {
-		item.setAmount(amount);
-		item.getData().setData((byte)data);
 		return item;
 	}
 

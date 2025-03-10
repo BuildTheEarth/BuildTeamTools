@@ -189,6 +189,14 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Mojang -->
+        <dependency>
+            <groupId>com.mojang</groupId>
+            <artifactId>authlib</artifactId>
+            <version>1.5.25</version>
+            <scope>provided</scope>
+        </dependency>
+
 
 
         <!--==========  BUILD THE EARTH  ==========-->

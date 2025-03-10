@@ -79,7 +79,7 @@ public class PlotSystemModule extends Module {
 
         // If the config world is not loaded, disable the module
         String world = BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.EARTH_WORLD);
-        if (Bukkit.getWorld(world) == null) {
+        if (world == null || Bukkit.getWorld(world) == null) {
             shutdown(Errors.WORLD_NOT_LOADED);
             return;
         }

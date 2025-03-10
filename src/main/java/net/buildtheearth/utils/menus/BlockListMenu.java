@@ -88,7 +88,7 @@ public class BlockListMenu extends AbstractPaginatedMenu {
         int slot = 0;
         for (ItemStack item : items) {
             if(selectedMaterials.contains(Item.getUniqueMaterialString(item)))
-                item = new Item(item).setAmount(1).addEnchantment(Enchantment.LUCK, 1).hideEnchantments(true).build();
+                item = new Item(item).setAmount(1).addEnchantment(Enchantment.LUCK_OF_THE_SEA, 1).hideEnchantments(true).build();
 
             getMenu().getSlot(slot).setItem(item);
             slot++;

@@ -9,7 +9,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.GeneratorModule;
-import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.ChatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -346,11 +346,11 @@ public class GeneratorCollections {
      * @param p The player to send the message to
      */
     private static void sendGeneratorCollectionsError(@Nullable Player p){
-        ChatHelper.logPlayerAndConsole(p, "§cAn error occurred while installing the Generator Collections.", Level.INFO);
-        ChatHelper.logPlayerAndConsole(p, "§cPlease install the Generator Collections v" + GENERATOR_COLLECTIONS_VERSION + " to use this tool. You can ask the server administrator to install it.", Level.INFO);
-        ChatHelper.logPlayerAndConsole(p, " ", Level.INFO);
-        ChatHelper.logPlayerAndConsole(p, "§cFor more installation help, please see the wiki:", Level.INFO);
-        ChatHelper.logPlayerAndConsole(p, "§c" + GeneratorModule.INSTALL_WIKI, Level.INFO);
+        ChatUtil.logPlayerAndConsole(p, "§cAn error occurred while installing the Generator Collections.", Level.INFO);
+        ChatUtil.logPlayerAndConsole(p, "§cPlease install the Generator Collections v" + GENERATOR_COLLECTIONS_VERSION + " to use this tool. You can ask the server administrator to install it.", Level.INFO);
+        ChatUtil.logPlayerAndConsole(p, " ", Level.INFO);
+        ChatUtil.logPlayerAndConsole(p, "§cFor more installation help, please see the wiki:", Level.INFO);
+        ChatUtil.logPlayerAndConsole(p, "§c" + GeneratorModule.INSTALL_WIKI, Level.INFO);
     }
 
 
@@ -374,11 +374,11 @@ public class GeneratorCollections {
             return false;
 
         if(update) {
-            ChatHelper.logPlayerAndConsole(p, "§cThe Generator Collections package is outdated. Updating...", Level.INFO);
+            ChatUtil.logPlayerAndConsole(p, "§cThe Generator Collections package is outdated. Updating...", Level.INFO);
 
             deleteDirectory(BuildTeamTools.getInstance().getDataFolder().getAbsolutePath() + path + fileDirectory);
         } else
-            ChatHelper.logPlayerAndConsole(p, "§cThe Generator Collections package wasn't found on your server. Installing...", Level.INFO);
+            ChatUtil.logPlayerAndConsole(p, "§cThe Generator Collections package wasn't found on your server. Installing...", Level.INFO);
 
 
 
@@ -386,7 +386,7 @@ public class GeneratorCollections {
             boolean success = installZipFolder(parentURL, filename, path);
 
             if(success) {
-                ChatHelper.logPlayerAndConsole(p, "§7Successfully installed §eGenerator Collections v" + GENERATOR_COLLECTIONS_VERSION + "§7!", Level.INFO);
+                ChatUtil.logPlayerAndConsole(p, "§7Successfully installed §eGenerator Collections v" + GENERATOR_COLLECTIONS_VERSION + "§7!", Level.INFO);
 
                 return true;
             }else {

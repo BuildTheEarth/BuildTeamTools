@@ -4,7 +4,7 @@ import lombok.Getter;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.api.API;
 import net.buildtheearth.modules.network.api.NetworkAPI;
-import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.ChatUtil;
 import net.buildtheearth.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import org.bukkit.entity.Player;
@@ -58,7 +58,7 @@ public class BuildTeam {
     public void createWarp(Player creator, Warp warp){
         // Check if the team owns that warp
         if(!warp.getWarpGroup().getBuildTeam().getID().equals(this.getID())){
-            creator.sendMessage(ChatHelper.getErrorString("You can only create warps for your own team!"));
+            creator.sendMessage(ChatUtil.getErrorString("You can only create warps for your own team!"));
             return;
         }
 
@@ -67,13 +67,13 @@ public class BuildTeam {
             public void onResponse(String response) {
                 // Update the cache
                 NetworkModule.getInstance().updateCache().thenRun(() ->
-                        ChatHelper.sendSuccessfulMessage(creator, "Successfully created the warp %s!", warp.getName())
+                        ChatUtil.sendSuccessful(creator, "Successfully created the warp %s!", warp.getName())
                 );
             }
 
             @Override
             public void onFailure(IOException e) {
-                creator.sendMessage(ChatHelper.getErrorString("Something went wrong while creating the warp %s! Please take a look at the console.", warp.getName()));
+                creator.sendMessage(ChatUtil.getErrorString("Something went wrong while creating the warp %s! Please take a look at the console.", warp.getName()));
                 e.printStackTrace();
             }
         });
@@ -82,7 +82,7 @@ public class BuildTeam {
     public void createWarpGroup(Player creator, WarpGroup warpGroup){
         // Check if the team owns that warp group
         if(!warpGroup.getBuildTeam().getID().equals(this.getID())){
-            creator.sendMessage(ChatHelper.getErrorString("You can only create warp groups for your own team!"));
+            creator.sendMessage(ChatUtil.getErrorString("You can only create warp groups for your own team!"));
             return;
         }
 
@@ -91,13 +91,13 @@ public class BuildTeam {
             public void onResponse(String response) {
                 // Update the cache
                 NetworkModule.getInstance().updateCache().thenRun(() ->
-                        ChatHelper.sendSuccessfulMessage(creator, "Successfully created the warp group %s!", warpGroup.getName())
+                        ChatUtil.sendSuccessful(creator, "Successfully created the warp group %s!", warpGroup.getName())
                 );
             }
 
             @Override
             public void onFailure(IOException e) {
-                creator.sendMessage(ChatHelper.getErrorString("Something went wrong while creating the warp group %s! Please take a look at the console.", warpGroup.getName()));
+                creator.sendMessage(ChatUtil.getErrorString("Something went wrong while creating the warp group %s! Please take a look at the console.", warpGroup.getName()));
                 e.printStackTrace();
             }
         });
@@ -107,7 +107,7 @@ public class BuildTeam {
     public void updateWarp(Player updater, Warp warp){
         // Check if the team owns that warp
         if(!warp.getWarpGroup().getBuildTeam().getID().equals(this.getID())){
-            updater.sendMessage(ChatHelper.getErrorString("You can only update warps for your own team!"));
+            updater.sendMessage(ChatUtil.getErrorString("You can only update warps for your own team!"));
             return;
         }
 
@@ -116,9 +116,9 @@ public class BuildTeam {
             public void onResponse(String response) {
                 // Update the cache
                 NetworkModule.getInstance().updateCache().thenRun(() ->
-                        ChatHelper.sendSuccessfulMessage(updater, "Successfully updated the warp %s!", warp.getName())
+                        ChatUtil.sendSuccessful(updater, "Successfully updated the warp %s!", warp.getName())
                 ).exceptionally(e -> {
-                    updater.sendMessage(ChatHelper.getErrorString("Something went wrong while updating the warp %s! Please take a look at the console.", warp.getName()));
+                    updater.sendMessage(ChatUtil.getErrorString("Something went wrong while updating the warp %s! Please take a look at the console.", warp.getName()));
                     e.printStackTrace();
                     return null;
                 });
@@ -126,7 +126,7 @@ public class BuildTeam {
 
             @Override
             public void onFailure(IOException e) {
-                updater.sendMessage(ChatHelper.getErrorString("Something went wrong while updating the warp %s! Please take a look at the console.", warp.getName()));
+                updater.sendMessage(ChatUtil.getErrorString("Something went wrong while updating the warp %s! Please take a look at the console.", warp.getName()));
                 e.printStackTrace();
             }
         });
@@ -135,7 +135,7 @@ public class BuildTeam {
     public void updateWarpGroup(Player updater, WarpGroup warpGroup){
         // Check if the team owns that warp group
         if(!warpGroup.getBuildTeam().getID().equals(this.getID())){
-            updater.sendMessage(ChatHelper.getErrorString("You can only update warp groups for your own team!"));
+            updater.sendMessage(ChatUtil.getErrorString("You can only update warp groups for your own team!"));
             return;
         }
 
@@ -144,9 +144,9 @@ public class BuildTeam {
             public void onResponse(String response) {
                 // Update the cache
                 NetworkModule.getInstance().updateCache().thenRun(() ->
-                        ChatHelper.sendSuccessfulMessage(updater, "Successfully updated the warp group %s!", warpGroup.getName())
+                        ChatUtil.sendSuccessful(updater, "Successfully updated the warp group %s!", warpGroup.getName())
                 ).exceptionally(e -> {
-                    updater.sendMessage(ChatHelper.getErrorString("Something went wrong while updating the warp group %s! Please take a look at the console.", warpGroup.getName()));
+                    updater.sendMessage(ChatUtil.getErrorString("Something went wrong while updating the warp group %s! Please take a look at the console.", warpGroup.getName()));
                     e.printStackTrace();
                     return null;
                 });
@@ -154,7 +154,7 @@ public class BuildTeam {
 
             @Override
             public void onFailure(IOException e) {
-                updater.sendMessage(ChatHelper.getErrorString("Something went wrong while updating the warp group %s! Please take a look at the console.", warpGroup.getName()));
+                updater.sendMessage(ChatUtil.getErrorString("Something went wrong while updating the warp group %s! Please take a look at the console.", warpGroup.getName()));
                 e.printStackTrace();
             }
         });
@@ -163,7 +163,7 @@ public class BuildTeam {
     public void deleteWarp(Player deleter, Warp warp){
         // Check if the team owns that warp
         if(!warp.getWarpGroup().getBuildTeam().getID().equals(this.getID())){
-            deleter.sendMessage(ChatHelper.getErrorString("You can only delete warps for your own team!"));
+            deleter.sendMessage(ChatUtil.getErrorString("You can only delete warps for your own team!"));
             return;
         }
 
@@ -172,13 +172,13 @@ public class BuildTeam {
             public void onResponse(String response) {
                 // Update the cache
                 NetworkModule.getInstance().updateCache().thenRun(() ->
-                        ChatHelper.sendSuccessfulMessage(deleter, "Successfully deleted the warp %s!", warp.getName())
+                        ChatUtil.sendSuccessful(deleter, "Successfully deleted the warp %s!", warp.getName())
                 );
             }
 
             @Override
             public void onFailure(IOException e) {
-                deleter.sendMessage(ChatHelper.getErrorString("Something went wrong while deleting the warp %s! Please take a look at the console.", warp.getName()));
+                deleter.sendMessage(ChatUtil.getErrorString("Something went wrong while deleting the warp %s! Please take a look at the console.", warp.getName()));
                 e.printStackTrace();
             }
         });
@@ -187,7 +187,7 @@ public class BuildTeam {
     public void deleteWarpGroup(Player deleter, WarpGroup warpGroup){
         // Check if the team owns that warp group
         if(!warpGroup.getBuildTeam().getID().equals(this.getID())){
-            deleter.sendMessage(ChatHelper.getErrorString("You can only delete warp groups for your own team!"));
+            deleter.sendMessage(ChatUtil.getErrorString("You can only delete warp groups for your own team!"));
             return;
         }
 
@@ -196,13 +196,13 @@ public class BuildTeam {
             public void onResponse(String response) {
                 // Update the cache
                 NetworkModule.getInstance().updateCache().thenRun(() ->
-                        ChatHelper.sendSuccessfulMessage(deleter, "Successfully deleted the warp group %s!", warpGroup.getName())
+                        ChatUtil.sendSuccessful(deleter, "Successfully deleted the warp group %s!", warpGroup.getName())
                 );
             }
 
             @Override
             public void onFailure(IOException e) {
-                deleter.sendMessage(ChatHelper.getErrorString("Something went wrong while deleting the warp group %s! Please take a look at the console.", warpGroup.getName()));
+                deleter.sendMessage(ChatUtil.getErrorString("Something went wrong while deleting the warp group %s! Please take a look at the console.", warpGroup.getName()));
                 e.printStackTrace();
             }
         });

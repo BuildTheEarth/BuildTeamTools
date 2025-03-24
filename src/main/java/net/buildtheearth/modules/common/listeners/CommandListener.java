@@ -2,7 +2,8 @@ package net.buildtheearth.modules.common.listeners;
 
 import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.ModuleHandler;
-import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.ChatUtil;
+import net.buildtheearth.utils.lang.LangPaths;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -30,7 +31,7 @@ public class CommandListener implements Listener {
                             if (module.getError() != null && !module.getError().isEmpty())
                                 reason = " Reason: " + module.getError();
 
-                            ChatHelper.sendErrorMessage(e.getPlayer(), "The Module " + module.getModuleName() + " is currently disabled." + reason);
+                            ChatUtil.sendError(e.getPlayer(), LangPaths.Common.MODULE_IS_DISABLED, module.getModuleName(), reason);
                             e.setCancelled(true);
                             return;
                         }

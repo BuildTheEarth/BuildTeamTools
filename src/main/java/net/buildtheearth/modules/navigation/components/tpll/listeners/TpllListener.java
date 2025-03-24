@@ -4,7 +4,7 @@ import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.navigation.NavigationModule;
-import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.ChatUtil;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
@@ -55,15 +55,15 @@ public class TpllListener implements Listener {
      */
     private boolean isTpllCommand(PlayerCommandPreprocessEvent event) {
         // Check if the command starts with "tpll"
-        ChatHelper.logDebug(event.getMessage());
+        ChatUtil.logDebug(event.getMessage());
         if (!event.getMessage().startsWith("/tpll")) return false;
-        ChatHelper.logDebug("Intercepted tpll command.");
+        ChatUtil.logDebug("Intercepted tpll command.");
 
         // Split the command to extract coordinates
         String[] splitMessage = event.getMessage().split(" ");
         splitMessage[1] = splitMessage[1].replaceAll(",", " ").trim();
         if (splitMessage.length < 3) return false;
-        ChatHelper.logDebug("Command had the correct length (%s).", splitMessage.length);
+        ChatUtil.logDebug("Command had the correct length (%s).", splitMessage.length);
 
         // Extract and set latitude and longitude coordinates
         this.lat = Double.parseDouble(splitMessage[1]);
@@ -86,7 +86,7 @@ public class TpllListener implements Listener {
                     Region region = Region.getByName(countryName);
 
                     if (!networkModule.getBuildTeam().isConnected() || !region.isConnected()) {
-                        event.getPlayer().sendMessage(ChatHelper.getErrorString("Either this server or the receiving server isn't connected to the network."));
+                        event.getPlayer().sendMessage(ChatUtil.getErrorString("Either this server or the receiving server isn't connected to the network."));
                         event.setCancelled(true);
                         return CompletableFuture.completedFuture(false);
                     }

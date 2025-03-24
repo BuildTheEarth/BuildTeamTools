@@ -6,7 +6,8 @@ import net.buildtheearth.modules.navigation.components.warps.menu.WarpMenu;
 import net.buildtheearth.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.Permissions;
-import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.ChatUtil;
+import net.buildtheearth.utils.lang.LangPaths;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -17,13 +18,13 @@ public class WarpCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatHelper.getErrorString("This command can only be used by a player!"));
+            ChatUtil.sendError(sender, LangPaths.ERROR.NO_PLAYER);
             return true;
         }
 
         // Check if the build team is loaded
         if(NetworkModule.getInstance().getBuildTeam() == null){
-            sender.sendMessage(ChatHelper.getErrorString("The Warp Module is currently disabled because the Build Team failed to load!"));
+            sender.sendMessage(ChatUtil.getErrorString("The Warp Module is currently disabled because the Build Team failed to load!"));
             return true;
         }
 
@@ -34,7 +35,7 @@ public class WarpCommand implements CommandExecutor {
             int warpGroupCount = NetworkModule.getInstance().getBuildTeam().getWarpGroups().size();
 
             if(warpGroupCount == 0){
-                player.sendMessage(ChatHelper.getErrorString("This server does not have any warps yet!"));
+                player.sendMessage(ChatUtil.getErrorString("This server does not have any warps yet!"));
                 return true;
             }else if(warpGroupCount == 1)
                 new WarpMenu(player, NetworkModule.getInstance().getBuildTeam().getWarpGroups().get(0), false, true);
@@ -48,17 +49,17 @@ public class WarpCommand implements CommandExecutor {
         if (args[0].equalsIgnoreCase("create")) {
             // Check if the command has only one argument
             if (args.length > 1){
-                player.sendMessage(ChatHelper.getErrorString("Usage: /warp create"));
+                player.sendMessage(ChatUtil.getErrorString("Usage: /warp create"));
                 return true;
             }
 
             // Check if the player has the required permissions
             if (!player.hasPermission(Permissions.WARP_CREATE)) {
-                player.sendMessage(ChatHelper.getErrorString("You don't have the required %s to %s warps.", "permission", "create"));
+                player.sendMessage(ChatUtil.getErrorString("You don't have the required %s to %s warps.", "permission", "create"));
                 return true;
             }
 
-            player.sendActionBar(ChatHelper.getStandardString(false, "Creating the warp..."));
+            player.sendActionBar(ChatUtil.getStandardString(false, "Creating the warp..."));
 
             NavigationModule.getInstance().getWarpsComponent().createWarp(player);
             return true;
@@ -70,7 +71,7 @@ public class WarpCommand implements CommandExecutor {
 
         // Check if the player has the required permission
         if (!player.hasPermission(Permissions.WARP_USE)) {
-            player.sendMessage(ChatHelper.getErrorString("You don't have the required %s to %s warps.", "permission", "use"));
+            player.sendMessage(ChatUtil.getErrorString("You don't have the required %s to %s warps.", "permission", "use"));
             return true;
         }
 
@@ -78,7 +79,7 @@ public class WarpCommand implements CommandExecutor {
         Warp warp = NavigationModule.getInstance().getWarpsComponent().getWarpByName(key);
 
         if(warp == null) {
-            player.sendMessage(ChatHelper.getErrorString("The warp with the name %s does not exist in this team!", key));
+            player.sendMessage(ChatUtil.getErrorString("The warp with the name %s does not exist in this team!", key));
             return true;
         }
 

@@ -19,9 +19,12 @@ import net.buildtheearth.modules.stats.model.StatsPlayerType;
 import net.buildtheearth.modules.stats.model.StatsServerType;
 import net.buildtheearth.utils.io.ConfigPaths;
 import net.buildtheearth.utils.io.ConfigUtil;
+import net.buildtheearth.utils.lang.LangUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.MenuFunctionListener;
+
+import java.util.logging.Level;
 
 public class CommonModule extends Module {
 
@@ -58,10 +61,22 @@ public class CommonModule extends Module {
             YamlFileFactory.registerPlugin(BuildTeamTools.getInstance());
             ConfigUtil.init();
         } catch (ConfigNotImplementedException ex) {
+            BuildTeamTools.getInstance().getLogger().log(Level.SEVERE, ex.getMessage(), ex);
+            BuildTeamTools.getInstance().getServer().getPluginManager().disablePlugin(BuildTeamTools.getInstance());
+            return;
         }
 
         // Reload the configuration file
         ConfigUtil.getInstance().reloadFiles();
+
+        // Load language files
+        try {
+            LangUtil.init();
+        } catch (Exception ex) {
+            BuildTeamTools.getInstance().getLogger().log(Level.SEVERE, ex.getMessage(), ex);
+            BuildTeamTools.getInstance().getServer().getPluginManager().disablePlugin(BuildTeamTools.getInstance());
+            return;
+        }
 
         // Set the debug mode
         BuildTeamTools.getInstance().setDebug(BuildTeamTools.getInstance().getConfig().getBoolean(ConfigPaths.DEBUG, false));

@@ -57,7 +57,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
             ).collect(Collectors.toList()));
         }
 
-        ChatHelper.logDebug("Continent in constructor: %s", continent);
+        ChatUtil.logDebug("Continent in constructor: %s", continent);
     }
 
     @Override
@@ -111,7 +111,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
             getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
 
-                ChatHelper.logDebug("%s", clickedRegion.getName());
+                ChatUtil.logDebug("%s", clickedRegion.getName());
 
                 if(clickedRegion.getCountryCodeCca3().equalsIgnoreCase("USA"))
                     new StateSelectorMenu(clickedRegion, clickPlayer, true);

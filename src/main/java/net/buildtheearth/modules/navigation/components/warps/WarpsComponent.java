@@ -9,7 +9,7 @@ import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.api.NetworkAPI;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.modules.network.model.BuildTeam;
-import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.ChatUtil;
 import net.buildtheearth.utils.GeometricUtils;
 import net.buildtheearth.utils.geo.CoordinateConversion;
 import net.buildtheearth.modules.navigation.components.warps.menu.WarpEditMenu;
@@ -52,7 +52,7 @@ public class WarpsComponent extends ModuleComponent {
             Warp warp = NetworkAPI.getWarpByKey(warpKey);
 
             if (warp == null) {
-                player.sendMessage(ChatHelper.getErrorString("The warp you tried to warp to does not exist anymore."));
+                player.sendMessage(ChatUtil.getErrorString("The warp you tried to warp to does not exist anymore."));
                 return;
             }
 
@@ -77,9 +77,9 @@ public class WarpsComponent extends ModuleComponent {
         }
 
         if(player.teleport(targetWarpLocation)) {
-            ChatHelper.sendSuccessfulMessage(player, "Successfully warped you to the desired location!");
+            ChatUtil.sendSuccessful(player, "Successfully warped you to the desired location!");
         } else {
-            player.sendMessage(ChatHelper.getErrorString("Something went wrong trying to warp you to the desired location."));
+            player.sendMessage(ChatUtil.getErrorString("Something went wrong trying to warp you to the desired location."));
         }
 
         warpQueue.remove(player.getUniqueId());
@@ -105,7 +105,7 @@ public class WarpsComponent extends ModuleComponent {
             loc.setY(warp.getY());
 
             player.teleport(loc);
-            ChatHelper.sendSuccessfulMessage(player, "Successfully warped you to %s.", warp.getName());
+            ChatUtil.sendSuccessful(player, "Successfully warped you to %s.", warp.getName());
 
             return;
         }
@@ -147,7 +147,7 @@ public class WarpsComponent extends ModuleComponent {
             boolean ownsRegion = NetworkModule.getInstance().ownsRegion(regionName, countryCodeCCA2);
 
             if(!ownsRegion) {
-                creator.sendMessage(ChatHelper.getErrorString("This team does not own the country %s!", result[0]));
+                creator.sendMessage(ChatUtil.getErrorString("This team does not own the country %s!", result[0]));
                 return;
             }
 
@@ -164,7 +164,7 @@ public class WarpsComponent extends ModuleComponent {
             new WarpEditMenu(creator, warp, false, true);
 
         }).exceptionally(e -> {
-            creator.sendMessage(ChatHelper.getErrorString("An error occurred while creating the warp!"));
+            creator.sendMessage(ChatUtil.getErrorString("An error occurred while creating the warp!"));
             e.printStackTrace();
             return null;
         });

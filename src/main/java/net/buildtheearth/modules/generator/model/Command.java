@@ -11,7 +11,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import lombok.Getter;
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
-import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.ChatUtil;
 import net.buildtheearth.utils.MenuItems;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -227,9 +227,9 @@ public class Command {
             }
         }catch (Exception e){
             if(operation != null)
-                ChatHelper.logError("Error while processing command: " + operation.getOperationType() + " - " + operation.getValuesAsString());
+                ChatUtil.logError("Error while processing command: " + operation.getOperationType() + " - " + operation.getValuesAsString());
             else
-                ChatHelper.logError("Error while processing command.");
+                ChatUtil.logError("Error while processing command.");
             e.printStackTrace();
         }
 

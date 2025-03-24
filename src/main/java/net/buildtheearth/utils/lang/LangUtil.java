@@ -22,32 +22,38 @@
  *  SOFTWARE.
  */
 
-package net.buildtheearth.utils.io;
+package net.buildtheearth.utils.lang;
 
-import com.alpsbte.alpslib.io.lang.LanguageUtil;
+
+import li.cinnazeyy.langlibs.core.Language;
+import li.cinnazeyy.langlibs.core.file.LanguageFile;
+import li.cinnazeyy.langlibs.core.language.LangLibAPI;
+import li.cinnazeyy.langlibs.core.language.LanguageUtil;
+import net.buildtheearth.BuildTeamTools;
+import org.bukkit.command.CommandSender;
 
 public class LangUtil extends LanguageUtil {
     private static LangUtil langUtilInstance;
 
-    public LangUtil(LanguageFile[] langFiles) {
-        super(langFiles);
-    }
-
     public static void init() {
         if (langUtilInstance != null) return;
-        langUtilInstance = new LangUtil(new LanguageFile[]{
-                new LanguageFile("en_GB", 1.3),
-                new LanguageFile("de_DE", 1.3, "de_AT", "de_CH"),
-                new LanguageFile("fr_FR", 1.3, "fr_CA"),
-                new LanguageFile("pt_PT", 1.2, "pt_BR"),
-                new LanguageFile("ko_KR", 1.3),
-                new LanguageFile("ru_RU", 1.3, "ba_RU", "tt_RU"),
-                new LanguageFile("zh_CN", 1.3),
-                new LanguageFile("zh_TW", 1.3, "zh_HK"),
+        LangLibAPI.register(BuildTeamTools.getInstance(),new LanguageFile[]{
+                new LanguageFile(Language.en_GB, 1.0),
+                new LanguageFile(Language.de_DE, 1.0, "de_AT", "de_CH"),
         });
+        langUtilInstance = new LangUtil();
+    }
+
+    public LangUtil() {
+        super(BuildTeamTools.getInstance());
     }
 
     public static LangUtil getInstance() {
         return langUtilInstance;
+    }
+
+    @Override
+    public String get(CommandSender sender, String key) {
+        return super.get(sender, key);
     }
 }

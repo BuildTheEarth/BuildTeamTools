@@ -138,7 +138,7 @@ public class WarpEditMenu extends AbstractMenu {
                 boolean ownsRegion = NetworkModule.getInstance().ownsRegion(regionName, countryCodeCCA2);
 
                 if(!ownsRegion) {
-                    clickPlayer.sendMessage(ChatHelper.getErrorString("This team does not own the country %s!", result[0]));
+                    clickPlayer.sendMessage(ChatUtil.getErrorString("This team does not own the country %s!", result[0]));
                     return;
                 }
 
@@ -154,7 +154,7 @@ public class WarpEditMenu extends AbstractMenu {
 
                 new WarpEditMenu(clickPlayer, warp, alreadyExists, true);
             }).exceptionally(e -> {
-                clickPlayer.sendMessage(ChatHelper.getErrorString("An error occurred while changing the location of the warp!"));
+                clickPlayer.sendMessage(ChatUtil.getErrorString("An error occurred while changing the location of the warp!"));
                 e.printStackTrace();
                 return null;
             });
@@ -232,7 +232,7 @@ public class WarpEditMenu extends AbstractMenu {
                 if(clickPlayer.hasPermission(Permissions.WARP_DELETE)) {
                     NetworkModule.getInstance().getBuildTeam().deleteWarp(clickPlayer, warp);
                 } else {
-                    clickPlayer.sendMessage(ChatHelper.getErrorString("You don't have the required permission to delete warps!"));
+                    clickPlayer.sendMessage(ChatUtil.getErrorString("You don't have the required permission to delete warps!"));
                 }
             });
     }

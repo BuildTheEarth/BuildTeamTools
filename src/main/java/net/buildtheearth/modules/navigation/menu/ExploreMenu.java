@@ -3,11 +3,10 @@ package net.buildtheearth.modules.navigation.menu;
 
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.modules.network.model.Continent;
-import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.ChatUtil;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.AbstractMenu;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
@@ -34,7 +33,7 @@ public class ExploreMenu extends AbstractMenu {
     protected void setPreviewItems() {
         // Create the continent items
         for (Continent continent : Continent.values()) {
-            ArrayList<String> continentLore = new ArrayList<>(Collections.singletonList(ChatHelper.getStandardString("Visit countries in %s", continent.getLabel())));
+            ArrayList<String> continentLore = new ArrayList<>(Collections.singletonList(ChatUtil.getStandardString("Visit countries in %s", continent.getLabel())));
             getMenu().getSlot(continent.getSlot()).setItem(Item.create(XMaterial.COMPASS.parseMaterial(),"§e§l" + continent.getLabel(), 1, continentLore));
         }
 

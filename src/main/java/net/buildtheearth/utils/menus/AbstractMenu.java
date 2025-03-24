@@ -2,7 +2,6 @@ package net.buildtheearth.utils.menus;
 
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.BuildTeamTools;
-import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.CustomHeads;
 import net.buildtheearth.utils.Item;
 import net.kyori.adventure.text.Component;

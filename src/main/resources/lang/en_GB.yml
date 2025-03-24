@@ -1,0 +1,34 @@
+# ----------------------------------------------------------------------------------------------
+# |                         BuildTeamTools - by BuildTheEarth
+# ----------------------------------------------------------------------------------------------
+# | [Github Repo]           https://github.com/BuildTheEarth/BuildTeamTools
+# | [Config Documentation]  https://github.com/BuildTheEarth/BuildTeamTools/wiki/Configuration
+# | [Contacts - Discord]    BuildTheEarth Staff Discord, @minefact
+#
+# | [Formatting] Use %newline% for a newline
+# | [Formatting] %s tags are replaced with the variables afterwards
+# ----------------------------------------------------------------------------------------------
+lang:
+  name: "English (GB)"
+  head-id: "27577"
+# -----------------------------------------------------
+# | Messages
+# -----------------------------------------------------
+message:
+  # TODO
+# -----------------------------------------------------
+# | Errors
+# -----------------------------------------------------
+error:
+  player-has-no-permissions: "You do not have permission to use this command."
+  no-player: "You must be a player to use this command."
+# -----------------------------------------------------
+# | Common
+# -----------------------------------------------------
+common:
+  module-is-disabled: "The Module %s is currently disabled. %s"
+# -----------------------------------------------------
+# | Generator
+# -----------------------------------------------------
+generator:
+  no-worldedit-while-generating: "You can't use WorldEdit commands while generating a structure."

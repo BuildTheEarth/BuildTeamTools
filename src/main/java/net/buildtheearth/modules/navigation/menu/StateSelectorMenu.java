@@ -98,7 +98,7 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
             getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
 
-                ChatHelper.logDebug("%s", clickedRegion.getName());
+                ChatUtil.logDebug("%s", clickedRegion.getName());
 
                 if (clickedRegion.getBuildTeam().isConnected())
                     Utils.sendPlayerToServer(clickPlayer, clickedRegion.getBuildTeam().getServerName());

@@ -1,7 +1,8 @@
 package net.buildtheearth.modules.generator.listeners;
 
 import net.buildtheearth.modules.generator.GeneratorModule;
-import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.ChatUtil;
+import net.buildtheearth.utils.lang.LangPaths;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -24,7 +25,7 @@ public class GeneratorListener implements Listener {
 
         e.setCancelled(true);
         p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-        ChatHelper.sendErrorMessage(p, "You can't use WorldEdit commands while generating a structure.");
+        ChatUtil.sendError(p, LangPaths.Generator.NO_WORLDEDIT_WHILE_GENERATING);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -40,6 +41,6 @@ public class GeneratorListener implements Listener {
 
         e.setCancelled(true);
         p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-        ChatHelper.sendErrorMessage(p, "You can't use WorldEdit while generating a structure.");
+        ChatUtil.sendError(p, LangPaths.Generator.NO_WORLDEDIT_WHILE_GENERATING);
     }
 }

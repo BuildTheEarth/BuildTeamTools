@@ -7,7 +7,7 @@ import net.buildtheearth.modules.ModuleComponent;
 import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.stats.StatsModule;
-import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.ChatUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
@@ -40,7 +40,7 @@ public class PluginMessagingComponent extends ModuleComponent implements PluginM
             ByteArrayDataInput in = ByteStreams.newDataInput(message);
             String subChannel = in.readUTF();
 
-            ChatHelper.logDebug("Plugin Message received: %s from Player: %s", subChannel, player.getName());
+            ChatUtil.logDebug("Plugin Message received: %s from Player: %s", subChannel, player.getName());
 
             if (subChannel.equalsIgnoreCase("Ping")) {
                 // Do something? not sure what tbh

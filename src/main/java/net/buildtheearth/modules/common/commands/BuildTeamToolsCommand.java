@@ -8,8 +8,10 @@ import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.Permissions;
 import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.stats.StatsModule;
-import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.ChatUtil;
 import net.buildtheearth.utils.Utils;
+import net.buildtheearth.utils.lang.LangPaths;
+import net.buildtheearth.utils.lang.LangUtil;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -17,7 +19,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -27,27 +28,24 @@ import java.util.UUID;
 
 public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
 
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-
-        if(!(sender instanceof Player)){
-            sender.sendMessage("§cYou need to be a player to execute this command.");
-            return true;
-        }
-        Player player = (Player) sender;
-
-        if(!player.hasPermission(Permissions.BUILD_TEAM_TOOLS)){
-            sender.sendMessage("§cYou don't have permission to execute this command.");
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String @NotNull [] args) {
+        // Check if the player has permission to use this command
+        if(!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS)){
+            ChatUtil.sendError(sender, LangPaths.ERROR.PLAYER_HAS_NO_PERMISSIONS);
             return true;
         }
 
 
+        // Command: /btt
         if(args.length == 0){
             sendBuildTeamToolsInfo(sender);
             return true;
         }
 
+
+        // Command: /btt help
         if (args[0].equalsIgnoreCase("help")) {
-            ChatHelper.sendMessageBox(sender, "Build Team Help", () -> {
+            ChatUtil.sendMessageBox(sender, "Build Team Help", () -> {
                 sender.sendMessage("§e/btt cache [upload] §8- §7View the cache or upload it to the network.");
                 sender.sendMessage("§e/btt checkForUpdates §8- §7Check for updates.");
                 sender.sendMessage("§e/btt communicators §8- §7List of players who communicate with the network.");
@@ -59,22 +57,25 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
         }
 
 
+        // Command: /btt communicators
         if(args[0].equalsIgnoreCase("communicators")) {
-            if(!player.hasPermission(Permissions.BUILD_TEAM_TOOLS_COMMUNICATORS)){
-                sender.sendMessage("§cYou don't have permission to execute this command.");
+            if(!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_COMMUNICATORS)){
+                ChatUtil.sendError(sender, LangPaths.ERROR.PLAYER_HAS_NO_PERMISSIONS);
                 return true;
             }
 
-            ChatHelper.sendMessageBox(sender, "Build Team Communicators", () -> {
+            ChatUtil.sendMessageBox(sender, "Build Team Communicators", () -> {
                 for (UUID uuid : NetworkModule.getInstance().getCommunicators())
                     sender.sendMessage("§7- §e" + uuid.toString());
             });
             return true;
         }
 
+
+        // Command: /btt cache
         if (args[0].equalsIgnoreCase("cache")) {
-            if(!player.hasPermission(Permissions.BUILD_TEAM_TOOLS_CACHE)){
-                sender.sendMessage("§cYou don't have permission to execute this command.");
+            if(!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_CACHE)){
+                ChatUtil.sendError(sender, LangPaths.ERROR.PLAYER_HAS_NO_PERMISSIONS);
                 return true;
             }
 
@@ -85,16 +86,16 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
 
-            ChatHelper.sendMessageBox(sender, "Build Team Cache", () ->
+            ChatUtil.sendMessageBox(sender, "Build Team Cache", () ->
                     sender.sendMessage(StatsModule.getInstance().getCurrentCache().toJSONString()));
             return true;
         }
 
 
-
+        // Command: /btt debug
         if (args[0].equalsIgnoreCase("debug")) {
-            if(!player.hasPermission(Permissions.BUILD_TEAM_TOOLS_DEBUG)){
-                sender.sendMessage("§cYou don't have permission to execute this command.");
+            if(!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_DEBUG)){
+                ChatUtil.sendError(sender, LangPaths.ERROR.PLAYER_HAS_NO_PERMISSIONS);
                 return true;
             }
 
@@ -111,13 +112,15 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
             boolean debug = Boolean.parseBoolean(args[1]);
 
             BuildTeamTools.getInstance().setDebug(debug);
-            player.sendMessage(ChatHelper.getStandardString("§7Debug Mode was set to: %s", debug));
+            sender.sendMessage(ChatUtil.getStandardString("§7Debug Mode was set to: %s", debug));
             return true;
         }
 
+
+        // Command: /btt checkForUpdates
         if (args[0].equalsIgnoreCase("checkForUpdates")) {
-            if(!player.hasPermission(Permissions.BUILD_TEAM_TOOLS_CHECK_FOR_UPDATES)){
-                sender.sendMessage("§cYou don't have permission to execute this command.");
+            if(!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_CHECK_FOR_UPDATES)){
+                ChatUtil.sendError(sender, LangPaths.ERROR.PLAYER_HAS_NO_PERMISSIONS);
                 return true;
             }
 
@@ -130,19 +133,18 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
+
+        // Command: /btt reload
         if(args[0].equalsIgnoreCase("reload")) {
-            if(!player.hasPermission(Permissions.BUILD_TEAM_TOOLS_RELOAD)){
-                sender.sendMessage("§cYou don't have permission to execute this command.");
+            if(!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_RELOAD)){
+                ChatUtil.sendError(sender, LangPaths.ERROR.PLAYER_HAS_NO_PERMISSIONS);
                 return true;
             }
 
-            sender.sendMessage(ChatHelper.getStandardString("§7Reloading all modules..."));
-            ModuleHandler.getInstance().reloadAll(player);
-            sender.sendMessage(ChatHelper.getStandardString("§7All modules have been reloaded."));
+            sender.sendMessage(ChatUtil.getStandardString("§7Reloading all modules..."));
+            ModuleHandler.getInstance().reloadAll(sender);
+            sender.sendMessage(ChatUtil.getStandardString("§7All modules have been reloaded."));
         }
-
-
-
         return true;
     }
 
@@ -163,7 +165,7 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
     }
 
     public static void sendBuildTeamToolsInfo(CommandSender sender){
-        ChatHelper.sendMessageBox(sender, "Build Team Tools", () -> {
+        ChatUtil.sendMessageBox(sender, "Build Team Tools", () -> {
 
             String buildTeamID = "-";
             if (NetworkModule.getInstance().getBuildTeam() != null

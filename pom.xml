@@ -155,9 +155,16 @@
             </snapshots>
         </repository>
 
+        <!-- Maven Central -->
         <repository>
-            <id>maven-enginehub</id>
-            <url>https://maven.enginehub.org/repo/</url>
+            <id>central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
     </repositories>
 
@@ -216,6 +223,14 @@
             <groupId>com.alpsbte</groupId>
             <artifactId>canvas</artifactId>
             <version>1.2</version>
+        </dependency>
+
+        <!-- LangLibs -->
+        <dependency>
+            <groupId>li.cinnazeyy</groupId>
+            <artifactId>LangLibs</artifactId>
+            <version>1.4.2</version>
+            <scope>compile</scope>
         </dependency>
 
         <!-- PorkLib -->

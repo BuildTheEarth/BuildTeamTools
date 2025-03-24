@@ -39,7 +39,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.GeneratorModule;
-import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.ChatUtil;
 import net.buildtheearth.utils.MenuItems;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
@@ -249,12 +249,12 @@ public class GeneratorUtils {
 
         if (region instanceof Polygonal2DRegion) {
             Polygonal2DRegion polyRegion = (Polygonal2DRegion) region;
-            ChatHelper.logDebug("Polygonal2DRegion found");
+            ChatUtil.logDebug("Polygonal2DRegion found");
             // In latest FAWE, the points are stored as BlockVector2
             // In 1.12 WorldEdit, the points are stored as BlockVector2D
             // Both classes have the same methods, so we can use reflection to get the methods
             for (Object blockVectorObj : polyRegion.getPoints()) {
-                ChatHelper.logDebug("BlockVector2:" + blockVectorObj);
+                ChatUtil.logDebug("BlockVector2:" + blockVectorObj);
                 try {
                     Class<?> blockVectorClass = blockVectorObj.getClass();
                     Method getXMethod = blockVectorClass.getMethod("getBlockX");
@@ -472,7 +472,7 @@ public class GeneratorUtils {
 
         sessionManager.get(actor).setRegionSelector(world, regionSelector);
 
-        ChatHelper.logDebug("Restored selection");
+        ChatUtil.logDebug("Restored selection");
     }
 
     /**
@@ -494,7 +494,7 @@ public class GeneratorUtils {
                 )
         );
 
-        ChatHelper.logDebug("Created cuboid selection");
+        ChatUtil.logDebug("Created cuboid selection");
     }
 
 
@@ -536,14 +536,14 @@ public class GeneratorUtils {
         List<BlockVector2> blockVector2List = new ArrayList<>();
         for (Vector vector : points){
             blockVector2List.add(BlockVector2.at(vector.getBlockX(), vector.getBlockZ()));
-            ChatHelper.logDebug("Added point: " + vector);
+            ChatUtil.logDebug("Added point: " + vector);
         }
 
         sessionManager.get(actor).setRegionSelector(world,
                 new Polygonal2DRegionSelector(world, blockVector2List, minY, maxY)
         );
 
-        ChatHelper.logDebug("Created polygonal selection with " + points.size() + " points. minY: " + minY + " maxY: " + maxY);
+        ChatUtil.logDebug("Created polygonal selection with " + points.size() + " points. minY: " + minY + " maxY: " + maxY);
     }
     
     
@@ -727,7 +727,7 @@ public class GeneratorUtils {
                     parserContext.setExtent(editSession);
 
                     for (String maskString : masks) {
-                        ChatHelper.logDebug("Replacing blocks with expression mask: " + maskString.replace("%", "'PCT'") + " from " + from + " to " + Arrays.toString(to) + " for " + iterations + " iterations");
+                        ChatUtil.logDebug("Replacing blocks with expression mask: " + maskString.replace("%", "'PCT'") + " from " + from + " to " + Arrays.toString(to) + " for " + iterations + " iterations");
 
                         Mask mask = new MaskFactory(WorldEdit.getInstance()).parseFromInput(maskString, parserContext);
 
@@ -781,7 +781,7 @@ public class GeneratorUtils {
     public static CompletableFuture<Void> replaceBlocksWithSchematic(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, BlockState[] from, String schematicPath) {
         CompletableFuture<Void> future = new CompletableFuture<>();
         Thread thread = new Thread(() -> {
-            ChatHelper.logDebug("Replacing blocks from " + Arrays.toString(from) + " to " + schematicPath);
+            ChatUtil.logDebug("Replacing blocks from " + Arrays.toString(from) + " to " + schematicPath);
 
             try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
                 Region region = localSession.getSelection();
@@ -838,7 +838,7 @@ public class GeneratorUtils {
 
         CompletableFuture<Void> future = new CompletableFuture<>();
         Thread thread = new Thread(() -> {
-            ChatHelper.logDebug("Replacing blocks from " + Arrays.toString(from) + " to " + Arrays.toString(to));
+            ChatUtil.logDebug("Replacing blocks from " + Arrays.toString(from) + " to " + Arrays.toString(to));
 
             try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
                 Region region = localSession.getSelection();
@@ -917,7 +917,7 @@ public class GeneratorUtils {
                 parserContext.setExtent(editSession);
 
                 for (String maskString : finalMasks) {
-                    ChatHelper.logDebug("Drawing spline with expression mask: " + maskString.replace("%", "'PCT'") + " with " + Arrays.toString(blocks));
+                    ChatUtil.logDebug("Drawing spline with expression mask: " + maskString.replace("%", "'PCT'") + " with " + Arrays.toString(blocks));
 
                     // Set the mask
                     if (!maskString.isEmpty()) {
@@ -1013,7 +1013,7 @@ public class GeneratorUtils {
                 parserContext.setExtent(editSession);
 
                 for (String maskString : finalMasks) {
-                    ChatHelper.logDebug("Drawing line with expression mask: " + maskString.replace("%", "'PCT'") + " with " + Arrays.toString(blocks) + " from " + point1 + " to " + point2);
+                    ChatUtil.logDebug("Drawing line with expression mask: " + maskString.replace("%", "'PCT'") + " with " + Arrays.toString(blocks) + " from " + point1 + " to " + point2);
 
                     // Set the mask
                     if(!maskString.isEmpty()) {
@@ -1141,7 +1141,7 @@ public class GeneratorUtils {
 
                 saveEditSession(editSession, localSession, actor);
 
-                ChatHelper.logDebug("Pasted schematic: " + schematicPath + " at " + loc + " with rotation " + rotation);
+                ChatUtil.logDebug("Pasted schematic: " + schematicPath + " at " + loc + " with rotation " + rotation);
             }
 
             future.complete(null);
@@ -1171,7 +1171,7 @@ public class GeneratorUtils {
             throw new RuntimeException(e);
         }
 
-        ChatHelper.logDebug("Expanded selection by: " + vector);
+        ChatUtil.logDebug("Expanded selection by: " + vector);
     }
 
 
@@ -1181,7 +1181,7 @@ public class GeneratorUtils {
      */
     public static void clearHistory(LocalSession session){
         session.clearHistory();
-        ChatHelper.logDebug("Cleared history");
+        ChatUtil.logDebug("Cleared history");
     }
 
     /**
@@ -1235,7 +1235,7 @@ public class GeneratorUtils {
     public static void setGmask(LocalSession session, String mask){
         if(mask == null || mask.isEmpty()) {
             session.setMask(null);
-            ChatHelper.logDebug("Disabled gmask");
+            ChatUtil.logDebug("Disabled gmask");
             return;
         }
 
@@ -1249,7 +1249,7 @@ public class GeneratorUtils {
             throw new RuntimeException(e);
         }
 
-        ChatHelper.logDebug("Set gmask to: " + mask);
+        ChatUtil.logDebug("Set gmask to: " + mask);
     }
 
 

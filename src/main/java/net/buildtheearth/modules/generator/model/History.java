@@ -5,13 +5,12 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import lombok.Getter;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
-import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.ChatUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
@@ -56,8 +55,8 @@ public class History {
         p.playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_DESTROY_EGG, 1.0F, 1.0F);
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(BuildTeamTools.getInstance(), () -> {
-            ChatHelper.sendSuccessfulMessage(p, "Successfully %s the last structure.", "undid");
-            p.sendMessage(ChatHelper.getStandardComponent(true,"Use %s to undo it.", "/gen redo")
+            ChatUtil.sendSuccessful(p, "Successfully %s the last structure.", "undid");
+            p.sendMessage(ChatUtil.getStandardComponent(true,"Use %s to undo it.", "/gen redo")
                     .clickEvent(ClickEvent.runCommand("/gen redo"))
                     .hoverEvent(HoverEvent.showText(Component.text("Click to redo the last structure.", NamedTextColor.GRAY)))
             );
@@ -84,8 +83,8 @@ public class History {
 
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(BuildTeamTools.getInstance(), () -> {
-            ChatHelper.sendSuccessfulMessage(p,"Successfully %s the last structure.", "redid");
-            p.sendMessage(ChatHelper.getStandardComponent(true,"Use %s to undo it.", "/gen undo")
+            ChatUtil.sendSuccessful(p,"Successfully %s the last structure.", "redid");
+            p.sendMessage(ChatUtil.getStandardComponent(true,"Use %s to undo it.", "/gen undo")
                     .clickEvent(ClickEvent.runCommand("/gen undo"))
                     .hoverEvent(HoverEvent.showText(Component.text("Click to undo the last structure.", NamedTextColor.GRAY)))
             );

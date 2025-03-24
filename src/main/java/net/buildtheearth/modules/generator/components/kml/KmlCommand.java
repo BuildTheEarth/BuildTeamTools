@@ -3,7 +3,7 @@ package net.buildtheearth.modules.generator.components.kml;
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.utils.BlockLocation;
-import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.ChatUtil;
 import net.buildtheearth.utils.GeometricUtils;
 import net.buildtheearth.utils.LineRasterization;
 import net.buildtheearth.utils.PolygonTools;
@@ -142,7 +142,7 @@ public class KmlCommand implements CommandExecutor {
         if (playerName == "" || blocktypeString == ""){
             //invalid metadata, cancel
             //send error message to all players within 50m of the command block
-            ChatHelper.sendMessageToPlayersNearLocation(
+            ChatUtil.sendMessageToPlayersNearLocation(
                 senderBlock.getLocation(),
                 "§cReceived /kml command from CommandBlock without sufficient metadata.\nThis command can only be executed from a CommandBlock created with the /kml command!",
                 50); 

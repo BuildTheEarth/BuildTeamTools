@@ -12,7 +12,7 @@ import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.plotsystem.commands.PlotSystemTerraCommand;
-import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.ChatUtil;
 import net.buildtheearth.utils.io.ConfigPaths;
 import net.buildtheearth.utils.io.ConfigUtil;
 import net.buildtheearth.utils.io.Constants;
@@ -110,7 +110,7 @@ public class PlotSystemModule extends Module {
             this.configManager = setup.configManager;
 
         } catch (Exception | NoClassDefFoundError ex) {
-            ChatHelper.logDebug("Error setting up PlotSystemTerra: " + ex.getMessage());
+            ChatUtil.logDebug("Error setting up PlotSystemTerra: " + ex.getMessage());
             if(BuildTeamTools.getInstance().isDebug())
                 ex.printStackTrace();
 

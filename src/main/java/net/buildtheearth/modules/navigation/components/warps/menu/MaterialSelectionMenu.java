@@ -74,7 +74,7 @@ public class MaterialSelectionMenu extends AbstractMenu {
                                     AnvilGUI.ResponseAction.run(() -> {
                                         clickPlayer.closeInventory();
                                         stateSnapshot.getPlayer().playSound(clickPlayer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-                                        clickPlayer.sendMessage(ChatHelper.getErrorString("§cThis is not a valid material."));
+                                        clickPlayer.sendMessage(ChatUtil.getErrorString("§cThis is not a valid material."));
                                         openObjectMenu();
                                     })
                             );

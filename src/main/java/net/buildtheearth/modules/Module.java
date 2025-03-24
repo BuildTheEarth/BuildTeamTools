@@ -3,7 +3,7 @@ package net.buildtheearth.modules;
 import lombok.Getter;
 import lombok.NonNull;
 import net.buildtheearth.BuildTeamTools;
-import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.ChatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
@@ -90,7 +90,7 @@ public abstract class Module {
         this.error = reason;
 
         if(isEnabled())
-            ChatHelper.logError("The %s Module crashed because of following error: " + reason, moduleName);
+            ChatUtil.logError("The %s Module crashed because of following error: " + reason, moduleName);
 
         disable();
     }

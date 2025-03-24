@@ -4,8 +4,10 @@ import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.menu.GeneratorMenu;
 import net.buildtheearth.modules.generator.model.History;
 import net.buildtheearth.modules.network.model.Permissions;
-import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.ChatUtil;
 import net.buildtheearth.utils.Utils;
+import net.buildtheearth.utils.lang.LangPaths;
+import net.buildtheearth.utils.lang.LangUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,14 +18,14 @@ public class GeneratorCommand implements CommandExecutor {
 
     public boolean onCommand(CommandSender sender, Command cmd, String cmdLabel, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage("§cOnly players can execute this command.");
+            sender.sendMessage("§c" + LangUtil.getInstance().get(sender, LangPaths.ERROR.NO_PLAYER));
             return true;
         }
 
         Player p = (Player) sender;
 
         if(!p.hasPermission(Permissions.GENERATOR_USE)) {
-            p.sendMessage(ChatHelper.getErrorString("You don't have permission to use this command!"));
+            ChatUtil.sendError(p, LangPaths.ERROR.PLAYER_HAS_NO_PERMISSIONS);
             return true;
         }
 
@@ -72,7 +74,7 @@ public class GeneratorCommand implements CommandExecutor {
                 return true;
             }
 
-            ChatHelper.sendMessageBox(sender, "Generator History for " + p.getName(), () -> {
+            ChatUtil.sendMessageBox(sender, "Generator History for " + p.getName(), () -> {
                 for (History.HistoryEntry history : GeneratorModule.getInstance().getPlayerHistory(p).getHistoryEntries()) {
                     long timeDifference = System.currentTimeMillis() - history.getTimeCreated();
 
@@ -101,7 +103,7 @@ public class GeneratorCommand implements CommandExecutor {
     }
 
     public static void sendHelp(CommandSender sender) {
-        ChatHelper.sendMessageBox(sender, "Generator Command", () -> {
+        ChatUtil.sendMessageBox(sender, "Generator Command", () -> {
 
             sender.sendMessage("§eHouse Generator:§7 /gen house help");
             sender.sendMessage("§eRoad Generator:§7 /gen road help");

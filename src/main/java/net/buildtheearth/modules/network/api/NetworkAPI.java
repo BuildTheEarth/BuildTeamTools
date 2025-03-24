@@ -6,7 +6,7 @@ import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Continent;
 import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.network.model.RegionType;
-import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.ChatUtil;
 import net.buildtheearth.utils.io.ConfigPaths;
 import net.buildtheearth.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
@@ -39,12 +39,12 @@ public class NetworkAPI {
         API.putAsync("https://nwapi.buildtheearth.net/api/teams/" + apiKey + "/hasBuildTeamToolsInstalled", requestBody, new API.ApiResponseCallback() {
             @Override
             public void onResponse(String response) {
-                ChatHelper.logDebug("Notified the network API of the plugins presence: %s", response);
+                ChatUtil.logDebug("Notified the network API of the plugins presence: %s", response);
             }
 
             @Override
             public void onFailure(IOException e) {
-                ChatHelper.logError("Something went wrong while notifying the network API of the plugins presence: %s", e.getMessage());
+                ChatUtil.logError("Something went wrong while notifying the network API of the plugins presence: %s", e.getMessage());
             }
         });
     }
@@ -251,7 +251,7 @@ public class NetworkAPI {
 
             @Override
             public void onFailure(IOException e) {
-                ChatHelper.logError("Failed to get teams information from the network API: %s", e);
+                ChatUtil.logError("Failed to get teams information from the network API: %s", e);
 
                 // Handle failure scenario
                 future.completeExceptionally(e);
@@ -285,7 +285,7 @@ public class NetworkAPI {
 
             @Override
             public void onFailure(IOException e) {
-                ChatHelper.logError("Failed to get team & server information from the network API: %s", e);
+                ChatUtil.logError("Failed to get team & server information from the network API: %s", e);
 
                 future.completeExceptionally(e);
             }
@@ -360,12 +360,12 @@ public class NetworkAPI {
         API.postAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/playerlist", requestBody, new API.ApiResponseCallback() {
             @Override
             public void onResponse(String response) {
-                ChatHelper.logDebug("Synced the player list with the network API: %s", response);
+                ChatUtil.logDebug("Synced the player list with the network API: %s", response);
             }
 
             @Override
             public void onFailure(IOException e) {
-                ChatHelper.getErrorString("Failed to sync the player list with the network API: %s", e);
+                ChatUtil.getErrorString("Failed to sync the player list with the network API: %s", e);
             }
         });
     }

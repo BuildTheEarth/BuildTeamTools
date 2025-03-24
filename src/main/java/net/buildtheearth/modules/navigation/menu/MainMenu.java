@@ -3,7 +3,7 @@ package net.buildtheearth.modules.navigation.menu;
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.network.NetworkModule;
-import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.ChatUtil;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.Utils;
@@ -49,20 +49,20 @@ public class MainMenu extends AbstractMenu {
         getMenu().getSlot(15).setItem(MenuItems.ITEM_BACKGROUND);
 
         // Set Explore Item
-        ArrayList<String> exploreLore = new ArrayList<>(Collections.singletonList(ChatHelper.getColorizedString(NamedTextColor.GRAY, "Click to explore the project!", false)));
-        getMenu().getSlot(slots[0]).setItem(Item.create(XMaterial.SPRUCE_BOAT.parseMaterial(), ChatHelper.getColorizedString(NamedTextColor.YELLOW, "Explore", true), 1, exploreLore));
+        ArrayList<String> exploreLore = new ArrayList<>(Collections.singletonList(ChatUtil.getColorizedString(NamedTextColor.GRAY, "Click to explore the project!", false)));
+        getMenu().getSlot(slots[0]).setItem(Item.create(XMaterial.SPRUCE_BOAT.parseMaterial(), ChatUtil.getColorizedString(NamedTextColor.YELLOW, "Explore", true), 1, exploreLore));
 
 
         // Set Build Item
         if(config.getBoolean(ConfigPaths.Navigation.BUILD_ITEM_ENABLED)) {
-            ArrayList<String> buildLore = new ArrayList<>(Collections.singletonList(ChatHelper.getColorizedString(NamedTextColor.GRAY, "Click to build for the project!", false)));
-            getMenu().getSlot(slots[1]).setItem(Item.create(XMaterial.DIAMOND_PICKAXE.parseMaterial(), ChatHelper.getColorizedString(NamedTextColor.GREEN, "Build", true), 1, buildLore));
+            ArrayList<String> buildLore = new ArrayList<>(Collections.singletonList(ChatUtil.getColorizedString(NamedTextColor.GRAY, "Click to build for the project!", false)));
+            getMenu().getSlot(slots[1]).setItem(Item.create(XMaterial.DIAMOND_PICKAXE.parseMaterial(), ChatUtil.getColorizedString(NamedTextColor.GREEN, "Build", true), 1, buildLore));
         }
 
         // Set Tutorials Item
         if(config.getBoolean(ConfigPaths.Navigation.TUTORIALS_ITEM_ENABLED)) {
-            ArrayList<String> tutorialsLore = new ArrayList<>(Collections.singletonList(ChatHelper.getColorizedString(NamedTextColor.GRAY, "Click to do some tutorials!", false)));
-            getMenu().getSlot(slots[2]).setItem(Item.create(XMaterial.KNOWLEDGE_BOOK.parseMaterial(), ChatHelper.getColorizedString(NamedTextColor.AQUA, "Tutorials", true), 1, tutorialsLore));
+            ArrayList<String> tutorialsLore = new ArrayList<>(Collections.singletonList(ChatUtil.getColorizedString(NamedTextColor.GRAY, "Click to do some tutorials!", false)));
+            getMenu().getSlot(slots[2]).setItem(Item.create(XMaterial.KNOWLEDGE_BOOK.parseMaterial(), ChatUtil.getColorizedString(NamedTextColor.AQUA, "Tutorials", true), 1, tutorialsLore));
         }
 
         super.setPreviewItems();
@@ -89,7 +89,7 @@ public class MainMenu extends AbstractMenu {
 
                 // If no command or message is set, teleport player to the plot system server
                 if(action == null || action.equals("/command") || action.equals("message")) {
-                    clickPlayer.sendMessage(ChatHelper.getStandardString("Teleporting you to the plot system server..."));
+                    clickPlayer.sendMessage(ChatUtil.getStandardString("Teleporting you to the plot system server..."));
                     Utils.sendPlayerToServer(clickPlayer, NetworkModule.GLOBAL_PLOT_SYSTEM_SERVER);
                     return;
                 }
@@ -161,6 +161,6 @@ public class MainMenu extends AbstractMenu {
         if(!action.equals("/command") &&! action.equals("message"))
             p.chat(action);
         else
-            p.sendMessage(ChatHelper.getErrorString("No action is set for the %s in the config yet! Please contact an %s.", "build item", "admin"));
+            p.sendMessage(ChatUtil.getErrorString("No action is set for the %s in the config yet! Please contact an %s.", "build item", "admin"));
     }
 }

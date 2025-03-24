@@ -5,7 +5,7 @@ import com.sk89q.worldedit.WorldEdit;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.ModuleComponent;
 import net.buildtheearth.modules.common.CommonModule;
-import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.ChatUtil;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.io.ConfigPaths;
 import org.bukkit.entity.Player;
@@ -60,10 +60,10 @@ public class NavigatorComponent extends ModuleComponent {
 
         if(!inventory.contains(getItem())) {
             inventory.setItem(getSlot(), getItem());
-            ChatHelper.sendSuccessfulMessage(player, "You turned the navigator %s.", "on");
+            ChatUtil.sendSuccessful(player, "You turned the navigator %s.", "on");
         } else {
             inventory.remove(getItem());
-            ChatHelper.sendSuccessfulMessage(player, "You turned the navigator %s.", "off");
+            ChatUtil.sendSuccessful(player, "You turned the navigator %s.", "off");
         }
     }
 

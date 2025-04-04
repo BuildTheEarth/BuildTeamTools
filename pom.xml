@@ -68,6 +68,13 @@
                                         <includes>com/cryptomorin/xseries/**</includes>
                                     </includes>
                                 </filter>
+                                <!-- Exclude sun code model to prevent issue #32 -->
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>com/sun/codemodel/**</exclude>
+                                    </excludes>
+                                </filter>
                             </filters>
                         </configuration>
                     </execution>

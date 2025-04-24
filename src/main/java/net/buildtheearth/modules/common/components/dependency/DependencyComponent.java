@@ -95,6 +95,15 @@ public class DependencyComponent extends ModuleComponent {
     }
 
     /**
+     * Checks if the plugin <a href="https://github.com/AlpsBTE/Plot-System-Terra">PlotSystem-Terra</a> by BTE Alps is already enabled.
+     *
+     * @return True if PlotSystemTerra is enabled, false if it is not enabled
+     */
+    public boolean isPlotSystemTerraEnabled() {
+        return BuildTeamTools.getInstance().getServer().getPluginManager().isPluginEnabled("PlotSystem-Terra");
+    }
+
+    /**
      * Get an instance of WorldEdit
      *
      * @return An instance of WorldEdit

@@ -59,6 +59,12 @@ public class PlotSystemModule extends Module {
             return;
         }
 
+        // Check if PlotSystemTerra is already enabled
+        if (CommonModule.getInstance().getDependencyComponent().isPlotSystemTerraEnabled()) {
+            shutdown(Errors.PLOT_SYSTEM_TERRA_ALREADY_ENABLED);
+            return;
+        }
+
         // If the DataMode is set to API, check if the NetworkModule is enabled
         String dataMode = BuildTeamTools.getInstance().getConfig(ConfigUtil.PLOTSYSTEM).getString(ConfigPaths.PlotSystem.DATA_MODE);
         if (dataMode == null || dataMode.equalsIgnoreCase("API")) {

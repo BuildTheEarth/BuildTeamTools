@@ -42,18 +42,31 @@
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
 
-                            <!-- Relocate Anvil GUI and XSeries to prevent conflicts with other plugins !-->
+                            <!-- Relocate Anvil GUI, XSeries and Canvas to prevent conflicts with other plugins !-->
                             <relocations>
                                 <relocation>
                                     <pattern>net.wesjd.anvilgui</pattern>
-                                    <shadedPattern>net.buildtheearth.buildteamtools.anvilgui</shadedPattern>
+                                    <shadedPattern>net.buildtheearth.buildteamtools.shaded.anvilgui</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>com.cryptomorin.xseries</pattern>
-                                    <shadedPattern>net.buildtheearth.buildteamtools.xseries</shadedPattern>
+                                    <shadedPattern>net.buildtheearth.buildteamtools.shaded.xseries</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.ipvp.canvas</pattern>
+                                    <shadedPattern>net.buildtheearth.buildteamtools.shaded.canvas</shadedPattern>
                                 </relocation>
                             </relocations>
                             <filters>
+                                <!-- Remove Canvas, XSeries and Anvil GUI from alpslib-libpsterra -->
+                                <filter>
+                                    <artifact>com.alpsbte.alpslib:alpslib-libpsterra</artifact>
+                                    <excludes>
+                                        <exclude>org/ipvp/canvas/**</exclude>
+                                        <exclude>com/cryptomorin/xseries/**</exclude>
+                                        <exclude>net/wesjd/anvilgui/**</exclude>
+                                    </excludes>
+                                </filter>
                                 <filter>
                                     <artifact>*:*</artifact>
                                     <excludeDefaults>false</excludeDefaults>
@@ -223,6 +236,7 @@
             <groupId>com.alpsbte</groupId>
             <artifactId>canvas</artifactId>
             <version>1.2</version>
+            <scope>compile</scope>
         </dependency>
 
         <!-- PorkLib -->
@@ -266,6 +280,7 @@
             <groupId>com.github.cryptomorin</groupId>
             <artifactId>XSeries</artifactId>
             <version>9.9.0</version>
+            <scope>compile</scope>
         </dependency>
 
         <!-- Anvil GUI (Anvil Inventory GUI Library)-->
@@ -274,6 +289,7 @@
             <groupId>net.wesjd</groupId>
             <artifactId>anvilgui</artifactId>
             <version>1.9.2-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
 
         <!-- Adventure API (Text Component Library) -->
@@ -281,11 +297,13 @@
             <groupId>net.kyori</groupId>
             <artifactId>adventure-api</artifactId>
             <version>4.17.0</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-text-serializer-legacy</artifactId>
             <version>4.17.0</version>
+            <scope>compile</scope>
         </dependency>
 
 
@@ -314,6 +332,7 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.10.1</version>
+            <scope>compile</scope>
         </dependency>
 
         <!-- Google Guava -->
@@ -321,6 +340,7 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>31.1-jre</version>
+            <scope>compile</scope>
         </dependency>
 
         <!-- OkHttp (HTTP Client) -->
@@ -328,6 +348,7 @@
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
             <version>4.11.0</version>
+            <scope>compile</scope>
         </dependency>
 
         <!-- KML Parser -->
@@ -335,6 +356,7 @@
             <groupId>de.micromata.jak</groupId>
             <artifactId>JavaAPIforKml</artifactId>
             <version>2.2.1</version>
+            <scope>compile</scope>
         </dependency>
 
 

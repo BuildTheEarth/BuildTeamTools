@@ -55,8 +55,8 @@ public class AdvancedSettingsMenu extends AbstractMenu {
         int streetLampDistance = (int) road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.STREET_LAMP_DISTANCE);
 
         XMaterial markingsMaterial = (XMaterial) road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.MARKING_MATERIAL);
-        XMaterial sidewalkSlab = (XMaterial) road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.SIDEWALK_SLAB_COLOR);
-        XMaterial roadSlab = (XMaterial) road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.ROAD_SLAB_COLOR);
+        XMaterial[] sidewalkSlab = (XMaterial[]) road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.SIDEWALK_SLAB_COLOR);
+        XMaterial[] roadSlab = (XMaterial[]) road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.ROAD_SLAB_COLOR);
         ItemStack streetLampType = getStreetLampItem((String) road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.STREET_LAMP_TYPE));
 
         createCounter(CustomHeads.SliderColor.WHITE, LANE_COUNT_SLOT, "Number of Lanes", laneCount, 1, 10, "Lanes");
@@ -65,8 +65,8 @@ public class AdvancedSettingsMenu extends AbstractMenu {
         createCounter(CustomHeads.SliderColor.LIGHT_GRAY, STREET_LAMP_DISTANCE_SLOT, "Street Lamp Distance", streetLampDistance, 5, 500, "Blocks");
 
         setChoiceItems(CustomHeads.SliderColor.WHITE, MARKINGS_MATERIAL_SLOT, "Line Markings Color", markingsMaterial.parseItem());
-        setChoiceItems(CustomHeads.SliderColor.LIGHT_GRAY, ROAD_SLAB_SLOT, "Road Elevation Slab", roadSlab.parseItem());
-        setChoiceItems(CustomHeads.SliderColor.WHITE, SIDEWALK_SLAB_SLOT, "Sidewalk Elevation Slab", sidewalkSlab.parseItem());
+        if (roadSlab.length > 0) setChoiceItems(CustomHeads.SliderColor.LIGHT_GRAY, ROAD_SLAB_SLOT, "Road Elevation Slab", roadSlab[0].parseItem());
+        setChoiceItems(CustomHeads.SliderColor.WHITE, SIDEWALK_SLAB_SLOT, "Sidewalk Elevation Slab", sidewalkSlab[0].parseItem());
         setChoiceItems(CustomHeads.SliderColor.LIGHT_GRAY, STREET_LAMP_TYPE_SLOT, "Street Lamp Type", streetLampType);
 
         getMenu().getSlot(NEXT_ITEM_SLOT).setItem(CustomHeads.getCheckmarkItem("§eNext"));

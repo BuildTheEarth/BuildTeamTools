@@ -42,10 +42,14 @@ import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.MenuItems;
 import org.apache.commons.lang3.StringUtils;
-import org.bukkit.*;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
 import java.io.File;
@@ -61,7 +65,19 @@ import java.util.concurrent.CompletableFuture;
 
 
 /** This class contains static utility methods for the generator module.<br>
- * It is categorized into the following sections:
+ * The following dependencies are needed for this class to work:
+ * <ol>
+ *     <li><b>WorldEdit</b></li>
+ *     <li><b>FastAsyncWorldEdit</b></li>
+ *     <li><b>XSeries</b></li>
+ *     <li><b>Clipper</b></li>
+ *     <li><b>ChatHelper (internal)</b></li>
+ * </ol>
+ * <br>
+ * The functions are categorized into the following sections:
+ *
+ * <br><br><b>Setup Functions</b>:
+ * These functions are plugin specific functions that need to be changed when copying the class to another plugin.
  *
  * <br><br><b>Script Helper Functions</b>:
  * <br>• {@link #convertArgsToFlags(String[])}
@@ -125,9 +141,53 @@ import java.util.concurrent.CompletableFuture;
  * <br>• {@link #checkForBrickOutline(Block[][][], Player)}
  * <br>• {@link #checkForWoolBlock(Block[][][], Player)}
  *
+ * @version 1.5
  * @author MineFact
  */
 public class GeneratorUtils {
+
+
+    /*=============================================**
+
+                SETUP FUNCTIONS
+
+     **=============================================*/
+
+    /** Get the plugin instance. */
+    private static Plugin getPlugin(){
+        return BuildTeamTools.getInstance();
+    }
+
+    /** Checks if the plugin "FastAsyncWorldEdit" is enabled. */
+    private static boolean isFastAsyncWorldEditEnabled(){
+        return CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled();
+    }
+
+    /** Checks if only the plugin "WorldEdit" is enabled and not "FastAsyncWorldEdit". */
+    private static boolean isLegacyWorldEditEnabled(){
+        return CommonModule.getInstance().getDependencyComponent().isLegacyWorldEdit();
+    }
+
+    /** Checks if the plugin "SchematicBrush" is enabled. */
+    private static boolean isSchematicBrushEnabled(){
+        return CommonModule.getInstance().getDependencyComponent().isSchematicBrushEnabled();
+    }
+
+    /** Checks if the server version is 1.12. */
+    private static boolean isServerVersion1_12(){
+        return CommonModule.getInstance().getVersionComponent().is_1_12();
+    }
+
+    /** Get the ignored materials. */
+    private static Material[] getIgnoredMaterials(){
+        return MenuItems.getIgnoredMaterials();
+    }
+    
+    private static void sendWikiLink(Player p){
+        sendWikiLink(p);
+    }
+
+
 
 
     
@@ -220,10 +280,10 @@ public class GeneratorUtils {
     public static String getWorldEditSchematicsFolderPath(){
         String worldEditFolder = "WorldEdit";
 
-        if(CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled())
+        if(isFastAsyncWorldEditEnabled())
             worldEditFolder = "FastAsyncWorldEdit";
 
-        return BuildTeamTools.getInstance().getDataFolder().getAbsolutePath() + "/../" + worldEditFolder + "/schematics";
+        return getPlugin().getDataFolder().getAbsolutePath() + "/../" + worldEditFolder + "/schematics";
     }
 
 
@@ -430,7 +490,7 @@ public class GeneratorUtils {
         for (Block[][] block2D : blocks)
             for (Block[] block1D : block2D)
                 for (Block block : block1D)
-                    if (CommonModule.getInstance().getVersionComponent().is_1_12()) {
+                    if (isServerVersion1_12()) {
                         if (block != null && block.getType() == xMaterial.parseMaterial() && block.getData() == xMaterial.getData())
                             amountFound++;
                     }else {
@@ -510,7 +570,7 @@ public class GeneratorUtils {
         int maxY = Integer.MIN_VALUE;
 
         for(Vector vector : points) {
-            int y = getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), MenuItems.getIgnoredMaterials());
+            int y = getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), getIgnoredMaterials());
 
             minY = Math.min(minY, y);
             maxY = Math.max(maxY, y);
@@ -590,7 +650,7 @@ public class GeneratorUtils {
                 .join();
 
         if(removeIgnoredMaterials) {
-            Material[] materials = MenuItems.getIgnoredMaterials();
+            Material[] materials = getIgnoredMaterials();
             for (Material material : materials) {
                 BlockType blockType = BlockTypes.get(material.getKey().asString());
 
@@ -639,7 +699,7 @@ public class GeneratorUtils {
             Method getMaximumPoint = regionClass.getMethod("getMaximumPoint");
             Method contains;
 
-            if(CommonModule.getInstance().getDependencyComponent().isLegacyWorldEdit())
+            if(isLegacyWorldEditEnabled())
                 contains = regionClass.getMethod("contains", Class.forName("com.sk89q.worldedit.Vector"));
             else
                 contains = regionClass.getMethod("contains", com.sk89q.worldedit.math.BlockVector3.class);
@@ -1088,7 +1148,7 @@ public class GeneratorUtils {
         int maxHeight = loc.getBlockY();
 
         if(blocks != null)
-            maxHeight = GeneratorUtils.getMaxHeight(blocks, loc.getBlockX(), loc.getBlockZ(), MenuItems.getIgnoredMaterials());
+            maxHeight = GeneratorUtils.getMaxHeight(blocks, loc.getBlockX(), loc.getBlockZ(), getIgnoredMaterials());
         if(maxHeight == 0)
             maxHeight = loc.getBlockY();
 
@@ -1265,7 +1325,7 @@ public class GeneratorUtils {
         editSession.commit();
         editSession.flushQueue();
 
-        if(CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled())
+        if(isFastAsyncWorldEditEnabled())
             localSession.remember(actor, localSession.getSelectionWorld(), editSession.getChangeSet(), FaweLimit.MAX);
 
         editSession.close();
@@ -1293,7 +1353,7 @@ public class GeneratorUtils {
      */
     public static void adjustHeight(List<Vector> points, Block[][][] blocks){
         for (Vector point : points)
-            point.setY(getMaxHeight(blocks, point.getBlockX(), point.getBlockZ(), MenuItems.getIgnoredMaterials()));
+            point.setY(getMaxHeight(blocks, point.getBlockX(), point.getBlockZ(), getIgnoredMaterials()));
     }
 
     /** As long as two neighboring vectors are further than a given distance of blocks apart, add a new vector in between them
@@ -1477,7 +1537,7 @@ public class GeneratorUtils {
         int maxHeight = vector.getBlockY();
 
         if(blocks != null)
-            maxHeight = getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), MenuItems.getIgnoredMaterials());
+            maxHeight = getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), getIgnoredMaterials());
         if(maxHeight == 0)
             maxHeight = vector.getBlockY();
 
@@ -1495,7 +1555,7 @@ public class GeneratorUtils {
         int maxHeight = vector.getBlockY();
 
         if(blocks != null)
-            maxHeight = getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), MenuItems.getIgnoredMaterials()) + offset;
+            maxHeight = getMaxHeight(blocks, vector.getBlockX(), vector.getBlockZ(), getIgnoredMaterials()) + offset;
         if(maxHeight == 0)
             maxHeight = vector.getBlockY();
 
@@ -1638,11 +1698,9 @@ public class GeneratorUtils {
      */
     public static boolean checkIfSchematicBrushIsInstalled(Player p){
         // Check if WorldEdit is enabled
-        if (!CommonModule.getInstance().getDependencyComponent().isSchematicBrushEnabled()) {
+        if (!isSchematicBrushEnabled()) {
             p.sendMessage("§cPlease install Schematic Brush to use this tool. You can ask the server administrator to install it.");
-            p.sendMessage(" ");
-            p.sendMessage("§cFor more installation help, please see the wiki:");
-            p.sendMessage("§c" + GeneratorModule.INSTALL_WIKI);
+            sendWikiLink(p);
             return false;
         }
         return true;
@@ -1680,7 +1738,7 @@ public class GeneratorUtils {
             p.sendMessage("§cPlease make a selection around an outline.");
             p.closeInventory();
             p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-            GeneratorModule.getInstance().sendWikiLink(p);
+            sendWikiLink(p);
 
             return false;
         }
@@ -1699,7 +1757,7 @@ public class GeneratorUtils {
             p.sendMessage("§cPlease place a yellow wool block inside the outline.");
             p.closeInventory();
             p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-            GeneratorModule.getInstance().sendWikiLink(p);
+            sendWikiLink(p);
 
             ItemStack yellowWool = XMaterial.YELLOW_WOOL.parseItem();
             if(!p.getInventory().contains(yellowWool)) {

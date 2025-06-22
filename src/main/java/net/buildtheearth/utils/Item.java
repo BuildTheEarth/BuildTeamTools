@@ -6,6 +6,7 @@ import com.mojang.authlib.properties.Property;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import net.buildtheearth.modules.common.CommonModule;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -488,30 +489,43 @@ public class Item {
 	}
 
 	private static void mutateItemMeta(SkullMeta meta, String b64) {
-		Method metaSetProfileMethod;
-		Field metaProfileField;
-		try {
-			metaSetProfileMethod = meta.getClass().getDeclaredMethod("setProfile", GameProfile.class);
-			metaSetProfileMethod.setAccessible(true);
-			metaSetProfileMethod.invoke(meta, makeProfile(b64));
-		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
-			try {
-				metaProfileField = meta.getClass().getDeclaredField("profile");
-				metaProfileField.setAccessible(true);
-				metaProfileField.set(meta, makeProfile(b64));
+		GameProfile profile = makeProfile(b64);
 
-			} catch (NoSuchFieldException | IllegalAccessException ex2) {
-				ex2.printStackTrace();
-			}
+		// Try Paper API (Minecraft Version 1.20+)
+		try {
+			Method setPlayerProfile = SkullMeta.class.getMethod("setPlayerProfile", com.destroystokyo.paper.profile.PlayerProfile.class);
+			com.destroystokyo.paper.profile.PlayerProfile paperProfile = Bukkit.createProfile(profile.getId(), profile.getName());
+			paperProfile.getProperties().add(new com.destroystokyo.paper.profile.ProfileProperty("textures", b64));
+			setPlayerProfile.invoke(meta, paperProfile);
+			return;
+		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {}
+
+		// Try setProfile(GameProfile) (Minecraft Version 1.15 – 1.19.4)
+		try {
+			Method metaSetProfileMethod = meta.getClass().getDeclaredMethod("setProfile", GameProfile.class);
+			metaSetProfileMethod.setAccessible(true);
+			metaSetProfileMethod.invoke(meta, profile);
+			return;
+		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {}
+
+		// Try direct profile field (Minecraft Version 1.12 – 1.14)
+		try {
+			Field metaProfileField = meta.getClass().getDeclaredField("profile");
+			metaProfileField.setAccessible(true);
+			metaProfileField.set(meta, profile);
+		} catch (NoSuchFieldException | IllegalAccessException ignored) {
+			System.err.println("Failed to set custom skull texture: unsupported server version or method change.");
 		}
 	}
+
+
 
 	private static GameProfile makeProfile(String b64) {
 		UUID id = new UUID(
 				b64.substring(b64.length() - 20).hashCode(),
 				b64.substring(b64.length() - 10).hashCode()
 		);
-		GameProfile profile = new GameProfile(id, "aaaaa");
+		GameProfile profile = new GameProfile(id, "bte");
 		profile.getProperties().put("textures", new Property("textures", b64));
 		return profile;
 	}

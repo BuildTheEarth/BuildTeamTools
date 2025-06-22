@@ -5,6 +5,7 @@ import com.sk89q.worldedit.WorldEdit;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.ModuleComponent;
 import net.buildtheearth.modules.common.CommonModule;
+import net.buildtheearth.modules.common.components.dependency.DependencyComponent;
 import net.buildtheearth.utils.ChatUtil;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.io.ConfigPaths;
@@ -30,6 +31,11 @@ public class NavigatorComponent extends ModuleComponent {
 
 
     private void disableWorldEditNavigationWand(){
+        // Check if WorldEdit is enabled
+        if(!CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled()
+        &&! CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled())
+            return;
+
         try {
             Object config = WorldEdit.getInstance().getConfiguration();
 

@@ -25,21 +25,23 @@
 package net.buildtheearth.utils.lang;
 
 
-import li.cinnazeyy.langlibs.core.Language;
+import li.cinnazeyy.langlibs.core.LangLibAPI;
 import li.cinnazeyy.langlibs.core.file.LanguageFile;
-import li.cinnazeyy.langlibs.core.language.LangLibAPI;
+import li.cinnazeyy.langlibs.core.language.Language;
 import li.cinnazeyy.langlibs.core.language.LanguageUtil;
 import net.buildtheearth.BuildTeamTools;
 import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.Plugin;
 
 public class LangUtil extends LanguageUtil {
     private static LangUtil langUtilInstance;
 
     public static void init() {
         if (langUtilInstance != null) return;
-        LangLibAPI.register(BuildTeamTools.getInstance(),new LanguageFile[]{
-                new LanguageFile(Language.en_GB, 1.0),
-                new LanguageFile(Language.de_DE, 1.0, "de_AT", "de_CH"),
+        Plugin plugin = BuildTeamTools.getInstance();
+        LangLibAPI.register(plugin,new LanguageFile[]{
+                new LanguageFile(plugin, 1.0, Language.en_GB),
+                new LanguageFile(plugin, 1.0, Language.de_DE, "de_AT", "de_CH"),
         });
         langUtilInstance = new LangUtil();
     }

@@ -9,8 +9,8 @@
 # | [Formatting] %s tags are replaced with the variables afterwards
 # ----------------------------------------------------------------------------------------------
 lang:
-  name: "English (GB)"
-  head-id: "27577"
+  name: "Deutsch (De)"
+  head-id: "522"
 # -----------------------------------------------------
 # | Messages
 # -----------------------------------------------------
@@ -20,17 +20,17 @@ message:
 # | Errors
 # -----------------------------------------------------
 error:
-  player-has-no-permissions: "You do not have permission to use this command."
-  no-player: "You must be a player to use this command."
+  player-has-no-permissions: "Sie haben keine Berechtigung, diesen Befehl zu verwenden."
+  no-player: "Sie müssen ein Spieler sein, um diesen Befehl zu verwenden."
 # -----------------------------------------------------
 # | Common
 # -----------------------------------------------------
 common:
-  module-is-disabled: "The Module %s is currently disabled. %s"
+  module-is-disabled: "Das Modul %s ist derzeit deaktiviert. %s"
 # -----------------------------------------------------
 # | Generator
 # -----------------------------------------------------
 generator:
-  no-worldedit-while-generating: "You can't use WorldEdit commands while generating a structure."
+  no-worldedit-while-generating: "Nein!"
 
 config-version: 1.0

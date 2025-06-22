@@ -225,7 +225,6 @@
         </dependency>
 
 
-
         <!--==========  BUILD THE EARTH  ==========-->
 
         <!-- Alps BTE Lib -->
@@ -250,8 +249,8 @@
         <dependency>
             <groupId>li.cinnazeyy</groupId>
             <artifactId>LangLibs</artifactId>
-            <version>1.4.2</version>
-            <scope>compile</scope>
+            <version>1.5</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- PorkLib -->

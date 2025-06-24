@@ -39,4 +39,26 @@ public abstract class LangPaths {
         public static final String NO_WORLDEDIT_WHILE_GENERATING = GENERATOR_PREFIX + "no-worldedit-while-generating";
     }
 
+    public static final class Network {
+        private Network() {
+        }
+
+        private static final String NETWORK_PREFIX = "network.";
+
+    }
+
+    public static final class Navigator{
+        private Navigator() {
+        }
+
+        private static final String NAVIGATOR_PREFIX = "navigator.";
+    }
+
+    public static final class Plot{
+        private Plot(){
+        }
+
+        private static final String PLOT_PREFIX = "prefix.";
+
+    }
 }

@@ -6,6 +6,7 @@ import lombok.Getter;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.common.commands.BuildTeamToolsCommand;
+import net.buildtheearth.modules.common.commands.LanguageCommand;
 import net.buildtheearth.modules.common.components.dependency.DependencyComponent;
 import net.buildtheearth.modules.common.components.pluginmessaging.PluginMessagingComponent;
 import net.buildtheearth.modules.common.components.updater.UpdaterComponent;
@@ -97,6 +98,7 @@ public class CommonModule extends Module {
     @Override
     public void registerCommands() {
         registerCommand("buildteam", new BuildTeamToolsCommand());
+        registerCommand("language", new LanguageCommand());
     }
 
     @Override

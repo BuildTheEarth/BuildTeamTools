@@ -12,6 +12,11 @@ commands:
     aliases:
       - btt
       - buildteamtools
+  language:
+    description: Allow user to set their language.
+    usage: /language <language>
+    aliases:
+      - lang
   generate:
     description: Allows usage of the Generator Tool.
     usage: /generate

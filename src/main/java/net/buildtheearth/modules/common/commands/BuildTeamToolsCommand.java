@@ -100,12 +100,12 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
             }
 
             if(!(args.length > 1)) {
-                sender.sendMessage("§cYou need to add a value: true/false");
+                sender.sendMessage("§c" + LangUtil.getInstance().get(sender, LangPaths.Common.BOOL));
                 return true;
             }
 
             if(!args[1].equalsIgnoreCase("true") && !args[1].equalsIgnoreCase("false")) {
-                sender.sendMessage("§cYou need to set the value to true or false.");
+                sender.sendMessage("§c" + LangUtil.getInstance().get(sender, LangPaths.Common.BOOL));
                 return true;
             }
 

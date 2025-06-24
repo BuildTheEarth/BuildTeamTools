@@ -15,22 +15,27 @@ lang:
 # | Messages
 # -----------------------------------------------------
 message:
-  # TODO
+  wiki: "For more information take a look here:"
 # -----------------------------------------------------
 # | Errors
 # -----------------------------------------------------
 error:
   player-has-no-permissions: "You do not have permission to use this command."
   no-player: "You must be a player to use this command."
+  reason: " Reason: "
 # -----------------------------------------------------
 # | Common
 # -----------------------------------------------------
 common:
   module-is-disabled: "The Module %s is currently disabled. %s"
+  btt-command:
+    true-false: "You need to set the value to true or false."
+
 # -----------------------------------------------------
 # | Generator
 # -----------------------------------------------------
 generator:
   no-worldedit-while-generating: "You can't use WorldEdit commands while generating a structure."
 
+# DO NOT MODIFY
 config-version: 1.0

@@ -8,6 +8,8 @@ public abstract class LangPaths {
         }
 
         private static final String MESSAGE_PREFIX = "message.";
+
+        public static final String WIKI = MESSAGE_PREFIX + "wiki";
     }
 
     public static final class ERROR {
@@ -18,6 +20,7 @@ public abstract class LangPaths {
 
         public static final String PLAYER_HAS_NO_PERMISSIONS = ERROR_PREFIX + "player-has-no-permissions";
         public static final String NO_PLAYER = ERROR_PREFIX + "no-player";
+        public static final String REASON = ERROR_PREFIX + "reason";
     }
 
     public static final class Common {
@@ -25,9 +28,11 @@ public abstract class LangPaths {
         }
 
         private static final String COMMON_PREFIX = "common.";
-
+        private static final String BTT_CMD = "btt-command.";
         /** Variables: Module Name, Reason */
         public static final String MODULE_IS_DISABLED = COMMON_PREFIX + "module-is-disabled";
+        public static final String BOOL = COMMON_PREFIX + BTT_CMD + "true-false";
+
     }
 
     public static final class Generator {

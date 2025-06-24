@@ -4,6 +4,7 @@ import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.ModuleHandler;
 import net.buildtheearth.utils.ChatUtil;
 import net.buildtheearth.utils.lang.LangPaths;
+import net.buildtheearth.utils.lang.LangUtil;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -29,7 +30,7 @@ public class CommandListener implements Listener {
                             String reason = "";
 
                             if (module.getError() != null && !module.getError().isEmpty())
-                                reason = " Reason: " + module.getError();
+                                reason = LangUtil.getInstance().get(e.getPlayer(), LangPaths.ERROR.REASON) + module.getError();
 
                             ChatUtil.sendError(e.getPlayer(), LangPaths.Common.MODULE_IS_DISABLED, module.getModuleName(), reason);
                             e.setCancelled(true);

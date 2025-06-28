@@ -59,13 +59,17 @@ public class AdvancedSettingsMenu extends AbstractMenu {
         XMaterial[] roadSlab = (XMaterial[]) road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.ROAD_SLAB_COLOR);
         ItemStack streetLampType = getStreetLampItem((String) road.getPlayerSettings().get(uuid).getValues().get(RoadFlag.STREET_LAMP_TYPE));
 
+        // If roadSlabs are empty, show a barrier instead.
+        if (roadSlab.length == 0)
+            roadSlab = new XMaterial[]{XMaterial.BARRIER};
+
         createCounter(CustomHeads.SliderColor.WHITE, LANE_COUNT_SLOT, "Number of Lanes", laneCount, 1, 10, "Lanes");
         createCounter(CustomHeads.SliderColor.LIGHT_GRAY, LANE_WIDTH_SLOT, "Lane Width", laneWidth, 1, 30, "Blocks");
         createCounter(CustomHeads.SliderColor.WHITE, SIDEWALK_WIDTH_SLOT, "Sidewalk Width", sidewalkWidth, 1, 30, "Blocks");
         createCounter(CustomHeads.SliderColor.LIGHT_GRAY, STREET_LAMP_DISTANCE_SLOT, "Street Lamp Distance", streetLampDistance, 5, 500, "Blocks");
 
         setChoiceItems(CustomHeads.SliderColor.WHITE, MARKINGS_MATERIAL_SLOT, "Line Markings Color", markingsMaterial.parseItem());
-        if (roadSlab.length > 0) setChoiceItems(CustomHeads.SliderColor.LIGHT_GRAY, ROAD_SLAB_SLOT, "Road Elevation Slab", roadSlab[0].parseItem());
+        setChoiceItems(CustomHeads.SliderColor.LIGHT_GRAY, ROAD_SLAB_SLOT, "Road Elevation Slab", roadSlab[0].parseItem());
         setChoiceItems(CustomHeads.SliderColor.WHITE, SIDEWALK_SLAB_SLOT, "Sidewalk Elevation Slab", sidewalkSlab[0].parseItem());
         setChoiceItems(CustomHeads.SliderColor.LIGHT_GRAY, STREET_LAMP_TYPE_SLOT, "Street Lamp Type", streetLampType);
 

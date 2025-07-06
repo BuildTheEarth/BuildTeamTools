@@ -5,7 +5,7 @@ import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.utils.ChatHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
+import org.bukkit.command.CommandSender;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -50,11 +50,11 @@ public class ModuleHandler {
      * Enables a specific module
      *
      * @param module {@link Module}
-     * @param executor the player that executed the command. If null, the command was executed by the system.
+     * @param executor the sender that executed the command. If null, the system executed the command.
      * @param isStarting if the server is starting
      * @return True if successfully enabled, false if not
      */
-    public boolean enable(Module module, Player executor, boolean isStarting) {
+    public boolean enable(Module module, CommandSender executor, boolean isStarting) {
         for (Module m : modules)
             if (m.getModuleName().equals(module.getModuleName()) && m.isEnabled())
                 return false;
@@ -112,10 +112,10 @@ public class ModuleHandler {
      * Disables a specific module
      *
      * @param module {@link Module}
-     * @param executor the player that executed the command. If null, the command was executed by the system.
+     * @param executor the sender that executed the command. If null, the system executed the command.
      * @return True if successfully disabled, false if not
      */
-    public boolean disable(Module module, Player executor) {
+    public boolean disable(Module module, CommandSender executor) {
         boolean contains = false;
         for(Module m : modules)
             if (m.getModuleName().equals(module.getModuleName())) {
@@ -161,7 +161,7 @@ public class ModuleHandler {
      * @param executor the player that executed the command. If null, the command was executed by the system.
      * @param isStarting if the server is starting
      */
-    public void enableAll(@Nullable Player executor, boolean isStarting) {
+    public void enableAll(@Nullable CommandSender executor, boolean isStarting) {
         for (Module module : new ArrayList<>(modules))
             if (!module.isEnabled())
                 enable(module, executor, isStarting);
@@ -174,7 +174,7 @@ public class ModuleHandler {
      *
      * @param executor the player that executed the command. If null, the command was executed by the system.
      */
-    public void disableAll(@Nullable Player executor) {
+    public void disableAll(@Nullable CommandSender executor) {
         for (Module module : new ArrayList<>(modules))
             if (module.isEnabled())
                 disable(module, executor);
@@ -183,7 +183,7 @@ public class ModuleHandler {
     /**
      * Reloads all modules
      */
-    public void reloadAll(Player executor) {
+    public void reloadAll(CommandSender executor) {
         disableAll(executor);
         enableAll(executor, false);
     }

@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.common.commands;
 
+import com.google.gson.Gson;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.ModuleHandler;
@@ -17,9 +18,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -27,19 +28,12 @@ import java.util.UUID;
 
 public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
 
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String @NotNull [] args) {
 
-        if(!(sender instanceof Player)){
-            sender.sendMessage("§cYou need to be a player to execute this command.");
-            return true;
-        }
-        Player player = (Player) sender;
-
-        if(!player.hasPermission(Permissions.BUILD_TEAM_TOOLS)){
+        if(!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS)){
             sender.sendMessage("§cYou don't have permission to execute this command.");
             return true;
         }
-
 
         if(args.length == 0){
             sendBuildTeamToolsInfo(sender);
@@ -58,9 +52,8 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-
         if(args[0].equalsIgnoreCase("communicators")) {
-            if(!player.hasPermission(Permissions.BUILD_TEAM_TOOLS_COMMUNICATORS)){
+            if(!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_COMMUNICATORS)){
                 sender.sendMessage("§cYou don't have permission to execute this command.");
                 return true;
             }
@@ -73,7 +66,7 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args[0].equalsIgnoreCase("cache")) {
-            if(!player.hasPermission(Permissions.BUILD_TEAM_TOOLS_CACHE)){
+            if(!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_CACHE)){
                 sender.sendMessage("§cYou don't have permission to execute this command.");
                 return true;
             }
@@ -90,15 +83,13 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-
-
         if (args[0].equalsIgnoreCase("debug")) {
-            if(!player.hasPermission(Permissions.BUILD_TEAM_TOOLS_DEBUG)){
+            if(!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_DEBUG)){
                 sender.sendMessage("§cYou don't have permission to execute this command.");
                 return true;
             }
 
-            if(!(args.length > 1)) {
+            if(args.length <= 1) {
                 sender.sendMessage("§cYou need to add a value: true/false");
                 return true;
             }
@@ -111,12 +102,12 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
             boolean debug = Boolean.parseBoolean(args[1]);
 
             BuildTeamTools.getInstance().setDebug(debug);
-            player.sendMessage(ChatHelper.getStandardString("§7Debug Mode was set to: %s", debug));
+            sender.sendMessage(ChatHelper.getStandardString("§7Debug Mode was set to: %s", debug));
             return true;
         }
 
         if (args[0].equalsIgnoreCase("checkForUpdates")) {
-            if(!player.hasPermission(Permissions.BUILD_TEAM_TOOLS_CHECK_FOR_UPDATES)){
+            if(!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_CHECK_FOR_UPDATES)){
                 sender.sendMessage("§cYou don't have permission to execute this command.");
                 return true;
             }
@@ -131,23 +122,21 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
         }
 
         if(args[0].equalsIgnoreCase("reload")) {
-            if(!player.hasPermission(Permissions.BUILD_TEAM_TOOLS_RELOAD)){
+            if(!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_RELOAD)){
                 sender.sendMessage("§cYou don't have permission to execute this command.");
                 return true;
             }
 
             sender.sendMessage(ChatHelper.getStandardString("§7Reloading all modules..."));
-            ModuleHandler.getInstance().reloadAll(player);
+            ModuleHandler.getInstance().reloadAll(sender);
             sender.sendMessage(ChatHelper.getStandardString("§7All modules have been reloaded."));
         }
-
-
 
         return true;
     }
 
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
         if(args.length == 1)
             return Arrays.asList("help", "communicators", "checkForUpdates", "cache", "debug", "reload");
 
@@ -175,11 +164,6 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
                     && NetworkModule.getInstance().getBuildTeam().getServerName() != null)
                 serverName = NetworkModule.getInstance().getBuildTeam().getServerName();
 
-            String continent = "-";
-            if (NetworkModule.getInstance().getBuildTeam() != null
-                    && NetworkModule.getInstance().getBuildTeam().getContinent() != null)
-                continent = NetworkModule.getInstance().getBuildTeam().getContinent().getLabel();
-
             String status = "§c§lDISCONNECTED";
             if (NetworkModule.getInstance().getBuildTeam() != null
                     && NetworkModule.getInstance().getBuildTeam().isConnected() && !buildTeamID.equals("-") && !serverName.equals("-"))
@@ -188,9 +172,6 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
                 status = "§6§lSTANDBY";
 
             boolean debug = BuildTeamTools.getInstance().isDebug();
-
-
-
 
             sender.sendMessage("§eStatus: " + status);
             sender.sendMessage("§eVersion: §7" + BuildTeamTools.getInstance().getDescription().getVersion());
@@ -213,14 +194,24 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
             }
 
             if(NetworkModule.getInstance().getBuildTeam() != null){
+
+                List<String> regions = new ArrayList<>();
+                List<String> continents = new ArrayList<>();
+                for (Region region : NetworkModule.getInstance().getBuildTeam().getRegions()) {
+                    if (region.getContinent() != null && !continents.contains(region.getContinent().getLabel()))
+                        continents.add(region.getContinent().getLabel());
+
+                    if (!regions.contains(region.getName()))
+                        regions.add(region.getName());
+                }
+
+                Gson gson = new Gson();
+
                 sender.sendMessage("");
                 sender.sendMessage("§eBuildTeam ID: §7" + buildTeamID);
                 sender.sendMessage("§eServer Name: §7" + serverName);
-                sender.sendMessage("§eContinent: §7" + continent);
-                sender.sendMessage("§eRegions: §7");
-
-                for(Region region : NetworkModule.getInstance().getBuildTeam().getRegions())
-                    sender.sendMessage("- §7" + region.getName());
+                sender.sendMessage("§eContinents: §7" + gson.toJson(continents));
+                sender.sendMessage("§eRegions: §7" + gson.toJson(regions));
             }
 
             sender.sendMessage("");

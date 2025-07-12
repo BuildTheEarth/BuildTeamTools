@@ -3,7 +3,6 @@ package net.buildtheearth.modules.backup.tasks;
 import net.buildtheearth.modules.backup.components.FileTrackerComponent;
 import net.buildtheearth.modules.backup.components.FileUploadComponent;
 import net.buildtheearth.utils.ChatHelper;
-import org.apache.commons.net.ntp.TimeStamp;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
@@ -22,17 +21,6 @@ public class FileSyncTask extends BukkitRunnable {
     @Override
     public void run() {
         List<File> changedFiles = fileTrackerComponent.getChangedRegionFiles();
-
-        ChatHelper.log("Backing up %s files...", changedFiles.size());
-        try {
-            fileUploadComponent.connect();
-            for(File file : changedFiles) {
-                fileUploadComponent.uploadFile(file);
-                fileTrackerComponent.markUploaded(file.getName(), TimeStamp.getCurrentTime().getTime());
-            }
-            fileUploadComponent.disconnect();
-        } catch (Exception e) {
-            ChatHelper.logError("Failed to back up the unchanged files.");
-        }
+        fileUploadComponent.getQueue().addAll(changedFiles);
     }
 }

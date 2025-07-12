@@ -6,7 +6,6 @@ import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.backup.components.FileTrackerComponent;
 import net.buildtheearth.modules.backup.components.FileUploadComponent;
 import net.buildtheearth.modules.backup.tasks.FileSyncTask;
-import org.bukkit.Bukkit;
 
 public final class BackupModule extends Module {
 

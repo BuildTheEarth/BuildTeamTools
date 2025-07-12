@@ -1,7 +1,5 @@
 package net.buildtheearth.modules.backup.tasks;
 
-import com.jcraft.jsch.JSchException;
-import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.backup.components.FileTrackerComponent;
 import net.buildtheearth.modules.backup.components.FileUploadComponent;
 import net.buildtheearth.utils.ChatHelper;

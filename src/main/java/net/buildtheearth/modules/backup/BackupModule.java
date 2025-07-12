@@ -5,6 +5,9 @@ import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.backup.components.FileTrackerComponent;
 import net.buildtheearth.modules.backup.components.FileUploadComponent;
+import net.buildtheearth.modules.backup.listeners.ChunkModifyListener;
+import net.buildtheearth.modules.backup.listeners.ChunkUnloadListener;
+import net.buildtheearth.modules.backup.tasks.FileProcessTask;
 import net.buildtheearth.modules.backup.tasks.FileSyncTask;
 
 public final class BackupModule extends Module {
@@ -26,15 +29,21 @@ public final class BackupModule extends Module {
         super.enable();
 
         fileTrackerComponent = new FileTrackerComponent();
-        fileUploadComponent = new FileUploadComponent();
+        fileUploadComponent = new FileUploadComponent(fileTrackerComponent);
 
         new FileSyncTask(fileTrackerComponent, fileUploadComponent)
                 .runTaskTimerAsynchronously(BuildTeamTools.getInstance(), 0L, 24 * 60 * 60 * 20L); // 24h = 24 * 60 * 60 * 20 ticks
+
+        new FileProcessTask(fileUploadComponent)
+                .runTaskTimerAsynchronously(BuildTeamTools.getInstance(), 0L, 2 * 20L); // 2 seconds : 2 * 20 ticks
     }
 
     @Override
     public void registerListeners() {
-        // TODO
+        super.registerListeners(
+                new ChunkUnloadListener(fileTrackerComponent, fileUploadComponent),
+                new ChunkModifyListener(fileTrackerComponent)
+        );
     }
 
     @Override

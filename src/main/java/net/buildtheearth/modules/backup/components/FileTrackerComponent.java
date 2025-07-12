@@ -1,25 +1,29 @@
 package net.buildtheearth.modules.backup.components;
 
+import lombok.Getter;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.ModuleComponent;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.io.ConfigPaths;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.World;
 
 import java.io.File;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public final class FileTrackerComponent extends ModuleComponent {
 
     private static final String DB_FILE = "backup/region_file_tracker.db";
     private static final String TABLE_NAME = "backup_region_table";
+    @Getter
     private static final File REGION_FOLDER = getRegionFolder(BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.EARTH_WORLD));
 
     private Connection connection;
+
+    @Getter
+    private final Set<Chunk> modifiedChunks =  new HashSet<>();
 
     public FileTrackerComponent() {
         super("FileTracker");
@@ -45,6 +49,10 @@ public final class FileTrackerComponent extends ModuleComponent {
         } catch (SQLException e) {
             ChatHelper.logError("Failed to close the connection to the backup SQLite database.");
         }
+    }
+
+    public void setChunkAsModified(Chunk chunk) {
+        this.modifiedChunks.add(chunk);
     }
 
     private static File getRegionFolder(String worldName) {

@@ -1,13 +1,25 @@
 package net.buildtheearth.modules.backup;
 
+import lombok.Getter;
 import net.buildtheearth.modules.Module;
+import net.buildtheearth.modules.backup.components.FileTrackerComponent;
 
 public final class BackupModule extends Module {
 
     private static BackupModule instance = null;
 
+    @Getter
+    private FileTrackerComponent fileTrackerComponent;
+
     public BackupModule() {
         super("Backup");
+    }
+
+    @Override
+    public void enable() {
+        super.enable();
+
+        fileTrackerComponent = new FileTrackerComponent();
     }
 
     @Override
@@ -19,8 +31,6 @@ public final class BackupModule extends Module {
     protected void registerCommands() {
         // TODO
     }
-
-    // Getters & Setters
 
     public static BackupModule getInstance() {
         return instance == null ? instance = new BackupModule() : instance;

@@ -1,8 +1,12 @@
 package net.buildtheearth.modules.backup;
 
 import lombok.Getter;
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.backup.components.FileTrackerComponent;
+import net.buildtheearth.modules.backup.components.FileUploadComponent;
+import net.buildtheearth.modules.backup.tasks.FileSyncTask;
+import org.bukkit.Bukkit;
 
 public final class BackupModule extends Module {
 
@@ -10,6 +14,9 @@ public final class BackupModule extends Module {
 
     @Getter
     private FileTrackerComponent fileTrackerComponent;
+
+    @Getter
+    private FileUploadComponent fileUploadComponent;
 
     public BackupModule() {
         super("Backup");
@@ -20,6 +27,8 @@ public final class BackupModule extends Module {
         super.enable();
 
         fileTrackerComponent = new FileTrackerComponent();
+        fileUploadComponent = new FileUploadComponent();
+
     }
 
     @Override

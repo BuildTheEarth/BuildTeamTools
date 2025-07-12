@@ -364,6 +364,13 @@
             <scope>compile</scope>
         </dependency>
 
+        <!-- SFTP library -->
+        <dependency>
+            <groupId>com.github.mwiede</groupId>
+            <artifactId>jsch</artifactId>
+            <version>2.27.2</version>
+        </dependency>
+
 
 
         <!--==========  JAVA EXTENSIONS  ==========-->

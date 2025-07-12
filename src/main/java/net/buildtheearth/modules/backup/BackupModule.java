@@ -29,6 +29,8 @@ public final class BackupModule extends Module {
         fileTrackerComponent = new FileTrackerComponent();
         fileUploadComponent = new FileUploadComponent();
 
+        new FileSyncTask(fileTrackerComponent, fileUploadComponent)
+                .runTaskTimerAsynchronously(BuildTeamTools.getInstance(), 0L, 24 * 60 * 60 * 20L); // 24h = 24 * 60 * 60 * 20 ticks
     }
 
     @Override

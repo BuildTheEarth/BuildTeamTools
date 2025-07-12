@@ -2,8 +2,8 @@ name: BuildTeamTools
 main: net.buildtheearth.BuildTeamTools
 api-version: 1.13
 version: 0.1.3-alpha
-author: MineFact, frikandelworst, George112n, ELgamer, SirJodelstein
-softdepend: [WorldEdit, HeadDatabase]
+author: MineFact, frikandelworst, George112n, ELgamer, SirJodelstein, Zoriot
+softdepend: [WorldEdit, HeadDatabase, PlotSystem-Terra]
 
 commands:
   buildteam:

@@ -1,14 +1,15 @@
 package net.buildtheearth.modules.navigation.components.tpll.listeners;
 
+import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.modules.network.model.Region;
-import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.utils.ChatHelper;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 
@@ -37,10 +38,12 @@ public class TpllListener implements Listener {
         // Check if the command is a TPLL command
         if (!isTpllCommand(event)) return;
 
+        ChatHelper.logDebug("Intercepted TPLL command wit lat and lon: %s %s", lat, lon);
+
         // Check if teleportation interception is required
         shouldIntercept(event).thenAcceptAsync(shouldIntercept -> {
             // If interception is required, cancel the event and perform cross teleportation
-            if (shouldIntercept) {
+            if (Boolean.TRUE.equals(shouldIntercept)) {
                 event.setCancelled(true);
                 NavigationModule.getInstance().getTpllComponent().tpllPlayer(event.getPlayer(), new double[]{lat, lon}, targetServerName);
             }
@@ -61,7 +64,7 @@ public class TpllListener implements Listener {
 
         // Split the command to extract coordinates
         String[] splitMessage = event.getMessage().split(" ");
-        splitMessage[1] = splitMessage[1].replaceAll(",", " ").trim();
+        splitMessage[1] = splitMessage[1].replace(",", " ").trim();
         if (splitMessage.length < 3) return false;
         ChatHelper.logDebug("Command had the correct length (%s).", splitMessage.length);
 
@@ -91,7 +94,7 @@ public class TpllListener implements Listener {
                         return CompletableFuture.completedFuture(false);
                     }
 
-                    if (region.getBuildTeam().getID() != networkModule.getBuildTeam().getID()) {
+                    if (!Objects.equals(region.getBuildTeam().getID(), networkModule.getBuildTeam().getID())) {
                         targetServerName = region.getBuildTeam().getServerName();
                         return CompletableFuture.completedFuture(true);
                     }

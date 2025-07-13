@@ -1,6 +1,8 @@
 package net.buildtheearth.modules.network.api;
 
 import net.buildtheearth.BuildTeamTools;
+import net.buildtheearth.modules.navigation.components.warps.model.Warp;
+import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Continent;
@@ -8,8 +10,6 @@ import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.network.model.RegionType;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.io.ConfigPaths;
-import net.buildtheearth.modules.navigation.components.warps.model.Warp;
-import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import org.bukkit.Bukkit;
@@ -105,8 +105,9 @@ public class NetworkAPI {
                         String serverName = getMainServerName(teamObject);
                         String name = (String) teamObject.get("Name");
                         String blankName = (String) teamObject.get("BlankName");
+                        boolean allowsTransfers = (long) teamObject.get("AllowsTransfers") == 1;
 
-                        BuildTeam buildTeam = new BuildTeam(teamID, mainServerIP, name, blankName, serverName, continent, isConnected, hasBuildTeamToolsInstalled);
+                        BuildTeam buildTeam = new BuildTeam(teamID, mainServerIP, name, blankName, serverName, isConnected, hasBuildTeamToolsInstalled, allowsTransfers);
                         NetworkModule.getInstance().getBuildTeams().add(buildTeam);
 
                         // Create an "other" Warp Group for warps that don't belong to a warp group
@@ -151,7 +152,7 @@ public class NetworkAPI {
                             float warpPitch = Float.parseFloat(warpObject.get("Pitch") + "");
                             boolean isHighlight = warpObject.get("isHighlight") != null && (long) warpObject.get("isHighlight") == 1;
 
-                            if (material != null && material.equals(""))
+                            if (material != null && material.isEmpty())
                                 material = null;
 
                             WarpGroup warpGroup = null;

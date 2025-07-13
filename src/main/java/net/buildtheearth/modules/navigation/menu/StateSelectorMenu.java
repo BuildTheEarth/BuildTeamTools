@@ -1,14 +1,19 @@
 package net.buildtheearth.modules.navigation.menu;
 
 import lombok.NonNull;
+import net.buildtheearth.modules.navigation.NavUtils;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.network.model.RegionType;
-import net.buildtheearth.utils.*;
+import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.ListUtil;
+import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.AbstractPaginatedMenu;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -20,8 +25,8 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
     private final Region country;
     private final List<Region> states;
 
-    public final int BACK_ITEM_SLOT = 27;
-    public static int SWITCH_PAGE_ITEM_SLOT = 34;
+    public static final int BACK_ITEM_SLOT = 27;
+    public static final int SWITCH_PAGE_ITEM_SLOT = 34;
 
     public StateSelectorMenu(@NonNull Region country, Player menuPlayer, boolean autoLoad) {
         super(4, 3, country.getName() + " - states", menuPlayer, autoLoad);
@@ -33,7 +38,7 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
         if(country.getCountryCodeCca3().equalsIgnoreCase("USA"))
             states.add(NetworkModule.getInstance().getRegions().stream().filter(region -> region.getBuildTeam() != null && region.getBuildTeam().getID().equals("Qy2duN4l")).findFirst().orElse(null));
 
-        if(this.states.size() > 0) {
+        if (!this.states.isEmpty()) {
             // Remove all regions that don't have a build team
             this.states.removeAll(this.states.stream().filter(region ->
                     region == null
@@ -63,12 +68,12 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPaginatedPreviewItems(List<?> source) {
-        List<Region> states = source.stream().map(l -> (Region) l).collect(Collectors.toList());
+        List<Region> collectedStates = source.stream().map(l -> (Region) l).collect(Collectors.toList());
 
         // Create the country items
         int slot = 0;
 
-        for (Region region : states) {
+        for (Region region : collectedStates) {
             ArrayList<String> stateLore = ListUtil.createList("", "§eBuild Team:", region.getBuildTeam().getBlankName(), "", "§8Click to join this state's server!");
             getMenu().getSlot(slot).setItem(
                     Item.createCustomHeadBase64(region.getHeadBase64() == null ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19" : region.getHeadBase64(),
@@ -89,7 +94,7 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
     }
 
     @Override
-    protected void setPaginatedItemClickEventsAsync(List<?> source) {
+    protected void setPaginatedItemClickEventsAsync(@NotNull List<?> source) {
         List<Region> countries = source.stream().map(l -> (Region) l).collect(Collectors.toList());
 
         int slot = 0;
@@ -98,12 +103,12 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
             getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
 
-                ChatHelper.logDebug("%s", clickedRegion.getName());
+                ChatHelper.logDebug("Clicked the state: %s", clickedRegion.getName() + " (" + clickedRegion.getCountryCodeCca3() + ")");
 
                 if (clickedRegion.getBuildTeam().isConnected())
-                    Utils.sendPlayerToServer(clickPlayer, clickedRegion.getBuildTeam().getServerName());
+                    NavUtils.sendPlayerToConnectedServer(clickPlayer, clickedRegion.getBuildTeam().getServerName());
                 else
-                    NetworkModule.sendNotConnectedMessage(clickPlayer, clickedRegion.getBuildTeam().getIP());
+                    NavUtils.sendNotConnectedMessage(clickPlayer, clickedRegion.getBuildTeam().getIP(), clickedRegion.getBuildTeam().getName());
             });
             slot++;
         }

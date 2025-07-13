@@ -2,12 +2,13 @@ package net.buildtheearth.modules.navigation.menu;
 
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.BuildTeamTools;
+import net.buildtheearth.modules.navigation.NavUtils;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
-import net.buildtheearth.utils.Utils;
 import net.buildtheearth.utils.io.ConfigPaths;
+import net.buildtheearth.utils.io.ConfigUtil;
 import net.buildtheearth.utils.menus.AbstractMenu;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -17,6 +18,7 @@ import org.ipvp.canvas.mask.Mask;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
 
 /**
  * The main menu for the BTE universal navigator. <br>
@@ -31,16 +33,16 @@ import java.util.Collections;
  */
 public class MainMenu extends AbstractMenu {
 
-    private static final String inventoryName = "BuildTheEarth Navigator";
+    private static final String INVENTORY_NAME = "BuildTheEarth Navigator";
     private static FileConfiguration config;
 
     public MainMenu(Player menuPlayer) {
-        super(3, inventoryName, menuPlayer);
+        super(3, INVENTORY_NAME, menuPlayer);
     }
 
     @Override
     protected void setPreviewItems() {
-        config = BuildTeamTools.getInstance().getConfig();
+        config = BuildTeamTools.getInstance().getConfig(ConfigUtil.NAVIGATION);
         int[] slots = getSlots();
 
         // Fill the blank slots with glass panes
@@ -50,19 +52,19 @@ public class MainMenu extends AbstractMenu {
 
         // Set Explore Item
         ArrayList<String> exploreLore = new ArrayList<>(Collections.singletonList(ChatHelper.getColorizedString(NamedTextColor.GRAY, "Click to explore the project!", false)));
-        getMenu().getSlot(slots[0]).setItem(Item.create(XMaterial.SPRUCE_BOAT.parseMaterial(), ChatHelper.getColorizedString(NamedTextColor.YELLOW, "Explore", true), 1, exploreLore));
+        getMenu().getSlot(slots[0]).setItem(Item.edit(Objects.requireNonNull(XMaterial.SPRUCE_BOAT.parseItem()), 1, ChatHelper.getColorizedString(NamedTextColor.YELLOW, "Explore", true), exploreLore));
 
 
         // Set Build Item
         if(config.getBoolean(ConfigPaths.Navigation.BUILD_ITEM_ENABLED)) {
             ArrayList<String> buildLore = new ArrayList<>(Collections.singletonList(ChatHelper.getColorizedString(NamedTextColor.GRAY, "Click to build for the project!", false)));
-            getMenu().getSlot(slots[1]).setItem(Item.create(XMaterial.DIAMOND_PICKAXE.parseMaterial(), ChatHelper.getColorizedString(NamedTextColor.GREEN, "Build", true), 1, buildLore));
+            getMenu().getSlot(slots[1]).setItem(Item.edit(Objects.requireNonNull(XMaterial.DIAMOND_PICKAXE.parseItem()), 1, ChatHelper.getColorizedString(NamedTextColor.GREEN, "Build", true), buildLore));
         }
 
         // Set Tutorials Item
         if(config.getBoolean(ConfigPaths.Navigation.TUTORIALS_ITEM_ENABLED)) {
             ArrayList<String> tutorialsLore = new ArrayList<>(Collections.singletonList(ChatHelper.getColorizedString(NamedTextColor.GRAY, "Click to do some tutorials!", false)));
-            getMenu().getSlot(slots[2]).setItem(Item.create(XMaterial.KNOWLEDGE_BOOK.parseMaterial(), ChatHelper.getColorizedString(NamedTextColor.AQUA, "Tutorials", true), 1, tutorialsLore));
+            getMenu().getSlot(slots[2]).setItem(Item.edit(Objects.requireNonNull(XMaterial.KNOWLEDGE_BOOK.parseItem()), 1, ChatHelper.getColorizedString(NamedTextColor.AQUA, "Tutorials", true), tutorialsLore));
         }
 
         super.setPreviewItems();
@@ -90,7 +92,7 @@ public class MainMenu extends AbstractMenu {
                 // If no command or message is set, teleport player to the plot system server
                 if(action == null || action.equals("/command") || action.equals("message")) {
                     clickPlayer.sendMessage(ChatHelper.getStandardString("Teleporting you to the plot system server..."));
-                    Utils.sendPlayerToServer(clickPlayer, NetworkModule.GLOBAL_PLOT_SYSTEM_SERVER);
+                    NavUtils.sendPlayerToConnectedServer(clickPlayer, NetworkModule.GLOBAL_PLOT_SYSTEM_SERVER);
                     return;
                 }
 

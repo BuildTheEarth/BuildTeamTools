@@ -1,32 +1,36 @@
 package net.buildtheearth.modules.navigation.menu;
 
 import lombok.NonNull;
+import net.buildtheearth.modules.navigation.NavUtils;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Continent;
 import net.buildtheearth.modules.network.model.Region;
-import net.buildtheearth.utils.*;
+import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.ListUtil;
+import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.AbstractPaginatedMenu;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// TODO Eloborate if this is still needed anywheere, otherwise remove it - maybe ts needed for new jersey
 public class CountrySelectorMenu extends AbstractPaginatedMenu {
 
-    private final Continent continent;
     private final List<Region> regions;
 
-    public final int BACK_ITEM_SLOT = 27;
-    public static int SWITCH_PAGE_ITEM_SLOT = 34;
+    public static final int BACK_ITEM_SLOT = 27;
+    public static final int SWITCH_PAGE_ITEM_SLOT = 34;
 
     public CountrySelectorMenu(Player menuPlayer, @NonNull Continent continent, boolean autoLoad) {
         super(4, 3, continent.getLabel() + " - countries", menuPlayer, autoLoad);
-        this.continent = continent;
         this.regions = new ArrayList<>(continent.getCountries());
 
         // Add USA region to North America because it is being built by multiple teams
@@ -34,13 +38,13 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
             regions.add(
                 new Region("USA",
                     Continent.NORTH_AMERICA,
-                    new BuildTeam(null, null, null, "4 Teams", null, Continent.NORTH_AMERICA, false, false),
+                        new BuildTeam(null, null, null, "4 Teams", null, false, false, false),
                     "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGNhYzk3NzRkYTEyMTcyNDg1MzJjZTE0N2Y3ODMxZjY3YTEyZmRjY2ExY2YwY2I0YjM4NDhkZTZiYzk0YjQifX19"
                     , 9372610, "US", "USA"
                 )
             );
 
-        if(regions.size() > 0) {
+        if (!regions.isEmpty()) {
             // Sort countries by area
             regions.sort(Comparator.comparing(Region::getArea).reversed());
 
@@ -48,7 +52,6 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
             regions.removeAll(regions.stream().filter(region ->
                     region.getBuildTeam() == null
                     || region.getHeadBase64() == null
-                    || region.getBuildTeam() == null
                     || region.getBuildTeam().getID() == null
                     || (
                             NetworkModule.getInstance().getBuildTeam() != null
@@ -102,7 +105,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
     }
 
     @Override
-    protected void setPaginatedItemClickEventsAsync(List<?> source) {
+    protected void setPaginatedItemClickEventsAsync(@NotNull List<?> source) {
         List<Region> countries = source.stream().map(l -> (Region) l).collect(Collectors.toList());
 
         int slot = 0;
@@ -111,14 +114,24 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
             getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
 
-                ChatHelper.logDebug("%s", clickedRegion.getName());
+                ChatHelper.logDebug("Clicked Region: %s", clickedRegion.getName() + " (" + clickedRegion.getCountryCodeCca3() + ")");
 
-                if(clickedRegion.getCountryCodeCca3().equalsIgnoreCase("USA"))
+                if (clickedRegion.getCountryCodeCca3().equalsIgnoreCase("USA")) {
                     new StateSelectorMenu(clickedRegion, clickPlayer, true);
-                else if (clickedRegion.getBuildTeam().isConnected())
-                    Utils.sendPlayerToServer(clickPlayer, clickedRegion.getBuildTeam().getServerName());
-                else
-                    NetworkModule.sendNotConnectedMessage(clickPlayer, clickedRegion.getBuildTeam().getIP());
+                } else if (clickedRegion.getBuildTeam().isConnected() && clickedRegion.getBuildTeam().getServerName() != null) {
+                    NavUtils.sendPlayerToConnectedServer(clickPlayer, clickedRegion.getBuildTeam().getServerName());
+                } else if (clickedRegion.getBuildTeam().getIP() != null) {
+                    if (NavUtils.isTransferCapable(clickPlayer, clickedRegion.getBuildTeam())) {
+                        int sep = clickedRegion.getBuildTeam().getIP().indexOf(':');
+                        String server = sep >= 0 ? clickedRegion.getBuildTeam().getIP().substring(0, sep) : clickedRegion.getBuildTeam().getIP();
+                        int port = sep >= 0 ? Integer.parseInt(clickedRegion.getBuildTeam().getIP().substring(sep + 1)) : 25565;
+                        clickPlayer.transfer(server, port);
+                    } else {
+                        NavUtils.sendNotConnectedMessage(clickPlayer, clickedRegion.getBuildTeam().getIP(), clickedRegion.getBuildTeam().getName());
+                    }
+                } else {
+                    NavUtils.sendNoIpMessage(clickPlayer, clickedRegion.getName() + " (" + clickedRegion.getCountryCodeCca3() + ")");
+                }
             });
             slot++;
         }
@@ -146,10 +159,8 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
 
     }
 
-    /** Converts an area in square meters to a string with dot notation starting from the right every 3 digits.
-     *
-     * @param area
-     * @return
+    /**
+     * Converts an area in square meters to a string with dot notation starting from the right every 3 digits.
      */
     public static String formatArea(double area) {
         String areaStr = String.valueOf((int) area);

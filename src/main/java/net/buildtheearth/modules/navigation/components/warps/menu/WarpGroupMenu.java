@@ -1,15 +1,16 @@
 package net.buildtheearth.modules.navigation.components.warps.menu;
 
 import net.buildtheearth.modules.navigation.NavigationModule;
+import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.modules.navigation.menu.CountrySelectorMenu;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Permissions;
+import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.CustomHeads;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.ListUtil;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.AbstractPaginatedMenu;
-import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
@@ -19,9 +20,9 @@ import java.util.stream.Collectors;
 
 public class WarpGroupMenu extends AbstractPaginatedMenu {
 
-    public final int BACK_ITEM_SLOT = 27;
+    public static final int BACK_ITEM_SLOT = 27;
 
-    public final int ALTERNATE_PLUS_SLOT = 35;
+    public static final int ALTERNATE_PLUS_SLOT = 35;
 
     private final boolean hasBackItem;
     private final BuildTeam buildTeam;
@@ -40,17 +41,20 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setMenuItemsAsync() {
-        if(hasBackItem)
-            setBackItem(BACK_ITEM_SLOT, new CountrySelectorMenu(getMenuPlayer(), buildTeam.getContinent(), false));
+        if (hasBackItem) {
+            if (ChatHelper.DEBUG)
+                getMenuPlayer().sendMessage("Finally triggered the misterious back item in the warp group menu");
+            setBackItem(BACK_ITEM_SLOT, new CountrySelectorMenu(getMenuPlayer(), buildTeam.getRegions().getFirst().getContinent(), false));
+            // TODO fix it for multiple continents
+            if (ChatHelper.DEBUG) Thread.dumpStack();
+            ChatHelper.logDebug("Setting back item for warp group menu");
+        }
     }
 
     @Override
     protected void setItemClickEventsAsync() {
         if(hasBackItem)
-            getMenu().getSlot(BACK_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
-                clickPlayer.closeInventory();
-
-            });
+            getMenu().getSlot(BACK_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> clickPlayer.closeInventory());
     }
 
     @Override
@@ -103,7 +107,7 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
 
         // If the warp group "Other" has no warps, remove it from the list
         WarpGroup otherWarpGroup = warpGroups.stream().filter(warpGroup -> warpGroup.getName().equalsIgnoreCase("Other")).findFirst().orElse(null);
-        if(otherWarpGroup != null && otherWarpGroup.getWarps().size() == 0)
+        if (otherWarpGroup != null && otherWarpGroup.getWarps().isEmpty())
             warpGroups.remove(otherWarpGroup);
 
         // Add a create warp group item if the player has permission
@@ -159,8 +163,10 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
         int warpGroupSlot = currentIndex;
 
         for(WarpGroup warpGroup : buildTeam.getWarpGroups())
-            if(warpGroup.getSlot() != -1 && warpGroup.getSlot() > 0 && warpGroup.getSlot() < 27)
+            if (warpGroup.getSlot() != -1 && warpGroup.getSlot() > 0 && warpGroup.getSlot() < 27) {
                 warpGroupSlot = ALTERNATE_PLUS_SLOT;
+                break;
+            }
 
         return warpGroupSlot;
     }

@@ -1,16 +1,5 @@
 package net.buildtheearth.utils;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
-import net.buildtheearth.BuildTeamTools;
-import net.buildtheearth.modules.network.NetworkModule;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,17 +33,6 @@ public class Utils {
         return lines.toArray(new String[0]);
     }
 
-    public static void sendPlayerToServer(Player player, String server) {
-        if(NetworkModule.getInstance().getBuildTeam() == null
-        || !NetworkModule.getInstance().getBuildTeam().isConnected())
-            return;
-
-        ByteArrayDataOutput out = ByteStreams.newDataOutput();
-        out.writeUTF("Connect");
-        out.writeUTF(server);
-        player.sendPluginMessage(BuildTeamTools.getInstance(), "BungeeCord", out.toByteArray());
-    }
-
     public static Object pickRandom(Object[] array) {
         if (array.length == 0)
             return null;
@@ -66,11 +44,9 @@ public class Utils {
     /**
      * Converts the given Time to a time string
      *
-     * @param p    player for translation
      * @param time time in Milliseconds
-     * @return
      */
-    public static String toDate(Player p, long time) {
+    public static String toDate(long time) {
         String s = "";
         int days = 0;
         int hours = 0;
@@ -79,22 +55,21 @@ public class Utils {
 
         if (time > 86400000) {                    //Tage
             days = (int) (time / 86400000);
-            time = time - (86400000 * days);
+            time = time - (86400000L * days);
         }
 
         if (time > 3600000) {                        //Stunden
             hours = (int) (time / 3600000);
-            time = time - (3600000 * hours);
+            time = time - (3600000L * hours);
         }
 
         if (time > 60000) {                        //Minuten
             minutes = (int) (time / 60000);
-            time = time - (60000 * minutes);
+            time = time - (60000L * minutes);
         }
 
         if (time > 1000) {                        //Sekunden
             seconds = (int) (time / 1000);
-            time = time - (1000 * seconds);
         }
 
         if (days > 0) {
@@ -103,13 +78,13 @@ public class Utils {
             else
                 s = s + days + " Days, ";
         }
-        if (hours > 0 | days > 0) {
+        if (hours > 0 || days > 0) {
             if (hours == 1)
                 s = s + hours + " Hour";
             else
                 s = s + hours + " Hours";
         }
-        if ((minutes > 0 | hours > 0) & days == 0) {
+        if ((minutes > 0 || hours > 0) && days == 0) {
             if (hours > 0)
                 s = s + ", ";
 
@@ -118,7 +93,7 @@ public class Utils {
             else
                 s = s + minutes + " Minutes";
         }
-        if ((seconds > 0 | minutes > 0) & hours == 0 & days == 0) {
+        if ((seconds > 0 || minutes > 0) && hours == 0 && days == 0) {
             if (minutes > 0)
                 s = s + ", ";
 

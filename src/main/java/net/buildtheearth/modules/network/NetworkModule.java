@@ -15,12 +15,9 @@ import net.buildtheearth.modules.network.model.RegionType;
 import net.buildtheearth.utils.io.ConfigPaths;
 import net.buildtheearth.utils.io.Constants;
 import net.buildtheearth.utils.io.Errors;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,9 +28,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class NetworkModule extends Module {
 
-    public static String GLOBAL_PLOT_SYSTEM_SERVER = "NYC-1";
-
-    public static int CACHE_UPLOAD_SPEED = 20 * 60 * 10 + 20;
+    public static final String GLOBAL_PLOT_SYSTEM_SERVER = "NYC-1";
+    public static final int CACHE_UPLOAD_SPEED = 20 * 60 * 10 + 20;
 
     /** Information about the build team of this server */
     @Getter @Setter
@@ -65,8 +61,8 @@ public class NetworkModule extends Module {
 
     @Override
     public void enable() {
-        String API_KEY = BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY);
-        if(API_KEY == null || API_KEY.isEmpty() || API_KEY.equals(Constants.DEFAULT_API_KEY)){
+        String apiKey = BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY);
+        if (apiKey == null || apiKey.isEmpty() || apiKey.equals(Constants.DEFAULT_API_KEY)) {
             shutdown(Errors.API_KEY_NOT_CONFIGURED);
             return;
         }
@@ -106,15 +102,13 @@ public class NetworkModule extends Module {
 
         try {
 
-            NetworkAPI.getBuildTeamInformation().thenRun(() -> {
-                NetworkAPI.setupCurrentServerData()
+            NetworkAPI.getBuildTeamInformation().thenRun(() -> NetworkAPI.setupCurrentServerData()
                     .thenRun(() ->
-                        future.complete(null))
+                            future.complete(null))
                     .exceptionally(e -> {
                         future.completeExceptionally(e);
                         return null;
-                    });
-            }).exceptionally(e -> {
+                    })).exceptionally(e -> {
                 future.completeExceptionally(e);
                 return null;
             });
@@ -146,7 +140,7 @@ public class NetworkModule extends Module {
      * {@link #ping(Player)}
      */
     public void pingAllOnlinePlayers() {
-        Bukkit.getOnlinePlayers().forEach(player -> ping(player));
+        Bukkit.getOnlinePlayers().forEach(this::ping);
     }
 
     /**
@@ -162,36 +156,12 @@ public class NetworkModule extends Module {
         player.sendPluginMessage(BuildTeamTools.getInstance(), "BungeeCord", out.toByteArray());
     }
 
-    /** Sends a message to the player that the server is not connected to the network yet.
-     *  Instead of the server name the server IP will be displayed so the player can join the other server ip manually.
-     *
-     * @param player The player to send the message to
-     * @param serverIP The IP of the server the player should join
-     */
-    public static void sendNotConnectedMessage(Player player, String serverIP) {
-        TextComponent comp = new TextComponent("§e" + serverIP + " §7(Click to copy)");
-        comp.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, serverIP));
-        comp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§eClick to copy").create()));
-
-        String notConnected = "§cThis server is not connected to the network yet and has a different Server IP:";
-
-        if(!NetworkModule.getInstance().getBuildTeam().isConnected())
-            notConnected = "§cThis server has a different Server IP:";
-
-        player.closeInventory();
-        player.sendMessage(notConnected);
-        player.sendMessage("");
-        player.spigot().sendMessage(comp);
-        player.sendMessage("");
-        player.sendMessage("§cClick on the IP to copy it. Then enter it in your Minecraft Server List. (Paste with CTRL + V)");
-    }
-
     /** Returns all regions of the given region type.
      *
      * @param regionType The region type to get the regions of
      * @return A list of all regions of the given region type
      */
-    public static ArrayList<Region> getRegionsByRegionType(RegionType regionType){
+    public static @NotNull List<Region> getRegionsByRegionType(RegionType regionType) {
         ArrayList<Region> regions = new ArrayList<>();
         for(Region region : NetworkModule.getInstance().getRegions())
             if(region.getType().equals(regionType))
@@ -218,9 +188,9 @@ public class NetworkModule extends Module {
      * @return The BuildTeam with the given ID
      */
     public BuildTeam getBuildTeamByID(String teamID) {
-        for(BuildTeam buildTeam : buildTeams)
-            if (buildTeam.getID() != null && buildTeam.getID().equals(teamID))
-                return buildTeam;
+        for (BuildTeam team : buildTeams)
+            if (team.getID() != null && team.getID().equals(teamID))
+                return team;
 
         return null;
     }

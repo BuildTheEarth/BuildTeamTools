@@ -41,7 +41,7 @@ Its primary goal is to significantly speed up the building process by eliminatin
 <!-- FEATURES -->
 ## Features
 🔨 **Easy-to-use** Tools for everything around BuildTheEarth<br/>
-⏱ **Multi-Version** support from `1.12` - `1.21` (PLANNED)<br/>
+⏱ **Multi-Version** support from `1.18` - `1.21.4`<br/>
 ✔️ **User-friendly** GUIs and Commands<br/>
 💬 **Multi-Language** Support (PLANNED)<br/>
 📆 **Automatic** Updates<br/>
@@ -63,7 +63,8 @@ The **\*** symbol shows that this feature is still being developed or under main
 <!-- INSTALLATION -->
 ## Installation
 💻 **Requirements:**
-- A Server running Minecraft `1.12` - `1.21`.
+
+- A Server running Paper 1.18 - **1.21.4**.
 
 🚩 **How to install:**
 1. Download BuildTeamTools [here](https://www.spigotmc.org/resources/buildteamtools.101854/).

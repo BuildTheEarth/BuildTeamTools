@@ -3,6 +3,8 @@ package net.buildtheearth.utils;
 import com.cryptomorin.xseries.XMaterial;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -64,12 +66,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * <br>• {@link #createLeatherArmor(Material, String, Color, List, Enchantment, Integer, Enchantment, Integer)}
  * <br>• {@link #createLeatherArmor(Material, String, Color, List, Enchantment, Integer, Enchantment, Integer, Enchantment, Integer)}
  *
- * <br><br><b>Skull Creation Methods</b>:
- * <br>Utility methods to create player and custom skulls:
- * <br>• {@link #createPlayerHead(String, String)}
- * <br>• {@link #createPlayerHead(String, String, List)}
- * <br>• {@link #createPlayerHead(String, String, int, List)}
- *
  * <br><br><b>Item Editing Methods</b>:
  * <br>Modify existing {@link ItemStack} objects:
  * <br>• {@link #edit(ItemStack, Material)}
@@ -86,15 +82,26 @@ import java.util.concurrent.ConcurrentHashMap;
  * <br>• {@link #getUniqueMaterialString(XMaterial)} – Gets the namespaced key of an {@link XMaterial}.
  * <br>• {@link #getUniqueMaterialString(XMaterial[])} – Gets a comma-separated list of namespaced keys from multiple {@link XMaterial}s.
  * <br>• {@link #convertStringToXMaterial(String)} – Converts a string to an {@link XMaterial}, fallback to Bukkit {@link Material} if needed.
+ * <br>• {@link #convertXMaterialToWEBlockType(XMaterial)} – Converts an {@link XMaterial} to a WorldEdit {@link BlockType}.
+ * <br>• {@link #createStringFromItemStringList(ArrayList)} – Converts a list of material strings to a comma-separated namespaced material string.
+ * <br>• {@link #createStringFromItemStringList(String...)} – Converts an array of material strings to a comma-separated namespaced material string.
  *
- * @version 1.3.3
+ * <br><br><b>Skull Creation Methods</b>:
+ * <br>Utility methods to create player and custom skulls:
+ * <br>• {@link #createPlayerHead(String, String)}
+ * <br>• {@link #createPlayerHead(String, String, List)}
+ * <br>• {@link #createPlayerHead(String, String, int, List)}
+ *
+ * @version 1.3.4
  * @author MineFact
  */
 @SuppressWarnings({"deprecation", "unused"})
 public class Item {
 	public static Map<String, ItemStack> nonPlayerSkulls = new ConcurrentHashMap<>();
 
-	private final Material material;
+	private ItemStack item;
+
+	private Material material;
 
 	private String displayName;
 
@@ -110,6 +117,10 @@ public class Item {
 
 	public Item(Material material) {
 		this.material = material;
+	}
+
+	public Item(ItemStack item) {
+		this.item = item;
 	}
 
 	public Item setDisplayName(String name) {
@@ -143,7 +154,12 @@ public class Item {
 	}
 
 	public ItemStack build() {
-		ItemStack item = new ItemStack(this.material);
+		ItemStack item;
+		if(this.item != null)
+			item = this.item.clone();
+		else
+			item = new ItemStack(this.material);
+
 		item.setAmount(this.amount);
 
 		for (Enchantment en : this.enchantments.keySet())
@@ -440,6 +456,39 @@ public class Item {
 		}
 
 		return material;
+	}
+
+	public static BlockType convertXMaterialToWEBlockType(XMaterial material) {
+		String mat = getUniqueMaterialString(material);
+		BlockType bt;
+
+		if(mat.contains("minecraft:"))
+			bt = BlockTypes.parse(mat);
+		else
+			bt = BlockTypes.get(mat);
+
+		return bt;
+	}
+
+	public static String createStringFromItemStringList(ArrayList<String> items) throws IllegalArgumentException {
+		StringBuilder s = new StringBuilder();
+
+		for (int i = 0; i < items.size(); i++)
+			if(XMaterial.matchXMaterial(items.get(i)).isPresent()) {
+				XMaterial xMaterial = XMaterial.matchXMaterial(items.get(i)).get();
+				ItemStack item = xMaterial.parseItem();
+
+				if(item == null)
+					continue;
+
+				if(i > 0) s.append(",");
+				s.append(getUniqueMaterialString(item));
+			}
+		return s.toString();
+	}
+
+	public static String createStringFromItemStringList(String... items) throws IllegalArgumentException {
+		return createStringFromItemStringList(new ArrayList<>(Arrays.asList(items)));
 	}
 
 

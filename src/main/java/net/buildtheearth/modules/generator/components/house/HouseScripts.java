@@ -506,7 +506,7 @@ public class HouseScripts extends Script {
             BlockState[] doubleSlabs = new BlockState[roofColor.length];
 
             for(int i = 0; i < roofColor.length; i++){
-                BlockType bt = Item.convertXMaterialToBlockType(roofColor[i]);
+                BlockType bt = Item.convertXMaterialToWEBlockType(roofColor[i]);
 
                 if(bt == null)
                     continue;
@@ -729,7 +729,7 @@ public class HouseScripts extends Script {
                     // Convert all stair blocks to the correct orientation
                     BlockState[] stairsWithOrientation = new BlockState[roofColor.length];
                     for(int i = 0; i < roofColor.length; i++){
-                        BlockType bt = Item.convertXMaterialToBlockType(roofColor[i]);
+                        BlockType bt = Item.convertXMaterialToWEBlockType(roofColor[i]);
 
                         if(bt == null)
                             continue;
@@ -760,7 +760,7 @@ public class HouseScripts extends Script {
         BlockState[] doubleSlabs = new BlockState[roofColor.length];
 
         for(int i = 0; i < roofColor.length; i++){
-            BlockType bt = Item.convertXMaterialToBlockType(roofColor[i]);
+            BlockType bt = Item.convertXMaterialToWEBlockType(roofColor[i]);
 
             if(bt == null)
                 continue;
@@ -768,7 +768,7 @@ public class HouseScripts extends Script {
             doubleSlabs[i] = getSlab(bt, "double");
         }
 
-        replaceBlocks(Item.convertXMaterialToBlockType(XMaterial.DISPENSER).getDefaultState(), doubleSlabs);
+        replaceBlocks(Item.convertXMaterialToWEBlockType(XMaterial.DISPENSER).getDefaultState(), doubleSlabs);
 
         // Finish the script
         finish(blocks, selectionPoints);

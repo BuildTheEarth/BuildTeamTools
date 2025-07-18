@@ -31,7 +31,7 @@ public class BaseColorMenu extends BlockListMenu {
                     return;
 
                 HouseSettings houseSettings = (HouseSettings) settings;
-                houseSettings.setValue(HouseFlag.BASE_COLOR, Item.createStringFromItemList(selectedMaterials));
+                houseSettings.setValue(HouseFlag.BASE_COLOR, Item.createStringFromItemStringList(selectedMaterials));
 
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);

@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <ol>
  *     <li><b>Bukkit API</b></li>
  *     <li><b>HeadDatabaseAPI</b></li> (removed for BuildTeamTools)
+ *     <li><b>XMaterial</b> from <a href="https://github.com/CryptoMorin/XSeries">XSeries</a></li>
  * </ol>
  *
  * <br>
@@ -78,7 +79,15 @@ import java.util.concurrent.ConcurrentHashMap;
  * <br>• {@link #edit(ItemStack, List)}
  * <br>• {@link #edit(ItemStack, int, String, List)}
  *
- * @version 1.3.2
+ * <br><br><b>Material Conversion Utilities</b>:
+ * <br>Utility methods to convert between {@link Material}, {@link XMaterial}, and {@link ItemStack} representations:
+ * <br>• {@link #fromUniqueMaterialString(String)} – Converts a namespaced string to an {@link ItemStack}.
+ * <br>• {@link #getUniqueMaterialString(ItemStack)} – Gets the namespaced key of an {@link ItemStack}'s material.
+ * <br>• {@link #getUniqueMaterialString(XMaterial)} – Gets the namespaced key of an {@link XMaterial}.
+ * <br>• {@link #getUniqueMaterialString(XMaterial[])} – Gets a comma-separated list of namespaced keys from multiple {@link XMaterial}s.
+ * <br>• {@link #convertStringToXMaterial(String)} – Converts a string to an {@link XMaterial}, fallback to Bukkit {@link Material} if needed.
+ *
+ * @version 1.3.3
  * @author MineFact
  */
 @SuppressWarnings({"deprecation", "unused"})
@@ -148,6 +157,14 @@ public class Item {
 		item.setItemMeta(itemmeta);
 		return item;
 	}
+
+
+
+	// ==============================
+	// SECTION: Item Creation Methods
+	// ==============================
+
+
 
 	private static ItemStack createItem(Material material, String name, int amount, List<String> lore,
 										Map<Enchantment, Integer> enchantments) {
@@ -270,6 +287,13 @@ public class Item {
 		return createLeatherArmorItem(material, name, color, lore, enchantments);
 	}
 
+
+	// ==============================
+	// SECTION: Skull Creation Methods
+	// ==============================
+
+
+
 	public static ItemStack createPlayerHead(String name, String owner) {
 		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
 		SkullMeta itemMeta = (SkullMeta)item.getItemMeta();
@@ -301,6 +325,14 @@ public class Item {
 		item.setItemMeta(itemMeta);
 		return item;
 	}
+
+
+	// ==============================
+	// SECTION: Item Editing Methods
+	// ==============================
+
+
+
 
 	public static ItemStack edit(ItemStack item, Material material) {
 		item.setType(material);
@@ -346,6 +378,71 @@ public class Item {
 		item.setItemMeta(itemmeta);
 		return item;
 	}
+
+
+	// ======================================
+	// SECTION: Material Conversion Utilities
+	// ======================================
+
+
+
+	public static ItemStack fromUniqueMaterialString(String materialString) {
+		Material material = Material.matchMaterial(materialString);
+		if(material != null)
+			return XMaterial.matchXMaterial(material).parseItem();
+
+
+		if(XMaterial.matchXMaterial(materialString).isPresent())
+			return XMaterial.matchXMaterial(materialString).get().parseItem();
+
+		return null;
+	}
+
+	public static String getUniqueMaterialString(ItemStack item) {
+		return item.getType().getKey().asString();
+	}
+
+	public static String getUniqueMaterialString(XMaterial material) {
+		if(material == null)
+			return null;
+
+		ItemStack item = material.parseItem();
+		if(item == null)
+			return null;
+
+		return getUniqueMaterialString(item);
+	}
+
+	public static String getUniqueMaterialString(XMaterial[] materials) {
+		if(materials == null || materials.length == 0)
+			return null;
+
+		StringBuilder s = new StringBuilder(getUniqueMaterialString(materials[0]));
+
+		for (int i = 1; i < materials.length; i++)
+			s.append(",").append(getUniqueMaterialString(materials[i]));
+
+		return s.toString();
+	}
+
+	public static XMaterial convertStringToXMaterial(String materialString) {
+		XMaterial material;
+
+		if(XMaterial.matchXMaterial(materialString).isPresent())
+			material = XMaterial.matchXMaterial(materialString).get();
+		else {
+			Material mat = Material.matchMaterial(materialString);
+
+			if(mat != null)
+				material = XMaterial.matchXMaterial(mat);
+			else
+				return null;
+		}
+
+		return material;
+	}
+
+
 
 	/*
 	public static ItemStack createNonPlayerSkull(String url, String name, List<String> lore) {

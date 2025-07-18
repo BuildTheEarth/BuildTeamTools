@@ -33,7 +33,7 @@ public class FenceTypeMenu extends BlockListMenu {
                     return;
 
                 FieldSettings fieldSettings = (FieldSettings) settings;
-                fieldSettings.setValue(FieldFlag.FENCE, Item.createStringFromItemList(selectedMaterials));
+                fieldSettings.setValue(FieldFlag.FENCE, Item.createStringFromItemStringList(selectedMaterials));
 
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);

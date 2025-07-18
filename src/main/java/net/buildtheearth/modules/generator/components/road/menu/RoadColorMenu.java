@@ -32,7 +32,7 @@ public class RoadColorMenu extends BlockListMenu {
                     return;
 
                 RoadSettings roadSettings = (RoadSettings) settings;
-                roadSettings.setValue(RoadFlag.ROAD_MATERIAL, Item.createStringFromItemList(selectedMaterials));
+                roadSettings.setValue(RoadFlag.ROAD_MATERIAL, Item.createStringFromItemStringList(selectedMaterials));
 
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);

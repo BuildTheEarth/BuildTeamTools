@@ -32,7 +32,7 @@ public class WallColorMenu extends BlockListMenu {
                     return;
 
                 HouseSettings houseSettings = (HouseSettings) settings;
-                houseSettings.setValue(HouseFlag.WALL_COLOR, Item.createStringFromItemList(selectedMaterials));
+                houseSettings.setValue(HouseFlag.WALL_COLOR, Item.createStringFromItemStringList(selectedMaterials));
 
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);

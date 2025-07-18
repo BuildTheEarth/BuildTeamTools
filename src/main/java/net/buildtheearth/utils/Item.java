@@ -5,7 +5,6 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import net.buildtheearth.modules.common.CommonModule;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -20,23 +19,101 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * This class provides static utility methods and a fluent builder API for creating and modifying {@link ItemStack} objects in Bukkit.<br>
+ * It supports the customization of items with names, lore, enchantments, attributes, and skull textures.
+ * <br><br>
+ * The following dependencies are required:
+ * <ol>
+ *     <li><b>Bukkit API</b></li>
+ *     <li><b>HeadDatabaseAPI</b></li> (removed for BuildTeamTools)
+ *     <li><b>XMaterial</b> from <a href="https://github.com/CryptoMorin/XSeries">XSeries</a></li>
+ * </ol>
+ *
+ * <br>
+ * The functions are categorized into the following sections:
+ *
+ * <br><br><b>Builder Pattern Methods</b>:
+ * <br>These methods allow chaining item properties using a fluent API:
+ * <br>• {@link #setDisplayName(String)}
+ * <br>• {@link #setAmount(int)}
+ * <br>• {@link #setLore(List)}
+ * <br>• {@link #addEnchantment(Enchantment, int)}
+ * <br>• {@link #hideAttributes(boolean)}
+ * <br>• {@link #hideEnchantments(boolean)}
+ * <br>• {@link #build()}
+ *
+ * <br><br><b>Item Creation Methods</b>:
+ * <br>Static methods to quickly create customized {@link ItemStack} instances:
+ * <br>• {@link #create(Material)}
+ * <br>• {@link #create(Material, int)}
+ * <br>• {@link #create(Material, String)}
+ * <br>• {@link #create(Material, String, int)}
+ * <br>• {@link #create(Material, String, List)}
+ * <br>• {@link #create(Material, String, short, List)}
+ * <br>• {@link #create(Material, String, int, List)}
+ * <br>• {@link #create(Material, String, List, Enchantment, Integer)}
+ * <br>• {@link #create(Material, String, List, Enchantment, Integer, Enchantment, Integer)}
+ * <br>• {@link #create(Material, String, List, Enchantment, Integer, Enchantment, Integer, Enchantment, Integer)}
+ *
+ * <br><br><b>Leather Armor Creation Methods</b>:
+ * <br>Special methods for creating and coloring leather armor:
+ * <br>• {@link #createLeatherArmor(Material, Color)}
+ * <br>• {@link #createLeatherArmor(Material, String, Color, List)}
+ * <br>• {@link #createLeatherArmor(Material, String, Color, List, Enchantment, Integer)}
+ * <br>• {@link #createLeatherArmor(Material, String, Color, List, Enchantment, Integer, Enchantment, Integer)}
+ * <br>• {@link #createLeatherArmor(Material, String, Color, List, Enchantment, Integer, Enchantment, Integer, Enchantment, Integer)}
+ *
+ * <br><br><b>Item Editing Methods</b>:
+ * <br>Modify existing {@link ItemStack} objects:
+ * <br>• {@link #edit(ItemStack, Material)}
+ * <br>• {@link #edit(ItemStack, int)}
+ * <br>• {@link #edit(ItemStack, String)}
+ * <br>• {@link #edit(ItemStack, int, String)}
+ * <br>• {@link #edit(ItemStack, List)}
+ * <br>• {@link #edit(ItemStack, int, String, List)}
+ *
+ * <br><br><b>Material Conversion Utilities</b>:
+ * <br>Utility methods to convert between {@link Material}, {@link XMaterial}, and {@link ItemStack} representations:
+ * <br>• {@link #fromUniqueMaterialString(String)} – Converts a namespaced string to an {@link ItemStack}.
+ * <br>• {@link #getUniqueMaterialString(ItemStack)} – Gets the namespaced key of an {@link ItemStack}'s material.
+ * <br>• {@link #getUniqueMaterialString(XMaterial)} – Gets the namespaced key of an {@link XMaterial}.
+ * <br>• {@link #getUniqueMaterialString(XMaterial[])} – Gets a comma-separated list of namespaced keys from multiple {@link XMaterial}s.
+ * <br>• {@link #convertStringToXMaterial(String)} – Converts a string to an {@link XMaterial}, fallback to Bukkit {@link Material} if needed.
+ * <br>• {@link #convertXMaterialToWEBlockType(XMaterial)} – Converts an {@link XMaterial} to a WorldEdit {@link BlockType}.
+ * <br>• {@link #createStringFromItemStringList(ArrayList)} – Converts a list of material strings to a comma-separated namespaced material string.
+ * <br>• {@link #createStringFromItemStringList(String...)} – Converts an array of material strings to a comma-separated namespaced material string.
+ *
+ * <br><br><b>Skull Creation Methods</b>:
+ * <br>Utility methods to create player and custom skulls:
+ * <br>• {@link #createPlayerHead(String, String)}
+ * <br>• {@link #createPlayerHead(String, String, List)}
+ * <br>• {@link #createPlayerHead(String, String, int, List)}
+ *
+ * @version 1.3.4
+ * @author MineFact
+ */
+@SuppressWarnings({"deprecation", "unused"})
 public class Item {
-	public static HashMap<String, ItemStack> nonPlayerSkulls = new HashMap<>();
+	public static Map<String, ItemStack> nonPlayerSkulls = new ConcurrentHashMap<>();
 
 	private ItemStack item;
+
 	private Material material;
+
 	private String displayName;
-	private int amount = -1;
-	private ArrayList<String> lore;
+
+	private int amount = 1;
+
+	private List<String> lore;
+
 	private boolean hideAttributes;
+
 	private boolean hideEnchantments;
-	private final List<String> canDestroyItems = new ArrayList<>();
-	private final List<String> canPlaceItems = new ArrayList<>();
 
-	private final HashMap<Enchantment, Integer> enchantments = new HashMap<>();
-
-	public Item() {}
+	private final Map<Enchantment, Integer> enchantments = new HashMap<>();
 
 	public Item(Material material) {
 		this.material = material;
@@ -44,11 +121,6 @@ public class Item {
 
 	public Item(ItemStack item) {
 		this.item = item;
-	}
-
-	public Item setType(Material material) {
-		this.material = material;
-		return this;
 	}
 
 	public Item setDisplayName(String name) {
@@ -61,7 +133,7 @@ public class Item {
 		return this;
 	}
 
-	public Item setLore(ArrayList<String> lore) {
+	public Item setLore(List<String> lore) {
 		this.lore = lore;
 		return this;
 	}
@@ -81,66 +153,68 @@ public class Item {
 		return this;
 	}
 
-	public Item addCanDestroyItem(String itemName){
-		this.canDestroyItems.add(itemName);
-		return this;
-	}
-
-	public Item addCanPlaceItem(String itemName){
-		this.canPlaceItems.add(itemName);
-		return this;
-	}
-
 	public ItemStack build() {
-		ItemStack item = XMaterial.BARRIER.parseItem();
-
-		if(this.material != null)
-			item.setType(material);
-
+		ItemStack item;
 		if(this.item != null)
 			item = this.item.clone();
-
-		if(this.amount != -1)
-			item.setAmount(this.amount);
 		else
-			item.setAmount(1);
+			item = new ItemStack(this.material);
 
-		if(item.getEnchantments().keySet().size() == 0)
-			for (Enchantment en : this.enchantments.keySet())
-				item.addUnsafeEnchantment(en, this.enchantments.get(en));
+		item.setAmount(this.amount);
 
-
+		for (Enchantment en : this.enchantments.keySet())
+			item.addUnsafeEnchantment(en, this.enchantments.get(en));
 
 		ItemMeta itemmeta = item.getItemMeta();
-
-		if(this.displayName != null)
-			itemmeta.setDisplayName(this.displayName);
-
-		if(this.lore != null)
-			itemmeta.setLore(this.lore);
-
-		if (this.hideAttributes)
-			itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		if (this.hideEnchantments)
-			itemmeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-
-		if(!canDestroyItems.isEmpty()){
-			// TODO Marked for removal in 1.20.6, not fixed yet.
-			//Set<Namespaced> nameSpacedKeySet = new HashSet<>();
-			//for(String itemName : canDestroyItems)
-			//	nameSpacedKeySet.add(NamespacedKey.minecraft(itemName));
-			//itemmeta.setDestroyableKeys(nameSpacedKeySet);
-		}
-
-		if(!canPlaceItems.isEmpty()){
-			// TODO Marked for removal in 1.20.6, not fixed yet.
-			//Set<Namespaced> nameSpacedKeySet = new HashSet<>();
-			//for(String itemName : canPlaceItems)
-			//	nameSpacedKeySet.add(NamespacedKey.minecraft(itemName));
-			//itemmeta.setPlaceableKeys(nameSpacedKeySet);
-		}
-
+		itemmeta.setDisplayName(this.displayName);
+		itemmeta.setLore(this.lore);
+		if (this.hideAttributes) itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		if (this.hideEnchantments)	itemmeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 		item.setItemMeta(itemmeta);
+		return item;
+	}
+
+
+
+	// ==============================
+	// SECTION: Item Creation Methods
+	// ==============================
+
+
+
+	private static ItemStack createItem(Material material, String name, int amount, List<String> lore,
+										Map<Enchantment, Integer> enchantments) {
+		ItemStack item = new ItemStack(material, amount);
+		if (enchantments != null)
+			for (Map.Entry<Enchantment, Integer> e : enchantments.entrySet())
+				item.addUnsafeEnchantment(e.getKey(), e.getValue());
+
+		ItemMeta meta = item.getItemMeta();
+		if (name != null)
+			meta.setDisplayName(name);
+		if (lore != null)
+			meta.setLore(lore);
+		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		item.setItemMeta(meta);
+		return item;
+	}
+
+	private static ItemStack createLeatherArmorItem(Material material, String name, Color color,
+													List<String> lore, Map<Enchantment, Integer> enchantments) {
+		ItemStack item = new ItemStack(material);
+		if (enchantments != null)
+			for (Map.Entry<Enchantment, Integer> e : enchantments.entrySet())
+				item.addUnsafeEnchantment(e.getKey(), e.getValue());
+
+
+		LeatherArmorMeta meta = (LeatherArmorMeta) item.getItemMeta();
+		if (name != null)
+			meta.setDisplayName(name);
+		if (lore != null)
+			meta.setLore(lore);
+		meta.setColor(color);
+		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		item.setItemMeta(meta);
 		return item;
 	}
 
@@ -153,191 +227,128 @@ public class Item {
 	}
 
 	public static ItemStack create(Material material, String name) {
-		ItemStack item = new ItemStack(material, 1);
-		ItemMeta itemmeta = item.getItemMeta();
-		itemmeta.setDisplayName(name);
-		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		item.setItemMeta(itemmeta);
-		return item;
+		return createItem(material, name, 1, null, null);
 	}
 
 	public static ItemStack create(Material material, String name, int amount) {
-		ItemStack item = new ItemStack(material, amount);
-		ItemMeta itemmeta = item.getItemMeta();
-		itemmeta.setDisplayName(name);
-		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		item.setItemMeta(itemmeta);
+		return createItem(material, name, amount, null, null);
+	}
+
+	public static ItemStack create(Material material, String name, List<String> lore) {
+		return createItem(material, name, 1, lore, null);
+	}
+
+	public static ItemStack create(Material material, String name, short durability, List<String> lore) {
+		ItemStack item = createItem(material, name, 1, lore, null);
+		item.setDurability(durability);
 		return item;
 	}
 
-	public static ItemStack create(Material material, String name, ArrayList<String> lore) {
-		ItemStack item = new ItemStack(material, 1, (short)0);
-		ItemMeta itemmeta = item.getItemMeta();
-		itemmeta.setDisplayName(name);
-		itemmeta.setLore(lore);
-		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		item.setItemMeta(itemmeta);
-		return item;
+	public static ItemStack create(Material material, String name, int amount, List<String> lore) {
+		return createItem(material, name, amount, lore, null);
 	}
 
-	public static ItemStack create(Material material, String name, short durability, ArrayList<String> lore) {
-		ItemStack item = new ItemStack(material, 1, durability);
-		ItemMeta itemmeta = item.getItemMeta();
-		itemmeta.setDisplayName(name);
-		itemmeta.setLore(lore);
-		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		item.setItemMeta(itemmeta);
-		return item;
+	public static ItemStack createLeatherArmor(Material material, String name, Color color, List<String> lore) {
+		return createLeatherArmorItem(material, name, color, lore, null);
 	}
 
-	public static ItemStack create(Material material, String name, int amount, ArrayList<String> lore) {
-		ItemStack item = new ItemStack(material, amount);
-		ItemMeta itemmeta = item.getItemMeta();
-		itemmeta.setDisplayName(name);
-		itemmeta.setLore(lore);
-		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		item.setItemMeta(itemmeta);
-		return item;
+	public static ItemStack create(Material material, String name, List<String> lore, Enchantment enchantment1, Integer level1) {
+		Map<Enchantment, Integer> enchantments = new HashMap<>();
+		enchantments.put(enchantment1, level1);
+		return createItem(material, name, 1, lore, enchantments);
 	}
 
-	public static ItemStack createLeatherArmor(Material material, String name, Color color, ArrayList<String> lore) {
-		ItemStack item = new ItemStack(material);
-		LeatherArmorMeta itemmeta = (LeatherArmorMeta)item.getItemMeta();
-		itemmeta.setDisplayName(name);
-		itemmeta.setLore(lore);
-		itemmeta.setColor(color);
-		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		item.setItemMeta(itemmeta);
-		return item;
+	public static ItemStack create(Material material, String name, List<String> lore, Enchantment enchantment, Integer level1, Enchantment enchantment2, Integer level2) {
+		Map<Enchantment, Integer> enchantments = new HashMap<>();
+		enchantments.put(enchantment, level1);
+		enchantments.put(enchantment2, level2);
+		return createItem(material, name, 1, lore, enchantments);
 	}
 
-	public static ItemStack create(Material material, String name, ArrayList<String> lore, Enchantment enchnt1, Integer level1) {
-		ItemStack item = new ItemStack(material);
-		item.addUnsafeEnchantment(enchnt1, level1);
-		ItemMeta itemmeta = item.getItemMeta();
-		itemmeta.setDisplayName(name);
-		itemmeta.setLore(lore);
-		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		item.setItemMeta(itemmeta);
-		return item;
-	}
-
-	public static ItemStack create(Material material, String name, ArrayList<String> lore, Enchantment enchnt1, Integer level1, Enchantment enchnt2, Integer level2) {
-		ItemStack item = new ItemStack(material);
-		item.addUnsafeEnchantment(enchnt1, level1);
-		item.addUnsafeEnchantment(enchnt2, level2);
-		ItemMeta itemmeta = item.getItemMeta();
-		itemmeta.setDisplayName(name);
-		itemmeta.setLore(lore);
-		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		item.setItemMeta(itemmeta);
-		return item;
-	}
-
-	public static ItemStack create(Material material, String name, ArrayList<String> lore, Enchantment enchnt1, Integer level1, Enchantment enchnt2, Integer level2, Enchantment enchnt3, Integer level3) {
-		ItemStack item = new ItemStack(material);
-		item.addUnsafeEnchantment(enchnt1, level1);
-		item.addUnsafeEnchantment(enchnt2, level2);
-		item.addUnsafeEnchantment(enchnt3, level3);
-		ItemMeta itemmeta = item.getItemMeta();
-		itemmeta.setDisplayName(name);
-		itemmeta.setLore(lore);
-		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		item.setItemMeta(itemmeta);
-		return item;
+	public static ItemStack create(Material material, String name, List<String> lore, Enchantment enchantment, Integer level1, Enchantment enchantment2, Integer level2, Enchantment enchantment3, Integer level3) {
+		Map<Enchantment, Integer> enchantments = new HashMap<>();
+		enchantments.put(enchantment, level1);
+		enchantments.put(enchantment2, level2);
+		enchantments.put(enchantment3, level3);
+		return createItem(material, name, 1, lore, enchantments);
 	}
 
 	public static ItemStack createLeatherArmor(Material material, Color color) {
+		LeatherArmorMeta itemMeta = (LeatherArmorMeta) new ItemStack(material).getItemMeta();
+		itemMeta.setColor(color);
+		itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		ItemStack item = new ItemStack(material);
-		LeatherArmorMeta itemmeta = (LeatherArmorMeta)item.getItemMeta();
-		itemmeta.setColor(color);
-		item.setItemMeta(itemmeta);
-		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		item.setItemMeta(itemMeta);
 		return item;
 	}
 
-	public static ItemStack createLeatherArmor(Material material, String name, Color color, ArrayList<String> lore, Enchantment enchnt1, Integer level1) {
-		ItemStack item = new ItemStack(material);
-		item.addUnsafeEnchantment(enchnt1, level1);
-		LeatherArmorMeta itemmeta = (LeatherArmorMeta)item.getItemMeta();
-		itemmeta.setDisplayName(name);
-		itemmeta.setLore(lore);
-		itemmeta.setColor(color);
-		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		item.setItemMeta(itemmeta);
-		return item;
+	public static ItemStack createLeatherArmor(Material material, String name, Color color, List<String> lore, Enchantment enchantment, Integer level1) {
+		Map<Enchantment, Integer> enchantments = new HashMap<>();
+		enchantments.put(enchantment, level1);
+		return createLeatherArmorItem(material, name, color, lore, enchantments);
 	}
 
-	public static ItemStack createLeatherArmor(Material material, String name, Color color, ArrayList<String> lore, Enchantment enchnt1, Integer level1, Enchantment enchnt2, Integer level2) {
-		ItemStack item = new ItemStack(material);
-		item.addUnsafeEnchantment(enchnt1, level1);
-		item.addUnsafeEnchantment(enchnt2, level2);
-		LeatherArmorMeta itemmeta = (LeatherArmorMeta)item.getItemMeta();
-		itemmeta.setDisplayName(name);
-		itemmeta.setLore(lore);
-		itemmeta.setColor(color);
-		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		item.setItemMeta(itemmeta);
-		return item;
+	public static ItemStack createLeatherArmor(Material material, String name, Color color, List<String> lore, Enchantment enchantment, Integer level1, Enchantment enchantment2, Integer level2) {
+		Map<Enchantment, Integer> enchantments = new HashMap<>();
+		enchantments.put(enchantment, level1);
+		enchantments.put(enchantment2, level2);
+		return createLeatherArmorItem(material, name, color, lore, enchantments);
 	}
 
-	public static ItemStack createLeatherArmor(Material material, String name, Color color, ArrayList<String> lore, Enchantment enchnt1, Integer level1, Enchantment enchnt2, Integer level2, Enchantment enchnt3, Integer level3) {
-		ItemStack item = new ItemStack(material);
-		item.addUnsafeEnchantment(enchnt1, level1);
-		item.addUnsafeEnchantment(enchnt2, level2);
-		item.addUnsafeEnchantment(enchnt3, level3);
-		LeatherArmorMeta itemmeta = (LeatherArmorMeta)item.getItemMeta();
-		itemmeta.setDisplayName(name);
-		itemmeta.setLore(lore);
-		itemmeta.setColor(color);
-		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		item.setItemMeta(itemmeta);
-		return item;
+	public static ItemStack createLeatherArmor(Material material, String name, Color color, List<String> lore, Enchantment enchantment, Integer level1, Enchantment enchantment2, Integer level2, Enchantment enchantment3, Integer level3) {
+		Map<Enchantment, Integer> enchantments = new HashMap<>();
+		enchantments.put(enchantment, level1);
+		enchantments.put(enchantment2, level2);
+		enchantments.put(enchantment3, level3);
+		return createLeatherArmorItem(material, name, color, lore, enchantments);
 	}
+
+
+	// ==============================
+	// SECTION: Skull Creation Methods
+	// ==============================
+
+
 
 	public static ItemStack createPlayerHead(String name, String owner) {
-		ItemStack item = XMaterial.PLAYER_HEAD.parseItem();
-
-		if(item == null)
-			return null;
-
-		SkullMeta itemmeta = (SkullMeta)item.getItemMeta();
-		itemmeta.setDisplayName(name);
-		itemmeta.setOwner(owner);
-		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		item.setItemMeta(itemmeta);
+		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
+		SkullMeta itemMeta = (SkullMeta)item.getItemMeta();
+		itemMeta.setDisplayName(name);
+		itemMeta.setOwningPlayer(Bukkit.getOfflinePlayer(owner));
+		itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		item.setItemMeta(itemMeta);
 		return item;
 	}
 
-	public static ItemStack createPlayerHead(String name, String owner, ArrayList<String> lore) {
-		ItemStack item = XMaterial.PLAYER_HEAD.parseItem();
-
-		if(item == null)
-			return null;
-
-		SkullMeta itemmeta = (SkullMeta)item.getItemMeta();
-		itemmeta.setDisplayName(name);
-		itemmeta.setOwner(owner);
-		itemmeta.setLore(lore);
-		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		item.setItemMeta(itemmeta);
+	public static ItemStack createPlayerHead(String name, String owner, List<String> lore) {
+		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
+		SkullMeta itemMeta = (SkullMeta)item.getItemMeta();
+		itemMeta.setDisplayName(name);
+		itemMeta.setOwningPlayer(Bukkit.getOfflinePlayer(owner));
+		itemMeta.setLore(lore);
+		itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		item.setItemMeta(itemMeta);
 		return item;
 	}
 
-	public static ItemStack createPlayerHead(String name, String owner, int amount, ArrayList<String> lore) {
-		ItemStack item = XMaterial.PLAYER_HEAD.parseItem();
-
-		if(item == null)
-			return null;
-
-		SkullMeta itemmeta = (SkullMeta)item.getItemMeta();
-		itemmeta.setDisplayName(name);
-		itemmeta.setOwner(owner);
-		itemmeta.setLore(lore);
-		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		item.setItemMeta(itemmeta);
+	public static ItemStack createPlayerHead(String name, String owner, int amount, List<String> lore) {
+		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
+		SkullMeta itemMeta = (SkullMeta)item.getItemMeta();
+		itemMeta.setDisplayName(name);
+		itemMeta.setOwningPlayer(Bukkit.getOfflinePlayer(owner));
+		itemMeta.setLore(lore);
+		itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		item.setItemMeta(itemMeta);
 		return item;
 	}
+
+
+	// ==============================
+	// SECTION: Item Editing Methods
+	// ==============================
+
+
+
 
 	public static ItemStack edit(ItemStack item, Material material) {
 		item.setType(material);
@@ -366,7 +377,7 @@ public class Item {
 		return item;
 	}
 
-	public static ItemStack edit(ItemStack item, ArrayList<String> lore) {
+	public static ItemStack edit(ItemStack item, List<String> lore) {
 		ItemMeta itemmeta = item.getItemMeta();
 		itemmeta.setLore(lore);
 		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
@@ -374,7 +385,7 @@ public class Item {
 		return item;
 	}
 
-	public static ItemStack edit(ItemStack item, int amount, String name, ArrayList<String> lore) {
+	public static ItemStack edit(ItemStack item, int amount, String name, List<String> lore) {
 		item.setAmount(amount);
 		ItemMeta itemmeta = item.getItemMeta();
 		itemmeta.setDisplayName(name);
@@ -383,6 +394,13 @@ public class Item {
 		item.setItemMeta(itemmeta);
 		return item;
 	}
+
+
+	// ======================================
+	// SECTION: Material Conversion Utilities
+	// ======================================
+
+
 
 	public static ItemStack fromUniqueMaterialString(String materialString) {
 		Material material = Material.matchMaterial(materialString);
@@ -397,15 +415,18 @@ public class Item {
 	}
 
 	public static String getUniqueMaterialString(ItemStack item) {
-		if(CommonModule.getInstance().getVersionComponent().is_1_12())
-			return XMaterial.matchXMaterial(item).getId() + ":" + XMaterial.matchXMaterial(item).getData();
-		else
-			return item.getType().getKey().asString();
-
+		return item.getType().getKey().asString();
 	}
 
 	public static String getUniqueMaterialString(XMaterial material) {
-		return getUniqueMaterialString(material.parseItem());
+		if(material == null)
+			return null;
+
+		ItemStack item = material.parseItem();
+		if(item == null)
+			return null;
+
+		return getUniqueMaterialString(item);
 	}
 
 	public static String getUniqueMaterialString(XMaterial[] materials) {
@@ -437,7 +458,7 @@ public class Item {
 		return material;
 	}
 
-	public static BlockType convertXMaterialToBlockType(XMaterial material) {
+	public static BlockType convertXMaterialToWEBlockType(XMaterial material) {
 		String mat = getUniqueMaterialString(material);
 		BlockType bt;
 
@@ -448,27 +469,89 @@ public class Item {
 
 		return bt;
 	}
-	public static String createStringFromItemList(ArrayList<String> items) throws IllegalArgumentException {
-		StringBuilder s = new StringBuilder(items.get(0));
 
-		for (int i = 1; i < items.size(); i++)
+	public static String createStringFromItemStringList(ArrayList<String> items) throws IllegalArgumentException {
+		StringBuilder s = new StringBuilder();
+
+		for (int i = 0; i < items.size(); i++)
 			if(XMaterial.matchXMaterial(items.get(i)).isPresent()) {
 				XMaterial xMaterial = XMaterial.matchXMaterial(items.get(i)).get();
+				ItemStack item = xMaterial.parseItem();
 
-				s.append(",").append(getUniqueMaterialString(xMaterial.parseItem()));
+				if(item == null)
+					continue;
+
+				if(i > 0) s.append(",");
+				s.append(getUniqueMaterialString(item));
 			}
-
 		return s.toString();
 	}
 
-	public static ItemStack createCustomHeadTextureURL(String url, String name, ArrayList<String> lore) {
+	public static String createStringFromItemStringList(String... items) throws IllegalArgumentException {
+		return createStringFromItemStringList(new ArrayList<>(Arrays.asList(items)));
+	}
+
+
+
+	/*
+	public static ItemStack createNonPlayerSkull(String url, String name, List<String> lore) {
+		StringBuilder loreString = new StringBuilder();
+		if(lore != null)
+			for (String s : lore)
+				loreString.append(s);
+		try {
+			if (nonPlayerSkulls.containsKey(url + name + loreString))
+				return nonPlayerSkulls.get(url + name + loreString);
+			byte[] encodedByteData = Base64.getEncoder().encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", url).getBytes());
+			String encodedData = new String(encodedByteData);
+			HeadDatabaseAPI api = new HeadDatabaseAPI();
+			if (api.getItemHead(url) == null)
+				api.addHead(CategoryEnum.CUSTOM, url, encodedData);
+			ItemStack item = api.getItemHead(url);
+			SkullMeta im = (SkullMeta)item.getItemMeta();
+			im.setDisplayName(name);
+			im.setLore(lore);
+			item.setItemMeta(im);
+			nonPlayerSkulls.remove(url + name + loreString);
+			nonPlayerSkulls.put(url + name + loreString, item);
+			return item;
+		} catch (NoClassDefFoundError ex) {
+			return create(Material.PLAYER_HEAD, name, lore);
+		}
+	}
+
+	public static ItemStack createCustomHead(String id, String name, List<String> lore) {
+		StringBuilder loreString = new StringBuilder();
+		if(lore != null)
+			for (String s : lore)
+				loreString.append(s);
+		try {
+			if (nonPlayerSkulls.containsKey(id + name + loreString))
+				return nonPlayerSkulls.get(id + name + loreString);
+			HeadDatabaseAPI api = new HeadDatabaseAPI();
+			if (api.getItemHead(id) == null)
+				return null;
+			ItemStack item = api.getItemHead(id);
+			SkullMeta im = (SkullMeta)item.getItemMeta();
+			im.setDisplayName(name);
+			im.setLore(lore);
+			item.setItemMeta(im);
+			nonPlayerSkulls.remove(id + name + loreString);
+			nonPlayerSkulls.put(id + name + loreString, item);
+			return item;
+		} catch (NoClassDefFoundError ex) {
+			return create(Material.PLAYER_HEAD, name, lore);
+		}
+	}*/
+
+	public static ItemStack createCustomHeadTextureURL(String url, String name, List<String> lore) {
 		byte[] encodedByteData = Base64.getEncoder().encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", url).getBytes());
 		String encodedData = new String(encodedByteData);
 
 		return createCustomHeadBase64(encodedData, name, lore);
 	}
 
-	public static ItemStack createCustomHeadBase64(String base64, String name, ArrayList<String> lore) {
+	public static ItemStack createCustomHeadBase64(String base64, String name, List<String> lore) {
 		if (nonPlayerSkulls.containsKey(base64 + name + lore))
 			return nonPlayerSkulls.get(base64 + name + lore);
 
@@ -517,8 +600,6 @@ public class Item {
 			System.err.println("Failed to set custom skull texture: unsupported server version or method change.");
 		}
 	}
-
-
 
 	private static GameProfile makeProfile(String b64) {
 		UUID id = new UUID(

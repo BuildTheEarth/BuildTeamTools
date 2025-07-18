@@ -14,6 +14,7 @@ import com.sk89q.worldedit.extension.factory.MaskFactory;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
@@ -21,6 +22,8 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
+import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.ClipboardPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -37,19 +40,15 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import net.buildtheearth.BuildTeamTools;
-import net.buildtheearth.modules.common.CommonModule;
-import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.utils.ChatHelper;
-import net.buildtheearth.utils.MenuItems;
 import org.apache.commons.lang3.StringUtils;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.Vector;
 
 import java.io.File;
@@ -99,10 +98,12 @@ import java.util.concurrent.CompletableFuture;
  * <br>• {@link #createCuboidSelection(Player, Vector, Vector)}
  * <br>• {@link #createPolySelection(Player, List, Block[][][])}
  * <br>• {@link #createPolySelection(Player, List, int, int)}
+ * <br>• {@link #changeRegionWorld(Region, com.sk89q.worldedit.world.World)} 
  *
  * <br><br><b>WorldEdit Operation Functions</b>:
  * <br>• {@link #prepareScriptSession(LocalSession, Actor, Player, com.sk89q.worldedit.world.World, int, boolean, boolean, boolean)}
  * <br>• {@link #analyzeRegion(Player, World)}
+ * <br>• {@link #copyRegion(LocalSession, Actor, Region, World, World)}
  * <br>• {@link #replaceBlocksWithMasks(LocalSession, Actor, com.sk89q.worldedit.world.World, List, BlockState, BlockState[], int)}
  * <br>• {@link #replaceBlocksWithSchematic(LocalSession, Actor, com.sk89q.worldedit.world.World, BlockState[], String)}
  * <br>• {@link #replaceBlocks(LocalSession, Actor, com.sk89q.worldedit.world.World, BlockState[], BlockState[])}
@@ -141,9 +142,10 @@ import java.util.concurrent.CompletableFuture;
  * <br>• {@link #checkForBrickOutline(Block[][][], Player)}
  * <br>• {@link #checkForWoolBlock(Block[][][], Player)}
  *
- * @version 1.5
+ * @version 1.7.3
  * @author MineFact
  */
+@SuppressWarnings("unused")
 public class GeneratorUtils {
 
 
@@ -160,31 +162,55 @@ public class GeneratorUtils {
 
     /** Checks if the plugin "FastAsyncWorldEdit" is enabled. */
     private static boolean isFastAsyncWorldEditEnabled(){
-        return CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled();
+        return getPlugin().getServer().getPluginManager().isPluginEnabled("FastAsyncWorldEdit");
     }
 
-    /** Checks if only the plugin "WorldEdit" is enabled and not "FastAsyncWorldEdit". */
-    private static boolean isLegacyWorldEditEnabled(){
-        return CommonModule.getInstance().getDependencyComponent().isLegacyWorldEdit();
+    private static boolean isLegacyWorldEditEnabled() {
+        if (isFastAsyncWorldEditEnabled())
+            return false;
+
+        PluginManager pluginManager = getPlugin().getServer().getPluginManager();
+        if (!pluginManager.isPluginEnabled("WorldEdit"))
+            return false;
+
+        Plugin plugin = pluginManager.getPlugin("WorldEdit");
+        if (plugin == null)
+            return false;
+
+        @SuppressWarnings("deprecation")
+        PluginDescriptionFile description = plugin.getDescription();
+        String version = description.getVersion();
+        int major;
+        try {
+            major = Integer.parseInt(version.split("\\.")[0]);
+        } catch (NumberFormatException e) {
+            // Fallback or assume not legacy if version can't be parsed
+            return false;
+        }
+
+        return major < 7;
     }
+
 
     /** Checks if the plugin "SchematicBrush" is enabled. */
     private static boolean isSchematicBrushEnabled(){
-        return CommonModule.getInstance().getDependencyComponent().isSchematicBrushEnabled();
-    }
+        return getPlugin().getServer().getPluginManager().isPluginEnabled("SchematicBrush");
+    }        // e.g., "1.21.4"
+
 
     /** Checks if the server version is 1.12. */
     private static boolean isServerVersion1_12(){
-        return CommonModule.getInstance().getVersionComponent().is_1_12();
+        String rawVersion = Bukkit.getBukkitVersion().split("-")[0];
+        return rawVersion.equals("1.12.2") || rawVersion.equals("1.12.1") || rawVersion.equals("1.12");
     }
 
     /** Get the ignored materials. */
     private static Material[] getIgnoredMaterials(){
-        return MenuItems.getIgnoredMaterials();
+        return new Material[]{};
     }
     
     private static void sendWikiLink(Player p){
-        sendWikiLink(p);
+        p.sendMessage("§cFor more information, see the Wiki.");
     }
 
 
@@ -242,12 +268,14 @@ public class GeneratorUtils {
             return null;
 
         BlockType blockType = BlockTypes.get(xMaterial.getId() + "");
+        ItemStack item = xMaterial.parseItem();
+        if(blockType == null && item != null)
+            blockType = BlockTypes.get(item.getType().getKey().asString());
 
-        if(blockType == null && xMaterial.parseMaterial() != null)
-            blockType = BlockTypes.get(xMaterial.parseMaterial().getKey().asString());
-
-        if(blockType == null)
-            throw new IllegalArgumentException("Invalid block type: " + xMaterial.parseMaterial().name());
+        if(blockType == null && item != null)
+            throw new IllegalArgumentException("Invalid block type: " + item.getType().name());
+        else if(blockType == null)
+            throw new IllegalArgumentException("Invalid block type: " + xMaterial.name());
 
         return blockType.getDefaultState();
     }
@@ -307,83 +335,82 @@ public class GeneratorUtils {
     public static List<Vector> getSelectionPointsFromRegion(Region region) {
         List<Vector> points = new ArrayList<>();
 
-        if (region instanceof Polygonal2DRegion) {
-            Polygonal2DRegion polyRegion = (Polygonal2DRegion) region;
-            ChatHelper.logDebug("Polygonal2DRegion found");
-            // In latest FAWE, the points are stored as BlockVector2
-            // In 1.12 WorldEdit, the points are stored as BlockVector2D
-            // Both classes have the same methods, so we can use reflection to get the methods
-            for (Object blockVectorObj : polyRegion.getPoints()) {
-                ChatHelper.logDebug("BlockVector2:" + blockVectorObj);
-                try {
-                    Class<?> blockVectorClass = blockVectorObj.getClass();
-                    Method getXMethod = blockVectorClass.getMethod("getBlockX");
-                    Method getZMethod = blockVectorClass.getMethod("getBlockZ");
+        switch (region) {
+            case Polygonal2DRegion polyRegion -> {
+                ChatHelper.logDebug("Polygonal2DRegion found");
+                // In latest FAWE, the points are stored as BlockVector2
+                // In 1.12 WorldEdit, the points are stored as BlockVector2D
+                // Both classes have the same methods, so we can use reflection to get the methods
+                for (Object blockVectorObj : polyRegion.getPoints()) {
+                    ChatHelper.logDebug("BlockVector2:" + blockVectorObj);
+                    try {
+                        Class<?> blockVectorClass = blockVectorObj.getClass();
+                        Method getXMethod = blockVectorClass.getMethod("getBlockX");
+                        Method getZMethod = blockVectorClass.getMethod("getBlockZ");
 
-                    int x = (Integer) getXMethod.invoke(blockVectorObj);
-                    int z = (Integer) getZMethod.invoke(blockVectorObj);
+                        int x = (Integer) getXMethod.invoke(blockVectorObj);
+                        int z = (Integer) getZMethod.invoke(blockVectorObj);
 
-                    points.add(new Vector(x, 0, z));
-                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
+                        points.add(new Vector(x, 0, z));
+                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                        ChatHelper.logDebug("Exception while processing region: " + e.getMessage());
+                    }
                 }
             }
+            case ConvexPolyhedralRegion convexRegion -> {
+                // In latest FAWE, the points are stored as BlockVector2
+                // In 1.12 WorldEdit, the points are stored as BlockVector2D
+                // Both classes have the same methods, so we can use reflection to get the methods
+                for (Object blockVectorObj : convexRegion.getVertices()) {
+                    try {
+                        Class<?> blockVectorClass = blockVectorObj.getClass();
+                        Method getXMethod = blockVectorClass.getMethod("getBlockX");
+                        Method getYMethod = blockVectorClass.getMethod("getBlockY");
+                        Method getZMethod = blockVectorClass.getMethod("getBlockZ");
 
-        } else if (region instanceof ConvexPolyhedralRegion) {
-            ConvexPolyhedralRegion convexRegion = (ConvexPolyhedralRegion) region;
+                        int x = (Integer) getXMethod.invoke(blockVectorObj);
+                        int y = (Integer) getYMethod.invoke(blockVectorObj);
+                        int z = (Integer) getZMethod.invoke(blockVectorObj);
 
-            // In latest FAWE, the points are stored as BlockVector2
-            // In 1.12 WorldEdit, the points are stored as BlockVector2D
-            // Both classes have the same methods, so we can use reflection to get the methods
-            for (Object blockVectorObj : convexRegion.getVertices()) {
-                try {
-                    Class<?> blockVectorClass = blockVectorObj.getClass();
-                    Method getXMethod = blockVectorClass.getMethod("getBlockX");
-                    Method getYMethod = blockVectorClass.getMethod("getBlockY");
-                    Method getZMethod = blockVectorClass.getMethod("getBlockZ");
-
-                    int x = (Integer) getXMethod.invoke(blockVectorObj);
-                    int y = (Integer) getYMethod.invoke(blockVectorObj);
-                    int z = (Integer) getZMethod.invoke(blockVectorObj);
-
-                    points.add(new Vector(x, y, z));
-                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
+                        points.add(new Vector(x, y, z));
+                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                        ChatHelper.logDebug("Exception while processing region: " + e.getMessage());
+                    }
                 }
             }
+            case CuboidRegion cuboidRegion -> {
+                try {
+                    Class<?> regionClass = cuboidRegion.getClass();
+                    Method getPos1Method = regionClass.getMethod("getPos1");
+                    Method getPos2Method = regionClass.getMethod("getPos2");
 
-        }else if (region instanceof CuboidRegion) {
-            CuboidRegion cuboidRegion = (CuboidRegion) region;
+                    Class<?> vectorClass = getPos1Method.getReturnType();
 
-            try {
-                Class<?> regionClass = cuboidRegion.getClass();
-                Method getPos1Method = regionClass.getMethod("getPos1");
-                Method getPos2Method = regionClass.getMethod("getPos2");
+                    Method getXMethod = vectorClass.getMethod("getBlockX");
+                    Method getYMethod = vectorClass.getMethod("getBlockY");
+                    Method getZMethod = vectorClass.getMethod("getBlockZ");
 
-                Class<?> vectorClass = getPos1Method.getReturnType();
+                    Object pos1 = getPos1Method.invoke(region);
+                    Object pos2 = getPos2Method.invoke(region);
 
-                Method getXMethod = vectorClass.getMethod("getBlockX");
-                Method getYMethod = vectorClass.getMethod("getBlockY");
-                Method getZMethod = vectorClass.getMethod("getBlockZ");
+                    int x1 = (Integer) getXMethod.invoke(pos1);
+                    int y1 = (Integer) getYMethod.invoke(pos1);
+                    int z1 = (Integer) getZMethod.invoke(pos1);
 
-                Object pos1 = getPos1Method.invoke(region);
-                Object pos2 = getPos2Method.invoke(region);
+                    int x2 = (Integer) getXMethod.invoke(pos2);
+                    int y2 = (Integer) getYMethod.invoke(pos2);
+                    int z2 = (Integer) getZMethod.invoke(pos2);
 
-                int x1 = (Integer) getXMethod.invoke(pos1);
-                int y1 = (Integer) getYMethod.invoke(pos1);
-                int z1 = (Integer) getZMethod.invoke(pos1);
-
-                int x2 = (Integer) getXMethod.invoke(pos2);
-                int y2 = (Integer) getYMethod.invoke(pos2);
-                int z2 = (Integer) getZMethod.invoke(pos2);
-
-                points.add(new Vector(x1, y1, z1));
-                points.add(new Vector(x2, y2, z2));
-            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
+                    points.add(new Vector(x1, y1, z1));
+                    points.add(new Vector(x2, y2, z2));
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                    ChatHelper.logDebug("Exception while processing region: " + e.getMessage());
+                }
             }
-        } else
-            return null;
+            case null, default -> {
+                return null;
+            }
+        }
 
         return points;
     }
@@ -423,7 +450,7 @@ public class GeneratorUtils {
             minMax[1] = new Vector(maxX, maxY, maxZ);
 
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+            ChatHelper.logDebug("Exception while processing MinMax Points: " + e.getMessage());
         }
 
         return minMax;
@@ -489,14 +516,11 @@ public class GeneratorUtils {
         int amountFound = 0;
         for (Block[][] block2D : blocks)
             for (Block[] block1D : block2D)
-                for (Block block : block1D)
-                    if (isServerVersion1_12()) {
-                        if (block != null && block.getType() == xMaterial.parseMaterial() && block.getData() == xMaterial.getData())
+                for (Block block : block1D) {
+                    ItemStack item = xMaterial.parseItem();
+                    if (block != null && item != null && block.getType() == item.getType())
                             amountFound++;
-                    }else {
-                        if (block != null && block.getType() == xMaterial.parseMaterial())
-                            amountFound++;
-                    }
+                }
 
         return amountFound >= requiredAmount;
     }
@@ -605,7 +629,40 @@ public class GeneratorUtils {
 
         ChatHelper.logDebug("Created polygonal selection with " + points.size() + " points. minY: " + minY + " maxY: " + maxY);
     }
-    
+
+    /**
+     * Rebuilds a region with a different world while keeping its coordinates.
+     * Currently, supports {@link Polygonal2DRegion} and {@link CuboidRegion}.
+     *
+     * @param region The region to rebuild
+     * @param world  The world that should be used for the new region
+     * @return A new region with the supplied world or {@code null} if the type is unsupported
+     */
+    public static Region changeRegionWorld(Region region, com.sk89q.worldedit.world.World world) {
+        if (region instanceof Polygonal2DRegion) {
+            List<Vector> points = getSelectionPointsFromRegion(region);
+            if (points == null)
+                return null;
+
+            List<BlockVector2> blockPoints = new ArrayList<>();
+            for (Vector v : points)
+                blockPoints.add(BlockVector2.at(v.getBlockX(), v.getBlockZ()));
+
+            Vector[] minMax = getMinMaxPoints(region);
+            int minY = minMax[0].getBlockY();
+            int maxY = minMax[1].getBlockY();
+
+            return new Polygonal2DRegion(world, blockPoints, minY, maxY);
+        } else if (region instanceof CuboidRegion) {
+            Vector[] minMax = getMinMaxPoints(region);
+            BlockVector3 min = BlockVector3.at(minMax[0].getBlockX(), minMax[0].getBlockY(), minMax[0].getBlockZ());
+            BlockVector3 max = BlockVector3.at(minMax[1].getBlockX(), minMax[1].getBlockY(), minMax[1].getBlockZ());
+            return new CuboidRegion(world, min, max);
+        }
+
+        return null;
+    }
+
     
     
     
@@ -702,7 +759,7 @@ public class GeneratorUtils {
             if(isLegacyWorldEditEnabled())
                 contains = regionClass.getMethod("contains", Class.forName("com.sk89q.worldedit.Vector"));
             else
-                contains = regionClass.getMethod("contains", com.sk89q.worldedit.math.BlockVector3.class);
+                contains = regionClass.getMethod("contains", BlockVector3.class);
 
             Object minPoint = getMinimumPoint.invoke(region);
             Object maxPoint = getMaximumPoint.invoke(region);
@@ -751,9 +808,69 @@ public class GeneratorUtils {
 
             return blocks;
         } catch (Exception e) {
-            e.printStackTrace();
+            ChatHelper.logDebug("Exception while analyzing region: " + e.getMessage());
             return null;
         }
+    }
+
+    /**
+     * Copies all blocks inside a region from one world to another to the same coordinates.
+     *
+     * @param region     The region to copy.
+     * @param fromWorld  The source world.
+     * @param toWorld    The destination world.
+     */
+    public static CompletableFuture<Void> copyRegion(LocalSession localSession, Actor actor,
+                                                     Region region, World fromWorld,
+                                                     World toWorld) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+        Bukkit.getScheduler().runTaskAsynchronously(getPlugin(), () -> {
+            com.sk89q.worldedit.world.World weFrom = BukkitAdapter.adapt(fromWorld);
+            com.sk89q.worldedit.world.World weTo = BukkitAdapter.adapt(toWorld);
+            Region copyRegion = region;
+
+            try (EditSession sourceEditSession = WorldEdit.getInstance().newEditSession(weFrom);
+                 EditSession targetEditSession = WorldEdit.getInstance().newEditSession(weTo)) {
+
+                if(copyRegion.getWorld() != null && !copyRegion.getWorld().getName().equals(fromWorld.getName()))
+                    copyRegion = changeRegionWorld(region, weFrom);
+
+                if(copyRegion == null) {
+                    ChatHelper.logError("Failed to copy region from " + fromWorld.getName() + " to " + toWorld.getName() + " because region is null.");
+                    return;
+                }
+
+                BlockArrayClipboard clipboard = new BlockArrayClipboard(copyRegion);
+                ForwardExtentCopy forwardCopy = new ForwardExtentCopy(sourceEditSession, copyRegion,
+                        clipboard, region.getMinimumPoint());
+                forwardCopy.setCopyingEntities(true);
+                forwardCopy.setCopyingBiomes(true);
+                Operations.complete(forwardCopy);
+
+                ChatHelper.log("Pasting at: " + region.getMinimumPoint() + " in world " + toWorld.getName());
+                ChatHelper.log("Clipboard size: " + clipboard.getRegion().getVolume());
+
+                Operation paste = new ClipboardHolder(clipboard)
+                        .createPaste(targetEditSession)
+                        .to(region.getMinimumPoint())
+                        .copyEntities(true)
+                        .copyBiomes(true)
+                        .ignoreAirBlocks(false)
+                        .build();
+                Operations.complete(paste);
+                targetEditSession.flushQueue();
+
+                saveEditSession(targetEditSession, localSession, actor);
+            } catch (WorldEditException e) {
+                ChatHelper.logError("Failed to copy region: " + e.getMessage());
+                future.completeExceptionally(e);
+                return;
+            }
+
+            future.complete(null);
+        });
+
+        return future;
     }
 
     /**
@@ -774,7 +891,7 @@ public class GeneratorUtils {
                 throw new IllegalArgumentException("BlockState[] to is empty");
 
         CompletableFuture<Void> future = new CompletableFuture<>();
-        Thread thread = new Thread(() -> {
+        Bukkit.getScheduler().runTaskAsynchronously(getPlugin(), () -> {
             for (int i = 0; i < iterations; i++) {
                 try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
 
@@ -823,7 +940,6 @@ public class GeneratorUtils {
             future.complete(null);
         });
 
-        thread.start();
         return future;
     }
 
@@ -840,7 +956,7 @@ public class GeneratorUtils {
      */
     public static CompletableFuture<Void> replaceBlocksWithSchematic(LocalSession localSession, Actor actor, com.sk89q.worldedit.world.World weWorld, BlockState[] from, String schematicPath) {
         CompletableFuture<Void> future = new CompletableFuture<>();
-        Thread thread = new Thread(() -> {
+        Bukkit.getScheduler().runTaskAsynchronously(getPlugin(), () -> {
             ChatHelper.logDebug("Replacing blocks from " + Arrays.toString(from) + " to " + schematicPath);
 
             try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
@@ -866,7 +982,7 @@ public class GeneratorUtils {
                     }else
                         editSession.setBlocks(region, pattern);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    ChatHelper.logDebug("Exception while replacing blocks with schematic: " + e.getMessage());
                     return;
                 }
 
@@ -877,7 +993,7 @@ public class GeneratorUtils {
 
             future.complete(null);
         });
-        thread.start();
+
         return future;
     }
 
@@ -897,7 +1013,7 @@ public class GeneratorUtils {
             throw new IllegalArgumentException("BlockState[] to is empty");
 
         CompletableFuture<Void> future = new CompletableFuture<>();
-        Thread thread = new Thread(() -> {
+        Bukkit.getScheduler().runTaskAsynchronously(getPlugin(), () -> {
             ChatHelper.logDebug("Replacing blocks from " + Arrays.toString(from) + " to " + Arrays.toString(to));
 
             try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
@@ -930,7 +1046,6 @@ public class GeneratorUtils {
 
             future.complete(null);
         });
-        thread.start();
         return future;
     }
 
@@ -959,14 +1074,14 @@ public class GeneratorUtils {
             throw new IllegalArgumentException("BlockState[] to is empty");
 
         // If no mask is provided, add an empty mask
-        if(masks.size() == 0) {
+        if(masks.isEmpty()) {
             masks = new ArrayList<>();
             masks.add("");
         }
 
         List<String> finalMasks = masks;
         CompletableFuture<Void> future = new CompletableFuture<>();
-        Thread thread = new Thread(() -> {
+        Bukkit.getScheduler().runTaskAsynchronously(getPlugin(), () -> {
 
             try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
 
@@ -1012,7 +1127,7 @@ public class GeneratorUtils {
                     editSession.drawSpline(pattern, blockVector3s, tension, bias, continuity, quality, radius, filled);
 
                     if (connectLineEnds && blockVector3s.size() > 1)
-                        editSession.drawLine(pattern, blockVector3s.get(0), blockVector3s.get(blockVector3s.size() - 1), radius, true);
+                        editSession.drawLine(pattern, blockVector3s.getFirst(), blockVector3s.getLast(), radius, true);
 
                     saveEditSession(editSession, localSession, actor);
                 }
@@ -1023,7 +1138,6 @@ public class GeneratorUtils {
             future.complete(null);
         });
 
-        thread.start();
         return future;
     }
 
@@ -1056,14 +1170,14 @@ public class GeneratorUtils {
             throw new IllegalArgumentException("BlockState[] to is empty");
 
         // If no mask is provided, add an empty mask
-        if(masks.size() == 0) {
+        if(masks.isEmpty()) {
             masks = new ArrayList<>();
             masks.add("");
         }
 
         CompletableFuture<Void> future = new CompletableFuture<>();
         List<String> finalMasks = masks;
-        Thread thread = new Thread(() -> {
+        Bukkit.getScheduler().runTaskAsynchronously(getPlugin(), () -> {
             try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
 
                 ParserContext parserContext = new ParserContext();
@@ -1120,7 +1234,6 @@ public class GeneratorUtils {
             future.complete(null);
         });
 
-        thread.start();
         return future;
     }
 
@@ -1140,7 +1253,7 @@ public class GeneratorUtils {
         int offsetY = 1;
 
         // If no mask is provided, add an empty mask
-        if (masks.size() == 0) {
+        if (masks.isEmpty()) {
             masks = new ArrayList<>();
             masks.add("");
         }
@@ -1155,7 +1268,7 @@ public class GeneratorUtils {
         CompletableFuture<Void> future = new CompletableFuture<>();
         int finalMaxHeight = maxHeight;
         final List<String> finalMasks = masks;
-        Thread thread = new Thread(() -> {
+        Bukkit.getScheduler().runTaskAsynchronously(getPlugin(), () -> {
             try (EditSession editSession = WorldEdit.getInstance().newEditSession(weWorld)) {
                 File schematicFile = new File(getWorldEditSchematicsFolderPath() + schematicPath);
 
@@ -1187,7 +1300,7 @@ public class GeneratorUtils {
                         if(!maskString.isEmpty())
                             mask = new MaskFactory(WorldEdit.getInstance()).parseFromInput(maskString, parserContext);
 
-                        com.sk89q.worldedit.function.operation.Operation op = holder
+                        Operation op = holder
                                 .createPaste(editSession)
                                 .to(BlockVector3.at(loc.getBlockX(), finalMaxHeight + offsetY, loc.getBlockZ()))
                                 .ignoreAirBlocks(true)
@@ -1207,7 +1320,6 @@ public class GeneratorUtils {
             future.complete(null);
         });
 
-        thread.start();
         return future;
     }
 
@@ -1395,7 +1507,7 @@ public class GeneratorUtils {
                 }
             }
 
-            result.add(points.get(points.size()-1));
+            result.add(points.getLast());
             points = result;
             result = new ArrayList<>();
         }
@@ -1450,7 +1562,7 @@ public class GeneratorUtils {
 
         // Get the last two points
         Vector p3 = vectors.get(vectors.size()-2);
-        Vector p4 = vectors.get(vectors.size()-1);
+        Vector p4 = vectors.getLast();
 
         // Get the vectors between the points
         Vector v1 = p1.clone().subtract(p2);
@@ -1480,7 +1592,7 @@ public class GeneratorUtils {
 
         // Get the last two points
         Vector p3 = vectors.get(vectors.size()-2);
-        Vector p4 = vectors.get(vectors.size()-1);
+        Vector p4 = vectors.getLast();
 
         // Get the vectors between the points
         Vector v1 = p2.clone().subtract(p1);
@@ -1491,8 +1603,8 @@ public class GeneratorUtils {
         v2 = v2.clone().normalize().multiply(distance);
 
         // Remove the first and last points
-        vectors.remove(0);
-        vectors.remove(vectors.size() - 1);
+        vectors.removeFirst();
+        vectors.removeLast();
 
         // Add the shortened vectors
         result.add(p1.clone().add(v1));
@@ -1579,7 +1691,7 @@ public class GeneratorUtils {
             for(Point64 point : new ArrayList<>(path))
                 vectorList.add(new Vector(point.x + reference.getX(), minHeight, point.y + reference.getZ()));
 
-            Vector vector = vectorList.get(vectorList.size() - 1).setY(maxHeight);
+            Vector vector = vectorList.getLast().setY(maxHeight);
             vectorList.set(vectorList.size() - 1, vector);
 
             vectors.add(vectorList);
@@ -1640,7 +1752,7 @@ public class GeneratorUtils {
      * @return The shifted polyline
      */
     public static List<List<Vector>> shiftPointsAll(List<Vector> vectors, double shift) {
-        Vector reference = vectors.get(0);
+        Vector reference = vectors.getFirst();
         int minHeight = getMinHeight(vectors);
         int maxHeight = getMaxHeight(vectors);
         Paths64 paths = new Paths64();

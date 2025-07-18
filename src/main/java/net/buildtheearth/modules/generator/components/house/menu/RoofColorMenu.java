@@ -1,20 +1,18 @@
 package net.buildtheearth.modules.generator.components.house.menu;
 
 import net.buildtheearth.modules.generator.GeneratorModule;
-import net.buildtheearth.modules.generator.model.Settings;
 import net.buildtheearth.modules.generator.components.house.HouseFlag;
 import net.buildtheearth.modules.generator.components.house.HouseSettings;
 import net.buildtheearth.modules.generator.components.house.RoofType;
+import net.buildtheearth.modules.generator.model.Settings;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.BlockListMenu;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class RoofColorMenu extends BlockListMenu {
@@ -38,7 +36,7 @@ public class RoofColorMenu extends BlockListMenu {
                     return;
 
                 HouseSettings houseSettings = (HouseSettings) settings;
-                houseSettings.setValue(HouseFlag.ROOF_COLOR, Item.createStringFromItemList(selectedMaterials));
+                houseSettings.setValue(HouseFlag.ROOF_COLOR, Item.createStringFromItemStringList(selectedMaterials));
 
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);

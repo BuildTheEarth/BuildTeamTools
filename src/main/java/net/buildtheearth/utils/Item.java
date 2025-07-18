@@ -5,7 +5,6 @@ import com.cryptomorin.xseries.profiles.builder.XSkull;
 import com.cryptomorin.xseries.profiles.objects.Profileable;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import net.buildtheearth.modules.common.CommonModule;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -34,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <ol>
  *     <li><b>Bukkit API</b></li>
  *     <li><b>HeadDatabaseAPI</b></li> (removed for BuildTeamTools)
+ *     <li><b>XMaterial</b> from <a href="https://github.com/CryptoMorin/XSeries">XSeries</a></li>
  * </ol>
  *
  * <br>
@@ -85,8 +85,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * <br>• {@link #edit(ItemStack, List)}
  * <br>• {@link #edit(ItemStack, int, String, List)}
  *
- * @author MineFact
- * @version 1.3.2
+ * <br><br><b>Material Conversion Utilities</b>:
+ * <br>Utility methods to convert between {@link Material}, {@link XMaterial}, and {@link ItemStack} representations:
+ * <br>• {@link #fromUniqueMaterialString(String)} – Converts a namespaced string to an {@link ItemStack}.
+ * <br>• {@link #getUniqueMaterialString(ItemStack)} – Gets the namespaced key of an {@link ItemStack}'s material.
+ * <br>• {@link #getUniqueMaterialString(XMaterial)} – Gets the namespaced key of an {@link XMaterial}.
+ * <br>• {@link #getUniqueMaterialString(XMaterial[])} – Gets a comma-separated list of namespaced keys from multiple {@link XMaterial}s.
+ * <br>• {@link #convertStringToXMaterial(String)} – Converts a string to an {@link XMaterial}, fallback to Bukkit {@link Material} if needed.
+ *
+ * @version 1.3.3
+ * @author MineFact, Zoriot
  */
 @SuppressWarnings({"deprecation", "unused"})
 public class Item {
@@ -155,6 +163,13 @@ public class Item {
 		item.setItemMeta(itemmeta);
 		return item;
 	}
+
+
+	// ==============================
+	// SECTION: Item Creation Methods
+	// ==============================
+
+
 
 	private static ItemStack createItem(Material material, String name, int amount, List<String> lore,
 										Map<Enchantment, Integer> enchantments) {
@@ -279,6 +294,10 @@ public class Item {
 		return createLeatherArmorItem(material, name, color, lore, enchantments);
 	}
 
+	// ==============================
+	// SECTION: Skull Creation Methods
+	// ==============================
+
 	public static @NonNull ItemStack createPlayerHead(String name, String owner) {
 		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
 		SkullMeta itemMeta = (SkullMeta) item.getItemMeta();
@@ -304,6 +323,10 @@ public class Item {
 		var item = createPlayerHead(name, owner, lore);
 		return edit(item, amount);
 	}
+
+	// ==============================
+	// SECTION: Item Editing Methods
+	// ==============================
 
     @Contract("_, _ -> param1")
 	public static @NotNull ItemStack edit(@NotNull ItemStack item, Material material) {
@@ -356,6 +379,10 @@ public class Item {
 		return item;
 	}
 
+	// ======================================
+	// SECTION: Material Conversion Utilities
+	// ======================================
+
     public static @Nullable ItemStack fromUniqueMaterialString(String materialString) {
 		Material material = Material.matchMaterial(materialString);
 		if(material != null)
@@ -368,20 +395,24 @@ public class Item {
 		return null;
 	}
 
-    public static @NotNull String getUniqueMaterialString(ItemStack item) {
-		if(CommonModule.getInstance().getVersionComponent().is_1_12())
-			return XMaterial.matchXMaterial(item).getId() + ":" + XMaterial.matchXMaterial(item).getData();
-		else
-			return item.getType().getKey().asString();
-
+	public static String getUniqueMaterialString(ItemStack item) {
+		return item.getType().getKey().asString();
 	}
 
-    public static @NotNull String getUniqueMaterialString(@NotNull XMaterial material) {
-		return getUniqueMaterialString(material.parseItem());
+
+	public static String getUniqueMaterialString(XMaterial material) {
+		if (material == null)
+			return null;
+
+		ItemStack item = material.parseItem();
+		if (item == null)
+			return null;
+
+		return getUniqueMaterialString(item);
 	}
 
 	public static String getUniqueMaterialString(XMaterial[] materials) {
-		if(materials == null || materials.length == 0)
+		if (materials == null || materials.length == 0)
 			return null;
 
 		StringBuilder s = new StringBuilder(getUniqueMaterialString(materials[0]));
@@ -392,7 +423,7 @@ public class Item {
 		return s.toString();
 	}
 
-    public static @Nullable XMaterial convertStringToXMaterial(String materialString) {
+	public static XMaterial convertStringToXMaterial(String materialString) {
 		XMaterial material;
 
 		if (XMaterial.matchXMaterial(materialString).isPresent())

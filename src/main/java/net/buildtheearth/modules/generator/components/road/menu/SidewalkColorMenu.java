@@ -1,9 +1,9 @@
 package net.buildtheearth.modules.generator.components.road.menu;
 
 import net.buildtheearth.modules.generator.GeneratorModule;
-import net.buildtheearth.modules.generator.model.Settings;
 import net.buildtheearth.modules.generator.components.road.RoadFlag;
 import net.buildtheearth.modules.generator.components.road.RoadSettings;
+import net.buildtheearth.modules.generator.model.Settings;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.BlockListMenu;
@@ -32,7 +32,7 @@ public class SidewalkColorMenu extends BlockListMenu {
                     return;
 
                 RoadSettings roadSettings = (RoadSettings) settings;
-                roadSettings.setValue(RoadFlag.SIDEWALK_MATERIAL, Item.createStringFromItemList(selectedMaterials));
+                roadSettings.setValue(RoadFlag.SIDEWALK_MATERIAL, Item.createStringFromItemStringList(selectedMaterials));
 
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);

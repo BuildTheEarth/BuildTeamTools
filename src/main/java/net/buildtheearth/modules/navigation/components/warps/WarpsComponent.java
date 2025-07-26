@@ -160,8 +160,10 @@ public class WarpsComponent extends ModuleComponent {
             // Create an instance of the warp POJO
             Warp warp = new Warp(group, name, countryCodeCCA2, "cca2", null, null, null, location.getWorld().getName(), coordinates[0], coordinates[1], location.getY(), location.getYaw(), location.getPitch(), false);
 
-            // Create the actual warp
-            new WarpEditMenu(creator, warp, false, true);
+            Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), () -> {
+                // Create the actual warp
+                new WarpEditMenu(creator, warp, false, true);
+            });
 
         }).exceptionally(e -> {
             creator.sendMessage(ChatHelper.getErrorString("An error occurred while creating the warp!"));

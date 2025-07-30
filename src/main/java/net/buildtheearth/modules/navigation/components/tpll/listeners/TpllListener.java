@@ -3,6 +3,7 @@ package net.buildtheearth.modules.navigation.components.tpll.listeners;
 import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
+import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.utils.ChatHelper;
 import org.bukkit.event.EventHandler;
@@ -28,7 +29,7 @@ public class TpllListener implements Listener {
     private double lat;
 
     // Target server name for teleportation
-    private String targetServerName;
+    private BuildTeam targetBuildTeam;
     
     @EventHandler
     public void onTpll(PlayerCommandPreprocessEvent event) {
@@ -45,7 +46,12 @@ public class TpllListener implements Listener {
             // If interception is required, cancel the event and perform cross teleportation
             if (Boolean.TRUE.equals(shouldIntercept)) {
                 event.setCancelled(true);
-                NavigationModule.getInstance().getTpllComponent().tpllPlayer(event.getPlayer(), new double[]{lat, lon}, targetServerName);
+
+                if (!networkModule.getBuildTeam().isConnected() || !targetBuildTeam.isConnected()) {
+                    NavigationModule.getInstance().getTpllComponent().tpllPlayer(event.getPlayer(), new double[]{lat,
+                            lon}, targetBuildTeam.getServerName());
+                } else NavigationModule.getInstance().getTpllComponent().tpllPlayerTransfer(event.getPlayer(),
+                        new double[]{lat, lon}, targetBuildTeam.getIP());
             }
         });
     }
@@ -88,14 +94,16 @@ public class TpllListener implements Listener {
                     String countryName = address[0];
                     Region region = Region.getByName(countryName);
 
-                    if (!networkModule.getBuildTeam().isConnected() || !region.isConnected()) {
-                        event.getPlayer().sendMessage(ChatHelper.getErrorString("Either this server or the receiving server isn't connected to the network."));
+                    if ((!networkModule.getBuildTeam().isConnected() || !region.isConnected()) || !region.getBuildTeam().isAllowsTransfers()) {
+                        event.getPlayer().sendMessage(ChatHelper.getErrorString("Either this server or the receiving " +
+                                "server isn't connected to the network. Or the receiving server does not accept " +
+                                "transfers."));
                         event.setCancelled(true);
                         return CompletableFuture.completedFuture(false);
                     }
 
                     if (!Objects.equals(region.getBuildTeam().getID(), networkModule.getBuildTeam().getID())) {
-                        targetServerName = region.getBuildTeam().getServerName();
+                        targetBuildTeam = region.getBuildTeam();
                         return CompletableFuture.completedFuture(true);
                     }
 

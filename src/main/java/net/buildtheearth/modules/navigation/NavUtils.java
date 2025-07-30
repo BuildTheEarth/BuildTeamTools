@@ -2,6 +2,7 @@ package net.buildtheearth.modules.navigation;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import lombok.experimental.UtilityClass;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.BuildTeam;
@@ -15,6 +16,7 @@ import org.bukkit.UnsafeValues;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+@UtilityClass
 public class NavUtils {
     public static void sendPlayerToConnectedServer(Player player, String server) {
         if (NetworkModule.getInstance().getBuildTeam() == null
@@ -27,15 +29,22 @@ public class NavUtils {
         player.sendPluginMessage(BuildTeamTools.getInstance(), "BungeeCord", out.toByteArray());
     }
 
-    public static boolean isTransferCapable(@NotNull Player clickPlayer, @NotNull BuildTeam targetBuildTeam) {
+    public static boolean isTransferCapable(@NotNull Player player, @NotNull BuildTeam targetBuildTeam) {
         // Must be 1.20.5 / 766 or higher for transfer capability
-        int playerVersion = clickPlayer.getProtocolVersion();
+        int playerVersion = player.getProtocolVersion();
         UnsafeValues unsafeValues = Bukkit.getUnsafe();
         int serverProtocolVersion = unsafeValues.getProtocolVersion();
 
         ChatHelper.logDebug("Transfer check - Player protocol: %d, Server protocol: %s, Allows transfers:  %b", playerVersion, serverProtocolVersion, targetBuildTeam.isAllowsTransfers());
 
         return targetBuildTeam.isAllowsTransfers() && playerVersion >= 766 && serverProtocolVersion >= 766;
+    }
+
+    public static void transferPlayer(@NotNull Player player, @NotNull String ip) {
+        int sep = ip.indexOf(':');
+        String server = sep >= 0 ? ip.substring(0, sep) : ip;
+        int port = sep >= 0 ? Integer.parseInt(ip.substring(sep + 1)) : 25565;
+        player.transfer(server, port);
     }
 
     /**

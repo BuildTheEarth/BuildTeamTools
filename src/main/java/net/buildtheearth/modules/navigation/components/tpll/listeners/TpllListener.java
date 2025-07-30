@@ -70,8 +70,8 @@ public class TpllListener implements Listener {
 
         // Split the command to extract coordinates
         String[] splitMessage = event.getMessage().split(" ");
-        splitMessage[1] = splitMessage[1].replace(",", " ").trim();
         if (splitMessage.length < 3) return false;
+        splitMessage[1] = splitMessage[1].replace(",", " ").trim();
         ChatHelper.logDebug("Command had the correct length (%s).", splitMessage.length);
 
         // Extract and set latitude and longitude coordinates

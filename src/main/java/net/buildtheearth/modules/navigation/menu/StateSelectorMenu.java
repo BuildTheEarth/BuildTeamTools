@@ -28,6 +28,7 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
     public static final int BACK_ITEM_SLOT = 27;
     public static final int SWITCH_PAGE_ITEM_SLOT = 34;
 
+    // TODO Eloborate if this is still needed anywheere, otherwise remove it - maybe ts needed for new jersey
     public StateSelectorMenu(@NonNull Region country, Player menuPlayer, boolean autoLoad) {
         super(4, 3, country.getName() + " - states", menuPlayer, autoLoad);
         this.country = country;
@@ -45,7 +46,7 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
                     || region.getBuildTeam() == null
                     || region.getBuildTeam().getID() == null
                     || region.getBuildTeam().getID().equals(NetworkModule.getInstance().getBuildTeam().getID())
-            ).collect(Collectors.toList()));
+            ).toList());
 
             // Sort countries by area
             this.states.sort(Comparator.comparing(Region::getName));
@@ -68,7 +69,7 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPaginatedPreviewItems(List<?> source) {
-        List<Region> collectedStates = source.stream().map(l -> (Region) l).collect(Collectors.toList());
+        List<Region> collectedStates = source.stream().map(l -> (Region) l).toList();
 
         // Create the country items
         int slot = 0;
@@ -95,7 +96,7 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPaginatedItemClickEventsAsync(@NotNull List<?> source) {
-        List<Region> countries = source.stream().map(l -> (Region) l).collect(Collectors.toList());
+        List<Region> countries = source.stream().map(l -> (Region) l).toList();
 
         int slot = 0;
         for (Region clickedRegion : countries) {

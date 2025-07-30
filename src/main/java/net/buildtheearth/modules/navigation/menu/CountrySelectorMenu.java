@@ -21,7 +21,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// TODO Eloborate if this is still needed anywheere, otherwise remove it - maybe ts needed for new jersey
 public class CountrySelectorMenu extends AbstractPaginatedMenu {
 
     private final List<Region> regions;
@@ -57,7 +56,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
                             NetworkModule.getInstance().getBuildTeam() != null
                         && region.getBuildTeam().getID().equals(NetworkModule.getInstance().getBuildTeam().getID())
                     )
-            ).collect(Collectors.toList()));
+            ).toList());
         }
 
         ChatHelper.logDebug("Continent in constructor: %s", continent);
@@ -79,7 +78,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPaginatedPreviewItems(List<?> source) {
-        List<Region> countries = source.stream().map(l -> (Region) l).collect(Collectors.toList());
+        List<Region> countries = source.stream().map(l -> (Region) l).toList();
 
         // Create the country items
         int slot = 0;
@@ -106,7 +105,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPaginatedItemClickEventsAsync(@NotNull List<?> source) {
-        List<Region> countries = source.stream().map(l -> (Region) l).collect(Collectors.toList());
+        List<Region> countries = source.stream().map(l -> (Region) l).toList();
 
         int slot = 0;
         for (Region clickedRegion : countries) {
@@ -122,10 +121,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
                     NavUtils.sendPlayerToConnectedServer(clickPlayer, clickedRegion.getBuildTeam().getServerName());
                 } else if (clickedRegion.getBuildTeam().getIP() != null) {
                     if (NavUtils.isTransferCapable(clickPlayer, clickedRegion.getBuildTeam())) {
-                        int sep = clickedRegion.getBuildTeam().getIP().indexOf(':');
-                        String server = sep >= 0 ? clickedRegion.getBuildTeam().getIP().substring(0, sep) : clickedRegion.getBuildTeam().getIP();
-                        int port = sep >= 0 ? Integer.parseInt(clickedRegion.getBuildTeam().getIP().substring(sep + 1)) : 25565;
-                        clickPlayer.transfer(server, port);
+                        NavUtils.transferPlayer(clickPlayer, clickedRegion.getBuildTeam().getIP());
                     } else {
                         NavUtils.sendNotConnectedMessage(clickPlayer, clickedRegion.getBuildTeam().getIP(), clickedRegion.getBuildTeam().getName());
                     }

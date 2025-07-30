@@ -5,11 +5,14 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.ModuleComponent;
+import net.buildtheearth.modules.navigation.NavUtils;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.GeometricUtils;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -19,6 +22,8 @@ public class TpllComponent extends ModuleComponent {
     public TpllComponent() {
         super("Tpll");
     }
+
+    public static final NamespacedKey TPLL_COOKIE_KEY = NamespacedKey.minecraft("btt:buildteam:tpll");
 
     /**
      * Stores a List of the tpll operations that need to happen on join
@@ -60,8 +65,9 @@ public class TpllComponent extends ModuleComponent {
         ChatHelper.logDebug("Trying to process tpll queue for player: %s", player.getDisplayName());
         if(!tpllQueue.containsKey(player.getUniqueId())) return;
         Location tpllTarget = tpllQueue.get(player.getUniqueId());
-        ChatHelper.logDebug("The tpll target is: %s", tpllTarget.toString());
         if (tpllTarget == null) return;
+
+        ChatHelper.logDebug("The tpll target is: %s", tpllTarget.toString());
 
         if (tpllTarget.getWorld() == null) {
             player.sendMessage(ChatHelper.getErrorString("The %s world of this server is %s.", "earth", "unknown"));
@@ -95,4 +101,17 @@ public class TpllComponent extends ModuleComponent {
         ChatHelper.logDebug("Teleported player to the target server.");
     }
 
+    public void tpllPlayerTransfer(@NotNull Player player, double @NotNull [] coordinates, String ip) {
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF(String.valueOf(coordinates[0] + coordinates[1]));
+        player.storeCookie(TPLL_COOKIE_KEY, out.toByteArray());
+        NavUtils.transferPlayer(player, ip);
+    }
+
+    public void processCookie(@NotNull Player player, byte[] cookie) {
+        ByteArrayDataInput in = ByteStreams.newDataInput(cookie);
+        double targetLatitude = Double.parseDouble(in.readUTF());
+        double targetLongitude = Double.parseDouble(in.readUTF());
+        player.performCommand("tpll " + targetLatitude + " " + targetLongitude);
+    }
 }

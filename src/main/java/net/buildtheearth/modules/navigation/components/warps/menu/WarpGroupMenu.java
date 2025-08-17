@@ -14,6 +14,7 @@ import net.buildtheearth.utils.menus.AbstractPaginatedMenu;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,7 +60,7 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPaginatedPreviewItems(List<?> source) {
-        List<WarpGroup> warpGroups = source.stream().map(l -> (WarpGroup) l).collect(Collectors.toList());
+        List<WarpGroup> warpGroups = source.stream().map(l -> (WarpGroup) l).toList();
 
         getMenu().getSlot(ALTERNATE_PLUS_SLOT).setItem(MenuItems.ITEM_BACKGROUND);
 
@@ -120,37 +121,43 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPaginatedItemClickEventsAsync(List<?> source) {
-        List<WarpGroup> warpGroups = source.stream().map(l -> (WarpGroup) l).collect(Collectors.toList());
+        List<WarpGroup> warpGroups = source.stream().map(l -> (WarpGroup) l).toList();
 
         int slot = 0;
         for (WarpGroup warpGroup : warpGroups) {
-
-            final int _slot = isPlusItem(warpGroup) ? getPlusSlot(slot) : getWarpGroupSlot(warpGroup, slot);
-
-            getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
-                clickPlayer.closeInventory();
-
-                // Create a click action for the "Create Warp" item if the player has permission
-                if(isPlusItem(warpGroup)){
-                    NavigationModule.getInstance().getWarpsComponent().createWarpGroup(clickPlayer);
-                    return;
-                }
-
-                if(clickInformation.getClickType().isRightClick() && clickPlayer.hasPermission(Permissions.WARP_GROUP_EDIT))
-                    new WarpGroupEditMenu(clickPlayer, warpGroup, true, true);
-                else
-                    new WarpMenu(clickPlayer, warpGroup, true, true);
-
-            });
+            setClickEventForSlot(warpGroup, slot);
             slot++;
         }
     }
 
-    protected boolean isPlusItem(WarpGroup warpGroup){
+    protected void setClickEventForSlot(@NotNull WarpGroup warpGroup, int slot) {
+        final int _slot = isPlusItem(warpGroup) ? getPlusSlot(slot) : getWarpGroupSlot(warpGroup, slot);
+
+        getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
+            clickPlayer.closeInventory();
+
+            // Create a click action for the "Create Warp" item if the player has permission
+            if(isPlusItem(warpGroup)){
+                NavigationModule.getInstance().getWarpsComponent().createWarpGroup(clickPlayer);
+                return;
+            }
+
+            if(clickInformation.getClickType().isRightClick() && clickPlayer.hasPermission(Permissions.WARP_GROUP_EDIT))
+                new WarpGroupEditMenu(clickPlayer, warpGroup, true, true);
+            else
+                leftClickAction(clickPlayer, warpGroup);
+        });
+    }
+
+    protected void leftClickAction(Player clickPlayer, @NotNull WarpGroup warpGroup) {
+        new WarpMenu(clickPlayer, warpGroup, true, true);
+    }
+
+    protected boolean isPlusItem(@NotNull WarpGroup warpGroup){
         return warpGroup.getName().equals("%create-warp-group%") && getMenuPlayer().hasPermission(Permissions.WARP_GROUP_CREATE);
     }
 
-    protected int getWarpGroupSlot(WarpGroup warpGroup, int currentIndex){
+    protected int getWarpGroupSlot(@NotNull WarpGroup warpGroup, int currentIndex){
         int warpGroupSlot = currentIndex;
 
         if(warpGroup.getSlot() != -1 && warpGroup.getSlot() > 0 && warpGroup.getSlot() < 27)

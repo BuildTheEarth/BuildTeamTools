@@ -19,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class CountrySelectorMenu extends AbstractPaginatedMenu {
 
@@ -115,24 +114,11 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
 
                 ChatHelper.logDebug("Clicked Region: %s", clickedRegion.getName() + " (" + clickedRegion.getCountryCodeCca3() + ")");
 
-                if (clickedRegion.getCountryCodeCca3().equalsIgnoreCase("USA")) {
-                    new StateSelectorMenu(clickedRegion, clickPlayer, true);
-                } else if (clickedRegion.getBuildTeam().isConnected() && clickedRegion.getBuildTeam().getServerName() != null) {
-                    NavUtils.sendPlayerToConnectedServer(clickPlayer, clickedRegion.getBuildTeam().getServerName());
-                } else if (clickedRegion.getBuildTeam().getIP() != null) {
-                    if (NavUtils.isTransferCapable(clickPlayer, clickedRegion.getBuildTeam())) {
-                        NavUtils.transferPlayer(clickPlayer, clickedRegion.getBuildTeam().getIP());
-                    } else {
-                        NavUtils.sendNotConnectedMessage(clickPlayer, clickedRegion.getBuildTeam().getIP(), clickedRegion.getBuildTeam().getName());
-                    }
-                } else {
-                    NavUtils.sendNoIpMessage(clickPlayer, clickedRegion.getName() + " (" + clickedRegion.getCountryCodeCca3() + ")");
-                }
+                NavUtils.switchToTeam(clickedRegion.getBuildTeam(), clickPlayer);
             });
             slot++;
         }
     }
-
 
     @Override
     protected Mask getMask() {

@@ -23,7 +23,7 @@ public class TpllComponent extends ModuleComponent {
         super("Tpll");
     }
 
-    public static final NamespacedKey TPLL_COOKIE_KEY = NamespacedKey.minecraft("btt:buildteam:tpll");
+    public static final NamespacedKey TPLL_COOKIE_KEY = NamespacedKey.minecraft("btt_buildteam_tpll");
 
     /**
      * Stores a List of the tpll operations that need to happen on join

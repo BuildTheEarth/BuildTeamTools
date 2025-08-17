@@ -55,7 +55,7 @@ public class NetworkAPI {
     public static CompletableFuture<Void> getBuildTeamInformation() {
         CompletableFuture<Void> future = new CompletableFuture<>();
 
-        API.getAsync("https://nwapi.buildtheearth.net/api/teams", new API.ApiResponseCallback() {
+        getAsync("https://nwapi.buildtheearth.net/api/teams", new API.ApiResponseCallback() {
             @Override
             public void onResponse(String response) {
                 try {
@@ -256,7 +256,7 @@ public class NetworkAPI {
     public static CompletableFuture<Void> setupCurrentServerData() {
         CompletableFuture<Void> future = new CompletableFuture<>();
 
-        getAsync("https://nwapi.buildtheearth.net/api/teams/" + BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY), new API.ApiResponseCallback() {
+        API.getAsync("https://nwapi.buildtheearth.net/api/teams/" + BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY), new API.ApiResponseCallback() {
             @Override
             public void onResponse(String response) {
                 try {

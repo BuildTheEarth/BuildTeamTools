@@ -3,6 +3,7 @@ package net.buildtheearth.modules.navigation;
 import lombok.Getter;
 import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.navigation.components.navigator.NavigatorComponent;
+import net.buildtheearth.modules.navigation.components.navigator.commands.BuildteamCommand;
 import net.buildtheearth.modules.navigation.components.navigator.commands.NavigatorCommand;
 import net.buildtheearth.modules.navigation.components.navigator.listeners.NavigatorJoinListener;
 import net.buildtheearth.modules.navigation.components.navigator.listeners.NavigatorOpenListener;
@@ -57,6 +58,7 @@ public class NavigationModule extends Module {
     public void registerCommands() {
         registerCommand("warp", new WarpCommand());
         registerCommand("navigator", new NavigatorCommand());
+        registerCommand("buildteam", new BuildteamCommand());
     }
 
     @Override

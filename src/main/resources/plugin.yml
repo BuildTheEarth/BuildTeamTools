@@ -6,12 +6,11 @@ author: MineFact, frikandelworst, George112n, ELgamer, SirJodelstein, Zoriot
 softdepend: [WorldEdit, HeadDatabase, PlotSystem-Terra]
 
 commands:
-  buildteam:
-    description: Main command of the Build Team plugin.
-    usage: /buildteam
+  buildteamtools:
+    description: Main command of the Build Team Tools plugin.
+    usage: /buildteamtools
     aliases:
       - btt
-      - buildteamtools
   generate:
     description: Allows usage of the Generator Tool.
     usage: /generate
@@ -29,9 +28,6 @@ commands:
     usage: /warp <subcommand>
     aliases:
       - warps
-  temporary:
-    description: Temporary test command.
-    usage: /temporary
   kml:
     description: kml pasting and parsing
     usage: /kml
@@ -51,3 +47,7 @@ commands:
   plotsystemterra:
     description: Sends info about the plugin
     usage: /plotsystemterra
+  buildteam:
+    description: Sends the player to the specified BuildTeam
+    usage: /buildteam <team>
+    aliases: [bt]

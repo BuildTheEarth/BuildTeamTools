@@ -97,8 +97,10 @@ public class NetworkAPI {
                         String name = (String) teamObject.get("Name");
                         String blankName = (String) teamObject.get("BlankName");
                         boolean allowsTransfers = (long) teamObject.get("AllowsTransfers") == 1;
+                        String tag = (String) teamObject.get("Tag");
 
-                        BuildTeam buildTeam = new BuildTeam(teamID, mainServerIP, name, blankName, serverName, isConnected, hasBuildTeamToolsInstalled, allowsTransfers);
+                        BuildTeam buildTeam = new BuildTeam(teamID, mainServerIP, name, blankName, serverName,
+                                isConnected, hasBuildTeamToolsInstalled, allowsTransfers, tag);
                         NetworkModule.getInstance().getBuildTeams().add(buildTeam);
 
                         // Create an "other" Warp Group for warps that don't belong to a warp group

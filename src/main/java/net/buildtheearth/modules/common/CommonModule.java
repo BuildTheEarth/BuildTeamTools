@@ -81,7 +81,7 @@ public class CommonModule extends Module {
 
     @Override
     public void registerCommands() {
-        registerCommand("buildteam", new BuildTeamToolsCommand());
+        registerCommand("buildteamtools", new BuildTeamToolsCommand());
     }
 
     @Override

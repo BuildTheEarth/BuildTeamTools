@@ -35,9 +35,12 @@ public class BuildTeam {
     private final List<WarpGroup> warpGroups;
     @Getter
     private final boolean allowsTransfers;
+    @Getter
+    private final String tag;
 
 
-    public BuildTeam(String ID, String serverIP, String name, String blankName, String serverName, boolean isConnected, boolean hasBTToolsInstalled, boolean allowsTransfers) {
+    public BuildTeam(String ID, String serverIP, String name, String blankName, String serverName,
+                     boolean isConnected, boolean hasBTToolsInstalled, boolean allowsTransfers, String tag) {
         this.ID = ID;
         this.name = name;
         this.blankName = blankName;
@@ -48,6 +51,7 @@ public class BuildTeam {
         this.regions = new ArrayList<>();
         this.warpGroups = new ArrayList<>();
         this.allowsTransfers = allowsTransfers;
+        this.tag = tag;
 
         if(!isConnected)
             this.IP = serverIP;

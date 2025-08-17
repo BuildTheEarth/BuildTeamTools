@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.navigation.components.tpll.listeners;
 
+import net.buildtheearth.modules.navigation.NavUtils;
 import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
@@ -9,6 +10,7 @@ import net.buildtheearth.utils.ChatHelper;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -42,16 +44,20 @@ public class TpllListener implements Listener {
         ChatHelper.logDebug("Intercepted TPLL command wit lat and lon: %s %s", lat, lon);
 
         // Check if teleportation interception is required
-        shouldIntercept(event).thenAcceptAsync(shouldIntercept -> {
+        shouldIntercept().thenAcceptAsync(shouldIntercept -> {
             // If interception is required, cancel the event and perform cross teleportation
             if (Boolean.TRUE.equals(shouldIntercept)) {
-                event.setCancelled(true);
-
-                if (!networkModule.getBuildTeam().isConnected() || !targetBuildTeam.isConnected()) {
-                    NavigationModule.getInstance().getTpllComponent().tpllPlayer(event.getPlayer(), new double[]{lat,
-                            lon}, targetBuildTeam.getServerName());
-                } else NavigationModule.getInstance().getTpllComponent().tpllPlayerTransfer(event.getPlayer(),
-                        new double[]{lat, lon}, targetBuildTeam.getIP());
+                var type = NavUtils.determineSwitchPossibilityOrMsgPlayerIfNone(event.getPlayer(), targetBuildTeam);
+                if (type != null) {
+                    if (type == NavUtils.NavSwitchType.NETWORK) {
+                        NavigationModule.getInstance().getTpllComponent().tpllPlayer(event.getPlayer(),
+                                new double[]{lat, lon}, targetBuildTeam.getServerName());
+                    } else if (type == NavUtils.NavSwitchType.TRANSFER) {
+                        NavigationModule.getInstance().getTpllComponent().tpllPlayerTransfer(event.getPlayer(),
+                                new double[]{lat, lon}, targetBuildTeam.getIP());
+                    }
+                    event.setCancelled(true);
+                }
             }
         });
     }
@@ -62,7 +68,7 @@ public class TpllListener implements Listener {
      * @param event The event triggered when a player processes a command.
      * @return True if the command is a TPLL command and coordinates are extracted sucessfully, false otherwise.
      */
-    private boolean isTpllCommand(PlayerCommandPreprocessEvent event) {
+    private boolean isTpllCommand(@NotNull PlayerCommandPreprocessEvent event) {
         // Check if the command starts with "tpll"
         ChatHelper.logDebug(event.getMessage());
         if (!event.getMessage().startsWith("/tpll")) return false;
@@ -83,24 +89,15 @@ public class TpllListener implements Listener {
     /**
      * Determines if teleportation interception is required based on the player's location and network status.
      *
-     * @param event The event triggered when a player processes a command.
      * @return A CompletableFuture representing whether teleportation interception is required.
      */
-    private CompletableFuture<Boolean> shouldIntercept(PlayerCommandPreprocessEvent event) {
+    private @NotNull CompletableFuture<Boolean> shouldIntercept() {
         return OpenStreetMapAPI.getCountryFromLocationAsync(new double[]{lat, lon})
                 .thenComposeAsync(address -> {
                     if (address == null) return CompletableFuture.completedFuture(false);
 
                     String countryName = address[0];
                     Region region = Region.getByName(countryName);
-
-                    if ((!networkModule.getBuildTeam().isConnected() || !region.isConnected()) || !region.getBuildTeam().isAllowsTransfers()) {
-                        event.getPlayer().sendMessage(ChatHelper.getErrorString("Either this server or the receiving " +
-                                "server isn't connected to the network. Or the receiving server does not accept " +
-                                "transfers."));
-                        event.setCancelled(true);
-                        return CompletableFuture.completedFuture(false);
-                    }
 
                     if (!Objects.equals(region.getBuildTeam().getID(), networkModule.getBuildTeam().getID())) {
                         targetBuildTeam = region.getBuildTeam();

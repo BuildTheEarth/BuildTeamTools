@@ -15,6 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.UnsafeValues;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @UtilityClass
 public class NavUtils {
@@ -77,5 +78,39 @@ public class NavUtils {
      */
     public static void sendNoIpMessage(@NotNull Player player, String buildteam) {
         player.sendMessage("IP of " + buildteam + " is missing in Network API.");
+    }
+
+    public static @Nullable NavSwitchType determineSwitchPossibilityOrMsgPlayerIfNone(@NotNull Player player, @NotNull BuildTeam targetBuildTeam) {
+        if (targetBuildTeam.isConnected() && targetBuildTeam.getServerName() != null) {
+            sendPlayerToConnectedServer(player, targetBuildTeam.getServerName());
+            return NavSwitchType.NETWORK;
+        } else if (targetBuildTeam.getIP() != null) {
+            if (isTransferCapable(player, targetBuildTeam)) {
+                transferPlayer(player, targetBuildTeam.getIP());
+                return NavSwitchType.TRANSFER;
+            } else {
+                sendNotConnectedMessage(player, targetBuildTeam.getIP(), targetBuildTeam.getName());
+                return null;
+            }
+        } else {
+            sendNoIpMessage(player, targetBuildTeam.getName());
+            return null;
+        }
+    }
+
+    public enum NavSwitchType {
+        TRANSFER, NETWORK
+    }
+
+    public static void switchToTeam(BuildTeam team, Player clickPlayer) {
+        var type = NavUtils.determineSwitchPossibilityOrMsgPlayerIfNone(clickPlayer, team);
+
+        if (type != null) {
+            if (type == NavUtils.NavSwitchType.NETWORK) {
+                NavUtils.sendPlayerToConnectedServer(clickPlayer, team.getServerName());
+            } else if (type == NavUtils.NavSwitchType.TRANSFER) {
+                NavUtils.transferPlayer(clickPlayer, team.getIP());
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.navigation.components.warps.menu;
 
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.modules.navigation.menu.CountrySelectorMenu;
@@ -10,12 +11,15 @@ import net.buildtheearth.utils.CustomHeads;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.ListUtil;
 import net.buildtheearth.utils.MenuItems;
+import net.buildtheearth.utils.io.ConfigPaths;
+import net.buildtheearth.utils.io.ConfigUtil;
 import net.buildtheearth.utils.menus.AbstractPaginatedMenu;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -104,7 +108,14 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
     @Override
     protected List<?> getSource() {
         // Get the warp groups in the build team sorted by name
-        List<WarpGroup> warpGroups = buildTeam.getWarpGroups().stream().sorted((warpGroup1, warpGroup2) -> warpGroup1.getName().compareToIgnoreCase(warpGroup2.getName())).collect(Collectors.toList());
+        List<WarpGroup> warpGroups;
+
+        String mode = BuildTeamTools.getInstance().getConfig(ConfigUtil.NAVIGATION)
+                .getString(ConfigPaths.Navigation.WARPS_GROUP_SORTING_MODE, "");
+
+        if (mode.equalsIgnoreCase("name")) {
+            warpGroups = buildTeam.getWarpGroups().stream().sorted((warpGroup1, warpGroup2) -> warpGroup1.getName().compareToIgnoreCase(warpGroup2.getName())).collect(Collectors.toList());
+        } else warpGroups = new ArrayList<>(buildTeam.getWarpGroups());
 
         // If the warp group "Other" has no warps, remove it from the list
         WarpGroup otherWarpGroup = warpGroups.stream().filter(warpGroup -> warpGroup.getName().equalsIgnoreCase("Other")).findFirst().orElse(null);
@@ -158,12 +169,11 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
     }
 
     protected int getWarpGroupSlot(@NotNull WarpGroup warpGroup, int currentIndex){
-        int warpGroupSlot = currentIndex;
+        if (warpGroup.getSlot() == -1 && warpGroup.getInternalSlot() == -1) return currentIndex;
 
-        if(warpGroup.getSlot() != -1 && warpGroup.getSlot() > 0 && warpGroup.getSlot() < 27)
-            warpGroupSlot = warpGroup.getSlot();
-
-        return warpGroupSlot;
+        if (warpGroup.getSlot() >= 0 && warpGroup.getSlot() < 27) {
+            return warpGroup.getSlot();
+        } else return warpGroup.getInternalSlot() == -1 ? currentIndex : warpGroup.getInternalSlot();
     }
 
     protected int getPlusSlot(int currentIndex){

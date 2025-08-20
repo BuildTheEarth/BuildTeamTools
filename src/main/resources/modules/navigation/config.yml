@@ -31,7 +31,10 @@ main-menu-items:
     # (Optional) Execute a custom command or send a message when the tutorial item is clicked [/command|message]
     tutorial-action: /command
 
-
+warps:
+  # The order in which the warps should be displayed in the navigator
+  # Possible values: default, name
+  sorting-mode: default
 
 # NOTE: Do not change
 config-version: 1.4

@@ -2,6 +2,7 @@ package net.buildtheearth.modules.navigation.components.warps.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.buildtheearth.modules.navigation.NavUtils;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.utils.*;
 import org.bukkit.Material;
@@ -26,7 +27,7 @@ public class WarpGroup {
     @Getter @Setter
     private String description;
 
-    @Getter @Setter
+    @Getter
     private int slot;
 
     @Getter @Setter
@@ -34,6 +35,10 @@ public class WarpGroup {
 
     @Getter
     private final List<Warp> warps;
+
+    // Slot which is used internally by the navigation module when auto slot is enabled
+    @Getter @Setter
+    private int internalSlot = -1;
 
 
     public WarpGroup(BuildTeam buildTeam, String name, String description, int slot, String material) {
@@ -104,5 +109,10 @@ public class WarpGroup {
             add("§eDescription:");
             addAll(ListUtil.createList(description.split("<br>")));
         }};
+    }
+
+    public void setSlot(int slot) {
+        this.slot = slot;
+        NavUtils.recalculateAutoSlots(buildTeam);
     }
 }

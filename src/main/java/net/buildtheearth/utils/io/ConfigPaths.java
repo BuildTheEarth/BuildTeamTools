@@ -32,6 +32,9 @@ public abstract class ConfigPaths {
         public static final String TUTORIALS_ITEM_ENABLED = TUTORIALS_ITEM + "tutorial-enabled";
         public static final String TUTORIALS_ITEM_ACTION = TUTORIALS_ITEM + "tutorial-action";
 
+        // Navigator.Warps
+        private static final String NAVIGATOR_WARPS = "warps.";
+        public static final String WARPS_GROUP_SORTING_MODE = NAVIGATOR_WARPS + "sorting-mode";
     }
 
     public static class PlotSystem {

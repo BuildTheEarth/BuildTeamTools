@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.navigation.components.warps.menu;
 
+import com.alpsbte.alpslib.utils.AlpsUtils;
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.network.NetworkModule;
@@ -23,18 +24,17 @@ import static net.buildtheearth.modules.navigation.components.warps.menu.WarpEdi
 
 public class WarpGroupEditMenu extends AbstractMenu {
 
-    public static String WARP_GROUP_UPDATE_INV_NAME = "Configure the Warp Group";
+    private static final String WARP_GROUP_UPDATE_INV_NAME = "Configure the Warp Group";
 
+    private static final int WARP_GROUP = 4;
+    private static final int NAME_SLOT = 18;
+    private static final int DESCRIPTION_SLOT = 20;
 
-    public static int WARP_GROUP = 4;
-    public static int NAME_SLOT = 18;
-    public static int DESCRIPTION_SLOT = 20;
+    private static final int SLOT_SLOT = 22;
 
-    public static int SLOT_SLOT = 22;
+    private static final int MATERIAL_SLOT = 24;
 
-    public static int MATERIAL_SLOT = 24;
-
-    public static int DELETE_SLOT = 26;
+    private static final int DELETE_SLOT = 26;
 
 
     private final WarpGroup warpGroup;
@@ -70,22 +70,22 @@ public class WarpGroupEditMenu extends AbstractMenu {
 
         // Set the name item
         ArrayList<String> nameLore = ListUtil.createList("", "§eCurrent Name: ", warpGroup.getName());
-        getMenu().getSlot(NAME_SLOT).setItem(Item.create(XMaterial.NAME_TAG.parseMaterial(), "§6§lChange Name", nameLore));
+        getMenu().getSlot(NAME_SLOT).setItem(Item.create(XMaterial.NAME_TAG.get(), "§6§lChange Name", nameLore));
 
         // Set the Description item
-        getMenu().getSlot(DESCRIPTION_SLOT).setItem(Item.create(XMaterial.BOOK.parseMaterial(), "§6§lChange Description", warpGroup.getDescriptionLore()));
+        getMenu().getSlot(DESCRIPTION_SLOT).setItem(Item.create(XMaterial.BOOK.get(), "§6§lChange Description", warpGroup.getDescriptionLore()));
 
         // Set the Slot item
         int slot = warpGroup.getSlot();
         ArrayList<String> slotLore = ListUtil.createList("", "§eSlot: ", slot < 0 || slot >= 27 ? "§7Auto" : String.valueOf(slot));
-        getMenu().getSlot(SLOT_SLOT).setItem(new Item(XMaterial.ITEM_FRAME.parseMaterial()).setDisplayName("§6§lChange Slot").setLore(slotLore).build());
+        getMenu().getSlot(SLOT_SLOT).setItem(new Item(XMaterial.ITEM_FRAME.get()).setDisplayName("§6§lChange Slot").setLore(slotLore).build());
 
         // Set the Material item
         ArrayList<String> materialLore = ListUtil.createList("", "§eMaterial: ", warpGroup.getMaterial() == null ? "§7Default" : warpGroup.getMaterial());
         getMenu().getSlot(MATERIAL_SLOT).setItem(new Item(warpGroup.getMaterialItem()).setDisplayName("§6§lChange Material").setLore(materialLore).build());
 
         // Set the delete item
-        getMenu().getSlot(DELETE_SLOT).setItem(Item.create(XMaterial.BARRIER.parseMaterial(), "§c§lDelete Warp Group", ListUtil.createList("", "§8Click to delete the warp group.")));
+        getMenu().getSlot(DELETE_SLOT).setItem(Item.create(XMaterial.BARRIER.get(), "§c§lDelete Warp Group", ListUtil.createList("", "§8Click to delete the warp group.")));
     }
 
     @Override
@@ -125,7 +125,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
                         );
                     })
                     .text("Name")
-                    .itemLeft(Item.create(XMaterial.NAME_TAG.parseMaterial(), "§6§lChange Name"))
+                    .itemLeft(Item.create(XMaterial.NAME_TAG.get(), "§6§lChange Name"))
                     .title("§8Change the warp name")
                     .plugin(BuildTeamTools.getInstance())
                     .open(clickPlayer);
@@ -140,7 +140,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
 
             BookMenu bookMenu = new BookMenu(clickPlayer, "§6§lChange Description", clickPlayer.getName(), description, 240);
 
-            bookMenu.onComplete((text) -> {
+            bookMenu.onComplete(text -> {
                 if(text == null) {
                     clickPlayer.sendMessage("§cA problem occurred while saving the description.");
                     new WarpGroupEditMenu(clickPlayer, warpGroup, alreadyExists, true);
@@ -148,9 +148,9 @@ public class WarpGroupEditMenu extends AbstractMenu {
                 }
 
                 // Combine the first page to a single string
-                StringBuilder finalText = new StringBuilder(text.get(0)[0]);
-                for(int i = 1; i < text.get(0).length; i++)
-                    finalText.append("<br>").append(text.get(0)[i]);
+                StringBuilder finalText = new StringBuilder(text.getFirst()[0]);
+                for(int i = 1; i < text.getFirst().length; i++)
+                    finalText.append("<br>").append(text.getFirst()[i]);
 
                 warpGroup.setDescription(finalText.toString());
                 new WarpGroupEditMenu(clickPlayer, warpGroup, alreadyExists, true);
@@ -170,12 +170,14 @@ public class WarpGroupEditMenu extends AbstractMenu {
                         if (slot != AnvilGUI.Slot.OUTPUT)
                             return Collections.emptyList();
 
+                        Integer selectedSlot = AlpsUtils.tryParseInt(stateSnapshot.getText());
+
                         // Make sure that the slot is a valid number and between 0 and 26
                         if(!stateSnapshot.getText().matches("-?\\d+")
-                        || Integer.parseInt(stateSnapshot.getText()) < -1
-                        || Integer.parseInt(stateSnapshot.getText()) > 26){
-                            return Arrays.asList(
-                                    AnvilGUI.ResponseAction.close(),
+                                || selectedSlot == null
+                                || selectedSlot < -1
+                                || selectedSlot > 26) {
+                            return Arrays.asList(AnvilGUI.ResponseAction.close(),
                                     AnvilGUI.ResponseAction.run(() -> {
                                         clickPlayer.closeInventory();
                                         stateSnapshot.getPlayer().playSound(clickPlayer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
@@ -185,17 +187,34 @@ public class WarpGroupEditMenu extends AbstractMenu {
                             );
                         }
 
+                        var warpGroups = warpGroup.getBuildTeam().getWarpGroups().stream()
+                                .filter(g -> g.getSlot() == selectedSlot)
+                                .map(WarpGroup::getName)
+                                .findFirst();
+
+                        if(selectedSlot != -1 && warpGroups.isPresent()) {
+                            return Arrays.asList(AnvilGUI.ResponseAction.close(),
+                                    AnvilGUI.ResponseAction.run(() -> {
+                                        clickPlayer.closeInventory();
+                                        stateSnapshot.getPlayer().playSound(clickPlayer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+                                        clickPlayer.sendMessage("§cThe warp group " + warpGroups.get() +
+                                                " already have the slot " + selectedSlot + " occupied.");
+                                        new WarpGroupEditMenu(clickPlayer, warpGroup, alreadyExists, true);
+                                    })
+                            );
+                        }
+
                         stateSnapshot.getPlayer().playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
                         return Arrays.asList(
                                 AnvilGUI.ResponseAction.close(),
                                 AnvilGUI.ResponseAction.run(() -> {
-                                    warpGroup.setSlot(Integer.parseInt(stateSnapshot.getText()));
+                                    warpGroup.setSlot(selectedSlot);
                                     new WarpGroupEditMenu(clickPlayer, warpGroup, alreadyExists, true);
                                 })
                         );
                     })
                     .text("Enter slot 0-26. Set -1 for auto.")
-                    .itemLeft(Item.create(XMaterial.ITEM_FRAME.parseMaterial(), "§6§lChange Slot"))
+                    .itemLeft(Item.create(XMaterial.ITEM_FRAME.get(), "§6§lChange Slot"))
                     .title("§8Change the warp slot")
                     .plugin(BuildTeamTools.getInstance())
                     .open(clickPlayer);

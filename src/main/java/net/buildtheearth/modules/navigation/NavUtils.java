@@ -4,6 +4,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import lombok.experimental.UtilityClass;
 import net.buildtheearth.BuildTeamTools;
+import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.utils.ChatHelper;
@@ -110,6 +111,23 @@ public class NavUtils {
                 NavUtils.sendPlayerToConnectedServer(clickPlayer, team.getServerName());
             } else if (type == NavUtils.NavSwitchType.TRANSFER) {
                 NavUtils.transferPlayer(clickPlayer, team.getIP());
+            }
+        }
+    }
+
+    public static void recalculateAutoSlots(@NotNull BuildTeam team) {
+        var occupiedSlots = team.getWarpGroups().stream()
+                .map(WarpGroup::getSlot)
+                .filter(slot -> slot != -1 && slot >= 0 && slot < 27).toList();
+
+        int freeSlot = 0;
+        for (WarpGroup warpGroup : team.getWarpGroups()) {
+            if (warpGroup.getSlot() < 0 || warpGroup.getSlot() > 26) {
+                while (occupiedSlots.contains(freeSlot)) freeSlot++;
+                warpGroup.setInternalSlot(freeSlot);
+                freeSlot++;
+            } else {
+                warpGroup.setInternalSlot(-1);
             }
         }
     }

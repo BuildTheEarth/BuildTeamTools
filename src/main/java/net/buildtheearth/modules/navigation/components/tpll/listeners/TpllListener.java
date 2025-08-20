@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.navigation.components.tpll.listeners;
 
+import com.alpsbte.alpslib.utils.AlpsUtils;
 import net.buildtheearth.modules.navigation.NavUtils;
 import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.modules.network.NetworkModule;
@@ -80,9 +81,15 @@ public class TpllListener implements Listener {
         splitMessage[1] = splitMessage[1].replace(",", " ").trim();
         ChatHelper.logDebug("Command had the correct length (%s).", splitMessage.length);
 
-        // Extract and set latitude and longitude coordinates
-        this.lat = Double.parseDouble(splitMessage[1]);
-        this.lon = Double.parseDouble(splitMessage[2]);
+        Double oLat = AlpsUtils.tryParseDouble(splitMessage[1]);
+        Double oLon = AlpsUtils.tryParseDouble(splitMessage[2]);
+        if (oLat == null || oLon == null) {
+            ChatHelper.logDebug("Command did not contain valid coordinates.");
+            return false;
+        }
+
+        this.lat = oLat;
+        this.lon = oLon;
         return true;
     }
 

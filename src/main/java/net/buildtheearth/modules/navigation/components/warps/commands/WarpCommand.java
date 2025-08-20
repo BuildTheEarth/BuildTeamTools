@@ -10,13 +10,19 @@ import net.buildtheearth.utils.ChatHelper;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class WarpCommand implements CommandExecutor {
+import java.util.Collections;
+import java.util.List;
+
+public class WarpCommand implements CommandExecutor, TabCompleter {
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player)) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+        if (!(sender instanceof Player player)) {
             sender.sendMessage(ChatHelper.getErrorString("This command can only be used by a player!"));
             return true;
         }
@@ -27,8 +33,6 @@ public class WarpCommand implements CommandExecutor {
             return true;
         }
 
-        Player player = (Player) sender;
-
         // If no arguments were supplied assume the player wants to open the warp menu
         if (args.length == 0) {
             int warpGroupCount = NetworkModule.getInstance().getBuildTeam().getWarpGroups().size();
@@ -37,7 +41,7 @@ public class WarpCommand implements CommandExecutor {
                 player.sendMessage(ChatHelper.getErrorString("This server does not have any warps yet!"));
                 return true;
             }else if(warpGroupCount == 1)
-                new WarpMenu(player, NetworkModule.getInstance().getBuildTeam().getWarpGroups().get(0), false, true);
+                new WarpMenu(player, NetworkModule.getInstance().getBuildTeam().getWarpGroups().getFirst(), false, true);
             else
                 new WarpGroupMenu(player, NetworkModule.getInstance().getBuildTeam(), false, true);
 
@@ -85,5 +89,18 @@ public class WarpCommand implements CommandExecutor {
         NavigationModule.getInstance().getWarpsComponent().warpPlayer(player, warp);
 
         return true;
+    }
+
+    @Override
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
+        if (args.length == 1) {
+            String partial = args[0].toLowerCase();
+            return NetworkModule.getInstance().getBuildTeam().getWarpGroups().stream()
+                    .flatMap(gr -> gr.getWarps().stream().map(Warp::getName))
+                    .filter(s -> s.toLowerCase().startsWith(partial))
+                    .toList();
+        }
+        return Collections.emptyList();
+
     }
 }

@@ -2,9 +2,10 @@ package net.buildtheearth.modules.navigation.components.warps.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.buildtheearth.modules.navigation.NavUtils;
 import net.buildtheearth.modules.network.model.BuildTeam;
-import net.buildtheearth.utils.*;
+import net.buildtheearth.utils.CustomHeads;
+import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.ListUtil;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.json.JSONObject;
@@ -19,7 +20,7 @@ public class WarpGroup {
     private UUID id = UUID.randomUUID();
 
     @Getter
-    private BuildTeam buildTeam;
+    private final BuildTeam buildTeam;
 
     @Getter @Setter
     private String name;
@@ -27,7 +28,7 @@ public class WarpGroup {
     @Getter @Setter
     private String description;
 
-    @Getter
+    @Getter @Setter
     private int slot;
 
     @Getter @Setter
@@ -39,7 +40,6 @@ public class WarpGroup {
     // Slot which is used internally by the navigation module when auto slot is enabled
     @Getter @Setter
     private int internalSlot = -1;
-
 
     public WarpGroup(BuildTeam buildTeam, String name, String description, int slot, String material) {
         this.buildTeam = buildTeam;
@@ -86,9 +86,9 @@ public class WarpGroup {
         else if(material.startsWith("http://textures.minecraft.net/texture/"))
             return Item.createCustomHeadTextureURL(material, itemName, lore);
 
-        Material material = Material.matchMaterial(this.material.split(":")[0]);
+        Material matchedMaterial = Material.matchMaterial(this.material.split(":")[0]);
 
-        if(material == null)
+        if(matchedMaterial == null)
             return CustomHeads.getLetterHead(
                     name.substring(0, 1),
                     CustomHeads.LetterType.STONE,
@@ -96,9 +96,9 @@ public class WarpGroup {
                     lore
             );
         else if(!this.material.contains(":"))
-            return Item.create(material, itemName, lore);
+            return Item.create(matchedMaterial, itemName, lore);
         else
-            return Item.create(material, itemName, Short.parseShort(this.material.split(":")[1]), lore);
+            return Item.create(matchedMaterial, itemName, Short.parseShort(this.material.split(":")[1]), lore);
 
     }
 
@@ -109,10 +109,5 @@ public class WarpGroup {
             add("§eDescription:");
             addAll(ListUtil.createList(description.split("<br>")));
         }};
-    }
-
-    public void setSlot(int slot) {
-        this.slot = slot;
-        NavUtils.recalculateAutoSlots(buildTeam);
     }
 }

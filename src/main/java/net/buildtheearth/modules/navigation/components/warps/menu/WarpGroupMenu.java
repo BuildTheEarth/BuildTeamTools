@@ -5,6 +5,7 @@ import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.modules.navigation.menu.CountrySelectorMenu;
+import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Permissions;
 import net.buildtheearth.utils.ChatHelper;
@@ -124,7 +125,8 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
             warpGroups.remove(otherWarpGroup);
 
         // Add a create warp group item if the player has permission
-        if (getMenuPlayer().hasPermission(Permissions.WARP_GROUP_CREATE))
+        if (getMenuPlayer().hasPermission(Permissions.WARP_GROUP_CREATE)
+                && NetworkModule.getInstance().getBuildTeam().equals(buildTeam))
             warpGroups.add(new WarpGroup(null, "%create-warp-group%", null, -1, null));
 
         return warpGroups;

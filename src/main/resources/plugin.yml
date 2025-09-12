@@ -36,10 +36,10 @@ commands:
     description: kml pasting and parsing
     usage: /kml
     aliases:
-     - geopoints
-     - geopath
-     - georing
-     - geosurface
+      - geopoints
+      - geopath
+      - georing
+      - geosurface
   createplot:
     description: Creates a new plot for the PlotSystem.
     usage: /createplot
@@ -51,3 +51,16 @@ commands:
   plotsystemterra:
     description: Sends info about the plugin
     usage: /plotsystemterra
+  blockpallet:
+    description: Opens the block pallet menu.
+    usage: /blockpallet [filter|menu|filter <filter1> <filter2> ...]
+    aliases: [bp, blocks]
+    permission: blockpallet.use
+
+permissions:
+  blockpallet.use:
+    description: Allows players to use /blockpallet
+    default: true
+  btt.bp.edit:
+    description: Allows players to create and edit custom block palettes
+    default: op

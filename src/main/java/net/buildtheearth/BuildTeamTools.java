@@ -9,21 +9,13 @@ import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.plotsystem.PlotSystemModule;
 import net.buildtheearth.modules.stats.StatsModule;
+import net.buildtheearth.modules.blockpalletegui.BlockPaletteModule;
 import net.buildtheearth.utils.io.ConfigUtil;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.util.logging.Level;
 
-/**
- * The parent of all modules of the Build Team Tools plugin
- */
 public class BuildTeamTools extends JavaPlugin {
 
     public static int SPIGOT_PROJECT_ID = 101854;
@@ -36,20 +28,21 @@ public class BuildTeamTools extends JavaPlugin {
     @Getter
     private static BuildTeamTools instance = null;
 
-
     @Override
     public void onEnable() {
         instance = this;
 
-        // Register Modules
+        BlockPaletteModule.initialize(this);
+
         ModuleHandler.getInstance().registerModules(
-            CommonModule.getInstance(),
-            NetworkModule.getInstance(),
-            GeneratorModule.getInstance(),
-            NavigationModule.getInstance(),
-            PlotSystemModule.getInstance(),
-            StatsModule.getInstance()
+                CommonModule.getInstance(),
+                NetworkModule.getInstance(),
+                GeneratorModule.getInstance(),
+                NavigationModule.getInstance(),
+                PlotSystemModule.getInstance(),
+                StatsModule.getInstance()
         );
+
         ModuleHandler.getInstance().enableAll(null, true);
     }
 
@@ -60,16 +53,13 @@ public class BuildTeamTools extends JavaPlugin {
         } catch (NoClassDefFoundError ignored) {}
     }
 
-
     @Override
     public FileConfiguration getConfig() {
         return getConfig(ConfigUtil.MAIN);
     }
 
     public FileConfiguration getConfig(ConfigUtil configType) {
-        if(ConfigUtil.getInstance() == null)
-            return null;
-
+        if (ConfigUtil.getInstance() == null) return null;
         return ConfigUtil.getInstance().configs[configType.ordinal()];
     }
 
@@ -85,5 +75,9 @@ public class BuildTeamTools extends JavaPlugin {
 
     public File getPluginFile() {
         return this.getFile();
+    }
+
+    public static BuildTeamTools getInstance() {
+        return instance;
     }
 }

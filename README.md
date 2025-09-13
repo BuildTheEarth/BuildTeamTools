@@ -103,4 +103,5 @@ Click the links below for more information, or see the [wiki](https://github.com
 - Statistics (PLANNED)
 - Plot System (PLANNED)
 - Tutorials (PLANNED)
+- Miscellaneous (PLANNED)
 - Security (PLANNED)

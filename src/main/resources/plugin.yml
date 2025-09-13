@@ -52,7 +52,7 @@ commands:
     description: Sends info about the plugin
     usage: /plotsystemterra
   blockpallet:
-    description: Opens the block pallet menu.
+    description: Opens the block palette menu.
     usage: /blockpallet [filter|menu|filter <filter1> <filter2> ...]
     aliases: [bp, blocks]
     permission: blockpallet.use

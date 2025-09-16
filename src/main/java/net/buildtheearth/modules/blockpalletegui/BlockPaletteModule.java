@@ -27,9 +27,7 @@ public final class BlockPaletteModule {
     public void enable() {
         this.manager = new BlockPalletManager(PLUGIN);
 
-        // Register both names so /bp and /blockpallet work
-        registerCommandSafely("bp");
-        registerCommandSafely("blockpallet");
+        registerCommandSafely("blockpalette");
     }
 
     public void disable() {}

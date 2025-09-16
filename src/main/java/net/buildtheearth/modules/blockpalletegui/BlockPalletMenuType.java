@@ -1,6 +1,8 @@
 package net.buildtheearth.modules.blockpalletegui;
 
+import net.buildtheearth.utils.MenuItems;
 import org.bukkit.inventory.ItemStack;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -10,23 +12,23 @@ import java.util.Collections;
 import java.util.stream.Collectors;
 
 public enum BlockPalletMenuType {
-    SLABS("Slabs", "slabs", MenuItems::getSlabs),
-    STAIRS("Stairs", "stairs", MenuItems::getStairs),
-    WALLS("Walls", "walls", MenuItems::getWalls),
-    COLOR("Color", "color", MenuItems::getBlocksByColor),
-    LOGS("Logs", "logs", MenuItems::getLogs),
-    LEAVES("Leaves", "leaves", MenuItems::getLeaves),
-    FENCES("Fences", "fences", MenuItems::getFences),
-    CARPET("Carpet", "carpet", MenuItems::getCarpet),
-    WOOL("Wool", "wool", MenuItems::getWool),
-    TERRACOTTA("Terracotta", "terracotta", MenuItems::getTerracotta),
-    CONCRETE("Concrete", "concrete", MenuItems::getConcrete),
-    CONCRETE_POWDER("Concrete Powder", "concrete_powder", MenuItems::getConcretePowder),
-    BED("Bed", "bed", MenuItems::getBeds),
-    CANDLE("Candle", "candle", MenuItems::getCandles),
-    BANNER("Banner", "banner", MenuItems::getBanners),
-    GLASS_PANE("Glass Pane", "glass_pane", MenuItems::getGlassPanes),
-    GLASS("Glass", "glass", MenuItems::getGlass);
+    SLABS("Slabs", "slabs", MenuItems::getSlabsArray),
+    STAIRS("Stairs", "stairs", MenuItems::getStairsArray),
+    WALLS("Walls", "walls", MenuItems::getWallsArray),
+    COLOR("Color", "color", MenuItems::getBlocksByColorArray),
+    LOGS("Logs", "logs", MenuItems::getLogsArray),
+    LEAVES("Leaves", "leaves", MenuItems::getLeavesArray),
+    FENCES("Fences", "fences", MenuItems::getFencesArray),
+    CARPET("Carpet", "carpet", MenuItems::getCarpetArray),
+    WOOL("Wool", "wool", MenuItems::getWoolArray),
+    TERRACOTTA("Terracotta", "terracotta", MenuItems::getTerracottaArray),
+    CONCRETE("Concrete", "concrete", MenuItems::getConcreteArray),
+    CONCRETE_POWDER("Concrete Powder", "concrete_powder", MenuItems::getConcretePowderArray),
+    BED("Bed", "bed", MenuItems::getBedsArray),
+    CANDLE("Candle", "candle", MenuItems::getCandlesArray),
+    BANNER("Banner", "banner", MenuItems::getBannersArray),
+    GLASS_PANE("Glass Pane", "glass_pane", MenuItems::getGlassPanesArray),
+    GLASS("Glass", "glass", MenuItems::getGlassArray);
 
     private final String readableName;
     private final String filterKey;
@@ -35,7 +37,7 @@ public enum BlockPalletMenuType {
     private static final Map<String, BlockPalletMenuType> keyToType = new HashMap<>();
     static {
         for (BlockPalletMenuType type : values()) {
-            keyToType.put(type.filterKey, type);
+            keyToType.put(type.filterKey.toLowerCase(), type);
         }
     }
 
@@ -55,34 +57,24 @@ public enum BlockPalletMenuType {
         this.itemSupplier = itemSupplier;
     }
 
-    /**
-     * @return human-readable menu title
-     */
+    /** @return human-readable menu title */
     public String getReadableName() {
         return readableName;
     }
 
-    /**
-     * @return the key used for filtering/tab-completion
-     */
+    /** @return the key used for filtering/tab-completion */
     public String getFilterKey() {
-        // If you already have a key field, return that instead.
-        return getReadableName().toLowerCase().trim().replace(' ', '_');
+        return filterKey;
     }
 
-
-    /**
-     * @return supplier for the menu's ItemStack array
-     */
+    /** @return supplier for the menu's ItemStack array */
     public Supplier<ItemStack[]> getItemSupplier() {
         return itemSupplier;
     }
 
-    /**
-     * Lookup enum by filter key (case-insensitive)
-     */
+    /** Lookup enum by filter key (case-insensitive) */
     public static BlockPalletMenuType getMenuType(String key) {
+        if (key == null) return null;
         return keyToType.get(key.toLowerCase());
     }
-
 }

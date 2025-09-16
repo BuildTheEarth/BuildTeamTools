@@ -4,19 +4,24 @@ import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.cryptomorin.xseries.XMaterial.*;
 
+/**
+ * Unified MenuItems utility.
+ * - Superset of block lists from both original classes
+ * - List-based API (original utils) kept intact
+ * - Adds helper array getters for the wrapper to delegate to
+ */
 public class MenuItems {
 
-    // ----------------- BLOCKS BY COLOR -----------------
-
-    private static final ItemStack[] BLOCKS_BY_COLOR = {
+    // ----------------- MASTER LIST (SUPERSET) -----------------
+    // Using ItemStack[] for fast toArray() conversions; keep nulls filtered by helpers.
+    private static final ItemStack[] BLOCKS_BY_COLOR = new ItemStack[]{
+            // --- Black / very dark ---
             BLACK_STAINED_GLASS.parseItem(),
             BLACK_CONCRETE.parseItem(),
             COAL_BLOCK.parseItem(),
@@ -44,6 +49,8 @@ public class MenuItems {
             GRAY_STAINED_GLASS.parseItem(),
             NETHERITE_BLOCK.parseItem(),
             MUD.parseItem(),
+
+            // --- Deepslate / Gray ---
             CHISELED_DEEPSLATE.parseItem(),
             CRACKED_DEEPSLATE_TILES.parseItem(),
             DEEPSLATE_TILES.parseItem(),
@@ -74,6 +81,8 @@ public class MenuItems {
             CYAN_TERRACOTTA.parseItem(),
             GRAY_GLAZED_TERRACOTTA.parseItem(),
             TUFF.parseItem(),
+
+            // --- Light gray / stone family ---
             LIGHT_GRAY_CONCRETE.parseItem(),
             COBBLESTONE.parseItem(),
             COBBLESTONE_STAIRS.parseItem(),
@@ -104,6 +113,8 @@ public class MenuItems {
             LIGHT_GRAY_GLAZED_TERRACOTTA.parseItem(),
             SEA_LANTERN.parseItem(),
             LODESTONE.parseItem(),
+
+            // --- Whites / quartz ---
             WHITE_GLAZED_TERRACOTTA.parseItem(),
             BONE_BLOCK.parseItem(),
             BIRCH_LOG.parseItem(),
@@ -131,6 +142,8 @@ public class MenuItems {
             WHITE_CARPET.parseItem(),
             SNOW_BLOCK.parseItem(),
             WHITE_STAINED_GLASS.parseItem(),
+
+            // --- Pinks / Cherry ---
             PINK_STAINED_GLASS.parseItem(),
             CHERRY_LEAVES.parseItem(),
             CHERRY_PLANKS.parseItem(),
@@ -149,6 +162,8 @@ public class MenuItems {
             PINK_WOOL.parseItem(),
             PINK_CARPET.parseItem(),
             PINK_CONCRETE.parseItem(),
+
+            // --- Magenta / Purple family ---
             MAGENTA_TERRACOTTA.parseItem(),
             MAGENTA_CONCRETE_POWDER.parseItem(),
             MAGENTA_WOOL.parseItem(),
@@ -169,6 +184,9 @@ public class MenuItems {
             CRYING_OBSIDIAN.parseItem(),
             BUDDING_AMETHYST.parseItem(),
             AMETHYST_BLOCK.parseItem(),
+            PURPLE_TERRACOTTA.parseItem(),
+
+            // --- Blues / Cyans ---
             BLUE_TERRACOTTA.parseItem(),
             LIGHT_BLUE_TERRACOTTA.parseItem(),
             BLUE_STAINED_GLASS.parseItem(),
@@ -225,7 +243,9 @@ public class MenuItems {
             WEATHERED_CUT_COPPER_STAIRS.parseItem(),
             WEATHERED_CUT_COPPER_SLAB.parseItem(),
             WEATHERED_COPPER.parseItem(),
-            ORANGE_GLAZED_TERRACOTTA.parseItem(),
+
+            // --- Greens ---
+            ORANGE_GLAZED_TERRACOTTA.parseItem(), // stays here to keep original order clusters
             BAMBOO_BLOCK.parseItem(),
             LIME_GLAZED_TERRACOTTA.parseItem(),
             LIME_CONCRETE_POWDER.parseItem(),
@@ -264,6 +284,8 @@ public class MenuItems {
             EXPOSED_CUT_COPPER.parseItem(),
             EXPOSED_CUT_COPPER_STAIRS.parseItem(),
             EXPOSED_CUT_COPPER_SLAB.parseItem(),
+
+            // --- Reds / Oranges / Browns / Woods ---
             POLISHED_GRANITE.parseItem(),
             POLISHED_GRANITE_STAIRS.parseItem(),
             POLISHED_GRANITE_SLAB.parseItem(),
@@ -408,7 +430,6 @@ public class MenuItems {
             MANGROVE_BUTTON.parseItem(),
             CRIMSON_HYPHAE.parseItem(),
             CRIMSON_STEM.parseItem(),
-            PURPLE_TERRACOTTA.parseItem(),
             STRIPPED_CRIMSON_STEM.parseItem(),
             STRIPPED_CRIMSON_HYPHAE.parseItem(),
             CRIMSON_PLANKS.parseItem(),
@@ -499,184 +520,200 @@ public class MenuItems {
             STRIPPED_JUNGLE_LOG.parseItem(),
             STRIPPED_JUNGLE_WOOD.parseItem(),
             BROWN_GLAZED_TERRACOTTA.parseItem(),
+
+            // --- Extras added by the module version (multi-color items) ---
+            // Candles
+            BLACK_CANDLE.parseItem(), BLUE_CANDLE.parseItem(), BROWN_CANDLE.parseItem(), CYAN_CANDLE.parseItem(),
+            GRAY_CANDLE.parseItem(), GREEN_CANDLE.parseItem(), LIGHT_BLUE_CANDLE.parseItem(), LIGHT_GRAY_CANDLE.parseItem(),
+            LIME_CANDLE.parseItem(), MAGENTA_CANDLE.parseItem(), ORANGE_CANDLE.parseItem(), PINK_CANDLE.parseItem(),
+            PURPLE_CANDLE.parseItem(), RED_CANDLE.parseItem(), WHITE_CANDLE.parseItem(), YELLOW_CANDLE.parseItem(),
+
+            // Beds
+            BLACK_BED.parseItem(), BLUE_BED.parseItem(), BROWN_BED.parseItem(), CYAN_BED.parseItem(),
+            GRAY_BED.parseItem(), GREEN_BED.parseItem(), LIGHT_BLUE_BED.parseItem(), LIGHT_GRAY_BED.parseItem(),
+            LIME_BED.parseItem(), MAGENTA_BED.parseItem(), ORANGE_BED.parseItem(), PINK_BED.parseItem(),
+            PURPLE_BED.parseItem(), RED_BED.parseItem(), WHITE_BED.parseItem(), YELLOW_BED.parseItem(),
+
+            // Banners
+            BLACK_BANNER.parseItem(), BLUE_BANNER.parseItem(), BROWN_BANNER.parseItem(), CYAN_BANNER.parseItem(),
+            GRAY_BANNER.parseItem(), GREEN_BANNER.parseItem(), LIGHT_BLUE_BANNER.parseItem(), LIGHT_GRAY_BANNER.parseItem(),
+            LIME_BANNER.parseItem(), MAGENTA_BANNER.parseItem(), ORANGE_BANNER.parseItem(), PINK_BANNER.parseItem(),
+            PURPLE_BANNER.parseItem(), RED_BANNER.parseItem(), WHITE_BANNER.parseItem(), YELLOW_BANNER.parseItem(),
+
+            // Glass panes
+            BLACK_STAINED_GLASS_PANE.parseItem(), BLUE_STAINED_GLASS_PANE.parseItem(), BROWN_STAINED_GLASS_PANE.parseItem(),
+            CYAN_STAINED_GLASS_PANE.parseItem(), GRAY_STAINED_GLASS_PANE.parseItem(), GREEN_STAINED_GLASS_PANE.parseItem(),
+            LIGHT_BLUE_STAINED_GLASS_PANE.parseItem(), LIGHT_GRAY_STAINED_GLASS_PANE.parseItem(), LIME_STAINED_GLASS_PANE.parseItem(),
+            MAGENTA_STAINED_GLASS_PANE.parseItem(), ORANGE_STAINED_GLASS_PANE.parseItem(), PINK_STAINED_GLASS_PANE.parseItem(),
+            PURPLE_STAINED_GLASS_PANE.parseItem(), RED_STAINED_GLASS_PANE.parseItem(), WHITE_STAINED_GLASS_PANE.parseItem(),
+            YELLOW_STAINED_GLASS_PANE.parseItem(),
+
+            // Shulker boxes
+            BLACK_SHULKER_BOX.parseItem(), BLUE_SHULKER_BOX.parseItem(), BROWN_SHULKER_BOX.parseItem(),
+            CYAN_SHULKER_BOX.parseItem(), GRAY_SHULKER_BOX.parseItem(), GREEN_SHULKER_BOX.parseItem(),
+            LIGHT_BLUE_SHULKER_BOX.parseItem(), LIGHT_GRAY_SHULKER_BOX.parseItem(), LIME_SHULKER_BOX.parseItem(),
+            MAGENTA_SHULKER_BOX.parseItem(), ORANGE_SHULKER_BOX.parseItem(), PINK_SHULKER_BOX.parseItem(),
+            PURPLE_SHULKER_BOX.parseItem(), RED_SHULKER_BOX.parseItem(), WHITE_SHULKER_BOX.parseItem(),
+            YELLOW_SHULKER_BOX.parseItem(),
     };
 
+    // ----------------- CORE HELPERS -----------------
+
     /**
-     * Get all blocks by color that are supported by the server version sorted by color
-     * @return a list of all blocks
+     * Stream of all non-null items in BLOCKS_BY_COLOR.
+     */
+    private static Stream<ItemStack> streamAll() {
+        return Arrays.stream(BLOCKS_BY_COLOR).filter(Objects::nonNull);
+    }
+
+    private static List<ItemStack> bySuffix(String... suffixes) {
+        Set<String> set = Arrays.stream(suffixes).collect(Collectors.toSet());
+        return streamAll()
+                .filter(it -> {
+                    String name = it.getType().name();
+                    for (String s : set) if (name.endsWith(s)) return true;
+                    return false;
+                })
+                .collect(Collectors.toList());
+    }
+
+    private static List<ItemStack> byPredicate(java.util.function.Predicate<ItemStack> pred) {
+        return streamAll().filter(pred).collect(Collectors.toList());
+    }
+
+    private static ItemStack[] toArray(Collection<ItemStack> coll) {
+        return coll.toArray(new ItemStack[0]);
+    }
+
+    // ----------------- PUBLIC API (LIST variants – original utils style) -----------------
+
+    /**
+     * Get all blocks by color that are supported by the server version sorted by color.
      */
     public static List<ItemStack> getBlocksByColor() {
-        return Arrays.stream(BLOCKS_BY_COLOR).filter(Objects::nonNull).collect(Collectors.toList());
+        return streamAll().collect(Collectors.toList());
     }
 
     /**
-     * Get all solid blocks that are supported by the server version sorted by color
-     * Solid blocks are blocks that are not transparent and do not allow light to pass through.
-     * @return a list of all solid blocks
+     * Solid == occluding blocks.
      */
     public static List<ItemStack> getSolidBlocks() {
         List<ItemStack> items = getBlocksByColor();
-
-        new ArrayList<>(items).stream().filter(item -> !item.getType().isOccluding()).forEach(items::remove);
-
+        // remove non-occluding
+        items.removeIf(item -> !item.getType().isOccluding());
         return items;
     }
 
     /**
-     * Get all wall blocks by color that are supported by the server version sorted by color.
-     * Wall Blocks are solid blocks + glass blocks
-     * @return a list of all wall blocks
+     * Wall blocks = solid blocks + stained/normal glass blocks.
      */
-    public static List<ItemStack> getWallBlocks(){
+    public static List<ItemStack> getWallBlocks() {
         List<ItemStack> items = getBlocksByColor();
-
-        new ArrayList<>(items).stream().filter(item ->
-                !item.getType().isOccluding() &&! item.getType().toString().endsWith("STAINED_GLASS"))
-                .forEach(items::remove);
-
+        items.removeIf(item ->
+                !item.getType().isOccluding()
+                        && !(item.getType().name().endsWith("_STAINED_GLASS")
+                        || item.getType().name().endsWith("_GLASS"))
+        );
         return items;
     }
 
+    public static List<ItemStack> getSlabs()           { return bySuffix("_SLAB"); }
+    public static List<ItemStack> getStairs()          { return bySuffix("_STAIRS"); }
+    public static List<ItemStack> getFences()          { return bySuffix("_FENCE"); }
+    public static List<ItemStack> getLogs()            { return bySuffix("_LOG"); }
+    public static List<ItemStack> getWoods()           { return bySuffix("_WOOD"); }
+    public static List<ItemStack> getLeaves()          { return bySuffix("_LEAVES"); }
+    public static List<ItemStack> getGlass()           { return bySuffix("_GLASS", "_STAINED_GLASS"); }
+    public static List<ItemStack> getWools()           { return bySuffix("_WOOL"); }
+    public static List<ItemStack> getCarpets()         { return bySuffix("_CARPET"); }
 
+    // Added categories from module version:
+    public static List<ItemStack> getTerracotta()      { return bySuffix("_TERRACOTTA"); }
+    public static List<ItemStack> getConcrete()        { return bySuffix("_CONCRETE"); }
+    public static List<ItemStack> getConcretePowder()  { return bySuffix("_CONCRETE_POWDER"); }
+    public static List<ItemStack> getBeds()            { return bySuffix("_BED"); }
+    public static List<ItemStack> getCandles()         { return bySuffix("_CANDLE"); }
+    public static List<ItemStack> getBanners()         { return bySuffix("_BANNER"); }
+    public static List<ItemStack> getGlassPanes()      { return bySuffix("_GLASS_PANE"); }
+    public static List<ItemStack> getSigns()           { return bySuffix("_SIGN"); }
+    public static List<ItemStack> getShulkerBoxes()    { return bySuffix("_SHULKER_BOX"); }
+    public static List<ItemStack> getGates()           { return bySuffix("_GATE"); }
+    public static List<ItemStack> getWalls()           { return bySuffix("_WALL"); }
 
-
-    // ----------------- SLABS -----------------
-
-    /**
-     * Get all slabs that are supported by the server version sorted by color
-     * @return a list of all slabs
-     */
-    public static List<ItemStack> getSlabs() {
-        return getBlocksByColor().stream().filter(item -> item != null && item.getType().toString().endsWith("_SLAB")).collect(Collectors.toList());
-    }
-
-
-
-
-    // ----------------- STAIRS -----------------
-
-    /**
-     * Get all stairs that are supported by the server version sorted by color
-     * @return a list of all stairs
-     */
-    public static List<ItemStack> getStairs() {
-        return getBlocksByColor().stream().filter(item -> item != null && item.getType().toString().endsWith("_STAIRS")).collect(Collectors.toList());
-    }
-
-
-
-
-    // ----------------- FENCES -----------------
-
-    /**
-     * Get all fences that are supported by the server version sorted by color
-     * @return a list of all fences
-     */
-    public static List<ItemStack> getFences() {
-        return getBlocksByColor().stream().filter(item -> item != null && item.getType().toString().endsWith("_FENCE")).collect(Collectors.toList());
-    }
-
-
-
-
-    // ----------------- LOGS -----------------
-
-    /**
-     * Get all logs that are supported by the server version sorted by color
-     * @return a list of all logs
-     */
-    public static List<ItemStack> getLogs() {
-        return getBlocksByColor().stream().filter(item -> item != null && item.getType().toString().endsWith("_LOG")).collect(Collectors.toList());
-    }
+    // ----------------- ARRAY convenience (for wrapper) -----------------
+    public static ItemStack[] getBlocksByColorArray()  { return toArray(getBlocksByColor()); }
+    public static ItemStack[] getSlabsArray()          { return toArray(getSlabs()); }
+    public static ItemStack[] getStairsArray()         { return toArray(getStairs()); }
+    public static ItemStack[] getWallsArray()          { return toArray(getWalls()); }
+    public static ItemStack[] getLogsArray()           { return toArray(getLogs()); }
+    public static ItemStack[] getLeavesArray()         { return toArray(getLeaves()); }
+    public static ItemStack[] getFencesArray()         { return toArray(getFences()); }
+    public static ItemStack[] getGlassArray()          { return toArray(getGlass()); }
+    public static ItemStack[] getCarpetArray()         { return toArray(getCarpets()); }
+    public static ItemStack[] getWoolArray()           { return toArray(getWools()); }
+    public static ItemStack[] getTerracottaArray()     { return toArray(getTerracotta()); }
+    public static ItemStack[] getConcreteArray()       { return toArray(getConcrete()); }
+    public static ItemStack[] getConcretePowderArray() { return toArray(getConcretePowder()); }
+    public static ItemStack[] getBedsArray()           { return toArray(getBeds()); }
+    public static ItemStack[] getCandlesArray()        { return toArray(getCandles()); }
+    public static ItemStack[] getBannersArray()        { return toArray(getBanners()); }
+    public static ItemStack[] getGlassPanesArray()     { return toArray(getGlassPanes()); }
+    public static ItemStack[] getSignsArray()          { return toArray(getSigns()); }
+    public static ItemStack[] getShulkerBoxesArray()   { return toArray(getShulkerBoxes()); }
+    public static ItemStack[] getGatesArray()          { return toArray(getGates()); }
 
     /**
-     * Get all woods that are supported by the server version sorted by color
-     * @return a list of all logs
+     * Filter selector (array form) mirroring the module's getItemsByFilter(String).
      */
-    public static List<ItemStack> getWoods() {
-        return getBlocksByColor().stream().filter(item -> item != null && item.getType().toString().endsWith("_WOOD")).collect(Collectors.toList());
+    public static ItemStack[] getItemsByFilterArray(String filter) {
+        switch (filter.toLowerCase(Locale.ROOT)) {
+            case "slabs":            return getSlabsArray();
+            case "stairs":           return getStairsArray();
+            case "walls":            return getWallsArray();
+            case "logs":             return getLogsArray();
+            case "leaves":           return getLeavesArray();
+            case "fences":           return getFencesArray();
+            case "carpet":           return getCarpetArray();
+            case "wool":             return getWoolArray();
+            case "terracotta":       return getTerracottaArray();
+            case "concrete":         return getConcreteArray();
+            case "concrete_powder":  return getConcretePowderArray();
+            case "bed":              return getBedsArray();
+            case "candle":           return getCandlesArray();
+            case "banner":           return getBannersArray();
+            case "glass_pane":       return getGlassPanesArray();
+            case "signs":            return getSignsArray();
+            case "shulker_boxes":    return getShulkerBoxesArray();
+            case "gates":            return getGatesArray();
+            case "glass":            return getGlassArray();
+            default:                 return getBlocksByColorArray();
+        }
     }
 
+    // ----------------- OTHER (from original utils) -----------------
 
-
-
-    // ----------------- LEAVES -----------------
+    // Background glass pane used in GUIs
+    public static ItemStack ITEM_BACKGROUND = new Item(GRAY_STAINED_GLASS_PANE.parseItem())
+            .setDisplayName(" ").build();
 
     /**
-     * Get all leaves that are supported by the server version  sorted by color
-     * @return a list of all leaves
+     * Materials to ignore in certain contexts (logs, woods, leaves, wools, snow, pumpkin)
      */
-
-    public static List<ItemStack> getLeaves() {
-        return getBlocksByColor().stream().filter(item -> item != null && item.getType().toString().endsWith("_LEAVES")).collect(Collectors.toList());
-    }
-
-
-
-
-    // ----------------- GLASS -----------------
-
-    /**
-     * Get all glass blocks that are supported by the server version  sorted by color
-     * @return a list of all glass blocks
-     */
-    public static List<ItemStack> getGlass() {
-        return getBlocksByColor().stream().filter(item -> item != null && item.getType().toString().endsWith("_STAINED_GLASS")).collect(Collectors.toList());
-    }
-
-
-
-
-    // ----------------- WOOLS -----------------
-
-    /**
-     * Get all wool blocks that are supported by the server version sorted by color
-     * @return a list of all wool blocks
-     */
-
-    public static List<ItemStack> getWools() {
-        return getBlocksByColor().stream().filter(item -> item != null && item.getType().toString().endsWith("_WOOL")).collect(Collectors.toList());
-    }
-
-
-
-
-    // ----------------- CARPETS -----------------
-
-    /**
-     * Get all carpets that are supported by the server version sorted by color
-     * @return a list of all carpets
-     */
-    public static List<ItemStack> getCarpets() {
-        return getBlocksByColor().stream().filter(item -> item != null && item.getType().toString().endsWith("_CARPET")).collect(Collectors.toList());
-    }
-
-
-
-
-    // ----------------- OTHER -----------------
-
-
-    public static ItemStack ITEM_BACKGROUND = new Item(GRAY_STAINED_GLASS_PANE.parseItem()).setDisplayName(" ").build();
-
-
-    public static Material[] getIgnoredMaterials(){
+    public static Material[] getIgnoredMaterials() {
         List<ItemStack> items = new ArrayList<>();
-
         items.addAll(getLogs());
         items.addAll(getWoods());
         items.addAll(getLeaves());
         items.addAll(getWools());
         items.add(SNOW.parseItem());
         items.add(PUMPKIN.parseItem());
-
         return items.stream().map(ItemStack::getType).toArray(Material[]::new);
     }
 
-
-
+    /**
+     * Map a stair XMaterial back to its "base" block XMaterial.
+     */
     public static XMaterial convertStairToBlock(XMaterial stair) {
-
         switch (stair) {
             case QUARTZ_STAIRS: return QUARTZ_BLOCK;
             case POLISHED_BLACKSTONE_BRICK_STAIRS: return POLISHED_BLACKSTONE_BRICKS;
@@ -726,7 +763,6 @@ public class MenuItems {
             case DARK_OAK_STAIRS: return DARK_OAK_PLANKS;
             case SPRUCE_STAIRS: return SPRUCE_PLANKS;
             case OAK_STAIRS: return OAK_PLANKS;
-
             case COBBLESTONE_STAIRS:
             default: return COBBLESTONE;
         }

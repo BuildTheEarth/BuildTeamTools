@@ -1,7 +1,6 @@
 package net.buildtheearth.modules.blockpalletegui;
 
 import com.cryptomorin.xseries.XMaterial;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -9,11 +8,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.logging.Level;
 
 public class BlockPalletManager {
     public static final int PAGE_SIZE = 36;
@@ -52,6 +52,8 @@ public class BlockPalletManager {
     /* =======================
        Palette model
        ======================= */
+    @Getter
+    @Setter
     public static class Palette {
         private String name;
         private String description;
@@ -62,12 +64,6 @@ public class BlockPalletManager {
             this.description = description != null ? description : "";
             this.blocks = new ArrayList<>(blocks != null ? blocks : new ArrayList<>());
         }
-
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
-
-        public String getDescription() { return description; }
-        public void setDescription(String description) { this.description = description; }
 
         public List<String> getBlocks() { return new ArrayList<>(blocks); }
         public void setBlocks(List<String> blocks) { this.blocks = new ArrayList<>(blocks); }

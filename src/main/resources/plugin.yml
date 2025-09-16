@@ -4,42 +4,30 @@ api-version: 1.13
 version: 0.1.3-alpha
 author: MineFact, frikandelworst, George112n, ELgamer, SirJodelstein
 softdepend: [WorldEdit, HeadDatabase]
-
 commands:
   buildteam:
     description: Main command of the Build Team plugin.
     usage: /buildteam
-    aliases:
-      - btt
-      - buildteamtools
+    aliases: [btt, buildteamtools]
   generate:
     description: Allows usage of the Generator Tool.
     usage: /generate
-    aliases:
-      - gen
-      - g
+    aliases: [gen, g]
   navigator:
     description: Opens the universal navigator.
     usage: /navigator
-    aliases:
-      - nav
-      - navigate
+    aliases: [nav, navigate]
   warp:
     description: Command for managing warps.
     usage: /warp <subcommand>
-    aliases:
-      - warps
+    aliases: [warps]
   temporary:
     description: Temporary test command.
     usage: /temporary
   kml:
     description: kml pasting and parsing
     usage: /kml
-    aliases:
-      - geopoints
-      - geopath
-      - georing
-      - geosurface
+    aliases: [geopoints, geopath, georing, geosurface]
   createplot:
     description: Creates a new plot for the PlotSystem.
     usage: /createplot
@@ -51,15 +39,14 @@ commands:
   plotsystemterra:
     description: Sends info about the plugin
     usage: /plotsystemterra
-  blockpallet:
-    description: Opens the block pallet menu.
-    usage: /blockpallet [filter|menu|filter <filter1> <filter2> ...]
+  blockpalette:
+    description: Opens the block palette menu.
+    usage: /blockpalette [filter|menu|filter <filter1> <filter2> ...]
     aliases: [bp, blocks]
-    permission: blockpallet.use
-
+    permission: blockpalette.use
 permissions:
-  blockpallet.use:
-    description: Allows players to use /blockpallet
+  blockpalette.use:
+    description: Allows players to use /blockpalette
     default: true
   btt.bp.edit:
     description: Allows players to create and edit custom block palettes

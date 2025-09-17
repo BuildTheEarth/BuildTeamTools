@@ -5,27 +5,31 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.ModuleComponent;
+import net.buildtheearth.modules.navigation.NavUtils;
+import net.buildtheearth.modules.navigation.components.warps.menu.WarpEditMenu;
+import net.buildtheearth.modules.navigation.components.warps.menu.WarpGroupEditMenu;
+import net.buildtheearth.modules.navigation.components.warps.model.Warp;
+import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.modules.network.NetworkModule;
-import net.buildtheearth.modules.network.api.NetworkAPI;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.GeometricUtils;
 import net.buildtheearth.utils.geo.CoordinateConversion;
-import net.buildtheearth.modules.navigation.components.warps.menu.WarpEditMenu;
-import net.buildtheearth.modules.navigation.components.warps.menu.WarpGroupEditMenu;
-import net.buildtheearth.modules.navigation.components.warps.model.Warp;
-import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class WarpsComponent extends ModuleComponent {
+
+    public static final NamespacedKey WARP_COOKIE_KEY = NamespacedKey.minecraft("btt_warp");
 
     public WarpsComponent() {
         super("Warps");
@@ -42,14 +46,10 @@ public class WarpsComponent extends ModuleComponent {
      * @param in     The ByteArray received through the PluginMessageChannel
      * @param player The player to whom the warp operation belongs
      */
-    public void addWarpToQueue(ByteArrayDataInput in, Player player) {
-        //Check the target server
-        String targetServer = in.readUTF();
-        if (targetServer.equals(NetworkModule.getInstance().getBuildTeam().getServerName())) {
-            //Extracts the warp key from the plugin message
+    public void addWarpToQueue(@NotNull ByteArrayDataInput in, Player player) {
+        // Extracts the warp key from the plugin message
             String warpKey = in.readUTF();
-
-            Warp warp = NetworkAPI.getWarpByKey(warpKey);
+        Warp warp = getWarpByKey(warpKey);
 
             if (warp == null) {
                 player.sendMessage(ChatHelper.getErrorString("The warp you tried to warp to does not exist anymore."));
@@ -62,7 +62,6 @@ public class WarpsComponent extends ModuleComponent {
 
             // Adds the event to the list, to be dealt with by the join listener
             warpQueue.put(player.getUniqueId(), targetWarpLocation);
-        }
     }
 
     /**
@@ -106,32 +105,46 @@ public class WarpsComponent extends ModuleComponent {
 
             player.teleport(loc);
             ChatHelper.sendSuccessfulMessage(player, "Successfully warped you to %s.", warp.getName());
-
             return;
         }
 
-        // Get the server the warp is on
-        String targetServer = "Empty"; // NetworkAPI.getServerNameByCountryCode(warp.getCountryCode());
+        var type = NavUtils.determineSwitchPossibilityOrMsgPlayerIfNone(player, warp.getWarpGroup().getBuildTeam());
 
-        // Send a plugin message to that server which adds the warp to the queue
-        ByteArrayDataOutput out = ByteStreams.newDataOutput();
-        out.writeUTF("UniversalWarps");
-        out.writeUTF(targetServer);
-        out.writeUTF(warp.getId().toString());
+        if (type == NavUtils.NavSwitchType.NETWORK) {
+            // Send a plugin message to that server which adds the warp to the queue
+            ByteArrayDataOutput out = ByteStreams.newDataOutput();
+            out.writeUTF("UniversalWarps");
+            out.writeUTF(warp.getId().toString());
 
-        player.sendPluginMessage(BuildTeamTools.getInstance(), "btt:buildteam", out.toByteArray());
+            player.sendPluginMessage(BuildTeamTools.getInstance(), "btt:buildteam", out.toByteArray());
 
-        // Switch the player to the target server
-        NetworkModule.getInstance().switchServer(player, targetServer);
+            // Switch the player to the target server
+            NetworkModule.getInstance().switchServer(player, warp.getWarpGroup().getBuildTeam().getServerName());
+        } else if (type == NavUtils.NavSwitchType.TRANSFER) {
+            ByteArrayDataOutput out = ByteStreams.newDataOutput();
+            out.writeUTF(String.valueOf(warp.getId()));
+            player.storeCookie(WARP_COOKIE_KEY, out.toByteArray());
+            NavUtils.transferPlayer(player, warp.getWarpGroup().getBuildTeam().getIP());
+        }
     }
 
+    public WarpGroup getOtherWarpGroup() {
+        return NetworkModule.getInstance().getBuildTeam().getWarpGroups().stream().filter(warpGroup -> warpGroup.getName().equalsIgnoreCase("Other")).findFirst().orElse(null);
+    }
 
+    public void createWarp(Player creator) {
+        WarpGroup group = getOtherWarpGroup();
+        if (group == null) {
+            group = NavUtils.createOtherWarpGroup();
+        }
+        createWarp(creator, group);
+    }
 
     /** Creates a warp at the player's location and opens the warp edit menu.
      *
      * @param creator The player that is creating the warp
      */
-    public void createWarp(Player creator){
+    public void createWarp(Player creator, WarpGroup group) {
         // Get the geographic coordinates of the player's location.
         Location location = creator.getLocation();
         double[] coordinates = CoordinateConversion.convertToGeo(location.getX(), location.getZ());
@@ -151,29 +164,24 @@ public class WarpsComponent extends ModuleComponent {
                 return;
             }
 
-            // Get the Other Group for default warp group
-            WarpGroup group = NetworkModule.getInstance().getBuildTeam().getWarpGroups().stream().filter(warpGroup -> warpGroup.getName().equalsIgnoreCase("Other")).findFirst().orElse(null);
-
             // Create a default name for the warp
             String name = creator.getName() + "'s Warp";
 
             // Create an instance of the warp POJO
             Warp warp = new Warp(group, name, countryCodeCCA2, "cca2", null, null, null, location.getWorld().getName(), coordinates[0], coordinates[1], location.getY(), location.getYaw(), location.getPitch(), false);
 
-            Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), () -> {
-                // Create the actual warp
-                new WarpEditMenu(creator, warp, false, true);
-            });
+            Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), () ->
+                    new WarpEditMenu(creator, warp, false, true));
 
         }).exceptionally(e -> {
-            creator.sendMessage(ChatHelper.getErrorString("An error occurred while creating the warp!"));
-            e.printStackTrace();
+            creator.sendMessage(ChatHelper.getErrorString("An error occurred while creating the warp! %s", e.getMessage()));
+            BuildTeamTools.getInstance().getComponentLogger().error("An error occurred while creating the warp!", e);
             return null;
         });
     }
 
 
-    public void createWarpGroup(Player creator){
+    public void createWarpGroup(@NotNull Player creator) {
         // Create a default name for the warp
         String name = creator.getName() + "'s Warp Group";
         String description = "This is a warp group.";
@@ -193,8 +201,19 @@ public class WarpsComponent extends ModuleComponent {
         return getWarpByName(NetworkModule.getInstance().getBuildTeam(), name);
     }
 
-    public Warp getWarpByName(BuildTeam buildTeam, String name) {
+    public Warp getWarpByName(@NotNull BuildTeam buildTeam, String name) {
         return buildTeam.getWarpGroups().stream().flatMap(warpGroup -> warpGroup.getWarps().stream())
                 .filter(warp1 -> warp1.getName() != null && warp1.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+    }
+
+    public void processCookie(@NotNull Player player, byte[] cookie) {
+        ByteArrayDataInput in = ByteStreams.newDataInput(cookie);
+
+        warpPlayer(player, getWarpByKey(in.readUTF()));
+    }
+
+    public Warp getWarpByKey(String key) {
+        return NetworkModule.getInstance().getBuildTeam().getWarpGroups().stream().flatMap(warpGroup -> warpGroup.getWarps().stream())
+                .filter(warp1 -> warp1.getId().toString().equals(key)).findFirst().orElse(null);
     }
 }

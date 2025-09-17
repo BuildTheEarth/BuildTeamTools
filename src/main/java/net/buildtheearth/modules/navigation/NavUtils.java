@@ -4,6 +4,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import lombok.experimental.UtilityClass;
 import net.buildtheearth.BuildTeamTools;
+import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.utils.ChatHelper;
@@ -112,5 +113,10 @@ public class NavUtils {
                 NavUtils.transferPlayer(clickPlayer, team.getIP());
             }
         }
+    }
+
+    public static @NotNull WarpGroup createOtherWarpGroup() {
+        // Create an "other" Warp Group for warps that don't belong to a warp group
+        return new WarpGroup(NetworkModule.getInstance().getBuildTeam(), "Other", "Other warps", -1, null);
     }
 }

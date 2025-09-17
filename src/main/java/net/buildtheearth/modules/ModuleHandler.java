@@ -6,6 +6,7 @@ import net.buildtheearth.utils.ChatHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -50,11 +51,10 @@ public class ModuleHandler {
      * Enables a specific module
      *
      * @param module {@link Module}
-     * @param executor the sender that executed the command. If null, the system executed the command.
-     * @param isStarting if the server is starting
+     * @param executor the sender, if it's triggered via command, else null, when it's called by btt on plugin start.
      * @return True if successfully enabled, false if not
      */
-    public boolean enable(Module module, CommandSender executor, boolean isStarting) {
+    public boolean enable(@NotNull Module module, @Nullable CommandSender executor) {
         for (Module m : modules)
             if (m.getModuleName().equals(module.getModuleName()) && m.isEnabled())
                 return false;
@@ -71,14 +71,14 @@ public class ModuleHandler {
                 module.enable();
         } catch (Exception ex) {
             if (BuildTeamTools.getInstance().isDebug()) {
-                ChatHelper.logError("An error occurred while enabling the %s Module: %s", module.getModuleName(), ex.getMessage());
-                ex.printStackTrace();
+                ChatHelper.logError("An error occurred while enabling the %s Module: %s", ex, module.getModuleName(),
+                        ex.getMessage());
             }
 
             module.shutdown(ex.getMessage());
         }
 
-        if (!isStarting) {
+        if (executor != null) {
             if (module.isEnabled() && BuildTeamTools.getInstance().isDebug())
                 ChatHelper.log("Successfully enabled %s Module", module.getModuleName());
             else {
@@ -112,10 +112,10 @@ public class ModuleHandler {
      * Disables a specific module
      *
      * @param module {@link Module}
-     * @param executor the sender that executed the command. If null, the system executed the command.
+     * @param executor the sender, if it's triggered via command, else null - when it's called by btt on plugin stop).
      * @return True if successfully disabled, false if not
      */
-    public boolean disable(Module module, CommandSender executor) {
+    public boolean disable(@NotNull Module module, @Nullable CommandSender executor) {
         boolean contains = false;
         for(Module m : modules)
             if (m.getModuleName().equals(module.getModuleName())) {
@@ -131,7 +131,7 @@ public class ModuleHandler {
         if (!module.isEnabled()) {
             if(BuildTeamTools.getInstance().isDebug())
                 ChatHelper.log("Successfully disabled %s Module", module.getModuleName());
-        }else {
+        } else {
             String reason = "";
 
             if(module.getError() != null && !module.getError().isEmpty())
@@ -158,21 +158,20 @@ public class ModuleHandler {
 
     /** Enables all modules
      *
-     * @param executor the player that executed the command. If null, the command was executed by the system.
-     * @param isStarting if the server is starting
+     * @param executor the player, if it's triggered via command, else null (when it's called by btt on plugin start).
      */
-    public void enableAll(@Nullable CommandSender executor, boolean isStarting) {
+    public void enableAll(@Nullable CommandSender executor) {
         for (Module module : new ArrayList<>(modules))
             if (!module.isEnabled())
-                enable(module, executor, isStarting);
+                enable(module, executor);
 
-        if(isStarting)
+        if (executor == null)
             sendBuildTeamToolsConsoleStartupMessage();
     }
 
     /** Disables all modules
      *
-     * @param executor the player that executed the command. If null, the command was executed by the system.
+     * @param executor the player, if it's triggered via command, else null (when it's called by btt on plugin stop).
      */
     public void disableAll(@Nullable CommandSender executor) {
         for (Module module : new ArrayList<>(modules))
@@ -183,9 +182,9 @@ public class ModuleHandler {
     /**
      * Reloads all modules
      */
-    public void reloadAll(CommandSender executor) {
+    public void reloadAll(@Nullable CommandSender executor) {
         disableAll(executor);
-        enableAll(executor, false);
+        enableAll(executor);
     }
 
     private void sendBuildTeamToolsConsoleStartupMessage(){

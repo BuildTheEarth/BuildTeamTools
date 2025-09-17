@@ -2,6 +2,7 @@ package net.buildtheearth.modules.network.api;
 
 import lombok.experimental.UtilityClass;
 import net.buildtheearth.BuildTeamTools;
+import net.buildtheearth.modules.navigation.NavUtils;
 import net.buildtheearth.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.modules.network.NetworkModule;
@@ -15,6 +16,7 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -52,7 +54,7 @@ public class NetworkAPI {
     }
 
     // Add all currently connected regions to their respective continents
-    public static CompletableFuture<Void> getBuildTeamInformation() {
+    public static @NotNull CompletableFuture<Void> getBuildTeamInformation() {
         CompletableFuture<Void> future = new CompletableFuture<>();
 
         getAsync("https://nwapi.buildtheearth.net/api/teams", new API.ApiResponseCallback() {
@@ -103,9 +105,7 @@ public class NetworkAPI {
                                 isConnected, hasBuildTeamToolsInstalled, allowsTransfers, tag);
                         NetworkModule.getInstance().getBuildTeams().add(buildTeam);
 
-                        // Create an "other" Warp Group for warps that don't belong to a warp group
-                        WarpGroup otherWarpGroup = new WarpGroup(buildTeam, "Other", "Other warps", -1, null);
-                        buildTeam.getWarpGroups().add(otherWarpGroup);
+                        WarpGroup otherWarpGroup = NavUtils.createOtherWarpGroup();
 
                         // Add all the warp groups of the team to their respective build teams
                         for (Object warpGroupJSON : warpGroups.toArray()) {
@@ -122,6 +122,8 @@ public class NetworkAPI {
 
                             buildTeam.getWarpGroups().add(warpGroup);
                         }
+
+                        if (!otherWarpGroup.getWarps().isEmpty()) buildTeam.getWarpGroups().add(otherWarpGroup);
 
                         // Add all the warps of the team to their respective warp groups
                         for (Object warpJSON : warps.toArray()) {
@@ -362,11 +364,6 @@ public class NetworkAPI {
                 ChatHelper.getErrorString("Failed to sync the player list with the network API: %s", e);
             }
         });
-    }
-
-    public static Warp getWarpByKey(String key) {
-        //TODO IMPLEMENT
-        return null;
     }
 
     public static void getAsync(String url, API.ApiResponseCallback callback) {

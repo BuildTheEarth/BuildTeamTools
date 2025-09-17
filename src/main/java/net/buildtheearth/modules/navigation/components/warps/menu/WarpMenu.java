@@ -1,6 +1,7 @@
 package net.buildtheearth.modules.navigation.components.warps.menu;
 
 import net.buildtheearth.modules.navigation.NavigationModule;
+import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.Permissions;
 import net.buildtheearth.utils.*;
 import net.buildtheearth.utils.menus.AbstractPaginatedMenu;
@@ -9,6 +10,7 @@ import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +19,7 @@ import java.util.stream.Collectors;
 
 public class WarpMenu extends AbstractPaginatedMenu {
 
-    public final int BACK_ITEM_SLOT = 27;
+    public static final int BACK_ITEM_SLOT = 27;
 
     private final boolean hasBackItem;
     private final WarpGroup warpGroup;
@@ -42,8 +44,7 @@ public class WarpMenu extends AbstractPaginatedMenu {
     }
 
     @Override
-    protected void setItemClickEventsAsync() {
-    }
+    protected void setItemClickEventsAsync() { /* Not needed */ }
 
     @Override
     protected Mask getMask() {
@@ -62,15 +63,16 @@ public class WarpMenu extends AbstractPaginatedMenu {
         List<Warp> warps = warpGroup.getWarps().stream().sorted((warp1, warp2) -> warp1.getName().compareToIgnoreCase(warp2.getName())).collect(Collectors.toList());
 
         // Add a "create warp" item if the player has permission
-        if (getMenuPlayer().hasPermission(Permissions.WARP_CREATE))
+        if (getMenuPlayer().hasPermission(Permissions.WARP_CREATE)
+                && NetworkModule.getInstance().getBuildTeam().equals(warpGroup.getBuildTeam()))
             warps.add(new Warp(null, "%create-warp%", null, null, null, null, null, null, 0, 0, 0, 0, 0, false));
 
         return warps;
     }
 
     @Override
-    protected void setPaginatedPreviewItems(List<?> source) {
-        List<Warp> warps = source.stream().map(l -> (Warp) l).collect(Collectors.toList());
+    protected void setPaginatedPreviewItems(@NotNull List<?> source) {
+        List<Warp> warps = source.stream().map(l -> (Warp) l).toList();
 
         // Create the country items
         int slot = 0;
@@ -96,13 +98,11 @@ public class WarpMenu extends AbstractPaginatedMenu {
     }
 
     @Override
-    protected void setPaginatedMenuItemsAsync(List<?> source) {
-
-    }
+    protected void setPaginatedMenuItemsAsync(List<?> source) {/* Not needed */}
 
     @Override
-    protected void setPaginatedItemClickEventsAsync(List<?> source) {
-        List<Warp> warps = source.stream().map(l -> (Warp) l).collect(Collectors.toList());
+    protected void setPaginatedItemClickEventsAsync(@NotNull List<?> source) {
+        List<Warp> warps = source.stream().map(l -> (Warp) l).toList();
 
         int slot = 0;
         for (Warp warp : warps) {
@@ -112,11 +112,12 @@ public class WarpMenu extends AbstractPaginatedMenu {
 
                 // Create a click action for the "Create Warp" item if the player has permission
                 if(warp.getName().equals("%create-warp%") && getMenuPlayer().hasPermission(Permissions.WARP_CREATE) && _slot == warps.size() - 1){
-                    NavigationModule.getInstance().getWarpsComponent().createWarp(clickPlayer);
+                    NavigationModule.getInstance().getWarpsComponent().createWarp(clickPlayer, warpGroup);
                     return;
                 }
 
-                if(clickInformation.getClickType().isRightClick() && clickPlayer.hasPermission(Permissions.WARP_EDIT))
+                if (clickInformation.getClickType().isRightClick() && clickPlayer.hasPermission(Permissions.WARP_EDIT)
+                        && warp.getWarpGroup().getBuildTeam().equals(NetworkModule.getInstance().getBuildTeam()))
                     new WarpEditMenu(clickPlayer, warp, true, true);
                 else
                     NavigationModule.getInstance().getWarpsComponent().warpPlayer(clickPlayer, warp);

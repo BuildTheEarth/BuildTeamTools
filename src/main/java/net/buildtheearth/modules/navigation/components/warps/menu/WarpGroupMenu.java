@@ -7,6 +7,7 @@ import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.modules.navigation.menu.CountrySelectorMenu;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.BuildTeam;
+import net.buildtheearth.modules.network.model.Continent;
 import net.buildtheearth.modules.network.model.Permissions;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.CustomHeads;
@@ -35,12 +36,13 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
     private final boolean hasBackItem;
     private final BuildTeam buildTeam;
     private int plusSlot = ALTERNATE_PLUS_SLOT;
+    private Continent continent;
 
     /** In this menu the player can select a warp group to view the warps in each warp group.
      *
      * @param menuPlayer The player that is viewing the menu
      * @param buildTeam The build team that the menu is for
-     * @param hasBackItem Whether the menu has a back item
+     * @param hasBackItem Whether the menu has a back item - only true on overrides or when country selector menu
      */
     public WarpGroupMenu(Player menuPlayer, BuildTeam buildTeam, boolean hasBackItem, boolean autoLoad) {
         super(4, 3, "Warp Menu", menuPlayer, autoLoad);
@@ -48,15 +50,16 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
         this.buildTeam = buildTeam;
     }
 
+    public WarpGroupMenu(Player menuPlayer, BuildTeam buildTeam, boolean hasBackItem, boolean autoLoad, Continent continent) {
+        this(menuPlayer, buildTeam, hasBackItem, autoLoad);
+        this.continent = continent;
+    }
+
     @Override
     protected void setMenuItemsAsync() {
         if (hasBackItem) {
-            if (ChatHelper.DEBUG)
-                getMenuPlayer().sendMessage("Finally triggered the misterious back item in the warp group menu");
-            setBackItem(BACK_ITEM_SLOT, new CountrySelectorMenu(getMenuPlayer(), buildTeam.getRegions().getFirst().getContinent(), false));
-            // TODO fix it for multiple continents
-            if (ChatHelper.DEBUG) Thread.dumpStack();
             ChatHelper.logDebug("Setting back item for warp group menu");
+            setBackItem(BACK_ITEM_SLOT, new CountrySelectorMenu(getMenuPlayer(), continent, false));
         }
     }
 

@@ -28,7 +28,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class NetworkModule extends Module {
 
-    public static final String GLOBAL_PLOT_SYSTEM_SERVER = "NYC-1";
     public static final int CACHE_UPLOAD_SPEED = 20 * 60 * 10 + 20;
 
     /** Information about the build team of this server */

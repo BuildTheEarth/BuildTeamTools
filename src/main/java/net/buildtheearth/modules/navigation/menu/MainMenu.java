@@ -3,7 +3,6 @@ package net.buildtheearth.modules.navigation.menu;
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.navigation.NavUtils;
-import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
@@ -11,14 +10,14 @@ import net.buildtheearth.utils.io.ConfigPaths;
 import net.buildtheearth.utils.io.ConfigUtil;
 import net.buildtheearth.utils.menus.AbstractMenu;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.apache.commons.lang3.BooleanUtils;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * The main menu for the BTE universal navigator. <br>
@@ -43,7 +42,7 @@ public class MainMenu extends AbstractMenu {
     @Override
     protected void setPreviewItems() {
         config = BuildTeamTools.getInstance().getConfig(ConfigUtil.NAVIGATION);
-        int[] slots = getSlots();
+        @NotNull Deque<@NotNull Integer> slots = getSlots();
 
         // Fill the blank slots with glass panes
         getMenu().getSlot(11).setItem(MenuItems.ITEM_BACKGROUND);
@@ -52,47 +51,50 @@ public class MainMenu extends AbstractMenu {
 
         // Set Explore Item
         ArrayList<String> exploreLore = new ArrayList<>(Collections.singletonList(ChatHelper.getColorizedString(NamedTextColor.GRAY, "Click to explore the project!", false)));
-        getMenu().getSlot(slots[0]).setItem(Item.edit(Objects.requireNonNull(XMaterial.SPRUCE_BOAT.parseItem()), 1, ChatHelper.getColorizedString(NamedTextColor.YELLOW, "Explore", true), exploreLore));
+        getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setItem(Item.edit(Objects.requireNonNull(XMaterial.SPRUCE_BOAT.parseItem()), 1, ChatHelper.getColorizedString(NamedTextColor.YELLOW, "Explore", true), exploreLore));
 
 
         // Set Build Item
-        if(config.getBoolean(ConfigPaths.Navigation.BUILD_ITEM_ENABLED)) {
+        if (config.getBoolean(ConfigPaths.Navigation.BUILD_ITEM_ENABLED)) {
             ArrayList<String> buildLore = new ArrayList<>(Collections.singletonList(ChatHelper.getColorizedString(NamedTextColor.GRAY, "Click to build for the project!", false)));
-            getMenu().getSlot(slots[1]).setItem(Item.edit(Objects.requireNonNull(XMaterial.DIAMOND_PICKAXE.parseItem()), 1, ChatHelper.getColorizedString(NamedTextColor.GREEN, "Build", true), buildLore));
+            getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setItem(Item.edit(Objects.requireNonNull(XMaterial.DIAMOND_PICKAXE.parseItem()), 1, ChatHelper.getColorizedString(NamedTextColor.GREEN, "Build", true), buildLore));
         }
 
         // Set Tutorials Item
-        if(config.getBoolean(ConfigPaths.Navigation.TUTORIALS_ITEM_ENABLED)) {
+        if (config.getBoolean(ConfigPaths.Navigation.TUTORIALS_ITEM_ENABLED)) {
             ArrayList<String> tutorialsLore = new ArrayList<>(Collections.singletonList(ChatHelper.getColorizedString(NamedTextColor.GRAY, "Click to do some tutorials!", false)));
-            getMenu().getSlot(slots[2]).setItem(Item.edit(Objects.requireNonNull(XMaterial.KNOWLEDGE_BOOK.parseItem()), 1, ChatHelper.getColorizedString(NamedTextColor.AQUA, "Tutorials", true), tutorialsLore));
+            getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setItem(Item.edit(Objects.requireNonNull(XMaterial.KNOWLEDGE_BOOK.parseItem()), 1, ChatHelper.getColorizedString(NamedTextColor.AQUA, "Tutorials", true), tutorialsLore));
         }
 
         super.setPreviewItems();
     }
 
     @Override
-    protected void setMenuItemsAsync() {}
+    protected void setMenuItemsAsync() { /* No async Items set */}
 
     @Override
     protected void setItemClickEventsAsync() {
-        int[] slots = getSlots();
-
-        // Set Explore Item Click Event
-        getMenu().getSlot(slots[0]).setClickHandler((clickPlayer, clickInformation) -> {
-            clickPlayer.closeInventory();
-            new ExploreMenu(clickPlayer, true);
-        });
+        Deque<Integer> slots = getSlots();
 
         // Set Build Item Click Event
-        if(config.getBoolean(ConfigPaths.Navigation.BUILD_ITEM_ENABLED)) {
-            getMenu().getSlot(slots[1]).setClickHandler((clickPlayer, clickInformation) -> {
-                clickPlayer.closeInventory();
-                String action = config.getString(ConfigPaths.Navigation.BUILD_ITEM_ACTION);
+        if (config.getBoolean(ConfigPaths.Navigation.BUILD_ITEM_ENABLED)) {
+            getMenu().getSlot(Objects.requireNonNull(slots.pollFirst()))
+                    .setClickHandler((clickPlayer, clickInformation) -> {
+                        clickPlayer.closeInventory();
+                        String action = config.getString(ConfigPaths.Navigation.BUILD_ITEM_ACTION);
+                        performClickAction(clickPlayer, Objects.requireNonNull(action).replace("&", "§"));
+                    });
+        }
 
-                // If no command or message is set, teleport player to the plot system server
-                if(action == null || action.equals("/command") || action.equals("message")) {
-                    clickPlayer.sendMessage(ChatHelper.getStandardString("Teleporting you to the plot system server..."));
-                    NavUtils.sendPlayerToConnectedServer(clickPlayer, NetworkModule.GLOBAL_PLOT_SYSTEM_SERVER);
+        // Set Tutorials Item Click Event
+        if (config.getBoolean(ConfigPaths.Navigation.TUTORIALS_ITEM_ENABLED)) {
+            getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setClickHandler((clickPlayer, clickInformation) -> {
+                clickPlayer.closeInventory();
+                String action = config.getString(ConfigPaths.Navigation.TUTORIALS_ITEM_ACTION);
+
+                // If no command or message is set, open the tutorial menu
+                if (action == null || action.equals("/command") || action.equals("message")) {
+                    new TutorialsMenu(clickPlayer);
                     return;
                 }
 
@@ -100,19 +102,21 @@ public class MainMenu extends AbstractMenu {
             });
         }
 
-        // Set Tutorials Item Click Event
-        if(config.getBoolean(ConfigPaths.Navigation.TUTORIALS_ITEM_ENABLED)) {
-            getMenu().getSlot(slots[2]).setClickHandler((clickPlayer, clickInformation) -> {
+        // Set Plotsystem Item Click Event
+        if (config.getBoolean(ConfigPaths.Navigation.PLOTSYSTEM_ITEM_ENABLED)) {
+            getMenu().getSlot(Objects.requireNonNull(slots.pollFirst()))
+                    .setClickHandler((clickPlayer, clickInformation) -> {
+                        clickPlayer.closeInventory();
+                        String action = config.getString(ConfigPaths.Navigation.PLOTSYSTEM_ITEM_ACTION);
+                        performClickAction(clickPlayer, Objects.requireNonNull(action).replace("&", "§"));
+                    });
+        }
+
+        if (config.getBoolean(ConfigPaths.Navigation.EXPLORE_ITEM_ENABLED)) {
+            // Set Explore Item Click Event
+            getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
-                String action = config.getString(ConfigPaths.Navigation.TUTORIALS_ITEM_ACTION);
-
-                // If no command or message is set, open the tutorial menu
-                if(action == null || action.equals("/command") || action.equals("message")) {
-                    new TutorialsMenu(clickPlayer);
-                    return;
-                }
-
-                performClickAction(clickPlayer, action.replace("&", "§"));
+                new ExploreMenu(clickPlayer, true);
             });
         }
     }
@@ -127,42 +131,58 @@ public class MainMenu extends AbstractMenu {
                 .build();
     }
 
-    /** Returns the slots for the Build, Explore and Tutorials items depending on which items are enabled in the config
+    /**
+     * Returns the slots for the Build, Explore and Tutorials items depending on which items are enabled in the config
      *
-     * @return int[] - Slots of the Explore [0], Build [1] and Tutorials [2] items
+     * @return int[] - Slots of the enabled items
      */
-    private int[] getSlots() {
-        int[] slots = new int[3];
-
+    private @NotNull Deque<@NotNull Integer> getSlots() {
+        Deque<Integer> slots = new ArrayDeque<>();
         boolean buildEnabled = config.getBoolean(ConfigPaths.Navigation.BUILD_ITEM_ENABLED);
         boolean tutorialsEnabled = config.getBoolean(ConfigPaths.Navigation.TUTORIALS_ITEM_ENABLED);
+        boolean plotsystemEnabled = config.getBoolean(ConfigPaths.Navigation.PLOTSYSTEM_ITEM_ENABLED);
+        boolean exploreEnabled = config.getBoolean(ConfigPaths.Navigation.EXPLORE_ITEM_ENABLED);
 
-        int exploreSlot = 11;
-        int buildSlot = 13;
-        int tutorialsSlot = 15;
-
-        int enabledItemCount = (buildEnabled ? 1 : 0) + 1 + (tutorialsEnabled ? 1 : 0);
+        int enabledItemCount = BooleanUtils.toInteger(buildEnabled) + BooleanUtils.toInteger(tutorialsEnabled) +
+                BooleanUtils.toInteger(plotsystemEnabled) + BooleanUtils.toInteger(exploreEnabled);
 
         // Depending on how many items are enabled, set the slots to the correct positions
-        if (enabledItemCount == 2) {
-            if (buildEnabled)
-                buildSlot = 15;
-            else
-                buildSlot = 11;
+        switch (enabledItemCount) {
+            case 1:
+                slots.add(14);
+                break;
+            case 2:
+                slots.add(12);
+                slots.add(16);
+                break;
+            case 3:
+                slots.add(12);
+                slots.add(14);
+                slots.add(16);
+                break;
+            case 4:
+                slots.add(11);
+                slots.add(13);
+                slots.add(15);
+                slots.add(17);
+                break;
+            default:
+                throw new IllegalStateException("Unexpected enabled items value: " + enabledItemCount);
         }
-
-        slots[0] = exploreSlot;
-        slots[1] = buildSlot;
-        slots[2] = tutorialsSlot;
 
         return slots;
     }
 
-    private void performClickAction(Player p, String action) {
+    private void performClickAction(Player p, @NotNull String action) {
         // Check if an action is set in the config
-        if(!action.equals("/command") &&! action.equals("message"))
+        if (action.startsWith("transfer:")) {
+            NavUtils.transferPlayer(p, action.substring(9));
+        } else if (action.startsWith("switch:")) {
+            NavUtils.sendPlayerToConnectedServer(p, action.substring(7));
+        } else if (!action.equals("/command") && !action.equals("message")) {
             p.chat(action);
-        else
+        } else {
             p.sendMessage(ChatHelper.getErrorString("No action is set for the %s in the config yet! Please contact an %s.", "build item", "admin"));
+        }
     }
 }

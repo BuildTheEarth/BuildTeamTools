@@ -78,7 +78,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
     }
 
     @Override
-    protected void setPaginatedPreviewItems(List<?> source) {
+    protected void setPaginatedPreviewItems(@NotNull List<?> source) {
         List<Region> countries = source.stream().map(l -> (Region) l).toList();
 
         // Create the country items
@@ -99,7 +99,8 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
     }
 
     @Override
-    protected void setMenuItemsAsync() {}
+    protected void setMenuItemsAsync(/* No async Items set */) {
+    }
 
     @Override
     protected void setItemClickEventsAsync() {
@@ -122,7 +123,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
                 if (clickInformation.getClickType().isRightClick() &&
                         clickPlayer.hasPermission(Permissions.WARP_USE) &&
                         !clickedRegion.getBuildTeam().getWarpGroups().isEmpty()) {
-                    new WarpGroupMenu(clickPlayer, clickedRegion.getBuildTeam(), true, true);
+                    new WarpGroupMenu(clickPlayer, clickedRegion.getBuildTeam(), true, true, clickedRegion.getContinent());
                 } else {
                     NavUtils.switchToTeam(clickedRegion.getBuildTeam(), clickPlayer);
                 }

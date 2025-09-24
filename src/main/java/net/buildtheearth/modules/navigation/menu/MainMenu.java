@@ -17,7 +17,11 @@ import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.Objects;
 
 /**
  * The main menu for the BTE universal navigator. <br>
@@ -45,9 +49,9 @@ public class MainMenu extends AbstractMenu {
         @NotNull Deque<@NotNull Integer> slots = getSlots();
 
         // Fill the blank slots with glass panes
-        getMenu().getSlot(11).setItem(MenuItems.ITEM_BACKGROUND);
-        getMenu().getSlot(13).setItem(MenuItems.ITEM_BACKGROUND);
-        getMenu().getSlot(15).setItem(MenuItems.ITEM_BACKGROUND);
+        for (int i = 10; i <= 16; i++) {
+            getMenu().getSlot(i).setItem(MenuItems.ITEM_BACKGROUND);
+        }
 
         // Set Explore Item
         ArrayList<String> exploreLore = new ArrayList<>(Collections.singletonList(ChatHelper.getColorizedString(NamedTextColor.GRAY, "Click to explore the project!", false)));
@@ -82,7 +86,7 @@ public class MainMenu extends AbstractMenu {
                     .setClickHandler((clickPlayer, clickInformation) -> {
                         clickPlayer.closeInventory();
                         String action = config.getString(ConfigPaths.Navigation.BUILD_ITEM_ACTION);
-                        performClickAction(clickPlayer, Objects.requireNonNull(action).replace("&", "§"));
+                        performClickAction(clickPlayer, Objects.requireNonNull(action).replace("&", "§"), "build");
                     });
         }
 
@@ -98,7 +102,7 @@ public class MainMenu extends AbstractMenu {
                     return;
                 }
 
-                performClickAction(clickPlayer, action.replace("&", "§"));
+                performClickAction(clickPlayer, action.replace("&", "§"), "tutorial");
             });
         }
 
@@ -108,7 +112,7 @@ public class MainMenu extends AbstractMenu {
                     .setClickHandler((clickPlayer, clickInformation) -> {
                         clickPlayer.closeInventory();
                         String action = config.getString(ConfigPaths.Navigation.PLOTSYSTEM_ITEM_ACTION);
-                        performClickAction(clickPlayer, Objects.requireNonNull(action).replace("&", "§"));
+                        performClickAction(clickPlayer, Objects.requireNonNull(action).replace("&", "§"), "plotsystem");
                     });
         }
 
@@ -126,7 +130,7 @@ public class MainMenu extends AbstractMenu {
         return BinaryMask.builder(getMenu())
                 .item(MenuItems.ITEM_BACKGROUND)
                 .pattern("111111111")
-                .pattern("110101011")
+                .pattern("100000001")
                 .pattern("111111111")
                 .build();
     }
@@ -149,22 +153,22 @@ public class MainMenu extends AbstractMenu {
         // Depending on how many items are enabled, set the slots to the correct positions
         switch (enabledItemCount) {
             case 1:
-                slots.add(14);
+                slots.add(13);
                 break;
             case 2:
-                slots.add(12);
-                slots.add(16);
+                slots.add(11);
+                slots.add(15);
                 break;
             case 3:
-                slots.add(12);
-                slots.add(14);
-                slots.add(16);
-                break;
-            case 4:
                 slots.add(11);
                 slots.add(13);
                 slots.add(15);
-                slots.add(17);
+                break;
+            case 4:
+                slots.add(10);
+                slots.add(12);
+                slots.add(14);
+                slots.add(16);
                 break;
             default:
                 throw new IllegalStateException("Unexpected enabled items value: " + enabledItemCount);
@@ -173,7 +177,7 @@ public class MainMenu extends AbstractMenu {
         return slots;
     }
 
-    private void performClickAction(Player p, @NotNull String action) {
+    private void performClickAction(Player p, @NotNull String action, @NotNull String type) {
         // Check if an action is set in the config
         if (action.startsWith("transfer:")) {
             NavUtils.transferPlayer(p, action.substring(9));
@@ -182,7 +186,7 @@ public class MainMenu extends AbstractMenu {
         } else if (!action.equals("/command") && !action.equals("message")) {
             p.chat(action);
         } else {
-            p.sendMessage(ChatHelper.getErrorString("No action is set for the %s in the config yet! Please contact an %s.", "build item", "admin"));
+            p.sendMessage(ChatHelper.getErrorString("No action is set for the %s in the config yet! Please contact an %s.", type + " item", "admin"));
         }
     }
 }

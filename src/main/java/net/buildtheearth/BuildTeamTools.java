@@ -52,7 +52,7 @@ public class BuildTeamTools extends JavaPlugin {
             StatsModule.getInstance(),
             MiscModule.getInstance()
         );
-        ModuleHandler.getInstance().enableAll(null, true);
+        ModuleHandler.getInstance().enableAll(null);
     }
 
     @Override

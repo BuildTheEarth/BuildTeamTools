@@ -1,4 +1,4 @@
-package net.buildtheearth.modules.blockpalletegui;
+package net.buildtheearth.modules.miscellaneous.blockpalletegui;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

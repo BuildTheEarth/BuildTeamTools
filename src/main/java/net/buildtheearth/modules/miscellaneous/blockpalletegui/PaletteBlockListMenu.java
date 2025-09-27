@@ -1,4 +1,4 @@
-package net.buildtheearth.modules.blockpalletegui;
+package net.buildtheearth.modules.miscellaneous.blockpalletegui;
 
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.utils.Item;

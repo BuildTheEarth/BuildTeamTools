@@ -5,15 +5,22 @@ import lombok.Setter;
 import net.buildtheearth.modules.ModuleHandler;
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.GeneratorModule;
+import net.buildtheearth.modules.miscellaneous.MiscModule;
 import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.plotsystem.PlotSystemModule;
 import net.buildtheearth.modules.stats.StatsModule;
 import net.buildtheearth.utils.io.ConfigUtil;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.logging.Level;
 
 /**
  * The parent of all modules of the Build Team Tools plugin
@@ -42,10 +49,10 @@ public class BuildTeamTools extends JavaPlugin {
                 GeneratorModule.getInstance(),
                 NavigationModule.getInstance(),
                 PlotSystemModule.getInstance(),
-                StatsModule.getInstance()
+                StatsModule.getInstance(),
+                MiscModule.getInstance()
         );
         ModuleHandler.getInstance().enableAll(null, true);
-        net.buildtheearth.modules.blockpalletegui.BlockPaletteModule.initialize(this);
     }
 
     @Override

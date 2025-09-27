@@ -1,4 +1,4 @@
-package net.buildtheearth.modules.blockpalletegui;
+package net.buildtheearth.modules.miscellaneous.blockpalletegui;
 
 import net.buildtheearth.utils.MenuItems;
 import org.bukkit.inventory.ItemStack;

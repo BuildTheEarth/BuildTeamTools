@@ -103,7 +103,8 @@ public class TpllComponent extends ModuleComponent {
 
     public void tpllPlayerTransfer(@NotNull Player player, double @NotNull [] coordinates, String ip) {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
-        out.writeUTF(String.valueOf(coordinates[0] + coordinates[1]));
+        out.writeDouble(coordinates[0]);
+        out.writeDouble(coordinates[1]);
         player.storeCookie(TPLL_COOKIE_KEY, out.toByteArray());
         NavUtils.transferPlayer(player, ip);
     }

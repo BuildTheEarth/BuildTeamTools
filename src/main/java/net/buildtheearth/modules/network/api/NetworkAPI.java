@@ -109,8 +109,7 @@ public class NetworkAPI {
 
                         // Add all the warp groups of the team to their respective build teams
                         for (Object warpGroupJSON : warpGroups.toArray()) {
-                            if (!(warpGroupJSON instanceof JSONObject)) continue;
-                            JSONObject warpGroupObject = (JSONObject) warpGroupJSON;
+                            if (!(warpGroupJSON instanceof JSONObject warpGroupObject)) continue;
 
                             UUID warpGroupID = UUID.fromString((String) warpGroupObject.get("ID"));
                             String warpGroupName = (String) warpGroupObject.get("Name");
@@ -127,8 +126,7 @@ public class NetworkAPI {
 
                         // Add all the warps of the team to their respective warp groups
                         for (Object warpJSON : warps.toArray()) {
-                            if (!(warpJSON instanceof JSONObject)) continue;
-                            JSONObject warpObject = (JSONObject) warpJSON;
+                            if (!(warpJSON instanceof JSONObject warpObject)) continue;
 
                             String warpIDString = (String) warpObject.get("ID");
                             UUID warpID = warpIDString != null ? UUID.fromString(warpIDString) : null;
@@ -183,8 +181,7 @@ public class NetworkAPI {
 
                         // Add all the regions of the team to their respective continents
                         for (Object regionJSON : regions.toArray()) {
-                            if (!(regionJSON instanceof JSONObject)) continue;
-                            JSONObject regionObject = (JSONObject) regionJSON;
+                            if (!(regionJSON instanceof JSONObject regionObject)) continue;
 
                             String regionName = (String) regionObject.get("RegionName");
                             String headBase64 = (String) regionObject.get("Head");
@@ -222,12 +219,10 @@ public class NetworkAPI {
                 String mainServerIP = (String) teamObject.get("MainServerIP");
 
                 Object serversObject = teamObject.get("Servers");
-                if(!(serversObject instanceof JSONArray)) return null;
-                JSONArray serversArray = (JSONArray) serversObject;
+                if (!(serversObject instanceof JSONArray serversArray)) return null;
 
                 for(Object object : serversArray.toArray()) {
-                    if(!(object instanceof JSONObject)) return null;
-                    JSONObject serverObject = (JSONObject) object;
+                    if (!(object instanceof JSONObject serverObject)) return null;
 
                     String serverIP = (String) serverObject.get("IP");
                     if(serverIP.equals(mainServerIP)) return (String) serverObject.get("Name");
@@ -240,7 +235,7 @@ public class NetworkAPI {
                 if(regionObject.get("area") == null) return 0;
 
                 if (regionObject.get("area") instanceof Long area)
-                    return area.intValue();
+                    return Math.toIntExact(area);
 
                 return ((Double) regionObject.get("area")).intValue();
             }

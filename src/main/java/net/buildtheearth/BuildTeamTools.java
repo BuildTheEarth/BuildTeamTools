@@ -5,6 +5,7 @@ import lombok.Setter;
 import net.buildtheearth.modules.ModuleHandler;
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.GeneratorModule;
+import net.buildtheearth.modules.miscellaneous.MiscModule;
 import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.plotsystem.PlotSystemModule;
@@ -48,7 +49,8 @@ public class BuildTeamTools extends JavaPlugin {
             GeneratorModule.getInstance(),
             NavigationModule.getInstance(),
             PlotSystemModule.getInstance(),
-            StatsModule.getInstance()
+            StatsModule.getInstance(),
+            MiscModule.getInstance()
         );
         ModuleHandler.getInstance().enableAll(null, true);
     }

@@ -1,4 +1,4 @@
-package net.buildtheearth.modules.miscellaneous.blockpalletegui;
+package net.buildtheearth.modules.miscellaneous.blockpalettegui;
 
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.utils.Item;
@@ -16,12 +16,12 @@ import java.util.Arrays;
 import java.util.List;
 
 public class PaletteBlockListMenu extends AbstractPaginatedMenu {
-    private final BlockPalletManager manager;
+    private final BlockPaletteManager manager;
     private final JavaPlugin plugin;
     private final boolean useDefaultBlocks;
 
-    public PaletteBlockListMenu(BlockPalletManager manager, Player player, JavaPlugin plugin, boolean useDefaultBlocks) {
-        super(6, BlockPalletManager.PAGE_SIZE / 9, "View Palette Menu", player, true);
+    public PaletteBlockListMenu(BlockPaletteManager manager, Player player, JavaPlugin plugin, boolean useDefaultBlocks) {
+        super(6, BlockPaletteManager.PAGE_SIZE / 9, "View Palette Menu", player, true);
         this.manager = manager;
         this.plugin = plugin;
         this.useDefaultBlocks = useDefaultBlocks;
@@ -66,10 +66,10 @@ public class PaletteBlockListMenu extends AbstractPaginatedMenu {
             getMenu().getSlot(slot).setItem(items.get(i));
         }
 
-        int totalPages = (int) Math.ceil((double) getSource().size() / BlockPalletManager.PAGE_SIZE);
+        int totalPages = (int) Math.ceil((double) getSource().size() / BlockPaletteManager.PAGE_SIZE);
         String pageText = getPage() + "/" + Math.max(totalPages, 1);
         getMenu().getSlot(49)
-                .setItem(Item.createCustomHeadBase64(BlockPalletManager.HEAD_BETWEEN_ARROWS, pageText, null));
+                .setItem(Item.createCustomHeadBase64(BlockPaletteManager.HEAD_BETWEEN_ARROWS, pageText, null));
     }
 
     @Override
@@ -95,23 +95,23 @@ public class PaletteBlockListMenu extends AbstractPaginatedMenu {
 
         // Filter / Palette chooser
         menu.getSlot(4).setItem(manager.createMenuItem(XMaterial.HOPPER, "Choose Palette Menu"));
-        menu.getSlot(4).setClickHandler((p, info) -> new ChoosePalleteMenu(manager, p, plugin).open());
+        menu.getSlot(4).setClickHandler((p, info) -> new ChoosePaletteMenu(manager, p, plugin).open());
 
         // Prev/Next
         menu.getSlot(48).setItem(hasPreviousPage()
-                ? Item.createCustomHeadBase64(BlockPalletManager.LEFT_ARROW, "§ePrevious Page", null)
+                ? Item.createCustomHeadBase64(BlockPaletteManager.LEFT_ARROW, "§ePrevious Page", null)
                 : Item.create(XMaterial.BARRIER.parseMaterial(), "§cNo Previous Page", null));
 
         menu.getSlot(50).setItem(hasNextPage()
-                ? Item.createCustomHeadBase64(BlockPalletManager.RIGHT_ARROW, "§eNext Page", null)
+                ? Item.createCustomHeadBase64(BlockPaletteManager.RIGHT_ARROW, "§eNext Page", null)
                 : Item.create(XMaterial.BARRIER.parseMaterial(), "§cNo Next Page", null));
 
         // Page indicator
-        menu.getSlot(49).setItem(Item.createCustomHeadBase64(BlockPalletManager.HEAD_BETWEEN_ARROWS, "", null));
+        menu.getSlot(49).setItem(Item.createCustomHeadBase64(BlockPaletteManager.HEAD_BETWEEN_ARROWS, "", null));
         setSwitchPageItemClickEvents(49);
     }
 
-    public static void open(BlockPalletManager manager, Player player, JavaPlugin plugin, boolean useDefaultBlocks) {
+    public static void open(BlockPaletteManager manager, Player player, JavaPlugin plugin, boolean useDefaultBlocks) {
         PaletteBlockListMenu menu = new PaletteBlockListMenu(manager, player, plugin, useDefaultBlocks);
         menu.setMenuItemsAsync();
         menu.setItemClickEventsAsync();
@@ -122,16 +122,16 @@ public class PaletteBlockListMenu extends AbstractPaginatedMenu {
     @Override
     protected void setItemClickEventsAsync() {
         List<?> sources = getSource();
-        int from = (getPage() - 1) * BlockPalletManager.PAGE_SIZE;
-        int to = Math.min(from + BlockPalletManager.PAGE_SIZE, sources.size());
+        int from = (getPage() - 1) * BlockPaletteManager.PAGE_SIZE;
+        int to = Math.min(from + BlockPaletteManager.PAGE_SIZE, sources.size());
         setPaginatedItemClickEventsAsync(sources.subList(from, to));
     }
 
     @Override
     protected void setMenuItemsAsync() {
         List<?> sources = getSource();
-        int from = (getPage() - 1) * BlockPalletManager.PAGE_SIZE;
-        int to = Math.min(from + BlockPalletManager.PAGE_SIZE, sources.size());
+        int from = (getPage() - 1) * BlockPaletteManager.PAGE_SIZE;
+        int to = Math.min(from + BlockPaletteManager.PAGE_SIZE, sources.size());
         setPaginatedMenuItemsAsync(sources.subList(from, to));
     }
 }

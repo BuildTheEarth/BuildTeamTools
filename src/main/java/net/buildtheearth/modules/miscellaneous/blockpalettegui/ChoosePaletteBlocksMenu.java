@@ -1,4 +1,4 @@
-package net.buildtheearth.modules.miscellaneous.blockpalletegui;
+package net.buildtheearth.modules.miscellaneous.blockpalettegui;
 
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.utils.Item;
@@ -22,7 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /** Paginated block picker used by Create/Edit palette menus. */
-public class ChoosePalleteBlocksMenu extends AbstractPaginatedMenu {
+public class ChoosePaletteBlocksMenu extends AbstractPaginatedMenu {
 
     // Layout & controls (matches the common 6-row layout)
     private static final int BACK_SLOT     = 45;
@@ -42,7 +42,7 @@ public class ChoosePalleteBlocksMenu extends AbstractPaginatedMenu {
                     + "NDYzMmRlZjVmZmFmMmViMGQ5ZDdjYzdiNTVhNTBjNGUzOTIw"
                     + "ZDkwMzcyYWFiMTQwNzgxZjVkZmJjNCJ9fX0=";
 
-    private final BlockPalletManager manager;
+    private final BlockPaletteManager manager;
     private final JavaPlugin plugin;
     private final Logger logger;
 
@@ -55,7 +55,7 @@ public class ChoosePalleteBlocksMenu extends AbstractPaginatedMenu {
     /** Debounce per player to avoid double-fire on same physical click. */
     private final Map<UUID, Long> clickDebounce = new HashMap<>();
 
-    public ChoosePalleteBlocksMenu(BlockPalletManager manager,
+    public ChoosePaletteBlocksMenu(BlockPaletteManager manager,
                                    Player player,
                                    JavaPlugin plugin,
                                    List<String> selectedBlocks,
@@ -107,7 +107,7 @@ public class ChoosePalleteBlocksMenu extends AbstractPaginatedMenu {
         Set<Material> seen = new LinkedHashSet<>();
         List<ItemStack> out = new ArrayList<>();
 
-        for (BlockPalletMenuType type : BlockPalletMenuType.values()) {
+        for (BlockPaletteMenuType type : BlockPaletteMenuType.values()) {
             try {
                 ItemStack[] supplied = (type.getItemSupplier() != null) ? type.getItemSupplier().get() : null;
                 if (supplied == null) continue;
@@ -148,7 +148,7 @@ public class ChoosePalleteBlocksMenu extends AbstractPaginatedMenu {
         int totalPages = Math.max(1, (int) Math.ceil((double) getSource().size() / PAGE_SIZE));
         String pageText = getPage() + "/" + totalPages;
         getMenu().getSlot(PAGE_SLOT)
-                .setItem(Item.createCustomHeadBase64(BlockPalletManager.HEAD_BETWEEN_ARROWS, "§e" + pageText, new ArrayList<>()));
+                .setItem(Item.createCustomHeadBase64(BlockPaletteManager.HEAD_BETWEEN_ARROWS, "§e" + pageText, new ArrayList<>()));
 
         // This helper from your base wires the page head to change pages
         setSwitchPageItemClickEvents(PAGE_SLOT);
@@ -245,7 +245,7 @@ public class ChoosePalleteBlocksMenu extends AbstractPaginatedMenu {
         getMask().apply(menu);
 
         // Back — return to caller with current selection
-        menu.getSlot(BACK_SLOT).setItem(Item.createCustomHeadBase64(BlockPalletManager.LEFT_ARROW, "§cBack", new ArrayList<>()));
+        menu.getSlot(BACK_SLOT).setItem(Item.createCustomHeadBase64(BlockPaletteManager.LEFT_ARROW, "§cBack", new ArrayList<>()));
         menu.getSlot(BACK_SLOT).setClickHandler((p, info) -> {
             p.closeInventory();
             if (onApply != null) onApply.accept(new ArrayList<>(selectedBlocks));
@@ -263,11 +263,11 @@ public class ChoosePalleteBlocksMenu extends AbstractPaginatedMenu {
 
         // Prev/Next arrows (visuals only; page head handles switching)
         menu.getSlot(PREVIOUS_SLOT).setItem(hasPreviousPage()
-                ? Item.createCustomHeadBase64(BlockPalletManager.LEFT_ARROW, "§ePrevious Page", new ArrayList<>())
+                ? Item.createCustomHeadBase64(BlockPaletteManager.LEFT_ARROW, "§ePrevious Page", new ArrayList<>())
                 : Item.create(XMaterial.BARRIER.parseMaterial(), "§cNo Previous Page", new ArrayList<>()));
 
         menu.getSlot(NEXT_SLOT).setItem(hasNextPage()
-                ? Item.createCustomHeadBase64(BlockPalletManager.RIGHT_ARROW, "§eNext Page", new ArrayList<>())
+                ? Item.createCustomHeadBase64(BlockPaletteManager.RIGHT_ARROW, "§eNext Page", new ArrayList<>())
                 : Item.create(XMaterial.BARRIER.parseMaterial(), "§cNo Next Page", new ArrayList<>()));
     }
 

@@ -1,4 +1,4 @@
-package net.buildtheearth.modules.miscellaneous.blockpalletegui;
+package net.buildtheearth.modules.miscellaneous.blockpalettegui;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,12 +16,12 @@ import java.util.*;
  * /bp filter
  * /bp filter <filter1> <filter2> …
  */
-public class BlockPalletCommand implements CommandExecutor, TabCompleter {
+public class BlockPaletteCommand implements CommandExecutor, TabCompleter {
 
-    private final BlockPalletManager blockPalletManager;
+    private final BlockPaletteManager blockPalletManager;
     private final JavaPlugin plugin;
 
-    public BlockPalletCommand(BlockPalletManager blockPalletManager, JavaPlugin plugin) {
+    public BlockPaletteCommand(BlockPaletteManager blockPalletManager, JavaPlugin plugin) {
         this.blockPalletManager = blockPalletManager;
         this.plugin = plugin;
     }
@@ -46,7 +46,7 @@ public class BlockPalletCommand implements CommandExecutor, TabCompleter {
 
         // /bp filter ⇒ just open the filter GUI
         if (args.length == 1 && args[0].equalsIgnoreCase("filter")) {
-            new ChoosePalleteMenu(blockPalletManager, player, plugin).open();
+            new ChoosePaletteMenu(blockPalletManager, player, plugin).open();
             return true;
         }
 
@@ -56,7 +56,7 @@ public class BlockPalletCommand implements CommandExecutor, TabCompleter {
                     Arrays.asList(Arrays.copyOfRange(args, 1, args.length))
             );
             blockPalletManager.updatePlayerFilters(player, newFilters);
-            new ChoosePalleteMenu(blockPalletManager, player, plugin).open();
+            new ChoosePaletteMenu(blockPalletManager, player, plugin).open();
             return true;
         }
 
@@ -83,7 +83,7 @@ public class BlockPalletCommand implements CommandExecutor, TabCompleter {
             // suggest from BlockPalletMenuType.FILTER_OPTIONS
             StringUtil.copyPartialMatches(
                     args[args.length - 1],
-                    BlockPalletMenuType.FILTER_OPTIONS,
+                    BlockPaletteMenuType.FILTER_OPTIONS,
                     completions
             );
         }

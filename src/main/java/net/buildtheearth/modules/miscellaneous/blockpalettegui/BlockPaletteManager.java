@@ -1,4 +1,4 @@
-package net.buildtheearth.modules.miscellaneous.blockpalletegui;
+package net.buildtheearth.modules.miscellaneous.blockpalettegui;
 
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
@@ -15,7 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-public class BlockPalletManager {
+public class BlockPaletteManager {
     public static final int PAGE_SIZE = 36;
 
     private final Map<UUID, List<String>> playerFilterMap = new HashMap<>();
@@ -42,7 +42,7 @@ public class BlockPalletManager {
             "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUv"
                     + "OTU2YTM2MTg0NTllNDNiMjg3YjIyYjdlMjM1ZWM2OTk1OTQ1NDZjNmZjZDZkYzg0YmZjYTRjZjMwYWI5MzExIn19fQ==";
 
-    public BlockPalletManager(JavaPlugin plugin) {
+    public BlockPaletteManager(JavaPlugin plugin) {
         this.plugin = plugin;
         this.paletteFile = new File(plugin.getDataFolder(), "palettes.yml");
         this.paletteConfig = YamlConfiguration.loadConfiguration(paletteFile);
@@ -196,7 +196,7 @@ public class BlockPalletManager {
             }
 
             // Predefined (use enum key)
-            for (BlockPalletMenuType type : BlockPalletMenuType.values()) {
+            for (BlockPaletteMenuType type : BlockPaletteMenuType.values()) {
                 String key = type.getFilterKey(); // <— canonical key
                 if (key.equalsIgnoreCase(filter)) {
                     ItemStack[] items = null;

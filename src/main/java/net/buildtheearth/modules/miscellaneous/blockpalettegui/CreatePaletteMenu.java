@@ -1,4 +1,4 @@
-package net.buildtheearth.modules.miscellaneous.blockpalletegui;
+package net.buildtheearth.modules.miscellaneous.blockpalettegui;
 
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.utils.Item;
@@ -16,12 +16,11 @@ import org.ipvp.canvas.mask.Mask;
 
 import java.util.*;
 
-public class EditPalleteMenu extends AbstractMenu {
+public class CreatePaletteMenu extends AbstractMenu {
 
-    private static final int NAME_SLOT        = 10;
-    private static final int DESCRIPTION_SLOT = 12;
-    private static final int BLOCKS_SLOT      = 14;
-    private static final int DELETE_SLOT      = 16;
+    private static final int NAME_SLOT        = 11;
+    private static final int DESCRIPTION_SLOT = 13;
+    private static final int BLOCKS_SLOT      = 15;
     private static final int BACK_SLOT        = 18;
     private static final int APPLY_SLOT       = 26;
 
@@ -41,31 +40,28 @@ public class EditPalleteMenu extends AbstractMenu {
     private static final int MAX_DESCRIPTION_LENGTH = 256;
     private static final String EDIT_PERMISSION = "btt.bp.edit";
 
-    private final BlockPalletManager manager;
+    private final BlockPaletteManager manager;
     private final JavaPlugin plugin;
     private final Player player;
-    private final String paletteKey;
-    private String name;
-    private String description;
-    private final List<String> blocks;
+    private final java.util.logging.Logger logger;
+
+    private String name = "Unnamed";
+    private String description = "";
+    private final List<String> blocks = new ArrayList<>();
     private InputMode inputMode = InputMode.NONE;
     private ChatInputListener chatListener;
-    private final java.util.logging.Logger logger;
 
     private enum InputMode { NONE, NAME, DESCRIPTION }
 
-    public EditPalleteMenu(BlockPalletManager manager, Player player, JavaPlugin plugin,
-                           String paletteKey, String name, String description, List<String> blocks) {
-        super(3, "Edit Palette: " + name, player);
+    public CreatePaletteMenu(BlockPaletteManager manager, Player player, JavaPlugin plugin) {
+        super(3, "Create Palette", player);
         this.manager = manager;
         this.plugin = plugin;
         this.player = player;
-        this.paletteKey = paletteKey;
-        this.name = name;
-        this.description = description != null ? description : "";
-        this.blocks = new ArrayList<>(blocks != null ? blocks : new ArrayList<>());
         this.logger = plugin.getLogger();
     }
+
+    public Player getPlayer() { return player; }
 
     @Override
     protected Mask getMask() {
@@ -80,7 +76,7 @@ public class EditPalleteMenu extends AbstractMenu {
 
     @Override
     protected void setMenuItemsAsync() {
-        logger.info("Setting menu items for EditPalleteMenu for player " + player.getName() + ". Blocks: " + blocks);
+        logger.info("Setting menu items for CreatePalleteMenu for player " + player.getName() + ". Blocks: " + blocks);
 
         getMenu().getSlot(NAME_SLOT).setItem(
                 Item.create(XMaterial.NAME_TAG.parseMaterial(), "§eSet Name",
@@ -97,11 +93,6 @@ public class EditPalleteMenu extends AbstractMenu {
                         new ArrayList<>(List.of("§7Selected: §f" + blocks.size())))
         );
 
-        getMenu().getSlot(DELETE_SLOT).setItem(
-                Item.create(XMaterial.BARRIER.parseMaterial(), "§cDelete Palette",
-                        new ArrayList<>(List.of("§7Click to delete this palette" + (isPredefinedFilter() ? " (Cannot delete predefined filter)" : ""))))
-        );
-
         getMenu().getSlot(BACK_SLOT).setItem(
                 Item.createCustomHeadBase64(BACK_HEAD, "§cBack", null)
         );
@@ -115,37 +106,25 @@ public class EditPalleteMenu extends AbstractMenu {
     protected void setItemClickEventsAsync() {
         // Name
         getMenu().getSlot(NAME_SLOT).setClickHandler((p, i) -> {
-            if (!p.hasPermission(EDIT_PERMISSION)) {
-                p.sendMessage("§cYou do not have permission to edit palettes.");
-                return;
-            }
             p.closeInventory();
             inputMode = InputMode.NAME;
             registerChatListener();
-            p.sendMessage("§ePlease type the new palette name in chat (max " + MAX_NAME_LENGTH + " characters). Type 'cancel' to abort.");
+            p.sendMessage("§ePlease type the palette name in chat (max " + MAX_NAME_LENGTH + " characters). Type 'cancel' to abort.");
         });
 
         // Description
         getMenu().getSlot(DESCRIPTION_SLOT).setClickHandler((p, i) -> {
-            if (!p.hasPermission(EDIT_PERMISSION)) {
-                p.sendMessage("§cYou do not have permission to edit palettes.");
-                return;
-            }
             p.closeInventory();
             inputMode = InputMode.DESCRIPTION;
             registerChatListener();
-            p.sendMessage("§ePlease type the new palette description in chat (max " + MAX_DESCRIPTION_LENGTH + " characters). Type 'cancel' to abort.");
+            p.sendMessage("§ePlease type the palette description in chat (max " + MAX_DESCRIPTION_LENGTH + " characters). Type 'cancel' to abort.");
         });
 
         // Blocks
         getMenu().getSlot(BLOCKS_SLOT).setClickHandler((p, i) -> {
-            if (!p.hasPermission(EDIT_PERMISSION)) {
-                p.sendMessage("§cYou do not have permission to edit palettes.");
-                return;
-            }
             p.closeInventory();
-            logger.info("Opening ChoosePalleteBlocksMenu from EditPalleteMenu for player " + p.getName() + ". Current blocks: " + blocks);
-            new ChoosePalleteBlocksMenu(manager, p, plugin, blocks, updatedBlocks -> {
+            logger.info("Opening ChoosePalleteBlocksMenu from CreatePalleteMenu for player " + p.getName() + ". Current blocks: " + blocks);
+            new ChoosePaletteBlocksMenu(manager, p, plugin, blocks, updatedBlocks -> {
                 logger.info("Received updated blocks for player " + p.getName() + ": " + updatedBlocks);
                 blocks.clear();
                 blocks.addAll(updatedBlocks);
@@ -154,50 +133,31 @@ public class EditPalleteMenu extends AbstractMenu {
             }).open();
         });
 
-        // Delete
-        getMenu().getSlot(DELETE_SLOT).setClickHandler((p, i) -> {
-            if (!p.hasPermission(EDIT_PERMISSION)) {
-                p.sendMessage("§cYou do not have permission to delete palettes.");
-                return;
-            }
-            if (isPredefinedFilter()) {
-                p.sendMessage("§cCannot delete predefined filters. Only custom palettes can be deleted.");
-                return;
-            }
-            unregisterChatListener();
-            manager.deletePalette(paletteKey);
-            Set<String> filters = new HashSet<>(manager.getPlayerFilters(p));
-            filters.remove(paletteKey);
-            manager.updatePlayerFilters(p, filters);
-            p.sendMessage("§aPalette deleted.");
-            p.closeInventory();
-            new ChoosePalleteMenu(manager, p, plugin).open();
-        });
-
         // Back
         getMenu().getSlot(BACK_SLOT).setClickHandler((p, i) -> {
             unregisterChatListener();
-            new ChoosePalleteMenu(manager, p, plugin).open();
+            new ChoosePaletteMenu(manager, p, plugin).open();
         });
 
         // Apply
         getMenu().getSlot(APPLY_SLOT).setClickHandler((p, i) -> {
             if (!p.hasPermission(EDIT_PERMISSION)) {
-                p.sendMessage("§cYou do not have permission to edit palettes.");
+                p.sendMessage("§cYou do not have permission to create palettes.");
                 return;
             }
             unregisterChatListener();
-            logger.info("Apply clicked in EditPalleteMenu by " + p.getName() + ". Name: " + name + ", Blocks: " + blocks);
-            if (name.isEmpty()) {
+            logger.info("Apply clicked in CreatePalleteMenu by " + p.getName() + ". Name: " + name + ", Blocks: " + blocks);
+            if (name.equals("Unnamed")) {
                 p.sendMessage("§cPlease set a valid name for the palette.");
                 return;
             }
-            manager.updatePalette(paletteKey, name, description, new ArrayList<>(blocks));
+            String paletteKey = UUID.randomUUID().toString();
+            manager.createPalette(paletteKey, name, description, new ArrayList<>(blocks));
             Set<String> filters = new HashSet<>(manager.getPlayerFilters(p));
             filters.add(paletteKey);
             manager.updatePlayerFilters(p, filters);
-            p.sendMessage("§aPalette updated: §f" + name);
-            new ChoosePalleteMenu(manager, p, plugin).open();
+            p.sendMessage("§aPalette created: §f" + name);
+            new ChoosePaletteMenu(manager, p, plugin).open();
         });
     }
 
@@ -226,6 +186,8 @@ public class EditPalleteMenu extends AbstractMenu {
             String message = event.getMessage().trim();
 
             if (message.equalsIgnoreCase("cancel")) {
+                if (inputMode == InputMode.NAME) name = "Unnamed";
+                else if (inputMode == InputMode.DESCRIPTION) description = "";
                 player.sendMessage("§cInput cancelled.");
                 unregisterChatListener();
                 Bukkit.getScheduler().runTask(plugin, () -> {
@@ -266,20 +228,8 @@ public class EditPalleteMenu extends AbstractMenu {
     }
 
     public void open() {
-        logger.info("Opening EditPalleteMenu for player " + player.getName() + ". Current blocks: " + blocks);
+        logger.info("Opening CreatePalleteMenu for player " + player.getName() + ". Current blocks: " + blocks);
         setMenuItemsAsync();
         getMenu().open(player);
     }
-
-    private boolean isPredefinedFilter() {
-        for (BlockPalletMenuType type : BlockPalletMenuType.values()) {
-            String typeKey = type.getReadableName().toLowerCase().replace(' ', '_');
-            if (typeKey.equals(paletteKey)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
 }

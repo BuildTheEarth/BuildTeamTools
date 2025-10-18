@@ -1,4 +1,4 @@
-package net.buildtheearth.modules.miscellaneous.blockpalletegui;
+package net.buildtheearth.modules.miscellaneous.blockpalettegui;
 
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.utils.Item;
@@ -15,7 +15,7 @@ import org.ipvp.canvas.mask.Mask;
 import java.util.*;
 import java.util.logging.Level;
 
-public class ChoosePalleteMenu extends AbstractMenu {
+public class ChoosePaletteMenu extends AbstractMenu {
 
     private static final int BACK_SLOT = 36;
     private static final int ADD_PALETTE_SLOT = 44;
@@ -33,14 +33,14 @@ public class ChoosePalleteMenu extends AbstractMenu {
                     + "MTI0NGZjZmY5OTM0NGYxMmFiYTQyYWMyM2ZlZTZlZjZlMzM1"
                     + "MWQyN2QyNzNjMTU3MjUzMWYifX19";
 
-    private final BlockPalletManager manager;
+    private final BlockPaletteManager manager;
     private final JavaPlugin plugin;
     private final Map<Integer, String> slotToFilter = new HashMap<>();
 
     // NEW: per-player debounce to prevent double-fire (on->off) for one physical click
     private final Map<UUID, Long> clickDebounce = new HashMap<>();
 
-    public ChoosePalleteMenu(BlockPalletManager manager, Player player, JavaPlugin plugin) {
+    public ChoosePaletteMenu(BlockPaletteManager manager, Player player, JavaPlugin plugin) {
         super(5, "Choose Palette", player);
         this.manager = manager;
         this.plugin = plugin;
@@ -68,9 +68,9 @@ public class ChoosePalleteMenu extends AbstractMenu {
             Set<String> active = manager.getPlayerFilters(getMenuPlayer());
 
             // Custom palettes
-            for (Map.Entry<String, BlockPalletManager.Palette> entry : manager.getPalettes().entrySet()) {
+            for (Map.Entry<String, BlockPaletteManager.Palette> entry : manager.getPalettes().entrySet()) {
                 String key = normalizeKey(entry.getKey());
-                BlockPalletManager.Palette palette = entry.getValue();
+                BlockPaletteManager.Palette palette = entry.getValue();
                 boolean on = active.contains(key);
 
                 String displayName = (on ? "§a✔ " : "§c✘ ")
@@ -94,7 +94,7 @@ public class ChoosePalleteMenu extends AbstractMenu {
             }
 
             // Predefined filters
-            for (BlockPalletMenuType type : BlockPalletMenuType.values()) {
+            for (BlockPaletteMenuType type : BlockPaletteMenuType.values()) {
                 String key = normalizeKey(type.getReadableName());
                 if (slotToFilter.containsValue(key)) continue;
 
@@ -164,7 +164,7 @@ public class ChoosePalleteMenu extends AbstractMenu {
                         ItemStack cur = getMenu().getSlot(slot).getItem();
                         if (cur != null) {
                             String baseTitle;
-                            BlockPalletManager.Palette pal = manager.getPalette(key);
+                            BlockPaletteManager.Palette pal = manager.getPalette(key);
                             if (pal != null && pal.getName() != null && !pal.getName().isEmpty()) {
                                 baseTitle = pal.getName();
                             } else {
@@ -181,19 +181,19 @@ public class ChoosePalleteMenu extends AbstractMenu {
                     }
 
                     if (click == ClickType.RIGHT && hasEditPermission()) {
-                        BlockPalletManager.Palette palette = manager.getPalette(key);
+                        BlockPaletteManager.Palette palette = manager.getPalette(key);
                         p.closeInventory();
                         if (palette != null) {
-                            new EditPalleteMenu(manager, p, plugin, key,
+                            new EditPaletteMenu(manager, p, plugin, key,
                                     palette.getName(), palette.getDescription(), palette.getBlocks()).open();
                         } else {
-                            for (BlockPalletMenuType type : BlockPalletMenuType.values()) {
+                            for (BlockPaletteMenuType type : BlockPaletteMenuType.values()) {
                                 String typeKey = normalizeKey(type.getReadableName());
                                 if (typeKey.equals(key)) {
                                     ItemStack[] items = (type.getItemSupplier() != null) ? type.getItemSupplier().get() : null;
                                     List<String> blockNames = new ArrayList<>();
                                     if (items != null) for (ItemStack it : items) if (it != null) blockNames.add(it.getType().name());
-                                    new EditPalleteMenu(manager, p, plugin, key, type.getReadableName(), "", blockNames).open();
+                                    new EditPaletteMenu(manager, p, plugin, key, type.getReadableName(), "", blockNames).open();
                                     return;
                                 }
                             }
@@ -211,7 +211,7 @@ public class ChoosePalleteMenu extends AbstractMenu {
             if (hasEditPermission()) {
                 getMenu().getSlot(ADD_PALETTE_SLOT).setClickHandler((p, i) -> {
                     p.closeInventory();
-                    new CreatePalleteMenu(manager, p, plugin).open();
+                    new CreatePaletteMenu(manager, p, plugin).open();
                 });
             }
         } catch (Exception ex) {

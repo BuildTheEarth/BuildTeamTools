@@ -1,4 +1,4 @@
-package net.buildtheearth.modules.miscellaneous.blockpalletegui;
+package net.buildtheearth.modules.miscellaneous.blockpalettegui;
 
 import net.buildtheearth.utils.MenuItems;
 import org.bukkit.inventory.ItemStack;
@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
-public enum BlockPalletMenuType {
+public enum BlockPaletteMenuType {
     SLABS("Slabs", "slabs", MenuItems::getSlabsArray),
     STAIRS("Stairs", "stairs", MenuItems::getStairsArray),
     WALLS("Walls", "walls", MenuItems::getWallsArray),
@@ -34,9 +34,9 @@ public enum BlockPalletMenuType {
     private final String filterKey;
     private final Supplier<ItemStack[]> itemSupplier;
 
-    private static final Map<String, BlockPalletMenuType> keyToType = new HashMap<>();
+    private static final Map<String, BlockPaletteMenuType> keyToType = new HashMap<>();
     static {
-        for (BlockPalletMenuType type : values()) {
+        for (BlockPaletteMenuType type : values()) {
             keyToType.put(type.filterKey.toLowerCase(), type);
         }
     }
@@ -47,11 +47,11 @@ public enum BlockPalletMenuType {
     public static final List<String> FILTER_OPTIONS =
             Collections.unmodifiableList(
                     Arrays.stream(values())
-                            .map(BlockPalletMenuType::getFilterKey)
+                            .map(BlockPaletteMenuType::getFilterKey)
                             .collect(Collectors.toList())
             );
 
-    BlockPalletMenuType(String readableName, String filterKey, Supplier<ItemStack[]> itemSupplier) {
+    BlockPaletteMenuType(String readableName, String filterKey, Supplier<ItemStack[]> itemSupplier) {
         this.readableName = readableName;
         this.filterKey = filterKey;
         this.itemSupplier = itemSupplier;
@@ -73,7 +73,7 @@ public enum BlockPalletMenuType {
     }
 
     /** Lookup enum by filter key (case-insensitive) */
-    public static BlockPalletMenuType getMenuType(String key) {
+    public static BlockPaletteMenuType getMenuType(String key) {
         if (key == null) return null;
         return keyToType.get(key.toLowerCase());
     }

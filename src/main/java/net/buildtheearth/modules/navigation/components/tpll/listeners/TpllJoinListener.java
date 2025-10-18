@@ -17,6 +17,7 @@ public class TpllJoinListener implements Listener {
             if (cookie != null) {
                 ChatHelper.logDebug("Player has a TPLL cookie, processing it.");
                 NavigationModule.getInstance().getTpllComponent().processCookie(event.getPlayer(), cookie);
+                event.getPlayer().storeCookie(TpllComponent.TPLL_COOKIE_KEY, new byte[0]); // Reset the cookie
             } else {
                 ChatHelper.logDebug("Player does not have a TPLL cookie.");
             }

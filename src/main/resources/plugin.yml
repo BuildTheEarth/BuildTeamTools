@@ -28,6 +28,10 @@ commands:
     usage: /warp <subcommand>
     aliases:
       - warps
+  warpsbt:
+    description: Opens the warp menu for the specified BuildTeam
+    usage: /warpsbt <team>
+    aliases: [ wbt ]
   kml:
     description: kml pasting and parsing
     usage: /kml

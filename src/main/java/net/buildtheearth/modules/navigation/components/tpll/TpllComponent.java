@@ -9,6 +9,7 @@ import net.buildtheearth.modules.navigation.NavUtils;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.GeometricUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -87,7 +88,7 @@ public class TpllComponent extends ModuleComponent {
      * @param coordinates The coordinates to send the player to on join.
      * @param targetServerName The server to send the player to.
      */
-    public void tpllPlayer(Player player, double[] coordinates, String targetServerName) {
+    public void tpllPlayer(@NotNull Player player, double @NotNull [] coordinates, String targetServerName) {
         ChatHelper.logDebug("Starting universal tpll teleportation for %s to %s.", player.getDisplayName(), targetServerName);
         // Send a plugin message to the target server which adds the tpll to the queue
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
@@ -111,8 +112,10 @@ public class TpllComponent extends ModuleComponent {
 
     public void processCookie(@NotNull Player player, byte[] cookie) {
         ByteArrayDataInput in = ByteStreams.newDataInput(cookie);
-        double targetLatitude = Double.parseDouble(in.readUTF());
-        double targetLongitude = Double.parseDouble(in.readUTF());
-        player.performCommand("tpll " + targetLatitude + " " + targetLongitude);
+        double targetLatitude = in.readDouble();
+        double targetLongitude = in.readDouble();
+        ChatHelper.logDebug("Processing cookie for tpll event: lat: %s lon: %s", targetLatitude, targetLongitude);
+        Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), // Needs to be delayed if not exception will be trown and nothing happens
+                () -> player.performCommand("tpll " + targetLatitude + " " + targetLongitude));
     }
 }

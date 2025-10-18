@@ -1,19 +1,20 @@
 package net.buildtheearth.modules.navigation.components.warps.menu;
 
 import net.buildtheearth.modules.navigation.NavigationModule;
-import net.buildtheearth.modules.network.NetworkModule;
-import net.buildtheearth.modules.network.model.Permissions;
-import net.buildtheearth.utils.*;
-import net.buildtheearth.utils.menus.AbstractPaginatedMenu;
 import net.buildtheearth.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
+import net.buildtheearth.modules.network.NetworkModule;
+import net.buildtheearth.modules.network.model.Permissions;
+import net.buildtheearth.utils.CustomHeads;
+import net.buildtheearth.utils.Item;
+import net.buildtheearth.utils.ListUtil;
+import net.buildtheearth.utils.MenuItems;
+import net.buildtheearth.utils.menus.AbstractPaginatedMenu;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -85,10 +86,6 @@ public class WarpMenu extends AbstractPaginatedMenu {
                 slot++;
                 continue;
             }
-
-            ArrayList<String> loreLines = ListUtil.createList("", "§eAddress:");
-            loreLines.addAll(Arrays.asList(Utils.splitStringByLineLength(warp.getAddress(), 30, ", ")));
-            loreLines.addAll(ListUtil.createList("", "§8Left-Click to warp to this location.", "§8Right-Click to edit this warp."));
 
             getMenu().getSlot(slot).setItem(warp.getMaterialItem());
             slot++;

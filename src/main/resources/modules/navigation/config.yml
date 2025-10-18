@@ -15,7 +15,7 @@ navigator-hotbar-item:
   # The hotbar slot into which the navigator item should be placed
   nav-slot: 0
 
-# ACTION - Blow you can define actions for some items. There is a comment when a default action exists, else it will error out.
+# ACTION - Below you can define actions for some items. There is a comment when a default action exists, else it will error out.
 # Command & Message - just specify it like you would do it in the chat. E.g.: /tp 100 50 100
 # Transfer - Transfer the player to the specified team. E.g.: transfer:<ip:port>
 # Switch - Switch the player to the specified server (on the same proxy). E.g.: switch:<alps>>
@@ -25,21 +25,22 @@ main-menu-items:
   # Configures the build item inside the navigator
   build-item:
     # Enables or disables the build item inside the navigator [true|false]
+    enabled: false
+    action: /command
+  plotsystem-item:
+    # Enables or disables the Plot System item inside the navigator [true|false]
     enabled: true
     action: /command
+  explore-item:
+    # Enables or disables the explore item inside the navigator [true|false]
+    # Left click opens BTT Warp System, right click Buildteam Explore Menu
+    enabled: true
   # Configures the tutorial item inside the navigator
   tutorial-item:
     # Enables or disables the tutorial item inside the navigator [true|false]
     enabled: false
     # (Optional) If nothing is set/changed here, it will open up the btt tutorial menu
     action: /command
-  plotsystem-item:
-    # Enables or disables the Plot System item inside the navigator [true|false]
-    enabled: false
-    action: /command
-  explore-item:
-    # Enables or disables the explore item inside the navigator [true|false]
-    enabled: false
 
 warps:
   # The order in which the warps should be displayed in the navigator

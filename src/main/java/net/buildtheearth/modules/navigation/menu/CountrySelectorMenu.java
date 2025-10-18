@@ -2,7 +2,7 @@ package net.buildtheearth.modules.navigation.menu;
 
 import lombok.NonNull;
 import net.buildtheearth.modules.navigation.NavUtils;
-import net.buildtheearth.modules.navigation.components.warps.menu.WarpGroupMenu;
+import net.buildtheearth.modules.navigation.components.warps.WarpsComponent;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Continent;
@@ -87,7 +87,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
         for (Region region : countries) {
             ArrayList<String> countryLore = ListUtil.createList("", "§eBuild Team:", region.getBuildTeam().getBlankName(), "", "§eArea:", formatArea(region.getArea()) + " km²", "", "§8Click to join this country's server!");
             if (!region.getBuildTeam().getWarpGroups().isEmpty()) {
-                countryLore.add("Right click to open the warp menu!");
+                countryLore.add("Right click to open the warp group menu!");
             }
             getMenu().getSlot(slot).setItem(
                     Item.createCustomHeadBase64(region.getHeadBase64() == null ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19" : region.getHeadBase64(),
@@ -123,7 +123,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
                 if (clickInformation.getClickType().isRightClick() &&
                         clickPlayer.hasPermission(Permissions.WARP_USE) &&
                         !clickedRegion.getBuildTeam().getWarpGroups().isEmpty()) {
-                    new WarpGroupMenu(clickPlayer, clickedRegion.getBuildTeam(), true, true, clickedRegion.getContinent());
+                    WarpsComponent.openWarpMenu(clickPlayer, clickedRegion.getBuildTeam(), clickedRegion.getContinent());
                 } else {
                     NavUtils.switchToTeam(clickedRegion.getBuildTeam(), clickPlayer);
                 }

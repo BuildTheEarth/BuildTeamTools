@@ -37,7 +37,7 @@ public class NavUtils {
         UnsafeValues unsafeValues = Bukkit.getUnsafe();
         int serverProtocolVersion = unsafeValues.getProtocolVersion();
 
-        ChatHelper.logDebug("Transfer check - Player protocol: %d, Server protocol: %s, Allows transfers:  %b", playerVersion, serverProtocolVersion, targetBuildTeam.isAllowsTransfers());
+        ChatHelper.logDebug("Transfer check - Player protocol: %d, Server protocol: %s, BuildTeam: %s, Allows transfers:  %b, IP: %s", playerVersion, serverProtocolVersion, targetBuildTeam.getBlankName(), targetBuildTeam.isAllowsTransfers(), targetBuildTeam.getIP());
 
         return targetBuildTeam.isAllowsTransfers() && playerVersion >= 766 && serverProtocolVersion >= 766;
     }
@@ -68,7 +68,7 @@ public class NavUtils {
         player.sendMessage("");
         player.spigot().sendMessage(comp);
         player.sendMessage("");
-        player.sendMessage("§cClick the IP to copy → Press ESC → Back to Menu → Multiplayer → Add Server → Ctrl+V → Done → Join.");
+        player.sendMessage("§cPress Ctrl + A and Ctrl + C to copy the ip → Press ESC → Back to Menu → Multiplayer → Add Server → Ctrl+V → Done → Join.");
     }
 
     /**
@@ -83,11 +83,9 @@ public class NavUtils {
 
     public static @Nullable NavSwitchType determineSwitchPossibilityOrMsgPlayerIfNone(@NotNull Player player, @NotNull BuildTeam targetBuildTeam) {
         if (targetBuildTeam.isConnected() && targetBuildTeam.getServerName() != null) {
-            sendPlayerToConnectedServer(player, targetBuildTeam.getServerName());
             return NavSwitchType.NETWORK;
         } else if (targetBuildTeam.getIP() != null) {
             if (isTransferCapable(player, targetBuildTeam)) {
-                transferPlayer(player, targetBuildTeam.getIP());
                 return NavSwitchType.TRANSFER;
             } else {
                 sendNotConnectedMessage(player, targetBuildTeam.getIP(), targetBuildTeam.getName());

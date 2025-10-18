@@ -252,10 +252,10 @@ public class NetworkAPI {
         return future;
     }
 
-    public static CompletableFuture<Void> setupCurrentServerData() {
+    public static @NotNull CompletableFuture<Void> setupCurrentServerData() {
         CompletableFuture<Void> future = new CompletableFuture<>();
 
-        API.getAsync("https://nwapi.buildtheearth.net/api/teams/" + BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY), new API.ApiResponseCallback() {
+        getOneAsync("https://nwapi.buildtheearth.net/api/teams/" + BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY), new API.ApiResponseCallback() {
             @Override
             public void onResponse(String response) {
                 try {
@@ -361,13 +361,31 @@ public class NetworkAPI {
         });
     }
 
-    public static void getAsync(String url, API.ApiResponseCallback callback) {
+    private static void getOneAsync(String url, API.ApiResponseCallback callback) {
+        var path = BuildTeamTools.getInstance().getDataPath().resolve("buildteam.json");
+        if (BuildTeamTools.getInstance().isDebug() && path.toFile().exists()) {
+            // If the file exists, read from it instead of making an API call
+            try {
+                String content = new String(java.nio.file.Files.readAllBytes(path));
+                callback.onResponse(content);
+                BuildTeamTools.getInstance().getComponentLogger().warn("[DEBUG] Read connected buildteam from local file buildteam.json. Remove the file if you want up to date data.");
+                return;
+            } catch (IOException e) {
+                ChatHelper.logError("Failed to read from local buildteam.json: %s", e.getMessage());
+            }
+        }
+
+        API.getAsync(url, callback);
+    }
+
+    private static void getAsync(String url, API.ApiResponseCallback callback) {
         var path = BuildTeamTools.getInstance().getDataPath().resolve("buildteams.json");
         if (BuildTeamTools.getInstance().isDebug() && path.toFile().exists()) {
             // If the file exists, read from it instead of making an API call
             try {
                 String content = new String(java.nio.file.Files.readAllBytes(path));
                 callback.onResponse(content);
+                BuildTeamTools.getInstance().getComponentLogger().warn("[DEBUG] Read buildteams from local file buildteams.json. Remove the file if you want up to date data.");
                 return;
             } catch (IOException e) {
                 ChatHelper.logError("Failed to read from local buildteams.json: %s", e.getMessage());

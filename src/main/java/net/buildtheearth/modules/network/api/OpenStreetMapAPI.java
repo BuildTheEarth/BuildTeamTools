@@ -16,7 +16,7 @@ public class OpenStreetMapAPI extends API {
      */
     public static @NotNull CompletableFuture<String[]> getCountryFromLocationAsync(double @NotNull [] coordinates) {
         CompletableFuture<String[]> future = new CompletableFuture<>();
-        String url = "https://photon.komoot.io/reverse?lon=" + coordinates[0] + "&lat=" + coordinates[1] + "&lang=en";
+        String url = "https://photon.komoot.io/reverse?lat=" + coordinates[0] + "&lon=" + coordinates[1] + "&lang=en";
 
         ChatHelper.logDebug("Requesting country from location: %s", url);
 
@@ -27,7 +27,7 @@ public class OpenStreetMapAPI extends API {
 
                 ChatHelper.logDebug("Response from OpenStreetMap: %s", jsonObject);
 
-                JSONObject featuresObject = (JSONObject) ((JSONArray) jsonObject.get("features")).get(0);
+                JSONObject featuresObject = (JSONObject) ((JSONArray) jsonObject.get("features")).getFirst();
 
                 JSONObject propertiesObject = (JSONObject) featuresObject.get("properties");
 

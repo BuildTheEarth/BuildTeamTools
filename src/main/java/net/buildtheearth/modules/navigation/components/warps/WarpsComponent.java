@@ -8,11 +8,14 @@ import net.buildtheearth.modules.ModuleComponent;
 import net.buildtheearth.modules.navigation.NavUtils;
 import net.buildtheearth.modules.navigation.components.warps.menu.WarpEditMenu;
 import net.buildtheearth.modules.navigation.components.warps.menu.WarpGroupEditMenu;
+import net.buildtheearth.modules.navigation.components.warps.menu.WarpGroupMenu;
+import net.buildtheearth.modules.navigation.components.warps.menu.WarpMenu;
 import net.buildtheearth.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.modules.network.model.BuildTeam;
+import net.buildtheearth.modules.network.model.Continent;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.GeometricUtils;
 import net.buildtheearth.utils.geo.CoordinateConversion;
@@ -22,6 +25,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -91,9 +95,10 @@ public class WarpsComponent extends ModuleComponent {
      * @param player The player to warp
      * @param warp The warp to teleport the player to
      */
-    public void warpPlayer(Player player, Warp warp) {
+    public void warpPlayer(Player player, @NotNull Warp warp) {
         // If the warp is in the same team, just teleport the player
         if(warp.getWarpGroup().getBuildTeam().getID().equals(NetworkModule.getInstance().getBuildTeam().getID())) {
+            ChatHelper.logDebug("Warping player %s to warp %s", player.getName(), warp.getName());
             Location loc = GeometricUtils.getLocationFromCoordinatesYawPitch(new double[]{warp.getLat(), warp.getLon()}, warp.getYaw(), warp.getPitch());
 
             if(loc.getWorld() == null) {
@@ -103,10 +108,12 @@ public class WarpsComponent extends ModuleComponent {
 
             loc.setY(warp.getY());
 
-            player.teleport(loc);
+            player.teleportAsync(loc);
             ChatHelper.sendSuccessfulMessage(player, "Successfully warped you to %s.", warp.getName());
             return;
         }
+
+        ChatHelper.logDebug("Determining switch possibility for warp %s, because it's the wrong server...", warp.getName());
 
         var type = NavUtils.determineSwitchPossibilityOrMsgPlayerIfNone(player, warp.getWarpGroup().getBuildTeam());
 
@@ -208,12 +215,28 @@ public class WarpsComponent extends ModuleComponent {
 
     public void processCookie(@NotNull Player player, byte[] cookie) {
         ByteArrayDataInput in = ByteStreams.newDataInput(cookie);
-
-        warpPlayer(player, getWarpByKey(in.readUTF()));
+        Warp warp = getWarpByKey(in.readUTF());
+        ChatHelper.logDebug("Processing cookie for warp %s", warp.getName());
+        warpPlayer(player, warp);
     }
 
     public Warp getWarpByKey(String key) {
+        ChatHelper.logDebug("Retrieving warp with key %s", key);
         return NetworkModule.getInstance().getBuildTeam().getWarpGroups().stream().flatMap(warpGroup -> warpGroup.getWarps().stream())
                 .filter(warp1 -> warp1.getId().toString().equals(key)).findFirst().orElse(null);
+    }
+
+    public static void openWarpMenu(@NotNull Player player) {
+        openWarpMenu(player, NetworkModule.getInstance().getBuildTeam(), null);
+    }
+
+    public static void openWarpMenu(@NotNull Player player, @NotNull BuildTeam buildTeam, @Nullable Continent continent) {
+        int warpGroupCount = buildTeam.getWarpGroups().size();
+
+        switch (warpGroupCount) {
+            case 0 -> player.sendMessage(ChatHelper.getErrorString("This server does not have any warps yet!"));
+            case 1 -> new WarpMenu(player, buildTeam.getWarpGroups().getFirst(), false, true);
+            default -> new WarpGroupMenu(player, buildTeam, continent != null, true, continent);
+        }
     }
 }

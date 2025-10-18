@@ -7,7 +7,6 @@ import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.AbstractMenu;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
@@ -34,8 +33,8 @@ public class ExploreMenu extends AbstractMenu {
     protected void setPreviewItems() {
         // Create the continent items
         for (Continent continent : Continent.values()) {
-            ArrayList<String> continentLore = new ArrayList<>(Collections.singletonList(ChatHelper.getStandardString("Visit countries in %s", continent.getLabel())));
-            getMenu().getSlot(continent.getSlot()).setItem(Item.create(XMaterial.COMPASS.parseMaterial(),"§e§l" + continent.getLabel(), 1, continentLore));
+            ArrayList<String> continentLore = new ArrayList<>(Collections.singletonList(ChatHelper.getStandardString(false, "Visit countries in %s", continent.getLabel())));
+            getMenu().getSlot(continent.getSlot()).setItem(Item.create(XMaterial.COMPASS.get(), "§e§l" + continent.getLabel(), 1, continentLore));
         }
 
         super.setPreviewItems();
@@ -48,13 +47,9 @@ public class ExploreMenu extends AbstractMenu {
             getMenu().getSlot(continent.getSlot()).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
 
-                System.out.println("Continent before creating CountrySelectorMenu: " + continent); // Add this line
+                ChatHelper.logDebug("Clicked Continent before creating CountrySelectorMenu: %s", continent.getLabel());
 
-                if(continent.equals(Continent.AFRICA)) {
-                    // TODO implement that the player gets information about the BTE Africa server when clicking on Africa
-                } else {
-                    new CountrySelectorMenu(clickPlayer, continent, true);
-                }
+                new CountrySelectorMenu(clickPlayer, continent, true);
             });
         }
     }

@@ -3,6 +3,7 @@ package net.buildtheearth.modules.navigation.menu;
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.navigation.NavUtils;
+import net.buildtheearth.modules.navigation.components.warps.WarpsComponent;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
@@ -21,6 +22,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -53,15 +55,22 @@ public class MainMenu extends AbstractMenu {
             getMenu().getSlot(i).setItem(MenuItems.ITEM_BACKGROUND);
         }
 
-        // Set Explore Item
-        ArrayList<String> exploreLore = new ArrayList<>(Collections.singletonList(ChatHelper.getColorizedString(NamedTextColor.GRAY, "Click to explore the project!", false)));
-        getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setItem(Item.edit(Objects.requireNonNull(XMaterial.SPRUCE_BOAT.parseItem()), 1, ChatHelper.getColorizedString(NamedTextColor.YELLOW, "Explore", true), exploreLore));
-
-
         // Set Build Item
         if (config.getBoolean(ConfigPaths.Navigation.BUILD_ITEM_ENABLED)) {
             ArrayList<String> buildLore = new ArrayList<>(Collections.singletonList(ChatHelper.getColorizedString(NamedTextColor.GRAY, "Click to build for the project!", false)));
-            getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setItem(Item.edit(Objects.requireNonNull(XMaterial.DIAMOND_PICKAXE.parseItem()), 1, ChatHelper.getColorizedString(NamedTextColor.GREEN, "Build", true), buildLore));
+            getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setItem(Item.edit(Objects.requireNonNull(XMaterial.DIAMOND_PICKAXE.parseItem()), 1, ChatHelper.getColorizedString(NamedTextColor.GREEN, "Terra Server", true), buildLore));
+        }
+
+        // Set Plotsystem Item Click Event
+        if (config.getBoolean(ConfigPaths.Navigation.PLOTSYSTEM_ITEM_ENABLED)) {
+            ArrayList<String> tutorialsLore = new ArrayList<>(Collections.singletonList(ChatHelper.getColorizedString(NamedTextColor.GRAY, "Click to start your journey!", false)));
+            getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setItem(Item.edit(Objects.requireNonNull(XMaterial.KNOWLEDGE_BOOK.parseItem()), 1, ChatHelper.getColorizedString(NamedTextColor.AQUA, "Plot System", true), tutorialsLore));
+        }
+
+        if (config.getBoolean(ConfigPaths.Navigation.EXPLORE_ITEM_ENABLED)) {
+            // Set Explore Item
+            List<String> exploreLore = List.of(ChatHelper.getColorizedString(NamedTextColor.GRAY, "Click to explore the warps!", false), ChatHelper.getColorizedString(NamedTextColor.LIGHT_PURPLE, "Right click to explore other build teams.", false));
+            getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setItem(Item.edit(Objects.requireNonNull(XMaterial.SPRUCE_BOAT.parseItem()), 1, ChatHelper.getColorizedString(NamedTextColor.YELLOW, "Explore", true), exploreLore));
         }
 
         // Set Tutorials Item
@@ -90,22 +99,6 @@ public class MainMenu extends AbstractMenu {
                     });
         }
 
-        // Set Tutorials Item Click Event
-        if (config.getBoolean(ConfigPaths.Navigation.TUTORIALS_ITEM_ENABLED)) {
-            getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setClickHandler((clickPlayer, clickInformation) -> {
-                clickPlayer.closeInventory();
-                String action = config.getString(ConfigPaths.Navigation.TUTORIALS_ITEM_ACTION);
-
-                // If no command or message is set, open the tutorial menu
-                if (action == null || action.equals("/command") || action.equals("message")) {
-                    new TutorialsMenu(clickPlayer);
-                    return;
-                }
-
-                performClickAction(clickPlayer, action.replace("&", "§"), "tutorial");
-            });
-        }
-
         // Set Plotsystem Item Click Event
         if (config.getBoolean(ConfigPaths.Navigation.PLOTSYSTEM_ITEM_ENABLED)) {
             getMenu().getSlot(Objects.requireNonNull(slots.pollFirst()))
@@ -120,7 +113,27 @@ public class MainMenu extends AbstractMenu {
             // Set Explore Item Click Event
             getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
-                new ExploreMenu(clickPlayer, true);
+                if (clickInformation.getClickType().isRightClick()) {
+                    new ExploreMenu(clickPlayer, true);
+                } else {
+                    WarpsComponent.openWarpMenu(clickPlayer);
+                }
+            });
+        }
+
+        // Set Tutorials Item Click Event
+        if (config.getBoolean(ConfigPaths.Navigation.TUTORIALS_ITEM_ENABLED)) {
+            getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setClickHandler((clickPlayer, clickInformation) -> {
+                clickPlayer.closeInventory();
+                String action = config.getString(ConfigPaths.Navigation.TUTORIALS_ITEM_ACTION);
+
+                // If no command or message is set, open the tutorial menu
+                if (action == null || action.equals("/command") || action.equals("message")) {
+                    new TutorialsMenu(clickPlayer);
+                    return;
+                }
+
+                performClickAction(clickPlayer, action.replace("&", "§"), "tutorial");
             });
         }
     }

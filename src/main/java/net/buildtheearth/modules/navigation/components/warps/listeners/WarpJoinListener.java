@@ -18,6 +18,7 @@ public class WarpJoinListener implements Listener {
             if (cookie != null) {
                 ChatHelper.logDebug("Player has a warp cookie, processing it.");
                 NavigationModule.getInstance().getWarpsComponent().processCookie(event.getPlayer(), cookie);
+                event.getPlayer().storeCookie(WarpsComponent.WARP_COOKIE_KEY, new byte[0]); // Reset the cookie
             } else {
                 ChatHelper.logDebug("Player does not have a warp cookie.");
             }

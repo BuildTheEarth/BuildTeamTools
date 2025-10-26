@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -51,6 +52,10 @@ public class EditPaletteMenu extends AbstractMenu {
     private InputMode inputMode = InputMode.NONE;
     private ChatInputListener chatListener;
     private final java.util.logging.Logger logger;
+
+    // --- NEW: singleton listener per speler + debounce ---
+    private static final Map<UUID, Listener> ACTIVE_CHAT = new HashMap<>();
+    private boolean awaitingInput = false;
 
     private enum InputMode { NONE, NAME, DESCRIPTION }
 
@@ -119,10 +124,16 @@ public class EditPaletteMenu extends AbstractMenu {
                 p.sendMessage("§cYou do not have permission to edit palettes.");
                 return;
             }
+            if (i.getClickType() != ClickType.LEFT) return;
+            if (awaitingInput || inputMode != InputMode.NONE) return;
+            awaitingInput = true;
+
             p.closeInventory();
             inputMode = InputMode.NAME;
             registerChatListener();
-            p.sendMessage("§ePlease type the new palette name in chat (max " + MAX_NAME_LENGTH + " characters). Type 'cancel' to abort.");
+            Bukkit.getScheduler().runTask(plugin, () ->
+                    p.sendMessage("§ePlease type the new palette name in chat (max " + MAX_NAME_LENGTH + " characters). Type 'cancel' to abort.")
+            );
         });
 
         // Description
@@ -131,10 +142,16 @@ public class EditPaletteMenu extends AbstractMenu {
                 p.sendMessage("§cYou do not have permission to edit palettes.");
                 return;
             }
+            if (i.getClickType() != ClickType.LEFT) return;
+            if (awaitingInput || inputMode != InputMode.NONE) return;
+            awaitingInput = true;
+
             p.closeInventory();
             inputMode = InputMode.DESCRIPTION;
             registerChatListener();
-            p.sendMessage("§ePlease type the new palette description in chat (max " + MAX_DESCRIPTION_LENGTH + " characters). Type 'cancel' to abort.");
+            Bukkit.getScheduler().runTask(plugin, () ->
+                    p.sendMessage("§ePlease type the new palette description in chat (max " + MAX_DESCRIPTION_LENGTH + " characters). Type 'cancel' to abort.")
+            );
         });
 
         // Blocks
@@ -201,26 +218,35 @@ public class EditPaletteMenu extends AbstractMenu {
         });
     }
 
+    // --- NEW/REPLACED ---
     private void registerChatListener() {
-        if (chatListener != null) {
-            HandlerList.unregisterAll(chatListener);
+        Listener prev = ACTIVE_CHAT.remove(player.getUniqueId());
+        if (prev != null) {
+            HandlerList.unregisterAll(prev);
         }
         chatListener = new ChatInputListener();
+        ACTIVE_CHAT.put(player.getUniqueId(), chatListener);
         plugin.getServer().getPluginManager().registerEvents(chatListener, plugin);
     }
 
+    // --- NEW/REPLACED ---
     private void unregisterChatListener() {
-        if (chatListener != null) {
-            HandlerList.unregisterAll(chatListener);
-            chatListener = null;
-            inputMode = InputMode.NONE;
+        Listener prev = ACTIVE_CHAT.remove(player.getUniqueId());
+        if (prev != null) {
+            HandlerList.unregisterAll(prev);
         }
+        chatListener = null;
+        inputMode = InputMode.NONE;
+        awaitingInput = false; // reset debounce
     }
 
     private class ChatInputListener implements Listener {
         @EventHandler
         public void onPlayerChat(AsyncPlayerChatEvent event) {
             if (!event.getPlayer().getUniqueId().equals(player.getUniqueId())) return;
+
+            // Alleen als we echt in input-modus zijn
+            if (inputMode == InputMode.NONE) return;
 
             event.setCancelled(true);
             String message = event.getMessage().trim();
@@ -280,6 +306,4 @@ public class EditPaletteMenu extends AbstractMenu {
         }
         return false;
     }
-
-
 }

@@ -44,13 +44,13 @@ public class BuildTeamTools extends JavaPlugin {
 
         // Register Modules
         ModuleHandler.getInstance().registerModules(
-            CommonModule.getInstance(),
-            NetworkModule.getInstance(),
-            GeneratorModule.getInstance(),
-            NavigationModule.getInstance(),
-            PlotSystemModule.getInstance(),
-            StatsModule.getInstance(),
-            MiscModule.getInstance()
+                CommonModule.getInstance(),
+                NetworkModule.getInstance(),
+                GeneratorModule.getInstance(),
+                NavigationModule.getInstance(),
+                PlotSystemModule.getInstance(),
+                StatsModule.getInstance(),
+                MiscModule.getInstance()
         );
         ModuleHandler.getInstance().enableAll(null, true);
     }

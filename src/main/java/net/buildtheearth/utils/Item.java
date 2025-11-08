@@ -15,20 +15,28 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class Item {
-	public static HashMap<String, ItemStack> nonPlayerSkulls = new HashMap<>();
+    public static final Map<String, ItemStack> nonPlayerSkulls = new HashMap<>();
 
 	private ItemStack item;
 	private Material material;
 	private String displayName;
 	private int amount = -1;
-	private ArrayList<String> lore;
+    private List<String> lore;
 	private boolean hideAttributes;
 	private boolean hideEnchantments;
 	private final List<String> canDestroyItems = new ArrayList<>();
@@ -61,7 +69,7 @@ public class Item {
 		return this;
 	}
 
-	public Item setLore(ArrayList<String> lore) {
+    public Item setLore(List<String> lore) {
 		this.lore = lore;
 		return this;
 	}
@@ -105,9 +113,9 @@ public class Item {
 		else
 			item.setAmount(1);
 
-		if(item.getEnchantments().keySet().size() == 0)
-			for (Enchantment en : this.enchantments.keySet())
-				item.addUnsafeEnchantment(en, this.enchantments.get(en));
+        if (item.getEnchantments().isEmpty())
+            for (Map.Entry<Enchantment, Integer> en : this.enchantments.entrySet())
+                item.addUnsafeEnchantment(en.getKey(), en.getValue());
 
 
 
@@ -124,7 +132,7 @@ public class Item {
 		if (this.hideEnchantments)
 			itemmeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 
-		if(!canDestroyItems.isEmpty()){
+		/*if(!canDestroyItems.isEmpty()){
 			// TODO Marked for removal in 1.20.6, not fixed yet.
 			//Set<Namespaced> nameSpacedKeySet = new HashSet<>();
 			//for(String itemName : canDestroyItems)
@@ -138,7 +146,7 @@ public class Item {
 			//for(String itemName : canPlaceItems)
 			//	nameSpacedKeySet.add(NamespacedKey.minecraft(itemName));
 			//itemmeta.setPlaceableKeys(nameSpacedKeySet);
-		}
+		}*/
 
 		item.setItemMeta(itemmeta);
 		return item;
@@ -154,11 +162,7 @@ public class Item {
 
 	public static ItemStack create(Material material, String name) {
 		ItemStack item = new ItemStack(material, 1);
-		ItemMeta itemmeta = item.getItemMeta();
-		itemmeta.setDisplayName(name);
-		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		item.setItemMeta(itemmeta);
-		return item;
+        return edit(item, name);
 	}
 
 	public static ItemStack create(Material material, String name, int amount) {
@@ -170,7 +174,7 @@ public class Item {
 		return item;
 	}
 
-	public static ItemStack create(Material material, String name, ArrayList<String> lore) {
+    public static @NotNull ItemStack create(Material material, String name, List<String> lore) {
 		ItemStack item = new ItemStack(material, 1, (short)0);
 		ItemMeta itemmeta = item.getItemMeta();
 		itemmeta.setDisplayName(name);
@@ -180,7 +184,7 @@ public class Item {
 		return item;
 	}
 
-	public static ItemStack create(Material material, String name, short durability, ArrayList<String> lore) {
+    public static @NotNull ItemStack create(Material material, String name, short durability, List<String> lore) {
 		ItemStack item = new ItemStack(material, 1, durability);
 		ItemMeta itemmeta = item.getItemMeta();
 		itemmeta.setDisplayName(name);
@@ -190,7 +194,7 @@ public class Item {
 		return item;
 	}
 
-	public static ItemStack create(Material material, String name, int amount, ArrayList<String> lore) {
+    public static @NotNull ItemStack create(Material material, String name, int amount, List<String> lore) {
 		ItemStack item = new ItemStack(material, amount);
 		ItemMeta itemmeta = item.getItemMeta();
 		itemmeta.setDisplayName(name);
@@ -200,7 +204,7 @@ public class Item {
 		return item;
 	}
 
-	public static ItemStack createLeatherArmor(Material material, String name, Color color, ArrayList<String> lore) {
+    public static @NotNull ItemStack createLeatherArmor(Material material, String name, Color color, List<String> lore) {
 		ItemStack item = new ItemStack(material);
 		LeatherArmorMeta itemmeta = (LeatherArmorMeta)item.getItemMeta();
 		itemmeta.setDisplayName(name);
@@ -211,7 +215,7 @@ public class Item {
 		return item;
 	}
 
-	public static ItemStack create(Material material, String name, ArrayList<String> lore, Enchantment enchnt1, Integer level1) {
+    public static @NotNull ItemStack create(Material material, String name, List<String> lore, Enchantment enchnt1, Integer level1) {
 		ItemStack item = new ItemStack(material);
 		item.addUnsafeEnchantment(enchnt1, level1);
 		ItemMeta itemmeta = item.getItemMeta();
@@ -222,7 +226,7 @@ public class Item {
 		return item;
 	}
 
-	public static ItemStack create(Material material, String name, ArrayList<String> lore, Enchantment enchnt1, Integer level1, Enchantment enchnt2, Integer level2) {
+    public static @NotNull ItemStack create(Material material, String name, List<String> lore, Enchantment enchnt1, Integer level1, Enchantment enchnt2, Integer level2) {
 		ItemStack item = new ItemStack(material);
 		item.addUnsafeEnchantment(enchnt1, level1);
 		item.addUnsafeEnchantment(enchnt2, level2);
@@ -234,7 +238,7 @@ public class Item {
 		return item;
 	}
 
-	public static ItemStack create(Material material, String name, ArrayList<String> lore, Enchantment enchnt1, Integer level1, Enchantment enchnt2, Integer level2, Enchantment enchnt3, Integer level3) {
+    public static @NotNull ItemStack create(Material material, String name, List<String> lore, Enchantment enchnt1, Integer level1, Enchantment enchnt2, Integer level2, Enchantment enchnt3, Integer level3) {
 		ItemStack item = new ItemStack(material);
 		item.addUnsafeEnchantment(enchnt1, level1);
 		item.addUnsafeEnchantment(enchnt2, level2);
@@ -247,7 +251,7 @@ public class Item {
 		return item;
 	}
 
-	public static ItemStack createLeatherArmor(Material material, Color color) {
+    public static @NotNull ItemStack createLeatherArmor(Material material, Color color) {
 		ItemStack item = new ItemStack(material);
 		LeatherArmorMeta itemmeta = (LeatherArmorMeta)item.getItemMeta();
 		itemmeta.setColor(color);
@@ -256,7 +260,7 @@ public class Item {
 		return item;
 	}
 
-	public static ItemStack createLeatherArmor(Material material, String name, Color color, ArrayList<String> lore, Enchantment enchnt1, Integer level1) {
+    public static @NotNull ItemStack createLeatherArmor(Material material, String name, Color color, List<String> lore, Enchantment enchnt1, Integer level1) {
 		ItemStack item = new ItemStack(material);
 		item.addUnsafeEnchantment(enchnt1, level1);
 		LeatherArmorMeta itemmeta = (LeatherArmorMeta)item.getItemMeta();
@@ -268,7 +272,7 @@ public class Item {
 		return item;
 	}
 
-	public static ItemStack createLeatherArmor(Material material, String name, Color color, ArrayList<String> lore, Enchantment enchnt1, Integer level1, Enchantment enchnt2, Integer level2) {
+    public static @NotNull ItemStack createLeatherArmor(Material material, String name, Color color, List<String> lore, Enchantment enchnt1, Integer level1, Enchantment enchnt2, Integer level2) {
 		ItemStack item = new ItemStack(material);
 		item.addUnsafeEnchantment(enchnt1, level1);
 		item.addUnsafeEnchantment(enchnt2, level2);
@@ -281,7 +285,7 @@ public class Item {
 		return item;
 	}
 
-	public static ItemStack createLeatherArmor(Material material, String name, Color color, ArrayList<String> lore, Enchantment enchnt1, Integer level1, Enchantment enchnt2, Integer level2, Enchantment enchnt3, Integer level3) {
+    public static @NotNull ItemStack createLeatherArmor(Material material, String name, Color color, List<String> lore, Enchantment enchnt1, Integer level1, Enchantment enchnt2, Integer level2, Enchantment enchnt3, Integer level3) {
 		ItemStack item = new ItemStack(material);
 		item.addUnsafeEnchantment(enchnt1, level1);
 		item.addUnsafeEnchantment(enchnt2, level2);
@@ -295,7 +299,7 @@ public class Item {
 		return item;
 	}
 
-	public static ItemStack createPlayerHead(String name, String owner) {
+    public static @Nullable ItemStack createPlayerHead(String name, String owner) {
 		ItemStack item = XMaterial.PLAYER_HEAD.parseItem();
 
 		if(item == null)
@@ -309,22 +313,7 @@ public class Item {
 		return item;
 	}
 
-	public static ItemStack createPlayerHead(String name, String owner, ArrayList<String> lore) {
-		ItemStack item = XMaterial.PLAYER_HEAD.parseItem();
-
-		if(item == null)
-			return null;
-
-		SkullMeta itemmeta = (SkullMeta)item.getItemMeta();
-		itemmeta.setDisplayName(name);
-		itemmeta.setOwner(owner);
-		itemmeta.setLore(lore);
-		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		item.setItemMeta(itemmeta);
-		return item;
-	}
-
-	public static ItemStack createPlayerHead(String name, String owner, int amount, ArrayList<String> lore) {
+    public static @Nullable ItemStack createPlayerHead(String name, String owner, List<String> lore) {
 		ItemStack item = XMaterial.PLAYER_HEAD.parseItem();
 
 		if(item == null)
@@ -339,17 +328,20 @@ public class Item {
 		return item;
 	}
 
-	public static ItemStack edit(ItemStack item, Material material) {
+    @Contract("_, _ -> param1")
+    public static @NotNull ItemStack edit(@NotNull ItemStack item, Material material) {
 		item.setType(material);
 		return item;
 	}
 
-	public static ItemStack edit(ItemStack item, int amount) {
+    @Contract("_, _ -> param1")
+    public static @NotNull ItemStack edit(@NotNull ItemStack item, int amount) {
 		item.setAmount(amount);
 		return item;
 	}
 
-	public static ItemStack edit(ItemStack item, String name) {
+    @Contract("_, _ -> param1")
+    public static @NotNull ItemStack edit(@NotNull ItemStack item, String name) {
 		ItemMeta itemmeta = item.getItemMeta();
 		itemmeta.setDisplayName(name);
 		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
@@ -357,7 +349,8 @@ public class Item {
 		return item;
 	}
 
-	public static ItemStack edit(ItemStack item, int amount, String name) {
+    @Contract("_, _, _ -> param1")
+    public static @NotNull ItemStack edit(@NotNull ItemStack item, int amount, String name) {
 		item.setAmount(amount);
 		ItemMeta itemmeta = item.getItemMeta();
 		itemmeta.setDisplayName(name);
@@ -366,7 +359,8 @@ public class Item {
 		return item;
 	}
 
-	public static ItemStack edit(ItemStack item, ArrayList<String> lore) {
+    @Contract("_, _ -> param1")
+    public static @NotNull ItemStack edit(@NotNull ItemStack item, List<String> lore) {
 		ItemMeta itemmeta = item.getItemMeta();
 		itemmeta.setLore(lore);
 		itemmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
@@ -374,7 +368,8 @@ public class Item {
 		return item;
 	}
 
-	public static ItemStack edit(ItemStack item, int amount, String name, ArrayList<String> lore) {
+    @Contract("_, _, _, _ -> param1")
+    public static @NotNull ItemStack edit(@NotNull ItemStack item, int amount, String name, List<String> lore) {
 		item.setAmount(amount);
 		ItemMeta itemmeta = item.getItemMeta();
 		itemmeta.setDisplayName(name);
@@ -384,7 +379,7 @@ public class Item {
 		return item;
 	}
 
-	public static ItemStack fromUniqueMaterialString(String materialString) {
+    public static @Nullable ItemStack fromUniqueMaterialString(String materialString) {
 		Material material = Material.matchMaterial(materialString);
 		if(material != null)
 			return XMaterial.matchXMaterial(material).parseItem();
@@ -396,7 +391,7 @@ public class Item {
 		return null;
 	}
 
-	public static String getUniqueMaterialString(ItemStack item) {
+    public static @NotNull String getUniqueMaterialString(ItemStack item) {
 		if(CommonModule.getInstance().getVersionComponent().is_1_12())
 			return XMaterial.matchXMaterial(item).getId() + ":" + XMaterial.matchXMaterial(item).getData();
 		else
@@ -404,7 +399,7 @@ public class Item {
 
 	}
 
-	public static String getUniqueMaterialString(XMaterial material) {
+    public static @NotNull String getUniqueMaterialString(@NotNull XMaterial material) {
 		return getUniqueMaterialString(material.parseItem());
 	}
 
@@ -420,7 +415,7 @@ public class Item {
 		return s.toString();
 	}
 
-	public static XMaterial convertStringToXMaterial(String materialString) {
+    public static @Nullable XMaterial convertStringToXMaterial(String materialString) {
 		XMaterial material;
 
 		if(XMaterial.matchXMaterial(materialString).isPresent())
@@ -448,8 +443,9 @@ public class Item {
 
 		return bt;
 	}
-	public static String createStringFromItemList(ArrayList<String> items) throws IllegalArgumentException {
-		StringBuilder s = new StringBuilder(items.get(0));
+
+    public static @NotNull String createStringFromItemList(@NotNull List<String> items) throws IllegalArgumentException {
+        StringBuilder s = new StringBuilder(items.getFirst());
 
 		for (int i = 1; i < items.size(); i++)
 			if(XMaterial.matchXMaterial(items.get(i)).isPresent()) {
@@ -461,14 +457,14 @@ public class Item {
 		return s.toString();
 	}
 
-	public static ItemStack createCustomHeadTextureURL(String url, String name, ArrayList<String> lore) {
+    public static ItemStack createCustomHeadTextureURL(String url, String name, List<String> lore) {
 		byte[] encodedByteData = Base64.getEncoder().encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", url).getBytes());
 		String encodedData = new String(encodedByteData);
 
 		return createCustomHeadBase64(encodedData, name, lore);
 	}
 
-	public static ItemStack createCustomHeadBase64(String base64, String name, ArrayList<String> lore) {
+    public static @Nullable ItemStack createCustomHeadBase64(String base64, String name, List<String> lore) {
 		if (nonPlayerSkulls.containsKey(base64 + name + lore))
 			return nonPlayerSkulls.get(base64 + name + lore);
 
@@ -519,8 +515,7 @@ public class Item {
 	}
 
 
-
-	private static GameProfile makeProfile(String b64) {
+    private static @NotNull GameProfile makeProfile(@NotNull String b64) {
 		UUID id = new UUID(
 				b64.substring(b64.length() - 20).hashCode(),
 				b64.substring(b64.length() - 10).hashCode()

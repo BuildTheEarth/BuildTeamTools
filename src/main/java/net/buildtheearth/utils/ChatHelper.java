@@ -34,6 +34,10 @@ public class ChatHelper {
         Bukkit.getLogger().log(Level.INFO, ChatHelper.getErrorString(errorMessage, objects));
     }
 
+    public static void logError(String errorMessage, Exception e, Object... objects) {
+        BuildTeamTools.getInstance().getComponentLogger().error(ChatHelper.getErrorComponent(errorMessage, objects), e);
+    }
+
     public static void log(String string, Object... objects) {
         Bukkit.getConsoleSender().sendMessage( getConsoleString(string, objects));
     }

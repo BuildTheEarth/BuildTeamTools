@@ -25,13 +25,23 @@ public abstract class ConfigPaths {
         // Navigator.MainMenuItems
         private static final String NAVIGATOR_MAIN_MENU = "main-menu-items.";
         private static final String BUILD_ITEM = NAVIGATOR_MAIN_MENU + "build-item.";
-        public static final String BUILD_ITEM_ENABLED = BUILD_ITEM + "build-enabled";
-        public static final String BUILD_ITEM_ACTION = BUILD_ITEM + "build-action";
+        public static final String BUILD_ITEM_ENABLED = BUILD_ITEM + "enabled";
+        public static final String BUILD_ITEM_ACTION = BUILD_ITEM + "action";
 
         private static final String TUTORIALS_ITEM = NAVIGATOR_MAIN_MENU + "tutorial-item.";
-        public static final String TUTORIALS_ITEM_ENABLED = TUTORIALS_ITEM + "tutorial-enabled";
-        public static final String TUTORIALS_ITEM_ACTION = TUTORIALS_ITEM + "tutorial-action";
+        public static final String TUTORIALS_ITEM_ENABLED = TUTORIALS_ITEM + "enabled";
+        public static final String TUTORIALS_ITEM_ACTION = TUTORIALS_ITEM + "action";
 
+        private static final String PLOTSYSTEM_ITEM = NAVIGATOR_MAIN_MENU + "plotsystem-item.";
+        public static final String PLOTSYSTEM_ITEM_ENABLED = PLOTSYSTEM_ITEM + "enabled";
+        public static final String PLOTSYSTEM_ITEM_ACTION = PLOTSYSTEM_ITEM + "action";
+
+        private static final String EXPLORE_ITEM = NAVIGATOR_MAIN_MENU + "explore-item.";
+        public static final String EXPLORE_ITEM_ENABLED = EXPLORE_ITEM + "enabled";
+
+        // Navigator.Warps
+        private static final String NAVIGATOR_WARPS = "warps.";
+        public static final String WARPS_GROUP_SORTING_MODE = NAVIGATOR_WARPS + "sorting-mode";
     }
 
     public static class PlotSystem {

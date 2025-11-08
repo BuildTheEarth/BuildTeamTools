@@ -5,9 +5,7 @@ import net.buildtheearth.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
 
 public class WarpGroupSelectionMenu extends WarpGroupMenu {
 
@@ -38,20 +36,8 @@ public class WarpGroupSelectionMenu extends WarpGroupMenu {
     }
 
     @Override
-    protected void setPaginatedItemClickEventsAsync(List<?> source) {
-        List<WarpGroup> warpGroups = source.stream().map(l -> (WarpGroup) l).collect(Collectors.toList());
-
-        int slot = 0;
-        for (WarpGroup warpGroup : warpGroups) {
-            final int _slot = slot;
-            getMenu().getSlot(getWarpGroupSlot(warpGroup, _slot)).setClickHandler((clickPlayer, clickInformation) -> {
-                clickPlayer.closeInventory();
-                clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
-
-                warp.setWarpGroup(warpGroup);
-                new WarpEditMenu(clickPlayer, warp, alreadyExists, true);
-            });
-            slot++;
-        }
-    }
+    protected void leftClickAction(@NotNull Player clickPlayer, @NotNull WarpGroup warpGroup) {
+        clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
+        warp.setWarpGroup(warpGroup);
+        new WarpEditMenu(clickPlayer, warp, alreadyExists, true);    }
 }

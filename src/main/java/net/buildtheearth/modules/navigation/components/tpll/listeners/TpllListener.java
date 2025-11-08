@@ -1,14 +1,19 @@
 package net.buildtheearth.modules.navigation.components.tpll.listeners;
 
+import com.alpsbte.alpslib.utils.AlpsUtils;
+import net.buildtheearth.modules.navigation.NavUtils;
+import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
+import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Region;
-import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.utils.ChatHelper;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 
@@ -27,7 +32,7 @@ public class TpllListener implements Listener {
     private double lat;
 
     // Target server name for teleportation
-    private String targetServerName;
+    private BuildTeam targetBuildTeam;
     
     @EventHandler
     public void onTpll(PlayerCommandPreprocessEvent event) {
@@ -37,12 +42,23 @@ public class TpllListener implements Listener {
         // Check if the command is a TPLL command
         if (!isTpllCommand(event)) return;
 
+        ChatHelper.logDebug("Intercepted TPLL command wit lat and lon: %s %s", lat, lon);
+
         // Check if teleportation interception is required
-        shouldIntercept(event).thenAcceptAsync(shouldIntercept -> {
+        shouldIntercept().thenAcceptAsync(shouldIntercept -> {
             // If interception is required, cancel the event and perform cross teleportation
-            if (shouldIntercept) {
-                event.setCancelled(true);
-                NavigationModule.getInstance().getTpllComponent().tpllPlayer(event.getPlayer(), new double[]{lat, lon}, targetServerName);
+            if (Boolean.TRUE.equals(shouldIntercept)) {
+                var type = NavUtils.determineSwitchPossibilityOrMsgPlayerIfNone(event.getPlayer(), targetBuildTeam);
+                if (type != null) {
+                    if (type == NavUtils.NavSwitchType.NETWORK) {
+                        NavigationModule.getInstance().getTpllComponent().tpllPlayer(event.getPlayer(),
+                                new double[]{lat, lon}, targetBuildTeam.getServerName());
+                    } else if (type == NavUtils.NavSwitchType.TRANSFER) {
+                        NavigationModule.getInstance().getTpllComponent().tpllPlayerTransfer(event.getPlayer(),
+                                new double[]{lat, lon}, targetBuildTeam.getIP());
+                    }
+                    event.setCancelled(true);
+                }
             }
         });
     }
@@ -53,7 +69,7 @@ public class TpllListener implements Listener {
      * @param event The event triggered when a player processes a command.
      * @return True if the command is a TPLL command and coordinates are extracted sucessfully, false otherwise.
      */
-    private boolean isTpllCommand(PlayerCommandPreprocessEvent event) {
+    private boolean isTpllCommand(@NotNull PlayerCommandPreprocessEvent event) {
         // Check if the command starts with "tpll"
         ChatHelper.logDebug(event.getMessage());
         if (!event.getMessage().startsWith("/tpll")) return false;
@@ -61,23 +77,28 @@ public class TpllListener implements Listener {
 
         // Split the command to extract coordinates
         String[] splitMessage = event.getMessage().split(" ");
-        splitMessage[1] = splitMessage[1].replaceAll(",", " ").trim();
         if (splitMessage.length < 3) return false;
+        splitMessage[1] = splitMessage[1].replace(",", " ").trim();
         ChatHelper.logDebug("Command had the correct length (%s).", splitMessage.length);
 
-        // Extract and set latitude and longitude coordinates
-        this.lat = Double.parseDouble(splitMessage[1]);
-        this.lon = Double.parseDouble(splitMessage[2]);
+        Double oLat = AlpsUtils.tryParseDouble(splitMessage[1]);
+        Double oLon = AlpsUtils.tryParseDouble(splitMessage[2]);
+        if (oLat == null || oLon == null) {
+            ChatHelper.logDebug("Command did not contain valid coordinates.");
+            return false;
+        }
+
+        this.lat = oLat;
+        this.lon = oLon;
         return true;
     }
 
     /**
      * Determines if teleportation interception is required based on the player's location and network status.
      *
-     * @param event The event triggered when a player processes a command.
      * @return A CompletableFuture representing whether teleportation interception is required.
      */
-    private CompletableFuture<Boolean> shouldIntercept(PlayerCommandPreprocessEvent event) {
+    private @NotNull CompletableFuture<Boolean> shouldIntercept() {
         return OpenStreetMapAPI.getCountryFromLocationAsync(new double[]{lat, lon})
                 .thenComposeAsync(address -> {
                     if (address == null) return CompletableFuture.completedFuture(false);
@@ -85,14 +106,8 @@ public class TpllListener implements Listener {
                     String countryName = address[0];
                     Region region = Region.getByName(countryName);
 
-                    if (!networkModule.getBuildTeam().isConnected() || !region.isConnected()) {
-                        event.getPlayer().sendMessage(ChatHelper.getErrorString("Either this server or the receiving server isn't connected to the network."));
-                        event.setCancelled(true);
-                        return CompletableFuture.completedFuture(false);
-                    }
-
-                    if (region.getBuildTeam().getID() != networkModule.getBuildTeam().getID()) {
-                        targetServerName = region.getBuildTeam().getServerName();
+                    if (!Objects.equals(region.getBuildTeam().getID(), networkModule.getBuildTeam().getID())) {
+                        targetBuildTeam = region.getBuildTeam();
                         return CompletableFuture.completedFuture(true);
                     }
 

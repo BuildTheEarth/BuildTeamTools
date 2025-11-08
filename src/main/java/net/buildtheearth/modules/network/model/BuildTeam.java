@@ -1,12 +1,12 @@
 package net.buildtheearth.modules.network.model;
 
 import lombok.Getter;
+import net.buildtheearth.modules.navigation.components.warps.model.Warp;
+import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.api.API;
 import net.buildtheearth.modules.network.api.NetworkAPI;
 import net.buildtheearth.utils.ChatHelper;
-import net.buildtheearth.modules.navigation.components.warps.model.Warp;
-import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
@@ -30,24 +30,28 @@ public class BuildTeam {
     @Getter
     private final boolean hasBTToolsInstalled;
     @Getter
-    private final Continent continent;
-    @Getter
     private final List<Region> regions;
     @Getter
     private final List<WarpGroup> warpGroups;
+    @Getter
+    private final boolean allowsTransfers;
+    @Getter
+    private final String tag;
 
 
-    public BuildTeam(String ID, String serverIP, String name, String blankName, String serverName, Continent continent, boolean isConnected, boolean hasBTToolsInstalled) {
+    public BuildTeam(String ID, String serverIP, String name, String blankName, String serverName,
+                     boolean isConnected, boolean hasBTToolsInstalled, boolean allowsTransfers, String tag) {
         this.ID = ID;
         this.name = name;
         this.blankName = blankName;
         this.serverName = serverName;
-        this.continent = continent;
         this.isConnected = isConnected;
         this.hasBTToolsInstalled = hasBTToolsInstalled;
 
         this.regions = new ArrayList<>();
         this.warpGroups = new ArrayList<>();
+        this.allowsTransfers = allowsTransfers;
+        this.tag = tag;
 
         if(!isConnected)
             this.IP = serverIP;

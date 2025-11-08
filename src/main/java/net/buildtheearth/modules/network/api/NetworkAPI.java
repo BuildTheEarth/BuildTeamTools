@@ -1,6 +1,10 @@
 package net.buildtheearth.modules.network.api;
 
+import lombok.experimental.UtilityClass;
 import net.buildtheearth.BuildTeamTools;
+import net.buildtheearth.modules.navigation.NavUtils;
+import net.buildtheearth.modules.navigation.components.warps.model.Warp;
+import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Continent;
@@ -8,12 +12,11 @@ import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.network.model.RegionType;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.io.ConfigPaths;
-import net.buildtheearth.modules.navigation.components.warps.model.Warp;
-import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -21,6 +24,7 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+@UtilityClass
 public class NetworkAPI {
 
     /**
@@ -50,10 +54,10 @@ public class NetworkAPI {
     }
 
     // Add all currently connected regions to their respective continents
-    public static CompletableFuture<Void> getBuildTeamInformation() {
+    public static @NotNull CompletableFuture<Void> getBuildTeamInformation() {
         CompletableFuture<Void> future = new CompletableFuture<>();
 
-        API.getAsync("https://nwapi.buildtheearth.net/api/teams", new API.ApiResponseCallback() {
+        getAsync("https://nwapi.buildtheearth.net/api/teams", new API.ApiResponseCallback() {
             @Override
             public void onResponse(String response) {
                 try {
@@ -78,23 +82,12 @@ public class NetworkAPI {
                     for (Object object : responseArray.toArray()) {
 
                         // Check if the object is a JSON object
-                        if (!(object instanceof JSONObject)) continue;
-                        JSONObject teamObject = (JSONObject) object;
-
-                        // Extract a JSON array containing the regions belonging to the team
-                        Object regions = teamObject.get("Regions");
-                        if (!(regions instanceof JSONArray)) continue;
-                        JSONArray regionArray = (JSONArray) regions;
-
-                        // Extract a JSON array containing the warps belonging to the team
-                        Object warps = teamObject.get("Warps");
-                        if (!(warps instanceof JSONArray)) continue;
-                        JSONArray warpArray = (JSONArray) warps;
-
-                        // Extract a JSON array containing the warp groups belonging to the team
-                        Object warpGroups = teamObject.get("WarpGroups");
-                        if (!(warpGroups instanceof JSONArray)) continue;
-                        JSONArray warpGroupArray = (JSONArray) warpGroups;
+                        if (!(object instanceof JSONObject teamObject) ||
+                                !(teamObject.get("Regions") instanceof JSONArray regions) ||
+                                !(teamObject.get("Warps") instanceof JSONArray warps) ||
+                                !(teamObject.get("WarpGroups") instanceof JSONArray warpGroups)) {
+                            continue;
+                        }
 
                         // Get some values to add to the build team
                         Continent continent = Continent.getByLabel((String) teamObject.get("Continent"));
@@ -105,18 +98,18 @@ public class NetworkAPI {
                         String serverName = getMainServerName(teamObject);
                         String name = (String) teamObject.get("Name");
                         String blankName = (String) teamObject.get("BlankName");
+                        boolean allowsTransfers = (long) teamObject.get("AllowsTransfers") == 1;
+                        String tag = (String) teamObject.get("Tag");
 
-                        BuildTeam buildTeam = new BuildTeam(teamID, mainServerIP, name, blankName, serverName, continent, isConnected, hasBuildTeamToolsInstalled);
+                        BuildTeam buildTeam = new BuildTeam(teamID, mainServerIP, name, blankName, serverName,
+                                isConnected, hasBuildTeamToolsInstalled, allowsTransfers, tag);
                         NetworkModule.getInstance().getBuildTeams().add(buildTeam);
 
-                        // Create an "other" Warp Group for warps that don't belong to a warp group
-                        WarpGroup otherWarpGroup = new WarpGroup(buildTeam, "Other", "Other warps", -1, null);
-                        buildTeam.getWarpGroups().add(otherWarpGroup);
+                        WarpGroup otherWarpGroup = NavUtils.createOtherWarpGroup();
 
                         // Add all the warp groups of the team to their respective build teams
-                        for (Object warpGroupJSON : warpGroupArray.toArray()) {
-                            if (!(warpGroupJSON instanceof JSONObject)) continue;
-                            JSONObject warpGroupObject = (JSONObject) warpGroupJSON;
+                        for (Object warpGroupJSON : warpGroups.toArray()) {
+                            if (!(warpGroupJSON instanceof JSONObject warpGroupObject)) continue;
 
                             UUID warpGroupID = UUID.fromString((String) warpGroupObject.get("ID"));
                             String warpGroupName = (String) warpGroupObject.get("Name");
@@ -129,10 +122,11 @@ public class NetworkAPI {
                             buildTeam.getWarpGroups().add(warpGroup);
                         }
 
+                        if (!otherWarpGroup.getWarps().isEmpty()) buildTeam.getWarpGroups().add(otherWarpGroup);
+
                         // Add all the warps of the team to their respective warp groups
-                        for (Object warpJSON : warpArray.toArray()) {
-                            if (!(warpJSON instanceof JSONObject)) continue;
-                            JSONObject warpObject = (JSONObject) warpJSON;
+                        for (Object warpJSON : warps.toArray()) {
+                            if (!(warpJSON instanceof JSONObject warpObject)) continue;
 
                             String warpIDString = (String) warpObject.get("ID");
                             UUID warpID = warpIDString != null ? UUID.fromString(warpIDString) : null;
@@ -151,7 +145,7 @@ public class NetworkAPI {
                             float warpPitch = Float.parseFloat(warpObject.get("Pitch") + "");
                             boolean isHighlight = warpObject.get("isHighlight") != null && (long) warpObject.get("isHighlight") == 1;
 
-                            if (material != null && material.equals(""))
+                            if (material != null && material.isEmpty())
                                 material = null;
 
                             WarpGroup warpGroup = null;
@@ -186,9 +180,8 @@ public class NetworkAPI {
                         }
 
                         // Add all the regions of the team to their respective continents
-                        for (Object regionJSON : regionArray.toArray()) {
-                            if (!(regionJSON instanceof JSONObject)) continue;
-                            JSONObject regionObject = (JSONObject) regionJSON;
+                        for (Object regionJSON : regions.toArray()) {
+                            if (!(regionJSON instanceof JSONObject regionObject)) continue;
 
                             String regionName = (String) regionObject.get("RegionName");
                             String headBase64 = (String) regionObject.get("Head");
@@ -226,12 +219,10 @@ public class NetworkAPI {
                 String mainServerIP = (String) teamObject.get("MainServerIP");
 
                 Object serversObject = teamObject.get("Servers");
-                if(!(serversObject instanceof JSONArray)) return null;
-                JSONArray serversArray = (JSONArray) serversObject;
+                if (!(serversObject instanceof JSONArray serversArray)) return null;
 
                 for(Object object : serversArray.toArray()) {
-                    if(!(object instanceof JSONObject)) return null;
-                    JSONObject serverObject = (JSONObject) object;
+                    if (!(object instanceof JSONObject serverObject)) return null;
 
                     String serverIP = (String) serverObject.get("IP");
                     if(serverIP.equals(mainServerIP)) return (String) serverObject.get("Name");
@@ -243,8 +234,8 @@ public class NetworkAPI {
                 if(regionObject == null) return 0;
                 if(regionObject.get("area") == null) return 0;
 
-                if (regionObject.get("area") instanceof Long)
-                    return ((Long) regionObject.get("area")).intValue();
+                if (regionObject.get("area") instanceof Long area)
+                    return Math.toIntExact(area);
 
                 return ((Double) regionObject.get("area")).intValue();
             }
@@ -261,10 +252,10 @@ public class NetworkAPI {
         return future;
     }
 
-    public static CompletableFuture<Void> setupCurrentServerData() {
+    public static @NotNull CompletableFuture<Void> setupCurrentServerData() {
         CompletableFuture<Void> future = new CompletableFuture<>();
 
-        API.getAsync("https://nwapi.buildtheearth.net/api/teams/" + BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY), new API.ApiResponseCallback() {
+        getOneAsync("https://nwapi.buildtheearth.net/api/teams/" + BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY), new API.ApiResponseCallback() {
             @Override
             public void onResponse(String response) {
                 try {
@@ -370,8 +361,37 @@ public class NetworkAPI {
         });
     }
 
-    public static Warp getWarpByKey(String key) {
-        //TODO IMPLEMENT
-        return null;
+    private static void getOneAsync(String url, API.ApiResponseCallback callback) {
+        var path = BuildTeamTools.getInstance().getDataPath().resolve("buildteam.json");
+        if (BuildTeamTools.getInstance().isDebug() && path.toFile().exists()) {
+            // If the file exists, read from it instead of making an API call
+            try {
+                String content = new String(java.nio.file.Files.readAllBytes(path));
+                callback.onResponse(content);
+                BuildTeamTools.getInstance().getComponentLogger().warn("[DEBUG] Read connected buildteam from local file buildteam.json. Remove the file if you want up to date data.");
+                return;
+            } catch (IOException e) {
+                ChatHelper.logError("Failed to read from local buildteam.json: %s", e.getMessage());
+            }
+        }
+
+        API.getAsync(url, callback);
+    }
+
+    private static void getAsync(String url, API.ApiResponseCallback callback) {
+        var path = BuildTeamTools.getInstance().getDataPath().resolve("buildteams.json");
+        if (BuildTeamTools.getInstance().isDebug() && path.toFile().exists()) {
+            // If the file exists, read from it instead of making an API call
+            try {
+                String content = new String(java.nio.file.Files.readAllBytes(path));
+                callback.onResponse(content);
+                BuildTeamTools.getInstance().getComponentLogger().warn("[DEBUG] Read buildteams from local file buildteams.json. Remove the file if you want up to date data.");
+                return;
+            } catch (IOException e) {
+                ChatHelper.logError("Failed to read from local buildteams.json: %s", e.getMessage());
+            }
+        }
+
+        API.getAsync(url, callback);
     }
 }

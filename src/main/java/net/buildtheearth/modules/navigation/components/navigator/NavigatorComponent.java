@@ -5,15 +5,16 @@ import com.sk89q.worldedit.WorldEdit;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.ModuleComponent;
 import net.buildtheearth.modules.common.CommonModule;
-import net.buildtheearth.modules.common.components.dependency.DependencyComponent;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.io.ConfigPaths;
+import net.buildtheearth.utils.io.ConfigUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Field;
+import java.util.Objects;
 
 public class NavigatorComponent extends ModuleComponent {
 
@@ -74,11 +75,11 @@ public class NavigatorComponent extends ModuleComponent {
     }
 
     public ItemStack getItem() {
-        return Item.create(XMaterial.COMPASS.parseMaterial(), "§aNavigator");
+        return Item.edit(Objects.requireNonNull(XMaterial.COMPASS.parseItem()), "§aNavigator");
     }
 
     public short getSlot() {
-        return (short) BuildTeamTools.getInstance().getConfig().getInt(ConfigPaths.Navigation.NAVIGATOR_ITEM_SLOT);
+        return (short) BuildTeamTools.getInstance().getConfig(ConfigUtil.NAVIGATION).getInt(ConfigPaths.Navigation.NAVIGATOR_ITEM_SLOT);
     }
 
 

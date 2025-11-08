@@ -64,8 +64,7 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setItemClickEventsAsync() {
-        if(hasBackItem)
-            getMenu().getSlot(BACK_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> clickPlayer.closeInventory());
+        // No items need to be set here
     }
 
     @Override

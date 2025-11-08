@@ -4,10 +4,8 @@ import com.google.gson.Gson;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
-import net.buildtheearth.modules.navigation.menu.CountrySelectorMenu;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.BuildTeam;
-import net.buildtheearth.modules.network.model.Continent;
 import net.buildtheearth.modules.network.model.Permissions;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.CustomHeads;
@@ -16,6 +14,7 @@ import net.buildtheearth.utils.ListUtil;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.io.ConfigPaths;
 import net.buildtheearth.utils.io.ConfigUtil;
+import net.buildtheearth.utils.menus.AbstractMenu;
 import net.buildtheearth.utils.menus.AbstractPaginatedMenu;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
@@ -36,7 +35,7 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
     private final boolean hasBackItem;
     private final BuildTeam buildTeam;
     private int plusSlot = ALTERNATE_PLUS_SLOT;
-    private Continent continent;
+    private AbstractMenu backMenue;
 
     /** In this menu the player can select a warp group to view the warps in each warp group.
      *
@@ -50,16 +49,16 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
         this.buildTeam = buildTeam;
     }
 
-    public WarpGroupMenu(Player menuPlayer, BuildTeam buildTeam, boolean hasBackItem, boolean autoLoad, Continent continent) {
+    public WarpGroupMenu(Player menuPlayer, BuildTeam buildTeam, boolean hasBackItem, boolean autoLoad, AbstractMenu menu) {
         this(menuPlayer, buildTeam, hasBackItem, autoLoad);
-        this.continent = continent;
+        this.backMenue = menu;
     }
 
     @Override
     protected void setMenuItemsAsync() {
         if (hasBackItem) {
             ChatHelper.logDebug("Setting back item for warp group menu");
-            setBackItem(BACK_ITEM_SLOT, new CountrySelectorMenu(getMenuPlayer(), continent, false));
+            setBackItem(BACK_ITEM_SLOT, backMenue);
         }
     }
 

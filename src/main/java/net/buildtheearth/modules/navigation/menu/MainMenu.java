@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.navigation.NavUtils;
 import net.buildtheearth.modules.navigation.components.warps.WarpsComponent;
+import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
@@ -116,7 +117,7 @@ public class MainMenu extends AbstractMenu {
                 if (clickInformation.getClickType().isRightClick()) {
                     new ExploreMenu(clickPlayer, true);
                 } else {
-                    WarpsComponent.openWarpMenu(clickPlayer);
+                    WarpsComponent.openWarpMenu(clickPlayer, NetworkModule.getInstance().getBuildTeam(), this);
                 }
             });
         }

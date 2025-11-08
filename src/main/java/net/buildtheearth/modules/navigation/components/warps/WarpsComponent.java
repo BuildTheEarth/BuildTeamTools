@@ -15,10 +15,10 @@ import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.modules.network.model.BuildTeam;
-import net.buildtheearth.modules.network.model.Continent;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.GeometricUtils;
 import net.buildtheearth.utils.geo.CoordinateConversion;
+import net.buildtheearth.utils.menus.AbstractMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -230,13 +230,13 @@ public class WarpsComponent extends ModuleComponent {
         openWarpMenu(player, NetworkModule.getInstance().getBuildTeam(), null);
     }
 
-    public static void openWarpMenu(@NotNull Player player, @NotNull BuildTeam buildTeam, @Nullable Continent continent) {
+    public static void openWarpMenu(@NotNull Player player, @NotNull BuildTeam buildTeam, @Nullable AbstractMenu menu) {
         int warpGroupCount = buildTeam.getWarpGroups().size();
 
         switch (warpGroupCount) {
             case 0 -> player.sendMessage(ChatHelper.getErrorString("This server does not have any warps yet!"));
             case 1 -> new WarpMenu(player, buildTeam.getWarpGroups().getFirst(), false, true);
-            default -> new WarpGroupMenu(player, buildTeam, continent != null, true, continent);
+            default -> new WarpGroupMenu(player, buildTeam, menu != null, true, menu);
         }
     }
 }

@@ -123,7 +123,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
                 if (clickInformation.getClickType().isRightClick() &&
                         clickPlayer.hasPermission(Permissions.WARP_USE) &&
                         !clickedRegion.getBuildTeam().getWarpGroups().isEmpty()) {
-                    WarpsComponent.openWarpMenu(clickPlayer, clickedRegion.getBuildTeam(), clickedRegion.getContinent());
+                    WarpsComponent.openWarpMenu(clickPlayer, clickedRegion.getBuildTeam(), this);
                 } else {
                     NavUtils.switchToTeam(clickedRegion.getBuildTeam(), clickPlayer);
                 }

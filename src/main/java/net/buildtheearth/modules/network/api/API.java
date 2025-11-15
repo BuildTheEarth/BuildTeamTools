@@ -8,6 +8,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okio.Buffer;
+import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -20,7 +21,7 @@ import java.io.IOException;
  */
 public class API {
 
-    private static OkHttpClient httpClient = new OkHttpClient();
+    private static final OkHttpClient httpClient = new OkHttpClient();
 
     /**
      * A callback function to be able to handle the result of an API request
@@ -50,8 +51,6 @@ public class API {
     /**
      * Sends an asynchronous get request to an API
      * @param url The URL to perform a get request on
-     * @return The result of the get request as a string
-     * @throws IOException When something went wrong performing the get request
      */
     public static void getAsync(String url, ApiResponseCallback callback) {
         Request request = new Request.Builder()
@@ -60,18 +59,20 @@ public class API {
 
         httpClient.newCall(request).enqueue(new Callback() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String responseBody = response.body().string();
-                    callback.onResponse(responseBody);
-                } else if(BuildTeamTools.getInstance().isDebug())
-                    callback.onFailure(new IOException("\nUnexpected code: \n" + response + "\n Response Body:\n" + response.body().string()));
-                else
-                    callback.onFailure(new IOException("Unexpected code " + response.code()));
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (response) {
+                    if (response.isSuccessful()) {
+                        String responseBody = response.body().string();
+                        callback.onResponse(responseBody);
+                    } else if(BuildTeamTools.getInstance().isDebug())
+                        callback.onFailure(new IOException("\nUnexpected code: \n" + response + "\n Response Body:\n" + response.body().string()));
+                    else
+                        callback.onFailure(new IOException("Unexpected code " + response.code()));
+                }
             }
 
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 callback.onFailure(e);
             }
         });
@@ -110,21 +111,23 @@ public class API {
 
         httpClient.newCall(request).enqueue(new Callback() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String responseBody = response.body().string();
-                    callback.onResponse(responseBody);
-                } else if(BuildTeamTools.getInstance().isDebug()) {
-                    Buffer buffer = new Buffer();
-                    requestBody.writeTo(buffer);
-                    callback.onFailure(new IOException("\nUnexpected code: \n" + response + "\n Request Body:\n" + buffer.readUtf8() +"\n Response Body:\n" + response.body().string()));
-                }else {
-                    callback.onFailure(new IOException("Unexpected code " + response.code()));
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (response) {
+                    if (response.isSuccessful()) {
+                        String responseBody = response.body().string();
+                        callback.onResponse(responseBody);
+                    } else if(BuildTeamTools.getInstance().isDebug()) {
+                        Buffer buffer = new Buffer();
+                        requestBody.writeTo(buffer);
+                        callback.onFailure(new IOException("\nUnexpected code: \n" + response + "\n Request Body:\n" + buffer.readUtf8() +"\n Response Body:\n" + response.body().string()));
+                    }else {
+                        callback.onFailure(new IOException("Unexpected code " + response.code()));
+                    }
                 }
             }
 
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 callback.onFailure(e);
             }
         });
@@ -162,20 +165,22 @@ public class API {
 
         httpClient.newCall(request).enqueue(new Callback() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String responseBody = response.body().string();
-                    callback.onResponse(responseBody);
-                } else if(BuildTeamTools.getInstance().isDebug()) {
-                    Buffer buffer = new Buffer();
-                    requestBody.writeTo(buffer);
-                    callback.onFailure(new IOException("\nUnexpected code: \n" + response + "\n Request Body:\n" + buffer.readUtf8() +"\n Response Body:\n" + response.body().string()));
-                }else
-                    callback.onFailure(new IOException("Unexpected code: " + response.code()));
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (response) {
+                    if (response.isSuccessful()) {
+                        String responseBody = response.body().string();
+                        callback.onResponse(responseBody);
+                    } else if(BuildTeamTools.getInstance().isDebug()) {
+                        Buffer buffer = new Buffer();
+                        requestBody.writeTo(buffer);
+                        callback.onFailure(new IOException("\nUnexpected code: \n" + response + "\n Request Body:\n" + buffer.readUtf8() +"\n Response Body:\n" + response.body().string()));
+                    }else
+                        callback.onFailure(new IOException("Unexpected code: " + response.code()));
+                }
             }
 
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 callback.onFailure(e);
             }
         });
@@ -213,17 +218,19 @@ public class API {
 
         httpClient.newCall(request).enqueue(new Callback() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String responseBody = response.body().string();
-                    callback.onResponse(responseBody);
-                } else {
-                    callback.onFailure(new IOException("Unexpected code " + response));
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (response) {
+                    if (response.isSuccessful()) {
+                        String responseBody = response.body().string();
+                        callback.onResponse(responseBody);
+                    } else {
+                        callback.onFailure(new IOException("Unexpected code " + response));
+                    }
                 }
             }
 
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 callback.onFailure(e);
             }
         });
@@ -238,7 +245,7 @@ public class API {
             try {
                 jsonArray = (JSONArray) jsonParser.parse(jsonString);
             } catch (ParseException e) {
-                e.printStackTrace();
+                BuildTeamTools.getInstance().getComponentLogger().error("Failed to parse JSON Array.", e);
             }
         }
         return jsonArray;
@@ -251,7 +258,7 @@ public class API {
             try {
                 jsonObject = (JSONObject) jsonParser.parse(jsonString);
             } catch (ParseException e) {
-                e.printStackTrace();
+                BuildTeamTools.getInstance().getComponentLogger().error("Failed to parse JSON Object.", e);
             }
         }
         return jsonObject;

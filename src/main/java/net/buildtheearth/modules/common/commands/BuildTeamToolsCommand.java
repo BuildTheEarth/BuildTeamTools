@@ -47,7 +47,7 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
                 sender.sendMessage("§e/btt communicators §8- §7List of players who communicate with the network.");
                 sender.sendMessage("§e/btt debug <true/false> §8- §7Enable or disable debug mode.");
                 sender.sendMessage("§e/btt help §8- §7List of all sub commands.");
-                sender.sendMessage("§e/btt reload §8- §7Reload all modules.");
+                sender.sendMessage("§e/btt reload-config §8- §7Reload all configs for the modules");
             });
             return true;
         }
@@ -121,15 +121,15 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        if(args[0].equalsIgnoreCase("reload")) {
+        if(args[0].equalsIgnoreCase("reload-config")) {
             if(!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_RELOAD)){
                 sender.sendMessage("§cYou don't have permission to execute this command.");
                 return true;
             }
 
-            sender.sendMessage(ChatHelper.getStandardString("§7Reloading all modules..."));
-            ModuleHandler.getInstance().reloadAll(sender);
-            sender.sendMessage(ChatHelper.getStandardString("§7All modules have been reloaded."));
+            sender.sendMessage(ChatHelper.getStandardString("§7Reloading all configs..."));
+            BuildTeamTools.getInstance().reloadConfig();
+            sender.sendMessage(ChatHelper.getStandardString("§7All configs have been reloaded. For some changes to apply you have to restart the server."));
         }
 
         return true;
@@ -138,17 +138,14 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
         if(args.length == 1)
-            return Arrays.asList("help", "communicators", "checkForUpdates", "cache", "debug", "reload");
+            return Arrays.asList("help", "communicators", "checkForUpdates", "cache", "debug", "reload-config");
 
         List<String> debugSuggestions = Utils.getTabCompleterArgs(args, "debug", 2, Arrays.asList("true", "false"));
         if(debugSuggestions != null)
             return debugSuggestions;
 
         List<String> cacheSuggestions = Utils.getTabCompleterArgs(args, "cache", 2, Collections.singletonList("upload"));
-        if(cacheSuggestions != null)
-            return cacheSuggestions;
-
-        return null;
+        return cacheSuggestions;
     }
 
     public static void sendBuildTeamToolsInfo(CommandSender sender){

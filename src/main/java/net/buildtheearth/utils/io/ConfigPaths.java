@@ -11,8 +11,7 @@ public abstract class ConfigPaths {
     // Earth World
     public static final String EARTH_WORLD = "earth-world";
 
-
-
+    public static final String DISABLED_MODULES = "disabled-modules";
 
     public static class Navigation {
 

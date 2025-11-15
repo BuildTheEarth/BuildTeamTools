@@ -11,16 +11,11 @@ import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.plotsystem.PlotSystemModule;
 import net.buildtheearth.modules.stats.StatsModule;
 import net.buildtheearth.utils.io.ConfigUtil;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.logging.Level;
 
 /**
  * The parent of all modules of the Build Team Tools plugin
@@ -43,8 +38,12 @@ public class BuildTeamTools extends JavaPlugin {
         instance = this;
 
         // Register Modules
+
+        // We need to register the Common Module first to have the Config System Available for other modules/logic.
+        ModuleHandler.getInstance().registerModule(CommonModule.getInstance());
+        ModuleHandler.getInstance().enable(CommonModule.getInstance(), null);
+
         ModuleHandler.getInstance().registerModules(
-                CommonModule.getInstance(),
                 NetworkModule.getInstance(),
                 GeneratorModule.getInstance(),
                 NavigationModule.getInstance(),
@@ -64,7 +63,7 @@ public class BuildTeamTools extends JavaPlugin {
 
 
     @Override
-    public FileConfiguration getConfig() {
+    public @NotNull FileConfiguration getConfig() {
         return getConfig(ConfigUtil.MAIN);
     }
 

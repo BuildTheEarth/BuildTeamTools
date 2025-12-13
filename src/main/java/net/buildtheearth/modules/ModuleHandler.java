@@ -3,6 +3,7 @@ package net.buildtheearth.modules;
 import lombok.Getter;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.utils.ChatHelper;
+import net.buildtheearth.utils.io.ConfigPaths;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Noah Husby
@@ -42,9 +44,12 @@ public class ModuleHandler {
      *
      * @param modules {@link Module}
      */
-    public void registerModules(Module... modules) {
-        for (Module m : modules)
-            registerModule(m);
+    public void registerModules(Module @NotNull ... modules) {
+        for (Module m : modules) {
+            if (!Objects.requireNonNull(BuildTeamTools.getInstance().getConfig().getList(ConfigPaths.DISABLED_MODULES)).contains(m.getModuleName())) {
+                registerModule(m);
+            }
+        }
     }
 
     /**

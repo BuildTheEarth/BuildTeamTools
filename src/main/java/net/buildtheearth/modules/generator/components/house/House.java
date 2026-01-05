@@ -1,6 +1,5 @@
 package net.buildtheearth.modules.generator.components.house;
 
-import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.modules.generator.model.GeneratorType;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
@@ -24,10 +23,10 @@ public class House extends GeneratorComponent {
 
         Block[][][] blocks = getPlayerSettings().get(p.getUniqueId()).getBlocks();
 
-        if (!GeneratorUtils.checkForBrickOutline(blocks, p))
+        if (!GeneratorUtils.checkForBrickOutline(blocks, p, this))
             return false;
 
-        return GeneratorUtils.checkForWoolBlock(blocks, p);
+        return GeneratorUtils.checkForWoolBlock(blocks, p, this);
     }
 
     @Override

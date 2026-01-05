@@ -1,12 +1,12 @@
 package net.buildtheearth.modules.plotsystem;
 
 
-import com.alpsbte.alpslib.libpsterra.core.Connection;
+/*import com.alpsbte.alpslib.libpsterra.core.Connection;
 import com.alpsbte.alpslib.libpsterra.core.PSTerraSetup;
 import com.alpsbte.alpslib.libpsterra.core.config.ConfigManager;
 import com.alpsbte.alpslib.libpsterra.core.config.PSInitializer;
 import com.alpsbte.alpslib.libpsterra.core.plotsystem.PlotCreator;
-import com.alpsbte.alpslib.libpsterra.core.plotsystem.PlotPaster;
+import com.alpsbte.alpslib.libpsterra.core.plotsystem.PlotPaster;*/
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.common.CommonModule;
@@ -17,24 +17,25 @@ import net.buildtheearth.utils.io.ConfigPaths;
 import net.buildtheearth.utils.io.ConfigUtil;
 import net.buildtheearth.utils.io.Constants;
 import net.buildtheearth.utils.io.Errors;
+import org.apache.commons.lang3.NotImplementedException;
 import org.bukkit.Bukkit;
 
 public class PlotSystemModule extends Module {
 
 
     private static PlotSystemModule instance = null;
-
+/*
     private ConfigManager configManager;
-    private PlotPaster plotPaster;
+    private PlotPaster plotPaster;*/
 
     private boolean pluginEnabled = false;
     public String version;
     public String newVersion;
     public boolean updateInstalled = false;
 
-
+/*
     private Connection connection;
-    private PlotCreator plotCreator;
+    private PlotCreator plotCreator;*/
 
     public PlotSystemModule() {
         super("PlotSystem");
@@ -47,6 +48,7 @@ public class PlotSystemModule extends Module {
 
     @Override
     public void enable() {
+        throw new NotImplementedException("Currently broken");/*
         // Check if WorldEdit is enabled
         if (!CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled()) {
             shutdown(Errors.WORLD_EDIT_NOT_INSTALLED);
@@ -124,7 +126,7 @@ public class PlotSystemModule extends Module {
             return;
         }
 
-        super.enable();
+        super.enable();*/
     }
 
 

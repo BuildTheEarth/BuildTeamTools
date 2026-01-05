@@ -42,8 +42,8 @@ public class FieldScripts extends Script {
 
         // Create a cuboid selection of the field area to scan enough blocks
         GeneratorUtils.createCuboidSelection(getPlayer(),
-                new Vector(getRegion().getMinimumPoint().getX(), getRegion().getMinimumPoint().getY(), getRegion().getMinimumPoint().getZ()),
-                new Vector(getRegion().getMaximumPoint().getX(), getRegion().getMaximumPoint().getY(), getRegion().getMaximumPoint().getZ())
+                new Vector(getRegion().getMinimumPoint().x(), getRegion().getMinimumPoint().y(), getRegion().getMinimumPoint().z()),
+                new Vector(getRegion().getMaximumPoint().x(), getRegion().getMaximumPoint().y(), getRegion().getMaximumPoint().z())
         );
 
         // Expand the selection to make sure the field is big enough

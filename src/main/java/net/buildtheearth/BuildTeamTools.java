@@ -8,7 +8,6 @@ import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.miscellaneous.MiscModule;
 import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.modules.network.NetworkModule;
-import net.buildtheearth.modules.plotsystem.PlotSystemModule;
 import net.buildtheearth.modules.stats.StatsModule;
 import net.buildtheearth.utils.io.ConfigUtil;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -47,8 +46,6 @@ public class BuildTeamTools extends JavaPlugin {
                 NetworkModule.getInstance(),
                 GeneratorModule.getInstance(),
                 NavigationModule.getInstance(),
-                PlotSystemModule.getInstance(),
-                StatsModule.getInstance(),
                 MiscModule.getInstance()
         );
         ModuleHandler.getInstance().enableAll(null);

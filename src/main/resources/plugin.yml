@@ -1,7 +1,8 @@
 name: BuildTeamTools
 main: net.buildtheearth.BuildTeamTools
 api-version: 1.13
-version: 0.1.3-alpha
+version: ${version}
+description: ${description}
 author: MineFact, frikandelworst, George112n, ELgamer, SirJodelstein, Zoriot
 softdepend: [WorldEdit, HeadDatabase, PlotSystem-Terra]
 
@@ -21,26 +22,15 @@ commands:
   warp:
     description: Command for managing warps.
     usage: /warp <subcommand>
-    aliases: [warps]
-  warpsbt:
+    aliases: [ warps, wp ]
+  warpbt:
     description: Opens the warp menu for the specified BuildTeam
     usage: /warpsbt <team>
-    aliases: [ wbt ]
+    aliases: [ wbt, wpt, warpsbuildteam, warpsbt ]
   kml:
     description: kml pasting and parsing
     usage: /kml
     aliases: [geopoints, geopath, georing, geosurface]
-  createplot:
-    description: Creates a new plot for the PlotSystem.
-    usage: /createplot
-    permission: plotsystem.createplot
-  pasteplot:
-    description: Pastes a plot manually with specific ID
-    usage: /pasteplot <ID>
-    permission: plotsystem.pasteplot
-  plotsystemterra:
-    description: Sends info about the plugin
-    usage: /plotsystemterra
   blockpalette:
     description: Opens the block palette menu.
     usage: /blockpalette [filter|menu|filter <filter1> <filter2> ...]

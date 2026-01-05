@@ -1,6 +1,8 @@
 package net.buildtheearth.utils;
 
 import com.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.profiles.builder.XSkull;
+import com.cryptomorin.xseries.profiles.objects.Profileable;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -473,8 +475,7 @@ public class Item {
 		if(head == null)
 			return null;
 
-		SkullMeta meta = (SkullMeta) head.getItemMeta();
-		mutateItemMeta(meta, base64);
+        ItemMeta meta = XSkull.of(head).profile(Profileable.detect(base64)).apply().getItemMeta();
 		meta.setDisplayName(name);
 		meta.setLore(lore);
 		head.setItemMeta(meta);
@@ -487,14 +488,42 @@ public class Item {
 	private static void mutateItemMeta(SkullMeta meta, String b64) {
 		GameProfile profile = makeProfile(b64);
 
-		// Try Paper API (Minecraft Version 1.20+)
+        // Try Paper API (Minecraft Version 1.21+)
 		try {
 			Method setPlayerProfile = SkullMeta.class.getMethod("setPlayerProfile", com.destroystokyo.paper.profile.PlayerProfile.class);
-			com.destroystokyo.paper.profile.PlayerProfile paperProfile = Bukkit.createProfile(profile.getId(), profile.getName());
-			paperProfile.getProperties().add(new com.destroystokyo.paper.profile.ProfileProperty("textures", b64));
+            com.destroystokyo.paper.profile.PlayerProfile paperProfile = Bukkit.createProfile(profile.id(), profile.name());
+            paperProfile.setProperty(new com.destroystokyo.paper.profile.ProfileProperty("textures", b64));
 			setPlayerProfile.invoke(meta, paperProfile);
 			return;
 		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {}
+
+        // Try Paper API (Minecraft Version 1.20+)
+        try {
+            Method setPlayerProfile = SkullMeta.class.getMethod(
+                    "setPlayerProfile",
+                    com.destroystokyo.paper.profile.PlayerProfile.class
+            );
+
+            // Reflective access to profile.getId() and profile.getName()
+            Method getIdMethod = profile.getClass().getMethod("getId");
+            Method getNameMethod = profile.getClass().getMethod("getName");
+
+            UUID id = (UUID) getIdMethod.invoke(profile);
+            String name = (String) getNameMethod.invoke(profile);
+
+            com.destroystokyo.paper.profile.PlayerProfile paperProfile =
+                    Bukkit.createProfile(id, name);
+
+            paperProfile.getProperties().add(
+                    new com.destroystokyo.paper.profile.ProfileProperty("textures", b64)
+            );
+
+            setPlayerProfile.invoke(meta, paperProfile);
+            return;
+
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {
+        }
+
 
 		// Try setProfile(GameProfile) (Minecraft Version 1.15 – 1.19.4)
 		try {
@@ -521,7 +550,28 @@ public class Item {
 				b64.substring(b64.length() - 10).hashCode()
 		);
 		GameProfile profile = new GameProfile(id, "bte");
-		profile.getProperties().put("textures", new Property("textures", b64));
+
+        // Try Paper API (Minecraft Version 1.21+)
+        boolean firstVersionWorked = false;
+        try {
+            profile.properties().put("textures", new Property("textures", b64));
+            firstVersionWorked = true;
+        } catch (Exception ignored) {
+        }
+
+        // Try api for older versions
+        if (!firstVersionWorked) {
+            try {
+                Method getPropertiesMethod = profile.getClass().getMethod("getProperties");
+                Object properties = getPropertiesMethod.invoke(profile);
+
+                ((com.mojang.authlib.properties.PropertyMap) properties)
+                        .put("textures", new Property("textures", b64));
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
 		return profile;
 	}
 }

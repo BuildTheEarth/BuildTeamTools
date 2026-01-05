@@ -235,8 +235,14 @@ public class Command {
 
         if(future != null){
             threadActive = true;
-            future.thenRun(() -> {
+            // Ensure we clear threadActive and remove the operation regardless of success or exception
+            future.whenComplete((v, ex) -> {
                 threadActive = false;
+                if (ex != null) {
+                    ChatHelper.logError("Async operation failed: " + operation.getOperationType() + " - " + operation.getValuesAsString());
+                    ex.printStackTrace();
+                }
+                // Remove the processed operation from the queue
                 operations.remove(0);
             });
 

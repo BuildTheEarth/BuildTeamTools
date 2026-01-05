@@ -46,7 +46,7 @@ public class ModuleHandler {
      */
     public void registerModules(Module @NotNull ... modules) {
         for (Module m : modules) {
-            if (!Objects.requireNonNull(BuildTeamTools.getInstance().getConfig().getList(ConfigPaths.DISABLED_MODULES)).contains(m.getModuleName())) {
+            if (!BuildTeamTools.getInstance().getConfig().getList(ConfigPaths.DISABLED_MODULES, List.of()).contains(m.getModuleName())) {
                 registerModule(m);
             }
         }

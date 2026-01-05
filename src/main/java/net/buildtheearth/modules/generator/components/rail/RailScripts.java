@@ -1,7 +1,9 @@
 package net.buildtheearth.modules.generator.components.rail;
 
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.generator.model.*;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -14,7 +16,7 @@ public class RailScripts extends Script {
     public RailScripts(Player player, GeneratorComponent generatorComponent) {
         super(player, generatorComponent);
 
-        railScript_v_1_3();
+        Bukkit.getScheduler().runTaskAsynchronously(BuildTeamTools.getInstance(), this::railScript_v_1_3);
     }
 
     public void railScript_v_1_3() {

@@ -1,6 +1,7 @@
 package net.buildtheearth.modules;
 
 import lombok.Getter;
+import org.bukkit.entity.Player;
 
 /**
  * An interface for BuildTeamTools components.

@@ -5,12 +5,14 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.generator.model.Flag;
 import net.buildtheearth.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.modules.generator.model.Script;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -22,8 +24,7 @@ public class HouseScripts extends Script {
 
     public HouseScripts(Player player, GeneratorComponent generatorComponent) {
         super(player, generatorComponent);
-
-        buildscript_v_1_2();
+        Bukkit.getScheduler().runTaskAsynchronously(BuildTeamTools.getInstance(), this::buildscript_v_1_2);
     }
 
     public void buildscript_v_1_2(){

@@ -3,6 +3,7 @@ package net.buildtheearth.modules.generator.model;
 import lombok.Getter;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.ModuleComponent;
+import net.buildtheearth.modules.WikiDocumented;
 import net.buildtheearth.modules.generator.components.field.FieldSettings;
 import net.buildtheearth.modules.generator.components.house.HouseSettings;
 import net.buildtheearth.modules.generator.components.rail.RailSettings;
@@ -22,9 +23,9 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.UUID;
 
-public abstract class GeneratorComponent extends ModuleComponent {
+public abstract class GeneratorComponent extends ModuleComponent implements WikiDocumented {
 
-
+    @Getter
     public String wikiPage;
 
     @Getter

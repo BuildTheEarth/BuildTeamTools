@@ -37,8 +37,8 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import net.buildtheearth.BuildTeamTools;
+import net.buildtheearth.modules.WikiDocumented;
 import net.buildtheearth.modules.common.CommonModule;
-import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.MenuItems;
 import org.apache.commons.lang3.StringUtils;
@@ -138,8 +138,8 @@ import java.util.concurrent.CompletableFuture;
  * <br><br><b>Preparation Check Functions</b>:
  * <br>• {@link #checkIfSchematicBrushIsInstalled(Player)}
  * <br>• {@link #checkForNoWorldEditSelection(Player)}
- * <br>• {@link #checkForBrickOutline(Block[][][], Player)}
- * <br>• {@link #checkForWoolBlock(Block[][][], Player)}
+ * <br>• {@link #checkForBrickOutline(Block[][][], Player, WikiDocumented)}
+ * <br>• {@link #checkForWoolBlock(Block[][][], Player, WikiDocumented)}
  *
  * @version 1.5
  * @author MineFact
@@ -182,14 +182,6 @@ public class GeneratorUtils {
     private static Material[] getIgnoredMaterials(){
         return MenuItems.getIgnoredMaterials();
     }
-    
-    private static void sendWikiLink(Player p){
-        sendWikiLink(p);
-    }
-
-
-
-
     
     /*=============================================**
     
@@ -1700,7 +1692,7 @@ public class GeneratorUtils {
         // Check if WorldEdit is enabled
         if (!isSchematicBrushEnabled()) {
             p.sendMessage("§cPlease install Schematic Brush to use this tool. You can ask the server administrator to install it.");
-            sendWikiLink(p);
+
             return false;
         }
         return true;
@@ -1733,12 +1725,12 @@ public class GeneratorUtils {
      * @param p The player to check for
      * @return Whether the player has a brick block in their selection
      */
-    public static boolean checkForBrickOutline(Block[][][] blocks, Player p){
+    public static boolean checkForBrickOutline(Block[][][] blocks, Player p, WikiDocumented w){
         if(!containsBlock(blocks, XMaterial.BRICKS)){
             p.sendMessage("§cPlease make a selection around an outline.");
             p.closeInventory();
             p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-            sendWikiLink(p);
+            w.sendWikiLink(p);
 
             return false;
         }
@@ -1752,12 +1744,12 @@ public class GeneratorUtils {
      * @param p The player to check for
      * @return Whether the player has a yellow wool block in their selection
      */
-    public static boolean checkForWoolBlock(Block[][][] blocks, Player p){
+    public static boolean checkForWoolBlock(Block[][][] blocks, Player p, WikiDocumented w){
         if(!containsBlock(blocks, XMaterial.YELLOW_WOOL)){
             p.sendMessage("§cPlease place a yellow wool block inside the outline.");
             p.closeInventory();
             p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-            sendWikiLink(p);
+            w.sendWikiLink(p);
 
             ItemStack yellowWool = XMaterial.YELLOW_WOOL.parseItem();
             if(!p.getInventory().contains(yellowWool)) {

@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
@@ -21,7 +22,7 @@ import java.util.List;
  *
  * @authors MineFact, Noah Husby
  */
-public abstract class Module {
+public abstract class Module implements WikiDocumented {
 
     @Getter
     private boolean enabled = false;
@@ -45,6 +46,7 @@ public abstract class Module {
     @Getter
     private final List<Module> dependsOnModules = new ArrayList<>();
 
+    @Getter
     private final String wikiPage;
 
 

@@ -62,7 +62,11 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.com.alpsbte.alpslib.alpslib.libpsterra)
+    //implementation(libs.com.alpsbte.alpslib.alpslib.libpsterra) CURRENTLY BROKEN
+    implementation(libs.alpslib.io)
+    implementation(libs.alpslib.utils)   {
+        exclude(group = "com.github.cryptomorin", module = "XSeries")
+    }
     implementation(libs.com.alpsbte.canvas)
     implementation(libs.net.daporkchop.lib.binary)
     implementation(libs.com.github.cryptomorin.xseries)

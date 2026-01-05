@@ -54,7 +54,6 @@ public class Script {
         GeneratorUtils.setGmask(localSession, null);
     }
 
-
     protected void finish(Block[][][] blocks, List<Vector> points){
         createSelection(points);
         //setGmask(null);

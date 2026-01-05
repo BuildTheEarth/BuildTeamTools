@@ -6,7 +6,7 @@ com-alpsbte-alpslib-alpslib-libpsterra = "1.1.3"
 com-alpsbte-canvas = "1.3"
 com-fastasyncworldedit-fastasyncworldedit-bukkit = "2.12.3"
 com-fastasyncworldedit-fastasyncworldedit-core = "2.12.3"
-com-github-cryptomorin-xseries = "13.4.0"
+com-github-cryptomorin-xseries = "13.6.0"
 com-google-code-gson-gson = "2.13.1"
 com-google-guava-guava = "33.4.8-jre"
 com-mojang-authlib = "7.0.61"
@@ -21,6 +21,8 @@ io-freefair-lombok = "9.1.0"
 com-googlecode-json-simple = "1.1.1" # https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple
 com-palantir-git-version = "4.0.0"
 com-gradleup-shadow = "9.3.0"
+alpslib-io = "1.2.0"
+alpslib-utils = "1.3.8"
 
 [libraries]
 com-alpsbte-alpslib-alpslib-libpsterra = { module = "com.alpsbte.alpslib:alpslib-libpsterra", version.ref = "com-alpsbte-alpslib-alpslib-libpsterra" }
@@ -39,6 +41,8 @@ net-daporkchop-lib-binary = { module = "net.daporkchop.lib:binary", version.ref 
 net-wesjd-anvilgui = { module = "net.wesjd:anvilgui", version.ref = "net-wesjd-anvilgui" }
 org-json-json = { module = "org.json:json", version.ref = "org-json-json" }
 com-googlecode-json-simple = { module = "com.googlecode.json-simple:json-simple", version.ref = "com-googlecode-json-simple" }
+alpslib-io = { module = "com.alpsbte.alpslib:alpslib-io", version.ref = "alpslib-io" }
+alpslib-utils = { module = "com.alpsbte.alpslib:alpslib-utils", version.ref = "alpslib-utils" }
 
 [plugins]
 lombok = { id = "io.freefair.lombok", version.ref = "io-freefair-lombok" }

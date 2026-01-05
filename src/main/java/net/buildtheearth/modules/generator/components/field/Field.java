@@ -1,6 +1,5 @@
 package net.buildtheearth.modules.generator.components.field;
 
-import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.modules.generator.model.GeneratorType;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
@@ -15,7 +14,7 @@ public class Field extends GeneratorComponent {
 
     @Override
     public boolean checkForPlayer(Player p) {
-        return GeneratorUtils.checkForNoWorldEditSelection(p);
+        return !GeneratorUtils.checkForNoWorldEditSelection(p);
 
         /* Only needed if block checks are made afterwards like in House Generator
         if (getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)

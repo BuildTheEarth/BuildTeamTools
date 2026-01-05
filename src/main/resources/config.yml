@@ -6,11 +6,9 @@
 # | [Contacts - Discord]    BuildTheEarth Staff Discord, @minefact
 # ----------------------------------------------------------------------------------------------
 
-language: "EN"
-
 # The Build Team API Key used to fetch build team info for display.
 # Find the key on the Minecraft Network at "buildtheearth.net". Navigate: Compass > Build Teams > My Teams > Your Team > API-Key.
-# Without this key, some plugin components won`t function. For assistance, see #server-support on the staff discord.
+# Without this key, some plugin components won't function. For assistance, see #server-support on the staff discord.
 api-key: 00000000-0000-0000-0000-000000000000
 
 # The main world using the custom BTE Dynmaxion projection
@@ -22,7 +20,6 @@ disabled-modules:
 
 # Enable or disable the debug mode
 debug: false
-
 
 # NOTE: Do not change
 config-version: 1.4

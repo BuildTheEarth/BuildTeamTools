@@ -8,7 +8,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
@@ -181,18 +180,5 @@ public abstract class Module {
                 shutdown(error);
                 return;
             }
-    }
-
-
-    /**
-     * Sends more information about the generator to a player.
-     * The WIKI_PAGE varies depending on the generator.
-     *
-     * @param p The player who should receive the information.
-     */
-    public void sendWikiLink(Player p) {
-        p.sendMessage(" ");
-        p.sendMessage("§cFor more information take a look here:");
-        p.sendMessage("§c" + wikiPage);
     }
 }

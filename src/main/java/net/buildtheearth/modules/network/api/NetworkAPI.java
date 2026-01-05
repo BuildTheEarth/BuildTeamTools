@@ -48,7 +48,7 @@ public class NetworkAPI {
 
             @Override
             public void onFailure(IOException e) {
-                ChatHelper.logError("Something went wrong while notifying the network API of the plugins presence: %s", e.getMessage());
+                ChatHelper.logError("Something went wrong while notifying the network API of the plugins presence: " + e.getMessage());
             }
         });
     }
@@ -242,7 +242,7 @@ public class NetworkAPI {
 
             @Override
             public void onFailure(IOException e) {
-                ChatHelper.logError("Failed to get teams information from the network API: %s", e);
+                ChatHelper.logError("Failed to get teams information from the network API: " + e.getMessage());
 
                 // Handle failure scenario
                 future.completeExceptionally(e);

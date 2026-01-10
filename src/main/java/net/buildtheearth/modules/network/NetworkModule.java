@@ -12,6 +12,7 @@ import net.buildtheearth.modules.network.listeners.NetworkQuitListener;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.network.model.RegionType;
+import net.buildtheearth.utils.WikiLinks;
 import net.buildtheearth.utils.io.ConfigPaths;
 import net.buildtheearth.utils.io.Constants;
 import net.buildtheearth.utils.io.Errors;
@@ -51,7 +52,7 @@ public class NetworkModule extends Module {
     private static NetworkModule instance = null;
 
     public NetworkModule() {
-        super("Network");
+        super("Network", WikiLinks.ENTRY);
     }
 
     public static NetworkModule getInstance() {
@@ -130,7 +131,7 @@ public class NetworkModule extends Module {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Ping");
         out.writeUTF(p.getUniqueId().toString());
-        out.writeUTF("Version: " + BuildTeamTools.getInstance().getDescription().getVersion());
+        out.writeUTF("Version: " + BuildTeamTools.getInstance().getPluginMeta().getVersion());
         p.sendPluginMessage(BuildTeamTools.getInstance(), "btt:buildteam", out.toByteArray());
     }
 

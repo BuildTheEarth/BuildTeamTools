@@ -14,16 +14,20 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.codehaus.plexus.util.FileUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.jspecify.annotations.NonNull;
 
 import java.io.*;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -114,7 +118,7 @@ public class GeneratorCollections {
                 return checkIfGeneratorCollectionsIsUpToDate(p);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            BuildTeamTools.getInstance().getComponentLogger().warn("Failed to check if Generator Collections is installed:", e);
             return installGeneratorCollections(p, true);
         }
     }
@@ -168,13 +172,17 @@ public class GeneratorCollections {
      *
      * @param filename The name of the zip folder to install. Example: "newtrees.zip"
      * @param path The path to extract the zip folder to. Parent Folder is the plugin folder. Example: "/../WorldEdit/schematics/"
+     * @param extractionFolder The path where the downloaded zip file is temporarily saved
      */
-    private static boolean installZipFolder(String parentURL, String filename, String path) throws IOException {
-        path = BuildTeamTools.getInstance().getDataFolder().getAbsolutePath() + path;
-        String zipFilePath = path + "/" + filename;
-        URL url = new URL(parentURL + filename);
+    private static boolean installZipFolder(String parentURL, String filename, Path path, @NonNull Path extractionFolder) throws IOException {
+        if (!extractionFolder.toFile().exists() && !extractionFolder.toFile().mkdirs()) {
+            throw new IOException("Failed to create generator module folder: " + extractionFolder);
+        }
 
-        File file = new File(path);
+        var zipFilePath = extractionFolder.resolve(filename);
+        URL url = URI.create(parentURL + filename).toURL();
+
+        File file = path.toFile();
         if(!file.exists()) {
             boolean created = file.mkdir();
 
@@ -192,7 +200,7 @@ public class GeneratorCollections {
 
             // Save the zip file to the path
             try (BufferedInputStream in = new BufferedInputStream(httpConn.getInputStream());
-                 FileOutputStream out = new FileOutputStream(path + "/" + filename)) {
+                 FileOutputStream out = new FileOutputStream(zipFilePath.toFile())) {
 
                 byte[] buffer = new byte[4096];
                 int bytesRead;
@@ -215,33 +223,30 @@ public class GeneratorCollections {
 
     /** Extracts a zip folder on the system
      *
-     * @param zipFilePath The path to the zip folder. Example: "/../WorldEdit/schematics/newtrees.zip"
+     * @param zipFilePath The path to the zip folder. Example: "/../BuildTeamTols/modules/generator/GeneratorCollections.zip"
      * @param destDirectory The path to extract the zip folder to. Parent Folder is the plugin folder. Example: "/../WorldEdit/schematics/"
      */
-    private static boolean unzip(String zipFilePath, String destDirectory) {
-        File destDir = new File(destDirectory);
+    private static boolean unzip(Path zipFilePath, @NonNull Path destDirectory) {
+        File destDir = destDirectory.toFile();
         if (!destDir.exists()) {
             boolean success = destDir.mkdir();
             if(!success)
                 return false;
         }
 
-        try (ZipInputStream zipIn = new ZipInputStream(Files.newInputStream(Paths.get(zipFilePath)))) {
+        try (ZipInputStream zipIn = new ZipInputStream(Files.newInputStream(zipFilePath))) {
             ZipEntry entry = zipIn.getNextEntry();
 
             while (entry != null) {
-                String filePath = destDirectory + File.separator + entry.getName();
+                var filePath = destDirectory.resolve(entry.getName());
 
                 if (!entry.isDirectory()) {
-                    File file = new File(filePath);
-                    File parentDir = file.getParentFile();
-                    if (!parentDir.exists()) {
-                        if (!parentDir.mkdirs()) {
+                    File parentDir = filePath.getParent().toFile();
+                    if (!parentDir.exists() && !parentDir.mkdirs()) {
                             throw new IOException("Failed to create parent directories for: " + filePath);
                         }
-                    }
 
-                    try (BufferedOutputStream bos = new BufferedOutputStream(Files.newOutputStream(Paths.get(filePath)))) {
+                    try (BufferedOutputStream bos = new BufferedOutputStream(Files.newOutputStream(filePath))) {
                         byte[] bytesIn = new byte[4096];
                         int read;
                         while ((read = zipIn.read(bytesIn)) != -1) {
@@ -249,8 +254,7 @@ public class GeneratorCollections {
                         }
                     }
                 } else {
-                    File dir = new File(filePath);
-                    boolean success = dir.mkdirs();
+                    boolean success = filePath.toFile().mkdirs();
 
                     if(!success)
                         return false;
@@ -259,8 +263,7 @@ public class GeneratorCollections {
                 entry = zipIn.getNextEntry();
             }
 
-            // Delete the old zip file
-            deleteFile(zipFilePath);
+            deleteFile(zipFilePath); // Delete the old zip file
         }catch (Exception e){
             e.printStackTrace();
             return false;
@@ -272,23 +275,13 @@ public class GeneratorCollections {
     /** Deletes a directory from the system
      *
      * @param path The path to the directory to delete
-     * @return Whether the directory was deleted successfully
      */
-    private static boolean deleteDirectory(String path) {
-        File dir = new File(path);
-
-        if (dir.isDirectory()) {
-            String[] children = dir.list();
-
-            if (children != null)
-                for (String child : children) {
-                    boolean success = deleteDirectory(new File(dir, child).getAbsolutePath());
-                    if (!success) {
-                        return false; // Return false if deletion is unsuccessful
-                    }
-                }
+    private static void deleteDirectory(@NonNull Path path) {
+        try {
+            FileUtils.deleteDirectory(path.toFile());
+        } catch (IOException e) {
+            BuildTeamTools.getInstance().getComponentLogger().warn("Failed to delete directory: {}", path);
         }
-        return dir.delete(); // Return true if directory is deleted successfully
     }
 
     /**
@@ -296,11 +289,11 @@ public class GeneratorCollections {
      *
      * @param path The path to the file to delete
      */
-    private static void deleteFile(String path) {
-        File file = new File(path);
+    private static void deleteFile(@NonNull Path path) {
+        File file = path.toFile();
         boolean success = file.delete();
         if(!success)
-            System.out.println("Failed to delete file: " + path);
+            BuildTeamTools.getInstance().getComponentLogger().warn("Failed to delete file: {}", path);
     }
 
     /**
@@ -312,16 +305,8 @@ public class GeneratorCollections {
     private static boolean checkIfGeneratorCollectionsIsUpToDate(Player p){
         // Load the schematic file
         try {
-            String folder;
-            if(CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled())
-                folder = "/../FastAsyncWorldEdit/schematics/";
-            else if(CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled())
-                folder = "/../WorldEdit/schematics/";
-            else
-                return false;
-
-            String filepath = "GeneratorCollections/";
-            FileConfiguration cfg = YamlConfiguration.loadConfiguration(new File(BuildTeamTools.getInstance().getDataFolder().getAbsolutePath() + folder + filepath, "config.yml"));
+            var cfgFile = BuildTeamTools.getInstance().getDataFolder().toPath().resolve("modules").resolve("generator").resolve("generatorCollectionsVersion.yml");
+            FileConfiguration cfg = YamlConfiguration.loadConfiguration(cfgFile.toFile());
 
             if(!cfg.contains("version"))
                 return installGeneratorCollections(p, true);
@@ -365,25 +350,25 @@ public class GeneratorCollections {
         String filename = "GeneratorCollections.zip";
         String fileDirectory = "GeneratorCollections/";
 
-        String path;
+        var path = Bukkit.getPluginsFolder().toPath();
         if(CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled())
-            path = "/../FastAsyncWorldEdit/schematics/";
+            path = path.resolve("FastAsyncWorldEdit").resolve("schematics");
         else if(CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled())
-            path = "/../WorldEdit/schematics/";
+            path = path.resolve("WorldEdit").resolve("schematics");
         else
             return false;
 
         if(update) {
             ChatHelper.logPlayerAndConsole(p, "§cThe Generator Collections package is outdated. Updating...", Level.INFO);
-
-            deleteDirectory(BuildTeamTools.getInstance().getDataFolder().getAbsolutePath() + path + fileDirectory);
+            deleteDirectory(path.resolve(fileDirectory));
         } else
             ChatHelper.logPlayerAndConsole(p, "§cThe Generator Collections package wasn't found on your server. Installing...", Level.INFO);
 
-
-
+        var generatorModulePath = BuildTeamTools.getInstance().getDataFolder().toPath().resolve("modules").resolve("generator");
         try {
-            boolean success = installZipFolder(parentURL, filename, path);
+            boolean success = installZipFolder(parentURL, filename, path, generatorModulePath);
+            if (success)
+                success = moveVersionFile(generatorModulePath, path.resolve("GeneratorCollections"), "config.yml", "generatorCollectionsVersion.yml");
 
             if(success) {
                 ChatHelper.logPlayerAndConsole(p, "§7Successfully installed §eGenerator Collections v" + GENERATOR_COLLECTIONS_VERSION + "§7!", Level.INFO);
@@ -396,6 +381,34 @@ public class GeneratorCollections {
 
         } catch (IOException e) {
             sendGeneratorCollectionsError(p);
+            return false;
+        }
+    }
+
+    /**
+     * Moves a file from the old directory to the new directory
+     *
+     * @param newDir      The new directory to move the file to
+     * @param oldDir      The old directory to move the file from
+     * @param oldFileName The name of the file to move
+     * @param newFileName The new name of the file
+     * @return Whether the move was successful
+     */
+    private static boolean moveVersionFile(@NotNull Path newDir, @NotNull Path oldDir, String oldFileName, String newFileName) {
+        Path source = oldDir.resolve(oldFileName);
+        Path target = newDir.resolve(newFileName);
+
+        try {
+            // Ensure target parent exists
+            Files.createDirectories(target.getParent());
+
+            // Move with replace to avoid failure if target exists
+            Files.move(source, target, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+            return true;
+        } catch (IOException e) {
+            BuildTeamTools.getInstance().getComponentLogger()
+                    .warn("Failed to move '{}' to '{}': {}", source, target, e.toString());
             return false;
         }
     }

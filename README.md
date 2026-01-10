@@ -4,10 +4,9 @@
   <a href="https://github.com/BuildTheEarth/BuildTeamTools">
     <img src="https://user-images.githubusercontent.com/66020920/167615506-89e56374-327e-413f-85d9-0179e4a7a3c9.png" alt="Logo" width="100" height="100">
     <br><br>
-    <img src="https://github-production-user-asset-6210df.s3.amazonaws.com/66020920/246825255-a75aa4e7-0cf5-40d3-af56-5c25d2a097b4.png" alt="Logo" width="612">
+    <img src="https://cdn.buildtheearth.net/outline/uploads/308d605b-c1a0-461c-a758-fd000a3b5a7a/7c38cde6-9c55-450f-ade6-0575da151444/buildteamtools_complete.png" alt="Logo" width="612">
   </a>
 </p>
-<br>
 
 <h1 align="Center">BuildTeamTools</h1>
 
@@ -25,7 +24,6 @@
 <p align="center">
     <a href="https://www.spigotmc.org/resources/buildteamtools.101854/"><img src="https://img.shields.io/spiget/downloads/101854?color=green&label=Downloads" alt="Downloads Count"></a>
     <a href="https://www.spigotmc.org/resources/buildteamtools.101854/"><img src="https://img.shields.io/spiget/version/101854?label=Version" alt="Latest Version"></a>
-    <a href="https://github.com/BuildTheEarth/BuildTeamTools"><img src="https://tokei.rs/b1/github/BuildTheEarth/BuildTeamTools" alt="Total Lines"></a>
     <a href="https://github.com/BuildTheEarth/BuildTeamTools"><img src="https://img.shields.io/github/repo-size/BuildTheEarth/BuildTeamTools" alt="Repo Size"></a>
 </p>  
 
@@ -41,11 +39,11 @@ Its primary goal is to significantly speed up the building process by eliminatin
 <!-- FEATURES -->
 ## Features
 🔨 **Easy-to-use** Tools for everything around BuildTheEarth<br/>
-⏱ **Multi-Version** support from `1.18` - `1.21.4`<br/>
+⏱ **Multi-Version** support from `1.18` - `1.21.x`<br/>
 ✔️ **User-friendly** GUIs and Commands<br/>
-💬 **Multi-Language** Support (PLANNED)<br/>
 📆 **Automatic** Updates<br/>
 🔌 **Easy setup** and configuration<br/>
+**Multi-Language** Support (PLANNED)<br/>
 
 <!-- COMPONENTS -->
 ## Components
@@ -64,7 +62,7 @@ The **\*** symbol shows that this feature is still being developed or under main
 ## Installation
 💻 **Requirements:**
 
-- A Server running Paper 1.18 - **1.21.4**.
+- A Server running Paper 1.18 - **1.21.x**.
 
 🚩 **How to install:**
 1. Download BuildTeamTools [here](https://www.spigotmc.org/resources/buildteamtools.101854/).

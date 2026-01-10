@@ -108,27 +108,10 @@ tasks.shadowJar {
     exclude("org/jetbrains/annotations/**")
     // Exclude slf4j classes
     exclude("org/slf4j/**")
-    exclude("META-INF/**")
-    // Exclude duplicate com.sun.* classes
-    exclude("com/sun/codemodel/**")
-    exclude("com/sun/tools/xjc/**")
-    exclude("com/sun/xml/xsom/**")
     archiveClassifier = ""
 
-    val relocationPrefix = "net.buildtheearth.buildteamtools.shaded"
-    relocate("com.alpsbte.alpslib", "$relocationPrefix.alpslib")
-    relocate("org.mariadb.jdbc", "$relocationPrefix.jdbc")
-    relocate("com.zaxxer.hikari", "$relocationPrefix.hikari")
-    relocate("net.wesjd.anvilgui", "$relocationPrefix.anvilgui")
-    relocate("com.cryptomorin.xseries", "$relocationPrefix.xseries")
-    relocate("org.ipvp.canvas", "$relocationPrefix.canvas")
-    relocate("net.daporkchop.lib.binary", "$relocationPrefix.binary")
-    relocate("clipper2", "$relocationPrefix.clipper2")
-    relocate("com.google.gson", "$relocationPrefix.gson")
-    relocate("de.micromata.jak", "$relocationPrefix.jak")
-    relocate("org.json", "$relocationPrefix.json")
-    relocate("com.google.guava", "$relocationPrefix.guava")
-    relocate("com.squareup.okhttp3", "$relocationPrefix.okhttp3")
+    relocationPrefix = "net.buildtheearth.buildteamtools.shaded"
+    enableAutoRelocation = true
 }
 
 tasks.assemble {
@@ -136,6 +119,7 @@ tasks.assemble {
 }
 
 tasks.jar {
+    archiveClassifier = "UNSHADED"
     enabled = false // Disable the default jar task since we are using shadowJar
 }
 

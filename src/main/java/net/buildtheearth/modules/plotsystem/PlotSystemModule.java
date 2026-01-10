@@ -7,18 +7,9 @@ import com.alpsbte.alpslib.libpsterra.core.config.ConfigManager;
 import com.alpsbte.alpslib.libpsterra.core.config.PSInitializer;
 import com.alpsbte.alpslib.libpsterra.core.plotsystem.PlotCreator;
 import com.alpsbte.alpslib.libpsterra.core.plotsystem.PlotPaster;*/
-import net.buildtheearth.BuildTeamTools;
+
 import net.buildtheearth.modules.Module;
-import net.buildtheearth.modules.common.CommonModule;
-import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.plotsystem.commands.PlotSystemTerraCommand;
-import net.buildtheearth.utils.ChatHelper;
-import net.buildtheearth.utils.io.ConfigPaths;
-import net.buildtheearth.utils.io.ConfigUtil;
-import net.buildtheearth.utils.io.Constants;
-import net.buildtheearth.utils.io.Errors;
-import org.apache.commons.lang3.NotImplementedException;
-import org.bukkit.Bukkit;
 
 public class PlotSystemModule extends Module {
 
@@ -48,7 +39,8 @@ public class PlotSystemModule extends Module {
 
     @Override
     public void enable() {
-        throw new NotImplementedException("Currently broken");/*
+        shutdown("This module is currently oudated & broken.");
+        /*
         // Check if WorldEdit is enabled
         if (!CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled()) {
             shutdown(Errors.WORLD_EDIT_NOT_INSTALLED);

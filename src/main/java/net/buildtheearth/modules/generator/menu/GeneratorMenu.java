@@ -164,7 +164,9 @@ public class GeneratorMenu extends AbstractMenu {
                 "§8Left-click to generate",
                 "§8Right-click for Tutorial");
 
-        ItemStack fieldItem = Item.create(XMaterial.WHEAT.parseMaterial(), "§6Generate Field", fieldLore);
+        fieldLore = ListUtil.createList("", "§cThis §eGenerator §cis currently broken", "§cField Generator is disabled", "", "§8If you want to help fixing ask on Dev Hub!");
+
+        ItemStack fieldItem = Item.create(XMaterial.WHEAT.get(), "§6Generate Field §c(DISABLED)", fieldLore);
 
         // Set navigator item
         getMenu().getSlot(FIELD_ITEM_SLOT).setItem(fieldItem);

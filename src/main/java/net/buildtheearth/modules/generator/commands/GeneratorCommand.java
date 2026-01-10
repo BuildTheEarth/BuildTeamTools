@@ -61,7 +61,8 @@ public class GeneratorCommand implements CommandExecutor {
 
             // Command Usage: /gen field ...
             case "field":
-                GeneratorModule.getInstance().getField().analyzeCommand(p, args);
+                p.sendMessage(Component.text("This generator have some serious issues and is currently disabled.", NamedTextColor.DARK_RED));
+                //GeneratorModule.getInstance().getField().analyzeCommand(p, args);
                 return true;
 
             // Command Usage: /gen history

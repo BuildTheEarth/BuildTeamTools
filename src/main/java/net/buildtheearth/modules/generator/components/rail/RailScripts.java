@@ -1,9 +1,8 @@
 package net.buildtheearth.modules.generator.components.rail;
 
-import net.buildtheearth.BuildTeamTools;
-import net.buildtheearth.modules.generator.model.*;
+import net.buildtheearth.modules.generator.model.GeneratorComponent;
+import net.buildtheearth.modules.generator.model.Script;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -16,7 +15,9 @@ public class RailScripts extends Script {
     public RailScripts(Player player, GeneratorComponent generatorComponent) {
         super(player, generatorComponent);
 
-        Bukkit.getScheduler().runTaskAsynchronously(BuildTeamTools.getInstance(), this::railScript_v_1_3);
+        throw new UnsupportedOperationException("RailScripts is currently broken.");
+        //getPlayer().chat("/clearhistory");
+        //Bukkit.getScheduler().runTaskAsynchronously(BuildTeamTools.getInstance(), this::railScript_v_1_3);
     }
 
     public void railScript_v_1_3() {
@@ -27,7 +28,6 @@ public class RailScripts extends Script {
         int zPos = getPlayer().getLocation().getBlockZ();
 
         int operations = 0;
-        getPlayer().chat("/clearhistory");
 
         int railWidth = 5;
 

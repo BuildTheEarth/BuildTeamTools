@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author Noah Husby
@@ -45,11 +44,8 @@ public class ModuleHandler {
      * @param modules {@link Module}
      */
     public void registerModules(Module @NotNull ... modules) {
-        for (Module m : modules) {
-            if (!BuildTeamTools.getInstance().getConfig().getList(ConfigPaths.DISABLED_MODULES, List.of()).contains(m.getModuleName())) {
-                registerModule(m);
-            }
-        }
+        for (Module m : modules)
+            registerModule(m);
     }
 
     /**
@@ -64,24 +60,30 @@ public class ModuleHandler {
             if (m.getModuleName().equals(module.getModuleName()) && m.isEnabled())
                 return false;
 
-        boolean containsDisabledDependencyModule = false;
-        for (Module m : module.getDependsOnModules())
-            if (!m.isEnabled()) {
-                module.checkForModuleDependencies();
-                containsDisabledDependencyModule = true;
-            }
+        if (!module.getModuleName().equals("Common") && BuildTeamTools.getInstance().getConfig().getList(ConfigPaths.DISABLED_MODULES, List.of()).contains(module.getModuleName())) {
+            module.shutdown("This module is disabled in the config.");
+        } else {
+            boolean containsDisabledDependencyModule = false;
+            for (Module m : module.getDependsOnModules())
+                if (!m.isEnabled()) {
+                    module.checkForModuleDependencies();
+                    containsDisabledDependencyModule = true;
+                }
 
-        try {
-            if (!containsDisabledDependencyModule)
-                module.enable();
-        } catch (Exception ex) {
-            if (BuildTeamTools.getInstance().isDebug()) {
-                ChatHelper.logError("An error occurred while enabling the %s Module: %s", ex, module.getModuleName(),
-                        ex.getMessage());
-            }
+            try {
+                if (!containsDisabledDependencyModule)
+                    module.enable();
+            } catch (Exception ex) {
+                if (BuildTeamTools.getInstance().isDebug()) {
+                    ChatHelper.logError("An error occurred while enabling the %s Module: %s", ex, module.getModuleName(),
+                            ex.getMessage());
+                }
 
-            module.shutdown(ex.getMessage());
+                module.shutdown(ex.getMessage());
+            }
         }
+
+
 
         if (executor != null) {
             if (module.isEnabled() && BuildTeamTools.getInstance().isDebug())

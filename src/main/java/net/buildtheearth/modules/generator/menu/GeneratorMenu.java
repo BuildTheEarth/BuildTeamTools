@@ -3,7 +3,6 @@ package net.buildtheearth.modules.generator.menu;
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.GeneratorModule;
-import net.buildtheearth.modules.generator.model.GeneratorCollections;
 import net.buildtheearth.modules.generator.components.field.Field;
 import net.buildtheearth.modules.generator.components.field.FieldSettings;
 import net.buildtheearth.modules.generator.components.field.menu.CropTypeMenu;
@@ -11,14 +10,13 @@ import net.buildtheearth.modules.generator.components.house.House;
 import net.buildtheearth.modules.generator.components.house.HouseSettings;
 import net.buildtheearth.modules.generator.components.house.RoofType;
 import net.buildtheearth.modules.generator.components.house.menu.WallColorMenu;
-import net.buildtheearth.modules.generator.components.rail.Rail;
-import net.buildtheearth.modules.generator.components.rail.RailSettings;
 import net.buildtheearth.modules.generator.components.road.Road;
 import net.buildtheearth.modules.generator.components.road.RoadSettings;
 import net.buildtheearth.modules.generator.components.road.menu.RoadColorMenu;
 import net.buildtheearth.modules.generator.components.tree.Tree;
 import net.buildtheearth.modules.generator.components.tree.TreeSettings;
 import net.buildtheearth.modules.generator.components.tree.menu.TreeTypeMenu;
+import net.buildtheearth.modules.generator.model.GeneratorCollections;
 import net.buildtheearth.modules.generator.model.GeneratorType;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.ListUtil;
@@ -26,13 +24,12 @@ import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.AbstractMenu;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.SoundGroup;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
+
 import java.util.ArrayList;
 
 public class GeneratorMenu extends AbstractMenu {
@@ -110,7 +107,9 @@ public class GeneratorMenu extends AbstractMenu {
                 "§8Left-click to generate",
                 "§8Right-click for Tutorial");
 
-        ItemStack railwayItem = Item.create(XMaterial.RAIL.parseMaterial(), "§9Generate Railway", railwayLore);
+        railwayLore = ListUtil.createList("", "§cThis §eGenerator §cis currently broken", "§cRailway Generator is disabled", "", "§8If you want to help fixing ask on Dev Hub!");
+
+        ItemStack railwayItem = Item.create(XMaterial.RAIL.parseMaterial(), "§9Generate Railway §c(DISABLED)", railwayLore);
 
         // Set navigator item
         getMenu().getSlot(RAILWAY_ITEM_SLOT).setItem(railwayItem);
@@ -221,8 +220,9 @@ public class GeneratorMenu extends AbstractMenu {
                 sendMoreInformation(clickPlayer, GeneratorType.RAILWAY);
                 return;
             }
+            sendMoreInformation(clickPlayer, GeneratorType.RAILWAY);
 
-            Rail rail = GeneratorModule.getInstance().getRail();
+            /*Rail rail = GeneratorModule.getInstance().getRail();
             rail.getPlayerSettings().put(clickPlayer.getUniqueId(), new RailSettings(clickPlayer));
 
             if(!rail.checkForPlayer(clickPlayer))
@@ -231,7 +231,7 @@ public class GeneratorMenu extends AbstractMenu {
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
 
-            GeneratorModule.getInstance().getRail().generate(clickPlayer);
+            GeneratorModule.getInstance().getRail().generate(clickPlayer);*/
         }));
 
         // Set click event for tree item

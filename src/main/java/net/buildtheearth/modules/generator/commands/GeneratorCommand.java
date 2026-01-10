@@ -6,6 +6,8 @@ import net.buildtheearth.modules.generator.model.History;
 import net.buildtheearth.modules.network.model.Permissions;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.Utils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -48,7 +50,8 @@ public class GeneratorCommand implements CommandExecutor {
 
             // Command Usage: /gen rail ...
             case "rail":
-                GeneratorModule.getInstance().getRail().analyzeCommand(p, args);
+                p.sendMessage(Component.text("This generator have some serious issues and is currently disabled.", NamedTextColor.DARK_RED));
+                //GeneratorModule.getInstance().getRail().analyzeCommand(p, args);
                 return true;
 
             // Command Usage: /gen tree ...

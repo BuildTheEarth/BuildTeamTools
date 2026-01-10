@@ -76,7 +76,9 @@ dependencies {
     implementation(libs.com.google.code.gson.gson)
     implementation(libs.com.google.guava.guava)
     implementation(libs.com.squareup.okhttp3.okhttp.jvm)
-    implementation(libs.de.micromata.jak.javaapiforkml)
+    implementation(libs.javaapiforkml) {
+        exclude(group = "com.sun.xml.bind", module = "jaxb-xjc") // Else Remapping will yell of duplicated classes
+    }
     implementation(libs.com.googlecode.json.simple)
     compileOnly(libs.io.papermc.paper.paper.api)
     compileOnly(libs.com.mojang.authlib)

@@ -6,9 +6,9 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import lombok.experimental.UtilityClass;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.common.CommonModule;
-import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.utils.ChatHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -32,10 +32,10 @@ import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+@UtilityClass
 public class GeneratorCollections {
 
-    public static String GENERATOR_COLLECTIONS_VERSION;
-
+    public static String generatorCollectionsVersion;
 
     /**
      * Checks if the GeneratorCollections is installed and sends the player a message if it isn't.
@@ -82,7 +82,7 @@ public class GeneratorCollections {
                 if(p != null)
                     bukkitWorld = new BukkitWorld(p.getWorld());
                 else
-                    bukkitWorld = new BukkitWorld(Bukkit.getWorlds().get(0));
+                    bukkitWorld = new BukkitWorld(Bukkit.getWorlds().getFirst());
 
                 if (reader != null){
                     Class<?> readerClass = reader.getClass();
@@ -130,11 +130,11 @@ public class GeneratorCollections {
      * @param repo The name of the repository
      * @return The latest release version of the repository
      */
-    public static String getRepositoryReleaseVersionString(String owner, String repo){
+    public static @Nullable String getRepositoryReleaseVersionString(String owner, String repo) {
         try {
             String url = "https://api.github.com/repos/" + owner + "/" + repo + "/releases";
 
-            HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
+            HttpURLConnection con = (HttpURLConnection) URI.create(url).toURL().openConnection();
             con.setRequestProperty("User-Agent", "Mozilla/5.0");
             con.setRequestMethod("GET");
 
@@ -151,7 +151,7 @@ public class GeneratorCollections {
                 in.close();
 
                 JSONArray releases = new JSONArray(response.toString());
-                if (releases.length() > 0) {
+                if (!releases.isEmpty()) {
                     JSONObject latestRelease = releases.getJSONObject(0); // The first object in the array is the latest release
 
                     return latestRelease.getString("tag_name").replace("v", "");
@@ -160,7 +160,7 @@ public class GeneratorCollections {
             } else
                 return null;
         } catch (Exception e) {
-            e.printStackTrace();
+            BuildTeamTools.getInstance().getComponentLogger().warn("Failed to get latest release version of repository {}/{}:", owner, repo, e);
             return null;
         }
     }
@@ -208,7 +208,7 @@ public class GeneratorCollections {
                     out.write(buffer, 0, bytesRead);
                 }
             }catch (Exception e){
-                e.printStackTrace();
+                BuildTeamTools.getInstance().getComponentLogger().warn("Failed to download zip file from {}:", url, e);
                 return false;
             }
         } else {
@@ -265,7 +265,7 @@ public class GeneratorCollections {
 
             deleteFile(zipFilePath); // Delete the old zip file
         }catch (Exception e){
-            e.printStackTrace();
+            BuildTeamTools.getInstance().getComponentLogger().warn("Failed to unzip zip file:", e);
             return false;
         }
 
@@ -290,10 +290,11 @@ public class GeneratorCollections {
      * @param path The path to the file to delete
      */
     private static void deleteFile(@NonNull Path path) {
-        File file = path.toFile();
-        boolean success = file.delete();
-        if(!success)
-            BuildTeamTools.getInstance().getComponentLogger().warn("Failed to delete file: {}", path);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            BuildTeamTools.getInstance().getComponentLogger().warn("Failed to delete file: {}", path, e);
+        }
     }
 
     /**
@@ -313,7 +314,7 @@ public class GeneratorCollections {
 
             String oldVersion = cfg.getString("version");
 
-            if(!CommonModule.getInstance().getUpdaterComponent().shouldUpdate(GENERATOR_COLLECTIONS_VERSION, oldVersion))
+            if (!CommonModule.getInstance().getUpdaterComponent().shouldUpdate(generatorCollectionsVersion, oldVersion))
                 return true;
             else
                 return installGeneratorCollections(p, true);
@@ -331,11 +332,7 @@ public class GeneratorCollections {
      * @param p The player to send the message to
      */
     private static void sendGeneratorCollectionsError(@Nullable Player p){
-        ChatHelper.logPlayerAndConsole(p, "§cAn error occurred while installing the Generator Collections.", Level.INFO);
-        ChatHelper.logPlayerAndConsole(p, "§cPlease install the Generator Collections v" + GENERATOR_COLLECTIONS_VERSION + " to use this tool. You can ask the server administrator to install it.", Level.INFO);
-        ChatHelper.logPlayerAndConsole(p, " ", Level.INFO);
-        ChatHelper.logPlayerAndConsole(p, "§cFor more installation help, please see the wiki:", Level.INFO);
-        ChatHelper.logPlayerAndConsole(p, "§c" + GeneratorModule.INSTALL_WIKI, Level.INFO);
+        ChatHelper.logPlayerAndConsole(p, "§cAn error occurred while installing the Generator Collections. Please report that with the log!", Level.INFO);
     }
 
 
@@ -371,7 +368,7 @@ public class GeneratorCollections {
                 success = moveVersionFile(generatorModulePath, path.resolve("GeneratorCollections"), "config.yml", "generatorCollectionsVersion.yml");
 
             if(success) {
-                ChatHelper.logPlayerAndConsole(p, "§7Successfully installed §eGenerator Collections v" + GENERATOR_COLLECTIONS_VERSION + "§7!", Level.INFO);
+                ChatHelper.logPlayerAndConsole(p, "§7Successfully installed §eGenerator Collections v" + generatorCollectionsVersion + "§7!", Level.INFO);
 
                 return true;
             }else {

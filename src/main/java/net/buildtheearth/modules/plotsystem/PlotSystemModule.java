@@ -1,15 +1,8 @@
 package net.buildtheearth.modules.plotsystem;
 
-
-/*import com.alpsbte.alpslib.libpsterra.core.Connection;
-import com.alpsbte.alpslib.libpsterra.core.PSTerraSetup;
-import com.alpsbte.alpslib.libpsterra.core.config.ConfigManager;
-import com.alpsbte.alpslib.libpsterra.core.config.PSInitializer;
-import com.alpsbte.alpslib.libpsterra.core.plotsystem.PlotCreator;
-import com.alpsbte.alpslib.libpsterra.core.plotsystem.PlotPaster;*/
-
 import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.plotsystem.commands.PlotSystemTerraCommand;
+import net.buildtheearth.utils.WikiLinks;
 
 public class PlotSystemModule extends Module {
 
@@ -17,19 +10,19 @@ public class PlotSystemModule extends Module {
     private static PlotSystemModule instance = null;
 /*
     private ConfigManager configManager;
-    private PlotPaster plotPaster;*/
+    private PlotPaster plotPaster;
 
     private boolean pluginEnabled = false;
     public String version;
     public String newVersion;
     public boolean updateInstalled = false;
 
-/*
+
     private Connection connection;
     private PlotCreator plotCreator;*/
 
     public PlotSystemModule() {
-        super("PlotSystem");
+        super("PlotSystem", WikiLinks.PLOT);
     }
 
     public static PlotSystemModule getInstance() {
@@ -128,7 +121,9 @@ public class PlotSystemModule extends Module {
     }
 
     @Override
-    public void registerListeners() {}
+    public void registerListeners() {
+        // No Listeners
+    }
 
 
 }

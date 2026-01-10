@@ -11,13 +11,13 @@ import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.ListUtil;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.AbstractMenu;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
+import org.jspecify.annotations.NonNull;
 
 public class CropTypeMenu extends AbstractMenu {
 
@@ -78,7 +78,7 @@ public class CropTypeMenu extends AbstractMenu {
         // Set click events for the crop type items
         getMenu().getSlot(POTATO_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
             if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
-                sendMoreInformation(clickPlayer, CropType.POTATO);
+                CropStageMenu.sendMoreInformation(clickPlayer, CropType.POTATO);
                 return;
             }
             performClickAction(clickPlayer, CropType.POTATO);
@@ -86,7 +86,7 @@ public class CropTypeMenu extends AbstractMenu {
 
         getMenu().getSlot(WHEAT_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
             if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
-                sendMoreInformation(clickPlayer, CropType.WHEAT);
+                CropStageMenu.sendMoreInformation(clickPlayer, CropType.WHEAT);
                 return;
             }
             performClickAction(clickPlayer, CropType.WHEAT);
@@ -94,7 +94,7 @@ public class CropTypeMenu extends AbstractMenu {
 
         getMenu().getSlot(CORN_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
             if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
-                sendMoreInformation(clickPlayer, CropType.CORN);
+                CropStageMenu.sendMoreInformation(clickPlayer, CropType.CORN);
                 return;
             }
             performClickAction(clickPlayer, CropType.CORN);
@@ -102,7 +102,7 @@ public class CropTypeMenu extends AbstractMenu {
 
         getMenu().getSlot(VINEYARD_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
             if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
-                sendMoreInformation(clickPlayer, CropType.VINEYARD);
+                CropStageMenu.sendMoreInformation(clickPlayer, CropType.VINEYARD);
                 return;
             }
             performClickAction(clickPlayer, CropType.VINEYARD);
@@ -110,7 +110,7 @@ public class CropTypeMenu extends AbstractMenu {
 
         getMenu().getSlot(PEAR_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
             if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
-                sendMoreInformation(clickPlayer, CropType.PEAR);
+                CropStageMenu.sendMoreInformation(clickPlayer, CropType.PEAR);
                 return;
             }
             performClickAction(clickPlayer, CropType.PEAR);
@@ -118,7 +118,7 @@ public class CropTypeMenu extends AbstractMenu {
 
         getMenu().getSlot(CATTLE_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
             if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
-                sendMoreInformation(clickPlayer, CropType.CATTLE);
+                CropStageMenu.sendMoreInformation(clickPlayer, CropType.CATTLE);
                 return;
             }
             performClickAction(clickPlayer, CropType.CATTLE);
@@ -126,7 +126,7 @@ public class CropTypeMenu extends AbstractMenu {
 
         getMenu().getSlot(MEADOW_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
             if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
-                sendMoreInformation(clickPlayer, CropType.MEADOW);
+                CropStageMenu.sendMoreInformation(clickPlayer, CropType.MEADOW);
                 return;
             }
             performClickAction(clickPlayer, CropType.MEADOW);
@@ -134,7 +134,7 @@ public class CropTypeMenu extends AbstractMenu {
 
         getMenu().getSlot(HARVESTED_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
             if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
-                sendMoreInformation(clickPlayer, CropType.HARVESTED);
+                CropStageMenu.sendMoreInformation(clickPlayer, CropType.HARVESTED);
                 return;
             }
             performClickAction(clickPlayer, CropType.HARVESTED);
@@ -142,7 +142,7 @@ public class CropTypeMenu extends AbstractMenu {
 
         getMenu().getSlot(OTHER_CROP_SLOT).setClickHandler(((clickPlayer, clickInformation) -> {
             if (clickInformation.getClickType().equals(ClickType.RIGHT)) {
-                sendMoreInformation(clickPlayer, CropType.OTHER);
+                CropStageMenu.sendMoreInformation(clickPlayer, CropType.OTHER);
                 return;
             }
             performClickAction(clickPlayer, CropType.OTHER);
@@ -151,7 +151,7 @@ public class CropTypeMenu extends AbstractMenu {
 
     }
 
-    private void performClickAction(Player p, CropType cropType) {
+    private void performClickAction(@NonNull Player p, CropType cropType) {
         Settings settings = GeneratorModule.getInstance().getField().getPlayerSettings().get(p.getUniqueId());
 
         if (!(settings instanceof FieldSettings))
@@ -172,38 +172,6 @@ public class CropTypeMenu extends AbstractMenu {
         }
 
         GeneratorModule.getInstance().getField().generate(p);
-    }
-
-    private void sendMoreInformation(Player p, CropType cropType) {
-        switch (cropType) {
-            case POTATO:
-                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#potato-requires-lines");
-                break;
-            case CORN:
-                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#corn");
-                break;
-            case WHEAT:
-                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#wheat");
-                break;
-            case HARVESTED:
-                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#harvested-requires-lines");
-                break;
-            case OTHER:
-                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#other-requires-lines");
-                break;
-            case VINEYARD:
-                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#vineyard-requires-lines");
-                break;
-            case PEAR:
-                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#pear-requires-lines");
-                break;
-            case CATTLE:
-                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#cattle");
-                break;
-            case MEADOW:
-                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#meadow");
-                break;
-        }
     }
 
     @Override

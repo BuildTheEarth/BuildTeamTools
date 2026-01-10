@@ -7,25 +7,28 @@ import net.buildtheearth.modules.generator.model.Settings;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.ListUtil;
 import net.buildtheearth.utils.MenuItems;
+import net.buildtheearth.utils.WikiLinks;
 import net.buildtheearth.utils.menus.AbstractMenu;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
+import org.jspecify.annotations.NonNull;
+
+import java.util.ArrayList;
 
 public class CropStageMenu extends AbstractMenu {
 
-    public static String CROP_TYPE_INV_NAME = "Choose a Crop Stage";
-
+    private static final String CROP_TYPE_INV_NAME = "Choose a Crop Stage";
 
     private final CropType cropType;
-    private final byte STAGE_ONE_SLOT = 11;
-    private final byte STAGE_TWO_SLOT = 15;
-
-    private final int BACK_ITEM_SLOT = 18;
+    private static final byte STAGE_ONE_SLOT = 11;
+    private static final byte STAGE_TWO_SLOT = 15;
+    private static final int BACK_ITEM_SLOT = 18;
 
     public CropStageMenu(Player player, CropType cropType) {
         super(3, CROP_TYPE_INV_NAME, player);
@@ -41,23 +44,23 @@ public class CropStageMenu extends AbstractMenu {
         ItemStack itemOne = Item.create(XMaterial.BARRIER.parseMaterial());
         ItemStack itemTwo = Item.create(XMaterial.BARRIER.parseMaterial());
 
+        ArrayList<String> typeLore = ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information");
         switch (cropType) {
             case POTATO:
-                itemOne = new Item(XMaterial.SHORT_GRASS.parseItem()).setDisplayName("§bLow").setLore(ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information")).build();
-                itemTwo = new Item(XMaterial.TALL_GRASS.parseItem()).setDisplayName("§bTall").setLore(ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information")).build();
+                itemOne = new Item(XMaterial.SHORT_GRASS.parseItem()).setDisplayName("§bLow").setLore(typeLore).build();
+                itemTwo = new Item(XMaterial.TALL_GRASS.parseItem()).setDisplayName("§bTall").setLore(typeLore).build();
                 break;
             case WHEAT:
-                itemOne = Item.create(XMaterial.BIRCH_FENCE.parseMaterial(), "§bLight", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
-                itemTwo = Item.create(XMaterial.DARK_OAK_FENCE.parseMaterial(), "§bDark", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
+                itemOne = Item.create(XMaterial.BIRCH_FENCE.parseMaterial(), "§bLight", typeLore);
+                itemTwo = Item.create(XMaterial.DARK_OAK_FENCE.parseMaterial(), "§bDark", typeLore);
                 break;
             case CORN:
-                itemOne = new Item(XMaterial.SHORT_GRASS.parseItem()).setDisplayName("§bHarvested").setLore(ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information")).build();
-                itemTwo = new Item(XMaterial.TALL_GRASS.parseItem()).setDisplayName("§bTall").setLore(ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information")).build();
+                itemOne = new Item(XMaterial.SHORT_GRASS.parseItem()).setDisplayName("§bHarvested").setLore(typeLore).build();
+                itemTwo = new Item(XMaterial.TALL_GRASS.parseItem()).setDisplayName("§bTall").setLore(typeLore).build();
                 break;
-            case HARVESTED:
             case OTHER:
-                itemOne = Item.create(XMaterial.DEAD_BUSH.parseMaterial(), "§bDry", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
-                itemTwo = Item.create(XMaterial.WATER_BUCKET.parseMaterial(), "§bWet", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
+                itemOne = Item.create(XMaterial.DEAD_BUSH.parseMaterial(), "§bDry", typeLore);
+                itemTwo = Item.create(XMaterial.WATER_BUCKET.parseMaterial(), "§bWet", typeLore);
                 break;
         }
 
@@ -96,7 +99,6 @@ public class CropStageMenu extends AbstractMenu {
                 case CORN:
                     cropstage = CropStage.HARVESTED;
                     break;
-                case HARVESTED:
                 case OTHER:
                     cropstage = CropStage.DRY;
                     break;
@@ -112,19 +114,12 @@ public class CropStageMenu extends AbstractMenu {
             }
 
             CropStage cropstage = CropStage.FALLBACK;
-            switch (cropType) {
-                case POTATO:
-                case CORN:
-                    cropstage = CropStage.TALL;
-                    break;
-                case WHEAT:
-                    cropstage = CropStage.DARK;
-                    break;
-                case HARVESTED:
-                case OTHER:
-                    cropstage = CropStage.WET;
-                    break;
-            }
+            cropstage = switch (cropType) {
+                case POTATO, CORN -> CropStage.TALL;
+                case WHEAT -> CropStage.DARK;
+                case HARVESTED, OTHER -> CropStage.WET;
+                default -> cropstage;
+            };
 
             performClickAction(clickPlayer, cropstage);
         }));
@@ -144,22 +139,34 @@ public class CropStageMenu extends AbstractMenu {
         GeneratorModule.getInstance().getField().generate(p);
     }
 
-    private void sendMoreInformation(Player p, CropType cropType) {
+    public static void sendMoreInformation(Player p, @NonNull CropType cropType) {
         switch (cropType) {
             case POTATO:
-                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#potato-requires-lines");
+                p.sendMessage(Component.text(WikiLinks.Gen.Field.CROP_POTATO, NamedTextColor.RED));
                 break;
             case CORN:
-                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#corn");
+                p.sendMessage(Component.text(WikiLinks.Gen.Field.CROP_CORN, NamedTextColor.RED));
                 break;
             case WHEAT:
-                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#wheat");
+                p.sendMessage(Component.text(WikiLinks.Gen.Field.CROP_WHEAT, NamedTextColor.RED));
                 break;
             case HARVESTED:
-                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#harvested-requires-lines");
+                p.sendMessage(Component.text(WikiLinks.Gen.Field.CROP_HARVESTED, NamedTextColor.RED));
                 break;
             case OTHER:
-                p.sendMessage(ChatColor.RED + "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Crop-Types#other-requires-lines");
+                p.sendMessage(Component.text(WikiLinks.Gen.Field.CROP_OTHER, NamedTextColor.RED));
+                break;
+            case VINEYARD:
+                p.sendMessage(Component.text(WikiLinks.Gen.Field.CROP_VINEYARD, NamedTextColor.RED));
+                break;
+            case PEAR:
+                p.sendMessage(Component.text(WikiLinks.Gen.Field.CROP_PEAR, NamedTextColor.RED));
+                break;
+            case CATTLE:
+                p.sendMessage(Component.text(WikiLinks.Gen.Field.CROP_CATTLE, NamedTextColor.RED));
+                break;
+            case MEADOW:
+                p.sendMessage(Component.text(WikiLinks.Gen.Field.CROP_MEADOW, NamedTextColor.RED));
                 break;
         }
 

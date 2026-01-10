@@ -9,23 +9,17 @@ import org.bukkit.entity.Player;
 
 public class Tree extends GeneratorComponent {
 
-    public static String TREE_PACK_VERSION = "v2.0";
+    public static final String TREE_PACK_VERSION = "v2.0";
 
 
     public Tree() {
         super(GeneratorType.TREE);
-
-        wikiPage = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Tree-Command";
     }
 
     @Override
     public boolean checkForPlayer(Player p) {
         if (!GeneratorCollections.checkIfGeneratorCollectionsIsInstalled(p))
             return false;
-
-        /* Only needed if block checks are made afterwards like in House Generator
-        if (getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
-            getPlayerSettings().get(p.getUniqueId()).setBlocks(GeneratorUtils.analyzeRegion(p, p.getWorld()));*/
 
         return GeneratorUtils.checkIfSchematicBrushIsInstalled(p);
     }

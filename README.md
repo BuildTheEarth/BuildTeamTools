@@ -78,29 +78,29 @@ The **\*** symbol shows that this feature is still being developed or under main
 **For more help, please see the [wiki](https://resources.buildtheearth.net/s/btt).**
 
 ## Contributors
-Thank you to the following developers for contributing towards the plugin:
 
-- **MineFact**
-- **frikandelworst**
-- **Brigart**
-- **v4siv**
-- **Adam**
-- **Noah Husby**
-- **Zoriot**
+Thanks to all our contributors for contributing towards the plugin development and improvement!
+You find them on the [contributors page](https://github.com/BuildTheEarth/BuildTeamTools/graphs/contributors).
 
+Special thanks to the people currently working on the plugin:
+
+- **[Zoriot](https://github.com/Zoriot)**
+- **[Jasupa](https://github.com/Jasupa)**
+- **[frikandelworst](https://github.com/kyanvde)**
+- **[MineFact](https://github.com/MineFact)**
 
 ## Index
 Click the links below for more information, or see the [wiki](https://resources.buildtheearth.net/s/btt).
 
+- [Sledgehammer](https://resources.buildtheearth.net/s/btt/doc/sledgehammer-module-T7I0PWPsTD)
 - [Generators](https://resources.buildtheearth.net/s/btt/doc/generator-module-13zqgI4yFA)
   - [Houses](https://resources.buildtheearth.net/s/btt/doc/house-generator-YKQunon6Bp)
   - [Roads](https://resources.buildtheearth.net/s/btt/doc/road-generator-QqKBBP0nqO)
-  - [Railways](https://resources.buildtheearth.net/s/btt/doc/rail-generator-EfgKXdBvk1)
+  - [Railways [Currently Broken]](https://resources.buildtheearth.net/s/btt/doc/rail-generator-EfgKXdBvk1)
   - [Trees](https://resources.buildtheearth.net/s/btt/doc/tree-generator-pnDmYC9hzW)
   - [Fields](https://resources.buildtheearth.net/s/btt/doc/field-generator-OqIN2BrZT7)
-- [Sledgehammer](https://resources.buildtheearth.net/s/btt/doc/sledgehammer-module-T7I0PWPsTD)
-- [Statistics](https://resources.buildtheearth.net/s/btt/doc/statistics-module-iM7IfoKroF) (PLANNED)
-- [Plot System](https://resources.buildtheearth.net/s/btt/doc/plot-system-module-kkcH00jpcQ) (PLANNED)
-- [Tutorials](https://resources.buildtheearth.net/s/btt/doc/tutorials-module-lkc3LaOrql) (PLANNED)
-- Miscellaneous (PLANNED)
-- [Security](https://resources.buildtheearth.net/s/btt/doc/security-module-iOmxV0djrW) (PLANNED)
+- [Statistics](https://resources.buildtheearth.net/s/btt/doc/statistics-module-iM7IfoKroF)
+- [Miscellaneous](https://resources.buildtheearth.net/doc/miscellaneous-appUzeNc5I)
+  - [Block Palette GUI](https://resources.buildtheearth.net/doc/block-palette-gui-hW8InCtxcq)
+- Tutorials (PLANNED)
+- Plot System (PLANNED - use [PST](https://github.com/AlpsBTE/Plot-System-Terra) for now)

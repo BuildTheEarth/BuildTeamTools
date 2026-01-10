@@ -17,6 +17,7 @@ import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.stats.StatsModule;
 import net.buildtheearth.modules.stats.model.StatsPlayerType;
 import net.buildtheearth.modules.stats.model.StatsServerType;
+import net.buildtheearth.utils.WikiLinks;
 import net.buildtheearth.utils.io.ConfigPaths;
 import net.buildtheearth.utils.io.ConfigUtil;
 import org.bukkit.Bukkit;
@@ -43,7 +44,7 @@ public class CommonModule extends Module {
     private static CommonModule instance = null;
 
     public CommonModule() {
-        super("Common");
+        super("Common", WikiLinks.ENTRY);
     }
 
     public static CommonModule getInstance() {
@@ -57,7 +58,7 @@ public class CommonModule extends Module {
         try {
             YamlFileFactory.registerPlugin(BuildTeamTools.getInstance());
             ConfigUtil.init();
-        } catch (ConfigNotImplementedException ex) {
+        } catch (ConfigNotImplementedException ex) { // Fine?
         }
 
         // Reload the configuration file
@@ -86,19 +87,8 @@ public class CommonModule extends Module {
 
     @Override
     public void registerListeners() {
-        super.registerListeners(
-            new MenuFunctionListener(),
-            new CommandListener()
-        );
-
-        // The ServerExceptionEvent only exists in Paper not in Spigot
-        try{
-            getListeners().add(new ExceptionListener());
-        }catch (Exception ignored){}
+        super.registerListeners(new MenuFunctionListener(), new CommandListener(), new ExceptionListener());
     }
-
-
-
 
 
     /**
@@ -109,20 +99,14 @@ public class CommonModule extends Module {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(BuildTeamTools.getInstance(), () -> {
             time++;
 
-            // Every hour
-            if (time % (20 * 60 * 60) == 0) {
-                // Do something
-            }
-
             // Every 10 minutes (+1 second)
-            if (time % (NetworkModule.CACHE_UPLOAD_SPEED) == 0) {
-                if(StatsModule.getInstance().isEnabled())
-                    StatsModule.getInstance().updateAndSave();
-            }
+            if (time % (NetworkModule.CACHE_UPLOAD_SPEED) == 0 && StatsModule.getInstance().isEnabled())
+                StatsModule.getInstance().updateAndSave();
+
 
             // Every minute
             if (time % (20 * 60) == 0) {
-                if(StatsModule.getInstance().isEnabled()){
+                if (StatsModule.getInstance().isEnabled()) {
                     StatsModule.getInstance().getStatsServer().addValue(StatsServerType.UPTIME, 1);
 
                     for (Player p : Bukkit.getOnlinePlayers()) {
@@ -131,23 +115,7 @@ public class CommonModule extends Module {
                     }
                 }
 
-                if(CommonModule.getInstance().isEnabled())
-                    ExceptionListener.limiter = false;
-            }
-
-            // Every 5 seconds
-            if (time % 100 == 0) {
-                // Do something
-            }
-
-            // Every second
-            if (time % 20 == 0) {
-                // Do something
-            }
-
-            // Every 0.25 seconds
-            if (time % 5 == 0) {
-                // Do something
+                if (CommonModule.getInstance().isEnabled()) ExceptionListener.limiter = false;
             }
 
             GeneratorModule.getInstance().tick();

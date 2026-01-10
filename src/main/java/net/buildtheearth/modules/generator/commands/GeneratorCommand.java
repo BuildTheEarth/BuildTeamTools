@@ -18,12 +18,10 @@ public class GeneratorCommand implements CommandExecutor {
 
 
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String cmdLabel, String @NotNull [] args) {
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player p)) {
             sender.sendMessage("§cOnly players can execute this command.");
             return true;
         }
-
-        Player p = (Player) sender;
 
         if(!p.hasPermission(Permissions.GENERATOR_USE)) {
             p.sendMessage(ChatHelper.getErrorString("You don't have permission to use this command!"));
@@ -87,10 +85,10 @@ public class GeneratorCommand implements CommandExecutor {
             case "redo":
                 GeneratorModule.getInstance().getPlayerHistory(p).redoCommand(p);
                 return true;
+            default:
+                sendHelp(p);
+                return true;
         }
-
-        sendHelp(p);
-        return true;
     }
 
     public static void sendHelp(CommandSender sender) {

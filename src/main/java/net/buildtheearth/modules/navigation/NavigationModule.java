@@ -15,6 +15,7 @@ import net.buildtheearth.modules.navigation.components.warps.commands.WarpComman
 import net.buildtheearth.modules.navigation.components.warps.commands.WarpsBtCommand;
 import net.buildtheearth.modules.navigation.components.warps.listeners.WarpJoinListener;
 import net.buildtheearth.modules.network.NetworkModule;
+import net.buildtheearth.utils.WikiLinks;
 
 /**
  * Manages all things related to universal tpll
@@ -33,7 +34,7 @@ public class NavigationModule extends Module {
     private static NavigationModule instance = null;
 
     public NavigationModule() {
-        super("Navigation", NetworkModule.getInstance());
+        super("Navigation", WikiLinks.NAV, NetworkModule.getInstance());
     }
 
     public static NavigationModule getInstance() {

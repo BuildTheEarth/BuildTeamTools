@@ -1,21 +1,11 @@
 package net.buildtheearth.modules.generator.components.kml;
 
 
-import java.util.List;
-import java.util.ArrayList;
-
+import de.micromata.opengis.kml.v_2_2_0.*;
 import org.bukkit.entity.Player;
 
-import de.micromata.opengis.kml.v_2_2_0.Coordinate;
-import de.micromata.opengis.kml.v_2_2_0.Document;
-import de.micromata.opengis.kml.v_2_2_0.Feature;
-import de.micromata.opengis.kml.v_2_2_0.Geometry;
-import de.micromata.opengis.kml.v_2_2_0.Kml;
-import de.micromata.opengis.kml.v_2_2_0.LineString;
-import de.micromata.opengis.kml.v_2_2_0.LinearRing;
-import de.micromata.opengis.kml.v_2_2_0.MultiGeometry;
-import de.micromata.opengis.kml.v_2_2_0.Placemark;
-import de.micromata.opengis.kml.v_2_2_0.Polygon;
+import java.util.ArrayList;
+import java.util.List;
 
 public class KmlParser {
     private Player player;
@@ -32,18 +22,26 @@ public class KmlParser {
 
         //https://github.com/micromata/javaapiforkml
         try {
-            Kml kml = Kml.unmarshal(kmlString);
+            // Set the context class loader to ensure JAXB service loader can find the implementation
+            // This is necessary when running in a PluginClassLoader environment
+            ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
+            try {
+                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+                Kml kml = Kml.unmarshal(kmlString);
 
-            //Top-level element will be a document
-            Document doc = (Document) kml.getFeature();
-            List<Placemark> placemarks = findPlacemarks(doc);
+                //Top-level element will be a document
+                Document doc = (Document) kml.getFeature();
+                List<Placemark> placemarks = findPlacemarks(doc);
 
 
-            for (Placemark placemark : placemarks){
-                // get all geometries from placemark (might be multiple lists)
-                //each list creates a separate entry list in the result
-                List<List<Coordinate>> placemark_coords_lists = getCoordinates(placemark.getGeometry());
-                result_lists.addAll(placemark_coords_lists);
+                for (Placemark placemark : placemarks) {
+                    // get all geometries from placemark (might be multiple lists)
+                    //each list creates a separate entry list in the result
+                    List<List<Coordinate>> placemark_coords_lists = getCoordinates(placemark.getGeometry());
+                    result_lists.addAll(placemark_coords_lists);
+                }
+            } finally {
+                Thread.currentThread().setContextClassLoader(originalClassLoader);
             }
 
         } catch (Exception ex) {
@@ -70,16 +68,24 @@ public class KmlParser {
 
         //https://github.com/micromata/javaapiforkml
         try {
-            Kml kml = Kml.unmarshal(kmlString);
-            //Top-level element will be a document
-            Document doc = (Document) kml.getFeature();
-            List<Placemark> placemarks = findPlacemarks(doc);
+            // Set the context class loader to ensure JAXB service loader can find the implementation
+            // This is necessary when running in a PluginClassLoader environment
+            ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
+            try {
+                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+                Kml kml = Kml.unmarshal(kmlString);
+                //Top-level element will be a document
+                Document doc = (Document) kml.getFeature();
+                List<Placemark> placemarks = findPlacemarks(doc);
 
 
-            for (Placemark placemark : placemarks){
-                // #extract coordinates assuming geometry is linestring
-                List<LineString> lines = findLineStrings(placemark);
-                linestrings.addAll(lines);
+                for (Placemark placemark : placemarks) {
+                    // #extract coordinates assuming geometry is linestring
+                    List<LineString> lines = findLineStrings(placemark);
+                    linestrings.addAll(lines);
+                }
+            } finally {
+                Thread.currentThread().setContextClassLoader(originalClassLoader);
             }
 
         } catch (Exception ex) {

@@ -11,7 +11,7 @@ com-google-code-gson-gson = "2.13.1"
 com-google-guava-guava = "33.4.8-jre"
 com-mojang-authlib = "7.0.61"
 com-squareup-okhttp3-okhttp-jvm = "5.1.0"
-de-micromata-jak-javaapiforkml = "2.2.1"
+javaapiforkml = "3.0.10" # https://github.com/urbancamo/javaapiforkml
 io-papermc-paper-paper-api = "1.21.10-R0.1-SNAPSHOT"
 micycle-clipper2 = "1.2.2"
 net-daporkchop-lib-binary = "0.5.7-SNAPSHOT"
@@ -34,7 +34,7 @@ com-google-code-gson-gson = { module = "com.google.code.gson:gson", version.ref 
 com-google-guava-guava = { module = "com.google.guava:guava", version.ref = "com-google-guava-guava" }
 com-mojang-authlib = { module = "com.mojang:authlib", version.ref = "com-mojang-authlib" }
 com-squareup-okhttp3-okhttp-jvm = { module = "com.squareup.okhttp3:okhttp-jvm", version.ref = "com-squareup-okhttp3-okhttp-jvm" }
-de-micromata-jak-javaapiforkml = { module = "de.micromata.jak:JavaAPIforKml", version.ref = "de-micromata-jak-javaapiforkml" }
+javaapiforkml = { module = "uk.m0nom:javaapiforkml", version.ref = "javaapiforkml" }
 io-papermc-paper-paper-api = { module = "io.papermc.paper:paper-api", version.ref = "io-papermc-paper-paper-api" }
 micycle-clipper2 = { module = "micycle:clipper2", version.ref = "micycle-clipper2" }
 net-daporkchop-lib-binary = { module = "net.daporkchop.lib:binary", version.ref = "net-daporkchop-lib-binary" }

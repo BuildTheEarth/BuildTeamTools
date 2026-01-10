@@ -40,6 +40,16 @@ public class StatsModule extends Module {
 
     @Override
     public void enable() {
+        if (NetworkModule.getInstance().getBuildTeam() == null) {
+            shutdown("The Network Module failed to load the Build Team.");
+            return;
+        }
+
+        if (!NetworkModule.getInstance().getBuildTeam().isConnected() || !Bukkit.getServerConfig().isProxyEnabled()) {
+            shutdown("The Build Team have to be connected to the BtE Network (Proxy).");
+            return;
+        }
+
         statsServer = new StatsServer();
         statsPlayerList = new HashMap<>();
 
@@ -93,18 +103,18 @@ public class StatsModule extends Module {
      */
     public boolean updateAndSave() {
         List<UUID> communicators = NetworkModule.getInstance().getCommunicators();
-        if (communicators.size() == 0) return false;
+        if (communicators.isEmpty()) return false;
 
         if (!BuildTeamTools.getInstance().isEnabled()) return false;
 
-        Player p = Bukkit.getPlayer(communicators.get(0));
+        Player p = Bukkit.getPlayer(communicators.getFirst());
 
         if (p == null) {
-            communicators.remove(0);
+            communicators.removeFirst();
             return false;
         }
         if (!p.isOnline()) {
-            communicators.remove(0);
+            communicators.removeFirst();
             return false;
         }
 

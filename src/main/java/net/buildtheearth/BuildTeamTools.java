@@ -8,6 +8,7 @@ import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.miscellaneous.MiscModule;
 import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.modules.network.NetworkModule;
+import net.buildtheearth.modules.plotsystem.PlotSystemModule;
 import net.buildtheearth.modules.stats.StatsModule;
 import net.buildtheearth.utils.io.ConfigUtil;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -37,16 +38,14 @@ public class BuildTeamTools extends JavaPlugin {
         instance = this;
 
         // Register Modules
-
-        // We need to register the Common Module first to have the Config System Available for other modules/logic.
-        ModuleHandler.getInstance().registerModule(CommonModule.getInstance());
-        ModuleHandler.getInstance().enable(CommonModule.getInstance(), null);
-
         ModuleHandler.getInstance().registerModules(
+                CommonModule.getInstance(),
                 NetworkModule.getInstance(),
                 GeneratorModule.getInstance(),
                 NavigationModule.getInstance(),
-                MiscModule.getInstance()
+                MiscModule.getInstance(),
+                StatsModule.getInstance(),
+                PlotSystemModule.getInstance()
         );
         ModuleHandler.getInstance().enableAll(null);
     }

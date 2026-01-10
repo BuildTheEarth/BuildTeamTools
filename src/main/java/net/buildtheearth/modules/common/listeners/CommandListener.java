@@ -20,11 +20,12 @@ public class CommandListener implements Listener {
         for(Module module : ModuleHandler.getInstance().getModules())
             if(!module.isEnabled())
                 for(PluginCommand command : module.getCommands().keySet()) {
+                    if (command == null) continue;
                     List<String> commands = command.getAliases();
                     commands.add(command.getLabel());
 
                     for (String alias : commands) {
-                        if (message.toLowerCase().startsWith("/" + alias.toLowerCase())) {
+                        if (message.toLowerCase().equalsIgnoreCase("/" + alias.toLowerCase())) {
                             String reason = "";
 
                             if (module.getError() != null && !module.getError().isEmpty())

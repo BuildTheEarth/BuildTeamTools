@@ -1,11 +1,9 @@
 package net.buildtheearth.modules.generator.components.field;
 
-import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.generator.model.Flag;
 import net.buildtheearth.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.modules.generator.model.Script;
 import net.buildtheearth.modules.generator.utils.GeneratorUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -18,8 +16,10 @@ public class FieldScripts extends Script {
 
     public FieldScripts(Player player, GeneratorComponent generatorComponent) {
         super(player, generatorComponent);
-        
-        Bukkit.getScheduler().runTaskAsynchronously(BuildTeamTools.getInstance(), this::fieldScript_v_1_0);
+
+        throw new UnsupportedOperationException("FieldScripts are currently broken.");
+
+        //Bukkit.getScheduler().runTaskAsynchronously(BuildTeamTools.getInstance(), this::fieldScript_v_1_0);
     }
     
     public void fieldScript_v_1_0() {

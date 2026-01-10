@@ -13,7 +13,6 @@ import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -425,7 +424,7 @@ public class HouseScripts extends Script {
                 for(int i = 0; i < maxRoofHeight; i++) {
                     if(roofType == RoofType.FLATTER_SLABS || roofType == RoofType.MEDIUM_SLABS)
                         //Only select air block that are surrounded by other stone slabs below or which are directly neighbors to lime wool or blue wool
-                        replaceBlocksWithMask("=queryRel(0,-1,0,43)&&" +
+                        replaceBlocksWithMask("=queryRel(0,-1,0,43,0)&&" +
                             "(" +
                                 "(" +
                                     "queryRel(1,-1,0,43,-1)&&queryRel(-1,-1,0,43,-1)&&queryRel(0,-1,1,43,-1)&&queryRel(0,-1,-1,43,-1)" +

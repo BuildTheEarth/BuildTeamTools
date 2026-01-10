@@ -1,7 +1,6 @@
 package net.buildtheearth.modules.generator;
 
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.WorldEdit;
 import lombok.Getter;
 import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.common.CommonModule;
@@ -16,20 +15,16 @@ import net.buildtheearth.modules.generator.components.tree.Tree;
 import net.buildtheearth.modules.generator.listeners.GeneratorListener;
 import net.buildtheearth.modules.generator.model.Command;
 import net.buildtheearth.modules.generator.model.GeneratorCollections;
-import net.buildtheearth.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.modules.generator.model.History;
-import net.buildtheearth.modules.navigation.components.navigator.listeners.NavigatorJoinListener;
-import net.buildtheearth.modules.navigation.components.navigator.listeners.NavigatorOpenListener;
-import net.buildtheearth.modules.navigation.components.tpll.listeners.TpllJoinListener;
-import net.buildtheearth.modules.navigation.components.tpll.listeners.TpllListener;
-import net.buildtheearth.modules.navigation.components.warps.listeners.WarpJoinListener;
+import net.buildtheearth.utils.WikiLinks;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 public class GeneratorModule extends Module {
-
-    public static String INSTALL_WIKI = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Installation";
 
     private final HashMap<UUID, History> playerHistory = new HashMap<>();
 
@@ -52,7 +47,7 @@ public class GeneratorModule extends Module {
     private static GeneratorModule instance = null;
 
     public GeneratorModule() {
-        super("Generator");
+        super("Generator", WikiLinks.GEN);
     }
 
     public static GeneratorModule getInstance() {
@@ -74,11 +69,11 @@ public class GeneratorModule extends Module {
         tree = new Tree();
         field = new Field();
 
-        GeneratorCollections.GENERATOR_COLLECTIONS_VERSION = GeneratorCollections.getRepositoryReleaseVersionString("BuildTheEarth", "GeneratorCollections");
+        GeneratorCollections.generatorCollectionsVersion = GeneratorCollections.getRepositoryReleaseVersionString("BuildTheEarth", "GeneratorCollections");
 
         // In case the version could not be retrieved, set it to 3.0 as a fallback
-        if(GeneratorCollections.GENERATOR_COLLECTIONS_VERSION == null)
-            GeneratorCollections.GENERATOR_COLLECTIONS_VERSION = "3.0";
+        if (GeneratorCollections.generatorCollectionsVersion == null)
+            GeneratorCollections.generatorCollectionsVersion = "3.0";
 
         // Check if the GeneratorCollections plugin is installed and up to date
         GeneratorCollections.checkIfGeneratorCollectionsIsInstalled(null);
@@ -110,12 +105,12 @@ public class GeneratorModule extends Module {
      * @see Command#tick()
      */
     public void tick() {
-        if (generatorCommands.size() == 0)
+        if (generatorCommands.isEmpty())
             return;
 
         // Tick all commands in the queue
         for(Command command : new ArrayList<>(generatorCommands)){
-            if(command.getOperations().size() == 0){
+            if (command.getOperations().isEmpty()) {
                 if(!command.isFinished())
                     command.finish();
                 generatorCommands.remove(command);

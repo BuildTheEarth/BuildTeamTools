@@ -9,7 +9,6 @@ public class Field extends GeneratorComponent {
 
     public Field() {
         super(GeneratorType.FIELD);
-        wikiPage = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/Field-Command";
     }
 
     @Override

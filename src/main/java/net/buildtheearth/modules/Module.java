@@ -8,7 +8,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
@@ -20,7 +19,7 @@ import java.util.List;
 /**
  * An interface for BuildTeamTools modules
  *
- * @authors MineFact, Noah Husby
+ * @author MineFact, Noah Husby
  */
 public abstract class Module implements WikiDocumented {
 
@@ -53,12 +52,13 @@ public abstract class Module implements WikiDocumented {
     /** Initializes a new module.
      *
      * @param moduleName The name of the module
+     * @param wikiPage The wiki page of the module
      * @param dependsOnModules The modules that this module depends on. If any of these modules are disabled, this module will be disabled as well.
      */
-    protected Module(String moduleName, Module... dependsOnModules) {
+    protected Module(String moduleName, String wikiPage, Module... dependsOnModules) {
         this.moduleName = moduleName;
         this.dependsOnModules.addAll(Arrays.asList(dependsOnModules));
-        this.wikiPage = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/" + moduleName + "-Module";
+        this.wikiPage = wikiPage;
 
         registerCommands();
         registerListeners();
@@ -114,8 +114,8 @@ public abstract class Module implements WikiDocumented {
     protected void registerCommand(@NonNull String command, @NonNull CommandExecutor executor){
         this.commands.put(BuildTeamTools.getInstance().getCommand(command), executor);
 
-        if(executor instanceof TabCompleter)
-            this.tabCompleter.put(BuildTeamTools.getInstance().getCommand(command), (TabCompleter) executor);
+        if (executor instanceof TabCompleter tc)
+            this.tabCompleter.put(BuildTeamTools.getInstance().getCommand(command), tc);
     }
 
     /** Registers a command for the module.
@@ -133,11 +133,11 @@ public abstract class Module implements WikiDocumented {
 
     /** Loads the commands for the module into Bukkit */
     private void loadCommands(){
-        for(PluginCommand command : commands.keySet())
-            command.setExecutor(commands.get(command));
+        for (var command : commands.entrySet())
+            command.getKey().setExecutor(command.getValue());
 
-        for(PluginCommand command : tabCompleter.keySet())
-            command.setTabCompleter(tabCompleter.get(command));
+        for (var command : tabCompleter.entrySet())
+            command.getKey().setTabCompleter(command.getValue());
     }
 
 
@@ -174,12 +174,12 @@ public abstract class Module implements WikiDocumented {
     protected void checkForModuleDependencies(){
         for(Module module : dependsOnModules)
             if(!module.isEnabled()) {
-                String error = "The " + module.getModuleName() + " Module is currently disabled.";
+                String moduleDepsError = "The " + module.getModuleName() + " Module is currently disabled.";
 
                 if(module.getError() != null && !module.getError().isEmpty())
-                    error = module.getError();
+                    moduleDepsError = module.getError();
 
-                shutdown(error);
+                shutdown(moduleDepsError);
                 return;
             }
     }

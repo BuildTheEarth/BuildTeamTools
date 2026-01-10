@@ -2,12 +2,14 @@ package net.buildtheearth.modules.stats;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import lombok.Getter;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.stats.listeners.StatsListener;
 import net.buildtheearth.modules.stats.model.StatsPlayer;
 import net.buildtheearth.modules.stats.model.StatsServer;
+import net.buildtheearth.utils.WikiLinks;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.json.JSONArray;
@@ -19,8 +21,9 @@ import java.util.UUID;
 
 public class StatsModule extends Module {
 
-    public static int RATE_LIMIT = NetworkModule.CACHE_UPLOAD_SPEED / 20;
+    public static final int RATE_LIMIT = NetworkModule.CACHE_UPLOAD_SPEED / 20;
 
+    @Getter
     private StatsServer statsServer;
     private HashMap<UUID, StatsPlayer> statsPlayerList;
 
@@ -29,7 +32,7 @@ public class StatsModule extends Module {
     private static StatsModule instance = null;
 
     public StatsModule() {
-        super("Stats");
+        super("Stats", WikiLinks.STATS);
     }
 
     public static StatsModule getInstance() {
@@ -69,13 +72,6 @@ public class StatsModule extends Module {
     @Override
     public void registerListeners() {
         super.registerListeners(new StatsListener());
-    }
-
-
-
-
-    public StatsServer getStatsServer() {
-        return statsServer;
     }
 
     public StatsPlayer getStatsPlayer(UUID uuid) {
@@ -133,8 +129,8 @@ public class StatsModule extends Module {
 
         //Player Stats
         JSONArray jsonArray = new JSONArray();
-        for (UUID uuid : statsPlayerList.keySet())
-            jsonArray.put(statsPlayerList.get(uuid).toJSON());
+        for (StatsPlayer statsPlayer : statsPlayerList.values())
+            jsonArray.put(statsPlayer.toJSON());
         jsonObject.put("PLAYERS", jsonArray);
 
         return jsonObject;

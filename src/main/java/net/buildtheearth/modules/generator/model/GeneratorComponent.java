@@ -19,22 +19,19 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.jspecify.annotations.NonNull;
 
 import java.util.HashMap;
 import java.util.UUID;
 
 public abstract class GeneratorComponent extends ModuleComponent implements WikiDocumented {
-
-    @Getter
-    public String wikiPage;
-
     @Getter
     private final GeneratorType generatorType;
 
     @Getter
     private final HashMap<UUID, Settings> playerSettings = new HashMap<>();
 
-    public GeneratorComponent(GeneratorType type) {
+    protected GeneratorComponent(@NonNull GeneratorType type) {
         super(type.getName());
         generatorType = type;
     }
@@ -75,50 +72,40 @@ public abstract class GeneratorComponent extends ModuleComponent implements Wiki
         }
     }
 
-    public void sendHelp(Player p, String[] args){
-        if (args.length == 2)
-            if (args[1].equals("info") || args[1].equals("help") || args[1].equals("?"))
+    public void sendHelp(Player p, String @NonNull [] args) {
+        if (args.length == 2 && (args[1].equals("info") || args[1].equals("help") || args[1].equals("?")))
                 sendHelp(p);
     }
 
-    public void sendHelp(Player p){
-        //TODO send houses help
-        p.sendMessage("TODO send Houses Help");
+    public void sendHelp(@NonNull Player p) {
+        p.sendMessage(Component.text(getWikiPage(), NamedTextColor.YELLOW));
     }
 
     public void sendMoreInfo(Player p) {
         p.sendMessage(" ");
         p.sendMessage("§cFor more information take a look at the wiki:");
-        p.sendMessage("§c" + wikiPage);
+        p.sendMessage("§c" + getWikiPage());
     }
 
     public void sendError(Player p) {
         p.sendMessage("§cThere was an error while generating the house. Please contact the admins");
     }
 
-    public String getCommand(Player p) {
+    public String getCommand(@NonNull Player p) {
         HashMap<Flag, String> flags = getPlayerSettings().get(p.getUniqueId()).getValuesAsString();
 
-        String type = "house";
-
-        switch (generatorType) {
-            case HOUSE:
-                type = "house";
-                break;
-            case ROAD:
-                type = "road";
-                break;
-            case RAILWAY:
-                type = "railway";
-                break;
-            case TREE:
-                type = "tree";
-                break;
-        }
+        String type = switch (generatorType) {
+            case HOUSE -> "house";
+            case ROAD -> "road";
+            case RAILWAY -> "railway";
+            case TREE -> "tree";
+            case FIELD -> "field";
+        };
 
         StringBuilder command = new StringBuilder("/gen " + type);
-        for(Flag flag : flags.keySet())
-            command.append(" -").append(flag.getFlag()).append(" ").append(flags.get(flag));
+
+        for (var flag : flags.entrySet())
+            command.append(" -").append(flag.getKey().getFlag()).append(" ").append(flag.getValue());
 
         return command.toString();
     }
@@ -138,23 +125,14 @@ public abstract class GeneratorComponent extends ModuleComponent implements Wiki
         p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
     }
 
-    private TextComponent getMessage() {
-        String type = "Building";
-
-        switch (generatorType){
-            case HOUSE:
-                type = "House";
-                break;
-            case ROAD:
-                type = "Road";
-                break;
-            case RAILWAY:
-                type = "Railway";
-                break;
-            case TREE:
-                type = "Tree";
-                break;
-        }
+    private @NonNull TextComponent getMessage() {
+        String type = switch (generatorType) {
+            case HOUSE -> "House";
+            case ROAD -> "Road";
+            case RAILWAY -> "Railway";
+            case TREE -> "Tree";
+            case FIELD -> "Field";
+        };
 
         return LegacyComponentSerializer.legacyAmpersand().deserialize(BuildTeamTools.PREFIX + type + "§a successfully §7generated.");
     }
@@ -194,5 +172,9 @@ public abstract class GeneratorComponent extends ModuleComponent implements Wiki
 
         if(getPlayerSettings().get(p.getUniqueId()).getValues().isEmpty() && args.length > 1)
             sendHelp(p);
+    }
+
+    public String getWikiPage() {
+        return generatorType.getWikiPage();
     }
 }

@@ -10,7 +10,6 @@ public class House extends GeneratorComponent {
 
     public House() {
         super(GeneratorType.HOUSE);
-        wikiPage = "https://github.com/BuildTheEarth/BuildTeamTools/wiki/House-Command";
     }
 
     @Override
@@ -18,7 +17,7 @@ public class House extends GeneratorComponent {
         if (GeneratorUtils.checkForNoWorldEditSelection(p))
             return false;
 
-        if (getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
+        if (getPlayerSettings().get(p.getUniqueId()).getBlocks() == null) // Needed because block checks are made afterwards
             getPlayerSettings().get(p.getUniqueId()).setBlocks(GeneratorUtils.analyzeRegion(p, p.getWorld()));
 
         Block[][][] blocks = getPlayerSettings().get(p.getUniqueId()).getBlocks();

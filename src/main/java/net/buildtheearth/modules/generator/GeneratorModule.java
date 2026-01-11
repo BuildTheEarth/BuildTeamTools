@@ -42,8 +42,6 @@ public class GeneratorModule extends Module {
     @Getter
     private Field field;
 
-
-
     private static GeneratorModule instance = null;
 
     public GeneratorModule() {
@@ -76,7 +74,7 @@ public class GeneratorModule extends Module {
             GeneratorCollections.generatorCollectionsVersion = "3.0";
 
         // Check if the GeneratorCollections plugin is installed and up to date
-        GeneratorCollections.checkIfGeneratorCollectionsIsInstalled(null);
+        GeneratorCollections.hasUpdatedGeneratorCollections(null);
 
         LocalSession.MAX_HISTORY_SIZE = 500;
 

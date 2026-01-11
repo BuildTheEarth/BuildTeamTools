@@ -1,6 +1,6 @@
 package net.buildtheearth.modules.network.api;
 
-import net.buildtheearth.utils.ChatHelper;
+import com.alpsbte.alpslib.utils.ChatHelper;
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;

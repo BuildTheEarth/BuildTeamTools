@@ -1,5 +1,7 @@
 package net.buildtheearth.modules.generator.model;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
+import com.alpsbte.alpslib.utils.GeneratorUtils;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.regions.Region;
@@ -10,8 +12,6 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import lombok.Getter;
 import net.buildtheearth.modules.common.CommonModule;
-import net.buildtheearth.modules.generator.utils.GeneratorUtils;
-import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.MenuItems;
 import org.bukkit.Location;
 import org.bukkit.Material;

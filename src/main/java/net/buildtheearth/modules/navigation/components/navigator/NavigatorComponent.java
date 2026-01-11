@@ -1,12 +1,12 @@
 package net.buildtheearth.modules.navigation.components.navigator;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
+import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import com.sk89q.worldedit.WorldEdit;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.ModuleComponent;
 import net.buildtheearth.modules.common.CommonModule;
-import net.buildtheearth.utils.ChatHelper;
-import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.io.ConfigPaths;
 import net.buildtheearth.utils.io.ConfigUtil;
 import org.bukkit.entity.Player;

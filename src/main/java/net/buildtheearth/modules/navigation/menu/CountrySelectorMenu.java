@@ -1,5 +1,7 @@
 package net.buildtheearth.modules.navigation.menu;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
+import com.alpsbte.alpslib.utils.item.Item;
 import lombok.NonNull;
 import net.buildtheearth.modules.navigation.NavUtils;
 import net.buildtheearth.modules.navigation.components.warps.WarpsComponent;
@@ -8,8 +10,6 @@ import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Continent;
 import net.buildtheearth.modules.network.model.Permissions;
 import net.buildtheearth.modules.network.model.Region;
-import net.buildtheearth.utils.ChatHelper;
-import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.ListUtil;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.AbstractPaginatedMenu;

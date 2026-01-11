@@ -1,9 +1,9 @@
 package net.buildtheearth.modules.generator.components.road;
 
+import com.alpsbte.alpslib.utils.GeneratorUtils;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.modules.generator.model.GeneratorType;
-import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import org.bukkit.entity.Player;
 
 public class Road extends GeneratorComponent {

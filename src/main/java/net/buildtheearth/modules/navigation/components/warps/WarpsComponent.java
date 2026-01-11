@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.navigation.components.warps;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
@@ -15,7 +16,6 @@ import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.modules.network.model.BuildTeam;
-import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.GeometricUtils;
 import net.buildtheearth.utils.geo.CoordinateConversion;
 import net.buildtheearth.utils.menus.AbstractMenu;

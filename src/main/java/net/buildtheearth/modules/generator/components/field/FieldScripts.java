@@ -1,9 +1,9 @@
 package net.buildtheearth.modules.generator.components.field;
 
+import com.alpsbte.alpslib.utils.GeneratorUtils;
 import net.buildtheearth.modules.generator.model.Flag;
 import net.buildtheearth.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.modules.generator.model.Script;
-import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;

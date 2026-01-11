@@ -1,8 +1,8 @@
 package net.buildtheearth.modules;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
 import lombok.Getter;
 import net.buildtheearth.BuildTeamTools;
-import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.io.ConfigPaths;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

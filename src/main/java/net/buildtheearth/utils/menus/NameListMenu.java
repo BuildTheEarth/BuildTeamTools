@@ -1,7 +1,7 @@
 package net.buildtheearth.utils.menus;
 
+import com.alpsbte.alpslib.utils.item.Item;
 import net.buildtheearth.utils.CustomHeads;
-import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
 import net.daporkchop.lib.common.misc.Tuple;
 import org.bukkit.enchantments.Enchantment;

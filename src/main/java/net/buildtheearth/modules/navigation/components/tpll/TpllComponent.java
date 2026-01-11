@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.navigation.components.tpll;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
@@ -7,7 +8,6 @@ import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.ModuleComponent;
 import net.buildtheearth.modules.navigation.NavUtils;
 import net.buildtheearth.modules.network.NetworkModule;
-import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.GeometricUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

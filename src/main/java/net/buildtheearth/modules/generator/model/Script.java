@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.generator.model;
 
+import com.alpsbte.alpslib.utils.GeneratorUtils;
 import com.cryptomorin.xseries.XMaterial;
 import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.sk89q.worldedit.LocalSession;
@@ -13,7 +14,6 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import lombok.Getter;
 import net.buildtheearth.modules.generator.GeneratorModule;
-import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;

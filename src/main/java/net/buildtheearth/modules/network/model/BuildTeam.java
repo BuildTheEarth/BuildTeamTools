@@ -1,12 +1,12 @@
 package net.buildtheearth.modules.network.model;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
 import lombok.Getter;
 import net.buildtheearth.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.api.API;
 import net.buildtheearth.modules.network.api.NetworkAPI;
-import net.buildtheearth.utils.ChatHelper;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;

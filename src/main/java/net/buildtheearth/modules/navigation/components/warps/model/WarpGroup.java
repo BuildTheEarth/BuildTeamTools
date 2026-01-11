@@ -1,10 +1,10 @@
 package net.buildtheearth.modules.navigation.components.warps.model;
 
+import com.alpsbte.alpslib.utils.item.Item;
 import lombok.Getter;
 import lombok.Setter;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.utils.CustomHeads;
-import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.ListUtil;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;

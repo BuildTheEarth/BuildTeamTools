@@ -80,7 +80,6 @@ dependencies {
     }
     implementation(libs.com.googlecode.json.simple)
     compileOnly(libs.io.papermc.paper.paper.api)
-    compileOnly(libs.com.mojang.authlib)
     compileOnly(libs.com.fastasyncworldedit.fastasyncworldedit.core)
     compileOnly(libs.com.fastasyncworldedit.fastasyncworldedit.bukkit)
 }

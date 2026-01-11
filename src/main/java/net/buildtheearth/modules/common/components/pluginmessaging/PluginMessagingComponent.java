@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.common.components.pluginmessaging;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.BuildTeamTools;
@@ -7,7 +8,6 @@ import net.buildtheearth.modules.ModuleComponent;
 import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.stats.StatsModule;
-import net.buildtheearth.utils.ChatHelper;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 

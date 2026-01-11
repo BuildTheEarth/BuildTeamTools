@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.generator.model;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
 import com.fastasyncworldedit.core.FaweAPI;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -9,7 +10,6 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import lombok.experimental.UtilityClass;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.common.CommonModule;
-import net.buildtheearth.utils.ChatHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;

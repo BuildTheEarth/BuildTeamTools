@@ -1,11 +1,11 @@
 package net.buildtheearth.modules.generator.components.field.menu;
 
 
+import com.alpsbte.alpslib.utils.item.Item;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.components.field.FieldFlag;
 import net.buildtheearth.modules.generator.components.field.FieldSettings;
 import net.buildtheearth.modules.generator.model.Settings;
-import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.BlockListMenu;
 import org.bukkit.Sound;

@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.generator.components.tree.menu;
 
+import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.components.tree.TreeFlag;
@@ -7,7 +8,6 @@ import net.buildtheearth.modules.generator.components.tree.TreeSettings;
 import net.buildtheearth.modules.generator.components.tree.TreeType;
 import net.buildtheearth.modules.generator.menu.GeneratorMenu;
 import net.buildtheearth.modules.generator.model.Settings;
-import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.menus.NameListMenu;
 import net.daporkchop.lib.common.misc.Tuple;
 import org.apache.commons.lang3.StringUtils;

@@ -1,10 +1,10 @@
 package net.buildtheearth.modules.generator.commands;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.menu.GeneratorMenu;
 import net.buildtheearth.modules.generator.model.History;
 import net.buildtheearth.modules.network.model.Permissions;
-import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

@@ -1,11 +1,11 @@
 package net.buildtheearth.modules.generator.components.tree;
 
+import com.alpsbte.alpslib.utils.GeneratorUtils;
 import lombok.Getter;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.generator.model.GeneratorCollections;
 import net.buildtheearth.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.modules.generator.model.GeneratorType;
-import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 

@@ -1,12 +1,12 @@
 package net.buildtheearth.modules.navigation.menu;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
+import com.alpsbte.alpslib.utils.item.Item;
 import lombok.NonNull;
 import net.buildtheearth.modules.navigation.NavUtils;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.network.model.RegionType;
-import net.buildtheearth.utils.ChatHelper;
-import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.ListUtil;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.AbstractPaginatedMenu;

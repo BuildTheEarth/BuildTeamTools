@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.common.commands;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
 import com.google.gson.Gson;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.Module;
@@ -9,7 +10,6 @@ import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.Permissions;
 import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.stats.StatsModule;
-import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.Utils;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -20,11 +20,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
 

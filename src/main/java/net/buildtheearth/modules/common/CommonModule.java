@@ -2,6 +2,7 @@ package net.buildtheearth.modules.common;
 
 import com.alpsbte.alpslib.io.YamlFileFactory;
 import com.alpsbte.alpslib.io.config.ConfigNotImplementedException;
+import com.alpsbte.alpslib.utils.ChatHelper;
 import lombok.Getter;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.Module;
@@ -58,6 +59,7 @@ public class CommonModule extends Module {
         try {
             YamlFileFactory.registerPlugin(BuildTeamTools.getInstance());
             ConfigUtil.init();
+            ChatHelper.init(BuildTeamTools.getInstance(), BuildTeamTools.getInstance().isDebug(), BuildTeamTools.PREFIX, BuildTeamTools.CONSOLE_PREFIX);
         } catch (ConfigNotImplementedException ex) { // Fine?
         }
 

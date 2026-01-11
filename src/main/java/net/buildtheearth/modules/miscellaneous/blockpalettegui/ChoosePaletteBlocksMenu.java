@@ -1,7 +1,7 @@
 package net.buildtheearth.modules.miscellaneous.blockpalettegui;
 
+import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
-import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.menus.AbstractPaginatedMenu;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -11,10 +11,10 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.ipvp.canvas.Menu;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 import java.util.function.Consumer;

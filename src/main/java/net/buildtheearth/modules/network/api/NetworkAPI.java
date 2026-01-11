@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.network.api;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
 import lombok.experimental.UtilityClass;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.navigation.NavUtils;
@@ -10,7 +11,6 @@ import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Continent;
 import net.buildtheearth.modules.network.model.Region;
 import net.buildtheearth.modules.network.model.RegionType;
-import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.io.ConfigPaths;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;

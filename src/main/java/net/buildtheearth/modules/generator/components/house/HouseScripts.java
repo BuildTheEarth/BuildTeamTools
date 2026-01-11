@@ -1,5 +1,7 @@
 package net.buildtheearth.modules.generator.components.house;
 
+import com.alpsbte.alpslib.utils.GeneratorUtils;
+import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -9,8 +11,6 @@ import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.generator.model.Flag;
 import net.buildtheearth.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.modules.generator.model.Script;
-import net.buildtheearth.modules.generator.utils.GeneratorUtils;
-import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;

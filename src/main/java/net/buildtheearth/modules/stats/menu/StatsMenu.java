@@ -1,11 +1,11 @@
 package net.buildtheearth.modules.stats.menu;
 
+import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.modules.stats.StatsModule;
 import net.buildtheearth.modules.stats.model.StatsPlayer;
 import net.buildtheearth.modules.stats.model.StatsServer;
 import net.buildtheearth.utils.CustomHeads;
-import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.ListUtil;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.AbstractMenu;

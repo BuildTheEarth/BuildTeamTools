@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.navigation;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import lombok.experimental.UtilityClass;
@@ -7,7 +8,6 @@ import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.BuildTeam;
-import net.buildtheearth.utils.ChatHelper;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;

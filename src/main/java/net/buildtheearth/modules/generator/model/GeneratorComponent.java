@@ -1,15 +1,15 @@
 package net.buildtheearth.modules.generator.model;
 
+import com.alpsbte.alpslib.utils.GeneratorUtils;
+import com.alpsbte.alpslib.utils.WikiDocumented;
 import lombok.Getter;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.ModuleComponent;
-import net.buildtheearth.modules.WikiDocumented;
 import net.buildtheearth.modules.generator.components.field.FieldSettings;
 import net.buildtheearth.modules.generator.components.house.HouseSettings;
 import net.buildtheearth.modules.generator.components.rail.RailSettings;
 import net.buildtheearth.modules.generator.components.road.RoadSettings;
 import net.buildtheearth.modules.generator.components.tree.TreeSettings;
-import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;

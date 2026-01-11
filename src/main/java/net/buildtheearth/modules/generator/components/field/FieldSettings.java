@@ -2,7 +2,6 @@ package net.buildtheearth.modules.generator.components.field;
 
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.modules.generator.model.Settings;
-import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.Utils;
 import org.bukkit.entity.Player;

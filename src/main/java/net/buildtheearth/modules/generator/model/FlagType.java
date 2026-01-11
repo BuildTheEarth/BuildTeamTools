@@ -1,5 +1,7 @@
 package net.buildtheearth.modules.generator.model;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
+import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import lombok.Getter;
 import net.buildtheearth.modules.generator.components.field.CropStage;
@@ -7,8 +9,6 @@ import net.buildtheearth.modules.generator.components.field.CropType;
 import net.buildtheearth.modules.generator.components.house.RoofType;
 import net.buildtheearth.modules.generator.components.tree.TreeType;
 import net.buildtheearth.modules.generator.components.tree.TreeWidth;
-import net.buildtheearth.utils.ChatHelper;
-import net.buildtheearth.utils.Item;
 
 public enum FlagType {
 

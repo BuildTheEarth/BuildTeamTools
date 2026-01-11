@@ -1,8 +1,8 @@
 package net.buildtheearth.modules.navigation.components.warps.listeners;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
 import net.buildtheearth.modules.navigation.NavigationModule;
 import net.buildtheearth.modules.navigation.components.warps.WarpsComponent;
-import net.buildtheearth.utils.ChatHelper;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;

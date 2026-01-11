@@ -1,7 +1,7 @@
 package net.buildtheearth.modules.generator.listeners;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
 import net.buildtheearth.modules.generator.GeneratorModule;
-import net.buildtheearth.utils.ChatHelper;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;

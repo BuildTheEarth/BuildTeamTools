@@ -86,9 +86,9 @@ public enum FlagType {
             case CROP_STAGE:
                 return CropStage.getByIdentifier(value);
             case TREE_TYPE:
-                return TreeType.valueOf(value);
+                return TreeType.byString(value);
             case TREE_WIDTH:
-                return TreeWidth.valueOf(value);
+                return TreeWidth.byString(value);
         }
         return null;
     }

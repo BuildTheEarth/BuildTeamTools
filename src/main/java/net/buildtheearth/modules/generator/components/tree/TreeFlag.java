@@ -1,15 +1,20 @@
 package net.buildtheearth.modules.generator.components.tree;
 
-import net.buildtheearth.modules.generator.model.FlagType;
+import lombok.Getter;
 import net.buildtheearth.modules.generator.model.Flag;
+import net.buildtheearth.modules.generator.model.FlagType;
+import org.jspecify.annotations.Nullable;
 
 public enum TreeFlag implements Flag {
 
     TYPE("t", FlagType.TREE_TYPE),
     WIDTH("w", FlagType.TREE_WIDTH),
-    HEIGHT("h", FlagType.INTEGER);
+    HEIGHT("h", FlagType.STRING);
 
+    @Getter
     private final String flag;
+
+    @Getter
     private final FlagType flagType;
 
     TreeFlag(String flag, FlagType flagType){
@@ -17,16 +22,7 @@ public enum TreeFlag implements Flag {
         this.flagType = flagType;
     }
 
-    public String getFlag() {
-        return flag;
-    }
-
-    @Override
-    public FlagType getFlagType() {
-        return null;
-    }
-
-    public static TreeFlag byString(String flag){
+    public static @Nullable TreeFlag byString(String flag) {
         for(TreeFlag treeFlag : TreeFlag.values())
             if(treeFlag.getFlag().equalsIgnoreCase(flag))
                 return treeFlag;

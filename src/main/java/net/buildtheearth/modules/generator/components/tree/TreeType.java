@@ -1,6 +1,7 @@
 package net.buildtheearth.modules.generator.components.tree;
 
 import lombok.Getter;
+import org.jspecify.annotations.Nullable;
 
 public enum TreeType {
 
@@ -49,5 +50,13 @@ public enum TreeType {
 
     TreeType(String name) {
         this.name = name;
+    }
+
+    public static @Nullable TreeType byString(String check) {
+        for (TreeType type : TreeType.values())
+            if (type.getName().equalsIgnoreCase(check))
+                return type;
+
+        return null;
     }
 }

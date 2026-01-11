@@ -74,7 +74,6 @@ dependencies {
     implementation(libs.micycle.clipper2)
     implementation(libs.org.json.json)
     implementation(libs.com.google.code.gson.gson)
-    implementation(libs.com.google.guava.guava)
     implementation(libs.com.squareup.okhttp3.okhttp.jvm)
     implementation(libs.javaapiforkml) {
         exclude(group = "com.sun.xml.bind", module = "jaxb-xjc") // Else Remapping will yell of duplicated classes

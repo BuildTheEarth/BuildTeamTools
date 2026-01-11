@@ -43,7 +43,7 @@ public class GeneratorCollections {
      * @param p The player to check for. If null, the console will be used instead.
      * @return Whether the Generator Collections package is installed
      */
-    public static boolean checkIfGeneratorCollectionsIsInstalled(@Nullable Player p){
+    public static boolean hasUpdatedGeneratorCollections(@Nullable Player p) {
         // Load the schematic file
         try {
             String folder;
@@ -327,7 +327,7 @@ public class GeneratorCollections {
     /**
      * Sends the player and console a message with more information about the generator collections package in case it isn't installed.
      *
-     * @see #checkIfGeneratorCollectionsIsInstalled(Player)
+     * @see #hasUpdatedGeneratorCollections(Player)
      *
      * @param p The player to send the message to
      */

@@ -4,6 +4,8 @@ import com.sk89q.worldedit.WorldEdit;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.ModuleComponent;
 
+import java.util.Objects;
+
 /**
  * This class handles checking if the required dependencies for certain features are present
  */
@@ -31,40 +33,11 @@ public class DependencyComponent extends ModuleComponent {
         if(!isWorldEditEnabled())
             return false;
 
-        String version = BuildTeamTools.getInstance().getServer().getPluginManager().getPlugin("WorldEdit").getDescription().getVersion();
+        String version = Objects.requireNonNull(BuildTeamTools.getInstance().getServer().getPluginManager()
+                .getPlugin("WorldEdit"), "World Edit was not found!").getPluginMeta().getVersion();
         int major = Integer.parseInt(version.split("\\.")[0]);
 
         return major < 7;
-    }
-
-    /**
-     * Checks if the server is running on a Paper-based server.
-     *
-     * @return True if the server is running on a Paper-based server, false if it is not
-     */
-    public boolean isPaper(){
-        try {
-            // Try to load a Paper-specific class
-            Class.forName("com.destroystokyo.paper.PaperConfig");
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-    }
-
-    /**
-     * Checks if the server is running on a Spigot-based server.
-     *
-     * @return True if the server is running on a Spigot-based server, false if it is not
-     */
-    public boolean isSpigot(){
-        try {
-            // Try to load a Spigot-specific class
-            Class.forName("org.spigotmc.SpigotConfig");
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
     }
 
     /**
@@ -82,7 +55,7 @@ public class DependencyComponent extends ModuleComponent {
      * @return True if SchematicBrush is enabled, false if it is not enabled
      */
     public boolean isSchematicBrushEnabled() {
-        return BuildTeamTools.getInstance().getServer().getPluginManager().isPluginEnabled("SchematicBrush");
+        return BuildTeamTools.getInstance().getServer().getPluginManager().isPluginEnabled("SchematicBrushReborn");
     }
 
     /**

@@ -90,7 +90,7 @@ public class GeneratorMenu extends AbstractMenu {
 
             // Set navigator item
             getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
-        } else if (GeneratorCollections.checkIfGeneratorCollectionsIsInstalled(getMenuPlayer())) {
+        } else if (!GeneratorCollections.hasUpdatedGeneratorCollections(getMenuPlayer())) {
             // TREE ITEM
             ArrayList<String> treeLore = ListUtil.createList("", "§cThe §eTree Pack " + Tree.TREE_PACK_VERSION + " §cis not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
 

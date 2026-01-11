@@ -1,6 +1,7 @@
 package net.buildtheearth.modules.generator.components.tree;
 
 import lombok.Getter;
+import org.jspecify.annotations.Nullable;
 
 public enum TreeWidth {
 
@@ -16,5 +17,13 @@ public enum TreeWidth {
 
     TreeWidth(String name) {
         this.name = name;
+    }
+
+    public static @Nullable TreeWidth byString(String width) {
+        for (TreeWidth treeWidth : TreeWidth.values())
+            if (treeWidth.getName().equalsIgnoreCase(width))
+                return treeWidth;
+
+        return null;
     }
 }

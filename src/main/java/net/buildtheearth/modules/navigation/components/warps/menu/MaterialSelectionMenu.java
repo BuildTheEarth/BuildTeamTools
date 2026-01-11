@@ -1,11 +1,15 @@
 package net.buildtheearth.modules.navigation.components.warps.menu;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
+import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.BuildTeamTools;
-import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
-import net.buildtheearth.utils.*;
-import net.buildtheearth.utils.menus.AbstractMenu;
 import net.buildtheearth.modules.navigation.components.warps.model.Warp;
+import net.buildtheearth.modules.navigation.components.warps.model.WarpGroup;
+import net.buildtheearth.utils.CustomHeads;
+import net.buildtheearth.utils.ListUtil;
+import net.buildtheearth.utils.MenuItems;
+import net.buildtheearth.utils.menus.AbstractMenu;
 import net.buildtheearth.utils.menus.BookMenu;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Sound;
@@ -43,7 +47,7 @@ public class MaterialSelectionMenu extends AbstractMenu {
 
     @Override
     protected void setMenuItemsAsync() {
-        getMenu().getSlot(MATERIAL_SLOT).setItem(Item.create(XMaterial.STONE.parseMaterial(), "§6§lItem", ListUtil.createList("", "Change the material of the warp", "to a minecraft item.", "", "§eExample:", "Stone")));
+        getMenu().getSlot(MATERIAL_SLOT).setItem(Item.create(XMaterial.STONE.get(), "§6§lItem", ListUtil.createList("", "Change the material of the warp", "to a minecraft item.", "", "§eExample:", "Stone")));
         getMenu().getSlot(CUSTOM_HEAD_SLOT).setItem(CustomHeads.getLetterHead("?", CustomHeads.LetterType.WOODEN, "§6§lCustom Head", ListUtil.createList("", "Change the material of the warp", "to a custom head texture URL.", "", "§eExample:", "https://textures.minecraft.net/texture/...")));
 
         if(object instanceof Warp)

@@ -1,10 +1,10 @@
 package net.buildtheearth.modules.navigation.components.navigator.commands;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
 import net.buildtheearth.modules.navigation.NavUtils;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.modules.network.model.BuildTeam;
 import net.buildtheearth.modules.network.model.Permissions;
-import net.buildtheearth.utils.ChatHelper;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

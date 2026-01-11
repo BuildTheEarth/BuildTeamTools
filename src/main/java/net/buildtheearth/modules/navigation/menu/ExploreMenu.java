@@ -1,10 +1,10 @@
 package net.buildtheearth.modules.navigation.menu;
 
 
+import com.alpsbte.alpslib.utils.ChatHelper;
+import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.modules.network.model.Continent;
-import net.buildtheearth.utils.ChatHelper;
-import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.AbstractMenu;
 import org.bukkit.entity.Player;

@@ -1,10 +1,10 @@
 package net.buildtheearth.modules.generator.components.field.menu;
 
+import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.modules.generator.GeneratorModule;
 import net.buildtheearth.modules.generator.components.field.*;
 import net.buildtheearth.modules.generator.model.Settings;
-import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.ListUtil;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.WikiLinks;

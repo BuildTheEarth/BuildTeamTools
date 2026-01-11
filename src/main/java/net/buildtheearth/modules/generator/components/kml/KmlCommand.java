@@ -1,44 +1,32 @@
 package net.buildtheearth.modules.generator.components.kml;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
 import com.cryptomorin.xseries.XMaterial;
+import de.micromata.opengis.kml.v_2_2_0.Coordinate;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.utils.BlockLocation;
-import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.GeometricUtils;
 import net.buildtheearth.utils.LineRasterization;
 import net.buildtheearth.utils.PolygonTools;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.CommandBlock;
+import org.bukkit.command.BlockCommandSender;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.Stack;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
-import java.util.HashSet;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.BlockCommandSender;
-
-import org.bukkit.entity.Player;
-
-import de.micromata.opengis.kml.v_2_2_0.Coordinate;
-
-import org.bukkit.World;
-
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.CommandBlock;
-
-import org.bukkit.metadata.FixedMetadataValue;
 
 
     /** Class to handle kml command and its aliases

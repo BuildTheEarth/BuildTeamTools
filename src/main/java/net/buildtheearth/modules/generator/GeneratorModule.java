@@ -1,7 +1,9 @@
 package net.buildtheearth.modules.generator;
 
+import com.alpsbte.alpslib.utils.GeneratorUtils;
 import com.sk89q.worldedit.LocalSession;
 import lombok.Getter;
+import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.commands.GeneratorCommand;
@@ -54,6 +56,8 @@ public class GeneratorModule extends Module {
 
     @Override
     public void enable() {
+        GeneratorUtils.plugin = BuildTeamTools.getInstance();
+
         // Check if WorldEdit is enabled
         if (!CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled()
          && !CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled()) {

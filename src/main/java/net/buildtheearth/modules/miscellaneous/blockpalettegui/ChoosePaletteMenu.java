@@ -1,7 +1,7 @@
 package net.buildtheearth.modules.miscellaneous.blockpalettegui;
 
+import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
-import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.menus.AbstractMenu;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

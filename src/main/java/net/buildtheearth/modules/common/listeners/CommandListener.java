@@ -1,8 +1,8 @@
 package net.buildtheearth.modules.common.listeners;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
 import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.ModuleHandler;
-import net.buildtheearth.utils.ChatHelper;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

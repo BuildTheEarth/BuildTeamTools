@@ -1,8 +1,8 @@
 package net.buildtheearth.modules.generator.components.tree;
 
+import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.modules.generator.model.Settings;
-import net.buildtheearth.utils.Item;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NonNull;

@@ -1,17 +1,16 @@
 package net.buildtheearth.modules.generator.model;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
+import com.alpsbte.alpslib.utils.GeneratorUtils;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
 import lombok.Getter;
 import net.buildtheearth.BuildTeamTools;
-import net.buildtheearth.modules.generator.utils.GeneratorUtils;
-import net.buildtheearth.utils.ChatHelper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 

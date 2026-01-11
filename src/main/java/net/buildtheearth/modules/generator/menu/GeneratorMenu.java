@@ -1,5 +1,6 @@
 package net.buildtheearth.modules.generator.menu;
 
+import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.modules.common.CommonModule;
 import net.buildtheearth.modules.generator.GeneratorModule;
@@ -15,7 +16,6 @@ import net.buildtheearth.modules.generator.components.tree.TreeSettings;
 import net.buildtheearth.modules.generator.components.tree.menu.TreeTypeMenu;
 import net.buildtheearth.modules.generator.model.GeneratorCollections;
 import net.buildtheearth.modules.generator.model.GeneratorType;
-import net.buildtheearth.utils.Item;
 import net.buildtheearth.utils.ListUtil;
 import net.buildtheearth.utils.MenuItems;
 import net.buildtheearth.utils.menus.AbstractMenu;

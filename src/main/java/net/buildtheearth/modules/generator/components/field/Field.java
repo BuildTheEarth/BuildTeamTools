@@ -1,8 +1,8 @@
 package net.buildtheearth.modules.generator.components.field;
 
+import com.alpsbte.alpslib.utils.GeneratorUtils;
 import net.buildtheearth.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.modules.generator.model.GeneratorType;
-import net.buildtheearth.modules.generator.utils.GeneratorUtils;
 import org.bukkit.entity.Player;
 
 public class Field extends GeneratorComponent {

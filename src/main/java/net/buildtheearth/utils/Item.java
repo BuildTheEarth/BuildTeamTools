@@ -3,12 +3,9 @@ package net.buildtheearth.utils;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.profiles.builder.XSkull;
 import com.cryptomorin.xseries.profiles.objects.Profileable;
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import net.buildtheearth.modules.common.CommonModule;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -21,15 +18,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class Item {
     public static final Map<String, ItemStack> nonPlayerSkulls = new HashMap<>();
@@ -483,95 +472,5 @@ public class Item {
 		nonPlayerSkulls.put(base64 + name + lore, head);
 
 		return head;
-	}
-
-	private static void mutateItemMeta(SkullMeta meta, String b64) {
-		GameProfile profile = makeProfile(b64);
-
-        // Try Paper API (Minecraft Version 1.21+)
-		try {
-			Method setPlayerProfile = SkullMeta.class.getMethod("setPlayerProfile", com.destroystokyo.paper.profile.PlayerProfile.class);
-            com.destroystokyo.paper.profile.PlayerProfile paperProfile = Bukkit.createProfile(profile.id(), profile.name());
-            paperProfile.setProperty(new com.destroystokyo.paper.profile.ProfileProperty("textures", b64));
-			setPlayerProfile.invoke(meta, paperProfile);
-			return;
-		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {}
-
-        // Try Paper API (Minecraft Version 1.20+)
-        try {
-            Method setPlayerProfile = SkullMeta.class.getMethod(
-                    "setPlayerProfile",
-                    com.destroystokyo.paper.profile.PlayerProfile.class
-            );
-
-            // Reflective access to profile.getId() and profile.getName()
-            Method getIdMethod = profile.getClass().getMethod("getId");
-            Method getNameMethod = profile.getClass().getMethod("getName");
-
-            UUID id = (UUID) getIdMethod.invoke(profile);
-            String name = (String) getNameMethod.invoke(profile);
-
-            com.destroystokyo.paper.profile.PlayerProfile paperProfile =
-                    Bukkit.createProfile(id, name);
-
-            paperProfile.getProperties().add(
-                    new com.destroystokyo.paper.profile.ProfileProperty("textures", b64)
-            );
-
-            setPlayerProfile.invoke(meta, paperProfile);
-            return;
-
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {
-        }
-
-
-		// Try setProfile(GameProfile) (Minecraft Version 1.15 – 1.19.4)
-		try {
-			Method metaSetProfileMethod = meta.getClass().getDeclaredMethod("setProfile", GameProfile.class);
-			metaSetProfileMethod.setAccessible(true);
-			metaSetProfileMethod.invoke(meta, profile);
-			return;
-		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {}
-
-		// Try direct profile field (Minecraft Version 1.12 – 1.14)
-		try {
-			Field metaProfileField = meta.getClass().getDeclaredField("profile");
-			metaProfileField.setAccessible(true);
-			metaProfileField.set(meta, profile);
-		} catch (NoSuchFieldException | IllegalAccessException ignored) {
-			System.err.println("Failed to set custom skull texture: unsupported server version or method change.");
-		}
-	}
-
-
-    private static @NotNull GameProfile makeProfile(@NotNull String b64) {
-		UUID id = new UUID(
-				b64.substring(b64.length() - 20).hashCode(),
-				b64.substring(b64.length() - 10).hashCode()
-		);
-		GameProfile profile = new GameProfile(id, "bte");
-
-        // Try Paper API (Minecraft Version 1.21+)
-        boolean firstVersionWorked = false;
-        try {
-            profile.properties().put("textures", new Property("textures", b64));
-            firstVersionWorked = true;
-        } catch (Exception ignored) {
-        }
-
-        // Try api for older versions
-        if (!firstVersionWorked) {
-            try {
-                Method getPropertiesMethod = profile.getClass().getMethod("getProperties");
-                Object properties = getPropertiesMethod.invoke(profile);
-
-                ((com.mojang.authlib.properties.PropertyMap) properties)
-                        .put("textures", new Property("textures", b64));
-            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-		return profile;
 	}
 }

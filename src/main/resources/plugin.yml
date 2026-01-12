@@ -1,5 +1,5 @@
 name: BuildTeamTools
-main: net.buildtheearth.BuildTeamTools
+main: net.buildtheearth.buildteamtools.BuildTeamTools
 api-version: 1.13
 version: ${version}
 description: ${description}

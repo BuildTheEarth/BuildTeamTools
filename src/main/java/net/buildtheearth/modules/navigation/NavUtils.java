@@ -113,8 +113,8 @@ public class NavUtils {
         }
     }
 
-    public static @NotNull WarpGroup createOtherWarpGroup() {
+    public static @NotNull WarpGroup createOtherWarpGroup(BuildTeam team) {
         // Create an "other" Warp Group for warps that don't belong to a warp group
-        return new WarpGroup(NetworkModule.getInstance().getBuildTeam(), "Other", "Other warps", -1, null);
+        return new WarpGroup(team, "Other", "Other warps", -1, null);
     }
 }

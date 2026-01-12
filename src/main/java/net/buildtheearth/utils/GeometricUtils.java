@@ -56,10 +56,10 @@ public class GeometricUtils {
      * @return A bukkit location matching the coordinates. Height is terrain elevation +2.
      */
     public static Location getLocationFromCoordinates(double[] coordinates) {
-        double[] xz = CoordinateConversion.convertToGeo(coordinates[0], coordinates[1]);
+        double[] xz = CoordinateConversion.convertFromGeo(coordinates[0], coordinates[1]);
 
         double x = xz[0];
-        double z = -xz[1];
+        double z = xz[1];
 
         //Creates the location
         Location location;

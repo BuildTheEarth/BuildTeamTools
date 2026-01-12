@@ -142,7 +142,7 @@ public class WarpsComponent extends ModuleComponent {
     public void createWarp(Player creator) {
         WarpGroup group = getOtherWarpGroup();
         if (group == null) {
-            group = NavUtils.createOtherWarpGroup();
+            group = NavUtils.createOtherWarpGroup(NetworkModule.getInstance().getBuildTeam());
         }
         createWarp(creator, group);
     }

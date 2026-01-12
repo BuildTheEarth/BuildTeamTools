@@ -29,6 +29,7 @@ public class NetworkAPI {
 
     /**
      * Notifies the network API about the presence of the plugin
+     *
      * @param installed if the plugin is installed
      */
     public static void setBuildTeamToolsInstalled(boolean installed) {
@@ -105,7 +106,7 @@ public class NetworkAPI {
                                 isConnected, hasBuildTeamToolsInstalled, allowsTransfers, tag);
                         NetworkModule.getInstance().getBuildTeams().add(buildTeam);
 
-                        WarpGroup otherWarpGroup = NavUtils.createOtherWarpGroup();
+                        WarpGroup otherWarpGroup = NavUtils.createOtherWarpGroup(buildTeam);
 
                         // Add all the warp groups of the team to their respective build teams
                         for (Object warpGroupJSON : warpGroups.toArray()) {
@@ -121,8 +122,6 @@ public class NetworkAPI {
 
                             buildTeam.getWarpGroups().add(warpGroup);
                         }
-
-                        if (!otherWarpGroup.getWarps().isEmpty()) buildTeam.getWarpGroups().add(otherWarpGroup);
 
                         // Add all the warps of the team to their respective warp groups
                         for (Object warpJSON : warps.toArray()) {
@@ -162,22 +161,20 @@ public class NetworkAPI {
                             Warp warp = new Warp(warpID, warpGroup, warpName, countryCode, "cca3", address, addressType, material, warpWorldName, warpLat, warpLon, warpHeight, warpYaw, warpPitch, isHighlight);
 
                             // If the warp belongs to a warp group, add it to that, otherwise add it to the "other" warp group.
-                            if (warpGroupID == null) {
+                            boolean added = false;
+
+                            for (WarpGroup wg : buildTeam.getWarpGroups())
+                                if (wg.getId().equals(warpGroup.getId())) {
+                                    wg.getWarps().add(warp);
+                                    added = true;
+                                    break;
+                                }
+
+                            if (!added)
                                 otherWarpGroup.getWarps().add(warp);
-                            } else {
-                                boolean added = false;
-
-                                for (WarpGroup wg : buildTeam.getWarpGroups())
-                                    if (wg.getId().equals(warpGroupID)) {
-                                        wg.getWarps().add(warp);
-                                        added = true;
-                                        break;
-                                    }
-
-                                if (!added)
-                                    otherWarpGroup.getWarps().add(warp);
-                            }
                         }
+
+                        if (!otherWarpGroup.getWarps().isEmpty()) buildTeam.getWarpGroups().add(otherWarpGroup);
 
                         // Add all the regions of the team to their respective continents
                         for (Object regionJSON : regions.toArray()) {
@@ -205,7 +202,7 @@ public class NetworkAPI {
                             NetworkModule.getInstance().getRegions().add(region);
                         }
                     }
-                }catch (Exception e) {
+                } catch (Exception e) {
                     future.completeExceptionally(e);
                     return;
                 }
@@ -214,25 +211,24 @@ public class NetworkAPI {
             }
 
 
-
             private String getMainServerName(JSONObject teamObject) {
                 String mainServerIP = (String) teamObject.get("MainServerIP");
 
                 Object serversObject = teamObject.get("Servers");
                 if (!(serversObject instanceof JSONArray serversArray)) return null;
 
-                for(Object object : serversArray.toArray()) {
+                for (Object object : serversArray.toArray()) {
                     if (!(object instanceof JSONObject serverObject)) return null;
 
                     String serverIP = (String) serverObject.get("IP");
-                    if(serverIP.equals(mainServerIP)) return (String) serverObject.get("Name");
+                    if (serverIP.equals(mainServerIP)) return (String) serverObject.get("Name");
                 }
                 return null;
             }
 
             private int getArea(JSONObject regionObject) {
-                if(regionObject == null) return 0;
-                if(regionObject.get("area") == null) return 0;
+                if (regionObject == null) return 0;
+                if (regionObject.get("area") == null) return 0;
 
                 if (regionObject.get("area") instanceof Long area)
                     return Math.toIntExact(area);
@@ -289,28 +285,28 @@ public class NetworkAPI {
         String apiKey = BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY);
 
         RequestBody requestBody = RequestBody.create(warp.toJSON().toString(), MediaType.parse("application/json"));
-        API.postAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warps", requestBody, callback);
+        API.postAsync("https://nwapi.buildtheearth.net/api/teams/" + apiKey + "/warps", requestBody, callback);
     }
 
     public static void createWarpGroup(WarpGroup warpGroup, API.ApiResponseCallback callback) {
         String apiKey = BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY);
 
         RequestBody requestBody = RequestBody.create(warpGroup.toJSON().toString(), MediaType.parse("application/json"));
-        API.postAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warpgroups", requestBody, callback);
+        API.postAsync("https://nwapi.buildtheearth.net/api/teams/" + apiKey + "/warpgroups", requestBody, callback);
     }
 
     public static void updateWarp(Warp warp, API.ApiResponseCallback callback) {
         String apiKey = BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY);
 
         RequestBody requestBody = RequestBody.create(warp.toJSON().toString(), MediaType.parse("application/json"));
-        API.putAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warps", requestBody, callback);
+        API.putAsync("https://nwapi.buildtheearth.net/api/teams/" + apiKey + "/warps", requestBody, callback);
     }
 
     public static void updateWarpGroup(WarpGroup warpGroup, API.ApiResponseCallback callback) {
         String apiKey = BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY);
 
         RequestBody requestBody = RequestBody.create(warpGroup.toJSON().toString(), MediaType.parse("application/json"));
-        API.putAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warpgroups", requestBody, callback);
+        API.putAsync("https://nwapi.buildtheearth.net/api/teams/" + apiKey + "/warpgroups", requestBody, callback);
     }
 
     public static void deleteWarp(Warp warp, API.ApiResponseCallback callback) {
@@ -322,7 +318,7 @@ public class NetworkAPI {
 
         RequestBody requestBody = RequestBody.create(requestBodyString, MediaType.parse("application/json"));
 
-        API.deleteAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warps", requestBody, callback);
+        API.deleteAsync("https://nwapi.buildtheearth.net/api/teams/" + apiKey + "/warps", requestBody, callback);
     }
 
     public static void deleteWarpGroup(WarpGroup warpGroup, API.ApiResponseCallback callback) {
@@ -333,11 +329,11 @@ public class NetworkAPI {
         String requestBodyString = requestBodyJson.toString();
         RequestBody requestBody = RequestBody.create(requestBodyString, MediaType.parse("application/json"));
 
-        API.deleteAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/warpgroups", requestBody, callback);
+        API.deleteAsync("https://nwapi.buildtheearth.net/api/teams/" + apiKey + "/warpgroups", requestBody, callback);
     }
 
     public static void syncPlayerList() {
-        if(NetworkModule.getInstance().getBuildTeam().isConnected())
+        if (NetworkModule.getInstance().getBuildTeam().isConnected())
             return;
 
         String apiKey = BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY);
@@ -348,7 +344,7 @@ public class NetworkAPI {
 
         RequestBody requestBody = RequestBody.create(requestBodyArray.toString(), MediaType.parse("application/json"));
 
-        API.postAsync("https://nwapi.buildtheearth.net/api/teams/"+apiKey+"/playerlist", requestBody, new API.ApiResponseCallback() {
+        API.postAsync("https://nwapi.buildtheearth.net/api/teams/" + apiKey + "/playerlist", requestBody, new API.ApiResponseCallback() {
             @Override
             public void onResponse(String response) {
                 ChatHelper.logDebug("Synced the player list with the network API: %s", response);

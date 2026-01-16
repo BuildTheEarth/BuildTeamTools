@@ -7,6 +7,7 @@ import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.navigation.NavUtils;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.WarpsComponent;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
+import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
 import net.buildtheearth.buildteamtools.utils.io.ConfigUtil;
@@ -109,10 +110,11 @@ public class MainMenu extends AbstractMenu {
             // Set Explore Item Click Event
             getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
-                if (clickInformation.getClickType().isRightClick()) {
-                    new ExploreMenu(clickPlayer, true);
-                } else {
+                if (!clickInformation.getClickType().isRightClick() && !NetworkModule.getInstance().getBuildTeam().getWarpGroups().isEmpty()
+                        && clickPlayer.hasPermission(Permissions.WARP_USE)) {
                     WarpsComponent.openWarpMenu(clickPlayer, NetworkModule.getInstance().getBuildTeam(), this);
+                } else {
+                    new ExploreMenu(clickPlayer, true);
                 }
             });
         }

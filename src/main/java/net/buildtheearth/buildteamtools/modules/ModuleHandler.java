@@ -60,7 +60,8 @@ public class ModuleHandler {
             if (m.getModuleName().equals(module.getModuleName()) && m.isEnabled())
                 return false;
 
-        if (!module.getModuleName().equals("Common") && BuildTeamTools.getInstance().getConfig().getList(ConfigPaths.DISABLED_MODULES, List.of()).contains(module.getModuleName())) {
+        if (!module.getModuleName().equals("Common") && BuildTeamTools.getInstance().getConfig()
+                .getStringList(ConfigPaths.DISABLED_MODULES).stream().anyMatch(module.getModuleName()::equalsIgnoreCase)) {
             module.shutdown("This module is disabled in the config.");
         } else {
             boolean containsDisabledDependencyModule = false;

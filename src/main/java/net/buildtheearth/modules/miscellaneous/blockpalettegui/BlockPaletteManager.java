@@ -44,7 +44,7 @@ public class BlockPaletteManager {
 
     public BlockPaletteManager(JavaPlugin plugin) {
         this.plugin = plugin;
-        this.paletteFile = new File(plugin.getDataFolder(), "palettes.yml");
+        this.paletteFile = new File(plugin.getDataFolder(), "modules/blockpalettegui/palettes.yml");
         this.paletteConfig = YamlConfiguration.loadConfiguration(paletteFile);
         loadPalettes();
     }
@@ -253,9 +253,11 @@ public class BlockPaletteManager {
     private void loadPalettes() {
         if (!paletteFile.exists()) {
             try {
-                paletteFile.getParentFile().mkdirs();
+                File parent = paletteFile.getParentFile();
+                if (parent != null) parent.mkdirs();
+
                 paletteFile.createNewFile();
-                plugin.getLogger().info("Created new palettes.yml file");
+                plugin.getLogger().info("Created new palettes.yml file at: " + paletteFile.getPath());
             } catch (IOException e) {
                 plugin.getLogger().severe("Failed to create palettes.yml: " + e.getMessage());
                 return;

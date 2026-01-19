@@ -3,3 +3,63 @@
  */
 
 rootProject.name = "BuildTeamTools"
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        mavenCentral()
+        //mavenLocal() // NEVER use in Production/Commits!
+        maven {
+            url = uri("https://repo.papermc.io/repository/maven-public/")
+        }
+
+        maven {
+            url = uri("https://maven.buildtheearth.net/releases")
+        }
+
+        maven {
+            url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+        }
+
+        maven {
+            url = uri("https://mvn.alps-bte.com/repository/alps-bte/")
+        }
+
+        maven {
+            url = uri("https://repo.onarandombox.com/content/groups/public/")
+        }
+
+        maven {
+            url = uri("https://repo.codemc.io/repository/maven-snapshots/")
+        }
+
+        maven {
+            url = uri("https://repo.codemc.io/repository/maven-public/")
+        }
+
+        maven {
+            url = uri("https://jitpack.io")
+        }
+
+        maven {
+            url = uri("https://repo.dmulloy2.net/repository/public/")
+        }
+
+        maven {
+            url = uri("https://maven.daporkchop.net/")
+        }
+
+        maven {
+            url = uri("https://download.java.net/maven/2")
+        }
+
+        maven {
+            url = uri("https://maven.enginehub.org/repo/")
+        }
+
+        maven {
+            url = uri("https://mvn.wesjd.net/")
+        }
+        maven { url = uri("https://jitpack.io") }
+    }
+}

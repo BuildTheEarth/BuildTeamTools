@@ -10,11 +10,12 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class GeneratorCommand implements CommandExecutor {
 
 
-    public boolean onCommand(CommandSender sender, Command cmd, String cmdLabel, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String cmdLabel, String @NotNull [] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage("§cOnly players can execute this command.");
             return true;
@@ -35,65 +36,53 @@ public class GeneratorCommand implements CommandExecutor {
 
 
         // Command Usage: /gen house ...
-        if (args[0].equals("house")) {
-            GeneratorModule.getInstance().getHouse().analyzeCommand(p, args);
-            return true;
-        }
-
-        // Command Usage: /gen road ...
-        if (args[0].equals("road")) {
-            GeneratorModule.getInstance().getRoad().analyzeCommand(p, args);
-            return true;
-        }
-
-        // Command Usage: /gen rail ...
-        if (args[0].equals("rail")) {
-            GeneratorModule.getInstance().getRail().analyzeCommand(p, args);
-            return true;
-        }
-
-        // Command Usage: /gen tree ...
-        if (args[0].equals("tree")) {
-            GeneratorModule.getInstance().getTree().analyzeCommand(p, args);
-            return true;
-        }
-
-        // Command Usage: /gen field ...
-        if (args[0].equals("field")) {
-            GeneratorModule.getInstance().getField().analyzeCommand(p, args);
-            return true;
-        }
-
-
-        // Command Usage: /gen history
-        if (args[0].equals("history")) {
-            if (GeneratorModule.getInstance().getPlayerHistory(p).getHistoryEntries().isEmpty()) {
-                p.sendMessage("§cYou didn't generate any structures yet. Use /gen to create one.");
+        switch (args[0]) {
+            case "house":
+                GeneratorModule.getInstance().getHouse().analyzeCommand(p, args);
                 return true;
-            }
 
-            ChatHelper.sendMessageBox(sender, "Generator History for " + p.getName(), () -> {
-                for (History.HistoryEntry history : GeneratorModule.getInstance().getPlayerHistory(p).getHistoryEntries()) {
-                    long timeDifference = System.currentTimeMillis() - history.getTimeCreated();
+            // Command Usage: /gen road ...
+            case "road":
+                GeneratorModule.getInstance().getRoad().analyzeCommand(p, args);
+                return true;
 
-                    p.sendMessage("§e- " + history.getGeneratorType().name() + " §7-§e " + Utils.toDate(p, timeDifference) + " ago §7-§e " + history.getWorldEditCommandCount() + " Commands executed");
+            // Command Usage: /gen rail ...
+            case "rail":
+                GeneratorModule.getInstance().getRail().analyzeCommand(p, args);
+                return true;
+
+            // Command Usage: /gen tree ...
+            case "tree":
+                GeneratorModule.getInstance().getTree().analyzeCommand(p, args);
+                return true;
+
+            // Command Usage: /gen field ...
+            case "field":
+                GeneratorModule.getInstance().getField().analyzeCommand(p, args);
+                return true;
+
+            // Command Usage: /gen history
+            case "history":
+                if (GeneratorModule.getInstance().getPlayerHistory(p).getHistoryEntries().isEmpty()) {
+                    p.sendMessage("§cYou didn't generate any structures yet. Use /gen to create one.");
+                    return true;
                 }
-            });
-            return true;
-        }
 
-        if(args[0].equals("undo")) {
-            GeneratorModule.getInstance().getPlayerHistory(p).undoCommand(p);
-            return true;
-        }
+                ChatHelper.sendMessageBox(sender, "Generator History for " + p.getName(), () -> {
+                    for (History.HistoryEntry history : GeneratorModule.getInstance().getPlayerHistory(p).getHistoryEntries()) {
+                        long timeDifference = System.currentTimeMillis() - history.getTimeCreated();
+                        p.sendMessage("§e- " + history.getGeneratorType().name() + " §7-§e " + Utils.toDate(timeDifference) + " ago §7-§e " + history.getWorldEditCommandCount() + " Commands executed");
+                    }
+                });
+                return true;
 
-        if(args[0].equals("redo")) {
-            GeneratorModule.getInstance().getPlayerHistory(p).redoCommand(p);
-            return true;
-        }
+            case "undo":
+                GeneratorModule.getInstance().getPlayerHistory(p).undoCommand(p);
+                return true;
 
-        if(args[0].equals("cancel")){
-
+            case "redo":
+                GeneratorModule.getInstance().getPlayerHistory(p).redoCommand(p);
+                return true;
         }
 
         sendHelp(p);

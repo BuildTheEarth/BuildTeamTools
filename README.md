@@ -14,7 +14,7 @@
 <p align="center">
   <b>An easy to use toolset for Build Teams in the BuildTheEarth project.</b>
   <br/>
-  <a href="https://github.com/BuildTheEarth/BuildTeamTools/wiki/"><strong>WIKI »</strong></a>
+  <a href="https://resources.buildtheearth.net/s/btt"><strong>WIKI »</strong></a>
   <br/><br/>
 </p>
 
@@ -69,15 +69,15 @@ The **\*** symbol shows that this feature is still being developed or under main
 🚩 **How to install:**
 1. Download BuildTeamTools [here](https://www.spigotmc.org/resources/buildteamtools.101854/).
 2. Place the downloaded plugin in your server's **../plugins** folder.
-3. *(Optional)* Some of the modules require intial configuration or dependencies to run:
+3. *(Optional)* Some of the modules require initial configuration or dependencies to run:
 >  - To activate the **Navigation Module**, please configure an **API Key** in the config.yml file.
 >  - To activate the **Network Module**, please configure an **API Key** in the config.yml file.
->  - To activate the **Generator Module**, please install the [WorldEdit](https://dev.bukkit.org/projects/worldedit) or [AsyncWorldEdit](https://www.spigotmc.org/resources/asyncworldedit.327/) plugin.
+>  - To activate the **Generator Module**, please install the [FastAsyncWorldEdit](https://modrinth.com/plugin/fastasyncworldedit/versions/) plugin.
 >  - To activate the **Tree Generator Component**, install the [SchematicBrush 0.5.2](https://dev.bukkit.org/projects/schematicbrush) plugin.
 4. Restart your server.
 5. Done!
 
-**For more help, please see the [wiki](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Installation).**
+**For more help, please see the [wiki](https://resources.buildtheearth.net/s/btt).**
 
 ## Contributors
 Thank you to the following developers for contributing towards the plugin:
@@ -88,19 +88,21 @@ Thank you to the following developers for contributing towards the plugin:
 - **v4siv**
 - **Adam**
 - **Noah Husby**
+- **Zoriot**
 
 
 ## Index
-Click the links below for more information, or see the [wiki](https://github.com/BuildTheEarth/BuildTeamTools/wiki).
+Click the links below for more information, or see the [wiki](https://resources.buildtheearth.net/s/btt).
 
-- [Generators](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Generators)
-  - [Houses](https://github.com/BuildTheEarth/BuildTeamTools/wiki/House-Command)
-  - [Roads](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Road-Command)
-  - [Railways](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Rail-Command)
-  - [Trees](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Tree-Command)
-  - [Fields](https://github.com/BuildTheEarth/BuildTeamTools/wiki/Field-Command)
-- [Sledgehammer](https://github.com/noahhusby/Sledgehammer) (PLANNED)
-- Statistics (PLANNED)
-- Plot System (PLANNED)
-- Tutorials (PLANNED)
-- Security (PLANNED)
+- [Generators](https://resources.buildtheearth.net/s/btt/doc/generator-module-13zqgI4yFA)
+  - [Houses](https://resources.buildtheearth.net/s/btt/doc/house-generator-YKQunon6Bp)
+  - [Roads](https://resources.buildtheearth.net/s/btt/doc/road-generator-QqKBBP0nqO)
+  - [Railways](https://resources.buildtheearth.net/s/btt/doc/rail-generator-EfgKXdBvk1)
+  - [Trees](https://resources.buildtheearth.net/s/btt/doc/tree-generator-pnDmYC9hzW)
+  - [Fields](https://resources.buildtheearth.net/s/btt/doc/field-generator-OqIN2BrZT7)
+- [Sledgehammer](https://resources.buildtheearth.net/s/btt/doc/sledgehammer-module-T7I0PWPsTD)
+- [Statistics](https://resources.buildtheearth.net/s/btt/doc/statistics-module-iM7IfoKroF) (PLANNED)
+- [Plot System](https://resources.buildtheearth.net/s/btt/doc/plot-system-module-kkcH00jpcQ) (PLANNED)
+- [Tutorials](https://resources.buildtheearth.net/s/btt/doc/tutorials-module-lkc3LaOrql) (PLANNED)
+- Miscellaneous (PLANNED)
+- [Security](https://resources.buildtheearth.net/s/btt/doc/security-module-iOmxV0djrW) (PLANNED)

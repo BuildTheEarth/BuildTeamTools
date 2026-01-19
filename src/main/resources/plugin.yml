@@ -2,13 +2,14 @@ name: BuildTeamTools
 main: net.buildtheearth.BuildTeamTools
 api-version: 1.13
 version: 0.1.3-alpha
-author: MineFact, frikandelworst, George112n, ELgamer, SirJodelstein
-softdepend: [WorldEdit, HeadDatabase]
+author: MineFact, frikandelworst, George112n, ELgamer, SirJodelstein, Zoriot
+softdepend: [WorldEdit, HeadDatabase, PlotSystem-Terra]
+
 commands:
-  buildteam:
-    description: Main command of the Build Team plugin.
-    usage: /buildteam
-    aliases: [btt, buildteamtools]
+  buildteamtools:
+    description: Main command of the Build Team Tools plugin.
+    usage: /buildteamtools
+    aliases: [btt]
   generate:
     description: Allows usage of the Generator Tool.
     usage: /generate
@@ -21,9 +22,10 @@ commands:
     description: Command for managing warps.
     usage: /warp <subcommand>
     aliases: [warps]
-  temporary:
-    description: Temporary test command.
-    usage: /temporary
+  warpsbt:
+    description: Opens the warp menu for the specified BuildTeam
+    usage: /warpsbt <team>
+    aliases: [ wbt ]
   kml:
     description: kml pasting and parsing
     usage: /kml
@@ -44,6 +46,10 @@ commands:
     usage: /blockpalette [filter|menu|filter <filter1> <filter2> ...]
     aliases: [bp, blocks]
     permission: blockpalette.use
+  buildteam:
+    description: Sends the player to the specified BuildTeam
+    usage: /buildteam <team>
+    aliases: [bt]
 permissions:
   blockpalette.use:
     description: Allows players to use /blockpalette

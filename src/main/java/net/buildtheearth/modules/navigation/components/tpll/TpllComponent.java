@@ -5,11 +5,15 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.BuildTeamTools;
 import net.buildtheearth.modules.ModuleComponent;
+import net.buildtheearth.modules.navigation.NavUtils;
 import net.buildtheearth.modules.network.NetworkModule;
 import net.buildtheearth.utils.ChatHelper;
 import net.buildtheearth.utils.GeometricUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -19,6 +23,8 @@ public class TpllComponent extends ModuleComponent {
     public TpllComponent() {
         super("Tpll");
     }
+
+    public static final NamespacedKey TPLL_COOKIE_KEY = NamespacedKey.minecraft("btt_buildteam_tpll");
 
     /**
      * Stores a List of the tpll operations that need to happen on join
@@ -60,8 +66,9 @@ public class TpllComponent extends ModuleComponent {
         ChatHelper.logDebug("Trying to process tpll queue for player: %s", player.getDisplayName());
         if(!tpllQueue.containsKey(player.getUniqueId())) return;
         Location tpllTarget = tpllQueue.get(player.getUniqueId());
-        ChatHelper.logDebug("The tpll target is: %s", tpllTarget.toString());
         if (tpllTarget == null) return;
+
+        ChatHelper.logDebug("The tpll target is: %s", tpllTarget.toString());
 
         if (tpllTarget.getWorld() == null) {
             player.sendMessage(ChatHelper.getErrorString("The %s world of this server is %s.", "earth", "unknown"));
@@ -81,7 +88,7 @@ public class TpllComponent extends ModuleComponent {
      * @param coordinates The coordinates to send the player to on join.
      * @param targetServerName The server to send the player to.
      */
-    public void tpllPlayer(Player player, double[] coordinates, String targetServerName) {
+    public void tpllPlayer(@NotNull Player player, double @NotNull [] coordinates, String targetServerName) {
         ChatHelper.logDebug("Starting universal tpll teleportation for %s to %s.", player.getDisplayName(), targetServerName);
         // Send a plugin message to the target server which adds the tpll to the queue
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
@@ -95,4 +102,20 @@ public class TpllComponent extends ModuleComponent {
         ChatHelper.logDebug("Teleported player to the target server.");
     }
 
+    public void tpllPlayerTransfer(@NotNull Player player, double @NotNull [] coordinates, String ip) {
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeDouble(coordinates[0]);
+        out.writeDouble(coordinates[1]);
+        player.storeCookie(TPLL_COOKIE_KEY, out.toByteArray());
+        NavUtils.transferPlayer(player, ip);
+    }
+
+    public void processCookie(@NotNull Player player, byte[] cookie) {
+        ByteArrayDataInput in = ByteStreams.newDataInput(cookie);
+        double targetLatitude = in.readDouble();
+        double targetLongitude = in.readDouble();
+        ChatHelper.logDebug("Processing cookie for tpll event: lat: %s lon: %s", targetLatitude, targetLongitude);
+        Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), // Needs to be delayed if not exception will be trown and nothing happens
+                () -> player.performCommand("tpll " + targetLatitude + " " + targetLongitude));
+    }
 }

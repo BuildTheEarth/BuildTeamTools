@@ -3,6 +3,7 @@ package net.buildtheearth.modules.navigation;
 import lombok.Getter;
 import net.buildtheearth.modules.Module;
 import net.buildtheearth.modules.navigation.components.navigator.NavigatorComponent;
+import net.buildtheearth.modules.navigation.components.navigator.commands.BuildteamCommand;
 import net.buildtheearth.modules.navigation.components.navigator.commands.NavigatorCommand;
 import net.buildtheearth.modules.navigation.components.navigator.listeners.NavigatorJoinListener;
 import net.buildtheearth.modules.navigation.components.navigator.listeners.NavigatorOpenListener;
@@ -11,6 +12,7 @@ import net.buildtheearth.modules.navigation.components.tpll.listeners.TpllJoinLi
 import net.buildtheearth.modules.navigation.components.tpll.listeners.TpllListener;
 import net.buildtheearth.modules.navigation.components.warps.WarpsComponent;
 import net.buildtheearth.modules.navigation.components.warps.commands.WarpCommand;
+import net.buildtheearth.modules.navigation.components.warps.commands.WarpsBtCommand;
 import net.buildtheearth.modules.navigation.components.warps.listeners.WarpJoinListener;
 import net.buildtheearth.modules.network.NetworkModule;
 
@@ -57,6 +59,8 @@ public class NavigationModule extends Module {
     public void registerCommands() {
         registerCommand("warp", new WarpCommand());
         registerCommand("navigator", new NavigatorCommand());
+        registerCommand("buildteam", new BuildteamCommand());
+        registerCommand("warpsbt", new WarpsBtCommand());
     }
 
     @Override

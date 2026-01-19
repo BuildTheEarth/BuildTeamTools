@@ -44,7 +44,7 @@ public class BlockPaletteManager {
 
     public BlockPaletteManager(JavaPlugin plugin) {
         this.plugin = plugin;
-        this.paletteFile = new File(plugin.getDataFolder(), "modules/miscellaneousblockpalettegui/palettes.yml");
+        this.paletteFile = new File(plugin.getDataFolder(), "modules/miscellaneous/blockpalettegui/palettes.yml");
         this.paletteConfig = YamlConfiguration.loadConfiguration(paletteFile);
         loadPalettes();
     }

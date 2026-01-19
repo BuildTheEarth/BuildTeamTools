@@ -9,58 +9,6 @@ plugins {
     alias(libs.plugins.shadow)
 }
 
-repositories {
-    //mavenLocal() // NEVER use in Production/Commits!
-    mavenCentral()
-    maven {
-        url = uri("https://repo.papermc.io/repository/maven-public/")
-    }
-
-    maven {
-        url = uri("https://maven.buildtheearth.net/releases")
-    }
-
-    maven {
-        url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-    }
-
-    maven {
-        url = uri("https://mvn.alps-bte.com/repository/alps-bte/")
-    }
-
-    maven {
-        url = uri("https://repo.onarandombox.com/content/groups/public/")
-    }
-
-    maven {
-        url = uri("https://repo.codemc.io/repository/maven-snapshots/")
-    }
-
-    maven {
-        url = uri("https://repo.codemc.io/repository/maven-public/")
-    }
-
-    maven {
-        url = uri("https://jitpack.io")
-    }
-
-    maven {
-        url = uri("https://repo.dmulloy2.net/repository/public/")
-    }
-
-    maven {
-        url = uri("https://maven.daporkchop.net/")
-    }
-
-    maven {
-        url = uri("https://download.java.net/maven/2")
-    }
-
-    maven {
-        url = uri("https://maven.enginehub.org/repo/")
-    }
-}
-
 dependencies {
     //implementation(libs.com.alpsbte.alpslib.alpslib.libpsterra) CURRENTLY BROKEN
     implementation(libs.alpslib.io)
@@ -79,9 +27,10 @@ dependencies {
         exclude(group = "com.sun.xml.bind", module = "jaxb-xjc") // Else Remapping will yell of duplicated classes
     }
     implementation(libs.com.googlecode.json.simple)
+    implementation(platform(libs.fawe.bom))
+    compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core")
+    compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") { isTransitive = false }
     compileOnly(libs.io.papermc.paper.paper.api)
-    compileOnly(libs.com.fastasyncworldedit.fastasyncworldedit.core)
-    compileOnly(libs.com.fastasyncworldedit.fastasyncworldedit.bukkit)
 }
 
 val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDetails> by extra

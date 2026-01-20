@@ -45,12 +45,16 @@ public class ModuleHandler {
      * @param modules {@link Module}
      */
     public void registerModules(Module @NotNull ... modules) {
+        List<?> disabled = BuildTeamTools.getInstance().getConfig().getList(ConfigPaths.DISABLED_MODULES);
+        if (disabled == null) disabled = new ArrayList<>();
+
         for (Module m : modules) {
-            if (!Objects.requireNonNull(BuildTeamTools.getInstance().getConfig().getList(ConfigPaths.DISABLED_MODULES)).contains(m.getModuleName())) {
+            if (!disabled.contains(m.getModuleName())) {
                 registerModule(m);
             }
         }
     }
+
 
     /**
      * Enables a specific module

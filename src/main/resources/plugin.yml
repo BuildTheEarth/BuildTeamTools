@@ -41,10 +41,10 @@ commands:
   plotsystemterra:
     description: Sends info about the plugin
     usage: /plotsystemterra
-  blockpalette:
+  bp:
     description: Opens the block palette menu.
-    usage: /blockpalette [filter|menu|filter <filter1> <filter2> ...]
-    aliases: [bp, blocks]
+    usage: /bp [filter|menu|filter <filter1> <filter2> ...]
+    aliases: [blockpalette, blocks]
     permission: blockpalette.use
   buildteam:
     description: Sends the player to the specified BuildTeam

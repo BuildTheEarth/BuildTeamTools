@@ -37,7 +37,7 @@ val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDe
 val details = versionDetails()
 
 group = "net.buildtheearth"
-version = "0.2.0" + "-" + details.commitDistance + "-" + details.gitHash + "-SNAPSHOT"
+version = "0.2.0" + "-" + details.gitHash + "-SNAPSHOT"
 description = "BuildTeamTools"
 java.sourceCompatibility = JavaVersion.VERSION_21
 java.targetCompatibility = JavaVersion.VERSION_21

@@ -4,25 +4,26 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class WikiLinks {
-    private static final String WIKI_BASE_URL = "https://resources.buildtheearth.net/doc/";
-    public static final String ENTRY = WIKI_BASE_URL + "build-team-tools-gwhwx9xRsX";
-    public static final String GEN = WIKI_BASE_URL + "generator-module-13zqgI4yFA";
-    public static final String NAV = WIKI_BASE_URL + "sledgehammer-module-T7I0PWPsTD";
-    public static final String MISC = WIKI_BASE_URL + "miscellaneous-appUzeNc5I";
-    public static final String STATS = WIKI_BASE_URL + "statistics-module-iM7IfoKroF";
+    private static final String WIKI_BASE_URL = "https://resources.buildtheearth.net/s/btt/";
+    private static final String WIKI_BASE_URL_DOC = WIKI_BASE_URL + "doc/";
+    public static final String ENTRY = WIKI_BASE_URL;
+    public static final String GEN = WIKI_BASE_URL_DOC + "generator-module-13zqgI4yFA";
+    public static final String NAV = WIKI_BASE_URL_DOC + "sledgehammer-module-T7I0PWPsTD";
+    public static final String MISC = WIKI_BASE_URL_DOC + "miscellaneous-appUzeNc5I";
+    public static final String STATS = WIKI_BASE_URL_DOC + "statistics-module-iM7IfoKroF";
     public static final String PLOT = "https://github.com/AlpsBTE/Plot-System/wiki/Installation#setting-up-the-terra-servers";
 
     @UtilityClass
     public static class Gen {
-        public static final String RAIL = WIKI_BASE_URL + "rail-generator-EfgKXdBvk1";
-        public static final String ROAD = WIKI_BASE_URL + "road-generator-QqKBBP0nqO";
-        public static final String TREE = WIKI_BASE_URL + "tree-generator-pnDmYC9hzW";
-        public static final String HOUSE = WIKI_BASE_URL + "house-generator-YKQunon6Bp";
-        public static final String FIELD = WIKI_BASE_URL + "field-generator-OqIN2BrZT7";
+        public static final String RAIL = WIKI_BASE_URL_DOC + "rail-generator-EfgKXdBvk1";
+        public static final String ROAD = WIKI_BASE_URL_DOC + "road-generator-QqKBBP0nqO";
+        public static final String TREE = WIKI_BASE_URL_DOC + "tree-generator-pnDmYC9hzW";
+        public static final String HOUSE = WIKI_BASE_URL_DOC + "house-generator-YKQunon6Bp";
+        public static final String FIELD = WIKI_BASE_URL_DOC + "field-generator-OqIN2BrZT7";
 
         @UtilityClass
         public static class Field {
-            private static final String CROP_BASE = WIKI_BASE_URL + "crop-types-z7ww6RZK2J";
+            private static final String CROP_BASE = WIKI_BASE_URL_DOC + "crop-types-z7ww6RZK2J";
             public static final String CROP_POTATO = CROP_BASE + "#h-potato-field";
             public static final String CROP_CORN = CROP_BASE + "#h-corn-field";
             public static final String CROP_WHEAT = CROP_BASE + "#h-wheat-field";

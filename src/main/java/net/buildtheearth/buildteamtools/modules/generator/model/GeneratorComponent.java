@@ -174,6 +174,7 @@ public abstract class GeneratorComponent extends ModuleComponent implements Wiki
             sendHelp(p);
     }
 
+    @Override
     public String getWikiPage() {
         return generatorType.getWikiPage();
     }

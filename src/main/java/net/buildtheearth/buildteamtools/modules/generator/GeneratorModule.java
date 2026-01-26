@@ -59,9 +59,8 @@ public class GeneratorModule extends Module {
         GeneratorUtils.plugin = BuildTeamTools.getInstance();
 
         // Check if WorldEdit is enabled
-        if (!CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled()
-         && !CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled()) {
-            shutdown("§cWorldEdit is not installed.");
+        if (!CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled()) {
+            shutdown("§FastAsyncWorldEdit is not installed.");
             return;
         }
 

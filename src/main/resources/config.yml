@@ -6,10 +6,9 @@
 # | [Contacts - Discord]    BTE Development Hub, @zoriot
 # ----------------------------------------------------------------------------------------------
 
-# The Build Team API Key used to fetch build team info for display. Find the key on the Minecraft Network at "buildtheearth.net".
-# Navigate: Compass > Build Teams > Your Country > Your Team → Edit > API-Key → Right click on it → Click on the api key in chat.
-# Without this key, some plugin components won`t function. For assistance, see #server-support on the staff discord -
-# you might need to be added as a owner first.
+# The Build Team API Key used to fetch build team info for display.
+# Visit https://resources.buildtheearth.net/s/btt/doc/configuration-tpEHSZ6Zt2#h-api-key-of-the-server
+# for an up-to-date guide on how to get your own API key.
 api-key: 00000000-0000-0000-0000-000000000000
 
 # The main world using the custom BTE Dynmaxion projection

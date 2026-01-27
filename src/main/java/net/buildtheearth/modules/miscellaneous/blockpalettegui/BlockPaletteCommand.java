@@ -35,11 +35,17 @@ public class BlockPaletteCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage("This command can only be used by players.");
             return true;
         }
+
         Player player = (Player) sender;
 
-        // /bp or /bp menu ⇒ default filters + open block menu
-        if (args.length == 0
-                || (args.length == 1 && args[0].equalsIgnoreCase("menu"))) {
+        // /bp ⇒ open block menu with remembered filters (do NOT reset to "color")
+        if (args.length == 0) {
+            blockPalletManager.openBlockMenu(player);
+            return true;
+        }
+
+        // /bp menu ⇒ reset to default filters + open block menu
+        if (args.length == 1 && args[0].equalsIgnoreCase("menu")) {
             blockPalletManager.setPlayerFiltersAndOpen(player);
             return true;
         }
@@ -61,7 +67,8 @@ public class BlockPaletteCommand implements CommandExecutor, TabCompleter {
         }
 
         // invalid usage ⇒ show help
-        sender.sendMessage("§cUsage: §7/bp menu\n"
+        sender.sendMessage("§cUsage: §7/bp\n"
+                + "§c   or §7/bp menu\n"
                 + "§c   or §7/bp filter\n"
                 + "§c   or §7/bp filter <filter1> <filter2> …");
         return true;

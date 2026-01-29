@@ -2,6 +2,7 @@ package net.buildtheearth.buildteamtools.modules.navigation;
 
 import lombok.Getter;
 import net.buildtheearth.buildteamtools.modules.Module;
+import net.buildtheearth.buildteamtools.modules.navigation.components.bluemap.BluemapComponent;
 import net.buildtheearth.buildteamtools.modules.navigation.components.navigator.NavigatorComponent;
 import net.buildtheearth.buildteamtools.modules.navigation.components.navigator.commands.BuildteamCommand;
 import net.buildtheearth.buildteamtools.modules.navigation.components.navigator.commands.NavigatorCommand;
@@ -16,6 +17,7 @@ import net.buildtheearth.buildteamtools.modules.navigation.components.warps.comm
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.listeners.WarpJoinListener;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.utils.WikiLinks;
+import org.bukkit.Bukkit;
 
 /**
  * Manages all things related to universal tpll
@@ -29,6 +31,8 @@ public class NavigationModule extends Module {
     private NavigatorComponent navigatorComponent;
     @Getter
     private TpllComponent tpllComponent;
+    @Getter
+    private BluemapComponent bluemapComponent;
 
 
     private static NavigationModule instance = null;
@@ -52,6 +56,7 @@ public class NavigationModule extends Module {
         warpsComponent = new WarpsComponent();
         navigatorComponent = new NavigatorComponent();
         tpllComponent = new TpllComponent();
+        if (Bukkit.getPluginManager().isPluginEnabled("BlueMap")) bluemapComponent = new BluemapComponent();
 
         super.enable();
     }

@@ -4,7 +4,7 @@ api-version: 1.13
 version: ${version}
 description: ${description}
 author: MineFact, frikandelworst, George112n, ELgamer, SirJodelstein, Zoriot
-softdepend: [WorldEdit, HeadDatabase, PlotSystem-Terra]
+softdepend: [ WorldEdit, HeadDatabase, PlotSystem-Terra, BlueMap ]
 
 commands:
   buildteamtools:

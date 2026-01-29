@@ -61,5 +61,7 @@ dependencyResolutionManagement {
             url = uri("https://mvn.wesjd.net/")
         }
         maven { url = uri("https://jitpack.io") }
+
+        maven("https://repo.bluecolored.de/releases")
     }
 }

@@ -29,33 +29,34 @@
 
 <br>
 
-<!-- ABOUT THE PROJECT -->
 ## About The Plugin
 
-BuildTeamTools offers a comprehensive suite of tools designed to enhance the building and exploration experience in BuildTheEarth.<br> Whether you're a casual creator or an experienced builder, the plugin provides powerful features such as Generators, Navigators, Warps, PlotSystem, Statistics and more to streamline your workflow.
+BuildTeamTools offers a comprehensive suite of tools designed to enhance the building and exploration experience in
+BuildTheEarth.  
+Whether you're a casual creator or an experienced builder, the plugin provides powerful features such as Generators,
+Navigators, Warps, Statistics and more to streamline your workflow.
 
 Its primary goal is to significantly speed up the building process by eliminating repetitive tasks while also providing an intuitive entry point for newcomers to the project.
 
-<!-- FEATURES -->
 ## Features
-🔨 **Easy-to-use** Tools for everything around BuildTheEarth<br/>
-⏱ **Multi-Version** support from `1.18` - `1.21.x`<br/>
-✔️ **User-friendly** GUIs and Commands<br/>
-📆 **Automatic** Updates<br/>
-🔌 **Easy setup** and configuration<br/>
-**Multi-Language** Support (PLANNED)<br/>
 
-<!-- COMPONENTS -->
+🔨 **Easy-to-use** Tools  
+⏱ **Multi-Version** support from `1.18` - `1.21.x`  
+✔️ **User-friendly** GUIs and Commands  
+📆 **Automatic** Updates  
+🔌 **Easy setup** and configuration
+
 ## Components
-<img width="250" align="top" src="https://github.com/BuildTheEarth/BuildTeamTools/assets/66020920/c7cb17f4-c240-4212-958f-70ced88467c8">
-<img width="250" align="top" src="https://github.com/BuildTheEarth/BuildTeamTools/assets/66020920/5d22d157-900a-4632-bc24-414bb7f4bc22">
-<img width="250" align="top" src="https://github.com/BuildTheEarth/BuildTeamTools/assets/66020920/3c684e41-2b4f-48f8-a13f-a4f8af106866">
-<img width="250" align="top" src="https://github.com/BuildTheEarth/BuildTeamTools/assets/66020920/405ce924-e03d-4e2b-ba32-ff6844cf5b37">
-<img width="250" align="top" src="https://github.com/BuildTheEarth/BuildTeamTools/assets/66020920/a773aacf-3285-48c8-940d-1ed277adfe6c">
-<img width="250" align="top" src="https://github.com/BuildTheEarth/BuildTeamTools/assets/66020920/f9d95564-ad5d-4293-b6ef-fcccabbe2e01">
+
+![Nav Module Overview](https://raw.githubusercontent.com/BuildTheEarth/assets/0f7a4f0e9c5a7ce9ab41636182d93e9d1948c4a1/images/btt/features/Navigation.png)
+![Generator Module Overview](https://raw.githubusercontent.com/BuildTheEarth/assets/0f7a4f0e9c5a7ce9ab41636182d93e9d1948c4a1/images/btt/features/Generator.png)
+![PlotSystem Module Overview](https://raw.githubusercontent.com/BuildTheEarth/assets/0f7a4f0e9c5a7ce9ab41636182d93e9d1948c4a1/images/btt/features/PlotSystem.png)
+![Statistics Module Overview](https://raw.githubusercontent.com/BuildTheEarth/assets/0f7a4f0e9c5a7ce9ab41636182d93e9d1948c4a1/images/btt/features/Statistics.png)
+![Tutorials Module Overview](https://raw.githubusercontent.com/BuildTheEarth/assets/0f7a4f0e9c5a7ce9ab41636182d93e9d1948c4a1/images/btt/features/Tutorials.png)
 
 <br/><br/>
-The **\*** symbol shows that this feature is still being developed or under maintenance
+The **\*** symbol shows that this feature is still being developed or under maintenance. *This image might be slightly
+outdated.*
 <br/><br/>
 
 <!-- INSTALLATION -->
@@ -67,11 +68,12 @@ The **\*** symbol shows that this feature is still being developed or under main
 🚩 **How to install:**
 1. Download BuildTeamTools [here](https://www.spigotmc.org/resources/buildteamtools.101854/).
 2. Place the downloaded plugin in your server's **../plugins** folder.
-3. *(Optional)* Some of the modules require initial configuration or dependencies to run:
+3. *(Optional)* Some modules require initial configuration or dependencies to run:
 >  - To activate the **Navigation Module**, please configure an **API Key** in the config.yml file.
 >  - To activate the **Network Module**, please configure an **API Key** in the config.yml file.
 >  - To activate the **Generator Module**, please install the [FastAsyncWorldEdit](https://modrinth.com/plugin/fastasyncworldedit/versions/) plugin.
->  - To activate the **Tree Generator Component**, install the [SchematicBrush 0.5.2](https://dev.bukkit.org/projects/schematicbrush) plugin.
+>  - To activate the **Tree Generator Component**, install
+     the [SchematicBrushReborn v1](https://www.spigotmc.org/resources/schematic-brush-reborn.79441/history) plugin.
 4. Restart your server.
 5. Done!
 
@@ -89,7 +91,8 @@ Special thanks to the people currently working on the plugin:
 - **[frikandelworst](https://github.com/kyanvde)**
 - **[MineFact](https://github.com/MineFact)**
 
-## Index
+## Infos
+
 Click the links below for more information, or see the [wiki](https://resources.buildtheearth.net/s/btt).
 
 - [Navigation](https://resources.buildtheearth.net/s/btt/doc/navigation-module-T7I0PWPsTD)
@@ -98,9 +101,7 @@ Click the links below for more information, or see the [wiki](https://resources.
   - [Roads](https://resources.buildtheearth.net/s/btt/doc/road-generator-QqKBBP0nqO)
   - [Railways [Currently Broken]](https://resources.buildtheearth.net/s/btt/doc/rail-generator-EfgKXdBvk1)
   - [Trees](https://resources.buildtheearth.net/s/btt/doc/tree-generator-pnDmYC9hzW)
-  - [Fields](https://resources.buildtheearth.net/s/btt/doc/field-generator-OqIN2BrZT7)
+  - [Fields [Currently Broken]](https://resources.buildtheearth.net/s/btt/doc/field-generator-OqIN2BrZT7)
 - [Statistics](https://resources.buildtheearth.net/s/btt/doc/statistics-module-iM7IfoKroF)
 - [Miscellaneous](https://resources.buildtheearth.net/doc/miscellaneous-appUzeNc5I)
   - [Block Palette GUI](https://resources.buildtheearth.net/doc/block-palette-gui-hW8InCtxcq)
-- Tutorials (PLANNED)
-- Plot System (PLANNED - use [PST](https://github.com/AlpsBTE/Plot-System-Terra) for now)

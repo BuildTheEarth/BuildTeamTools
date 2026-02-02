@@ -8,7 +8,7 @@ public class WikiLinks {
     private static final String WIKI_BASE_URL_DOC = WIKI_BASE_URL + "doc/";
     public static final String ENTRY = WIKI_BASE_URL;
     public static final String GEN = WIKI_BASE_URL_DOC + "generator-module-13zqgI4yFA";
-    public static final String NAV = WIKI_BASE_URL_DOC + "sledgehammer-module-T7I0PWPsTD";
+    public static final String NAV = WIKI_BASE_URL_DOC + "navigation-module-T7I0PWPsTD";
     public static final String MISC = WIKI_BASE_URL_DOC + "miscellaneous-appUzeNc5I";
     public static final String STATS = WIKI_BASE_URL_DOC + "statistics-module-iM7IfoKroF";
     public static final String PLOT = "https://github.com/AlpsBTE/Plot-System/wiki/Installation#setting-up-the-terra-servers";

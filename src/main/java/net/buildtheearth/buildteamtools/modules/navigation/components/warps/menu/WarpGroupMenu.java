@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class WarpGroupMenu extends AbstractPaginatedMenu {
 
@@ -34,8 +33,8 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
 
     private final boolean hasBackItem;
     private final BuildTeam buildTeam;
-    private int plusSlot = ALTERNATE_PLUS_SLOT;
     private AbstractMenu backMenue;
+    private final boolean showPlusItem;
 
     /** In this menu the player can select a warp group to view the warps in each warp group.
      *
@@ -47,6 +46,8 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
         super(4, 3, "Warp Menu", menuPlayer, autoLoad);
         this.hasBackItem = hasBackItem;
         this.buildTeam = buildTeam;
+        this.showPlusItem = getMenuPlayer().hasPermission(Permissions.WARP_GROUP_CREATE)
+                && NetworkModule.getInstance().getBuildTeam().equals(buildTeam);
     }
 
     public WarpGroupMenu(Player menuPlayer, BuildTeam buildTeam, boolean hasBackItem, boolean autoLoad, AbstractMenu menu) {
@@ -72,23 +73,21 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
         List<WarpGroup> warpGroups = source.stream().map(l -> (WarpGroup) l).toList();
 
         getMenu().getSlot(ALTERNATE_PLUS_SLOT).setItem(MenuItems.ITEM_BACKGROUND);
-        final int nextSlot = recalculateAutoSlots(warpGroups);
+        recalculateAutoSlots(warpGroups);
 
         // Create the country items
         for (WarpGroup warpGroup : warpGroups) {
-            // Create a create warp group item if the player has permission
-            if(isPlusItem(warpGroup)){
-                setPlusSlot(warpGroup.getInternalSlot(), nextSlot);
-                getMenu().getSlot(plusSlot).setItem(
-                        Item.createCustomHeadBase64(
-                                CustomHeads.GREEN_PLUS, "§a§lCreate a new Warp Group",
-                                ListUtil.createList("§8Click to create a new warp group.")
-                        )
-                );
-                continue;
-            }
-
             getMenu().getSlot(getWarpGroupSlot(warpGroup)).setItem(warpGroup.getMaterialItem());
+        }
+
+        // Create a create warp group item if the player has permission
+        if (showPlusItem) {
+            getMenu().getSlot(ALTERNATE_PLUS_SLOT).setItem(
+                    Item.createCustomHeadBase64(
+                            CustomHeads.GREEN_PLUS, "§a§lCreate a new Warp Group",
+                            ListUtil.createList("§8Click to create a new warp group.")
+                    )
+            );
         }
     }
 
@@ -117,18 +116,8 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
                 .getString(ConfigPaths.Navigation.WARPS_GROUP_SORTING_MODE, "");
 
         if (mode.equalsIgnoreCase("name")) {
-            warpGroups = buildTeam.getWarpGroups().stream().sorted((warpGroup1, warpGroup2) -> warpGroup1.getName().compareToIgnoreCase(warpGroup2.getName())).collect(Collectors.toList());
+            warpGroups = buildTeam.getWarpGroups().stream().sorted((warpGroup1, warpGroup2) -> warpGroup1.getName().compareToIgnoreCase(warpGroup2.getName())).toList();
         } else warpGroups = new ArrayList<>(buildTeam.getWarpGroups());
-
-        // If the warp group "Other" has no warps, remove it from the list
-        WarpGroup otherWarpGroup = warpGroups.stream().filter(warpGroup -> warpGroup.getName().equalsIgnoreCase("Other")).findFirst().orElse(null);
-        if (otherWarpGroup != null && otherWarpGroup.getWarps().isEmpty())
-            warpGroups.remove(otherWarpGroup);
-
-        // Add a create warp group item if the player has permission
-        if (getMenuPlayer().hasPermission(Permissions.WARP_GROUP_CREATE)
-                && NetworkModule.getInstance().getBuildTeam().equals(buildTeam))
-            warpGroups.add(new WarpGroup(null, "%create-warp-group%", null, -1, null));
 
         return warpGroups;
     }
@@ -143,30 +132,23 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
     }
 
     protected void setClickEventForSlot(@NotNull WarpGroup warpGroup) {
-        final int _slot = isPlusItem(warpGroup) ? plusSlot : getWarpGroupSlot(warpGroup);
+        final int _slot = getWarpGroupSlot(warpGroup);
 
         getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
             clickPlayer.closeInventory();
-
-            // Create a click action for the "Create Warp" item if the player has permission
-            if(isPlusItem(warpGroup)){
-                NavigationModule.getInstance().getWarpsComponent().createWarpGroup(clickPlayer);
-                return;
-            }
 
             if(clickInformation.getClickType().isRightClick() && clickPlayer.hasPermission(Permissions.WARP_GROUP_EDIT))
                 new WarpGroupEditMenu(clickPlayer, warpGroup, true, true);
             else
                 leftClickAction(clickPlayer, warpGroup);
         });
+
+        getMenu().getSlot(ALTERNATE_PLUS_SLOT).setClickHandler((clickPlayer, clickInformation)
+                -> NavigationModule.getInstance().getWarpsComponent().createWarpGroup(clickPlayer));
     }
 
     protected void leftClickAction(Player clickPlayer, @NotNull WarpGroup warpGroup) {
         new WarpMenu(clickPlayer, warpGroup, true, true);
-    }
-
-    protected boolean isPlusItem(@NotNull WarpGroup warpGroup){
-        return warpGroup.getName().equals("%create-warp-group%") && getMenuPlayer().hasPermission(Permissions.WARP_GROUP_CREATE);
     }
 
     protected int getWarpGroupSlot(@NotNull WarpGroup g) {
@@ -174,16 +156,6 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
         if (s >= 0 && s <= 26) return s;
         int a = g.getInternalSlot();
         return a >= 0 && a <= 26 ? a : -1;
-    }
-
-    protected void setPlusSlot(int internalSlot, int freeSlot){
-        if(internalSlot >= 0) {
-            plusSlot = internalSlot;
-            return;
-        }
-
-        if(freeSlot < 0) return;
-        plusSlot = freeSlot;
     }
 
     /**

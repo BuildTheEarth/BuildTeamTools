@@ -26,8 +26,10 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -135,12 +137,12 @@ public class WarpsComponent extends ModuleComponent {
         }
     }
 
-    public WarpGroup getOtherWarpGroup() {
-        return NetworkModule.getInstance().getBuildTeam().getWarpGroups().stream().filter(warpGroup -> warpGroup.getName().equalsIgnoreCase("Other")).findFirst().orElse(null);
+    public static WarpGroup getOtherWarpGroup(@NonNull List<WarpGroup> groups) {
+        return groups.stream().filter(warpGroup -> warpGroup.getName().equalsIgnoreCase("Other")).findFirst().orElse(null);
     }
 
-    public void createWarp(Player creator) {
-        WarpGroup group = getOtherWarpGroup();
+    public static void createWarp(Player creator) {
+        WarpGroup group = getOtherWarpGroup(NetworkModule.getInstance().getBuildTeam().getWarpGroups());
         if (group == null) {
             group = NavUtils.createOtherWarpGroup(NetworkModule.getInstance().getBuildTeam());
         }
@@ -151,7 +153,7 @@ public class WarpsComponent extends ModuleComponent {
      *
      * @param creator The player that is creating the warp
      */
-    public void createWarp(Player creator, WarpGroup group) {
+    public static void createWarp(@NonNull Player creator, WarpGroup group) {
         // Get the geographic coordinates of the player's location.
         Location location = creator.getLocation();
         double[] coordinates = CoordinateConversion.convertToGeo(location.getX(), location.getZ());

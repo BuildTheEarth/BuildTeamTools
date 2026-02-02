@@ -92,7 +92,7 @@ Special thanks to the people currently working on the plugin:
 ## Index
 Click the links below for more information, or see the [wiki](https://resources.buildtheearth.net/s/btt).
 
-- [Sledgehammer](https://resources.buildtheearth.net/s/btt/doc/sledgehammer-module-T7I0PWPsTD)
+- [Navigation](https://resources.buildtheearth.net/s/btt/doc/navigation-module-T7I0PWPsTD)
 - [Generators](https://resources.buildtheearth.net/s/btt/doc/generator-module-13zqgI4yFA)
   - [Houses](https://resources.buildtheearth.net/s/btt/doc/house-generator-YKQunon6Bp)
   - [Roads](https://resources.buildtheearth.net/s/btt/doc/road-generator-QqKBBP0nqO)

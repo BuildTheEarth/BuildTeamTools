@@ -27,6 +27,7 @@ dependencies {
         exclude(group = "com.sun.xml.bind", module = "jaxb-xjc") // Else Remapping will yell of duplicated classes
     }
     implementation(libs.com.googlecode.json.simple)
+    implementation(libs.bstats.bukkit)
     implementation(platform(libs.fawe.bom))
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core")
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") { isTransitive = false }

@@ -20,6 +20,7 @@ com-gradleup-shadow = "9.3.1" # https://github.com/GradleUp/shadow/releases
 alpslib-io = "1.2.0" # https://mvn.alps-bte.com/service/rest/repository/browse/alps-bte/com/alpsbte/alpslib/alpslib-io/
 alpslib-utils = "1.4.0" # https://mvn.alps-bte.com/service/rest/repository/browse/alps-bte/com/alpsbte/alpslib/alpslib-utils/
 fawe-bom = "1.55" # Ref: https://github.com/IntellectualSites/bom
+bstats = "3.1.0" # https://central.sonatype.com/artifact/org.bstats/bstats-bukkit
 
 [libraries]
 com-alpsbte-alpslib-alpslib-libpsterra = { module = "com.alpsbte.alpslib:alpslib-libpsterra", version.ref = "com-alpsbte-alpslib-alpslib-libpsterra" }
@@ -37,6 +38,7 @@ com-googlecode-json-simple = { module = "com.googlecode.json-simple:json-simple"
 alpslib-io = { module = "com.alpsbte.alpslib:alpslib-io", version.ref = "alpslib-io" }
 alpslib-utils = { module = "com.alpsbte.alpslib:alpslib-utils", version.ref = "alpslib-utils" }
 fawe-bom = { module = "com.intellectualsites.bom:bom-newest", version.ref = "fawe-bom" }
+bstats-bukkit = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }
 
 [plugins]
 lombok = { id = "io.freefair.lombok", version.ref = "io-freefair-lombok" }

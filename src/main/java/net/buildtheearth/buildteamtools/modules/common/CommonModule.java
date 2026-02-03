@@ -13,6 +13,7 @@ import net.buildtheearth.buildteamtools.modules.common.components.updater.Update
 import net.buildtheearth.buildteamtools.modules.common.components.version.VersionComponent;
 import net.buildtheearth.buildteamtools.modules.common.listeners.CommandListener;
 import net.buildtheearth.buildteamtools.modules.common.listeners.ExceptionListener;
+import net.buildtheearth.buildteamtools.modules.common.metrics.MetricsManager;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.stats.StatsModule;
@@ -75,6 +76,7 @@ public class CommonModule extends Module {
         dependencyComponent = new DependencyComponent();
         versionComponent = new VersionComponent();
 
+        MetricsManager.init(BuildTeamTools.getInstance());
 
         // Start the timer
         startTimer();

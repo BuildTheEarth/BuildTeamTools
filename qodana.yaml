@@ -1,10 +1,13 @@
 ####################################################################################################################
 # WARNING: Do not store sensitive information in this file, as its contents will be included in the Qodana report. #
 ####################################################################################################################
-
 version: "1.0"
-linter: jetbrains/qodana-jvm-community:2025.2
 profile:
-  name: qodana.recommended
+  name: qodana.starter
 include:
-  - name: CheckDependencyLicenses
+  - name: Deprecation
+  - name: JavadocDeclaration
+  - name: FieldMayBeFinal
+  - name: LombokGetterMayBeUsed
+  - name: UnnecessarySemicolon
+  - name: FieldCanBeLocal

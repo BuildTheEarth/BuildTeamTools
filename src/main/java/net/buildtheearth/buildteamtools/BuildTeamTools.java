@@ -1,7 +1,7 @@
 package net.buildtheearth.buildteamtools;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
 import lombok.Getter;
-import lombok.Setter;
 import net.buildtheearth.buildteamtools.modules.ModuleHandler;
 import net.buildtheearth.buildteamtools.modules.common.CommonModule;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
@@ -26,7 +26,7 @@ public class BuildTeamTools extends JavaPlugin {
     public static String PREFIX = "§9§lBTE §8> §7";
     public static String CONSOLE_PREFIX = "[BuildTeamTools] ";
 
-    @Getter @Setter
+    @Getter
     private boolean debug;
 
     @Getter
@@ -82,5 +82,10 @@ public class BuildTeamTools extends JavaPlugin {
 
     public File getPluginFile() {
         return this.getFile();
+    }
+
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+        ChatHelper.DEBUG = debug;
     }
 }

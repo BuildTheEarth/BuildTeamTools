@@ -19,6 +19,7 @@ import net.buildtheearth.buildteamtools.utils.io.Errors;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,9 +32,13 @@ public class NetworkModule extends Module {
 
     public static final int CACHE_UPLOAD_SPEED = 20 * 60 * 10 + 20;
 
-    /** Information about the build team of this server */
-    @Getter @Setter
-    private BuildTeam buildTeam;
+    /**
+     * Information about the build team of this server
+     * Nullable if build team is not loaded yet
+     */
+    @Getter
+    @Setter
+    private @Nullable BuildTeam buildTeam;
 
     /** A list of players that are communicating with this server. */
     @Getter

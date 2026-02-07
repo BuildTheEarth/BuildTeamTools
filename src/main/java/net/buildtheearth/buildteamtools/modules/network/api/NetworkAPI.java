@@ -262,6 +262,7 @@ public class NetworkAPI {
                     NetworkModule networkModule = NetworkModule.getInstance();
                     BuildTeam buildTeam = networkModule.getBuildTeamByID(teamID);
                     networkModule.setBuildTeam(buildTeam);
+                    if (!buildTeam.isHasBTToolsInstalled()) setBuildTeamToolsInstalled(true);
                 } catch (Exception e) {
                     future.completeExceptionally(e);
                     return;

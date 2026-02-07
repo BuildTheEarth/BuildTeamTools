@@ -45,7 +45,7 @@ public class BuildTeam {
         this.name = name;
         this.blankName = blankName;
         this.serverName = serverName;
-        this.isConnected = isConnected;
+        this.isConnected = isConnected && (serverName != null && !serverName.isEmpty()); // We need to verify the Data manually because NwApi i quite scuffed
         this.hasBTToolsInstalled = hasBTToolsInstalled;
 
         this.regions = new ArrayList<>();
@@ -53,10 +53,10 @@ public class BuildTeam {
         this.allowsTransfers = allowsTransfers;
         this.tag = tag;
 
-        if(!isConnected)
-            this.IP = serverIP;
-        else
+        if (isConnected && NetworkModule.getInstance().getBuildTeam() != null && NetworkModule.getInstance().getBuildTeam().isConnected())
             this.IP = null;
+        else
+            this.IP = serverIP;
     }
 
     public void createWarp(Player creator, Warp warp){

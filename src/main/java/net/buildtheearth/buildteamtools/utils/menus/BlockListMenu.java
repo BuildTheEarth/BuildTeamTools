@@ -87,7 +87,7 @@ public class BlockListMenu extends AbstractPaginatedMenu {
         List<ItemStack> items = source.stream().map(l -> (ItemStack) l).collect(Collectors.toList());
         int slot = 0;
         for (ItemStack item : items) {
-            if(selectedMaterials.contains(Item.getUniqueMaterialString(item)))
+            if (selectedMaterials.contains(Item.getUppercaseMaterialString(item)))
                 item = new Item(item).setAmount(1).addEnchantment(Enchantment.LUCK_OF_THE_SEA, 1).hideEnchantments(true).build();
 
             getMenu().getSlot(slot).setItem(item);
@@ -106,7 +106,7 @@ public class BlockListMenu extends AbstractPaginatedMenu {
         for (ItemStack item : items) {
             final int _slot = slot;
             getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
-                String type = Item.getUniqueMaterialString(getMenu().getSlot(_slot).getItem(getMenuPlayer()));
+                String type = Item.getUppercaseMaterialString(getMenu().getSlot(_slot).getItem(getMenuPlayer()));
 
                 if(selectedMaterials.contains(type))
                     selectedMaterials.remove(type);

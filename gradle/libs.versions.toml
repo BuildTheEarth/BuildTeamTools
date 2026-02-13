@@ -18,7 +18,7 @@ com-googlecode-json-simple = "1.1.1" # https://mvnrepository.com/artifact/com.go
 com-palantir-git-version = "4.2.0" # https://github.com/palantir/gradle-git-version/releases
 com-gradleup-shadow = "9.3.1" # https://github.com/GradleUp/shadow/releases
 alpslib-io = "1.2.0" # https://mvn.alps-bte.com/service/rest/repository/browse/alps-bte/com/alpsbte/alpslib/alpslib-io/
-alpslib-utils = "1.4.0" # https://mvn.alps-bte.com/service/rest/repository/browse/alps-bte/com/alpsbte/alpslib/alpslib-utils/
+alpslib-utils = "1.4.1" # https://mvn.alps-bte.com/service/rest/repository/browse/alps-bte/com/alpsbte/alpslib/alpslib-utils/
 fawe-bom = "1.55" # Ref: https://github.com/IntellectualSites/bom
 bstats = "3.1.0" # https://central.sonatype.com/artifact/org.bstats/bstats-bukkit
 

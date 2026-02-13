@@ -9,7 +9,7 @@ public enum HouseFlag implements Flag {
     BASE_COLOR("b", FlagType.XMATERIAL_LIST),
     WINDOW_COLOR("wd", FlagType.XMATERIAL_LIST),
     BALCONY_COLOR("bc", FlagType.XMATERIAL_LIST),
-    BALCONY_FENCE_COLOR("bfc", FlagType.XMATERIAL),
+    BALCONY_FENCE_COLOR("bfc", FlagType.XMATERIAL_LIST),
     ROOF_TYPE("rt", FlagType.ROOF_TYPE),
     FLOOR_COUNT("fc", FlagType.INTEGER),
     FLOOR_HEIGHT("fh", FlagType.INTEGER),

@@ -18,14 +18,32 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/BuildTheEarth/BuildTeamTools/releases/latest">
+    <img src="https://img.shields.io/badge/_DOWNLOAD_STABLE_RELEASE-28A745?style=for-the-badge&logoColor=white" alt="Download Stable Release" height="50">
+  </a>
+  <br/>
+  <a href="https://github.com/BuildTheEarth/BuildTeamTools/actions/workflows/build.yml">
+    <img src="https://img.shields.io/badge/_DOWNLOAD_DEV_BUILD-FFA500?style=for-the-badge&logoColor=white" alt="Download Dev Build" height="40">
+  </a>
+</p>
+
+<br>
+
+<p align="center">
     <a href="https://github.com/BuildTheEarth"><img src="https://go.buildtheearth.net/official-shield" alt="BuildTheEarth Github"></a>
     <a href="https://www.discord.gg/buildtheearth"><img src="https://img.shields.io/discord/690908396404080650?label=Discord&color=768AD4" alt="BuildTheEarth Discord"></a>
 </p>
 <p align="center">
     <a href="https://www.spigotmc.org/resources/buildteamtools.101854/"><img src="https://img.shields.io/spiget/downloads/101854?color=green&label=Downloads" alt="Downloads Count"></a>
     <a href="https://www.spigotmc.org/resources/buildteamtools.101854/"><img src="https://img.shields.io/spiget/version/101854?label=Version" alt="Latest Version"></a>
-    <a href="https://github.com/BuildTheEarth/BuildTeamTools"><img src="https://img.shields.io/github/repo-size/BuildTheEarth/BuildTeamTools" alt="Repo Size"></a>
-</p>  
+    <img src="https://img.shields.io/github/repo-size/BuildTheEarth/BuildTeamTools" alt="Repo Size">
+    <a href="https://github.com/BuildTheEarth/BuildTeamTools/actions/workflows/qodana_code_quality.yml"><img src="https://github.com/BuildTheEarth/BuildTeamTools/actions/workflows/qodana_code_quality.yml/badge.svg" alt="Qodana"></a>
+</p>
+<p align="center">
+    <img alt="bStats Badges" src="https://img.shields.io/badge/bStats%3A?style=for-the-badge">
+    <a href="https://bstats.org/plugin/bukkit/BuildTeamTools/29076"><img alt="bStats Players" src="https://img.shields.io/bstats/players/29076"></a>
+    <a href="https://bstats.org/plugin/bukkit/BuildTeamTools/29076"><img alt="bStats Servers" src="https://img.shields.io/bstats/servers/29076"></a>
+</p>
 
 <br>
 

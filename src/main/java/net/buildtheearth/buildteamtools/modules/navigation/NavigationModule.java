@@ -1,6 +1,7 @@
 package net.buildtheearth.buildteamtools.modules.navigation;
 
 import lombok.Getter;
+import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.Module;
 import net.buildtheearth.buildteamtools.modules.navigation.components.bluemap.BluemapComponent;
 import net.buildtheearth.buildteamtools.modules.navigation.components.navigator.NavigatorComponent;
@@ -17,6 +18,8 @@ import net.buildtheearth.buildteamtools.modules.navigation.components.warps.comm
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.listeners.WarpJoinListener;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.utils.WikiLinks;
+import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
+import net.buildtheearth.buildteamtools.utils.io.ConfigUtil;
 import org.bukkit.Bukkit;
 
 /**
@@ -56,7 +59,14 @@ public class NavigationModule extends Module {
         warpsComponent = new WarpsComponent();
         navigatorComponent = new NavigatorComponent();
         tpllComponent = new TpllComponent();
-        if (Bukkit.getPluginManager().isPluginEnabled("BlueMap")) bluemapComponent = new BluemapComponent();
+
+        // Check if BlueMap plugin is enabled and config allows BlueMap integration
+        boolean bluemapConfigEnabled = BuildTeamTools.getInstance().getConfig(ConfigUtil.NAVIGATION)
+                .getBoolean(ConfigPaths.Navigation.BLUEMAP_ENABLED, true);
+
+        if (Bukkit.getPluginManager().isPluginEnabled("BlueMap") && bluemapConfigEnabled) {
+            bluemapComponent = new BluemapComponent();
+        }
 
         super.enable();
     }

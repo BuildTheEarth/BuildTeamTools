@@ -47,5 +47,10 @@ warps:
   # Possible values: default (same as the creation order), name
   sorting-mode: default
 
+# Configures the BlueMap integration
+bluemap:
+  # Enables or disables the BlueMap integration for displaying warps [true|false]
+  enabled: true
+
 # NOTE: Do not change
 config-version: 1.6

@@ -41,6 +41,10 @@ public abstract class ConfigPaths {
         // Navigator.Warps
         private static final String NAVIGATOR_WARPS = "warps.";
         public static final String WARPS_GROUP_SORTING_MODE = NAVIGATOR_WARPS + "sorting-mode";
+
+        // BlueMap Integration
+        private static final String BLUEMAP = "bluemap.";
+        public static final String BLUEMAP_ENABLED = BLUEMAP + "enabled";
     }
 
     public static class PlotSystem {

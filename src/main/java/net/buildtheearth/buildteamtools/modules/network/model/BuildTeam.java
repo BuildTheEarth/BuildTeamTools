@@ -2,6 +2,7 @@ package net.buildtheearth.buildteamtools.modules.network.model;
 
 import com.alpsbte.alpslib.utils.ChatHelper;
 import lombok.Getter;
+import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
@@ -70,9 +71,11 @@ public class BuildTeam {
             @Override
             public void onResponse(String response) {
                 // Update the cache
-                NetworkModule.getInstance().updateCache().thenRun(() ->
-                        ChatHelper.sendSuccessfulMessage(creator, "Successfully created the warp %s!", warp.getName())
-                );
+                NetworkModule.getInstance().updateCache().thenRun(() -> {
+                    ChatHelper.sendSuccessfulMessage(creator, "Successfully created the warp %s!", warp.getName());
+                    // Refresh BlueMap markers
+                    refreshBluemapMarkers();
+                });
             }
 
             @Override
@@ -94,9 +97,11 @@ public class BuildTeam {
             @Override
             public void onResponse(String response) {
                 // Update the cache
-                NetworkModule.getInstance().updateCache().thenRun(() ->
-                        ChatHelper.sendSuccessfulMessage(creator, "Successfully created the warp group %s!", warpGroup.getName())
-                );
+                NetworkModule.getInstance().updateCache().thenRun(() -> {
+                    ChatHelper.sendSuccessfulMessage(creator, "Successfully created the warp group %s!", warpGroup.getName());
+                    // Refresh BlueMap markers
+                    refreshBluemapMarkers();
+                });
             }
 
             @Override
@@ -119,9 +124,11 @@ public class BuildTeam {
             @Override
             public void onResponse(String response) {
                 // Update the cache
-                NetworkModule.getInstance().updateCache().thenRun(() ->
-                        ChatHelper.sendSuccessfulMessage(updater, "Successfully updated the warp %s!", warp.getName())
-                ).exceptionally(e -> {
+                NetworkModule.getInstance().updateCache().thenRun(() -> {
+                    ChatHelper.sendSuccessfulMessage(updater, "Successfully updated the warp %s!", warp.getName());
+                    // Refresh BlueMap markers
+                    refreshBluemapMarkers();
+                }).exceptionally(e -> {
                     updater.sendMessage(ChatHelper.getErrorString("Something went wrong while updating the warp %s! Please take a look at the console.", warp.getName()));
                     e.printStackTrace();
                     return null;
@@ -147,9 +154,11 @@ public class BuildTeam {
             @Override
             public void onResponse(String response) {
                 // Update the cache
-                NetworkModule.getInstance().updateCache().thenRun(() ->
-                        ChatHelper.sendSuccessfulMessage(updater, "Successfully updated the warp group %s!", warpGroup.getName())
-                ).exceptionally(e -> {
+                NetworkModule.getInstance().updateCache().thenRun(() -> {
+                    ChatHelper.sendSuccessfulMessage(updater, "Successfully updated the warp group %s!", warpGroup.getName());
+                    // Refresh BlueMap markers
+                    refreshBluemapMarkers();
+                }).exceptionally(e -> {
                     updater.sendMessage(ChatHelper.getErrorString("Something went wrong while updating the warp group %s! Please take a look at the console.", warpGroup.getName()));
                     e.printStackTrace();
                     return null;
@@ -175,9 +184,11 @@ public class BuildTeam {
             @Override
             public void onResponse(String response) {
                 // Update the cache
-                NetworkModule.getInstance().updateCache().thenRun(() ->
-                        ChatHelper.sendSuccessfulMessage(deleter, "Successfully deleted the warp %s!", warp.getName())
-                );
+                NetworkModule.getInstance().updateCache().thenRun(() -> {
+                    ChatHelper.sendSuccessfulMessage(deleter, "Successfully deleted the warp %s!", warp.getName());
+                    // Refresh BlueMap markers
+                    refreshBluemapMarkers();
+                });
             }
 
             @Override
@@ -199,9 +210,11 @@ public class BuildTeam {
             @Override
             public void onResponse(String response) {
                 // Update the cache
-                NetworkModule.getInstance().updateCache().thenRun(() ->
-                        ChatHelper.sendSuccessfulMessage(deleter, "Successfully deleted the warp group %s!", warpGroup.getName())
-                );
+                NetworkModule.getInstance().updateCache().thenRun(() -> {
+                    ChatHelper.sendSuccessfulMessage(deleter, "Successfully deleted the warp group %s!", warpGroup.getName());
+                    // Refresh BlueMap markers
+                    refreshBluemapMarkers();
+                });
             }
 
             @Override
@@ -210,6 +223,20 @@ public class BuildTeam {
                 e.printStackTrace();
             }
         });
+    }
+
+    /**
+     * Refreshes BlueMap markers for all warp groups.
+     * <p>
+     * This method is called after any warp or warp group is created, updated, or deleted
+     * to ensure the BlueMap display stays in sync with the current state.
+     * </p>
+     */
+    private void refreshBluemapMarkers() {
+        if (NavigationModule.getInstance().getBluemapComponent() != null
+                && NavigationModule.getInstance().getBluemapComponent().isEnabled()) {
+            NavigationModule.getInstance().getBluemapComponent().refreshAllMarkers();
+        }
     }
 
 }

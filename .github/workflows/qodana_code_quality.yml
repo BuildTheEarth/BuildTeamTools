@@ -15,14 +15,15 @@ jobs:
       pull-requests: write
       checks: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}  # to check out the actual pull request commit, not the merge commit
           fetch-depth: 0  # a full history is required for pull request analysis
       - name: 'Qodana Scan'
-        uses: JetBrains/qodana-action@v2025.2
+        uses: JetBrains/qodana-action@v2025.3
         with:
-          pr-mode: false
+          pr-mode: ${{ github.event_name == 'pull_request' }}
+          args: '--baseline,.github/workflows/qodana.sarif.json'
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_538010437 }}
           QODANA_ENDPOINT: 'https://qodana.cloud'

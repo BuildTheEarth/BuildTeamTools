@@ -3,7 +3,7 @@ package net.buildtheearth.buildteamtools.utils.menus;
 import com.alpsbte.alpslib.utils.item.Item;
 import net.buildtheearth.buildteamtools.utils.CustomHeads;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
-import net.daporkchop.lib.common.misc.Tuple;
+import org.apache.commons.lang3.tuple.MutablePair;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -26,12 +26,12 @@ public class NameListMenu extends AbstractPaginatedMenu {
     public static final int BACK_ITEM_SLOT = 27;
 
     protected final List<String> selectedNames;
-    private final List<Tuple<ItemStack, String>> items;
+    private final List<MutablePair<ItemStack, String>> items;
 
     private final AbstractMenu backMenu;
 
 
-    public NameListMenu(Player player, String invName, List<Tuple<ItemStack, String>> items, AbstractMenu backMenu, boolean autoLoad) {
+    public NameListMenu(Player player, String invName, List<MutablePair<ItemStack, String>> items, AbstractMenu backMenu, boolean autoLoad) {
         super(4, 3, invName, player, autoLoad);
 
         this.items = items;
@@ -85,13 +85,13 @@ public class NameListMenu extends AbstractPaginatedMenu {
     @Override
     protected void setPaginatedPreviewItems(List<?> source) {
         // Set pagignated items
-        List<Tuple<ItemStack, String>> pagItems = source.stream().map(l -> (Tuple<ItemStack, String>) l).toList();
+        List<MutablePair<ItemStack, String>> pagItems = source.stream().map(l -> (MutablePair<ItemStack, String>) l).toList();
         int slot = 0;
-        for (Tuple<ItemStack, String> item : pagItems) {
-            if (selectedNames.contains(item.getB()))
-                item.setA(new Item(item.getA()).setAmount(1).addEnchantment(Enchantment.LUCK_OF_THE_SEA, 1).hideEnchantments(true).build());
+        for (MutablePair<ItemStack, String> item : pagItems) {
+            if (selectedNames.contains(item.getRight()))
+                item.setLeft(new Item(item.getLeft()).setAmount(1).addEnchantment(Enchantment.LUCK_OF_THE_SEA, 1).hideEnchantments(true).build());
 
-            getMenu().getSlot(slot).setItem(item.getA());
+            getMenu().getSlot(slot).setItem(item.getLeft());
             slot++;
         }
     }
@@ -103,12 +103,12 @@ public class NameListMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPaginatedItemClickEventsAsync(@NonNull List<?> source) {
-        List<Tuple<ItemStack, String>> pagItems = source.stream().map(l -> (Tuple<ItemStack, String>) l).toList();
+        List<MutablePair<ItemStack, String>> pagItems = source.stream().map(l -> (MutablePair<ItemStack, String>) l).toList();
         int slot = 0;
-        for (Tuple<ItemStack, String> item : pagItems) {
+        for (MutablePair<ItemStack, String> item : pagItems) {
             final int _slot = slot;
             getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
-                String type = (item.getB().toLowerCase());
+                String type = (item.getRight().toLowerCase());
 
                 if (selectedNames.contains(type))
                     selectedNames.remove(type);

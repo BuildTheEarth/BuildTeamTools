@@ -9,8 +9,8 @@ import net.buildtheearth.buildteamtools.modules.generator.components.tree.TreeTy
 import net.buildtheearth.buildteamtools.modules.generator.menu.GeneratorMenu;
 import net.buildtheearth.buildteamtools.modules.generator.model.Settings;
 import net.buildtheearth.buildteamtools.utils.menus.NameListMenu;
-import net.daporkchop.lib.common.misc.Tuple;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.MutablePair;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -28,13 +28,13 @@ public class TreeTypeMenu extends NameListMenu {
     }
 
     /** Get a list of all tree types */
-    private static @NonNull List<Tuple<ItemStack, String>> getTreeTypes() {
-        List<Tuple<ItemStack, String>> treeTypes = new ArrayList<>();
+    private static @NonNull List<MutablePair<ItemStack, String>> getTreeTypes() {
+        List<MutablePair<ItemStack, String>> treeTypes = new ArrayList<>();
 
-        treeTypes.add(new Tuple<>(new Item(XMaterial.LIME_CONCRETE.parseItem()).setDisplayName("Any").build(), "Any"));
+        treeTypes.add(new MutablePair<>(new Item(XMaterial.LIME_CONCRETE.parseItem()).setDisplayName("Any").build(), "Any"));
 
         for(TreeType treeType : TreeType.values())
-            treeTypes.add(new Tuple<>(Item.create(XMaterial.OAK_SAPLING.get(), StringUtils.capitalize(treeType.getName())), treeType.getName()));
+            treeTypes.add(new MutablePair<>(Item.create(XMaterial.OAK_SAPLING.get(), StringUtils.capitalize(treeType.getName())), treeType.getName()));
 
         return treeTypes;
     }

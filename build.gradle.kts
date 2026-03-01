@@ -16,7 +16,6 @@ dependencies {
         exclude(group = "com.github.cryptomorin", module = "XSeries")
     }
     implementation(libs.com.alpsbte.canvas)
-    implementation(libs.net.daporkchop.lib.binary)
     implementation(libs.com.github.cryptomorin.xseries)
     implementation(libs.net.wesjd.anvilgui)
     implementation(libs.micycle.clipper2)

@@ -8,8 +8,8 @@ import net.buildtheearth.buildteamtools.modules.generator.components.tree.TreeSe
 import net.buildtheearth.buildteamtools.modules.generator.components.tree.TreeWidth;
 import net.buildtheearth.buildteamtools.modules.generator.model.Settings;
 import net.buildtheearth.buildteamtools.utils.menus.NameListMenu;
-import net.daporkchop.lib.common.misc.Tuple;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.MutablePair;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -29,13 +29,13 @@ public class TreeWidthMenu extends NameListMenu {
     /**
      * Get a list of all tree widths
      */
-    private static @NonNull List<Tuple<ItemStack, String>> getTreeWidths() {
-        List<Tuple<ItemStack, String>> treeWidths = new ArrayList<>();
+    private static @NonNull List<MutablePair<ItemStack, String>> getTreeWidths() {
+        List<MutablePair<ItemStack, String>> treeWidths = new ArrayList<>();
 
-        treeWidths.add(new Tuple<>(new Item(XMaterial.LIME_CONCRETE.parseItem()).setDisplayName("Any").build(), "Any"));
+        treeWidths.add(new MutablePair<>(new Item(XMaterial.LIME_CONCRETE.parseItem()).setDisplayName("Any").build(), "Any"));
 
         for (TreeWidth treeWidth : TreeWidth.values())
-            treeWidths.add(new Tuple<>(Item.create(XMaterial.JUNGLE_SAPLING.get(), StringUtils.capitalize(treeWidth.getName())), treeWidth.getName()));
+            treeWidths.add(new MutablePair<>(Item.create(XMaterial.JUNGLE_SAPLING.get(), StringUtils.capitalize(treeWidth.getName())), treeWidth.getName()));
 
         return treeWidths;
     }

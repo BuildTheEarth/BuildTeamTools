@@ -7,8 +7,8 @@ import net.buildtheearth.buildteamtools.modules.generator.components.tree.TreeFl
 import net.buildtheearth.buildteamtools.modules.generator.components.tree.TreeSettings;
 import net.buildtheearth.buildteamtools.modules.generator.model.Settings;
 import net.buildtheearth.buildteamtools.utils.menus.NameListMenu;
-import net.daporkchop.lib.common.misc.Tuple;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.MutablePair;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -28,13 +28,13 @@ public class TreeHeightMenu extends NameListMenu {
     /**
      * Get a list of all tree widths
      */
-    private static @NonNull List<Tuple<ItemStack, String>> getTreeHeights() {
-        List<Tuple<ItemStack, String>> treeHeights = new ArrayList<>();
+    private static @NonNull List<MutablePair<ItemStack, String>> getTreeHeights() {
+        List<MutablePair<ItemStack, String>> treeHeights = new ArrayList<>();
 
-        treeHeights.add(new Tuple<>(new Item(XMaterial.LIME_CONCRETE.parseItem()).setDisplayName("Any").build(), "Any"));
+        treeHeights.add(MutablePair.of(new Item(XMaterial.LIME_CONCRETE.parseItem()).setDisplayName("Any").build(), "Any"));
 
         GeneratorModule.getInstance().getTree().getHeights().forEach(h ->
-                treeHeights.add(new Tuple<>(Item.create(XMaterial.PAPER.get(), StringUtils.capitalize(h)), h)));
+                treeHeights.add(MutablePair.of(Item.create(XMaterial.PAPER.get(), StringUtils.capitalize(h)), h)));
 
         return treeHeights;
     }

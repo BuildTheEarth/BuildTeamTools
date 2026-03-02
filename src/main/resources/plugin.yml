@@ -35,13 +35,13 @@ commands:
     description: Opens the block palette menu.
     usage: /blockpalette [filter|menu|filter <filter1> <filter2> ...]
     aliases: [bp, blocks]
-    permission: blockpalette.use
+    permission: btt.bp.use
   buildteam:
     description: Sends the player to the specified BuildTeam
     usage: /buildteam <team>
     aliases: [bt]
 permissions:
-  blockpalette.use:
+  btt.bp.use:
     description: Allows players to use /blockpalette
     default: true
   btt.bp.edit:

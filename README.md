@@ -32,17 +32,16 @@
 <p align="center">
     <a href="https://github.com/BuildTheEarth"><img src="https://go.buildtheearth.net/official-shield" alt="BuildTheEarth Github"></a>
     <a href="https://www.discord.gg/buildtheearth"><img src="https://img.shields.io/discord/690908396404080650?label=Discord&color=768AD4" alt="BuildTheEarth Discord"></a>
+    <a href="https://discord.gg/88YxDHeMSf"><img src="https://img.shields.io/discord/706317564904472627?label=Dev Hub Discord&color=768AD4" alt="BuildTheEarth Dev Hib Discord"></a>
 </p>
 <p align="center">
-    <a href="https://www.spigotmc.org/resources/buildteamtools.101854/"><img src="https://img.shields.io/spiget/downloads/101854?color=green&label=Downloads" alt="Downloads Count"></a>
-    <a href="https://www.spigotmc.org/resources/buildteamtools.101854/"><img src="https://img.shields.io/spiget/version/101854?label=Version" alt="Latest Version"></a>
+    <a href="https://www.spigotmc.org/resources/buildteamtools.101854/"><img src="https://img.shields.io/spiget/downloads/101854?color=green&label=Spigot%20Downloads" alt="Downloads Count"></a>
+    <a href="https://www.spigotmc.org/resources/buildteamtools.101854/"><img src="https://img.shields.io/github/downloads/BuildTheEarth/BuildTeamTools/total?label=GitHub%20Downloads" alt="GitHub Downloads Count"></a>
+    <a href="https://www.spigotmc.org/resources/buildteamtools.101854/"><img src="https://img.shields.io/spiget/version/101854?label=Spigot%20Version" alt="Latest Version"></a>
+    <a href="https://bstats.org/plugin/bukkit/BuildTeamTools/29076"><img alt="bStats Players" src="https://img.shields.io/bstats/players/29076?label=Bstats%20players"></a>
+    <a href="https://bstats.org/plugin/bukkit/BuildTeamTools/29076"><img alt="bStats Servers" src="https://img.shields.io/bstats/servers/29076"></a>
     <img src="https://img.shields.io/github/repo-size/BuildTheEarth/BuildTeamTools" alt="Repo Size">
     <a href="https://github.com/BuildTheEarth/BuildTeamTools/actions/workflows/qodana_code_quality.yml"><img src="https://github.com/BuildTheEarth/BuildTeamTools/actions/workflows/qodana_code_quality.yml/badge.svg" alt="Qodana"></a>
-</p>
-<p align="center">
-    <img alt="bStats Badges" src="https://img.shields.io/badge/bStats%3A?style=for-the-badge">
-    <a href="https://bstats.org/plugin/bukkit/BuildTeamTools/29076"><img alt="bStats Players" src="https://img.shields.io/bstats/players/29076"></a>
-    <a href="https://bstats.org/plugin/bukkit/BuildTeamTools/29076"><img alt="bStats Servers" src="https://img.shields.io/bstats/servers/29076"></a>
 </p>
 
 <br>

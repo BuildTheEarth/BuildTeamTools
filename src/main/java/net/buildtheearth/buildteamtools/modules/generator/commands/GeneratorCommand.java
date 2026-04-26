@@ -6,8 +6,6 @@ import net.buildtheearth.buildteamtools.modules.generator.menu.GeneratorMenu;
 import net.buildtheearth.buildteamtools.modules.generator.model.History;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.buildteamtools.utils.Utils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,54 +14,44 @@ import org.jetbrains.annotations.NotNull;
 
 public class GeneratorCommand implements CommandExecutor {
 
-
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String cmdLabel, String @NotNull [] args) {
         if (!(sender instanceof Player p)) {
             sender.sendMessage("§cOnly players can execute this command.");
             return true;
         }
 
-        if(!p.hasPermission(Permissions.GENERATOR_USE)) {
+        if (!p.hasPermission(Permissions.GENERATOR_USE)) {
             p.sendMessage(ChatHelper.getErrorString("You don't have permission to use this command!"));
             return true;
         }
 
-        // Command Usage: /gen
         if (args.length == 0) {
             new GeneratorMenu(p, true);
             return true;
         }
 
-
-        // Command Usage: /gen house ...
-        switch (args[0]) {
+        switch (args[0].toLowerCase()) {
             case "house":
                 GeneratorModule.getInstance().getHouse().analyzeCommand(p, args);
                 return true;
 
-            // Command Usage: /gen road ...
             case "road":
                 GeneratorModule.getInstance().getRoad().analyzeCommand(p, args);
                 return true;
 
-            // Command Usage: /gen rail ...
             case "rail":
-                p.sendMessage(Component.text("This generator have some serious issues and is currently disabled.", NamedTextColor.DARK_RED));
-                //GeneratorModule.getInstance().getRail().analyzeCommand(p, args);
+            case "railway":
+                GeneratorModule.getInstance().getRail().analyzeCommand(p, args);
                 return true;
 
-            // Command Usage: /gen tree ...
             case "tree":
                 GeneratorModule.getInstance().getTree().analyzeCommand(p, args);
                 return true;
 
-            // Command Usage: /gen field ...
             case "field":
-                p.sendMessage(Component.text("This generator have some serious issues and is currently disabled.", NamedTextColor.DARK_RED));
-                //GeneratorModule.getInstance().getField().analyzeCommand(p, args);
+                p.sendMessage("§cThis generator has serious issues and is currently disabled.");
                 return true;
 
-            // Command Usage: /gen history
             case "history":
                 if (GeneratorModule.getInstance().getPlayerHistory(p).getHistoryEntries().isEmpty()) {
                     p.sendMessage("§cYou didn't generate any structures yet. Use /gen to create one.");
@@ -85,6 +73,7 @@ public class GeneratorCommand implements CommandExecutor {
             case "redo":
                 GeneratorModule.getInstance().getPlayerHistory(p).redoCommand(p);
                 return true;
+
             default:
                 sendHelp(p);
                 return true;
@@ -93,7 +82,6 @@ public class GeneratorCommand implements CommandExecutor {
 
     public static void sendHelp(CommandSender sender) {
         ChatHelper.sendMessageBox(sender, "Generator Command", () -> {
-
             sender.sendMessage("§eHouse Generator:§7 /gen house help");
             sender.sendMessage("§eRoad Generator:§7 /gen road help");
             sender.sendMessage("§eRail Generator:§7 /gen rail help");
@@ -103,7 +91,6 @@ public class GeneratorCommand implements CommandExecutor {
             sender.sendMessage("§eGenerator History:§7 /gen history");
             sender.sendMessage("§eUndo last command:§7 /gen undo");
             sender.sendMessage("§eRedo last command:§7 /gen redo");
-
         });
     }
 }

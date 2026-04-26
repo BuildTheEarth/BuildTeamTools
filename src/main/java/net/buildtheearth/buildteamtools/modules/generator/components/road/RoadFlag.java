@@ -19,7 +19,7 @@ public enum RoadFlag implements Flag {
 
     SIDEWALK_SLAB_COLOR("ss", FlagType.XMATERIAL_LIST),
 
-    ROAD_SLAB_COLOR("rs", FlagType.XMATERIAL_LIST),
+    ROAD_SLAB_COLOR("rsc", FlagType.XMATERIAL_LIST),
 
     CROSSWALK("cw", FlagType.BOOLEAN),
 

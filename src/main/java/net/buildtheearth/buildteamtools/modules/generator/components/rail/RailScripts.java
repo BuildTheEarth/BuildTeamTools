@@ -4,8 +4,10 @@ import com.alpsbte.alpslib.utils.GeneratorUtils;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
 import net.buildtheearth.buildteamtools.modules.generator.model.GeneratorComponent;
@@ -68,7 +70,10 @@ public class RailScripts extends Script {
 
     private List<Vector> getControlPoints() {
         if (getRegion() instanceof CuboidRegion cuboidRegion)
-            return getCuboidCenterLine(cuboidRegion);
+            return getCuboidControlPoints(cuboidRegion);
+
+        if (getRegion() instanceof Polygonal2DRegion polygonalRegion)
+            return getPolygonalControlPoints(polygonalRegion);
 
         List<Vector> points = GeneratorUtils.getSelectionPointsFromRegion(getRegion());
 
@@ -83,30 +88,66 @@ public class RailScripts extends Script {
         return orderPointsAsPath(blockPoints);
     }
 
-    private List<Vector> getCuboidCenterLine(CuboidRegion cuboidRegion) {
-        int minX = cuboidRegion.getMinimumPoint().x();
-        int maxX = cuboidRegion.getMaximumPoint().x();
-        int minY = cuboidRegion.getMinimumPoint().y();
-        int minZ = cuboidRegion.getMinimumPoint().z();
-        int maxZ = cuboidRegion.getMaximumPoint().z();
-
-        int centerX = (minX + maxX) / 2;
-        int centerZ = (minZ + maxZ) / 2;
-
-        int widthX = Math.abs(maxX - minX);
-        int widthZ = Math.abs(maxZ - minZ);
-
+    private List<Vector> getCuboidControlPoints(CuboidRegion cuboidRegion) {
         List<Vector> points = new ArrayList<>();
 
-        if (widthX >= widthZ) {
-            points.add(new Vector(minX, minY, centerZ));
-            points.add(new Vector(maxX, minY, centerZ));
-        } else {
-            points.add(new Vector(centerX, minY, minZ));
-            points.add(new Vector(centerX, minY, maxZ));
+        BlockVector3 pos1 = cuboidRegion.getPos1();
+        BlockVector3 pos2 = cuboidRegion.getPos2();
+
+        Vector start = new Vector(pos1.x(), pos1.y(), pos1.z());
+        Vector end = new Vector(pos2.x(), pos2.y(), pos2.z());
+
+        if (sameBlock(start, end)) {
+            start = new Vector(
+                    cuboidRegion.getMinimumPoint().x(),
+                    cuboidRegion.getMinimumPoint().y(),
+                    cuboidRegion.getMinimumPoint().z()
+            );
+
+            end = new Vector(
+                    cuboidRegion.getMaximumPoint().x(),
+                    cuboidRegion.getMinimumPoint().y(),
+                    cuboidRegion.getMaximumPoint().z()
+            );
         }
 
+        points.add(start);
+        points.add(end);
+
         return points;
+    }
+
+    private List<Vector> getPolygonalControlPoints(Polygonal2DRegion polygonalRegion) {
+        List<Vector> points = new ArrayList<>();
+
+        int minY = polygonalRegion.getMinimumY();
+        int maxY = polygonalRegion.getMaximumY();
+
+        for (BlockVector2 point : polygonalRegion.getPoints()) {
+            int y = findBestYForPolygonPoint(point.x(), point.z(), minY, maxY);
+            points.add(new Vector(point.x(), y, point.z()));
+        }
+
+        if (points.size() < 2)
+            return points;
+
+        return removeOnlyConsecutiveDuplicates(points);
+    }
+
+    private int findBestYForPolygonPoint(int x, int z, int minY, int maxY) {
+        org.bukkit.World world = getPlayer().getWorld();
+
+        int safeMinY = Math.max(world.getMinHeight(), Math.min(minY, maxY));
+        int safeMaxY = Math.min(world.getMaxHeight() - 1, Math.max(minY, maxY));
+
+        for (int y = safeMaxY; y >= safeMinY; y--) {
+            Material material = world.getBlockAt(x, y, z).getType();
+
+            if (material.isSolid())
+                return y;
+        }
+
+        return safeMaxY;
     }
 
     private List<Vector> orderPointsAsPath(List<Vector> points) {

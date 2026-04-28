@@ -8,9 +8,11 @@ import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
-import net.buildtheearth.buildteamtools.utils.CustomHeads;
+import net.buildtheearth.buildteamtools.utils.HeadUtil;
 import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
+import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
+import net.buildtheearth.buildteamtools.utils.heads.LetterType;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import net.buildtheearth.buildteamtools.utils.menus.BookMenu;
 import net.wesjd.anvilgui.AnvilGUI;
@@ -60,13 +62,13 @@ public class WarpGroupEditMenu extends AbstractMenu {
     @Override
     protected void setMenuItemsAsync() {
         // Set the confirmation item
-        getMenu().getSlot(CONFIRM_SLOT).setItem(CustomHeads.getCheckmarkItem(alreadyExists ? "§aUpdate" : "§aCreate"));
+        getMenu().getSlot(CONFIRM_SLOT).setItem(HeadUtil.getCheckmarkItem(alreadyExists ? "§aUpdate" : "§aCreate"));
 
         // Set the warp group item
         getMenu().getSlot(WARP_GROUP).setItem(
-                CustomHeads.getLetterHead(
-                        warpGroup.getName().substring(0, 1),
-                        CustomHeads.LetterType.WOODEN,
+                HeadTexture.getLetterHead(
+                        warpGroup.getName().charAt(0),
+                        LetterType.WOODEN,
                         "§6§l" + warpGroup.getName(),
                         warpGroup.getDescriptionLore()
                 )

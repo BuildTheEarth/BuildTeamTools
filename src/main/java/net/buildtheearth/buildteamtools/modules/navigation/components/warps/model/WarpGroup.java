@@ -4,8 +4,10 @@ import com.alpsbte.alpslib.utils.item.Item;
 import lombok.Getter;
 import lombok.Setter;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
-import net.buildtheearth.buildteamtools.utils.CustomHeads;
+import net.buildtheearth.buildteamtools.utils.HeadUtil;
 import net.buildtheearth.buildteamtools.utils.ListUtil;
+import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
+import net.buildtheearth.buildteamtools.utils.heads.LetterType;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.json.JSONObject;
@@ -77,9 +79,9 @@ public class WarpGroup {
         ArrayList<String> lore = getDescriptionLore();
 
         if(material == null)
-            return  CustomHeads.getLetterHead(
-                    name.substring(0, 1),
-                    CustomHeads.LetterType.WOODEN,
+            return  HeadTexture.getLetterHead(
+                    name.charAt(0),
+                    LetterType.WOODEN,
                     itemName,
                     lore
             );
@@ -89,9 +91,9 @@ public class WarpGroup {
         Material matchedMaterial = Material.matchMaterial(this.material.split(":")[0]);
 
         if(matchedMaterial == null)
-            return CustomHeads.getLetterHead(
-                    name.substring(0, 1),
-                    CustomHeads.LetterType.STONE,
+            return HeadTexture.getLetterHead(
+                    name.charAt(0),
+                    LetterType.STONE,
                     itemName,
                     lore
             );

@@ -1,7 +1,7 @@
 package net.buildtheearth.buildteamtools.utils.menus;
 
 import com.alpsbte.alpslib.utils.item.Item;
-import net.buildtheearth.buildteamtools.utils.CustomHeads;
+import net.buildtheearth.buildteamtools.utils.HeadUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -45,7 +45,7 @@ public class BlockListMenu extends AbstractPaginatedMenu {
         setSwitchPageItems(SWITCH_PAGE_ITEM_SLOT);
 
         if(canProceed())
-            getMenu().getSlot(NEXT_ITEM_SLOT).setItem(CustomHeads.getCheckmarkItem("§eNext"));
+            getMenu().getSlot(NEXT_ITEM_SLOT).setItem(HeadUtil.getCheckmarkItem("§eNext"));
         else
             getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.ITEM_BACKGROUND);
 

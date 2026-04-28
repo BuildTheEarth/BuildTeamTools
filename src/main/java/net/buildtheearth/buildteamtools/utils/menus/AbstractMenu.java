@@ -3,7 +3,9 @@ package net.buildtheearth.buildteamtools.utils.menus;
 import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
-import net.buildtheearth.buildteamtools.utils.CustomHeads;
+import net.buildtheearth.buildteamtools.utils.heads.HeadColorScheme;
+import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
+import net.buildtheearth.buildteamtools.utils.HeadUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
@@ -105,15 +107,15 @@ public abstract class AbstractMenu {
      * @param maxValue Maximum value of the slider
      * @param valueType Type of the value (e.g. "m", "°C", "°F", "blocks", "chunks", "seconds", "minutes", "hours", "days", "weeks", "months", "years", ...)
      */
-    protected void createCounter(CustomHeads.SliderColor sliderColor, int sliderItemSlot, String sliderName, int value, int minValue, int maxValue, String valueType){
+    protected void createCounter(HeadColorScheme sliderColor, int sliderItemSlot, String sliderName, int value, int minValue, int maxValue, String valueType){
         // Set previous page item
-        getMenu().getSlot(sliderItemSlot - 1).setItem(CustomHeads.getCounterMinusItem(sliderColor, sliderName, value, minValue));
+        getMenu().getSlot(sliderItemSlot - 1).setItem(HeadUtil.getCounterMinusItem(sliderColor, sliderName, value, minValue));
 
         // Set current page item
-        getMenu().getSlot(sliderItemSlot).setItem(CustomHeads.getCounterCurrentValueItem(sliderColor, sliderName, value, valueType));
+        getMenu().getSlot(sliderItemSlot).setItem(HeadUtil.getCounterCurrentValueItem(sliderColor, sliderName, value, valueType));
 
         // Set next page item
-        getMenu().getSlot(sliderItemSlot + 1).setItem(CustomHeads.getCounterPlusItem(sliderColor, sliderName, value, maxValue));
+        getMenu().getSlot(sliderItemSlot + 1).setItem(HeadUtil.getCounterPlusItem(sliderColor, sliderName, value, maxValue));
     }
 
     /**
@@ -126,31 +128,31 @@ public abstract class AbstractMenu {
      * @param sliderName Name of the slider
      * @param current Current block item
      */
-    protected void setChoiceItems(CustomHeads.SliderColor sliderColor, int sliderItemSlot, String sliderName, ItemStack current){
+    protected void setChoiceItems(HeadColorScheme sliderColor, int sliderItemSlot, String sliderName, ItemStack current){
         sliderName = "§e" + sliderName;
 
         if(current == null) {
             // Set previous page item
-            getMenu().getSlot(sliderItemSlot - 1).setItem(CustomHeads.getBlankItem(sliderColor, sliderName + ": §c§lOFF"));
+            getMenu().getSlot(sliderItemSlot - 1).setItem(HeadUtil.getBlankItem(sliderColor, sliderName + ": §c§lOFF"));
 
             // Set current page item
             getMenu().getSlot(sliderItemSlot).setItem(Item.create(XMaterial.BARRIER.parseMaterial(), sliderName + ": §c§lOFF"));
 
             // Set next page item
-            getMenu().getSlot(sliderItemSlot + 1).setItem(CustomHeads.getBlankItem(sliderColor, sliderName + ": §c§lOFF"));
+            getMenu().getSlot(sliderItemSlot + 1).setItem(HeadUtil.getBlankItem(sliderColor, sliderName + ": §c§lOFF"));
         }else{
             ItemMeta meta = current.getItemMeta();
             meta.setDisplayName(sliderName);
             current.setItemMeta(meta);
 
             // Set previous page item
-            getMenu().getSlot(sliderItemSlot - 1).setItem(CustomHeads.getXItem(sliderColor, "§cDisable " + sliderName));
+            getMenu().getSlot(sliderItemSlot - 1).setItem(HeadUtil.getXItem(sliderColor, "§cDisable " + sliderName));
 
             // Set current page item
             getMenu().getSlot(sliderItemSlot).setItem(current);
 
             // Set next page item
-            getMenu().getSlot(sliderItemSlot + 1).setItem(CustomHeads.getXItem(sliderColor, "§cDisable " + sliderName));
+            getMenu().getSlot(sliderItemSlot + 1).setItem(HeadUtil.getXItem(sliderColor, "§cDisable " + sliderName));
         }
     }
 
@@ -159,7 +161,7 @@ public abstract class AbstractMenu {
      * @param slot Slot of the back item
      */
     protected void setBackItem(int slot, AbstractMenu backMenu){
-        getMenu().getSlot(slot).setItem(CustomHeads.getBackItem());
+        getMenu().getSlot(slot).setItem(Item.createCustomHeadBase64(HeadTexture.WHITE_BACKWARD.getBase64(), "§eBack", null));
         getMenu().getSlot(slot).setClickHandler((clickPlayer, clickInformation) -> Bukkit.getScheduler().scheduleSyncDelayedTask(BuildTeamTools.getInstance(), () -> {
             clickPlayer.closeInventory();
             backMenu.reloadMenuAsync();

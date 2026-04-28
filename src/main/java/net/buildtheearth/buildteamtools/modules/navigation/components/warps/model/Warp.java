@@ -4,9 +4,11 @@ import com.alpsbte.alpslib.utils.item.Item;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import net.buildtheearth.buildteamtools.utils.CustomHeads;
+import net.buildtheearth.buildteamtools.utils.HeadUtil;
 import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.Utils;
+import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
+import net.buildtheearth.buildteamtools.utils.heads.LetterType;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.json.JSONObject;
@@ -78,9 +80,9 @@ public class Warp {
         }
 
         if(material == null)
-            return  CustomHeads.getLetterHead(
-                    name.substring(0, 1),
-                    CustomHeads.LetterType.STONE,
+            return  HeadTexture.getLetterHead(
+                    name.charAt(0),
+                    LetterType.STONE,
                     itemName,
                     lore
             );
@@ -90,9 +92,9 @@ public class Warp {
         Material material = Material.matchMaterial(this.material.split(":")[0]);
 
         if(material == null)
-            return CustomHeads.getLetterHead(
-                    name.substring(0, 1),
-                    CustomHeads.LetterType.STONE,
+            return HeadTexture.getLetterHead(
+                    name.charAt(0),
+                    LetterType.STONE,
                     itemName,
                     lore
             );

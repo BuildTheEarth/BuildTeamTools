@@ -10,9 +10,11 @@ import net.buildtheearth.buildteamtools.modules.navigation.components.warps.mode
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
-import net.buildtheearth.buildteamtools.utils.CustomHeads;
+import net.buildtheearth.buildteamtools.utils.HeadUtil;
 import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
+import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
+import net.buildtheearth.buildteamtools.utils.heads.LetterType;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import net.buildtheearth.model.GeographicalCoordinate;
 import net.buildtheearth.model.MinecraftCoordinate;
@@ -71,7 +73,7 @@ public class WarpEditMenu extends AbstractMenu {
     @Override
     protected void setMenuItemsAsync() {
         // Set the confirmation item
-        getMenu().getSlot(CONFIRM_SLOT).setItem(CustomHeads.getCheckmarkItem(alreadyExists ? "§aUpdate" : "§aCreate"));
+        getMenu().getSlot(CONFIRM_SLOT).setItem(HeadUtil.getCheckmarkItem(alreadyExists ? "§aUpdate" : "§aCreate"));
 
         // Set the warp item
         getMenu().getSlot(WARP_SLOT).setItem(warp.getMaterialItem());
@@ -89,9 +91,9 @@ public class WarpEditMenu extends AbstractMenu {
 
         // Set the group item
         ArrayList<String> groupLore = ListUtil.createList("", "§eCurrent Group: ", warp.getWarpGroup().getName());
-        getMenu().getSlot(GROUP_SLOT).setItem(CustomHeads.getLetterHead(
-                warp.getWarpGroup().getName().substring(0, 1),
-                CustomHeads.LetterType.WOODEN,
+        getMenu().getSlot(GROUP_SLOT).setItem(HeadTexture.getLetterHead(
+                warp.getWarpGroup().getName().charAt(0),
+                LetterType.WOODEN,
                 "§6§lChange Warp Group",
                 groupLore
         ));

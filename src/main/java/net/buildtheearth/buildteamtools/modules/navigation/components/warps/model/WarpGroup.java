@@ -6,6 +6,7 @@ import lombok.Setter;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.utils.HeadUtil;
 import net.buildtheearth.buildteamtools.utils.ListUtil;
+import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
 import net.buildtheearth.buildteamtools.utils.heads.LetterType;
 import org.bukkit.Material;
@@ -79,9 +80,9 @@ public class WarpGroup {
         ArrayList<String> lore = getDescriptionLore();
 
         if(material == null)
-            return  HeadTexture.getLetterHead(
-                    name.charAt(0),
+            return  HeadFactory.letter(
                     LetterType.WOODEN,
+                    name.charAt(0),
                     itemName,
                     lore
             );
@@ -91,9 +92,9 @@ public class WarpGroup {
         Material matchedMaterial = Material.matchMaterial(this.material.split(":")[0]);
 
         if(matchedMaterial == null)
-            return HeadTexture.getLetterHead(
-                    name.charAt(0),
+            return HeadFactory.letter(
                     LetterType.STONE,
+                    name.charAt(0),
                     itemName,
                     lore
             );

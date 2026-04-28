@@ -9,20 +9,6 @@ import java.util.ArrayList;
 
 public class HeadUtil {
 
-    public static ItemStack getCounterCurrentValueItem(HeadColorScheme sliderColor, String name, int value, String valueType) {
-        String sliderName = "§e" + name + ": §7§l" + value;
-        if (valueType != null)
-            sliderName += " " + valueType;
-
-        switch (sliderColor) {
-            default:
-            case WHITE:
-                return HeadTexture.getWhiteNumberHead(value, sliderName, null);
-            case LIGHT_GRAY:
-                return HeadTexture.getLightGrayNumberHead(value, sliderName, null);
-        }
-    }
-
     public static ItemStack getCounterPlusItem(HeadColorScheme sliderColor, String name, int value, int maxValue) {
         if (value >= maxValue)
             switch (sliderColor) {
@@ -78,9 +64,4 @@ public class HeadUtil {
                 return Item.createCustomHeadBase64(HeadTexture.LIGHT_GRAY_BLANK.getBase64(), name, null);
         }
     }
-
-    public static ItemStack getCheckmarkItem(String name) {
-        return Item.createCustomHeadBase64(HeadTexture.CHECKMARK.getBase64(), name, null);
-    }
-
 }

@@ -4,6 +4,7 @@ import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.utils.heads.HeadColorScheme;
+import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
 import net.buildtheearth.buildteamtools.utils.HeadUtil;
 import net.kyori.adventure.text.Component;
@@ -112,8 +113,10 @@ public abstract class AbstractMenu {
         getMenu().getSlot(sliderItemSlot - 1).setItem(HeadUtil.getCounterMinusItem(sliderColor, sliderName, value, minValue));
 
         // Set current page item
-        getMenu().getSlot(sliderItemSlot).setItem(HeadUtil.getCounterCurrentValueItem(sliderColor, sliderName, value, valueType));
-
+        String currentCounterName = "§e" + sliderName + ": §7§l" + value;
+        if (valueType != null)
+            currentCounterName += " " + valueType;
+        getMenu().getSlot(sliderItemSlot).setItem(HeadFactory.number(sliderColor, value, currentCounterName));
         // Set next page item
         getMenu().getSlot(sliderItemSlot + 1).setItem(HeadUtil.getCounterPlusItem(sliderColor, sliderName, value, maxValue));
     }

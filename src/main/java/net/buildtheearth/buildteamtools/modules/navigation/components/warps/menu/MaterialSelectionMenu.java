@@ -9,6 +9,7 @@ import net.buildtheearth.buildteamtools.modules.navigation.components.warps.mode
 import net.buildtheearth.buildteamtools.utils.HeadUtil;
 import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
+import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
 import net.buildtheearth.buildteamtools.utils.heads.LetterType;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
@@ -50,7 +51,7 @@ public class MaterialSelectionMenu extends AbstractMenu {
     @Override
     protected void setMenuItemsAsync() {
         getMenu().getSlot(MATERIAL_SLOT).setItem(Item.create(XMaterial.STONE.get(), "§6§lItem", ListUtil.createList("", "Change the material of the warp", "to a minecraft item.", "", "§eExample:", "Stone")));
-        getMenu().getSlot(CUSTOM_HEAD_SLOT).setItem(HeadTexture.getLetterHead('?', LetterType.WOODEN, "§6§lCustom Head", ListUtil.createList("", "Change the material of the warp", "to a custom head texture URL.", "", "§eExample:", "https://textures.minecraft.net/texture/...")));
+        getMenu().getSlot(CUSTOM_HEAD_SLOT).setItem(HeadFactory.letter(LetterType.WOODEN, '?', "§6§lCustom Head", ListUtil.createList("", "Change the material of the warp", "to a custom head texture URL.", "", "§eExample:", "https://textures.minecraft.net/texture/...")));
 
         if(object instanceof Warp)
             setBackItem(BACK_ITEM_SLOT, new WarpEditMenu(getMenuPlayer(), (Warp) object, alreadyExists, false));

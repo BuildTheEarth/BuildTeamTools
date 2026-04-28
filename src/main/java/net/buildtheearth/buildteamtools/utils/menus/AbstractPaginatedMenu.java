@@ -2,6 +2,8 @@ package net.buildtheearth.buildteamtools.utils.menus;
 
 import com.alpsbte.alpslib.utils.item.Item;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.utils.heads.HeadColorScheme;
+import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -128,7 +130,7 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
      * @return The current page item.
      */
     private ItemStack getCurrentPageItem() {
-        return HeadTexture.getWhiteNumberHead(currentPage, "§eCurrent Page §7- §f" + (currentPage), null);
+        return HeadFactory.number(HeadColorScheme.WHITE, currentPage, "§eCurrent Page §7- §f" + (currentPage));
     }
 
     /**

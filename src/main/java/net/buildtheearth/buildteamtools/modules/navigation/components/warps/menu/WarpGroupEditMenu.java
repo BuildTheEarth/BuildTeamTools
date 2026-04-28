@@ -11,6 +11,7 @@ import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.buildteamtools.utils.HeadUtil;
 import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
+import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
 import net.buildtheearth.buildteamtools.utils.heads.LetterType;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
@@ -62,13 +63,13 @@ public class WarpGroupEditMenu extends AbstractMenu {
     @Override
     protected void setMenuItemsAsync() {
         // Set the confirmation item
-        getMenu().getSlot(CONFIRM_SLOT).setItem(HeadUtil.getCheckmarkItem(alreadyExists ? "§aUpdate" : "§aCreate"));
+        getMenu().getSlot(CONFIRM_SLOT).setItem(HeadFactory.head(HeadTexture.CHECKMARK, alreadyExists ? "§aUpdate" : "§aCreate"));
 
         // Set the warp group item
         getMenu().getSlot(WARP_GROUP).setItem(
-                HeadTexture.getLetterHead(
-                        warpGroup.getName().charAt(0),
+                HeadFactory.letter(
                         LetterType.WOODEN,
+                        warpGroup.getName().charAt(0),
                         "§6§l" + warpGroup.getName(),
                         warpGroup.getDescriptionLore()
                 )

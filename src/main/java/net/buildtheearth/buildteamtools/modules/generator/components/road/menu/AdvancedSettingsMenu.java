@@ -11,6 +11,8 @@ import net.buildtheearth.buildteamtools.utils.HeadUtil;
 import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.heads.HeadColorScheme;
+import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
+import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -74,7 +76,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
         setChoiceItems(HeadColorScheme.WHITE, SIDEWALK_SLAB_SLOT, "Sidewalk Elevation Slab", sidewalkSlab[0].parseItem());
         setChoiceItems(HeadColorScheme.LIGHT_GRAY, STREET_LAMP_TYPE_SLOT, "Street Lamp Type", streetLampType);
 
-        getMenu().getSlot(NEXT_ITEM_SLOT).setItem(HeadUtil.getCheckmarkItem("§eNext"));
+        getMenu().getSlot(NEXT_ITEM_SLOT).setItem(HeadFactory.head(HeadTexture.CHECKMARK, "§eNext"));
 
         setBackItem(BACK_ITEM_SLOT, new SidewalkColorMenu(getMenuPlayer(), false));
 

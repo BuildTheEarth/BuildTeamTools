@@ -3,6 +3,8 @@ package net.buildtheearth.buildteamtools.utils.menus;
 import com.alpsbte.alpslib.utils.item.Item;
 import net.buildtheearth.buildteamtools.utils.HeadUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
+import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
+import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -47,7 +49,7 @@ public class NameListMenu extends AbstractPaginatedMenu {
         setSwitchPageItems(SWITCH_PAGE_ITEM_SLOT);
 
         if (canProceed())
-            getMenu().getSlot(NEXT_ITEM_SLOT).setItem(HeadUtil.getCheckmarkItem("§eNext"));
+            getMenu().getSlot(NEXT_ITEM_SLOT).setItem(HeadFactory.head(HeadTexture.CHECKMARK, "§eNext"));
         else
             getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.ITEM_BACKGROUND);
 

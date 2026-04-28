@@ -4,16 +4,22 @@ import com.alpsbte.alpslib.utils.ChatHelper;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import lombok.experimental.UtilityClass;
+import net.buildtheearth.OutOfProjectionBoundsException;
+import net.buildtheearth.Projection;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
+import net.buildtheearth.model.GeographicalCoordinate;
+import net.buildtheearth.model.MinecraftCoordinate;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.UnsafeValues;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -116,5 +122,55 @@ public class NavUtils {
     public static @NotNull WarpGroup createOtherWarpGroup(BuildTeam team) {
         // Create an "other" Warp Group for warps that don't belong to a warp group
         return new WarpGroup(team, "Other", "Other warps", -1, null);
+    }
+
+    /**
+     * Creates a minecraft location object for the specified coordinates, yaw and pitch from the BTE projection.
+     * Height is extracted from the world.
+     * <p>
+     * Note: Height returned is actually terrain elevation +2. This is because this method internally uses
+     * Bukkits @see World::getHighestBlockYAt() already returns elevation+1, and this method deliberately
+     * adds one to the location elevation on top.
+     * </p
+     * The world is extracted from the server config's "earth world". If no earth world is specified then the height defaults to 64
+     * and the world is nullified.
+     *
+     * @param coordinate Latitude and longitude of the location
+     * @param yaw        Player's yaw
+     * @param pitch      Player's pitch
+     * @return A bukkit location matching the coordinates, yaw and pitch specified. Height is terrain elevation +2.
+     */
+    public static Location getLocationFromCoordinatesYawPitch(GeographicalCoordinate coordinate, float yaw, float pitch) {
+        try {
+            MinecraftCoordinate mcCoord = Projection.toMinecraft(coordinate);
+
+            World earthWorld = BuildTeamTools.getInstance().getEarthWorld();
+            int y = 64;
+
+            if (earthWorld != null)
+                y = earthWorld.getHighestBlockYAt(mcCoord.blockX(), mcCoord.blockZ() + 1);
+
+            return new Location(earthWorld, mcCoord.x(), y, mcCoord.z(), yaw, pitch);
+        } catch (OutOfProjectionBoundsException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Creates a minecraft location object for the specified coordinates from the BTE projection.
+     * Height is extracted from the world.
+     * <p>
+     * Note: Height returned is actually terrain elevation +2. This is because this method internally uses
+     * Bukkits @see World::getHighestBlockYAt() already returns elevation+1, and this method deliberately
+     * adds one to the location elevation on top.
+     * </p
+     * The world is extracted from the server config's "earth world". If no earth world is specified then the height defaults to 64
+     * and the world is nullified.
+     *
+     * @param coordinate Latitude and longitude of the location
+     * @return A bukkit location matching the coordinates. Height is terrain elevation +2.
+     */
+    public static Location getLocationFromCoordinates(GeographicalCoordinate coordinate) {
+        return getLocationFromCoordinatesYawPitch(coordinate, 0, 0);
     }
 }

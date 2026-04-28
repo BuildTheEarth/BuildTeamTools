@@ -4,10 +4,11 @@ import com.alpsbte.alpslib.utils.ChatHelper;
 import com.cryptomorin.xseries.XMaterial;
 import de.micromata.opengis.kml.v_2_2_0.Coordinate;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.modules.navigation.NavUtils;
 import net.buildtheearth.buildteamtools.utils.BlockLocation;
-import net.buildtheearth.buildteamtools.utils.GeometricUtils;
 import net.buildtheearth.buildteamtools.utils.LineRasterization;
 import net.buildtheearth.buildteamtools.utils.PolygonTools;
+import net.buildtheearth.model.GeographicalCoordinate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -516,7 +517,7 @@ public class KmlCommand implements CommandExecutor {
      * <p>
      * This method:
      * <ol>
-     *   <li>Converts lat/lon to Minecraft X/Z using {@link GeometricUtils#getLocationFromCoordinates(double[])}</li>
+     *   <li>Converts lat/lon to Minecraft X/Z using </li>
      *   <li>Applies the KML altitude offset (Google Earth altitudes are relative to ground)</li>
      * </ol>
      * <p>
@@ -527,7 +528,7 @@ public class KmlCommand implements CommandExecutor {
      * @return A Bukkit Location with X/Z from projection and Y adjusted for altitude
      */
     private @NonNull Location getLocationFromCoordinates(double[] coordinates, double altitudeFromKML) {
-        Location mcLocation = GeometricUtils.getLocationFromCoordinates(coordinates);
+        Location mcLocation = NavUtils.getLocationFromCoordinates(new GeographicalCoordinate(coordinates[0], coordinates[1]));
         //add altitude from kml (altitude from Google Earth is always relative to ground)
         //note: the "-2" is only neccesary because 
         //  getLocationFromCoordinates returns terrain altitude + 2

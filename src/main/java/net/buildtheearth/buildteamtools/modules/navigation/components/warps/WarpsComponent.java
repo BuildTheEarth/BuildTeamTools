@@ -18,7 +18,6 @@ import net.buildtheearth.buildteamtools.modules.navigation.components.warps.mode
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
-import net.buildtheearth.buildteamtools.utils.GeometricUtils;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import net.buildtheearth.model.GeographicalCoordinate;
 import net.buildtheearth.model.MinecraftCoordinate;
@@ -65,7 +64,7 @@ public class WarpsComponent extends ModuleComponent {
                 return;
             }
 
-            Location targetWarpLocation = GeometricUtils.getLocationFromCoordinatesYawPitch(new double[]{warp.getLat(), warp.getLon()}, warp.getYaw(), warp.getPitch());
+            Location targetWarpLocation = NavUtils.getLocationFromCoordinatesYawPitch(new GeographicalCoordinate(warp.getLat(), warp.getLon()), warp.getYaw(), warp.getPitch());
             targetWarpLocation.setY(warp.getY());
             targetWarpLocation.setWorld(Bukkit.getWorld(warp.getWorldName()));
 
@@ -104,7 +103,7 @@ public class WarpsComponent extends ModuleComponent {
         // If the warp is in the same team, just teleport the player
         if(warp.getWarpGroup().getBuildTeam().getID().equals(NetworkModule.getInstance().getBuildTeam().getID())) {
             ChatHelper.logDebug("Warping player %s to warp %s", player.getName(), warp.getName());
-            Location loc = GeometricUtils.getLocationFromCoordinatesYawPitch(new double[]{warp.getLat(), warp.getLon()}, warp.getYaw(), warp.getPitch());
+            Location loc = NavUtils.getLocationFromCoordinatesYawPitch(new GeographicalCoordinate(warp.getLat(), warp.getLon()), warp.getYaw(), warp.getPitch());
 
             if(loc.getWorld() == null) {
                 World world = Bukkit.getWorld(warp.getWorldName()) == null ? player.getWorld() : Bukkit.getWorld(warp.getWorldName());

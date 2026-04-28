@@ -24,7 +24,7 @@ dependencies {
     implementation(libs.com.googlecode.json.simple)
     implementation(libs.bstats.bukkit)
     implementation(platform(libs.fawe.bom))
-    implementation("net.buildtheearth:projection:1.0.2")
+    implementation("net.buildtheearth:projection:1.0.3")
 
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core")
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") { isTransitive = false }

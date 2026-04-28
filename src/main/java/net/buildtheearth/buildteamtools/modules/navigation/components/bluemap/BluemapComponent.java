@@ -5,14 +5,17 @@ import de.bluecolored.bluemap.api.BlueMapAPI;
 import de.bluecolored.bluemap.api.BlueMapMap;
 import de.bluecolored.bluemap.api.markers.MarkerSet;
 import de.bluecolored.bluemap.api.markers.POIMarker;
+import net.buildtheearth.OutOfProjectionBoundsException;
+import net.buildtheearth.Projection;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.ModuleComponent;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
-import net.buildtheearth.buildteamtools.utils.geo.CoordinateConversion;
 import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
 import net.buildtheearth.buildteamtools.utils.io.ConfigUtil;
+import net.buildtheearth.model.GeographicalCoordinate;
+import net.buildtheearth.model.MinecraftCoordinate;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -145,16 +148,20 @@ public class BluemapComponent extends ModuleComponent {
      */
     private void addWarpMarker(@NotNull MarkerSet markerSet, @NotNull Warp warp) {
         // Convert geographic coordinates to Minecraft world coordinates
-        double[] xz = CoordinateConversion.convertFromGeo(warp.getLat(), warp.getLon());
+        try {
+            MinecraftCoordinate coordinate = Projection.toMinecraft(new GeographicalCoordinate(warp.getLat(), warp.getLon()));
 
-        // Create a POI marker for the warp
-        POIMarker marker = POIMarker.builder()
-                .label(warp.getName())
-                .position(new Vector3d(xz[0], warp.getY(), xz[1]))
-                .build();
+            // Create a POI marker for the warp
+            POIMarker marker = POIMarker.builder()
+                    .label(warp.getName())
+                    .position(new Vector3d(coordinate.x(), warp.getY(), coordinate.z()))
+                    .build();
 
-        // Add marker to the marker set
-        markerSet.getMarkers().put(warp.getId().toString(), marker);
+            // Add marker to the marker set
+            markerSet.getMarkers().put(warp.getId().toString(), marker);
+        } catch (OutOfProjectionBoundsException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

@@ -3,6 +3,8 @@ package net.buildtheearth.buildteamtools.modules.navigation.components.warps.men
 import com.alpsbte.alpslib.utils.ChatHelper;
 import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
+import net.buildtheearth.OutOfProjectionBoundsException;
+import net.buildtheearth.Projection;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
@@ -11,8 +13,9 @@ import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.buildteamtools.utils.CustomHeads;
 import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
-import net.buildtheearth.buildteamtools.utils.geo.CoordinateConversion;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
+import net.buildtheearth.model.GeographicalCoordinate;
+import net.buildtheearth.model.MinecraftCoordinate;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -129,39 +132,43 @@ public class WarpEditMenu extends AbstractMenu {
 
             // Get the geographic coordinates of the player's location.
             Location location = clickPlayer.getLocation();
-            double[] coordinates = CoordinateConversion.convertToGeo(location.getX(), location.getZ());
+            try {
+                GeographicalCoordinate coordinate = Projection.toGeo(new MinecraftCoordinate(location.getX(), location.getZ()));
 
-            //Get the country belonging to the coordinates
-            CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(coordinates);
+                //Get the country belonging to the coordinates
+                CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(new double[] {coordinate.latitude(), coordinate.longitude()} );
 
-            future.thenAccept(result -> {
-                String regionName = result[0];
-                String countryCodeCCA2 = result[1].toUpperCase();
+                future.thenAccept(result -> {
+                    String regionName = result[0];
+                    String countryCodeCCA2 = result[1].toUpperCase();
 
-                //Check if the team owns this region/country
-                boolean ownsRegion = NetworkModule.getInstance().ownsRegion(regionName, countryCodeCCA2);
+                    //Check if the team owns this region/country
+                    boolean ownsRegion = NetworkModule.getInstance().ownsRegion(regionName, countryCodeCCA2);
 
-                if(!ownsRegion) {
-                    clickPlayer.sendMessage(ChatHelper.getErrorString("This team does not own the country %s!", result[0]));
-                    return;
-                }
+                    if(!ownsRegion) {
+                        clickPlayer.sendMessage(ChatHelper.getErrorString("This team does not own the country %s!", result[0]));
+                        return;
+                    }
 
-                warp.setCountryCode(countryCodeCCA2);
-                warp.setWorldName(location.getWorld().getName());
-                warp.setY(location.getY());
-                warp.setLat(coordinates[0]);
-                warp.setLon(coordinates[1]);
-                warp.setYaw(location.getYaw());
-                warp.setPitch(location.getPitch());
+                    warp.setCountryCode(countryCodeCCA2);
+                    warp.setWorldName(location.getWorld().getName());
+                    warp.setY(location.getY());
+                    warp.setLat(coordinate.latitude());
+                    warp.setLon(coordinate.longitude());
+                    warp.setYaw(location.getYaw());
+                    warp.setPitch(location.getPitch());
 
-                clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
+                    clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
-                new WarpEditMenu(clickPlayer, warp, alreadyExists, true);
-            }).exceptionally(e -> {
-                clickPlayer.sendMessage(ChatHelper.getErrorString("An error occurred while changing the location of the warp!"));
-                e.printStackTrace();
-                return null;
-            });
+                    new WarpEditMenu(clickPlayer, warp, alreadyExists, true);
+                }).exceptionally(e -> {
+                    clickPlayer.sendMessage(ChatHelper.getErrorString("An error occurred while changing the location of the warp!"));
+                    e.printStackTrace();
+                    return null;
+                });
+            } catch (OutOfProjectionBoundsException e) {
+                throw new RuntimeException(e);
+            }
         });
 
 

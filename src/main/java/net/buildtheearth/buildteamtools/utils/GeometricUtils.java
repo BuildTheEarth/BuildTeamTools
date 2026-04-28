@@ -1,8 +1,11 @@
 package net.buildtheearth.buildteamtools.utils;
 
+import net.buildtheearth.OutOfProjectionBoundsException;
+import net.buildtheearth.Projection;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
-import net.buildtheearth.buildteamtools.utils.geo.CoordinateConversion;
 import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
+import net.buildtheearth.model.GeographicalCoordinate;
+import net.buildtheearth.model.MinecraftCoordinate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -25,20 +28,21 @@ public class GeometricUtils {
      * @return A bukkit location matching the coordinates, yaw and pitch specified. Height is terrain elevation +2.
      */
     public static Location getLocationFromCoordinatesYawPitch(double[] coordinates, float yaw, float pitch) {
-        double[] xz = CoordinateConversion.convertFromGeo(coordinates[0], coordinates[1]);
+        try {
+            MinecraftCoordinate coordinate = Projection.toMinecraft(new GeographicalCoordinate(coordinates[0], coordinates[1]));
 
-        double x = xz[0];
-        double z = xz[1];
+            //Creates the location
+            Location location;
+            World tpWorld = Bukkit.getWorld(BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.EARTH_WORLD));
+            if (tpWorld == null)
+                location = new Location(null, coordinate.x(), 64, coordinate.z(), yaw, pitch);
+            else
+                location = new Location(tpWorld, coordinate.x(), (tpWorld.getHighestBlockYAt((int) coordinate.x(), (int) coordinate.z()) + 1), coordinate.z(), yaw, pitch);
 
-        //Creates the location
-        Location location;
-        World tpWorld = Bukkit.getWorld(BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.EARTH_WORLD));
-        if (tpWorld == null)
-            location = new Location(null, x, 64, z, yaw, pitch);
-        else
-            location = new Location(tpWorld, x, (tpWorld.getHighestBlockYAt((int) x, (int) z) + 1), z, yaw, pitch);
-
-        return location;
+            return location;
+        } catch (OutOfProjectionBoundsException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -56,20 +60,22 @@ public class GeometricUtils {
      * @return A bukkit location matching the coordinates. Height is terrain elevation +2.
      */
     public static Location getLocationFromCoordinates(double[] coordinates) {
-        double[] xz = CoordinateConversion.convertFromGeo(coordinates[0], coordinates[1]);
+        try {
+            MinecraftCoordinate coordinate = Projection.toMinecraft(new GeographicalCoordinate(coordinates[0], coordinates[1]));
 
-        double x = xz[0];
-        double z = xz[1];
+            //Creates the location
+            Location location;
+            World tpWorld = Bukkit.getWorld(BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.EARTH_WORLD));
 
-        //Creates the location
-        Location location;
-        World tpWorld = Bukkit.getWorld(BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.EARTH_WORLD));
+            if (tpWorld == null)
+                location = new Location(null, coordinate.x(), 64, coordinate.z());
+            else
+                location = new Location(tpWorld, coordinate.x(), (tpWorld.getHighestBlockYAt((int) coordinate.x(), (int) coordinate.z()) + 1), coordinate.z());
 
-        if (tpWorld == null)
-            location = new Location(null, x, 64, z);
-        else
-            location = new Location(tpWorld, x, (tpWorld.getHighestBlockYAt((int) x, (int) z) + 1), z);
+            return location;
+        } catch (OutOfProjectionBoundsException e) {
+            throw new RuntimeException(e);
+        }
 
-        return location;
     }
 }

@@ -1,7 +1,6 @@
 package net.buildtheearth.buildteamtools.utils.menus;
 
 import com.alpsbte.alpslib.utils.item.Item;
-import net.buildtheearth.buildteamtools.utils.HeadUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;

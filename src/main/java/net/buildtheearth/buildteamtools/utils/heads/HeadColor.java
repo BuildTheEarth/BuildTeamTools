@@ -1,6 +1,6 @@
 package net.buildtheearth.buildteamtools.utils.heads;
 
-public enum HeadColorScheme {
+public enum HeadColor {
     WHITE,
     LIGHT_GRAY;
 }

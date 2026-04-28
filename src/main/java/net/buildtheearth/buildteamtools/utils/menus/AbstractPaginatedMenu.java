@@ -2,7 +2,7 @@ package net.buildtheearth.buildteamtools.utils.menus;
 
 import com.alpsbte.alpslib.utils.item.Item;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
-import net.buildtheearth.buildteamtools.utils.heads.HeadColorScheme;
+import net.buildtheearth.buildteamtools.utils.heads.HeadColor;
 import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
 import org.bukkit.Bukkit;
@@ -130,7 +130,7 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
      * @return The current page item.
      */
     private ItemStack getCurrentPageItem() {
-        return HeadFactory.number(HeadColorScheme.WHITE, currentPage, "§eCurrent Page §7- §f" + (currentPage));
+        return HeadFactory.number(HeadColor.WHITE, currentPage, "§eCurrent Page §7- §f" + (currentPage));
     }
 
     /**
@@ -138,9 +138,9 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
      */
     private ItemStack getPreviousPageItem() {
         if (currentPage <= 1)
-            return Item.createCustomHeadBase64(HeadTexture.WHITE_BLANK.getBase64(), " ", null);
+            return HeadFactory.head(HeadTexture.WHITE_BLANK, " ");
 
-        return Item.createCustomHeadBase64(HeadTexture.WHITE_ARROW_LEFT.getBase64(), "§ePrevious Page §7- §f" + (currentPage - 1), null);
+        return HeadFactory.head(HeadTexture.WHITE_ARROW_LEFT, "§ePrevious Page §7- §f" + (currentPage - 1));
     }
 
     /**
@@ -148,9 +148,9 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
      */
     private ItemStack getNextPageItem() {
         if (!hasNextPage())
-            return Item.createCustomHeadBase64(HeadTexture.WHITE_BLANK.getBase64(), " ", null);
+            return HeadFactory.head(HeadTexture.WHITE_BLANK, " ");
 
-        return Item.createCustomHeadBase64(HeadTexture.WHITE_ARROW_RIGHT.getBase64(), "§eNext Page §7- §f" + (currentPage + 1), null);
+        return HeadFactory.head(HeadTexture.WHITE_ARROW_RIGHT, "§eNext Page §7- §f" + (currentPage + 1));
     }
 
 

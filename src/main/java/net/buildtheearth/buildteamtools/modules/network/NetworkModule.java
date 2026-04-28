@@ -14,7 +14,6 @@ import net.buildtheearth.buildteamtools.modules.network.model.Region;
 import net.buildtheearth.buildteamtools.modules.network.model.RegionType;
 import net.buildtheearth.buildteamtools.utils.WikiLinks;
 import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
-import net.buildtheearth.buildteamtools.utils.io.Constants;
 import net.buildtheearth.buildteamtools.utils.io.Errors;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -31,6 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class NetworkModule extends Module {
 
     public static final int CACHE_UPLOAD_SPEED = 20 * 60 * 10 + 20;
+    private static final String DEFAULT_API_KEY = "00000000-0000-0000-0000-000000000000";
 
     /**
      * Information about the build team of this server
@@ -67,7 +67,7 @@ public class NetworkModule extends Module {
     @Override
     public void enable() {
         String apiKey = BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY);
-        if (apiKey == null || apiKey.isEmpty() || apiKey.equals(Constants.DEFAULT_API_KEY)) {
+        if (apiKey == null || apiKey.isEmpty() || apiKey.equals(DEFAULT_API_KEY)) {
             shutdown(Errors.API_KEY_NOT_CONFIGURED);
             return;
         }

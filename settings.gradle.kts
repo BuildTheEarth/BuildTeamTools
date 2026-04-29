@@ -9,7 +9,6 @@ dependencyResolutionManagement {
             url = uri("https://repo.papermc.io/repository/maven-public/")
         }
 
-        // BTE REPO! :)
         maven {
             url = uri("https://maven.buildtheearth.net/releases")
         }

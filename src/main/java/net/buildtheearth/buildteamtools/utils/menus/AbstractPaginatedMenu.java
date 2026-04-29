@@ -1,10 +1,14 @@
 package net.buildtheearth.buildteamtools.utils.menus;
 
+import com.alpsbte.alpslib.utils.item.Item;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
-import net.buildtheearth.buildteamtools.utils.CustomHeads;
+import net.buildtheearth.buildteamtools.utils.heads.HeadColor;
+import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
+import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -122,6 +126,34 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
         return (currentPage + 1) * maxItemsPerPage;
     }
 
+    /**
+     * @return The current page item.
+     */
+    private ItemStack getCurrentPageItem() {
+        return HeadFactory.number(HeadColor.WHITE, getPage(), "§eCurrent Page §7- §f" + getPage());
+    }
+
+    /**
+     * @return The previous page item.
+     */
+    private ItemStack getPreviousPageItem() {
+        if (currentPage <= 1)
+            return HeadFactory.head(HeadTexture.WHITE_BLANK, " ");
+
+        return HeadFactory.head(HeadTexture.WHITE_ARROW_LEFT, "§ePrevious Page §7- §f" + (getPage() - 1));
+    }
+
+    /**
+     * @return The next page item.
+     */
+    private ItemStack getNextPageItem() {
+        if (!hasNextPage())
+            return HeadFactory.head(HeadTexture.WHITE_BLANK, " ");
+
+        return HeadFactory.head(HeadTexture.WHITE_ARROW_RIGHT, "§eNext Page §7- §f" + (getPage() + 1));
+    }
+    
+
 
     /**
      * @param reloadSources if true, reload the source collection for the inventory items
@@ -152,13 +184,13 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
         int currentPage = getPage();
 
         // Set previous page item
-        getMenu().getSlot(switchPageItemSlot - 1).setItem(CustomHeads.getPreviousPageItem(currentPage));
+        getMenu().getSlot(switchPageItemSlot - 1).setItem(getPreviousPageItem());
 
         // Set current page item
-        getMenu().getSlot(switchPageItemSlot).setItem(CustomHeads.getCurrentPageItem(currentPage));
+        getMenu().getSlot(switchPageItemSlot).setItem(getCurrentPageItem());
 
         // Set next page item
-        getMenu().getSlot(switchPageItemSlot + 1).setItem(CustomHeads.getNextPageItem(currentPage, hasNextPage()));
+        getMenu().getSlot(switchPageItemSlot + 1).setItem(getNextPageItem());
     }
 
     protected void setSwitchPageItemClickEvents(int switchPageItemSlot){
@@ -178,4 +210,5 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
             }
         });
     }
+
 }

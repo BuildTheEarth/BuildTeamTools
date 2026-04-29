@@ -4,6 +4,8 @@ import com.alpsbte.alpslib.utils.ChatHelper;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import net.buildtheearth.OutOfProjectionBoundsException;
+import net.buildtheearth.Projection;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.ModuleComponent;
 import net.buildtheearth.buildteamtools.modules.navigation.NavUtils;
@@ -16,9 +18,9 @@ import net.buildtheearth.buildteamtools.modules.navigation.components.warps.mode
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
-import net.buildtheearth.buildteamtools.utils.GeometricUtils;
-import net.buildtheearth.buildteamtools.utils.geo.CoordinateConversion;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
+import net.buildtheearth.model.GeographicalCoordinate;
+import net.buildtheearth.model.MinecraftCoordinate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -62,7 +64,7 @@ public class WarpsComponent extends ModuleComponent {
                 return;
             }
 
-            Location targetWarpLocation = GeometricUtils.getLocationFromCoordinatesYawPitch(new double[]{warp.getLat(), warp.getLon()}, warp.getYaw(), warp.getPitch());
+            Location targetWarpLocation = NavUtils.getLocationFromCoordinatesYawPitch(new GeographicalCoordinate(warp.getLat(), warp.getLon()), warp.getYaw(), warp.getPitch());
             targetWarpLocation.setY(warp.getY());
             targetWarpLocation.setWorld(Bukkit.getWorld(warp.getWorldName()));
 
@@ -101,7 +103,7 @@ public class WarpsComponent extends ModuleComponent {
         // If the warp is in the same team, just teleport the player
         if(warp.getWarpGroup().getBuildTeam().getID().equals(NetworkModule.getInstance().getBuildTeam().getID())) {
             ChatHelper.logDebug("Warping player %s to warp %s", player.getName(), warp.getName());
-            Location loc = GeometricUtils.getLocationFromCoordinatesYawPitch(new double[]{warp.getLat(), warp.getLon()}, warp.getYaw(), warp.getPitch());
+            Location loc = NavUtils.getLocationFromCoordinatesYawPitch(new GeographicalCoordinate(warp.getLat(), warp.getLon()), warp.getYaw(), warp.getPitch());
 
             if(loc.getWorld() == null) {
                 World world = Bukkit.getWorld(warp.getWorldName()) == null ? player.getWorld() : Bukkit.getWorld(warp.getWorldName());
@@ -156,37 +158,41 @@ public class WarpsComponent extends ModuleComponent {
     public static void createWarp(@NonNull Player creator, WarpGroup group) {
         // Get the geographic coordinates of the player's location.
         Location location = creator.getLocation();
-        double[] coordinates = CoordinateConversion.convertToGeo(location.getX(), location.getZ());
+        try {
+            GeographicalCoordinate coordinate = Projection.toGeo(new MinecraftCoordinate(location.getX(), location.getZ()));
 
-        //Get the country belonging to the coordinates
-        CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(coordinates);
+            //Get the country belonging to the coordinates
+            CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(new double[] { coordinate.latitude(), coordinate.longitude() });
 
-        future.thenAccept(result -> {
-            String regionName = result[0];
-            String countryCodeCCA2 = result[1].toUpperCase();
+            future.thenAccept(result -> {
+                String regionName = result[0];
+                String countryCodeCCA2 = result[1].toUpperCase();
 
-            //Check if the team owns this region/country
-            boolean ownsRegion = NetworkModule.getInstance().ownsRegion(regionName, countryCodeCCA2);
+                //Check if the team owns this region/country
+                boolean ownsRegion = NetworkModule.getInstance().ownsRegion(regionName, countryCodeCCA2);
 
-            if(!ownsRegion) {
-                creator.sendMessage(ChatHelper.getErrorString("This team does not own the country %s!", result[0]));
-                return;
-            }
+                if(!ownsRegion) {
+                    creator.sendMessage(ChatHelper.getErrorString("This team does not own the country %s!", result[0]));
+                    return;
+                }
 
-            // Create a default name for the warp
-            String name = creator.getName() + "'s Warp";
+                // Create a default name for the warp
+                String name = creator.getName() + "'s Warp";
 
-            // Create an instance of the warp POJO
-            Warp warp = new Warp(group, name, countryCodeCCA2, "cca2", null, null, null, location.getWorld().getName(), coordinates[0], coordinates[1], location.getY(), location.getYaw(), location.getPitch(), false);
+                // Create an instance of the warp POJO
+                Warp warp = new Warp(group, name, countryCodeCCA2, "cca2", null, null, null, location.getWorld().getName(), coordinate.latitude(), coordinate.longitude(), location.getY(), location.getYaw(), location.getPitch(), false);
 
-            Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), () ->
-                    new WarpEditMenu(creator, warp, false, true));
+                Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), () ->
+                        new WarpEditMenu(creator, warp, false, true));
 
-        }).exceptionally(e -> {
-            creator.sendMessage(ChatHelper.getErrorString("An error occurred while creating the warp! %s", e.getMessage()));
-            BuildTeamTools.getInstance().getComponentLogger().error("An error occurred while creating the warp!", e);
-            return null;
-        });
+            }).exceptionally(e -> {
+                creator.sendMessage(ChatHelper.getErrorString("An error occurred while creating the warp! %s", e.getMessage()));
+                BuildTeamTools.getInstance().getComponentLogger().error("An error occurred while creating the warp!", e);
+                return null;
+            });
+        } catch (OutOfProjectionBoundsException e) {
+            ChatHelper.sendErrorMessage(creator, e.getMessage());
+        }
     }
 
 

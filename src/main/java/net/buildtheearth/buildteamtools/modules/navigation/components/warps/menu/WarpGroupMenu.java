@@ -9,9 +9,10 @@ import net.buildtheearth.buildteamtools.modules.navigation.components.warps.mode
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
-import net.buildtheearth.buildteamtools.utils.CustomHeads;
 import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
+import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
+import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
 import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
 import net.buildtheearth.buildteamtools.utils.io.ConfigUtil;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
@@ -83,10 +84,7 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
         // Create a create warp group item if the player has permission
         if (showPlusItem) {
             getMenu().getSlot(ALTERNATE_PLUS_SLOT).setItem(
-                    Item.createCustomHeadBase64(
-                            CustomHeads.GREEN_PLUS, "§a§lCreate a new Warp Group",
-                            ListUtil.createList("§8Click to create a new warp group.")
-                    )
+                    HeadFactory.head(HeadTexture.GREEN_PLUS, "§a§lCreate a new Warp Group", ListUtil.createList("§8Click to create a new warp group."))
             );
         }
     }

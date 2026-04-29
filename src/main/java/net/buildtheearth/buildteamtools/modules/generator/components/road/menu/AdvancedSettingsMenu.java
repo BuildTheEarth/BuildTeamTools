@@ -7,9 +7,11 @@ import net.buildtheearth.buildteamtools.modules.generator.components.road.Road;
 import net.buildtheearth.buildteamtools.modules.generator.components.road.RoadFlag;
 import net.buildtheearth.buildteamtools.modules.generator.components.road.RoadSettings;
 import net.buildtheearth.buildteamtools.modules.generator.model.Settings;
-import net.buildtheearth.buildteamtools.utils.CustomHeads;
 import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
+import net.buildtheearth.buildteamtools.utils.heads.HeadColor;
+import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
+import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -63,17 +65,17 @@ public class AdvancedSettingsMenu extends AbstractMenu {
         if (roadSlab.length == 0)
             roadSlab = new XMaterial[]{XMaterial.BARRIER};
 
-        createCounter(CustomHeads.SliderColor.WHITE, LANE_COUNT_SLOT, "Number of Lanes", laneCount, 1, 10, "Lanes");
-        createCounter(CustomHeads.SliderColor.LIGHT_GRAY, LANE_WIDTH_SLOT, "Lane Width", laneWidth, 1, 30, "Blocks");
-        createCounter(CustomHeads.SliderColor.WHITE, SIDEWALK_WIDTH_SLOT, "Sidewalk Width", sidewalkWidth, 1, 30, "Blocks");
-        createCounter(CustomHeads.SliderColor.LIGHT_GRAY, STREET_LAMP_DISTANCE_SLOT, "Street Lamp Distance", streetLampDistance, 5, 500, "Blocks");
+        createCounter(HeadColor.WHITE, LANE_COUNT_SLOT, "Number of Lanes", laneCount, 1, 10, "Lanes");
+        createCounter(HeadColor.LIGHT_GRAY, LANE_WIDTH_SLOT, "Lane Width", laneWidth, 1, 30, "Blocks");
+        createCounter(HeadColor.WHITE, SIDEWALK_WIDTH_SLOT, "Sidewalk Width", sidewalkWidth, 1, 30, "Blocks");
+        createCounter(HeadColor.LIGHT_GRAY, STREET_LAMP_DISTANCE_SLOT, "Street Lamp Distance", streetLampDistance, 5, 500, "Blocks");
 
-        setChoiceItems(CustomHeads.SliderColor.WHITE, MARKINGS_MATERIAL_SLOT, "Line Markings Color", markingsMaterial.parseItem());
-        setChoiceItems(CustomHeads.SliderColor.LIGHT_GRAY, ROAD_SLAB_SLOT, "Road Elevation Slab", roadSlab[0].parseItem());
-        setChoiceItems(CustomHeads.SliderColor.WHITE, SIDEWALK_SLAB_SLOT, "Sidewalk Elevation Slab", sidewalkSlab[0].parseItem());
-        setChoiceItems(CustomHeads.SliderColor.LIGHT_GRAY, STREET_LAMP_TYPE_SLOT, "Street Lamp Type", streetLampType);
+        setChoiceItems(HeadColor.WHITE, MARKINGS_MATERIAL_SLOT, "Line Markings Color", markingsMaterial.parseItem());
+        setChoiceItems(HeadColor.LIGHT_GRAY, ROAD_SLAB_SLOT, "Road Elevation Slab", roadSlab[0].parseItem());
+        setChoiceItems(HeadColor.WHITE, SIDEWALK_SLAB_SLOT, "Sidewalk Elevation Slab", sidewalkSlab[0].parseItem());
+        setChoiceItems(HeadColor.LIGHT_GRAY, STREET_LAMP_TYPE_SLOT, "Street Lamp Type", streetLampType);
 
-        getMenu().getSlot(NEXT_ITEM_SLOT).setItem(CustomHeads.getCheckmarkItem("§eNext"));
+        getMenu().getSlot(NEXT_ITEM_SLOT).setItem(HeadFactory.head(HeadTexture.CHECKMARK, "§eNext"));
 
         setBackItem(BACK_ITEM_SLOT, new SidewalkColorMenu(getMenuPlayer(), false));
 

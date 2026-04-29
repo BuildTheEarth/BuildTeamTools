@@ -5,9 +5,10 @@ import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.buildteamtools.modules.stats.StatsModule;
 import net.buildtheearth.buildteamtools.modules.stats.model.StatsPlayer;
 import net.buildtheearth.buildteamtools.modules.stats.model.StatsServer;
-import net.buildtheearth.buildteamtools.utils.CustomHeads;
 import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
+import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
+import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -20,8 +21,8 @@ import java.util.UUID;
 
 public class StatsMenu extends AbstractMenu {
 
-    private final static ItemStack GLOBAL_HEAD = Item.createCustomHeadBase64(CustomHeads.EARTH, "§eGlobal Statistics", ListUtil.createList("error"));
-    private final static ItemStack ACHIEVEMENTS_HEAD = Item.createCustomHeadBase64(CustomHeads.GOLDEN_CUP, "§eAchievements", ListUtil.createList("error"));
+    private final static ItemStack GLOBAL_HEAD = HeadFactory.head(HeadTexture.EARTH, "§eGlobal Statistics", ListUtil.createList("error"));
+    private final static ItemStack ACHIEVEMENTS_HEAD = HeadFactory.head(HeadTexture.GOLDEN_CUP, "§eAchievements", ListUtil.createList("error"));
     private final byte PLAYER_HEAD_SLOT = 4;
     private final byte TEAM_HEAD_SLOT = 20;
     private final byte GLOBAL_HEAD_SLOT = 22;

@@ -5,8 +5,10 @@ import net.buildtheearth.buildteamtools.modules.generator.components.house.House
 import net.buildtheearth.buildteamtools.modules.generator.components.house.HouseFlag;
 import net.buildtheearth.buildteamtools.modules.generator.components.house.HouseSettings;
 import net.buildtheearth.buildteamtools.modules.generator.model.Settings;
-import net.buildtheearth.buildteamtools.utils.CustomHeads;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
+import net.buildtheearth.buildteamtools.utils.heads.HeadColor;
+import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
+import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -47,15 +49,15 @@ public class AdvancedSettingsMenu extends AbstractMenu {
         this.windowHeight = (int) house.getPlayerSettings().get(uuid).getValues().get(HouseFlag.WINDOW_HEIGHT);
         this.windowDistance = (int) house.getPlayerSettings().get(uuid).getValues().get(HouseFlag.WINDOW_DISTANCE);
 
-        createCounter(CustomHeads.SliderColor.WHITE, FLOOR_COUNT_SLOT, "Number of Floors", floorCount, 1, 10, "Floors");
-        createCounter(CustomHeads.SliderColor.LIGHT_GRAY, FLOOR_HEIGHT_SLOT, "Floors Height", floorHeight, 1, 10, "Blocks");
-        createCounter(CustomHeads.SliderColor.WHITE, BASE_HEIGHT_SLOT, "Basement Height", baseHeight, 0, 10, "Blocks");
-        createCounter(CustomHeads.SliderColor.WHITE, WINDOW_WIDTH_SLOT, "Window Width", windowWidth, 1, 5, "Blocks");
-        createCounter(CustomHeads.SliderColor.LIGHT_GRAY, WINDOW_HEIGHT_SLOT, "Window Height", windowHeight, 1, 5, "Blocks");
-        createCounter(CustomHeads.SliderColor.WHITE, WINDOW_DISTANCE_SLOT, "Window Distance", windowDistance, 1, 6, "Blocks");
+        createCounter(HeadColor.WHITE, FLOOR_COUNT_SLOT, "Number of Floors", floorCount, 1, 10, "Floors");
+        createCounter(HeadColor.LIGHT_GRAY, FLOOR_HEIGHT_SLOT, "Floors Height", floorHeight, 1, 10, "Blocks");
+        createCounter(HeadColor.WHITE, BASE_HEIGHT_SLOT, "Basement Height", baseHeight, 0, 10, "Blocks");
+        createCounter(HeadColor.WHITE, WINDOW_WIDTH_SLOT, "Window Width", windowWidth, 1, 5, "Blocks");
+        createCounter(HeadColor.LIGHT_GRAY, WINDOW_HEIGHT_SLOT, "Window Height", windowHeight, 1, 5, "Blocks");
+        createCounter(HeadColor.WHITE, WINDOW_DISTANCE_SLOT, "Window Distance", windowDistance, 1, 6, "Blocks");
 
 
-        getMenu().getSlot(NEXT_ITEM_SLOT).setItem(CustomHeads.getCheckmarkItem("§eNext"));
+        getMenu().getSlot(NEXT_ITEM_SLOT).setItem(HeadFactory.head(HeadTexture.CHECKMARK, "§eNext"));
         setBackItem(BACK_ITEM_SLOT, new BaseColorMenu(getMenuPlayer(), false));
 
         super.setPreviewItems();

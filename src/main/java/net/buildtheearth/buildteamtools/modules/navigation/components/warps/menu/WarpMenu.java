@@ -6,9 +6,10 @@ import net.buildtheearth.buildteamtools.modules.navigation.components.warps.mode
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
-import net.buildtheearth.buildteamtools.utils.CustomHeads;
 import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
+import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
+import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractPaginatedMenu;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
@@ -82,7 +83,7 @@ public class WarpMenu extends AbstractPaginatedMenu {
 
             // Create a "create warp" item if the player has permission
             if(warp.getName().equals("%create-warp%") && getMenuPlayer().hasPermission(Permissions.WARP_CREATE) && slot == warps.size() - 1){
-                getMenu().getSlot(slot).setItem(Item.createCustomHeadBase64(CustomHeads.GREEN_PLUS, "§a§lCreate a new Warp", ListUtil.createList("§8Click to create a new warp.")));
+                getMenu().getSlot(slot).setItem(HeadFactory.head(HeadTexture.GREEN_PLUS, "§a§lCreate a new Warp", ListUtil.createList("§8Click to create a new warp.")));
                 slot++;
                 continue;
             }

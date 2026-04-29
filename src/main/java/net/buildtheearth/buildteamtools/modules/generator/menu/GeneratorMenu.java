@@ -22,6 +22,8 @@ import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -38,13 +40,9 @@ public class GeneratorMenu extends AbstractMenu {
     public static final String GENERATOR_INV_NAME = "What do you want to generate?";
 
     public static final int HOUSE_ITEM_SLOT = 9;
-
     public static final int ROAD_ITEM_SLOT = 11;
-
     public static final int RAILWAY_ITEM_SLOT = 13;
-
     public static final int TREE_ITEM_SLOT = 15;
-
     public static final int FIELD_ITEM_SLOT = 17;
 
     public GeneratorMenu(Player player, boolean autoLoad) {
@@ -105,9 +103,9 @@ public class GeneratorMenu extends AbstractMenu {
                 "- Convex",
                 "",
                 "§eFeatures:",
-                "- Straight rail sections",
-                "- Curves and corners",
-                "- Automatic rail orientation",
+                "- Straight sections",
+                "- Direction changes",
+                "- Automatic side block orientation",
                 "",
                 "§8Left-click to generate",
                 "§8Right-click for Tutorial"
@@ -172,7 +170,7 @@ public class GeneratorMenu extends AbstractMenu {
 
     @Override
     protected void setMenuItemsAsync() {
-        // No Async / DB Items
+        // No async or database items.
     }
 
     @Override
@@ -256,7 +254,16 @@ public class GeneratorMenu extends AbstractMenu {
     }
 
     private void sendMoreInformation(@NonNull Player clickPlayer, @NonNull GeneratorType generator) {
-        clickPlayer.sendMessage(Component.text(generator.getWikiPage(), NamedTextColor.RED));
+        String wikiPage = generator.getWikiPage();
+
+        clickPlayer.sendMessage(
+                Component.text("Open generator documentation: ", NamedTextColor.GRAY)
+                        .append(
+                                Component.text(wikiPage, NamedTextColor.RED)
+                                        .clickEvent(ClickEvent.openUrl(wikiPage))
+                                        .hoverEvent(HoverEvent.showText(Component.text("Click to open this page", NamedTextColor.GRAY)))
+                        )
+        );
     }
 
     @Override

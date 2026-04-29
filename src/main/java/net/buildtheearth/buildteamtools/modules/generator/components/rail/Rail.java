@@ -1,14 +1,15 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.rail;
 
 import com.alpsbte.alpslib.utils.GeneratorUtils;
-import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
-import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
+import net.buildtheearth.buildteamtools.modules.generator.components.rail.selection.RailSelectionPointReader;
 import net.buildtheearth.buildteamtools.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.buildteamtools.modules.generator.model.GeneratorType;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
+
+import java.util.List;
 
 public class Rail extends GeneratorComponent {
 
@@ -24,11 +25,17 @@ public class Rail extends GeneratorComponent {
         }
 
         Region region = GeneratorUtils.getWorldEditSelection(player);
+        RailSelectionPointReader reader = new RailSelectionPointReader(player, region);
 
-        if (!(region instanceof CuboidRegion)
-                && !(region instanceof Polygonal2DRegion)
-                && !(region instanceof ConvexPolyhedralRegion)) {
+        if (!reader.isSupportedSelection()) {
             player.sendMessage("§cRail Generator only supports cuboid, polygonal and convex WorldEdit selections.");
+            return false;
+        }
+
+        List<Vector> controlPoints = reader.readControlPoints();
+
+        if (controlPoints.size() < 2) {
+            player.sendMessage("§cRail Generator could not read enough points from this selection.");
             return false;
         }
 

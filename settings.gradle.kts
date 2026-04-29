@@ -15,10 +15,6 @@ dependencyResolutionManagement {
         }
 
         maven {
-            url = uri("https://maven.buildtheearth.net/releases")
-        }
-
-        maven {
             url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
         }
 

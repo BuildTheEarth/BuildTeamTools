@@ -130,7 +130,7 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
      * @return The current page item.
      */
     private ItemStack getCurrentPageItem() {
-        return HeadFactory.number(HeadColor.WHITE, currentPage, "§eCurrent Page §7- §f" + (currentPage));
+        return HeadFactory.number(HeadColor.WHITE, getPage(), "§eCurrent Page §7- §f" + getPage());
     }
 
     /**
@@ -140,7 +140,7 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
         if (currentPage <= 1)
             return HeadFactory.head(HeadTexture.WHITE_BLANK, " ");
 
-        return HeadFactory.head(HeadTexture.WHITE_ARROW_LEFT, "§ePrevious Page §7- §f" + (currentPage - 1));
+        return HeadFactory.head(HeadTexture.WHITE_ARROW_LEFT, "§ePrevious Page §7- §f" + (getPage() - 1));
     }
 
     /**
@@ -150,8 +150,9 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
         if (!hasNextPage())
             return HeadFactory.head(HeadTexture.WHITE_BLANK, " ");
 
-        return HeadFactory.head(HeadTexture.WHITE_ARROW_RIGHT, "§eNext Page §7- §f" + (currentPage + 1));
+        return HeadFactory.head(HeadTexture.WHITE_ARROW_RIGHT, "§eNext Page §7- §f" + (getPage() + 1));
     }
+    
 
 
     /**

@@ -160,7 +160,10 @@ public class BluemapComponent extends ModuleComponent {
             // Add marker to the marker set
             markerSet.getMarkers().put(warp.getId().toString(), marker);
         } catch (OutOfProjectionBoundsException e) {
-            throw new RuntimeException(e);
+            BuildTeamTools.getInstance().getComponentLogger().warn(Component.text(
+                    "Warp '" + warp.getName() + "' (" + warp.getId() + ") is out of projection bounds. Skipping BlueMap marker registration for this warp.",
+                    NamedTextColor.YELLOW
+            ));
         }
     }
 

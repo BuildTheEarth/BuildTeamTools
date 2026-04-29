@@ -169,7 +169,7 @@ public class WarpEditMenu extends AbstractMenu {
                     return null;
                 });
             } catch (OutOfProjectionBoundsException e) {
-                throw new RuntimeException(e);
+                clickPlayer.sendMessage(ChatHelper.getErrorString("An error occurred while changing the location of the warp!"));
             }
         });
 

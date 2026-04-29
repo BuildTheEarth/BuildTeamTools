@@ -60,7 +60,7 @@ public class HeadFactory {
      * @return the created {@link ItemStack}
      */
     public static ItemStack colorizedHead(HeadColor color, HeadTexture headTexture, String name, ArrayList<String> lore) {
-        String key = color.name() + "_" + headTexture.name().substring(color.name().length());
+        String key = color.name() + "_" + headTexture.name().substring(color.name().length() + 1);
         HeadTexture texture;
 
         try {

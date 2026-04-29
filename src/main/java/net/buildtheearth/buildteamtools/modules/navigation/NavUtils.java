@@ -131,7 +131,7 @@ public class NavUtils {
      * Note: Height returned is actually terrain elevation +2. This is because this method internally uses
      * Bukkits @see World::getHighestBlockYAt() already returns elevation+1, and this method deliberately
      * adds one to the location elevation on top.
-     * </p
+     * </p>
      * The world is extracted from the server config's "earth world". If no earth world is specified then the height defaults to 64
      * and the world is nullified.
      *
@@ -148,7 +148,7 @@ public class NavUtils {
             int y = 64;
 
             if (earthWorld != null)
-                y = earthWorld.getHighestBlockYAt(mcCoord.blockX(), mcCoord.blockZ() + 1);
+                y = earthWorld.getHighestBlockYAt(mcCoord.blockX(), mcCoord.blockZ()) + 1;
 
             return new Location(earthWorld, mcCoord.x(), y, mcCoord.z(), yaw, pitch);
         } catch (OutOfProjectionBoundsException e) {
@@ -163,7 +163,7 @@ public class NavUtils {
      * Note: Height returned is actually terrain elevation +2. This is because this method internally uses
      * Bukkits @see World::getHighestBlockYAt() already returns elevation+1, and this method deliberately
      * adds one to the location elevation on top.
-     * </p
+     * </p>
      * The world is extracted from the server config's "earth world". If no earth world is specified then the height defaults to 64
      * and the world is nullified.
      *

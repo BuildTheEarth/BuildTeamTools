@@ -1,10 +1,6 @@
 package net.buildtheearth.buildteamtools.utils.heads;
 
-import com.alpsbte.alpslib.utils.item.Item;
 import lombok.Getter;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.ArrayList;
 
 @Getter
 public enum HeadTexture {

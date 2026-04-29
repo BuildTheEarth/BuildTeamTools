@@ -60,16 +60,28 @@ public class HeadFactory {
      * @return the created {@link ItemStack}
      */
     public static ItemStack colorizedHead(HeadColor color, HeadTexture headTexture, String name, ArrayList<String> lore) {
-        String key = color.name() + "_" + headTexture.name().substring(color.name().length() + 1);
-        HeadTexture texture;
+        String textureName = headTexture.name();
 
-        try {
-            texture = HeadTexture.valueOf(key);
-        } catch (IllegalArgumentException e) {
-            texture = HeadTexture.valueOf(color.name() + "_BLANK");
+        String suffix;
+        for (HeadColor c : HeadColor.values()) {
+            String prefix = c.name() + "_";
+            if (textureName.startsWith(prefix)) {
+                suffix = textureName.substring(prefix.length());
+
+                String key = color.name() + "_" + suffix;
+
+                try {
+                    HeadTexture texture = HeadTexture.valueOf(key);
+                    return head(texture, name, lore);
+                } catch (IllegalArgumentException ignored) {
+                    break;
+                }
+            }
         }
 
-        return Item.createCustomHeadBase64(texture.getBase64(), name, lore);
+        // fallback
+        HeadTexture fallback = HeadTexture.valueOf(color.name() + "_BLANK");
+        return head(fallback, name, lore);
     }
 
     /**

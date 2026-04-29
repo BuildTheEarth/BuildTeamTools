@@ -1,6 +1,5 @@
 package net.buildtheearth.buildteamtools.modules.navigation.components.warps.menu;
 
-import com.alpsbte.alpslib.utils.item.Item;
 import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.WarpGroup;

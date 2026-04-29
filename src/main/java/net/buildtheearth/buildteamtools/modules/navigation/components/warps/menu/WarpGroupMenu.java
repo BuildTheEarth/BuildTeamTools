@@ -1,7 +1,6 @@
 package net.buildtheearth.buildteamtools.modules.navigation.components.warps.menu;
 
 import com.alpsbte.alpslib.utils.ChatHelper;
-import com.alpsbte.alpslib.utils.item.Item;
 import com.google.gson.Gson;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;

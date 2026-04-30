@@ -1,41 +1,32 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.rail;
 
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.math.BlockVector3;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.path.RailPath;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.path.RailPathBuilder;
+import net.buildtheearth.buildteamtools.modules.generator.components.rail.placement.RailBlockPlacement;
+import net.buildtheearth.buildteamtools.modules.generator.components.rail.placement.RailPlacementBuilder;
+import net.buildtheearth.buildteamtools.modules.generator.components.rail.placement.RailWorldEditPlacer;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.selection.RailSelectionPointReader;
+import net.buildtheearth.buildteamtools.modules.generator.components.rail.types.RailType;
+import net.buildtheearth.buildteamtools.modules.generator.components.rail.types.SampleRailType;
 import net.buildtheearth.buildteamtools.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.buildteamtools.modules.generator.model.GeneratorType;
 import net.buildtheearth.buildteamtools.modules.generator.model.History;
 import net.buildtheearth.buildteamtools.modules.generator.model.Script;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 
 public class RailScripts extends Script {
 
-    private static final Material[] CENTER_MATERIALS = new Material[]{
-            Material.DEAD_FIRE_CORAL_BLOCK,
-            Material.STONE,
-            Material.COBBLESTONE
-    };
+    private final RailPathBuilder pathBuilder = new RailPathBuilder();
+    private final RailPlacementBuilder placementBuilder = new RailPlacementBuilder();
+    private final RailWorldEditPlacer placer = new RailWorldEditPlacer();
 
-    private static final Material SIDE_MATERIAL = Material.ANVIL;
+    private final RailType railType = new SampleRailType();
 
     public RailScripts(Player player, GeneratorComponent generatorComponent) {
         super(player, generatorComponent);
@@ -53,14 +44,21 @@ public class RailScripts extends Script {
                 return;
             }
 
-            RailPath railPath = new RailPathBuilder().build(controlPoints);
+            RailPath railPath = pathBuilder.build(controlPoints);
 
             if (!railPath.isValid()) {
                 getPlayer().sendMessage("§cRail Generator could not derive a valid path from this selection.");
                 return;
             }
 
-            Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), () -> placeSampleTrack(railPath));
+            List<RailBlockPlacement> placements = placementBuilder.buildPlacements(railPath);
+
+            if (placements.isEmpty()) {
+                getPlayer().sendMessage("§cRail Generator did not create any block placements.");
+                return;
+            }
+
+            Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), () -> placeRail(placements));
         } catch (Exception exception) {
             getPlayer().sendMessage("§cRail Generator failed while generating from the WorldEdit selection.");
             exception.printStackTrace();
@@ -72,26 +70,20 @@ public class RailScripts extends Script {
         return reader.readControlPoints();
     }
 
-    private void placeSampleTrack(RailPath railPath) {
-        List<Vector> centerPath = railPath.getCenterPath();
-
-        Map<BlockVector3, BlockData> blockMap = new LinkedHashMap<>();
-        LinkedHashSet<BlockVector3> centerPositions = new LinkedHashSet<>();
-        Map<BlockVector3, SideBlock> sideBlocks = new LinkedHashMap<>();
-
-        for (Vector center : centerPath)
-            centerPositions.add(toBlockVector3(center));
-
-        createSideBlocksFromCenterEdges(centerPath, centerPositions, sideBlocks);
-        placeSideBlocks(blockMap, sideBlocks);
-        placeCenterBlocks(blockMap, centerPositions);
-
-        boolean placedWithWorldEdit = tryPlaceWithWorldEdit(blockMap);
+    private void placeRail(List<RailBlockPlacement> placements) {
+        boolean placedWithWorldEdit = placer.placeWithWorldEdit(this, placements, railType);
 
         if (!placedWithWorldEdit) {
             getPlayer().sendMessage("§eWorldEdit history is unavailable. Falling back to Bukkit placement.");
             getPlayer().sendMessage("§eUse §6/gen undo§e instead of §6//undo§e for this generation.");
-            placeWithBukkitFallback(blockMap);
+
+            List<History.BlockChange> changes = placer.placeWithBukkitFallback(this, placements, railType);
+
+            GeneratorModule.getInstance()
+                    .getPlayerHistory(getPlayer())
+                    .addHistoryEntry(new History.HistoryEntry(GeneratorType.RAILWAY, this, changes));
+
+            getGeneratorComponent().sendSuccessMessage(getPlayer());
             return;
         }
 
@@ -100,255 +92,5 @@ public class RailScripts extends Script {
                 .addHistoryEntry(new History.HistoryEntry(GeneratorType.RAILWAY, this, 1));
 
         getGeneratorComponent().sendSuccessMessage(getPlayer());
-    }
-
-    private void createSideBlocksFromCenterEdges(
-            List<Vector> centerPath,
-            LinkedHashSet<BlockVector3> centerPositions,
-            Map<BlockVector3, SideBlock> sideBlocks
-    ) {
-        for (int i = 0; i < centerPath.size() - 1; i++) {
-            Vector from = centerPath.get(i);
-            Vector to = centerPath.get(i + 1);
-            Vector direction = getDirection(from, to);
-
-            if (direction == null)
-                continue;
-
-            int dx = direction.getBlockX();
-            int dz = direction.getBlockZ();
-
-            if (dx != 0 && dz != 0) {
-                placeDiagonalEdgeSideBlocks(sideBlocks, centerPositions, from, dx, dz);
-            } else {
-                placeStraightEdgeSideBlocks(sideBlocks, centerPositions, from, to, direction);
-            }
-        }
-    }
-
-    private void placeStraightEdgeSideBlocks(
-            Map<BlockVector3, SideBlock> sideBlocks,
-            LinkedHashSet<BlockVector3> centerPositions,
-            Vector from,
-            Vector to,
-            Vector direction
-    ) {
-        Vector leftOffset = getLeftOffset(direction);
-        Vector rightOffset = getRightOffset(direction);
-
-        addSideBlock(sideBlocks, centerPositions, offset(from, leftOffset), direction);
-        addSideBlock(sideBlocks, centerPositions, offset(to, leftOffset), direction);
-        addSideBlock(sideBlocks, centerPositions, offset(from, rightOffset), direction);
-        addSideBlock(sideBlocks, centerPositions, offset(to, rightOffset), direction);
-    }
-
-    private void placeDiagonalEdgeSideBlocks(
-            Map<BlockVector3, SideBlock> sideBlocks,
-            LinkedHashSet<BlockVector3> centerPositions,
-            Vector from,
-            int dx,
-            int dz
-    ) {
-        Vector direction = new Vector(dx, 0, dz);
-
-        BlockVector3 horizontalSide = BlockVector3.at(
-                from.getBlockX() + dx,
-                from.getBlockY(),
-                from.getBlockZ()
-        );
-
-        BlockVector3 verticalSide = BlockVector3.at(
-                from.getBlockX(),
-                from.getBlockY(),
-                from.getBlockZ() + dz
-        );
-
-        addSideBlock(sideBlocks, centerPositions, horizontalSide, direction);
-        addSideBlock(sideBlocks, centerPositions, verticalSide, direction);
-    }
-
-    private BlockVector3 offset(Vector center, Vector offset) {
-        return BlockVector3.at(
-                center.getBlockX() + offset.getBlockX(),
-                center.getBlockY(),
-                center.getBlockZ() + offset.getBlockZ()
-        );
-    }
-
-    private void addSideBlock(
-            Map<BlockVector3, SideBlock> sideBlocks,
-            LinkedHashSet<BlockVector3> centerPositions,
-            BlockVector3 position,
-            Vector direction
-    ) {
-        if (centerPositions.contains(position))
-            return;
-
-        SideBlock sideBlock = sideBlocks.computeIfAbsent(position, SideBlock::new);
-        sideBlock.addDirection(direction);
-    }
-
-    private Vector getLeftOffset(Vector direction) {
-        int dx = direction.getBlockX();
-        int dz = direction.getBlockZ();
-
-        return new Vector(-dz, 0, dx);
-    }
-
-    private Vector getRightOffset(Vector direction) {
-        int dx = direction.getBlockX();
-        int dz = direction.getBlockZ();
-
-        return new Vector(dz, 0, -dx);
-    }
-
-    private void placeSideBlocks(Map<BlockVector3, BlockData> blockMap, Map<BlockVector3, SideBlock> sideBlocks) {
-        for (SideBlock sideBlock : sideBlocks.values()) {
-            Vector direction = getBestAnvilDirection(sideBlock, sideBlocks);
-            blockMap.put(sideBlock.position, getAnvilBlockData(direction));
-        }
-    }
-
-    private Vector getBestAnvilDirection(SideBlock sideBlock, Map<BlockVector3, SideBlock> sideBlocks) {
-        boolean eastWest = sideBlocks.containsKey(sideBlock.position.add(1, 0, 0))
-                || sideBlocks.containsKey(sideBlock.position.add(-1, 0, 0));
-
-        boolean northSouth = sideBlocks.containsKey(sideBlock.position.add(0, 0, 1))
-                || sideBlocks.containsKey(sideBlock.position.add(0, 0, -1));
-
-        if (eastWest && !northSouth)
-            return new Vector(1, 0, 0);
-
-        if (northSouth && !eastWest)
-            return new Vector(0, 0, 1);
-
-        return sideBlock.getAverageDirection();
-    }
-
-    private Vector getDirection(Vector from, Vector to) {
-        int dx = Integer.compare(to.getBlockX() - from.getBlockX(), 0);
-        int dz = Integer.compare(to.getBlockZ() - from.getBlockZ(), 0);
-
-        if (dx == 0 && dz == 0)
-            return null;
-
-        return new Vector(dx, 0, dz);
-    }
-
-    private void placeCenterBlocks(Map<BlockVector3, BlockData> blockMap, LinkedHashSet<BlockVector3> centerPositions) {
-        for (BlockVector3 center : centerPositions)
-            blockMap.put(center, getCenterBlockData(center));
-    }
-
-    private boolean tryPlaceWithWorldEdit(Map<BlockVector3, BlockData> blockMap) {
-        try (EditSession editSession = WorldEdit.getInstance()
-                .newEditSessionBuilder()
-                .world(getWeWorld())
-                .actor(getActor())
-                .build()) {
-
-            for (Map.Entry<BlockVector3, BlockData> entry : blockMap.entrySet())
-                editSession.setBlock(entry.getKey(), BukkitAdapter.adapt(entry.getValue()));
-
-            editSession.flushQueue();
-            getLocalSession().remember(editSession);
-            return true;
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return false;
-        }
-    }
-
-    private void placeWithBukkitFallback(Map<BlockVector3, BlockData> blockMap) {
-        List<History.BlockChange> changes = new ArrayList<>();
-
-        for (Map.Entry<BlockVector3, BlockData> entry : blockMap.entrySet()) {
-            BlockVector3 position = entry.getKey();
-            BlockData newData = entry.getValue();
-
-            org.bukkit.block.Block block = getPlayer().getWorld().getBlockAt(position.x(), position.y(), position.z());
-
-            changes.add(new History.BlockChange(
-                    getPlayer().getWorld().getName(),
-                    position.x(),
-                    position.y(),
-                    position.z(),
-                    block.getBlockData().getAsString(),
-                    newData.getAsString()
-            ));
-
-            block.setBlockData(newData, false);
-        }
-
-        GeneratorModule.getInstance()
-                .getPlayerHistory(getPlayer())
-                .addHistoryEntry(new History.HistoryEntry(GeneratorType.RAILWAY, this, changes));
-
-        getGeneratorComponent().sendSuccessMessage(getPlayer());
-    }
-
-    private BlockData getCenterBlockData(BlockVector3 position) {
-        int index = Math.floorMod(position.x() * 31 + position.z() * 17, CENTER_MATERIALS.length);
-        return CENTER_MATERIALS[index].createBlockData();
-    }
-
-    private BlockData getAnvilBlockData(Vector direction) {
-        BlockData data = SIDE_MATERIAL.createBlockData();
-
-        if (data instanceof Directional directional)
-            directional.setFacing(toBlockFace(direction));
-
-        return data;
-    }
-
-    private BlockFace toBlockFace(Vector direction) {
-        int dx = direction.getBlockX();
-        int dz = direction.getBlockZ();
-
-        if (Math.abs(dx) >= Math.abs(dz)) {
-            if (dx > 0)
-                return BlockFace.EAST;
-
-            if (dx < 0)
-                return BlockFace.WEST;
-        }
-
-        if (dz > 0)
-            return BlockFace.SOUTH;
-
-        if (dz < 0)
-            return BlockFace.NORTH;
-
-        return BlockFace.EAST;
-    }
-
-    private BlockVector3 toBlockVector3(Vector vector) {
-        return BlockVector3.at(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
-    }
-
-    private static class SideBlock {
-
-        private final BlockVector3 position;
-        private int directionX;
-        private int directionZ;
-
-        private SideBlock(BlockVector3 position) {
-            this.position = position;
-        }
-
-        private void addDirection(Vector direction) {
-            directionX += direction.getBlockX();
-            directionZ += direction.getBlockZ();
-        }
-
-        private Vector getAverageDirection() {
-            int dx = Integer.compare(directionX, 0);
-            int dz = Integer.compare(directionZ, 0);
-
-            if (dx == 0 && dz == 0)
-                return new Vector(1, 0, 0);
-
-            return new Vector(dx, 0, dz);
-        }
     }
 }

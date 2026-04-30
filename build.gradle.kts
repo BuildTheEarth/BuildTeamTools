@@ -54,6 +54,8 @@ tasks.shadowJar {
 
     relocationPrefix = "net.buildtheearth.buildteamtools.shaded"
     enableAutoRelocation = true
+
+    relocate("net.buildtheearth.buildteamtools", "net.buildtheearth.buildteamtools")
 }
 
 tasks.assemble {

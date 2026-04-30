@@ -21,6 +21,7 @@ alpslib-utils = "1.4.2" # https://mvn.alps-bte.com/service/rest/repository/brows
 fawe-bom = "1.55" # Ref: https://github.com/IntellectualSites/bom
 bstats = "3.1.0" # https://central.sonatype.com/artifact/org.bstats/bstats-bukkit
 bluemap-api = "2.7.7" # Ref: https://github.com/BlueMap-Minecraft/BlueMapAPI
+net-buildtheearth-projection = "1.+" # Ref: https://github.com/BuildTheEarth/projection
 
 [libraries]
 com-alpsbte-alpslib-alpslib-libpsterra = { module = "com.alpsbte.alpslib:alpslib-libpsterra", version.ref = "com-alpsbte-alpslib-alpslib-libpsterra" }
@@ -39,6 +40,7 @@ alpslib-utils = { module = "com.alpsbte.alpslib:alpslib-utils", version.ref = "a
 fawe-bom = { module = "com.intellectualsites.bom:bom-newest", version.ref = "fawe-bom" }
 bstats-bukkit = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }
 bluemap-api = { module = "de.bluecolored:bluemap-api", version.ref = "bluemap-api" }
+net-buildtheearth-projection = { module = "net.buildtheearth:projection", version.ref = "net-buildtheearth-projection"}
 
 [plugins]
 lombok = { id = "io.freefair.lombok", version.ref = "io-freefair-lombok" }

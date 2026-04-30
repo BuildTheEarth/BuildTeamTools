@@ -10,7 +10,10 @@ import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.plotsystem.PlotSystemModule;
 import net.buildtheearth.buildteamtools.modules.stats.StatsModule;
+import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
 import net.buildtheearth.buildteamtools.utils.io.ConfigUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +35,7 @@ public class BuildTeamTools extends JavaPlugin {
     @Getter
     private static BuildTeamTools instance = null;
 
+    private World earthWorld;
 
     @Override
     public void onEnable() {
@@ -87,5 +91,17 @@ public class BuildTeamTools extends JavaPlugin {
     public void setDebug(boolean debug) {
         this.debug = debug;
         ChatHelper.DEBUG = debug;
+    }
+
+    public World getEarthWorld() {
+        if (earthWorld != null)
+            return earthWorld;
+
+        String worldName = BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.EARTH_WORLD);
+        if (worldName == null || worldName.isEmpty())
+            return null;
+
+        earthWorld = Bukkit.getWorld(worldName);
+        return earthWorld;
     }
 }

@@ -8,7 +8,7 @@ import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.ModuleComponent;
 import net.buildtheearth.buildteamtools.modules.navigation.NavUtils;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
-import net.buildtheearth.buildteamtools.utils.GeometricUtils;
+import net.buildtheearth.model.GeographicalCoordinate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -47,11 +47,11 @@ public class TpllComponent extends ModuleComponent {
             //Extracts the coordinates from the plugin message
             double targetLatitude = Double.parseDouble(in.readUTF());
             double targetLongitude = Double.parseDouble(in.readUTF());
-            double[] coordinates = new double[]{targetLatitude, targetLongitude};
+
             ChatHelper.logDebug("The coordinates of the tpll event are: %s %s", targetLatitude, targetLongitude);
 
             // Creates a bukkit location for this tpll target
-            Location targetTpllLocation = GeometricUtils.getLocationFromCoordinates(coordinates);
+            Location targetTpllLocation = NavUtils.getLocationFromCoordinates(new GeographicalCoordinate(targetLatitude, targetLongitude));
             ChatHelper.logDebug("Created a bukkit location for this event");
             // Location may contain a null world, this is checked for when the tpll event needs to be run
             // so that the player can be informed that the earth world was not specified

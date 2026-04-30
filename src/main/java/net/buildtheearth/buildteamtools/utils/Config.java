@@ -26,7 +26,6 @@ public class Config {
         return files.get(dir + file);
     }
 
-
     public static FileConfiguration getFileConfiguration(String file) {
         return YamlConfiguration.loadConfiguration(getFile(file));
     }

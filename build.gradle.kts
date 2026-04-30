@@ -24,7 +24,7 @@ dependencies {
     implementation(libs.com.googlecode.json.simple)
     implementation(libs.bstats.bukkit)
     implementation(platform(libs.fawe.bom))
-    implementation("net.buildtheearth:projection:1.0.3")
+    implementation("net.buildtheearth:projection:1.+")
 
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core")
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") { isTransitive = false }
@@ -55,6 +55,7 @@ tasks.shadowJar {
     relocationPrefix = "net.buildtheearth.buildteamtools.shaded"
     enableAutoRelocation = true
 
+    // Prevents the plugin itself from being relocated by autorelocate
     relocate("net.buildtheearth.buildteamtools", "net.buildtheearth.buildteamtools")
 }
 

@@ -126,7 +126,6 @@ public class RailPathBuilder {
 
         for (int sample = 1; sample <= samples; sample++) {
             double t = sample / (double) samples;
-
             double inverse = 1.0 - t;
 
             double x = inverse * inverse * start.getX()
@@ -231,7 +230,6 @@ public class RailPathBuilder {
 
             while (cleaned.size() >= 3) {
                 Vector a = cleaned.get(cleaned.size() - 3);
-                Vector b = cleaned.get(cleaned.size() - 2);
                 Vector c = cleaned.get(cleaned.size() - 1);
 
                 if (sameBlock(a, c)) {
@@ -271,8 +269,11 @@ public class RailPathBuilder {
     }
 
     private Vector getDirection(Vector from, Vector to) {
-        int dx = Integer.compare(to.getBlockX() - from.getBlockX(), 0);
-        int dz = Integer.compare(to.getBlockZ() - from.getBlockZ(), 0);
+        Vector blockFrom = toBlockVector(from);
+        Vector blockTo = toBlockVector(to);
+
+        int dx = Integer.compare(blockTo.getBlockX() - blockFrom.getBlockX(), 0);
+        int dz = Integer.compare(blockTo.getBlockZ() - blockFrom.getBlockZ(), 0);
 
         if (dx == 0 && dz == 0)
             return null;
@@ -291,23 +292,24 @@ public class RailPathBuilder {
     }
 
     private int getChebyshevDistance(Vector a, Vector b) {
-        int dx = Math.abs(a.getBlockX() - b.getBlockX());
-        int dz = Math.abs(a.getBlockZ() - b.getBlockZ());
+        Vector blockA = toBlockVector(a);
+        Vector blockB = toBlockVector(b);
+
+        int dx = Math.abs(blockA.getBlockX() - blockB.getBlockX());
+        int dz = Math.abs(blockA.getBlockZ() - blockB.getBlockZ());
 
         return Math.max(dx, dz);
     }
 
     private Vector toBlockVector(Vector vector) {
         return new Vector(
-                Math.round(vector.getX()),
-                Math.round(vector.getY()),
-                Math.round(vector.getZ())
+                vector.getBlockX(),
+                vector.getBlockY(),
+                vector.getBlockZ()
         );
     }
 
     private boolean sameBlock(Vector a, Vector b) {
-        return a.getBlockX() == b.getBlockX()
-                && a.getBlockY() == b.getBlockY()
-                && a.getBlockZ() == b.getBlockZ();
+        return toBlockVector(a).equals(toBlockVector(b));
     }
 }

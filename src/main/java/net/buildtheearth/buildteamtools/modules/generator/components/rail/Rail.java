@@ -19,6 +19,10 @@ public class Rail extends GeneratorComponent {
 
     @Override
     public boolean checkForPlayer(Player player) {
+        return hasValidRailSelection(player);
+    }
+
+    private boolean hasValidRailSelection(Player player) {
         if (GeneratorUtils.checkForNoWorldEditSelection(player)) {
             player.sendMessage("§cRail Generator requires an active WorldEdit selection.");
             return false;

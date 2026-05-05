@@ -1,8 +1,10 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.rail.side;
 
 import com.sk89q.worldedit.math.BlockVector3;
+import lombok.Getter;
 import org.bukkit.util.Vector;
 
+@Getter
 public class RailSideBlock {
 
     private final BlockVector3 position;
@@ -11,10 +13,6 @@ public class RailSideBlock {
 
     public RailSideBlock(BlockVector3 position) {
         this.position = position;
-    }
-
-    public BlockVector3 getPosition() {
-        return position;
     }
 
     public void addDirection(Vector direction) {

@@ -4,6 +4,8 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BlockState;
+import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.types.RailType;
 import net.buildtheearth.buildteamtools.modules.generator.model.History;
 import net.buildtheearth.buildteamtools.modules.generator.model.Script;
@@ -14,6 +16,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 public class RailWorldEditPlacer {
 
@@ -26,15 +29,23 @@ public class RailWorldEditPlacer {
                 .actor(script.getActor())
                 .build()) {
 
-            for (Map.Entry<BlockVector3, BlockData> entry : blockMap.entrySet())
-                editSession.setBlock(entry.getKey(), BukkitAdapter.adapt(entry.getValue()));
+            for (Map.Entry<BlockVector3, BlockData> entry : blockMap.entrySet()) {
+                BlockVector3 position = entry.getKey();
+                BlockState blockState = BukkitAdapter.adapt(entry.getValue());
+
+                editSession.setBlock(position.x(), position.y(), position.z(), blockState);
+            }
 
             editSession.flushQueue();
             script.getLocalSession().remember(editSession);
 
             return true;
         } catch (Throwable throwable) {
-            throwable.printStackTrace();
+            BuildTeamTools.getInstance().getLogger().log(
+                    Level.SEVERE,
+                    "Failed to place railway with WorldEdit.",
+                    throwable
+            );
             return false;
         }
     }

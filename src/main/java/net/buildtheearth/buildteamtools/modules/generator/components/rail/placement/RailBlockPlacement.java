@@ -1,8 +1,10 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.rail.placement;
 
 import com.sk89q.worldedit.math.BlockVector3;
+import lombok.Getter;
 import org.bukkit.util.Vector;
 
+@Getter
 public class RailBlockPlacement {
 
     private final BlockVector3 position;
@@ -13,17 +15,5 @@ public class RailBlockPlacement {
         this.position = position;
         this.role = role;
         this.direction = direction == null ? new Vector(1, 0, 0) : direction;
-    }
-
-    public BlockVector3 getPosition() {
-        return position;
-    }
-
-    public RailBlockRole getRole() {
-        return role;
-    }
-
-    public Vector getDirection() {
-        return direction;
     }
 }

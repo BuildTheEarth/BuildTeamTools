@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.util.List;
+import java.util.logging.Level;
 
 public class RailScripts extends Script {
 
@@ -61,7 +62,12 @@ public class RailScripts extends Script {
             Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), () -> placeRail(placements));
         } catch (Exception exception) {
             getPlayer().sendMessage("§cRail Generator failed while generating from the WorldEdit selection.");
-            exception.printStackTrace();
+
+            BuildTeamTools.getInstance().getLogger().log(
+                    Level.SEVERE,
+                    "Rail Generator failed while generating from the WorldEdit selection.",
+                    exception
+            );
         }
     }
 

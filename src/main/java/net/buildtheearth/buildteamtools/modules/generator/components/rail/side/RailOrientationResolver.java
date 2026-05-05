@@ -21,10 +21,10 @@ public class RailOrientationResolver {
         if (eastWest && !northSouth)
             return getHorizontalDirection(east, west);
 
-        if (northSouth && !eastWest)
+        if (!eastWest && northSouth)
             return getVerticalDirection(south, north);
 
-        if (eastWest && northSouth)
+        if (eastWest)
             return resolveCornerDirection(sideBlock, east, west, south, north);
 
         return sideBlock.getAverageDirection();

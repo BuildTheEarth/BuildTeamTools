@@ -40,7 +40,6 @@ public class GeneratorCommand implements CommandExecutor {
                 return true;
 
             case "rail":
-            case "railway":
                 GeneratorModule.getInstance().getRail().analyzeCommand(p, args);
                 return true;
 

@@ -9,7 +9,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.util.Vector;
 
-public class SampleRailType implements RailType {
+public class DefaultRailType implements RailType {
 
     private static final Material[] CENTER_MATERIALS = new Material[]{
             Material.DEAD_FIRE_CORAL_BLOCK,
@@ -21,7 +21,7 @@ public class SampleRailType implements RailType {
 
     @Override
     public String getName() {
-        return "Sample Railway";
+        return "Default Railway";
     }
 
     @Override

@@ -8,8 +8,8 @@ import net.buildtheearth.buildteamtools.modules.generator.components.rail.placem
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.placement.RailPlacementBuilder;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.placement.RailWorldEditPlacer;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.selection.RailSelectionPointReader;
+import net.buildtheearth.buildteamtools.modules.generator.components.rail.types.DefaultRailType;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.types.RailType;
-import net.buildtheearth.buildteamtools.modules.generator.components.rail.types.SampleRailType;
 import net.buildtheearth.buildteamtools.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.buildteamtools.modules.generator.model.GeneratorType;
 import net.buildtheearth.buildteamtools.modules.generator.model.History;
@@ -23,20 +23,22 @@ import java.util.logging.Level;
 
 public class RailScripts extends Script {
 
+    private static final int MAX_PATH_POINTS = 20_000;
+    private static final int MAX_BLOCK_PLACEMENTS = 100_000;
+
     private final RailPathBuilder pathBuilder = new RailPathBuilder();
     private final RailPlacementBuilder placementBuilder = new RailPlacementBuilder();
     private final RailWorldEditPlacer placer = new RailWorldEditPlacer();
 
-    private final RailType railType = new SampleRailType();
+    private final RailType railType = new DefaultRailType();
 
     public RailScripts(Player player, GeneratorComponent generatorComponent) {
         super(player, generatorComponent);
 
-        Thread thread = new Thread(this::generateRail);
-        thread.start();
+        Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), this::readSelectionOnMainThread);
     }
 
-    private void generateRail() {
+    private void readSelectionOnMainThread() {
         try {
             List<Vector> controlPoints = getControlPoints();
 
@@ -45,29 +47,44 @@ public class RailScripts extends Script {
                 return;
             }
 
+            Bukkit.getScheduler().runTaskAsynchronously(
+                    BuildTeamTools.getInstance(),
+                    () -> buildRailAsync(controlPoints)
+            );
+        } catch (Exception exception) {
+            fail("Rail Generator failed while reading the WorldEdit selection.", exception);
+        }
+    }
+
+    private void buildRailAsync(List<Vector> controlPoints) {
+        try {
             RailPath railPath = pathBuilder.build(controlPoints);
 
             if (!railPath.isValid()) {
-                getPlayer().sendMessage("§cRail Generator could not derive a valid path from this selection.");
+                sendPlayerMessage("§cRail Generator could not derive a valid path from this selection.");
+                return;
+            }
+
+            if (railPath.size() > MAX_PATH_POINTS) {
+                sendPlayerMessage("§cRail Generator selection is too large. Please use a smaller selection.");
                 return;
             }
 
             List<RailBlockPlacement> placements = placementBuilder.buildPlacements(railPath);
 
             if (placements.isEmpty()) {
-                getPlayer().sendMessage("§cRail Generator did not create any block placements.");
+                sendPlayerMessage("§cRail Generator did not create any block placements.");
+                return;
+            }
+
+            if (placements.size() > MAX_BLOCK_PLACEMENTS) {
+                sendPlayerMessage("§cRail Generator would place too many blocks. Please use a smaller selection.");
                 return;
             }
 
             Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), () -> placeRail(placements));
         } catch (Exception exception) {
-            getPlayer().sendMessage("§cRail Generator failed while generating from the WorldEdit selection.");
-
-            BuildTeamTools.getInstance().getLogger().log(
-                    Level.SEVERE,
-                    "Rail Generator failed while generating from the WorldEdit selection.",
-                    exception
-            );
+            fail("Rail Generator failed while generating from the WorldEdit selection.", exception);
         }
     }
 
@@ -77,26 +94,36 @@ public class RailScripts extends Script {
     }
 
     private void placeRail(List<RailBlockPlacement> placements) {
-        boolean placedWithWorldEdit = placer.placeWithWorldEdit(this, placements, railType);
+        List<History.BlockChange> changes = placer.placeWithBukkitHistory(this, placements, railType);
 
-        if (!placedWithWorldEdit) {
-            getPlayer().sendMessage("§eWorldEdit history is unavailable. Falling back to Bukkit placement.");
-            getPlayer().sendMessage("§eUse §6/gen undo§e instead of §6//undo§e for this generation.");
-
-            List<History.BlockChange> changes = placer.placeWithBukkitFallback(this, placements, railType);
-
-            GeneratorModule.getInstance()
-                    .getPlayerHistory(getPlayer())
-                    .addHistoryEntry(new History.HistoryEntry(GeneratorType.RAILWAY, this, changes));
-
-            getGeneratorComponent().sendSuccessMessage(getPlayer());
+        if (changes.isEmpty()) {
+            getPlayer().sendMessage("§eRail Generator did not change any blocks. No undo entry was added.");
             return;
         }
 
         GeneratorModule.getInstance()
                 .getPlayerHistory(getPlayer())
-                .addHistoryEntry(new History.HistoryEntry(GeneratorType.RAILWAY, this, 1));
+                .addHistoryEntry(new History.HistoryEntry(GeneratorType.RAILWAY, this, changes));
 
         getGeneratorComponent().sendSuccessMessage(getPlayer());
+    }
+
+    private void fail(String message, Exception exception) {
+        sendPlayerMessage("§c" + message);
+
+        BuildTeamTools.getInstance().getLogger().log(
+                Level.SEVERE,
+                message,
+                exception
+        );
+    }
+
+    private void sendPlayerMessage(String message) {
+        if (Bukkit.isPrimaryThread()) {
+            getPlayer().sendMessage(message);
+            return;
+        }
+
+        Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), () -> getPlayer().sendMessage(message));
     }
 }

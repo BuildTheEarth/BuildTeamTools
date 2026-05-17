@@ -93,7 +93,7 @@ public class GeneratorModule extends Module {
     @Override
     public void registerListeners() {
         super.registerListeners(
-            new GeneratorListener()
+                new GeneratorListener()
         );
     }
 

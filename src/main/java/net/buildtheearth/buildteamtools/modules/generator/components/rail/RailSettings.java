@@ -9,9 +9,8 @@ public class RailSettings extends Settings {
         super(player);
     }
 
+    @Override
     public void setDefaultValues() {
-
-        // Lane Count (Default: Fixed Value)
-        setValue(RailFlag.LANE_COUNT, 1);
+        // Rail Generator v1 does not use configurable settings yet.
     }
 }

@@ -63,7 +63,9 @@ public class BuildTeam {
     public void createWarp(Player creator, Warp warp){
         // Check if the team owns that warp
         if(!warp.getWarpGroup().getBuildTeam().getID().equals(this.getID())){
+            if (creator != null) {
             creator.sendMessage(ChatHelper.getErrorString("You can only create warps for your own team!"));
+            }
             return;
         }
 
@@ -72,7 +74,9 @@ public class BuildTeam {
             public void onResponse(String response) {
                 // Update the cache
                 NetworkModule.getInstance().updateCache().thenRun(() -> {
-                    ChatHelper.sendSuccessfulMessage(creator, "Successfully created the warp %s!", warp.getName());
+                    if (creator != null) {
+                        ChatHelper.sendSuccessfulMessage(creator, "Successfully created the warp %s!", warp.getName());
+                    }
                     // Refresh BlueMap markers
                     refreshBluemapMarkers();
                 });
@@ -80,7 +84,10 @@ public class BuildTeam {
 
             @Override
             public void onFailure(IOException e) {
-                creator.sendMessage(ChatHelper.getErrorString("Something went wrong while creating the warp %s! Please take a look at the console.", warp.getName()));
+                if (creator != null) {
+                    creator.sendMessage(ChatHelper.getErrorString("Something went wrong while creating the warp %s! Please take a look at the console.", warp.getName()));
+
+                }
                 e.printStackTrace();
             }
         });

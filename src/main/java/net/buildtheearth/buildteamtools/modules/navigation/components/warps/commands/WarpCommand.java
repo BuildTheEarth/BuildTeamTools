@@ -2,8 +2,10 @@ package net.buildtheearth.buildteamtools.modules.navigation.components.warps.com
 
 import com.alpsbte.alpslib.utils.ChatHelper;
 import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
+import net.buildtheearth.buildteamtools.modules.navigation.components.warps.WarpMigrator;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.WarpsComponent;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.Warp;
+import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.WarpMigrationSource;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import org.bukkit.command.Command;
@@ -14,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -55,6 +58,41 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
             player.sendActionBar(ChatHelper.getStandardString(false, "Creating the warp..."));
 
             NavigationModule.getInstance().getWarpsComponent().createWarp(player);
+            return true;
+        }
+
+        // WARP MIGRATE
+        if(args[0].equalsIgnoreCase("migrate")) {
+            // Check if the player has the required permissions
+            if (!player.hasPermission(Permissions.WARP_MIGRATE)) {
+                player.sendMessage(ChatHelper.getErrorString("You don't have the required %s to %s warps.", "permission", "migrate"));
+                return true;
+            }
+
+            // check if the command has the correct amount of arguments
+            if (args.length != 2) {
+                player.sendMessage(ChatHelper.getErrorString("Usage: /warp migrate <source>"));
+                player.sendMessage(ChatHelper.getErrorString("Valid sources are: %s", Arrays.toString(WarpMigrationSource.values())));
+                return true;
+            }
+
+            // check if the given source is valid
+            WarpMigrationSource source = WarpMigrationSource.fromString(args[1]);
+            if (source == null) {
+                player.sendMessage(ChatHelper.getErrorString("Invalid source: %s", args[1]));
+                player.sendMessage(ChatHelper.getErrorString("Valid sources are: %s", Arrays.toString(WarpMigrationSource.values())));
+                return true;
+            }
+
+            WarpMigrator migrator = new WarpMigrator(source);
+            player.sendMessage(ChatHelper.getStandardString(false, "Migrating the warps..."));
+            migrator.migrate().whenComplete((result, throwable) -> {
+                if (throwable != null) {
+                    player.sendMessage(ChatHelper.getErrorString("Something went wrong while migrating the warps: %s", throwable.getMessage()));
+                    return;
+                }
+                player.sendMessage(ChatHelper.getSuccessComponent("Successfully migrated the warps!"));
+            });
             return true;
         }
 

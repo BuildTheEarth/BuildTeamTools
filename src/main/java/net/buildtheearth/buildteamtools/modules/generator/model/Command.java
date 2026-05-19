@@ -11,13 +11,16 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import lombok.Getter;
+import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.common.CommonModule;
+import net.buildtheearth.buildteamtools.modules.generator.listeners.GeneratorListener;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import java.util.Arrays;
@@ -84,48 +87,46 @@ public class Command {
     }
 
     /** Processes the commands from the command queue to prevent the server from freezing. */
-    public void tick(){
-        if(operations.isEmpty()) {
-            if(!isFinished)
+    public void tick() {
+        if (operations.isEmpty()) {
+            if (!isFinished)
                 finish();
             return;
         }
 
         percentage = (int) Math.round((double) (totalCommands - operations.size()) / (double) totalCommands * 100);
 
-        if(!breakPointActive &&! threadActive)
+        if (!breakPointActive && !threadActive)
             player.sendActionBar("§a§lGenerator Progress: §7" + percentage + "%");
         else
             player.sendActionBar("§e§lGenerator Progress: §7" + percentage + "%");
 
-        if(threadActive)
+        if (threadActive)
             return;
 
-
-
         // Process commands in batches of MAX_COMMANDS_PER_SERVER_TICK
-        for(int i = 0; i < MAX_COMMANDS_PER_SERVER_TICK;){
-            if(operations.isEmpty()){
-                if(!isFinished)
+        for (int i = 0; i < MAX_COMMANDS_PER_SERVER_TICK;) {
+            if (operations.isEmpty()) {
+                if (!isFinished)
                     finish();
                 break;
             }
 
-
             Operation command = operations.get(0);
             processOperation(command);
 
-            if(breakPointActive || threadActive)
+            if (breakPointActive || threadActive)
                 break;
 
             // Skip WorldEdit commands that take no time to execute
-            if(command.getOperationType() == Operation.OperationType.COMMAND){
+            if (command.getOperationType() == Operation.OperationType.COMMAND) {
                 String commandString = (String) command.getValues().get(0);
-                if(commandString.startsWith("//gmask")
-                || commandString.startsWith("//mask")
-                || commandString.startsWith("//pos")
-                || commandString.startsWith("//sel")
-                || commandString.startsWith("//expand"))
+
+                if (commandString.startsWith("//gmask")
+                        || commandString.startsWith("//mask")
+                        || commandString.startsWith("//pos")
+                        || commandString.startsWith("//sel")
+                        || commandString.startsWith("//expand"))
                     continue;
             }
 
@@ -134,7 +135,7 @@ public class Command {
     }
 
     /** Processes a single command. */
-    public void processOperation(Operation operation){
+    public void processOperation(Operation operation) {
         CompletableFuture<Void> future = null;
 
         try {
@@ -145,7 +146,7 @@ public class Command {
                     if (command.contains("%%XYZ/"))
                         command = convertXYZ(command);
 
-                    player.chat(command);
+                    runInternalGeneratorCommand(command);
                     break;
 
                 case BREAKPOINT:
@@ -171,7 +172,7 @@ public class Command {
                         oldBlockData = block.getBlockData();
                         BlockType blockType = BlockTypes.BARRIER;
 
-                        if(blockType == null)
+                        if (blockType == null)
                             break;
 
                         GeneratorUtils.createCuboidSelection(getPlayer(), point, point);
@@ -225,33 +226,53 @@ public class Command {
                     GeneratorUtils.expandSelection(localSession, (Vector) operation.get(0));
                     break;
             }
-        }catch (Exception e){
-            if(operation != null)
+        } catch (Exception e) {
+            if (operation != null)
                 ChatHelper.logError("Error while processing command: " + operation.getOperationType() + " - " + operation.getValuesAsString());
             else
                 ChatHelper.logError("Error while processing command.");
+
             e.printStackTrace();
         }
 
-        if(future != null){
+        if (future != null) {
             threadActive = true;
+
             // Ensure we clear threadActive and remove the operation regardless of success or exception
             future.whenComplete((v, ex) -> {
                 threadActive = false;
+
                 if (ex != null) {
                     ChatHelper.logError("Async operation failed: " + operation.getOperationType() + " - " + operation.getValuesAsString());
                     ex.printStackTrace();
                 }
+
                 // Remove the processed operation from the queue
                 operations.remove(0);
             });
-
-        }else if(!breakPointActive)
+        } else if (!breakPointActive) {
             operations.remove(0);
+        }
+    }
+
+    private void runInternalGeneratorCommand(String command) {
+        player.setMetadata(
+                GeneratorListener.INTERNAL_GENERATOR_COMMAND_METADATA,
+                new FixedMetadataValue(BuildTeamTools.getInstance(), true)
+        );
+
+        try {
+            player.chat(command);
+        } finally {
+            player.removeMetadata(
+                    GeneratorListener.INTERNAL_GENERATOR_COMMAND_METADATA,
+                    BuildTeamTools.getInstance()
+            );
+        }
     }
 
     /** Converts the XYZ coordinates in a command to the highest block at that location while skipping certain blocks. */
-    public String convertXYZ(String command){
+    public String convertXYZ(String command) {
         String xyz = command.split("%%XYZ/")[1].split("/%%")[0];
 
         String[] xyzSplit = xyz.split(",");
@@ -261,22 +282,22 @@ public class Command {
 
         int maxHeight = y;
 
-        if(blocks != null)
+        if (blocks != null)
             maxHeight = GeneratorUtils.getMaxHeight(blocks, x, z, MenuItems.getIgnoredMaterials());
-        if(maxHeight == 0)
+
+        if (maxHeight == 0)
             maxHeight = y;
 
         String commandSuffix = "";
-        if(command.split("/%%").length > 1)
+
+        if (command.split("/%%").length > 1)
             commandSuffix = command.split("/%%")[1];
 
         return command.split("%%XYZ/")[0] + x + "," + maxHeight + "," + z + commandSuffix;
     }
 
-
-
     /** Called when the command queue is finished. */
-    public void finish(){
+    public void finish() {
         player.sendActionBar("§a§lGenerator Progress: §7100%");
         isFinished = true;
         generatorComponent.sendSuccessMessage(player);

@@ -152,6 +152,14 @@ public abstract class GeneratorComponent extends ModuleComponent implements Wiki
                 .deserialize(BuildTeamTools.PREFIX + type + "§a successfully §7generated.");
     }
 
+    /**
+     * Conversion:
+     * Command: /gen house -w 123:12 -r 456:78
+     * args: ["-w", "123:12", "-r", "456:78"]
+     * HouseSettings:
+     * WALL_COLOR: 123:12
+     * ROOF_TYPE: 456:78
+     */
     protected void convertArgsToSettings(Player p, String[] args) {
         for (String flag : GeneratorUtils.convertArgsToFlags(args)) {
             String[] flagAndValue = GeneratorUtils.convertToFlagAndValue(flag, p);

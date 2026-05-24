@@ -6,6 +6,7 @@ import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.OutOfProjectionBoundsException;
 import net.buildtheearth.Projection;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.modules.navigation.NavUtils;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.api.OpenStreetMapAPI;
@@ -151,6 +152,9 @@ public class WarpEditMenu extends AbstractMenu {
                 future.thenAccept(result -> {
                     String regionName = result[0];
                     String countryCodeCCA2 = result[1].toUpperCase();
+
+                    if (countryCodeCCA2.isEmpty())
+                        countryCodeCCA2 = NavUtils.getCCA2FromCountryName(regionName, clickPlayer);
 
                     //Check if the team owns this region/country
                     boolean ownsRegion = NetworkModule.getInstance().ownsRegion(regionName, countryCodeCCA2);

@@ -45,6 +45,12 @@ public abstract class ConfigPaths {
         // BlueMap Integration
         private static final String BLUEMAP = "bluemap.";
         public static final String BLUEMAP_ENABLED = BLUEMAP + "enabled";
+
+        // Reverse Geocode
+        private static final String RGC_LOCAL_DB = "reverse-geocode.local-database.";
+        public static final String RGC_LOCAL_DB_ENABLED = RGC_LOCAL_DB + "enabled";
+        public static final String RGC_LOCAL_DB_UPDATE_URL = RGC_LOCAL_DB + "url";
+        public static final String RGC_LOCAL_DB_PATH = RGC_LOCAL_DB + "path";
     }
 
     public static class PlotSystem {

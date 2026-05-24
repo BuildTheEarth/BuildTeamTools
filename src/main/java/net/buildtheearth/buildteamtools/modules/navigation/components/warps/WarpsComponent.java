@@ -177,6 +177,8 @@ public class WarpsComponent extends ModuleComponent {
                 String regionName = result[0];
                 String countryCodeCCA2 = result[1].toUpperCase();
 
+                if (countryCodeCCA2.isEmpty()) countryCodeCCA2 = NavUtils.getCCA2FromCountryName(regionName, creator);
+
                 //Check if the team owns this region/country
                 boolean ownsRegion = NetworkModule.getInstance().ownsRegion(regionName, countryCodeCCA2);
 

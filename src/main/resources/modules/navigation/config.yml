@@ -52,5 +52,16 @@ bluemap:
   # Enables or disables the BlueMap integration for displaying warps [true|false]
   enabled: true
 
+reverse-geocode:
+  local-database:
+    # Whether to use the local database for reverse geocoding or not. If false, the online Photon/Komoot API will be used.
+    # Currently, we use only https://photon.komoot.io/ for online reverse geocoding.
+    enabled: true
+    # The URL to the local database. More infos: https://github.com/kno10/reversegeocode/blob/master/data/README.md
+    # The file is automatically downloaded once if it does not exist.
+    url: "https://data.ub.uni-muenchen.de/61/8/osm-20151130-0.001-2.bin"
+    # The relative path to the local database.
+    path: "reversegeocode/osm-20151130-0.001-2.bin"
+
 # NOTE: Do not change
-config-version: 1.6
+config-version: 1.7

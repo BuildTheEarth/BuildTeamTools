@@ -1,12 +1,17 @@
 package net.buildtheearth.buildteamtools.modules.network.api;
 
+import com.alpsbte.alpslib.geo.AdminLevel;
 import com.alpsbte.alpslib.utils.ChatHelper;
 import net.buildtheearth.model.GeographicalCoordinate;
+import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 public class OpenStreetMapAPI extends API {
@@ -17,8 +22,38 @@ public class OpenStreetMapAPI extends API {
      */
     public static @NotNull CompletableFuture<String[]> getCountryFromLocationAsync(@NotNull GeographicalCoordinate coordinates) {
         CompletableFuture<String[]> future = new CompletableFuture<>();
-        String url = "https://photon.komoot.io/reverse?lat=" + coordinates.latitude() + "&lon=" + coordinates.longitude() +
-                "&lang=en";
+
+        if (NavigationModule.getInstance().isEnabled() && NavigationModule.getInstance().getRgcHandler() != null) {
+            ChatHelper.logDebug("Using custom file API to get country from location: %s, %s", coordinates.latitude(), coordinates.longitude());
+
+            // If we are not on main thread, schedule lookup on main thread and complete the outer future there
+            if (!Bukkit.isPrimaryThread()) {
+                ChatHelper.logDebug("Not on main thread: scheduling RGC lookup on main thread...");
+                Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), () -> {
+                    try {
+                        var rgcGeoLocation = NavigationModule.getInstance().getRgcHandler()
+                                .locationFromCoordinates((float) coordinates.latitude(), (float) coordinates.longitude());
+                        ChatHelper.logDebug("RGC lookup successful: %s", rgcGeoLocation);
+                        future.complete(new String[]{rgcGeoLocation.get(AdminLevel.COUNTRY), ""});
+                    } catch (Exception ex) {
+                        future.completeExceptionally(ex);
+                    }
+                });
+                return future;
+            }
+
+            // We're on the main thread already — run synchronously
+            try {
+                var location = Objects.requireNonNull(NavigationModule.getInstance().getRgcHandler()).locationFromCoordinates((float) coordinates.latitude(), (float) coordinates.longitude());
+                ChatHelper.logDebug("RGC lookup successful: %s", location);
+                future.complete(new String[]{location.get(AdminLevel.COUNTRY), ""});
+            } catch (Exception ex) {
+                future.completeExceptionally(ex);
+            }
+            return future;
+        }
+
+        String url = "https://photon.komoot.io/reverse?lat=" + coordinates.latitude() + "&lon=" + coordinates.longitude() + "&lang=en";
 
         ChatHelper.logDebug("Requesting country from location: %s", url);
 

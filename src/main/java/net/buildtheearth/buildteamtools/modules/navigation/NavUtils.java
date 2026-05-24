@@ -24,6 +24,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 @UtilityClass
 public class NavUtils {
     public static void sendPlayerToConnectedServer(Player player, String server) {
@@ -179,5 +181,19 @@ public class NavUtils {
      */
     public static Location getLocationFromCoordinates(GeographicalCoordinate coordinate) {
         return getLocationFromCoordinatesYawPitch(coordinate, 0, 0);
+    }
+
+    /**
+     * Returns the CCA2 code of the country of the given country name.
+     */
+    public static String getCCA2FromCountryName(String countryName, Player clickPlayer) {
+        var region = Objects.requireNonNull(NetworkModule.getInstance().getBuildTeam()).getRegions().stream().filter(regionF -> regionF.getName().equals(countryName)).findFirst();
+        if (region.isPresent()) {
+            return region.get().getCountryCodeCca2();
+        } else {
+            clickPlayer.sendMessage(ChatHelper.getErrorString("Could not find the country of the location! Please report that"));
+            return "";
+        }
+
     }
 }

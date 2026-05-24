@@ -42,7 +42,7 @@ public enum ConfigUtil {
         configUtilInstance = new ConfigurationUtil(new ConfigurationUtil.ConfigFile[]{
                 new ConfigurationUtil.ConfigFile(Paths.get("config.yml"), 1.4, false),
                 new ConfigurationUtil.ConfigFile(Paths.get("modules", "plotsystem", "config.yml"), 1.6, false),
-                new ConfigurationUtil.ConfigFile(Paths.get("modules", "navigation", "config.yml"), 1.6, false),
+                new ConfigurationUtil.ConfigFile(Paths.get("modules", "navigation", "config.yml"), 1.7, false),
         });
     }
 

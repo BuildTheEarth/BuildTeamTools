@@ -24,7 +24,9 @@ dependencies {
     implementation(libs.com.googlecode.json.simple)
     implementation(libs.bstats.bukkit)
     implementation(platform(libs.fawe.bom))
-    implementation(libs.net.buildtheearth.projection)
+    implementation(libs.net.buildtheearth.projection) {
+        exclude(group = "com.google.guava", module = "guava")
+    }
 
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core")
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") { isTransitive = false }

@@ -19,6 +19,9 @@ commands:
     description: Opens the universal navigator.
     usage: /navigator
     aliases: [nav, navigate]
+  explore:
+    description: Opens the BuildTeams explore menu.
+    usage: /explore
   warp:
     description: Command for managing warps.
     usage: /warp <subcommand>

@@ -6,6 +6,7 @@ import net.buildtheearth.buildteamtools.modules.Module;
 import net.buildtheearth.buildteamtools.modules.navigation.components.bluemap.BluemapComponent;
 import net.buildtheearth.buildteamtools.modules.navigation.components.navigator.NavigatorComponent;
 import net.buildtheearth.buildteamtools.modules.navigation.components.navigator.commands.BuildteamCommand;
+import net.buildtheearth.buildteamtools.modules.navigation.components.navigator.commands.ExploreCommand;
 import net.buildtheearth.buildteamtools.modules.navigation.components.navigator.commands.NavigatorCommand;
 import net.buildtheearth.buildteamtools.modules.navigation.components.navigator.listeners.NavigatorJoinListener;
 import net.buildtheearth.buildteamtools.modules.navigation.components.navigator.listeners.NavigatorOpenListener;
@@ -77,6 +78,7 @@ public class NavigationModule extends Module {
         registerCommand("navigator", new NavigatorCommand());
         registerCommand("buildteam", new BuildteamCommand());
         registerCommand("warpsbt", new WarpsBtCommand());
+        registerCommand("explore", new ExploreCommand());
     }
 
     @Override

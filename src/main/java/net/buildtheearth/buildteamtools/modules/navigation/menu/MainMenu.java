@@ -66,7 +66,7 @@ public class MainMenu extends AbstractMenu {
 
         if (config.getBoolean(ConfigPaths.Navigation.EXPLORE_ITEM_ENABLED)) {
             // Set Explore Item
-            List<String> exploreLore = List.of(ChatHelper.getColorizedString(NamedTextColor.GRAY, "Click to explore the warps!", false), ChatHelper.getColorizedString(NamedTextColor.LIGHT_PURPLE, "Right click to explore other build teams.", false));
+            List<String> exploreLore = List.of(getMenuPlayer().hasPermission(Permissions.WARP_USE) ? ChatHelper.getColorizedString(NamedTextColor.GRAY, "Click to explore the warps!", false) : "", ChatHelper.getColorizedString(NamedTextColor.LIGHT_PURPLE, "Right click to explore other build teams.", false));
             getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setItem(Item.edit(Objects.requireNonNull(XMaterial.SPRUCE_BOAT.parseItem()), 1, ChatHelper.getColorizedString(NamedTextColor.YELLOW, "Explore", true), exploreLore));
         }
 

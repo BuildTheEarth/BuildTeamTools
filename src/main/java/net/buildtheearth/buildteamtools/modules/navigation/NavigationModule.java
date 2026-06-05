@@ -69,6 +69,10 @@ public class NavigationModule extends Module {
             bluemapComponent = new BluemapComponent();
         }
 
+        if (BuildTeamTools.getInstance().getConfig(ConfigUtil.NAVIGATION).getBoolean(ConfigPaths.Navigation.NAVIGATOR_ITEM_ENABLED, false)) {
+            registerListeners(new NavigatorJoinListener(), new NavigatorOpenListener());
+        }
+
         super.enable();
     }
 
@@ -86,9 +90,7 @@ public class NavigationModule extends Module {
         super.registerListeners(
                 new TpllJoinListener(),
                 new TpllListener(),
-                new WarpJoinListener(),
-                new NavigatorJoinListener(),
-                new NavigatorOpenListener()
+                new WarpJoinListener()
         );
     }
 }

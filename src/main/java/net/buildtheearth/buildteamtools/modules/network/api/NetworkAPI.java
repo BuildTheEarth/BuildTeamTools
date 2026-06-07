@@ -91,7 +91,7 @@ public class NetworkAPI {
                         }
 
                         // Get some values to add to the build team
-                        Continent continent = Continent.getByLabel((String) teamObject.get("Continent"));
+                        Continent continent;
                         boolean isConnected = (boolean) teamObject.get("isConnectedToNetwork");
                         boolean hasBuildTeamToolsInstalled = (long) teamObject.get("hasBuildTeamToolsInstalled") == 1;
                         String mainServerIP = (String) teamObject.get("MainServerIP");
@@ -191,10 +191,15 @@ public class NetworkAPI {
                                 int area = getArea(regionObject);
                                 String regionCodeCca3 = (String) regionObject.get("RegionCode");
                                 String regionCodeCca2 = (String) regionObject.get("cca2");
+                                continent = Continent.getByLabel((String) regionObject.get("region"));
+                                if (continent == Continent.OTHER)
+                                    continent = Continent.getByLabel((String) regionObject.get("subregion"));
 
                                 region = new Region(regionName, continent, buildTeam, headBase64, area, regionCodeCca2, regionCodeCca3);
-                            } else
+                            } else {
+                                continent = Continent.getByLabel((String) teamObject.get("Continent"));
                                 region = new Region(regionName, regionType, continent, buildTeam, headBase64);
+                            }
 
 
                             continent.getRegions().add(region);

@@ -10,6 +10,7 @@ import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
+import net.buildtheearth.buildteamtools.modules.network.model.Region;
 import net.buildtheearth.model.GeographicalCoordinate;
 import net.buildtheearth.model.MinecraftCoordinate;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -21,10 +22,10 @@ import org.bukkit.Location;
 import org.bukkit.UnsafeValues;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Objects;
+import org.jspecify.annotations.NonNull;
 
 @UtilityClass
 public class NavUtils {
@@ -97,17 +98,19 @@ public class NavUtils {
                                                                                       @NotNull BuildTeam targetBuildTeam) {
         if (targetBuildTeam.isConnected() && targetBuildTeam.getServerName() != null && NetworkModule.getInstance().getBuildTeam() != null && NetworkModule.getInstance().getBuildTeam().isConnected()) {
             return NavSwitchType.NETWORK;
-        } else if (targetBuildTeam.getIP() != null) {
-            if (isTransferCapable(player, targetBuildTeam)) {
-                return NavSwitchType.TRANSFER;
-            } else {
-                sendNotConnectedMessage(player, targetBuildTeam.getIP(), targetBuildTeam.getName());
-                return null;
-            }
-        } else {
+        }
+
+        if (targetBuildTeam.getIP() == null) {
             sendNoIpMessage(player, targetBuildTeam.getName());
             return null;
         }
+
+        if (isTransferCapable(player, targetBuildTeam)) {
+            return NavSwitchType.TRANSFER;
+        }
+
+        sendNotConnectedMessage(player, targetBuildTeam.getIP(), targetBuildTeam.getName());
+        return null;
     }
 
     public enum NavSwitchType {
@@ -115,14 +118,14 @@ public class NavUtils {
     }
 
     public static void switchToTeam(BuildTeam team, Player clickPlayer) {
-        var type = NavUtils.determineSwitchPossibilityOrMsgPlayerIfNone(clickPlayer, team);
+        NavSwitchType type = determineSwitchPossibilityOrMsgPlayerIfNone(clickPlayer, team);
+        if (type == null) {
+            return;
+        }
 
-        if (type != null) {
-            if (type == NavUtils.NavSwitchType.NETWORK) {
-                NavUtils.sendPlayerToConnectedServer(clickPlayer, team.getServerName());
-            } else if (type == NavUtils.NavSwitchType.TRANSFER) {
-                NavUtils.transferPlayer(clickPlayer, team.getIP());
-            }
+        switch (type) {
+            case NETWORK -> sendPlayerToConnectedServer(clickPlayer, team.getServerName());
+            case TRANSFER -> transferPlayer(clickPlayer, team.getIP());
         }
     }
 
@@ -148,7 +151,8 @@ public class NavUtils {
      * @param pitch      Player's pitch
      * @return A bukkit location matching the coordinates, yaw and pitch specified. Height is terrain elevation +2.
      */
-    public static Location getLocationFromCoordinatesYawPitch(GeographicalCoordinate coordinate, float yaw, float pitch) {
+    @Contract("_, _, _ -> new")
+    public static @NonNull Location getLocationFromCoordinatesYawPitch(GeographicalCoordinate coordinate, float yaw, float pitch) {
         try {
             MinecraftCoordinate mcCoord = Projection.toMinecraft(coordinate);
 
@@ -179,7 +183,8 @@ public class NavUtils {
      * @param coordinate Latitude and longitude of the location
      * @return A bukkit location matching the coordinates. Height is terrain elevation +2.
      */
-    public static Location getLocationFromCoordinates(GeographicalCoordinate coordinate) {
+    @Contract("_ -> new")
+    public static @NonNull Location getLocationFromCoordinates(GeographicalCoordinate coordinate) {
         return getLocationFromCoordinatesYawPitch(coordinate, 0, 0);
     }
 
@@ -187,13 +192,24 @@ public class NavUtils {
      * Returns the CCA2 code of the country of the given country name.
      */
     public static String getCCA2FromCountryName(String countryName, Player clickPlayer) {
-        var region = Objects.requireNonNull(NetworkModule.getInstance().getBuildTeam()).getRegions().stream().filter(regionF -> regionF.getName().equals(countryName)).findFirst();
-        if (region.isPresent()) {
-            return region.get().getCountryCodeCca2();
-        } else {
-            clickPlayer.sendMessage(ChatHelper.getErrorString("Could not find the country of the location! Please report that"));
-            return "";
+        Region region = findRegionByName(countryName);
+        if (region != null) {
+            return region.getCountryCodeCca2();
         }
 
+        clickPlayer.sendMessage(ChatHelper.getErrorString("Could not find the country of the location! Please report that"));
+        return "";
+    }
+
+    private static @Nullable Region findRegionByName(String countryName) {
+        BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
+        if (buildTeam == null) {
+            return null;
+        }
+
+        return buildTeam.getRegions().stream()
+                .filter(region -> region.getName().equals(countryName))
+                .findFirst()
+                .orElse(null);
     }
 }

@@ -11,26 +11,26 @@ dependencies {
     implementation(libs.alpslib.utils)   {
         exclude(group = "com.github.cryptomorin", module = "XSeries")
     }
-    implementation(libs.com.alpsbte.canvas)
-    implementation(libs.com.github.cryptomorin.xseries)
-    implementation(libs.net.wesjd.anvilgui)
-    implementation(libs.micycle.clipper2)
-    implementation(libs.org.json.json)
-    implementation(libs.com.google.code.gson.gson)
-    implementation(libs.com.squareup.okhttp3.okhttp.jvm)
+    implementation(libs.alpsbte.canvas)
+    implementation(libs.xseries)
+    implementation(libs.anvilgui)
+    implementation(libs.clipper2)
+    implementation(libs.json)
+    implementation(libs.googlecode.gson)
+    implementation(libs.okhttp.jvm)
     implementation(libs.javaapiforkml) {
         exclude(group = "com.sun.xml.bind", module = "jaxb-xjc") // Else Remapping will yell of duplicated classes
     }
-    implementation(libs.com.googlecode.json.simple)
+    implementation(libs.googlecode.json.simple)
     implementation(libs.bstats.bukkit)
     implementation(platform(libs.fawe.bom))
-    implementation(libs.net.buildtheearth.projection) {
+    implementation(libs.buildtheearth.projection) {
         exclude(group = "com.google.guava", module = "guava")
     }
 
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core")
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") { isTransitive = false }
-    compileOnly(libs.io.papermc.paper.paper.api)
+    compileOnly(libs.paper.api)
     compileOnly(libs.bluemap.api)
 }
 

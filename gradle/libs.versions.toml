@@ -21,7 +21,7 @@ alpslib-utils = "1.4.+" # https://mvn.alps-bte.com/service/rest/repository/brows
 fawe-bom = "1.56" # Ref: https://github.com/IntellectualSites/bom
 bstats = "3.+" # https://central.sonatype.com/artifact/org.bstats/bstats-bukkit
 bluemap-api = "2.+" # Ref: https://github.com/BlueMap-Minecraft/BlueMapAPI
-net-buildtheearth-projection = "1.+" # Ref: https://github.com/BuildTheEarth/projection
+net-buildtheearth-projection = "1.0.4" # Ref: https://github.com/BuildTheEarth/projection
 
 [libraries]
 com-alpsbte-alpslib-alpslib-libpsterra = { module = "com.alpsbte.alpslib:alpslib-libpsterra", version.ref = "com-alpsbte-alpslib-alpslib-libpsterra" }

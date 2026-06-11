@@ -38,7 +38,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
             regions.add(
                 new Region("USA",
                     Continent.NORTH_AMERICA,
-                        new BuildTeam(null, null, null, "4 Teams", null, false, false, false, ""),
+                        new BuildTeam("USA", null, null, "3 Teams", null, false, false, false, ""),
                     "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGNhYzk3NzRkYTEyMTcyNDg1MzJjZTE0N2Y3ODMxZjY3YTEyZmRjY2ExY2YwY2I0YjM4NDhkZTZiYzk0YjQifX19"
                     , 9372610, "US", "USA"
                 )
@@ -119,6 +119,11 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
                 clickPlayer.closeInventory();
 
                 ChatHelper.logDebug("Clicked Region: %s", clickedRegion.getName() + " (" + clickedRegion.getCountryCodeCca3() + ")");
+
+                if (clickedRegion.getCountryCodeCca3().equalsIgnoreCase("USA")) {
+                    new StateSelectorMenu(clickPlayer, clickedRegion.getContinent(), true);
+                    return;
+                }
 
                 if (clickInformation.getClickType().isRightClick() &&
                         clickPlayer.hasPermission(Permissions.WARP_USE) &&

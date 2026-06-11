@@ -79,6 +79,7 @@ public class TpllListener implements Listener {
         String[] splitMessage = event.getMessage().split(" ");
         if (splitMessage.length < 3) return false;
         splitMessage[1] = splitMessage[1].replace(",", " ").trim();
+        splitMessage[2] = splitMessage[2].replace(",", " ").trim();
         ChatHelper.logDebug("Command had the correct length (%s).", splitMessage.length);
 
         Double oLat = AlpsUtils.tryParseDouble(splitMessage[1]);

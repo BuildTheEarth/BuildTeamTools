@@ -1,5 +1,7 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.field;
 
+import lombok.Getter;
+
 public enum CropType {
 
     POTATO("POTATO", true, true),
@@ -12,7 +14,9 @@ public enum CropType {
     HARVESTED("HARVESTED", true, true),
     OTHER("OTHER", true, true);
 
+    @Getter
     private final String identifier;
+    @Getter
     private final boolean linesRequired;
     private final boolean hasStages;
 
@@ -29,14 +33,6 @@ public enum CropType {
             }
         }
         return POTATO;
-    }
-
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    public boolean isLinesRequired() {
-        return linesRequired;
     }
 
     public boolean hasStages() {

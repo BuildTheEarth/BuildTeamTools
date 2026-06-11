@@ -10,7 +10,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Collections;
 import java.util.List;
@@ -19,11 +19,11 @@ import java.util.stream.Stream;
 public class BuildteamCommand implements CommandExecutor, TabCompleter {
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+    public boolean onCommand(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, String @NonNull [] args) {
         return btCommand(sender, label, args, Permissions.NAVIGATOR_USE);
     }
 
-    protected boolean btCommand(@NotNull CommandSender sender, @NotNull String label, String[] args, String permission) {
+    protected boolean btCommand(@NonNull CommandSender sender, @NonNull String label, String[] args, String permission) {
         if (!(sender instanceof Player player)) {
             sender.sendMessage(ChatHelper.getErrorString("You must be a %s to %s this command!", "player", "execute"));
             return true;
@@ -55,7 +55,7 @@ public class BuildteamCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
+    public List<String> onTabComplete(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, String @NonNull [] args) {
         if (args.length >= 1) {
             String partial = args[0].toLowerCase();
             return NetworkModule.getInstance().getBuildTeams().stream()

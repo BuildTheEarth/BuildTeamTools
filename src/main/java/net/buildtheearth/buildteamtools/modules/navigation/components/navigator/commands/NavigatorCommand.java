@@ -8,16 +8,15 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jspecify.annotations.NonNull;
 
 public class NavigatorCommand implements CommandExecutor {
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player)) {
+    public boolean onCommand(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, String @NonNull [] args) {
+        if (!(sender instanceof Player player)) {
             sender.sendMessage(ChatHelper.getErrorString("You must be a %s to %s this command!", "player", "execute"));
             return true;
         }
-
-        Player player = (Player) sender;
 
         if(!player.hasPermission(Permissions.NAVIGATOR_USE)) {
             player.sendMessage(ChatHelper.getErrorString("You don't have permission to use this command!"));

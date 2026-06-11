@@ -51,7 +51,7 @@ public class ChoosePaletteMenu extends AbstractMenu {
         ItemStack glass = Item.create(safeMat(XMaterial.GRAY_STAINED_GLASS_PANE, Material.GRAY_STAINED_GLASS_PANE), " ");
         return BinaryMask.builder(getMenu())
                 .item(glass)
-                .pattern("111111111")
+                .pattern(BinaryMask.FULL_PATTERN)
                 .pattern("100000001")
                 .pattern("100000001")
                 .pattern("100000001")
@@ -280,9 +280,9 @@ public class ChoosePaletteMenu extends AbstractMenu {
 
     private Material safeMat(XMaterial xmat, Material fallback) {
         try {
-            Material m = xmat.parseMaterial();
+            Material m = xmat.get();
             return (m != null) ? m : fallback;
-        } catch (Throwable t) {
+        } catch (Exception t) {
             return fallback;
         }
     }

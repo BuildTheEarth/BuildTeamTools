@@ -1,12 +1,7 @@
 package net.buildtheearth.buildteamtools.modules.generator.model;
 
 import com.alpsbte.alpslib.utils.ChatHelper;
-import com.fastasyncworldedit.core.FaweAPI;
-import com.sk89q.worldedit.bukkit.BukkitWorld;
-import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import lombok.experimental.UtilityClass;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.common.CommonModule;
@@ -22,7 +17,6 @@ import org.json.JSONObject;
 import org.jspecify.annotations.NonNull;
 
 import java.io.*;
-import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -47,9 +41,9 @@ public class GeneratorCollections {
         // Load the schematic file
         try {
             String folder;
-            if(CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled())
+            if (CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled())
                 folder = "/../FastAsyncWorldEdit/schematics/";
-            else if(CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled())
+            else if (CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled())
                 folder = "/../WorldEdit/schematics/";
             else
                 return false;
@@ -57,66 +51,20 @@ public class GeneratorCollections {
             String filepath = "GeneratorCollections/treepack/oak41.schematic";
             File myFile = new File(BuildTeamTools.getInstance().getDataFolder().getAbsolutePath() + folder + filepath);
 
-            if(!myFile.exists())
+            if (!myFile.exists())
                 return installGeneratorCollections(p, false);
 
-            Clipboard clipboard = null;
-
-            // For FastAsyncWorldEdit
-            if(CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled()) {
-                clipboard = FaweAPI.load(myFile);
-
-            // For Legacy WorldEdit
-            }else if(CommonModule.getInstance().getDependencyComponent().isLegacyWorldEdit()) {
-                Class<?> formatClass = ClipboardFormat.class;
-                Method findByFile = formatClass.getMethod("findByFile", File.class);
-                Method getReader = ClipboardFormat.class.getMethod("getReader", InputStream.class);
-
-                ClipboardFormat format = (ClipboardFormat) findByFile.invoke(null, myFile);
-                ClipboardReader reader = null;
-
-                if (format != null)
-                    reader = (ClipboardReader) getReader.invoke(format, Files.newInputStream(myFile.toPath()));
-
-                BukkitWorld bukkitWorld;
-                if(p != null)
-                    bukkitWorld = new BukkitWorld(p.getWorld());
-                else
-                    bukkitWorld = new BukkitWorld(Bukkit.getWorlds().getFirst());
-
-                if (reader != null){
-                    Class<?> readerClass = reader.getClass();
-                    Method read = readerClass.getMethod("read", Class.forName("com.sk89q.worldedit.world.registry.WorldData"));
-
-                    Method getWorldDataMethod = bukkitWorld.getClass().getMethod("getWorldData");
-                    Object worldData = getWorldDataMethod.invoke(bukkitWorld);
-
-                    clipboard = (Clipboard) read.invoke(reader, worldData);
+            var format = ClipboardFormats.findByFile(myFile);
+            boolean foundFile = false;
+            if (format != null) {
+                try (var ignored = format.load(myFile)) {
+                    foundFile = true;
                 }
-
-            // For latest WorldEdit
-            }else if(CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled()) {
-
-                ClipboardFormat format = ClipboardFormats.findByFile(myFile);
-                ClipboardReader reader = null;
-
-                if (format != null)
-                    reader = format.getReader(Files.newInputStream(myFile.toPath()));
-
-                if (reader != null)
-                    clipboard = reader.read();
-
-            }else{
-                return false;
             }
-
-
-
-            if(clipboard == null)
+            if (!foundFile)
                 return installGeneratorCollections(p, false);
             else
                 return checkIfGeneratorCollectionsIsUpToDate(p);
-
         } catch (Exception e) {
             BuildTeamTools.getInstance().getComponentLogger().warn("Failed to check if Generator Collections is installed:", e);
             return installGeneratorCollections(p, true);
@@ -124,10 +72,11 @@ public class GeneratorCollections {
     }
 
 
-    /** Returns the latest release version of a repository on GitHub
+    /**
+     * Returns the latest release version of a repository on GitHub
      *
      * @param owner The owner of the repository
-     * @param repo The name of the repository
+     * @param repo  The name of the repository
      * @return The latest release version of the repository
      */
     public static @Nullable String getRepositoryReleaseVersionString(String owner, String repo) {
@@ -166,12 +115,11 @@ public class GeneratorCollections {
     }
 
 
-
-
-    /** Installs and extracts a zip folder on the system
+    /**
+     * Installs and extracts a zip folder on the system
      *
-     * @param filename The name of the zip folder to install. Example: "newtrees.zip"
-     * @param path The path to extract the zip folder to. Parent Folder is the plugin folder. Example: "/../WorldEdit/schematics/"
+     * @param filename         The name of the zip folder to install. Example: "newtrees.zip"
+     * @param path             The path to extract the zip folder to. Parent Folder is the plugin folder. Example: "/../WorldEdit/schematics/"
      * @param extractionFolder The path where the downloaded zip file is temporarily saved
      */
     private static boolean installZipFolder(String parentURL, String filename, Path path, @NonNull Path extractionFolder) throws IOException {
@@ -183,10 +131,10 @@ public class GeneratorCollections {
         URL url = URI.create(parentURL + filename).toURL();
 
         File file = path.toFile();
-        if(!file.exists()) {
+        if (!file.exists()) {
             boolean created = file.mkdir();
 
-            if(!created)
+            if (!created)
                 return false;
         }
         // Open a connection to the URL
@@ -207,7 +155,7 @@ public class GeneratorCollections {
                 while ((bytesRead = in.read(buffer)) != -1) {
                     out.write(buffer, 0, bytesRead);
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 BuildTeamTools.getInstance().getComponentLogger().warn("Failed to download zip file from {}:", url, e);
                 return false;
             }
@@ -221,16 +169,17 @@ public class GeneratorCollections {
     }
 
 
-    /** Extracts a zip folder on the system
+    /**
+     * Extracts a zip folder on the system
      *
-     * @param zipFilePath The path to the zip folder. Example: "/../BuildTeamTols/modules/generator/GeneratorCollections.zip"
+     * @param zipFilePath   The path to the zip folder. Example: "/../BuildTeamTols/modules/generator/GeneratorCollections.zip"
      * @param destDirectory The path to extract the zip folder to. Parent Folder is the plugin folder. Example: "/../WorldEdit/schematics/"
      */
     private static boolean unzip(Path zipFilePath, @NonNull Path destDirectory) {
         File destDir = destDirectory.toFile();
         if (!destDir.exists()) {
             boolean success = destDir.mkdir();
-            if(!success)
+            if (!success)
                 return false;
         }
 
@@ -243,8 +192,8 @@ public class GeneratorCollections {
                 if (!entry.isDirectory()) {
                     File parentDir = filePath.getParent().toFile();
                     if (!parentDir.exists() && !parentDir.mkdirs()) {
-                            throw new IOException("Failed to create parent directories for: " + filePath);
-                        }
+                        throw new IOException("Failed to create parent directories for: " + filePath);
+                    }
 
                     try (BufferedOutputStream bos = new BufferedOutputStream(Files.newOutputStream(filePath))) {
                         byte[] bytesIn = new byte[4096];
@@ -256,7 +205,7 @@ public class GeneratorCollections {
                 } else {
                     boolean success = filePath.toFile().mkdirs();
 
-                    if(!success)
+                    if (!success)
                         return false;
                 }
                 zipIn.closeEntry();
@@ -264,7 +213,7 @@ public class GeneratorCollections {
             }
 
             deleteFile(zipFilePath); // Delete the old zip file
-        }catch (Exception e){
+        } catch (Exception e) {
             BuildTeamTools.getInstance().getComponentLogger().warn("Failed to unzip zip file:", e);
             return false;
         }
@@ -272,7 +221,8 @@ public class GeneratorCollections {
         return true;
     }
 
-    /** Deletes a directory from the system
+    /**
+     * Deletes a directory from the system
      *
      * @param path The path to the directory to delete
      */
@@ -303,13 +253,13 @@ public class GeneratorCollections {
      * @param p The player to check for
      * @return Whether the Generator Collections package is up-to-date or not
      */
-    private static boolean checkIfGeneratorCollectionsIsUpToDate(Player p){
+    private static boolean checkIfGeneratorCollectionsIsUpToDate(Player p) {
         // Load the schematic file
         try {
             var cfgFile = BuildTeamTools.getInstance().getDataFolder().toPath().resolve("modules").resolve("generator").resolve("generatorCollectionsVersion.yml");
             FileConfiguration cfg = YamlConfiguration.loadConfiguration(cfgFile.toFile());
 
-            if(!cfg.contains("version"))
+            if (!cfg.contains("version"))
                 return installGeneratorCollections(p, true);
 
             String oldVersion = cfg.getString("version");
@@ -327,35 +277,35 @@ public class GeneratorCollections {
     /**
      * Sends the player and console a message with more information about the generator collections package in case it isn't installed.
      *
-     * @see #hasUpdatedGeneratorCollections(Player)
-     *
      * @param p The player to send the message to
+     * @see #hasUpdatedGeneratorCollections(Player)
      */
-    private static void sendGeneratorCollectionsError(@Nullable Player p){
+    private static void sendGeneratorCollectionsError(@Nullable Player p) {
         ChatHelper.logPlayerAndConsole(p, "§cAn error occurred while installing the Generator Collections. Please report that with the log!", Level.INFO);
     }
 
 
-    /** Installs or updates the Generator Collections on the system by downloading it from the buildtheearth cdn and extracting it.
+    /**
+     * Installs or updates the Generator Collections on the system by downloading it from the buildtheearth cdn and extracting it.
      *
-     * @param p The player to send the error message to in case the installation fails
+     * @param p      The player to send the error message to in case the installation fails
      * @param update Whether the Generator Collections package is already installed or should just be updated
      * @return Whether the installation was successful
      */
-    private static boolean installGeneratorCollections(@Nullable Player p, boolean update){
+    private static boolean installGeneratorCollections(@Nullable Player p, boolean update) {
         String parentURL = "https://github.com/BuildTheEarth/GeneratorCollections/releases/latest/download/";
         String filename = "GeneratorCollections.zip";
         String fileDirectory = "GeneratorCollections/";
 
         var path = Bukkit.getPluginsFolder().toPath();
-        if(CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled())
+        if (CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled())
             path = path.resolve("FastAsyncWorldEdit").resolve("schematics");
-        else if(CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled())
+        else if (CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled())
             path = path.resolve("WorldEdit").resolve("schematics");
         else
             return false;
 
-        if(update) {
+        if (update) {
             ChatHelper.logPlayerAndConsole(p, "§cThe Generator Collections package is outdated. Updating...", Level.INFO);
             deleteDirectory(path.resolve(fileDirectory));
         } else
@@ -367,11 +317,11 @@ public class GeneratorCollections {
             if (success)
                 success = moveVersionFile(generatorModulePath, path.resolve("GeneratorCollections"), "config.yml", "generatorCollectionsVersion.yml");
 
-            if(success) {
+            if (success) {
                 ChatHelper.logPlayerAndConsole(p, "§7Successfully installed §eGenerator Collections v" + generatorCollectionsVersion + "§7!", Level.INFO);
 
                 return true;
-            }else {
+            } else {
                 sendGeneratorCollectionsError(p);
                 return false;
             }

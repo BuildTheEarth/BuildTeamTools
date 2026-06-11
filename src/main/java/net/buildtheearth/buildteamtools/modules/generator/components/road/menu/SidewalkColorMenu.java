@@ -28,10 +28,9 @@ public class SidewalkColorMenu extends BlockListMenu {
             getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
                 Settings settings = GeneratorModule.getInstance().getRoad().getPlayerSettings().get(clickPlayer.getUniqueId());
 
-                if(!(settings instanceof RoadSettings))
+                if (!(settings instanceof RoadSettings roadSettings))
                     return;
 
-                RoadSettings roadSettings = (RoadSettings) settings;
                 roadSettings.setValue(RoadFlag.SIDEWALK_MATERIAL, Item.createStringFromItemStringList(selectedMaterials));
 
                 clickPlayer.closeInventory();

@@ -26,7 +26,7 @@ public class Utils {
             i++;
         }
 
-        if (currentLine.length() > 0) {
+        if (!currentLine.isEmpty()) {
             lines.add(currentLine.toString().trim());
         }
 

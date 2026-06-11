@@ -21,6 +21,7 @@ import org.ipvp.canvas.mask.Mask;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class AdvancedSettingsMenu extends AbstractMenu {
@@ -114,7 +115,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
                 .item(MenuItems.ITEM_BACKGROUND)
-                .pattern("111111111")
+                .pattern(BinaryMask.FULL_PATTERN)
                 .pattern("100010001")
                 .pattern("100010001")
                 .pattern("100010001")
@@ -132,10 +133,9 @@ public class AdvancedSettingsMenu extends AbstractMenu {
             if (value > minValue) {
                 Settings settings = road.getPlayerSettings().get(clickPlayer.getUniqueId());
 
-                if(!(settings instanceof RoadSettings))
+                if (!(settings instanceof RoadSettings roadSettings))
                     return;
 
-                RoadSettings roadSettings = (RoadSettings) settings;
                 roadSettings.setValue(roadFlag, value - 1);
 
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
@@ -152,10 +152,9 @@ public class AdvancedSettingsMenu extends AbstractMenu {
             if (value < maxValue) {
                 Settings settings = road.getPlayerSettings().get(clickPlayer.getUniqueId());
 
-                if(!(settings instanceof RoadSettings))
+                if (!(settings instanceof RoadSettings roadSettings))
                     return;
 
-                RoadSettings roadSettings = (RoadSettings) settings;
                 roadSettings.setValue(roadFlag, value + 1);
 
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
@@ -186,10 +185,9 @@ public class AdvancedSettingsMenu extends AbstractMenu {
         Road road = GeneratorModule.getInstance().getRoad();
         Settings settings = road.getPlayerSettings().get(clickPlayer.getUniqueId());
 
-        if(!(settings instanceof RoadSettings))
+        if (!(settings instanceof RoadSettings roadSettings))
             return;
 
-        RoadSettings roadSettings = (RoadSettings) settings;
         roadSettings.setValue(roadFlag, "OFF");
 
         clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
@@ -197,6 +195,6 @@ public class AdvancedSettingsMenu extends AbstractMenu {
     }
 
     protected ItemStack getStreetLampItem(String id){
-        return Item.create(XMaterial.SEA_LANTERN.parseMaterial(), "§eStreet Lamp #" + id, ListUtil.createList("§7Click to select this street lamp type."));
+        return Item.create(Objects.requireNonNull(XMaterial.SEA_LANTERN.get()), "§eStreet Lamp #" + id, ListUtil.createList("§7Click to select this street lamp type."));
     }
 }

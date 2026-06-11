@@ -13,6 +13,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class BookMenu {
@@ -60,7 +61,7 @@ public class BookMenu {
             time++;
         }, 20, 20);
 
-        ItemStack item = Item.create(XMaterial.WRITABLE_BOOK.parseMaterial(), bookTitle);
+        ItemStack item = Item.create(Objects.requireNonNull(XMaterial.WRITABLE_BOOK.get()), bookTitle);
         BookMeta bookMeta = (BookMeta) item.getItemMeta();
         bookMeta.setTitle(bookTitle);
         bookMeta.setAuthor(bookAuthor);
@@ -93,8 +94,8 @@ public class BookMenu {
         if(item == null)
             return;
 
-        if(item.getType() != XMaterial.WRITABLE_BOOK.parseMaterial()
-        && item.getType() != XMaterial.WRITTEN_BOOK.parseMaterial())
+        if (item.getType() != Objects.requireNonNull(XMaterial.WRITABLE_BOOK.get())
+                && item.getType() != Objects.requireNonNull(XMaterial.WRITTEN_BOOK.get()))
             return;
 
         BookMeta meta = (BookMeta) item.getItemMeta();
@@ -135,7 +136,7 @@ public class BookMenu {
             String[] lines = text.split("\n");
 
             for(int i = 0; i < lines.length; i++)
-                if(lines[i].toCharArray().length > 30)
+                if (lines[i].length() > 30)
                     lines[i] = lines[i].replaceAll("(.{30})", "$1\n");
 
             StringBuilder editedText = new StringBuilder(lines[0]);

@@ -106,7 +106,9 @@ public class TpllListener implements Listener {
                     String countryName = address[0];
                     Region region = Region.getByName(countryName);
 
-                    if (!Objects.equals(region.getBuildTeam().getID(), networkModule.getBuildTeam().getID())) {
+                    BuildTeam currentTeam = networkModule.getBuildTeam();
+                    if (region != null && region.getBuildTeam() != null && currentTeam != null
+                            && !Objects.equals(region.getBuildTeam().getID(), currentTeam.getID())) {
                         targetBuildTeam = region.getBuildTeam();
                         return CompletableFuture.completedFuture(true);
                     }

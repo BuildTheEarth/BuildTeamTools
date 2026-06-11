@@ -49,6 +49,7 @@ public class StatsPlayer {
         stats.put(statsPlayerType, object);
     }
 
+    @SuppressWarnings("unchecked")
     public JSONObject toJSON(){
         JSONObject jsonObject = new JSONObject();
 

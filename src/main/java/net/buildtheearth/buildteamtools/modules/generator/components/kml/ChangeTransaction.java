@@ -22,7 +22,7 @@ import java.util.Set;
  */
 public class ChangeTransaction {
 
-    public class BlockModification{
+    public static class BlockModification {
         public BlockModification(Block block, Material newType)
         {
             this.block = block;
@@ -33,7 +33,7 @@ public class ChangeTransaction {
         public Block block;
         public Material previousType;
         public Material newType;
-    };
+    }
 
     //------------------------------------
 

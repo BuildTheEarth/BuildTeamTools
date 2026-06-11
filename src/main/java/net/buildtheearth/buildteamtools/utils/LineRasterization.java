@@ -17,9 +17,7 @@ public class LineRasterization {
      * Interpolates block positions between to given locations, similarly to what 
      * the WorldEdit command "//line" does. Internally uses Bresenhams algorithm to
      * calculate the intermediate positions
-     * 
-     * @param start Start position
-     * @param end End position
+     *
      * @return List<BlockLocation> all locations forming the line, including start and endpoint.
      */
     public static List<BlockLocation> rasterizeLine(int x0, int y0, int z0, int x1, int y1, int z1){

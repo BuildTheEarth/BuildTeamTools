@@ -101,7 +101,8 @@ public class WarpsComponent extends ModuleComponent {
      */
     public void warpPlayer(Player player, @NotNull Warp warp) {
         // If the warp is in the same team, just teleport the player
-        if(warp.getWarpGroup().getBuildTeam().getID().equals(NetworkModule.getInstance().getBuildTeam().getID())) {
+        BuildTeam currentTeam = NetworkModule.getInstance().getBuildTeam();
+        if (currentTeam != null && warp.getWarpGroup().getBuildTeam().getID().equals(currentTeam.getID())) {
             ChatHelper.logDebug("Warping player %s to warp %s", player.getName(), warp.getName());
             Location loc = NavUtils.getLocationFromCoordinatesYawPitch(new GeographicalCoordinate(warp.getLat(), warp.getLon()), warp.getYaw(), warp.getPitch());
 
@@ -144,7 +145,10 @@ public class WarpsComponent extends ModuleComponent {
     }
 
     public static void createWarp(Player creator) {
-        WarpGroup group = getOtherWarpGroup(NetworkModule.getInstance().getBuildTeam().getWarpGroups());
+        BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
+        if (buildTeam == null || buildTeam.getWarpGroups() == null) return;
+
+        WarpGroup group = getOtherWarpGroup(buildTeam.getWarpGroups());
         if (group == null) {
             group = NavUtils.createOtherWarpGroup(NetworkModule.getInstance().getBuildTeam());
         }
@@ -214,10 +218,13 @@ public class WarpsComponent extends ModuleComponent {
     // ------------------------- //
 
     public Warp getWarpByName(String name){
-        return getWarpByName(NetworkModule.getInstance().getBuildTeam(), name);
+        BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
+        if (buildTeam == null) return null;
+        return getWarpByName(buildTeam, name);
     }
 
     public Warp getWarpByName(@NotNull BuildTeam buildTeam, String name) {
+        if (buildTeam.getWarpGroups() == null) return null;
         return buildTeam.getWarpGroups().stream().flatMap(warpGroup -> warpGroup.getWarps().stream())
                 .filter(warp1 -> warp1.getName() != null && warp1.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
@@ -231,15 +238,20 @@ public class WarpsComponent extends ModuleComponent {
 
     public Warp getWarpByKey(String key) {
         ChatHelper.logDebug("Retrieving warp with key %s", key);
-        return NetworkModule.getInstance().getBuildTeam().getWarpGroups().stream().flatMap(warpGroup -> warpGroup.getWarps().stream())
+        BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
+        if (buildTeam == null || buildTeam.getWarpGroups() == null) return null;
+        return buildTeam.getWarpGroups().stream().flatMap(warpGroup -> warpGroup.getWarps().stream())
                 .filter(warp1 -> warp1.getId().toString().equals(key)).findFirst().orElse(null);
     }
 
     public static void openWarpMenu(@NotNull Player player) {
-        openWarpMenu(player, NetworkModule.getInstance().getBuildTeam(), null);
+        BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
+        if (buildTeam == null) return;
+        openWarpMenu(player, buildTeam, null);
     }
 
     public static void openWarpMenu(@NotNull Player player, @NotNull BuildTeam buildTeam, @Nullable AbstractMenu menu) {
+        if (buildTeam.getWarpGroups() == null) return;
         int warpGroupCount = buildTeam.getWarpGroups().size();
 
         switch (warpGroupCount) {

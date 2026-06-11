@@ -16,6 +16,8 @@ import org.ipvp.canvas.Menu;
 import org.ipvp.canvas.mask.Mask;
 import org.ipvp.canvas.type.ChestMenu;
 
+import java.util.Objects;
+
 public abstract class AbstractMenu {
 
     private final Menu menu;
@@ -72,7 +74,7 @@ public abstract class AbstractMenu {
                 setMenuItemsAsync();
                 setItemClickEventsAsync();
             } catch (Exception e) {
-                e.printStackTrace();
+                BuildTeamTools.getInstance().getComponentLogger().error("Error reloading menu asynchronously", e);
             }
 
             menu.update(getMenuPlayer());
@@ -138,7 +140,7 @@ public abstract class AbstractMenu {
             getMenu().getSlot(sliderItemSlot - 1).setItem(HeadFactory.colorizedHead(sliderColor, HeadTexture.WHITE_BLANK, sliderName + ": §c§lOFF"));
 
             // Set current page item
-            getMenu().getSlot(sliderItemSlot).setItem(Item.create(XMaterial.BARRIER.parseMaterial(), sliderName + ": §c§lOFF"));
+            getMenu().getSlot(sliderItemSlot).setItem(Item.create(Objects.requireNonNull(XMaterial.BARRIER.get()), sliderName + ": §c§lOFF"));
 
             // Set next page item
             getMenu().getSlot(sliderItemSlot + 1).setItem(HeadFactory.colorizedHead(sliderColor, HeadTexture.WHITE_BLANK, sliderName + ": §c§lOFF"));

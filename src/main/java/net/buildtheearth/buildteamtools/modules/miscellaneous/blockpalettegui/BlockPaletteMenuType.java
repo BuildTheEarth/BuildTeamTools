@@ -1,5 +1,6 @@
 package net.buildtheearth.buildteamtools.modules.miscellaneous.blockpalettegui;
 
+import lombok.Getter;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import org.bukkit.inventory.ItemStack;
 
@@ -7,6 +8,7 @@ import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+@Getter
 public enum BlockPaletteMenuType {
     SLABS("Slabs", "slabs", MenuItems::getSlabsArray),
     STAIRS("Stairs", "stairs", MenuItems::getStairsArray),
@@ -26,8 +28,17 @@ public enum BlockPaletteMenuType {
     GLASS_PANE("Glass Pane", "glass_pane", MenuItems::getGlassPanesArray),
     GLASS("Glass", "glass", MenuItems::getGlassArray);
 
+    /**
+     * Human-readable menu title
+     */
     private final String readableName;
+    /**
+     * The key used for filtering/tab-completion
+     */
     private final String filterKey;
+    /**
+     * Supplier for the menu's ItemStack array
+     */
     private final Supplier<ItemStack[]> itemSupplier;
 
     private static final Map<String, BlockPaletteMenuType> keyToType = new HashMap<>();
@@ -51,21 +62,6 @@ public enum BlockPaletteMenuType {
         this.readableName = readableName;
         this.filterKey = filterKey;
         this.itemSupplier = itemSupplier;
-    }
-
-    /** @return human-readable menu title */
-    public String getReadableName() {
-        return readableName;
-    }
-
-    /** @return the key used for filtering/tab-completion */
-    public String getFilterKey() {
-        return filterKey;
-    }
-
-    /** @return supplier for the menu's ItemStack array */
-    public Supplier<ItemStack[]> getItemSupplier() {
-        return itemSupplier;
     }
 
     /** Lookup enum by filter key (case-insensitive) */

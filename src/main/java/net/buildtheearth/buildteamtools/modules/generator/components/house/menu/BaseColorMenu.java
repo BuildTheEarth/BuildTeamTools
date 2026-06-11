@@ -27,10 +27,9 @@ public class BaseColorMenu extends BlockListMenu {
             getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
                 Settings settings = GeneratorModule.getInstance().getHouse().getPlayerSettings().get(clickPlayer.getUniqueId());
 
-                if (!(settings instanceof HouseSettings))
+                if (!(settings instanceof HouseSettings houseSettings))
                     return;
 
-                HouseSettings houseSettings = (HouseSettings) settings;
                 houseSettings.setValue(HouseFlag.BASE_COLOR, Item.createStringFromItemStringList(selectedMaterials));
 
                 clickPlayer.closeInventory();

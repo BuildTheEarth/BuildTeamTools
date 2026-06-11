@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Config {
-    private static final HashMap<String, File> files = new HashMap<String, File>();
+    private static final HashMap<String, File> files = new HashMap<>();
 
     public static File getFile(String file) {
         return getFile("", file);
@@ -59,7 +59,7 @@ public class Config {
         try {
             cfg.save(getFile(file));
         } catch (IOException e) {
-            e.printStackTrace();
+            BuildTeamTools.getInstance().getComponentLogger().error("Error saving config file: {}", file, e);
         }
     }
 
@@ -69,7 +69,7 @@ public class Config {
         try {
             cfg.save(getFile(dir, file));
         } catch (IOException e) {
-            e.printStackTrace();
+            BuildTeamTools.getInstance().getComponentLogger().error("Error saving config file: {}/{}", dir, file, e);
         }
     }
 
@@ -144,7 +144,11 @@ public class Config {
         double x = cfg.getDouble(place + ".X");
         int y = cfg.getInt(place + ".Y");
         double z = cfg.getDouble(place + ".Z");
-        World world = Bukkit.getWorld(cfg.getString(place + ".World"));
+        String worldName = cfg.getString(place + ".World");
+        if (worldName == null) {
+            throw new IllegalStateException("World name is null for location at " + place);
+        }
+        World world = Bukkit.getWorld(worldName);
 
         if (cfg.getInt(place + ".Yaw") != 0 || cfg.getInt(place + ".Pitch") != 0) {
             int yaw = cfg.getInt(place + ".Yaw");

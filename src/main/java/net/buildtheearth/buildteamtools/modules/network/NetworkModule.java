@@ -176,9 +176,12 @@ public class NetworkModule extends Module {
 
     public boolean ownsRegion(String regionName, String countryCodeCca2) {
         AtomicBoolean ownsRegion = new AtomicBoolean(false);
-        buildTeam.getRegions().forEach(region -> {
-            if(region.getName().equals(regionName) || region.getCountryCodeCca2().equals(countryCodeCca2)) ownsRegion.set(true);
-        });
+        if (buildTeam != null && buildTeam.getRegions() != null) {
+            buildTeam.getRegions().forEach(region -> {
+                if (region.getName().equals(regionName) || region.getCountryCodeCca2().equals(countryCodeCca2))
+                    ownsRegion.set(true);
+            });
+        }
 
         return ownsRegion.get();
     }

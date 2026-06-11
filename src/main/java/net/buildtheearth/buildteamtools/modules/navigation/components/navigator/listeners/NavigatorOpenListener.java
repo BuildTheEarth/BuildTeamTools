@@ -34,8 +34,7 @@ public class NavigatorOpenListener implements Listener {
         if (event.getCurrentItem().getType() != NavigationModule.getInstance().getNavigatorComponent().getItem().getType()) return;
 
         //Extract the player
-        if (!(event.getWhoClicked() instanceof Player)) return;
-        Player player = (Player) event.getWhoClicked();
+        if (!(event.getWhoClicked() instanceof Player player)) return;
 
         //Cancel the event
         event.setCancelled(true);
@@ -60,11 +59,6 @@ public class NavigatorOpenListener implements Listener {
 
     @EventHandler
     public void swapHands(PlayerSwapHandItemsEvent e) {
-
-        if (e.getOffHandItem() == null) {
-            return;
-        }
-
         if (e.getOffHandItem().equals(NavigationModule.getInstance().getNavigatorComponent().getItem())) {
             e.setCancelled(true);
         }

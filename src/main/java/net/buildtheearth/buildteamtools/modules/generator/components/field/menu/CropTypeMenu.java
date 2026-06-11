@@ -19,6 +19,8 @@ import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
 import org.jspecify.annotations.NonNull;
 
+import java.util.Objects;
+
 public class CropTypeMenu extends AbstractMenu {
 
     public static String CROP_TYPE_INV_NAME = "Choose a Crop Type";
@@ -33,8 +35,6 @@ public class CropTypeMenu extends AbstractMenu {
     private final byte HARVESTED_CROP_SLOT = 16;
     private final byte OTHER_CROP_SLOT = 17;
 
-    private final int BACK_ITEM_SLOT = 18;
-
     public CropTypeMenu(Player player, boolean autoLoad) {
         super(3, CROP_TYPE_INV_NAME, player, autoLoad);
     }
@@ -43,15 +43,15 @@ public class CropTypeMenu extends AbstractMenu {
     @Override
     protected void setPreviewItems() {
 
-        ItemStack potatoItem = Item.create(XMaterial.POTATO.parseMaterial(), "§bPotato", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
-        ItemStack wheatItem = Item.create(XMaterial.WHEAT.parseMaterial(), "§bWheat", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
-        ItemStack cornItem = Item.create(XMaterial.PUMPKIN_SEEDS.parseMaterial(), "§bCorn", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
-        ItemStack vineyardItem = Item.create(XMaterial.VINE.parseMaterial(), "§bVineyard", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
-        ItemStack pearItem = Item.create(XMaterial.SLIME_BALL.parseMaterial(), "§bPear", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
-        ItemStack cattleItem = Item.create(XMaterial.SPRUCE_FENCE.parseMaterial(), "§bWheat", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
-        ItemStack meadowItem = Item.create(XMaterial.SHORT_GRASS.parseMaterial(), "§bMeadow", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
-        ItemStack harvestedItem = Item.create(XMaterial.HAY_BLOCK.parseMaterial(), "§bHarvested", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
-        ItemStack otherItem = Item.create(XMaterial.DEAD_BUSH.parseMaterial(), "§bOther", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
+        ItemStack potatoItem = Item.create(Objects.requireNonNull(XMaterial.POTATO.get()), "§bPotato", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
+        ItemStack wheatItem = Item.create(Objects.requireNonNull(XMaterial.WHEAT.get()), "§bWheat", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
+        ItemStack cornItem = Item.create(Objects.requireNonNull(XMaterial.PUMPKIN_SEEDS.get()), "§bCorn", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
+        ItemStack vineyardItem = Item.create(Objects.requireNonNull(XMaterial.VINE.get()), "§bVineyard", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
+        ItemStack pearItem = Item.create(Objects.requireNonNull(XMaterial.SLIME_BALL.get()), "§bPear", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
+        ItemStack cattleItem = Item.create(Objects.requireNonNull(XMaterial.SPRUCE_FENCE.get()), "§bWheat", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
+        ItemStack meadowItem = Item.create(Objects.requireNonNull(XMaterial.SHORT_GRASS.get()), "§bMeadow", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
+        ItemStack harvestedItem = Item.create(Objects.requireNonNull(XMaterial.HAY_BLOCK.get()), "§bHarvested", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
+        ItemStack otherItem = Item.create(Objects.requireNonNull(XMaterial.DEAD_BUSH.get()), "§bOther", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
 
         // Set items
         getMenu().getSlot(POTATO_CROP_SLOT).setItem(potatoItem);
@@ -64,7 +64,8 @@ public class CropTypeMenu extends AbstractMenu {
         getMenu().getSlot(HARVESTED_CROP_SLOT).setItem(harvestedItem);
         getMenu().getSlot(OTHER_CROP_SLOT).setItem(otherItem);
 
-        setBackItem(BACK_ITEM_SLOT, new GeneratorMenu(getMenuPlayer(), false));
+        int backItemSlot = 18;
+        setBackItem(backItemSlot, new GeneratorMenu(getMenuPlayer(), false));
 
         super.setPreviewItems();
     }
@@ -154,10 +155,9 @@ public class CropTypeMenu extends AbstractMenu {
     private void performClickAction(@NonNull Player p, CropType cropType) {
         Settings settings = GeneratorModule.getInstance().getField().getPlayerSettings().get(p.getUniqueId());
 
-        if (!(settings instanceof FieldSettings))
+        if (!(settings instanceof FieldSettings fieldSettings))
             return;
 
-        FieldSettings fieldSettings = (FieldSettings) settings;
         fieldSettings.setValue(FieldFlag.CROP_TYPE, cropType.getIdentifier());
 
         p.closeInventory();
@@ -178,8 +178,8 @@ public class CropTypeMenu extends AbstractMenu {
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
                 .item(MenuItems.ITEM_BACKGROUND)
-                .pattern("111111111")
-                .pattern("000000000")
+                .pattern(BinaryMask.FULL_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
                 .pattern("011111111")
                 .build();
     }

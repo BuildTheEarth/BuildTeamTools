@@ -74,12 +74,12 @@ public class EditPaletteMenu extends AbstractMenu {
 
     @Override
     protected Mask getMask() {
-        ItemStack filler = Item.create(XMaterial.GRAY_STAINED_GLASS_PANE.parseMaterial(), " ");
+        ItemStack filler = Item.create(Objects.requireNonNull(XMaterial.GRAY_STAINED_GLASS_PANE.get()), " ");
         return BinaryMask.builder(getMenu())
                 .item(filler)
-                .pattern("111111111")
-                .pattern("111111111")
-                .pattern("111111111")
+                .pattern(BinaryMask.FULL_PATTERN)
+                .pattern(BinaryMask.FULL_PATTERN)
+                .pattern(BinaryMask.FULL_PATTERN)
                 .build();
     }
 
@@ -88,22 +88,22 @@ public class EditPaletteMenu extends AbstractMenu {
         logger.info("Setting menu items for EditPalleteMenu for player " + player.getName() + ". Blocks: " + blocks);
 
         getMenu().getSlot(NAME_SLOT).setItem(
-                Item.create(XMaterial.NAME_TAG.parseMaterial(), "§eSet Name",
+                Item.create(Objects.requireNonNull(XMaterial.NAME_TAG.get()), "§eSet Name",
                         new ArrayList<>(List.of("§7Current: §f" + name)))
         );
 
         getMenu().getSlot(DESCRIPTION_SLOT).setItem(
-                Item.create(XMaterial.WRITABLE_BOOK.parseMaterial(), "§eSet Description",
+                Item.create(Objects.requireNonNull(XMaterial.WRITABLE_BOOK.get()), "§eSet Description",
                         new ArrayList<>(List.of("§7Current: §f" + (description.isEmpty() ? "None" : description))))
         );
 
         getMenu().getSlot(BLOCKS_SLOT).setItem(
-                Item.create(XMaterial.STONE.parseMaterial(), "§eSet Blocks",
+                Item.create(Objects.requireNonNull(XMaterial.STONE.get()), "§eSet Blocks",
                         new ArrayList<>(List.of("§7Selected: §f" + blocks.size())))
         );
 
         getMenu().getSlot(DELETE_SLOT).setItem(
-                Item.create(XMaterial.BARRIER.parseMaterial(), "§cDelete Palette",
+                Item.create(Objects.requireNonNull(XMaterial.BARRIER.get()), "§cDelete Palette",
                         new ArrayList<>(List.of("§7Click to delete this palette" + (isPredefinedFilter() ? " (Cannot delete predefined filter)" : ""))))
         );
 

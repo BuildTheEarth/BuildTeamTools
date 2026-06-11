@@ -202,7 +202,7 @@ public class BlockPaletteManager {
                     ItemStack[] items = null;
                     try {
                         items = (type.getItemSupplier() != null) ? type.getItemSupplier().get() : null;
-                    } catch (Throwable t) {
+                    } catch (Exception t) {
                         plugin.getLogger().log(java.util.logging.Level.SEVERE,
                                 "[BlockPalletManager] Supplier failed for " + key + ": " + t.getMessage(), t);
                     }
@@ -254,10 +254,15 @@ public class BlockPaletteManager {
         if (!paletteFile.exists()) {
             try {
                 File parent = paletteFile.getParentFile();
-                if (parent != null) parent.mkdirs();
+                if (parent != null && !parent.exists() && !parent.mkdirs()) {
+                    plugin.getLogger().warning("Failed to create parent directories for palettes.yml at: " + parent.getPath());
+                }
 
-                paletteFile.createNewFile();
-                plugin.getLogger().info("Created new palettes.yml file at: " + paletteFile.getPath());
+
+                boolean created = paletteFile.createNewFile();
+                if (created) {
+                    plugin.getLogger().info("Created new palettes.yml file at: " + paletteFile.getPath());
+                }
             } catch (IOException e) {
                 plugin.getLogger().severe("Failed to create palettes.yml: " + e.getMessage());
                 return;
@@ -269,7 +274,7 @@ public class BlockPaletteManager {
             return;
         }
 
-        for (String key : paletteConfig.getConfigurationSection("palettes").getKeys(false)) {
+        for (String key : Objects.requireNonNull(paletteConfig.getConfigurationSection("palettes")).getKeys(false)) {
             String name = paletteConfig.getString("palettes." + key + ".name", "Unnamed");
             String description = paletteConfig.getString("palettes." + key + ".description", "");
             List<String> blocks = new ArrayList<>();

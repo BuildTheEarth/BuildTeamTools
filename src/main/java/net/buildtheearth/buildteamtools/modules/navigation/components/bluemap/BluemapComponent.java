@@ -12,6 +12,7 @@ import net.buildtheearth.buildteamtools.modules.ModuleComponent;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
+import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
 import net.buildtheearth.buildteamtools.utils.io.ConfigUtil;
 import net.buildtheearth.model.GeographicalCoordinate;
@@ -22,6 +23,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -190,8 +192,11 @@ public class BluemapComponent extends ModuleComponent {
         clearAllMarkers(api);
 
         // Re-register all warp groups
-        NetworkModule.getInstance().getBuildTeam().getWarpGroups()
-                .forEach(warpGroup -> registerWarpGroupMarkers(api, warpGroup));
+        BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
+        if (buildTeam != null && buildTeam.getWarpGroups() != null) {
+            buildTeam.getWarpGroups()
+                    .forEach(warpGroup -> registerWarpGroupMarkers(api, warpGroup));
+        }
 
         BuildTeamTools.getInstance().getComponentLogger().info(
                 Component.text("Refreshed BlueMap markers for all warp groups.", NamedTextColor.GREEN)
@@ -209,10 +214,12 @@ public class BluemapComponent extends ModuleComponent {
      */
     private void clearAllMarkers(@NotNull BlueMapAPI api) {
         // Get all warp group IDs that need to be cleared
-        List<String> warpGroupIds = NetworkModule.getInstance().getBuildTeam().getWarpGroups()
-                .stream()
+        BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
+        List<String> warpGroupIds = (buildTeam != null && buildTeam.getWarpGroups() != null)
+                ? buildTeam.getWarpGroups().stream()
                 .map(warpGroup -> warpGroup.getId().toString())
-                .toList();
+                .toList()
+                : Collections.emptyList();
 
         // Clear markers from all worlds
         api.getWorlds().forEach(world -> world.getMaps().forEach(map -> warpGroupIds.forEach(id -> map.getMarkerSets().remove(id))));

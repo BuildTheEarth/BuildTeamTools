@@ -29,10 +29,9 @@ public class FenceTypeMenu extends BlockListMenu {
             getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
                 Settings settings = GeneratorModule.getInstance().getField().getPlayerSettings().get(clickPlayer.getUniqueId());
 
-                if (!(settings instanceof FieldSettings))
+                if (!(settings instanceof FieldSettings fieldSettings))
                     return;
 
-                FieldSettings fieldSettings = (FieldSettings) settings;
                 fieldSettings.setValue(FieldFlag.FENCE, Item.createStringFromItemStringList(selectedMaterials));
 
                 clickPlayer.closeInventory();

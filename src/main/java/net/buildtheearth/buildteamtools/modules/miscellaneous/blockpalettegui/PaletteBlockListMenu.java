@@ -14,6 +14,7 @@ import org.ipvp.canvas.mask.Mask;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class PaletteBlockListMenu extends AbstractPaginatedMenu {
     private final BlockPaletteManager manager;
@@ -30,13 +31,13 @@ public class PaletteBlockListMenu extends AbstractPaginatedMenu {
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-                .item(Item.create(XMaterial.GRAY_STAINED_GLASS_PANE.parseMaterial(), " "))
-                .pattern("111111111")
-                .pattern("000000000")
-                .pattern("000000000")
-                .pattern("000000000")
-                .pattern("000000000")
-                .pattern("111111111")
+                .item(Item.create(Objects.requireNonNull(XMaterial.GRAY_STAINED_GLASS_PANE.get()), " "))
+                .pattern(BinaryMask.FULL_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
+                .pattern(BinaryMask.FULL_PATTERN)
                 .build();
     }
 
@@ -48,7 +49,7 @@ public class PaletteBlockListMenu extends AbstractPaginatedMenu {
             return blocks;
         } else {
             List<String> filters = manager.getFilters(getMenuPlayer());
-            if (filters.isEmpty()) filters = Arrays.asList("color");
+            if (filters.isEmpty()) filters = List.of("color");
             ItemStack[] items = manager.getItemsForFilters(filters);
             return new ArrayList<>(Arrays.asList(items));
         }
@@ -100,11 +101,11 @@ public class PaletteBlockListMenu extends AbstractPaginatedMenu {
         // Prev/Next
         menu.getSlot(48).setItem(hasPreviousPage()
                 ? Item.createCustomHeadBase64(BlockPaletteManager.LEFT_ARROW, "§ePrevious Page", null)
-                : Item.create(XMaterial.BARRIER.parseMaterial(), "§cNo Previous Page", null));
+                : Item.create(Objects.requireNonNull(XMaterial.BARRIER.get()), "§cNo Previous Page", null));
 
         menu.getSlot(50).setItem(hasNextPage()
                 ? Item.createCustomHeadBase64(BlockPaletteManager.RIGHT_ARROW, "§eNext Page", null)
-                : Item.create(XMaterial.BARRIER.parseMaterial(), "§cNo Next Page", null));
+                : Item.create(Objects.requireNonNull(XMaterial.BARRIER.get()), "§cNo Next Page", null));
 
         // Page indicator
         menu.getSlot(49).setItem(Item.createCustomHeadBase64(BlockPaletteManager.HEAD_BETWEEN_ARROWS, "", null));

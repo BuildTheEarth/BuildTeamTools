@@ -85,7 +85,7 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
 
-            if(args.length <= 1) {
+            if (args.length == 1) {
                 sender.sendMessage("§cYou need to add a value: true/false");
                 return true;
             }
@@ -140,8 +140,7 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
         if(debugSuggestions != null)
             return debugSuggestions;
 
-        List<String> cacheSuggestions = Utils.getTabCompleterArgs(args, "cache", 2, Collections.singletonList("upload"));
-        return cacheSuggestions;
+        return Utils.getTabCompleterArgs(args, "cache", 2, Collections.singletonList("upload"));
     }
 
     public static void sendBuildTeamToolsInfo(CommandSender sender){
@@ -167,7 +166,7 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
             boolean debug = BuildTeamTools.getInstance().isDebug();
 
             sender.sendMessage("§eStatus: " + status);
-            sender.sendMessage("§eVersion: §7" + BuildTeamTools.getInstance().getDescription().getVersion());
+            sender.sendMessage("§eVersion: §7" + BuildTeamTools.getInstance().getPluginMeta().getVersion());
 
             if(debug)
                 sender.sendMessage("§eDebug Mode: §a§lON");

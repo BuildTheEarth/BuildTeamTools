@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class KmlParser {
-    private Player player;
+    private final Player player;
 
     public KmlParser(Player player){
         this.player = player;
@@ -45,7 +45,7 @@ public class KmlParser {
             }
 
         } catch (Exception ex) {
-            player.sendMessage(String.format("§cthere was an error parsing the kml string: '%s'", ex.toString()));
+            player.sendMessage(String.format("§cthere was an error parsing the kml string: '%s'", ex));
         }
 
         return result_lists;
@@ -89,7 +89,7 @@ public class KmlParser {
             }
 
         } catch (Exception ex) {
-            player.sendMessage(String.format("§cthere was an error parsing the kml string: '%s'", ex.toString()));
+            player.sendMessage(String.format("§cthere was an error parsing the kml string: '%s'", ex));
         }
 
         return linestrings;
@@ -145,9 +145,7 @@ public class KmlParser {
         if (geom instanceof LineString)
         {
             lines.add( (LineString) geom);
-        }      
-        else if (geom instanceof MultiGeometry){
-            MultiGeometry mg = (MultiGeometry)geom;
+        } else if (geom instanceof MultiGeometry mg) {
             for (Geometry subgeom : mg.getGeometry())
             {
                 if (subgeom instanceof LineString)
@@ -169,15 +167,14 @@ public class KmlParser {
      * A placemark can have different geometry types. The type MultiGeometry can be used to create
      * arbitrarily complex hierarchies of Geometries. We only support one layer of MultiGeometry,
      *  so a Placemark geometry will only ever have List<List<Coordinate>> without any option to stack more levels of lists
-     * 
-     * 
-     * @param placemark the placemark to search
+     *
+     *
+     * @param geom the placemark to search
      */
     private List<List<Coordinate>> getCoordinates(Geometry geom){
         List<List<Coordinate>> geometry_coords = new ArrayList<>();
 
-        if (geom instanceof MultiGeometry){ 
-            MultiGeometry mg = (MultiGeometry)geom;
+        if (geom instanceof MultiGeometry mg) {
             for (Geometry subgeom : mg.getGeometry())
             {
                 geometry_coords.add(getGeometryCoordinatesNoMulti(subgeom));//

@@ -100,7 +100,7 @@ public class Operation {
             else if(value instanceof String[])
                 valueString = Arrays.toString((String[]) value);
             else if(value instanceof Boolean)
-                valueString = ((Boolean) value) ? "true" : "false";
+                valueString = ((Boolean) value).toString();
             else if(value instanceof Double)
                 valueString = String.valueOf(value);
             else if(value instanceof Integer)

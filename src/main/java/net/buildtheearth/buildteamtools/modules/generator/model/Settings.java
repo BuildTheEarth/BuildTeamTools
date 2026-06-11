@@ -54,49 +54,47 @@ public abstract class Settings {
 
         for(Flag flag : getValues().keySet()){
             Object valueObject = getValues().get(flag);
-            StringBuilder value;
 
             if(valueObject == null)
                 continue;
 
+            StringBuilder valueStr;
+
             switch(flag.getFlagType()){
                 case XMATERIAL:
-                    value = new StringBuilder(Item.getUniqueMaterialString((XMaterial) valueObject));
+                    valueStr = new StringBuilder(Item.getUniqueMaterialString((XMaterial) valueObject));
                     break;
                 case XMATERIAL_LIST:
                     XMaterial[] materials = (XMaterial[]) valueObject;
 
-                    if(materials == null || materials.length == 0){
-                        value = null;
-                        break;
+                    if (materials.length == 0) {
+                        // Skip this entry if no materials
+                        continue;
                     }
 
-                    value = new StringBuilder(Item.getUniqueMaterialString(((XMaterial[]) valueObject)[0]));
+                    valueStr = new StringBuilder(Item.getUniqueMaterialString(materials[0]));
                     for(int i = 1; i < materials.length; i++)
-                        value.append(",").append(Item.getUniqueMaterialString(materials[i]));
+                        valueStr.append(",").append(Item.getUniqueMaterialString(materials[i]));
 
                     break;
                 case ROOF_TYPE:
-                    value = new StringBuilder(((RoofType) valueObject).getType());
+                    valueStr = new StringBuilder(((RoofType) valueObject).getType());
                     break;
                 case CROP_TYPE:
-                    value = new StringBuilder(((CropType) valueObject).getIdentifier());
+                    valueStr = new StringBuilder(((CropType) valueObject).getIdentifier());
                     break;
                 case CROP_STAGE:
-                    value = new StringBuilder(((CropStage) valueObject).getIdentifier());
+                    valueStr = new StringBuilder(((CropStage) valueObject).getIdentifier());
                     break;
                 case TREE_WIDTH:
-                    value = new StringBuilder(((TreeWidth) valueObject).getName());
+                    valueStr = new StringBuilder(((TreeWidth) valueObject).getName());
                     break;
                 default:
-                    value = new StringBuilder(getValues().get(flag).toString());
+                    valueStr = new StringBuilder(getValues().get(flag).toString());
                     break;
             }
 
-            if(value == null)
-                continue;
-
-            values.put(flag, value.toString());
+            values.put(flag, valueStr.toString());
         }
 
         return values;

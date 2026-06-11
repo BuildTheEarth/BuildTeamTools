@@ -30,6 +30,7 @@ import org.ipvp.canvas.mask.Mask;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class GeneratorMenu extends AbstractMenu {
 
@@ -55,7 +56,7 @@ public class GeneratorMenu extends AbstractMenu {
         // HOUSE ITEM
         ArrayList<String> houseLore = ListUtil.createList("", "§eDescription:", "Generate basic building shells", "with multiple floors, windows and roofs", "", "§eFeatures:", "- " + RoofType.values().length + " Roof Types", "- Custom Wall, Base and Roof Color", "- Custom Floor and Window Sizes", "", "§8Left-click to generate", "§8Right-click for Tutorial");
 
-        ItemStack houseItem = Item.create(XMaterial.BIRCH_DOOR.get(), "§cGenerate House", houseLore);
+        ItemStack houseItem = Item.create(Objects.requireNonNull(XMaterial.BIRCH_DOOR.get()), "§cGenerate House", houseLore);
 
         // Set navigator item
         getMenu().getSlot(HOUSE_ITEM_SLOT).setItem(houseItem);
@@ -76,7 +77,7 @@ public class GeneratorMenu extends AbstractMenu {
 
         railwayLore = ListUtil.createList("", "§cThis §eGenerator §cis currently broken", "§cRailway Generator is disabled", "", "§8If you want to help fixing ask on Dev Hub!");
 
-        ItemStack railwayItem = Item.create(XMaterial.RAIL.get(), "§9Generate Railway §c(DISABLED)", railwayLore);
+        ItemStack railwayItem = Item.create(Objects.requireNonNull(XMaterial.RAIL.get()), "§9Generate Railway §c(DISABLED)", railwayLore);
 
         // Set navigator item
         getMenu().getSlot(RAILWAY_ITEM_SLOT).setItem(railwayItem);
@@ -86,7 +87,7 @@ public class GeneratorMenu extends AbstractMenu {
             // TREE ITEM
             ArrayList<String> treeLore = ListUtil.createList("", "§cPlugin §eSchematicBrush §cis not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
 
-            ItemStack treeItem = Item.create(XMaterial.OAK_SAPLING.get(), "§aGenerate Tree & Forest §c(DISABLED)", treeLore);
+            ItemStack treeItem = Item.create(Objects.requireNonNull(XMaterial.OAK_SAPLING.get()), "§aGenerate Tree & Forest §c(DISABLED)", treeLore);
 
             // Set navigator item
             getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
@@ -94,7 +95,7 @@ public class GeneratorMenu extends AbstractMenu {
             // TREE ITEM
             ArrayList<String> treeLore = ListUtil.createList("", "§cThe §eTree Pack " + Tree.TREE_PACK_VERSION + " §cis not installed", "§cTree Generator is disabled", "", "§8Leftclick for Installation Instructions");
 
-            ItemStack treeItem = Item.create(XMaterial.OAK_SAPLING.get(), "§aGenerate Tree & Forest §c(DISABLED)", treeLore);
+            ItemStack treeItem = Item.create(Objects.requireNonNull(XMaterial.OAK_SAPLING.get()), "§aGenerate Tree & Forest §c(DISABLED)", treeLore);
 
             // Set navigator item
             getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
@@ -102,7 +103,7 @@ public class GeneratorMenu extends AbstractMenu {
             // TREE ITEM
             ArrayList<String> treeLore = ListUtil.createList("", "§eDescription:", "Generate trees from a set of", "hundreds of different types", "", "§eFeatures:", "- Custom Tree Type", "", "§8Left-click to generate", "§8Right-click for Tutorial");
 
-            ItemStack treeItem = Item.create(XMaterial.OAK_SAPLING.get(), "§aGenerate Tree & Forest", treeLore);
+            ItemStack treeItem = Item.create(Objects.requireNonNull(XMaterial.OAK_SAPLING.get()), "§aGenerate Tree & Forest", treeLore);
 
             // Set navigator item
             getMenu().getSlot(TREE_ITEM_SLOT).setItem(treeItem);
@@ -110,11 +111,9 @@ public class GeneratorMenu extends AbstractMenu {
 
 
         // FIELD ITEM
-        ArrayList<String> fieldLore = ListUtil.createList("", "§eDescription:", "Generate fields with different", "crops and plants", "", "§eFeatures:", "- Custom Crop Type", "- Custom Crop Size", "", "§8Left-click to generate", "§8Right-click for Tutorial");
+        ArrayList<String> fieldLore = ListUtil.createList("", "§cThis §eGenerator §cis currently broken", "§cField Generator is disabled", "", "§8If you want to help fixing ask on Dev Hub!");
 
-        fieldLore = ListUtil.createList("", "§cThis §eGenerator §cis currently broken", "§cField Generator is disabled", "", "§8If you want to help fixing ask on Dev Hub!");
-
-        ItemStack fieldItem = Item.create(XMaterial.WHEAT.get(), "§6Generate Field §c(DISABLED)", fieldLore);
+        ItemStack fieldItem = Item.create(Objects.requireNonNull(XMaterial.WHEAT.get()), "§6Generate Field §c(DISABLED)", fieldLore);
 
         // Set navigator item
         getMenu().getSlot(FIELD_ITEM_SLOT).setItem(fieldItem);
@@ -227,6 +226,6 @@ public class GeneratorMenu extends AbstractMenu {
 
     @Override
     protected Mask getMask() {
-        return BinaryMask.builder(getMenu()).item(MenuItems.ITEM_BACKGROUND).pattern("111111111").pattern("010101010").pattern("111111111").build();
+        return BinaryMask.builder(getMenu()).item(MenuItems.ITEM_BACKGROUND).pattern(BinaryMask.FULL_PATTERN).pattern("010101010").pattern(BinaryMask.FULL_PATTERN).build();
     }
 }

@@ -55,7 +55,7 @@ public class NavigatorComponent extends ModuleComponent {
                 navigationWandField.set(config, 399);
             }
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace(); // Handle the error properly
+            BuildTeamTools.getInstance().getComponentLogger().error("Error configuring navigator wand", e);
         }
     }
 

@@ -18,10 +18,7 @@ import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class MaterialSelectionMenu extends AbstractMenu {
 
@@ -48,7 +45,7 @@ public class MaterialSelectionMenu extends AbstractMenu {
 
     @Override
     protected void setMenuItemsAsync() {
-        getMenu().getSlot(MATERIAL_SLOT).setItem(Item.create(XMaterial.STONE.get(), "§6§lItem", ListUtil.createList("", "Change the material of the warp", "to a minecraft item.", "", "§eExample:", "Stone")));
+        getMenu().getSlot(MATERIAL_SLOT).setItem(Item.create(Objects.requireNonNull(XMaterial.STONE.get()), "§6§lItem", ListUtil.createList("", "Change the material of the warp", "to a minecraft item.", "", "§eExample:", "Stone")));
         getMenu().getSlot(CUSTOM_HEAD_SLOT).setItem(HeadFactory.letter(LetterType.WOODEN, '?', "§6§lCustom Head", ListUtil.createList("", "Change the material of the warp", "to a custom head texture URL.", "", "§eExample:", "https://textures.minecraft.net/texture/...")));
 
         if(object instanceof Warp)
@@ -99,7 +96,7 @@ public class MaterialSelectionMenu extends AbstractMenu {
                         );
                     })
                     .text("Material")
-                    .itemLeft(Item.create(XMaterial.NAME_TAG.parseMaterial(), "§6§lEnter Material Name"))
+                    .itemLeft(Item.create(Objects.requireNonNull(XMaterial.NAME_TAG.get()), "§6§lEnter Material Name"))
                     .title("§8Enter Material Name")
                     .plugin(BuildTeamTools.getInstance())
                     .open(clickPlayer);
@@ -124,9 +121,9 @@ public class MaterialSelectionMenu extends AbstractMenu {
                 }
 
                 // Combine the first page to a single string
-                StringBuilder finalText = new StringBuilder(text.get(0)[0]);
-                for(int i = 1; i < text.get(0).length; i++)
-                    finalText.append(text.get(0)[i]);
+                StringBuilder finalText = new StringBuilder(text.getFirst()[0]);
+                for (int i = 1; i < text.getFirst().length; i++)
+                    finalText.append(text.getFirst()[i]);
 
                 if(!finalText.toString().startsWith("http://textures.minecraft.net/texture/")){
                     clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
@@ -148,9 +145,9 @@ public class MaterialSelectionMenu extends AbstractMenu {
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
                 .item(MenuItems.ITEM_BACKGROUND)
-                .pattern("000000000")
-                .pattern("000000000")
-                .pattern("000000000")
+                .pattern(BinaryMask.EMPTY_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
                 .pattern("011111111")
                 .build();
     }

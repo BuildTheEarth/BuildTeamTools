@@ -46,8 +46,9 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
         super(4, 3, "Warp Menu", menuPlayer, autoLoad);
         this.hasBackItem = hasBackItem;
         this.buildTeam = buildTeam;
+        BuildTeam currentTeam = NetworkModule.getInstance().getBuildTeam();
         this.showPlusItem = getMenuPlayer().hasPermission(Permissions.WARP_GROUP_CREATE)
-                && NetworkModule.getInstance().getBuildTeam().equals(buildTeam);
+                && currentTeam != null && currentTeam.equals(buildTeam);
     }
 
     public WarpGroupMenu(Player menuPlayer, BuildTeam buildTeam, boolean hasBackItem, boolean autoLoad, AbstractMenu menu) {
@@ -97,9 +98,9 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
             .item(MenuItems.ITEM_BACKGROUND)
-            .pattern("000000000")
-            .pattern("000000000")
-            .pattern("000000000")
+                .pattern(BinaryMask.EMPTY_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
             .pattern("111111110")
             .build();
     }

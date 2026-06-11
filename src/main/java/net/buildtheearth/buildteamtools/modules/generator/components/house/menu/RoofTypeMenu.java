@@ -16,6 +16,8 @@ import org.bukkit.inventory.ItemStack;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
 
+import java.util.Objects;
+
 public class RoofTypeMenu extends AbstractMenu {
 
     public static final String ROOF_COLOR_INV_NAME = "Choose a Roof Type";
@@ -35,11 +37,11 @@ public class RoofTypeMenu extends AbstractMenu {
     @Override
     protected void setPreviewItems() {
 
-        ItemStack flatRoofItem = Item.create(XMaterial.WHITE_CARPET.parseMaterial(), "§bFlat Roof", ListUtil.createList("", "§eDescription:", "A flat roof for", "skyscrapers using carpets", "or slabs"));
-        ItemStack gableRoofItem = Item.create(XMaterial.COBBLESTONE_STAIRS.parseMaterial(), "§bGable Roof", ListUtil.createList("", "§eDescription:", "A gable roof for", "residential houses using stairs"));
-        ItemStack steepSlabRoofItem = Item.create(XMaterial.COBBLESTONE_SLAB.parseMaterial(), "§bSteep Slab Roof", ListUtil.createList("", "§eDescription:", "A gable roof for", "residential houses using the", "steepest way you can", "create a roof with slabs"));
-        ItemStack mediumSlabRoofItem = Item.create(XMaterial.COBBLESTONE_SLAB.parseMaterial(), "§bMedium Steep Slab Roof", ListUtil.createList("", "§eDescription:", "A gable roof for", "residential houses by creating", "a medium steep roof with slabs"));
-        ItemStack flatterSlabRoofItem = Item.create(XMaterial.COBBLESTONE_SLAB.parseMaterial(), "§bFlatter Slab Roof", ListUtil.createList("", "§eDescription:", "A flat gable roof for", "residential houses by creating", "a very flat roof with slabs"));
+        ItemStack flatRoofItem = Item.create(Objects.requireNonNull(XMaterial.WHITE_CARPET.get()), "§bFlat Roof", ListUtil.createList("", "§eDescription:", "A flat roof for", "skyscrapers using carpets", "or slabs"));
+        ItemStack gableRoofItem = Item.create(Objects.requireNonNull(XMaterial.COBBLESTONE_STAIRS.get()), "§bGable Roof", ListUtil.createList("", "§eDescription:", "A gable roof for", "residential houses using stairs"));
+        ItemStack steepSlabRoofItem = Item.create(Objects.requireNonNull(XMaterial.COBBLESTONE_SLAB.get()), "§bSteep Slab Roof", ListUtil.createList("", "§eDescription:", "A gable roof for", "residential houses using the", "steepest way you can", "create a roof with slabs"));
+        ItemStack mediumSlabRoofItem = Item.create(Objects.requireNonNull(XMaterial.COBBLESTONE_SLAB.get()), "§bMedium Steep Slab Roof", ListUtil.createList("", "§eDescription:", "A gable roof for", "residential houses by creating", "a medium steep roof with slabs"));
+        ItemStack flatterSlabRoofItem = Item.create(Objects.requireNonNull(XMaterial.COBBLESTONE_SLAB.get()), "§bFlatter Slab Roof", ListUtil.createList("", "§eDescription:", "A flat gable roof for", "residential houses by creating", "a very flat roof with slabs"));
 
         // Set items
         getMenu().getSlot(FLAT_ROOF_ITEM_SLOT).setItem(flatRoofItem);
@@ -75,10 +77,9 @@ public class RoofTypeMenu extends AbstractMenu {
     private void performClickAction(Player p, RoofType roofType) {
         Settings settings = GeneratorModule.getInstance().getHouse().getPlayerSettings().get(p.getUniqueId());
 
-        if (!(settings instanceof HouseSettings))
+        if (!(settings instanceof HouseSettings houseSettings))
             return;
 
-        HouseSettings houseSettings = (HouseSettings) settings;
         houseSettings.setValue(HouseFlag.ROOF_TYPE, roofType.getType());
 
         p.closeInventory();
@@ -90,7 +91,7 @@ public class RoofTypeMenu extends AbstractMenu {
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
                 .item(MenuItems.ITEM_BACKGROUND)
-                .pattern("111111111")
+                .pattern(BinaryMask.FULL_PATTERN)
                 .pattern("010101010")
                 .pattern("011111111")
                 .build();

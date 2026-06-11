@@ -18,6 +18,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class TreeTypeMenu extends NameListMenu {
 
@@ -31,10 +32,10 @@ public class TreeTypeMenu extends NameListMenu {
     private static @NonNull List<MutablePair<ItemStack, String>> getTreeTypes() {
         List<MutablePair<ItemStack, String>> treeTypes = new ArrayList<>();
 
-        treeTypes.add(new MutablePair<>(new Item(XMaterial.LIME_CONCRETE.parseItem()).setDisplayName("Any").build(), "Any"));
+        treeTypes.add(new MutablePair<>(new Item(Objects.requireNonNull(XMaterial.LIME_CONCRETE.parseItem())).setDisplayName("Any").build(), "Any"));
 
         for(TreeType treeType : TreeType.values())
-            treeTypes.add(new MutablePair<>(Item.create(XMaterial.OAK_SAPLING.get(), StringUtils.capitalize(treeType.getName())), treeType.getName()));
+            treeTypes.add(new MutablePair<>(Item.create(Objects.requireNonNull(XMaterial.OAK_SAPLING.get()), StringUtils.capitalize(treeType.getName())), treeType.getName()));
 
         return treeTypes;
     }

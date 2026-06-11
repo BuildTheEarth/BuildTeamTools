@@ -34,16 +34,7 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
      * Helper class to represent a state entry which can be either from a build team's regions
      * or a standalone state build team.
      */
-    private static class StateEntry {
-        final Region stateRegion;
-        final BuildTeam buildTeam;
-        final boolean hasSubCities;
-
-        StateEntry(Region stateRegion, BuildTeam buildTeam, boolean hasSubCities) {
-            this.stateRegion = stateRegion;
-            this.buildTeam = buildTeam;
-            this.hasSubCities = hasSubCities;
-        }
+    private record StateEntry(Region stateRegion, BuildTeam buildTeam, boolean hasSubCities) {
     }
 
     /**
@@ -193,9 +184,9 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
                 .item(MenuItems.ITEM_BACKGROUND)
-                .pattern("000000000")
-                .pattern("000000000")
-                .pattern("000000000")
+                .pattern(BinaryMask.EMPTY_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
                 .pattern("011111000")
                 .build();
     }

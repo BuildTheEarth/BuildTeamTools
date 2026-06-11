@@ -7,6 +7,7 @@ import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.navigation.NavUtils;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.WarpsComponent;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
+import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
@@ -21,7 +22,6 @@ import org.ipvp.canvas.mask.Mask;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-
 /**
  * The main menu for the BTE universal navigator. <br>
  * <br>
@@ -110,9 +110,10 @@ public class MainMenu extends AbstractMenu {
             // Set Explore Item Click Event
             getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
-                if (!clickInformation.getClickType().isRightClick() && !NetworkModule.getInstance().getBuildTeam().getWarpGroups().isEmpty()
-                        && clickPlayer.hasPermission(Permissions.WARP_USE)) {
-                    WarpsComponent.openWarpMenu(clickPlayer, NetworkModule.getInstance().getBuildTeam(), this);
+                BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
+                if (!clickInformation.getClickType().isRightClick() && buildTeam != null && buildTeam.getWarpGroups() != null
+                        && !buildTeam.getWarpGroups().isEmpty() && clickPlayer.hasPermission(Permissions.WARP_USE)) {
+                    WarpsComponent.openWarpMenu(clickPlayer, buildTeam, this);
                 } else {
                     new ExploreMenu(clickPlayer, true);
                 }
@@ -140,9 +141,9 @@ public class MainMenu extends AbstractMenu {
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
                 .item(MenuItems.ITEM_BACKGROUND)
-                .pattern("111111111")
+                .pattern(BinaryMask.FULL_PATTERN)
                 .pattern("100000001")
-                .pattern("111111111")
+                .pattern(BinaryMask.FULL_PATTERN)
                 .build();
     }
 
@@ -188,7 +189,7 @@ public class MainMenu extends AbstractMenu {
         return slots;
     }
 
-    private void performClickAction(Player p, @NotNull String action, @NotNull String type) {
+    private void performClickAction(Player p, String action, String type) {
         // Check if an action is set in the config
         if (action.startsWith("transfer:")) {
             NavUtils.transferPlayer(p, action.substring(9));

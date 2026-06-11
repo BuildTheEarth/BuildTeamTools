@@ -5,6 +5,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,7 +22,7 @@ public class KmlTabCompleter implements TabCompleter{
     }
 
 
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args)
+    public List<String> onTabComplete(@NonNull CommandSender sender, @NonNull Command command, @NonNull String alias, String @NonNull [] args)
     {
         //the player can use /geopoints and /geopath with a single argument: "undo" or Blocktype
         //
@@ -67,5 +68,6 @@ public class KmlTabCompleter implements TabCompleter{
             }
         }
     }
-    private List<String> blocktypes;
+
+    private final List<String> blocktypes;
 }

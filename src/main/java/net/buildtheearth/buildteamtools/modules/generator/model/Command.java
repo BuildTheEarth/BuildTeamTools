@@ -11,6 +11,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import lombok.Getter;
+import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.common.CommonModule;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import org.bukkit.Location;
@@ -230,7 +231,7 @@ public class Command {
                 ChatHelper.logError("Error while processing command: " + operation.getOperationType() + " - " + operation.getValuesAsString());
             else
                 ChatHelper.logError("Error while processing command.");
-            e.printStackTrace();
+            BuildTeamTools.getInstance().getComponentLogger().error("Command processing error", e);
         }
 
         if(future != null){
@@ -240,14 +241,14 @@ public class Command {
                 threadActive = false;
                 if (ex != null) {
                     ChatHelper.logError("Async operation failed: " + operation.getOperationType() + " - " + operation.getValuesAsString());
-                    ex.printStackTrace();
+                    BuildTeamTools.getInstance().getComponentLogger().error("Async operation failed", ex);
                 }
                 // Remove the processed operation from the queue
-                operations.remove(0);
+                operations.removeFirst();
             });
 
         }else if(!breakPointActive)
-            operations.remove(0);
+            operations.removeFirst();
     }
 
     /** Converts the XYZ coordinates in a command to the highest block at that location while skipping certain blocks. */

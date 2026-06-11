@@ -1,5 +1,8 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.field;
 
+import lombok.Getter;
+
+@Getter
 public enum CropStage {
 
     FALLBACK("FALLBACK"),
@@ -27,7 +30,4 @@ public enum CropStage {
         return FALLBACK;
     }
 
-    public String getIdentifier() {
-        return identifier;
-    }
 }

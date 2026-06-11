@@ -27,7 +27,7 @@ public class BlockLocation {
      * @return Bukkit Location object for this position
      */
     public Location getLocation(World world){
-        
-        return new Location(world, (double)x, (double)y, (double)z);
+
+        return new Location(world, x, y, z);
     }
 }

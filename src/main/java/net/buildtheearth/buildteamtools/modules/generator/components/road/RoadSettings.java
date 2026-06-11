@@ -20,9 +20,11 @@ public class RoadSettings extends Settings {
         File directory = new File(GeneratorUtils.getWorldEditSchematicsFolderPath() + "/GeneratorCollections/roadpack/");
         File[] files = directory.listFiles();
 
-        for(File file : files)
-            if(file.getName().contains("streetlamp"))
-                streetLampTypes.add(file.getName().replace(".schematic", "").replace("streetlamp", ""));
+        if (files != null) {
+            for (File file : files)
+                if (file.getName().contains("streetlamp"))
+                    streetLampTypes.add(file.getName().replace(".schematic", "").replace("streetlamp", ""));
+        }
     }
 
     public void setDefaultValues(){

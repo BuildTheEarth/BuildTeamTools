@@ -60,7 +60,7 @@ public class BuildteamCommand implements CommandExecutor, TabCompleter {
             String partial = args[0].toLowerCase();
             return NetworkModule.getInstance().getBuildTeams().stream()
                     .flatMap(bt -> Stream.of(bt.getTag(), bt.getBlankName()))
-                    .filter(s -> s.toLowerCase().startsWith(partial))
+                    .filter(s -> s.toLowerCase().contains(partial))
                     .toList();
         }
         return Collections.emptyList();

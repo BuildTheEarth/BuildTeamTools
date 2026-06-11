@@ -186,12 +186,13 @@ public class WarpsComponent extends ModuleComponent {
                         new WarpEditMenu(creator, warp, false, true));
 
             }).exceptionally(e -> {
-                creator.sendMessage(ChatHelper.getErrorString("An error occurred while creating the warp! %s", e.getMessage()));
+                Throwable cause = e.getCause() != null ? e.getCause() : e;
+                creator.sendMessage(ChatHelper.getErrorString("Failed to create warp: %s", cause.getMessage()));
                 BuildTeamTools.getInstance().getComponentLogger().error("An error occurred while creating the warp!", e);
                 return null;
             });
         } catch (OutOfProjectionBoundsException e) {
-            ChatHelper.sendErrorMessage(creator, e.getMessage());
+            creator.sendMessage(ChatHelper.getErrorString("Cannot create warp here: %s", e.getMessage()));
         }
     }
 

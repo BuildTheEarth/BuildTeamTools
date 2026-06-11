@@ -164,12 +164,12 @@ public class WarpEditMenu extends AbstractMenu {
 
                     new WarpEditMenu(clickPlayer, warp, alreadyExists, true);
                 }).exceptionally(e -> {
-                    clickPlayer.sendMessage(ChatHelper.getErrorString("An error occurred while changing the location of the warp!"));
-                    e.printStackTrace();
-                    return null;
+                    Throwable cause = e.getCause() != null ? e.getCause() : e;
+                    clickPlayer.sendMessage(ChatHelper.getErrorString("Failed to change location: %s", cause.getMessage()));
+                    BuildTeamTools.getInstance().getComponentLogger().error("An error occurred while changing the location of the warp!", e);                    return null;
                 });
             } catch (OutOfProjectionBoundsException e) {
-                clickPlayer.sendMessage(ChatHelper.getErrorString("An error occurred while changing the location of the warp!"));
+                clickPlayer.sendMessage(ChatHelper.getErrorString("Cannot set location here: %s", e.getMessage()));
             }
         });
 

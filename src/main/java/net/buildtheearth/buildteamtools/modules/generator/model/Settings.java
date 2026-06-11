@@ -25,7 +25,7 @@ public abstract class Settings {
     @Setter
     private Block[][][] blocks;
 
-    public Settings(Player player){
+    public Settings(Player player) {
         this.player = player;
         this.values = new HashMap<>();
 
@@ -34,13 +34,13 @@ public abstract class Settings {
 
     public abstract void setDefaultValues();
 
-    public void setValue(Flag flag, Object value){
-        if(FlagType.validateFlagType(flag, value) != null){
+    public void setValue(Flag flag, Object value) {
+        if (FlagType.validateFlagType(flag, value) != null) {
             value = FlagType.convertToFlagType(flag, value.toString());
 
             String errorMessage = FlagType.validateFlagType(flag, value);
 
-            if(errorMessage != null){
+            if (errorMessage != null) {
                 player.sendMessage(errorMessage);
                 return;
             }
@@ -49,18 +49,18 @@ public abstract class Settings {
         getValues().put(flag, value);
     }
 
-    public HashMap<Flag, String> getValuesAsString(){
+    public HashMap<Flag, String> getValuesAsString() {
         HashMap<Flag, String> values = new HashMap<>();
 
-        for(Flag flag : getValues().keySet()){
+        for (Flag flag : getValues().keySet()) {
             Object valueObject = getValues().get(flag);
 
-            if(valueObject == null)
+            if (valueObject == null)
                 continue;
 
             StringBuilder valueStr;
 
-            switch(flag.getFlagType()){
+            switch (flag.getFlagType()) {
                 case XMATERIAL:
                     valueStr = new StringBuilder(Item.getUniqueMaterialString((XMaterial) valueObject));
                     break;
@@ -73,7 +73,7 @@ public abstract class Settings {
                     }
 
                     valueStr = new StringBuilder(Item.getUniqueMaterialString(materials[0]));
-                    for(int i = 1; i < materials.length; i++)
+                    for (int i = 1; i < materials.length; i++)
                         valueStr.append(",").append(Item.getUniqueMaterialString(materials[i]));
 
                     break;

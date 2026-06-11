@@ -12,7 +12,7 @@ public class ExceptionListener implements Listener {
 
     @EventHandler
     public void onException(ServerExceptionEvent e) {
-        if(limiter) return;
+        if (limiter) return;
 
         String string = Arrays.toString(e.getException().getStackTrace());
 

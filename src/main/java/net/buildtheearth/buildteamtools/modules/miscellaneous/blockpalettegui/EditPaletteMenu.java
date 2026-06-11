@@ -19,12 +19,12 @@ import java.util.*;
 
 public class EditPaletteMenu extends AbstractMenu {
 
-    private static final int NAME_SLOT        = 10;
+    private static final int NAME_SLOT = 10;
     private static final int DESCRIPTION_SLOT = 12;
-    private static final int BLOCKS_SLOT      = 14;
-    private static final int DELETE_SLOT      = 16;
-    private static final int BACK_SLOT        = 18;
-    private static final int APPLY_SLOT       = 26;
+    private static final int BLOCKS_SLOT = 14;
+    private static final int DELETE_SLOT = 16;
+    private static final int BACK_SLOT = 18;
+    private static final int APPLY_SLOT = 26;
 
     private static final String BACK_HEAD =
             "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90"
@@ -57,7 +57,7 @@ public class EditPaletteMenu extends AbstractMenu {
     private static final Map<UUID, Listener> ACTIVE_CHAT = new HashMap<>();
     private boolean awaitingInput = false;
 
-    private enum InputMode { NONE, NAME, DESCRIPTION }
+    private enum InputMode {NONE, NAME, DESCRIPTION}
 
     public EditPaletteMenu(BlockPaletteManager manager, Player player, JavaPlugin plugin,
                            String paletteKey, String name, String description, List<String> blocks) {

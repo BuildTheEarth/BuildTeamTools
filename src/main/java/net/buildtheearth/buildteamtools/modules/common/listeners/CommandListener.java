@@ -17,9 +17,9 @@ public class CommandListener implements Listener {
         String message = e.getMessage();
 
 
-        for(Module module : ModuleHandler.getInstance().getModules())
-            if(!module.isEnabled())
-                for(PluginCommand command : module.getCommands().keySet()) {
+        for (Module module : ModuleHandler.getInstance().getModules())
+            if (!module.isEnabled())
+                for (PluginCommand command : module.getCommands().keySet()) {
                     if (command == null) continue;
                     List<String> commands = command.getAliases();
                     commands.add(command.getLabel());
@@ -31,7 +31,8 @@ public class CommandListener implements Listener {
                             if (module.getError() != null && !module.getError().isEmpty())
                                 reason = " Reason: " + module.getError();
 
-                            ChatHelper.sendErrorMessage(e.getPlayer(), "The Module " + module.getModuleName() + " is currently disabled." + reason);
+                            ChatHelper.sendErrorMessage(e.getPlayer(), "The Module " + module.getModuleName() + " is currently " +
+                                    "disabled." + reason);
                             e.setCancelled(true);
                             return;
                         }

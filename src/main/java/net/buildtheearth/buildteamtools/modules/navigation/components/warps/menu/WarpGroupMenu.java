@@ -36,10 +36,11 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
     private AbstractMenu backMenue;
     private final boolean showPlusItem;
 
-    /** In this menu the player can select a warp group to view the warps in each warp group.
+    /**
+     * In this menu the player can select a warp group to view the warps in each warp group.
      *
-     * @param menuPlayer The player that is viewing the menu
-     * @param buildTeam The build team that the menu is for
+     * @param menuPlayer  The player that is viewing the menu
+     * @param buildTeam   The build team that the menu is for
      * @param hasBackItem Whether the menu has a back item - only true on overrides or when country selector menu
      */
     public WarpGroupMenu(Player menuPlayer, BuildTeam buildTeam, boolean hasBackItem, boolean autoLoad) {
@@ -97,12 +98,12 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-            .item(MenuItems.ITEM_BACKGROUND)
+                .item(MenuItems.ITEM_BACKGROUND)
                 .pattern(BinaryMask.EMPTY_PATTERN)
                 .pattern(BinaryMask.EMPTY_PATTERN)
                 .pattern(BinaryMask.EMPTY_PATTERN)
-            .pattern("111111110")
-            .build();
+                .pattern("111111110")
+                .build();
     }
 
     @Override
@@ -135,7 +136,7 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
         getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
             clickPlayer.closeInventory();
 
-            if(clickInformation.getClickType().isRightClick() && clickPlayer.hasPermission(Permissions.WARP_GROUP_EDIT))
+            if (clickInformation.getClickType().isRightClick() && clickPlayer.hasPermission(Permissions.WARP_GROUP_EDIT))
                 new WarpGroupEditMenu(clickPlayer, warpGroup, true, true);
             else
                 leftClickAction(clickPlayer, warpGroup);
@@ -215,5 +216,6 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
         return free;
     }
 
-    private record WarpGropSlotDebug(String name, int slot, int internalSlot) {}
+    private record WarpGropSlotDebug(String name, int slot, int internalSlot) {
+    }
 }

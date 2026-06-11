@@ -13,7 +13,9 @@ public interface Flag {
 
     FlagType getFlagType();
 
-    /** @return the flag by the given string and generator type */
+    /**
+     * @return the flag by the given string and generator type
+     */
     static Flag byString(@NonNull GeneratorType generatorType, String flag) {
         return switch (generatorType) {
             case HOUSE -> HouseFlag.byString(flag);

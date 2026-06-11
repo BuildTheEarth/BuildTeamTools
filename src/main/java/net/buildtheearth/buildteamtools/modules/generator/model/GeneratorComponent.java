@@ -37,23 +37,23 @@ public abstract class GeneratorComponent extends ModuleComponent implements Wiki
     }
 
     public abstract boolean checkForPlayer(Player p);
+
     public abstract void generate(Player p);
 
 
-
-    public void analyzeCommand(Player p, String[] args){
+    public void analyzeCommand(Player p, String[] args) {
         sendHelp(p, args);
         addPlayerSetting(p);
         convertArgsToSettings(p, args);
         generate(p);
     }
 
-    public void addPlayerSetting(UUID uuid, Settings settings){
+    public void addPlayerSetting(UUID uuid, Settings settings) {
         playerSettings.put(uuid, settings);
     }
 
-    public void addPlayerSetting(Player p){
-        switch (generatorType){
+    public void addPlayerSetting(Player p) {
+        switch (generatorType) {
             case HOUSE:
                 addPlayerSetting(p.getUniqueId(), new HouseSettings(p));
                 break;
@@ -74,7 +74,7 @@ public abstract class GeneratorComponent extends ModuleComponent implements Wiki
 
     public void sendHelp(Player p, String @NonNull [] args) {
         if (args.length == 2 && (args[1].equals("info") || args[1].equals("help") || args[1].equals("?")))
-                sendHelp(p);
+            sendHelp(p);
     }
 
     public void sendHelp(@NonNull Player p) {
@@ -110,7 +110,7 @@ public abstract class GeneratorComponent extends ModuleComponent implements Wiki
         return command.toString();
     }
 
-    public void sendSuccessMessage(Player p){
+    public void sendSuccessMessage(Player p) {
         TextComponent copyCommand = Component.text("[COPY]", NamedTextColor.YELLOW, TextDecoration.BOLD)
                 .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.SUGGEST_COMMAND, getCommand(p)))
                 .hoverEvent(HoverEvent.showText(Component.text("Click to copy command", NamedTextColor.GRAY)));
@@ -119,7 +119,8 @@ public abstract class GeneratorComponent extends ModuleComponent implements Wiki
                 .clickEvent(ClickEvent.runCommand("/gen undo"))
                 .hoverEvent(HoverEvent.showText(Component.text("Click to undo last generation", NamedTextColor.GRAY)));
 
-        TextComponent message = getMessage().append(Component.text(" ")).append(copyCommand).append(Component.text(" ")).append(undo);
+        TextComponent message =
+                getMessage().append(Component.text(" ")).append(copyCommand).append(Component.text(" ")).append(undo);
 
         p.sendMessage(message);
         p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
@@ -134,35 +135,37 @@ public abstract class GeneratorComponent extends ModuleComponent implements Wiki
             case FIELD -> "Field";
         };
 
-        return LegacyComponentSerializer.legacyAmpersand().deserialize(BuildTeamTools.PREFIX + type + "§a successfully §7generated.");
+        return LegacyComponentSerializer.legacyAmpersand().deserialize(BuildTeamTools.PREFIX + type + "§a successfully " +
+                "§7generated.");
     }
 
-    /** Conversion:
+    /**
+     * Conversion:
      * Command: /gen house -w 123:12 -r 456:78
      * args: ["-w", "123:12", "-r", "456:78"]
      * HouseSettings:
      * WALL_COLOR: 123:12
      * ROOF_TYPE:  456:78
      */
-    protected void convertArgsToSettings(Player p, String[] args){
-        for(String flag : GeneratorUtils.convertArgsToFlags(args)){
+    protected void convertArgsToSettings(Player p, String[] args) {
+        for (String flag : GeneratorUtils.convertArgsToFlags(args)) {
             String[] flagAndValue = GeneratorUtils.convertToFlagAndValue(flag, p);
 
-            if(flagAndValue == null) continue;
+            if (flagAndValue == null) continue;
 
             String flagName = flagAndValue[0];
 
-            if(flagName == null) continue;
+            if (flagName == null) continue;
 
             Flag finalFlag = Flag.byString(generatorType, flagName);
 
-            if(finalFlag == null) continue;
+            if (finalFlag == null) continue;
 
             Object flagValue = FlagType.convertToFlagType(finalFlag, flagAndValue[1]);
 
             String errorMessage = FlagType.validateFlagType(finalFlag, flagValue);
 
-            if(errorMessage != null){
+            if (errorMessage != null) {
                 p.sendMessage(errorMessage);
                 continue;
             }
@@ -170,7 +173,7 @@ public abstract class GeneratorComponent extends ModuleComponent implements Wiki
             getPlayerSettings().get(p.getUniqueId()).setValue(finalFlag, flagValue);
         }
 
-        if(getPlayerSettings().get(p.getUniqueId()).getValues().isEmpty() && args.length > 1)
+        if (getPlayerSettings().get(p.getUniqueId()).getValues().isEmpty() && args.length > 1)
             sendHelp(p);
     }
 

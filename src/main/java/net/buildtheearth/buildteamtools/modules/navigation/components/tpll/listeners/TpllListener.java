@@ -33,7 +33,7 @@ public class TpllListener implements Listener {
 
     // Target server name for teleportation
     private BuildTeam targetBuildTeam;
-    
+
     @EventHandler
     public void onTpll(PlayerCommandPreprocessEvent event) {
         // Check if the NavigationModule is enabled

@@ -23,20 +23,22 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/** Paginated block picker used by Create/Edit palette menus. */
+/**
+ * Paginated block picker used by Create/Edit palette menus.
+ */
 public class ChoosePaletteBlocksMenu extends AbstractPaginatedMenu {
 
     // Layout & controls (matches the common 6-row layout)
-    private static final int BACK_SLOT     = 45;
+    private static final int BACK_SLOT = 45;
     private static final int PREVIOUS_SLOT = 48;
-    private static final int PAGE_SLOT     = 49;
-    private static final int NEXT_SLOT     = 50;
-    private static final int APPLY_SLOT    = 53;
+    private static final int PAGE_SLOT = 49;
+    private static final int NEXT_SLOT = 50;
+    private static final int APPLY_SLOT = 53;
 
     // Content grid: slots 9..44 (36 items = page size)
     private static final int CONTENT_START = 9;
-    private static final int CONTENT_END   = 44;
-    private static final int PAGE_SIZE     = CONTENT_END - CONTENT_START + 1; // 36
+    private static final int CONTENT_END = 44;
+    private static final int PAGE_SIZE = CONTENT_END - CONTENT_START + 1; // 36
 
     private static final String GREEN_CHECK_HEAD =
             "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90"
@@ -46,13 +48,19 @@ public class ChoosePaletteBlocksMenu extends AbstractPaginatedMenu {
 
     private final Logger logger;
 
-    /** Selected block material names, e.g. "STONE". */
+    /**
+     * Selected block material names, e.g. "STONE".
+     */
     private final List<String> selectedBlocks;
 
-    /** Callback invoked when user clicks Back/Apply (returns current selection). */
+    /**
+     * Callback invoked when user clicks Back/Apply (returns current selection).
+     */
     private final Consumer<List<String>> onApply;
 
-    /** Debounce per player to avoid double-fire on same physical click. */
+    /**
+     * Debounce per player to avoid double-fire on same physical click.
+     */
     private final Map<UUID, Long> clickDebounce = new HashMap<>();
 
     public ChoosePaletteBlocksMenu(BlockPaletteManager manager,
@@ -62,7 +70,7 @@ public class ChoosePaletteBlocksMenu extends AbstractPaginatedMenu {
                                    Consumer<List<String>> onApply) {
         // rows=6, columns=4? (second arg is the "content rows" in your base), title, player, fillMask=true
         super(6, 4, "Choose Palette Blocks", player, true);
-        this.logger  = plugin.getLogger();
+        this.logger = plugin.getLogger();
         this.selectedBlocks = (selectedBlocks != null) ? new ArrayList<>(selectedBlocks) : new ArrayList<>();
         this.onApply = onApply;
     }
@@ -86,7 +94,10 @@ public class ChoosePaletteBlocksMenu extends AbstractPaginatedMenu {
     protected Mask getMask() {
         ItemStack glass = new ItemStack(safeMat(XMaterial.GRAY_STAINED_GLASS_PANE, Material.GRAY_STAINED_GLASS_PANE));
         ItemMeta m = glass.getItemMeta();
-        if (m != null) { m.setDisplayName(" "); glass.setItemMeta(m); }
+        if (m != null) {
+            m.setDisplayName(" ");
+            glass.setItemMeta(m);
+        }
 
         return BinaryMask.builder(getMenu())
                 .item(glass)
@@ -99,7 +110,9 @@ public class ChoosePaletteBlocksMenu extends AbstractPaginatedMenu {
                 .build();
     }
 
-    /** Build the full source list of candidate blocks (unique by Material), sorted by name. */
+    /**
+     * Build the full source list of candidate blocks (unique by Material), sorted by name.
+     */
     @Override
     protected List<ItemStack> getSource() {
         Set<Material> seen = new LinkedHashSet<>();
@@ -125,7 +138,9 @@ public class ChoosePaletteBlocksMenu extends AbstractPaginatedMenu {
         return out;
     }
 
-    /** Render current page items + border/controls. */
+    /**
+     * Render current page items + border/controls.
+     */
     @Override
     protected void setPaginatedMenuItemsAsync(List<?> pageItems) {
         setupBorderAndControls();
@@ -152,7 +167,9 @@ public class ChoosePaletteBlocksMenu extends AbstractPaginatedMenu {
         setSwitchPageItemClickEvents(PAGE_SLOT);
     }
 
-    /** Register click handlers for items shown on current page. */
+    /**
+     * Register click handlers for items shown on current page.
+     */
     @Override
     protected void setPaginatedItemClickEventsAsync(List<?> pageItems) {
         @SuppressWarnings("unchecked")
@@ -206,7 +223,10 @@ public class ChoosePaletteBlocksMenu extends AbstractPaginatedMenu {
             // show up to 6 names as a teaser
             int shown = 0;
             for (String n : selectedBlocks) {
-                if (shown++ >= 6) { lore.add("§7…"); break; }
+                if (shown++ >= 6) {
+                    lore.add("§7…");
+                    break;
+                }
                 lore.add("§8- §f" + pretty(n));
             }
         }
@@ -269,7 +289,9 @@ public class ChoosePaletteBlocksMenu extends AbstractPaginatedMenu {
                 : Item.create(Objects.requireNonNull(XMaterial.BARRIER.get()), "§cNo Next Page", new ArrayList<>()));
     }
 
-    /** Build a visual item for a material reflecting selected/unselected state. */
+    /**
+     * Build a visual item for a material reflecting selected/unselected state.
+     */
     private ItemStack createBlockItem(Material mat) {
         boolean selected = selectedBlocks.contains(mat.name());
 
@@ -290,7 +312,9 @@ public class ChoosePaletteBlocksMenu extends AbstractPaginatedMenu {
         return stack;
     }
 
-    /** Version-safe "glow": find a harmless enchant dynamically and hide it. */
+    /**
+     * Version-safe "glow": find a harmless enchant dynamically and hide it.
+     */
     private void applyGlow(ItemMeta meta) {
         try {
             var reg = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);

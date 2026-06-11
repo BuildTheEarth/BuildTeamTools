@@ -22,6 +22,7 @@ import org.ipvp.canvas.mask.Mask;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+
 /**
  * The main menu for the BTE universal navigator. <br>
  * <br>

@@ -22,11 +22,11 @@ import java.util.*;
 
 public class CreatePaletteMenu extends AbstractMenu {
 
-    private static final int NAME_SLOT        = 11;
+    private static final int NAME_SLOT = 11;
     private static final int DESCRIPTION_SLOT = 13;
-    private static final int BLOCKS_SLOT      = 15;
-    private static final int BACK_SLOT        = 18;
-    private static final int APPLY_SLOT       = 26;
+    private static final int BLOCKS_SLOT = 15;
+    private static final int BACK_SLOT = 18;
+    private static final int APPLY_SLOT = 26;
 
     private static final String BACK_HEAD =
             "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90"
@@ -60,7 +60,7 @@ public class CreatePaletteMenu extends AbstractMenu {
     private static final Map<UUID, Listener> ACTIVE_CHAT = new HashMap<>();
     private boolean awaitingInput = false;
 
-    private enum InputMode { NONE, NAME, DESCRIPTION }
+    private enum InputMode {NONE, NAME, DESCRIPTION}
 
     public CreatePaletteMenu(BlockPaletteManager manager, Player player, JavaPlugin plugin) {
         super(3, "Create Palette", player);

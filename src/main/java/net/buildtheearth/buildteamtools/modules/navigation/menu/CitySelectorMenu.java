@@ -33,12 +33,13 @@ public class CitySelectorMenu extends AbstractPaginatedMenu {
      * Creates a menu for selecting cities within a state.
      * This is currently hardcoded for the USA - New York
      *
-     * @param parentState The state region that contains these cities
+     * @param parentState    The state region that contains these cities
      * @param cityBuildTeams List of build teams that represent cities in this state
-     * @param menuPlayer The player viewing the menu
-     * @param autoLoad Whether to auto-load the menu
+     * @param menuPlayer     The player viewing the menu
+     * @param autoLoad       Whether to auto-load the menu
      */
-    public CitySelectorMenu(@NonNull Region parentState, @NonNull List<BuildTeam> cityBuildTeams, Player menuPlayer, boolean autoLoad) {
+    public CitySelectorMenu(@NonNull Region parentState, @NonNull List<BuildTeam> cityBuildTeams, Player menuPlayer,
+                            boolean autoLoad) {
         super(4, 3, parentState.getName() + " - Cities", menuPlayer, autoLoad);
         this.parentState = parentState;
         this.cityBuildTeams = new ArrayList<>(cityBuildTeams);
@@ -52,10 +53,10 @@ public class CitySelectorMenu extends AbstractPaginatedMenu {
     protected void setPreviewItems() {
         setBackItem(BACK_ITEM_SLOT, new StateSelectorMenu(getMenuPlayer(), parentState.getContinent(), false));
 
-        if(cityBuildTeams.size() > 27)
+        if (cityBuildTeams.size() > 27)
             setSwitchPageItems(SWITCH_PAGE_ITEM_SLOT);
         else
-            for(int i = -1; i < 2; i++)
+            for (int i = -1; i < 2; i++)
                 getMenu().getSlot(SWITCH_PAGE_ITEM_SLOT + i).setItem(MenuItems.ITEM_BACKGROUND);
 
         super.setPreviewItems();
@@ -92,10 +93,12 @@ public class CitySelectorMenu extends AbstractPaginatedMenu {
                 "§8Click to join this state's server!"
         );
 
-        setRegionItem(parentState.getBuildTeam(), lore, slot, parentState.getHeadBase64(), "Rest of State " + parentState.getName());
+        setRegionItem(parentState.getBuildTeam(), lore, slot, parentState.getHeadBase64(),
+                "Rest of State " + parentState.getName());
     }
 
-    private void setRegionItem(@NotNull BuildTeam cityTeam, ArrayList<String> cityLore, int slot, String headBase64, String name) {
+    private void setRegionItem(@NotNull BuildTeam cityTeam, ArrayList<String> cityLore, int slot, String headBase64,
+                               String name) {
         if (!cityTeam.getWarpGroups().isEmpty()) {
             cityLore.add("Right click to open the warp group menu!");
         }
@@ -110,11 +113,12 @@ public class CitySelectorMenu extends AbstractPaginatedMenu {
     }
 
     @Override
-    protected void setMenuItemsAsync() {}
+    protected void setMenuItemsAsync() {
+    }
 
     @Override
     protected void setItemClickEventsAsync() {
-        if(cityBuildTeams.size() > 27)
+        if (cityBuildTeams.size() > 27)
             setSwitchPageItemClickEvents(SWITCH_PAGE_ITEM_SLOT);
     }
 
@@ -159,5 +163,6 @@ public class CitySelectorMenu extends AbstractPaginatedMenu {
     }
 
     @Override
-    protected void setPaginatedMenuItemsAsync(List<?> source) {}
+    protected void setPaginatedMenuItemsAsync(List<?> source) {
+    }
 }

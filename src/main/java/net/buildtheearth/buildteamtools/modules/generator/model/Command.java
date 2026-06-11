@@ -84,30 +84,31 @@ public class Command {
         minMax = GeneratorUtils.getMinMaxPoints(getRegion());
     }
 
-    /** Processes the commands from the command queue to prevent the server from freezing. */
-    public void tick(){
-        if(operations.isEmpty()) {
-            if(!isFinished)
+    /**
+     * Processes the commands from the command queue to prevent the server from freezing.
+     */
+    public void tick() {
+        if (operations.isEmpty()) {
+            if (!isFinished)
                 finish();
             return;
         }
 
         percentage = (int) Math.round((double) (totalCommands - operations.size()) / (double) totalCommands * 100);
 
-        if(!breakPointActive &&! threadActive)
+        if (!breakPointActive && !threadActive)
             player.sendActionBar("§a§lGenerator Progress: §7" + percentage + "%");
         else
             player.sendActionBar("§e§lGenerator Progress: §7" + percentage + "%");
 
-        if(threadActive)
+        if (threadActive)
             return;
 
 
-
         // Process commands in batches of MAX_COMMANDS_PER_SERVER_TICK
-        for(int i = 0; i < MAX_COMMANDS_PER_SERVER_TICK;){
-            if(operations.isEmpty()){
-                if(!isFinished)
+        for (int i = 0; i < MAX_COMMANDS_PER_SERVER_TICK; ) {
+            if (operations.isEmpty()) {
+                if (!isFinished)
                     finish();
                 break;
             }
@@ -116,17 +117,17 @@ public class Command {
             Operation command = operations.get(0);
             processOperation(command);
 
-            if(breakPointActive || threadActive)
+            if (breakPointActive || threadActive)
                 break;
 
             // Skip WorldEdit commands that take no time to execute
-            if(command.getOperationType() == Operation.OperationType.COMMAND){
+            if (command.getOperationType() == Operation.OperationType.COMMAND) {
                 String commandString = (String) command.getValues().get(0);
-                if(commandString.startsWith("//gmask")
-                || commandString.startsWith("//mask")
-                || commandString.startsWith("//pos")
-                || commandString.startsWith("//sel")
-                || commandString.startsWith("//expand"))
+                if (commandString.startsWith("//gmask")
+                        || commandString.startsWith("//mask")
+                        || commandString.startsWith("//pos")
+                        || commandString.startsWith("//sel")
+                        || commandString.startsWith("//expand"))
                     continue;
             }
 
@@ -134,8 +135,10 @@ public class Command {
         }
     }
 
-    /** Processes a single command. */
-    public void processOperation(Operation operation){
+    /**
+     * Processes a single command.
+     */
+    public void processOperation(Operation operation) {
         CompletableFuture<Void> future = null;
 
         try {
@@ -172,7 +175,7 @@ public class Command {
                         oldBlockData = block.getBlockData();
                         BlockType blockType = BlockTypes.BARRIER;
 
-                        if(blockType == null)
+                        if (blockType == null)
                             break;
 
                         GeneratorUtils.createCuboidSelection(getPlayer(), point, point);
@@ -226,15 +229,15 @@ public class Command {
                     GeneratorUtils.expandSelection(localSession, (Vector) operation.get(0));
                     break;
             }
-        }catch (Exception e){
-            if(operation != null)
+        } catch (Exception e) {
+            if (operation != null)
                 ChatHelper.logError("Error while processing command: " + operation.getOperationType() + " - " + operation.getValuesAsString());
             else
                 ChatHelper.logError("Error while processing command.");
             BuildTeamTools.getInstance().getComponentLogger().error("Command processing error", e);
         }
 
-        if(future != null){
+        if (future != null) {
             threadActive = true;
             // Ensure we clear threadActive and remove the operation regardless of success or exception
             future.whenComplete((v, ex) -> {
@@ -247,12 +250,14 @@ public class Command {
                 operations.removeFirst();
             });
 
-        }else if(!breakPointActive)
+        } else if (!breakPointActive)
             operations.removeFirst();
     }
 
-    /** Converts the XYZ coordinates in a command to the highest block at that location while skipping certain blocks. */
-    public String convertXYZ(String command){
+    /**
+     * Converts the XYZ coordinates in a command to the highest block at that location while skipping certain blocks.
+     */
+    public String convertXYZ(String command) {
         String xyz = command.split("%%XYZ/")[1].split("/%%")[0];
 
         String[] xyzSplit = xyz.split(",");
@@ -262,22 +267,23 @@ public class Command {
 
         int maxHeight = y;
 
-        if(blocks != null)
+        if (blocks != null)
             maxHeight = GeneratorUtils.getMaxHeight(blocks, x, z, MenuItems.getIgnoredMaterials());
-        if(maxHeight == 0)
+        if (maxHeight == 0)
             maxHeight = y;
 
         String commandSuffix = "";
-        if(command.split("/%%").length > 1)
+        if (command.split("/%%").length > 1)
             commandSuffix = command.split("/%%")[1];
 
         return command.split("%%XYZ/")[0] + x + "," + maxHeight + "," + z + commandSuffix;
     }
 
 
-
-    /** Called when the command queue is finished. */
-    public void finish(){
+    /**
+     * Called when the command queue is finished.
+     */
+    public void finish() {
         player.sendActionBar("§a§lGenerator Progress: §7100%");
         isFinished = true;
         generatorComponent.sendSuccessMessage(player);

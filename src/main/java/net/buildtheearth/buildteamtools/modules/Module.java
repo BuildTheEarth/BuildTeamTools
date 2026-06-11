@@ -50,11 +50,13 @@ public abstract class Module implements WikiDocumented {
     private final String wikiPage;
 
 
-    /** Initializes a new module.
+    /**
+     * Initializes a new module.
      *
-     * @param moduleName The name of the module
-     * @param wikiPage The wiki page of the module
-     * @param dependsOnModules The modules that this module depends on. If any of these modules are disabled, this module will be disabled as well.
+     * @param moduleName       The name of the module
+     * @param wikiPage         The wiki page of the module
+     * @param dependsOnModules The modules that this module depends on. If any of these modules are disabled, this module will
+     *                         be disabled as well.
      */
     protected Module(String moduleName, String wikiPage, Module... dependsOnModules) {
         this.moduleName = moduleName;
@@ -66,8 +68,10 @@ public abstract class Module implements WikiDocumented {
     }
 
 
-    /** Enables the module */
-    public void enable(){
+    /**
+     * Enables the module
+     */
+    public void enable() {
         checkForModuleDependencies();
 
         loadCommands();
@@ -76,64 +80,75 @@ public abstract class Module implements WikiDocumented {
         enabled = true;
     }
 
-    /** Disables the module */
-    public void disable(){
+    /**
+     * Disables the module
+     */
+    public void disable() {
         unregisterListeners();
 
         enabled = false;
     }
 
-    /** Shuts down the module with a reason.
-     *  This can be used to disable the module if it encounters an error.
+    /**
+     * Shuts down the module with a reason.
+     * This can be used to disable the module if it encounters an error.
      *
      * @param reason The reason for the shutdown like an error message
      */
-    public void shutdown(String reason){
+    public void shutdown(String reason) {
         this.error = reason;
 
-        if(isEnabled())
+        if (isEnabled())
             ChatHelper.logError("The %s Module crashed because of following error: " + reason, moduleName);
 
         disable();
     }
 
 
-
-    /** Registers commands for the module.
+    /**
+     * Registers commands for the module.
      * Note that this method will only register the commands in the module, but it won't load them in Bukkit.
      * To load the commands, use the loadCommands() method.
      */
-    protected void registerCommands(){}
+    protected void registerCommands() {
+    }
 
-    /** Registers a command for the module.
+    /**
+     * Registers a command for the module.
      * Note that this method will only register the command in the module, but it won't load it in Bukkit.
      * To load the command, use the loadCommands() method.
      *
-     * @param command The command to register
-     * @param executor The executor for the command. If the executor is also a TabCompleter, the TabCompleter will be registered as well.
+     * @param command  The command to register
+     * @param executor The executor for the command. If the executor is also a TabCompleter, the TabCompleter will be
+     *                 registered as well.
      */
-    protected void registerCommand(@NonNull String command, @NonNull CommandExecutor executor){
+    protected void registerCommand(@NonNull String command, @NonNull CommandExecutor executor) {
         this.commands.put(BuildTeamTools.getInstance().getCommand(command), executor);
 
         if (executor instanceof TabCompleter tc)
             this.tabCompleter.put(BuildTeamTools.getInstance().getCommand(command), tc);
     }
 
-    /** Registers a command for the module.
+    /**
+     * Registers a command for the module.
      * Note that this method will only register the command in the module, but it won't load it in Bukkit.
      * To load the command, use the loadCommands() method.
      *
-     * @param command The command to register
-     * @param executor The executor for the command.
-     * @param tabCompleter The tab completer for the command. Only needed to specify if the TabCompleter is in a different class than the executor.
+     * @param command      The command to register
+     * @param executor     The executor for the command.
+     * @param tabCompleter The tab completer for the command. Only needed to specify if the TabCompleter is in a different
+     *                     class than the executor.
      */
-    protected void registerCommand(@NonNull String command, @NonNull CommandExecutor executor, @NonNull TabCompleter tabCompleter){
+    protected void registerCommand(@NonNull String command, @NonNull CommandExecutor executor,
+                                   @NonNull TabCompleter tabCompleter) {
         this.commands.put(BuildTeamTools.getInstance().getCommand(command), executor);
         this.tabCompleter.put(BuildTeamTools.getInstance().getCommand(command), tabCompleter);
     }
 
-    /** Loads the commands for the module into Bukkit */
-    private void loadCommands(){
+    /**
+     * Loads the commands for the module into Bukkit
+     */
+    private void loadCommands() {
         for (var command : commands.entrySet())
             command.getKey().setExecutor(command.getValue());
 
@@ -142,42 +157,48 @@ public abstract class Module implements WikiDocumented {
     }
 
 
-    /** Registers listeners for the module.
+    /**
+     * Registers listeners for the module.
      * Note that this method will only register the listeners in the module, but it won't load them in Bukkit.
      * To load the listeners, use the loadListeners() method.
      */
-    public void registerListeners(Listener... listeners){
+    public void registerListeners(Listener... listeners) {
         this.listeners.addAll(Arrays.asList(listeners));
     }
 
     public abstract void registerListeners();
 
-    /** Loads the listeners for the module into Bukkit */
-    private void loadListeners(){
-        for(Listener listener : listeners)
-            if(listener != null)
+    /**
+     * Loads the listeners for the module into Bukkit
+     */
+    private void loadListeners() {
+        for (Listener listener : listeners)
+            if (listener != null)
                 Bukkit.getPluginManager().registerEvents(listener, BuildTeamTools.getInstance());
     }
 
-    /** Unregisters all listeners from Bukkit and removes them from the module */
-    private void unregisterListeners(){
-        for(Listener listener : listeners)
-            if(listener != null)
+    /**
+     * Unregisters all listeners from Bukkit and removes them from the module
+     */
+    private void unregisterListeners() {
+        for (Listener listener : listeners)
+            if (listener != null)
                 HandlerList.unregisterAll(listener);
 
         listeners.clear();
     }
 
 
-    /** Checks if the module has all its dependencies enabled
+    /**
+     * Checks if the module has all its dependencies enabled
      * If not, it will disable the module and log an error.
      */
-    protected void checkForModuleDependencies(){
-        for(Module module : dependsOnModules)
-            if(!module.isEnabled()) {
+    protected void checkForModuleDependencies() {
+        for (Module module : dependsOnModules)
+            if (!module.isEnabled()) {
                 String moduleDepsError = "The " + module.getModuleName() + " Module is currently disabled.";
 
-                if(module.getError() != null && !module.getError().isEmpty())
+                if (module.getError() != null && !module.getError().isEmpty())
                     moduleDepsError = module.getError();
 
                 shutdown(moduleDepsError);

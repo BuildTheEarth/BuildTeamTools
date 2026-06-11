@@ -33,11 +33,12 @@ public class AddressTypeSelectionMenu extends AbstractMenu {
     private final Warp warp;
     private final boolean alreadyExists;
 
-    /** In this menu the player can select an address type for a warp.
+    /**
+     * In this menu the player can select an address type for a warp.
      * This can be used for example to change the AddressType of a warp in the {@link WarpMenu}.
      *
-     * @param menuPlayer  The player that is viewing the menu.
-     * @param warp The warp that is being updated with the selected warp group.
+     * @param menuPlayer    The player that is viewing the menu.
+     * @param warp          The warp that is being updated with the selected warp group.
      * @param alreadyExists Whether the warp already exists.
      */
     public AddressTypeSelectionMenu(Player menuPlayer, Warp warp, boolean alreadyExists) {

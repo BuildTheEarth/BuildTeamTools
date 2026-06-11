@@ -47,7 +47,8 @@ public class BuildTeam {
         this.name = name;
         this.blankName = blankName;
         this.serverName = serverName;
-        this.isConnected = isConnected && (serverName != null && !serverName.isEmpty()); // We need to verify the Data manually because NwApi i quite scuffed
+        // We need to verify the Data manually, because NwApi is quite scuffed
+        this.isConnected = isConnected && (serverName != null && !serverName.isEmpty());
         this.hasBTToolsInstalled = hasBTToolsInstalled;
 
         this.regions = new ArrayList<>();
@@ -61,9 +62,9 @@ public class BuildTeam {
             this.IP = serverIP;
     }
 
-    public void createWarp(Player creator, Warp warp){
+    public void createWarp(Player creator, Warp warp) {
         // Check if the team owns that warp
-        if(!warp.getWarpGroup().getBuildTeam().getID().equals(this.getID())){
+        if (!warp.getWarpGroup().getBuildTeam().getID().equals(this.getID())) {
             creator.sendMessage(ChatHelper.getErrorString("You can only create warps for your own team!"));
             return;
         }
@@ -83,15 +84,16 @@ public class BuildTeam {
             @Override
             public void onFailure(IOException e) {
                 warp.getWarpGroup().getWarps().remove(warp);
-                creator.sendMessage(ChatHelper.getErrorString("Failed to sync warp %s to the network! It has been removed locally. Please try again.", warp.getName()));
+                creator.sendMessage(ChatHelper.getErrorString("Failed to sync warp %s to the network! It has been removed " +
+                        "locally. Please try again.", warp.getName()));
                 BuildTeamTools.getInstance().getComponentLogger().error("Failed to create warp via API", e);
             }
         });
     }
 
-    public void createWarpGroup(Player creator, WarpGroup warpGroup){
+    public void createWarpGroup(Player creator, WarpGroup warpGroup) {
         // Check if the team owns that warp group
-        if(!warpGroup.getBuildTeam().getID().equals(this.getID())){
+        if (!warpGroup.getBuildTeam().getID().equals(this.getID())) {
             creator.sendMessage(ChatHelper.getErrorString("You can only create warp groups for your own team!"));
             return;
         }
@@ -103,7 +105,8 @@ public class BuildTeam {
             @Override
             public void onResponse(String response) {
                 NetworkModule.getInstance().updateCache().thenRun(() -> refreshBluemapMarkers()).exceptionally(e -> {
-                    BuildTeamTools.getInstance().getComponentLogger().warn("Failed to update cache after warp group creation.", e);
+                    BuildTeamTools.getInstance().getComponentLogger().warn("Failed to update cache after warp group creation.",
+                            e);
                     return null;
                 });
             }
@@ -111,16 +114,17 @@ public class BuildTeam {
             @Override
             public void onFailure(IOException e) {
                 warpGroups.remove(warpGroup);
-                creator.sendMessage(ChatHelper.getErrorString("Failed to sync warp group %s to the network! It has been removed locally. Please try again.", warpGroup.getName()));
+                creator.sendMessage(ChatHelper.getErrorString("Failed to sync warp group %s to the network! It has been removed" +
+                        " locally. Please try again.", warpGroup.getName()));
                 BuildTeamTools.getInstance().getComponentLogger().error("Failed to create warp group via API", e);
             }
         });
     }
 
 
-    public void updateWarp(Player updater, Warp warp){
+    public void updateWarp(Player updater, Warp warp) {
         // Check if the team owns that warp
-        if(!warp.getWarpGroup().getBuildTeam().getID().equals(this.getID())){
+        if (!warp.getWarpGroup().getBuildTeam().getID().equals(this.getID())) {
             updater.sendMessage(ChatHelper.getErrorString("You can only update warps for your own team!"));
             return;
         }
@@ -140,15 +144,16 @@ public class BuildTeam {
 
             @Override
             public void onFailure(IOException e) {
-                updater.sendMessage(ChatHelper.getErrorString("Failed to sync warp %s changes to the network! Your changes may be lost on reload. Please try editing again.", warp.getName()));
+                updater.sendMessage(ChatHelper.getErrorString("Failed to sync warp %s changes to the network! Your changes may " +
+                        "be lost on reload. Please try editing again.", warp.getName()));
                 BuildTeamTools.getInstance().getComponentLogger().error("Failed to update warp via API", e);
             }
         });
     }
 
-    public void updateWarpGroup(Player updater, WarpGroup warpGroup){
+    public void updateWarpGroup(Player updater, WarpGroup warpGroup) {
         // Check if the team owns that warp group
-        if(!warpGroup.getBuildTeam().getID().equals(this.getID())){
+        if (!warpGroup.getBuildTeam().getID().equals(this.getID())) {
             updater.sendMessage(ChatHelper.getErrorString("You can only update warp groups for your own team!"));
             return;
         }
@@ -168,15 +173,16 @@ public class BuildTeam {
 
             @Override
             public void onFailure(IOException e) {
-                updater.sendMessage(ChatHelper.getErrorString("Failed to sync warp group %s changes to the network! Your changes may be lost on reload. Please try editing again.", warpGroup.getName()));
+                updater.sendMessage(ChatHelper.getErrorString("Failed to sync warp group %s changes to the network! Your " +
+                        "changes may be lost on reload. Please try editing again.", warpGroup.getName()));
                 BuildTeamTools.getInstance().getComponentLogger().error("Failed to update warp group via API", e);
             }
         });
     }
 
-    public void deleteWarp(Player deleter, Warp warp){
+    public void deleteWarp(Player deleter, Warp warp) {
         // Check if the team owns that warp
-        if(!warp.getWarpGroup().getBuildTeam().getID().equals(this.getID())){
+        if (!warp.getWarpGroup().getBuildTeam().getID().equals(this.getID())) {
             deleter.sendMessage(ChatHelper.getErrorString("You can only delete warps for your own team!"));
             return;
         }
@@ -196,15 +202,16 @@ public class BuildTeam {
             @Override
             public void onFailure(IOException e) {
                 warp.getWarpGroup().getWarps().add(warp);
-                deleter.sendMessage(ChatHelper.getErrorString("Failed to delete warp %s from the network! It has been restored locally. Please try again.", warp.getName()));
+                deleter.sendMessage(ChatHelper.getErrorString("Failed to delete warp %s from the network! It has been restored " +
+                        "locally. Please try again.", warp.getName()));
                 BuildTeamTools.getInstance().getComponentLogger().error("Failed to delete warp via API", e);
             }
         });
     }
 
-    public void deleteWarpGroup(Player deleter, WarpGroup warpGroup){
+    public void deleteWarpGroup(Player deleter, WarpGroup warpGroup) {
         // Check if the team owns that warp group
-        if(!warpGroup.getBuildTeam().getID().equals(this.getID())){
+        if (!warpGroup.getBuildTeam().getID().equals(this.getID())) {
             deleter.sendMessage(ChatHelper.getErrorString("You can only delete warp groups for your own team!"));
             return;
         }
@@ -216,7 +223,8 @@ public class BuildTeam {
             @Override
             public void onResponse(String response) {
                 NetworkModule.getInstance().updateCache().thenRun(() -> refreshBluemapMarkers()).exceptionally(e -> {
-                    BuildTeamTools.getInstance().getComponentLogger().warn("Failed to update cache after warp group deletion.", e);
+                    BuildTeamTools.getInstance().getComponentLogger().warn("Failed to update cache after warp group deletion.",
+                            e);
                     return null;
                 });
             }
@@ -224,7 +232,8 @@ public class BuildTeam {
             @Override
             public void onFailure(IOException e) {
                 warpGroups.add(warpGroup);
-                deleter.sendMessage(ChatHelper.getErrorString("Failed to delete warp group %s from the network! It has been restored locally. Please try again.", warpGroup.getName()));
+                deleter.sendMessage(ChatHelper.getErrorString("Failed to delete warp group %s from the network! It has been " +
+                        "restored locally. Please try again.", warpGroup.getName()));
                 BuildTeamTools.getInstance().getComponentLogger().error("Failed to delete warp group via API", e);
             }
         });

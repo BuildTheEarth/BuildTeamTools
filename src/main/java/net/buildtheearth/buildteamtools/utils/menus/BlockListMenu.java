@@ -39,12 +39,12 @@ public class BlockListMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPreviewItems() {
-        if(backMenu != null)
+        if (backMenu != null)
             setBackItem(BACK_ITEM_SLOT, backMenu);
 
         setSwitchPageItems(SWITCH_PAGE_ITEM_SLOT);
 
-        if(canProceed())
+        if (canProceed())
             getMenu().getSlot(NEXT_ITEM_SLOT).setItem(HeadFactory.head(HeadTexture.CHECKMARK, "§eNext"));
         else
             getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.ITEM_BACKGROUND);
@@ -53,7 +53,8 @@ public class BlockListMenu extends AbstractPaginatedMenu {
     }
 
     @Override
-    protected void setMenuItemsAsync() {}
+    protected void setMenuItemsAsync() {
+    }
 
     @Override
     protected void setItemClickEventsAsync() {
@@ -80,7 +81,7 @@ public class BlockListMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPaginatedPreviewItems(List<?> source) {
-        if(selectedMaterials == null)
+        if (selectedMaterials == null)
             selectedMaterials = new ArrayList<>();
 
         // Set pagignated items
@@ -108,7 +109,7 @@ public class BlockListMenu extends AbstractPaginatedMenu {
             getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
                 String type = Item.getUppercaseMaterialString(getMenu().getSlot(_slot).getItem(getMenuPlayer()));
 
-                if(selectedMaterials.contains(type))
+                if (selectedMaterials.contains(type))
                     selectedMaterials.remove(type);
                 else
                     selectedMaterials.add(type);
@@ -124,7 +125,7 @@ public class BlockListMenu extends AbstractPaginatedMenu {
      *
      * @return true if the player has selected at least one block, false otherwise.
      */
-    protected boolean canProceed(){
+    protected boolean canProceed() {
         return !selectedMaterials.isEmpty();
     }
 }

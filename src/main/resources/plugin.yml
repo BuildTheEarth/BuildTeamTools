@@ -10,15 +10,15 @@ commands:
   buildteamtools:
     description: Main command of the Build Team Tools plugin.
     usage: /buildteamtools
-    aliases: [btt]
+    aliases: [ btt ]
   generate:
     description: Allows usage of the Generator Tool.
     usage: /generate
-    aliases: [gen, g]
+    aliases: [ gen, g ]
   navigator:
     description: Opens the universal navigator.
     usage: /navigator
-    aliases: [nav, navigate]
+    aliases: [ nav, navigate ]
   explore:
     description: Opens the BuildTeams explore menu.
     usage: /explore
@@ -33,16 +33,16 @@ commands:
   kml:
     description: kml pasting and parsing
     usage: /kml
-    aliases: [geopoints, geopath, georing, geosurface]
+    aliases: [ geopoints, geopath, georing, geosurface ]
   blockpalette:
     description: Opens the block palette menu.
     usage: /blockpalette [filter|menu|filter <filter1> <filter2> ...]
-    aliases: [bp, blocks]
+    aliases: [ bp, blocks ]
     permission: btt.bp.use
   buildteam:
     description: Sends the player to the specified BuildTeam
     usage: /buildteam <team>
-    aliases: [bt]
+    aliases: [ bt ]
 permissions:
   btt.bp.use:
     description: Allows players to use /blockpalette

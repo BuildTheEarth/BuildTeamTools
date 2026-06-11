@@ -17,28 +17,28 @@ public class HouseSettings extends Settings {
     public void setDefaultValues() {
         // Roof Type (Default: Random)
         RoofType roofType = (RoofType) Utils.pickRandom(RoofType.values());
-        if(roofType != null)
+        if (roofType != null)
             setValue(HouseFlag.ROOF_TYPE, roofType);
 
         // Wall Color (Default: Random)
         ItemStack block = (ItemStack) Utils.pickRandom(MenuItems.getSolidBlocks().toArray());
-        if(block != null)
+        if (block != null)
             setValue(HouseFlag.WALL_COLOR, new XMaterial[]{XMaterial.matchXMaterial(block)});
 
         // Wall Color (Default: Random)
         block = (ItemStack) Utils.pickRandom(MenuItems.getSolidBlocks().toArray());
-        if(block != null)
+        if (block != null)
             setValue(HouseFlag.BASE_COLOR, new XMaterial[]{XMaterial.matchXMaterial(block)});
 
         // Roof Color (Default: Random)
-        if(roofType == RoofType.STAIRS)
+        if (roofType == RoofType.STAIRS)
             block = (ItemStack) Utils.pickRandom(MenuItems.getStairs().toArray());
-        else if(roofType == RoofType.FLATTER_SLABS || roofType == RoofType.MEDIUM_SLABS || roofType == RoofType.STEEP_SLABS)
+        else if (roofType == RoofType.FLATTER_SLABS || roofType == RoofType.MEDIUM_SLABS || roofType == RoofType.STEEP_SLABS)
             block = (ItemStack) Utils.pickRandom(MenuItems.getSlabs().toArray());
-        else if(roofType == RoofType.FLAT)
+        else if (roofType == RoofType.FLAT)
             block = (ItemStack) Utils.pickRandom(MenuItems.getSlabs().toArray());
 
-        if(block != null)
+        if (block != null)
             setValue(HouseFlag.ROOF_COLOR, new XMaterial[]{XMaterial.matchXMaterial(block)});
 
         // Balcony Color (Default: Random)
@@ -49,7 +49,7 @@ public class HouseSettings extends Settings {
 
 
         // Floor Count (Default: Random)
-        setValue(HouseFlag.FLOOR_COUNT, (int)(Math.random()*3.0) + 1);
+        setValue(HouseFlag.FLOOR_COUNT, (int) (Math.random() * 3.0) + 1);
 
         // Window Color (Default: Fixed Value)
         setValue(HouseFlag.WINDOW_COLOR, new XMaterial[]{XMaterial.BLACK_STAINED_GLASS});

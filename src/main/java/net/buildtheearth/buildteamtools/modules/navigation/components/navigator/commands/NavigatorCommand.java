@@ -18,7 +18,7 @@ public class NavigatorCommand implements CommandExecutor {
             return true;
         }
 
-        if(!player.hasPermission(Permissions.NAVIGATOR_USE)) {
+        if (!player.hasPermission(Permissions.NAVIGATOR_USE)) {
             player.sendMessage(ChatHelper.getErrorString("You don't have permission to use this command!"));
             return true;
         }

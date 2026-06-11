@@ -57,7 +57,8 @@ public class StatsListener implements Listener {
 
         if (e.getMessage().startsWith("//")) {
             StatsModule.getInstance().getStatsServer().addValue(StatsServerType.WORLD_EDIT_COMMANDS, 1);
-            StatsModule.getInstance().getStatsPlayer(e.getPlayer().getUniqueId()).addValue(StatsPlayerType.WORLD_EDIT_COMMANDS, 1);
+            StatsModule.getInstance().getStatsPlayer(e.getPlayer().getUniqueId()).addValue(StatsPlayerType.WORLD_EDIT_COMMANDS,
+                    1);
         }
     }
 }

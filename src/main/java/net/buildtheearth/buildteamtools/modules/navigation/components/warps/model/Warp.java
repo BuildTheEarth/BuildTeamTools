@@ -22,89 +22,107 @@ public class Warp {
     @Getter
     private final UUID id;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private WarpGroup warpGroup;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String name;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String countryCode;
 
     @Getter
     private String countryCodeType;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String address;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private AddressType addressType;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String material;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String worldName;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private double lat;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private double lon;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private double y;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private float yaw;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private float pitch;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean isHighlight;
 
-    /** Create a warp with a random warp ID. */
-    public Warp(WarpGroup warpGroup, String name, String countryCode, String countryCodeType, String address, AddressType addressType, String material, String worldName, double lat, double lon, double y, float yaw, float pitch, boolean isHighlight) {
-        this(UUID.randomUUID(), warpGroup, name, countryCode, countryCodeType, address, addressType, material, worldName, lat, lon, y, yaw, pitch, isHighlight);
+    /**
+     * Create a warp with a random warp ID.
+     */
+    public Warp(WarpGroup warpGroup, String name, String countryCode, String countryCodeType, String address,
+                AddressType addressType, String material, String worldName, double lat, double lon, double y, float yaw,
+                float pitch, boolean isHighlight) {
+        this(UUID.randomUUID(), warpGroup, name, countryCode, countryCodeType, address, addressType, material, worldName, lat,
+                lon, y, yaw, pitch, isHighlight);
     }
 
     public ItemStack getMaterialItem() {
         String itemName = "§6§l" + getName();
         ArrayList<String> lore = null;
 
-        if(address != null){
+        if (address != null) {
             lore = new ArrayList<>(Arrays.asList("", "§eAddress:"));
             lore.addAll(ListUtil.createList(Utils.splitStringByLineLength(address, 30, ", ")));
         }
 
-        if(material == null)
+        if (material == null)
             return HeadFactory.letter(
                     LetterType.STONE,
                     name.charAt(0),
                     itemName,
                     lore
             );
-        else if(material.startsWith("http://textures.minecraft.net/texture/"))
+        else if (material.startsWith("http://textures.minecraft.net/texture/"))
             return Item.createCustomHeadTextureURL(material, itemName, lore);
 
         Material material = Material.matchMaterial(this.material.split(":")[0]);
 
-        if(material == null)
+        if (material == null)
             return HeadFactory.letter(
                     LetterType.STONE,
                     name.charAt(0),
                     itemName,
                     lore
             );
-        else if(!this.material.contains(":"))
+        else if (!this.material.contains(":"))
             return Item.create(material, itemName, lore);
         else
             return Item.create(material, itemName, Short.parseShort(this.material.split(":")[1]), lore);
 
     }
 
-    public JSONObject toJSON(){
+    public JSONObject toJSON() {
         JSONObject json = new JSONObject();
 
         json.put("id", id.toString());
@@ -120,21 +138,23 @@ public class Warp {
         json.put("pitch", pitch);
         json.put("isHighlight", isHighlight);
 
-        if(address != null)
+        if (address != null)
             json.put("address", address);
 
-        if(addressType != null)
+        if (addressType != null)
             json.put("addressType", addressType.toString());
 
-        if(material != null)
+        if (material != null)
             json.put("material", material);
 
         return json;
     }
 
     public enum AddressType {
-        BUILDING("Building", "Empire State Building, 350, 5th Avenue, Midtown South, Manhattan, New York County, City of New York, New York, 10118, United States"),
-        STREET("Street", "West 33rd Street, Midtown South, Manhattan, New York County, City of New York, New York, 10001, United States"),
+        BUILDING("Building", "Empire State Building, 350, 5th Avenue, Midtown South, Manhattan, New York County, City of New " +
+                "York, New York, 10118, United States"),
+        STREET("Street", "West 33rd Street, Midtown South, Manhattan, New York County, City of New York, New York, 10001, " +
+                "United States"),
         CITY("City", "Manhattan, New York County, City of New York, New York, United States"),
         STATE("State", "New York, United States"),
         COUNTRY("Country", "United States"),

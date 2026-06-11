@@ -84,12 +84,13 @@ public class AdvancedSettingsMenu extends AbstractMenu {
     }
 
     @Override
-    protected void setMenuItemsAsync() {}
+    protected void setMenuItemsAsync() {
+    }
 
     @Override
     protected void setItemClickEventsAsync() {
         List<ItemStack> streetLampTypes = new ArrayList<>();
-        for(String streetLampType : RoadSettings.streetLampTypes)
+        for (String streetLampType : RoadSettings.streetLampTypes)
             streetLampTypes.add(getStreetLampItem(streetLampType));
 
         setSliderClickEvents(RoadFlag.LANE_COUNT, LANE_COUNT_SLOT, 1, 10);
@@ -140,7 +141,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
 
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
                 reloadMenuAsync();
-            }else{
+            } else {
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
             }
         });
@@ -159,7 +160,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
 
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
                 reloadMenuAsync();
-            }else{
+            } else {
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
 
             }
@@ -167,7 +168,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
     }
 
 
-    protected void setChoiceClickEvents(RoadFlag roadFlag, int slot, String choiceInvName, List<ItemStack> choices){
+    protected void setChoiceClickEvents(RoadFlag roadFlag, int slot, String choiceInvName, List<ItemStack> choices) {
         // Set click event for X items
         getMenu().getSlot(slot - 1).setClickHandler((clickPlayer, clickInformation) -> turnOffColorChoice(clickPlayer, roadFlag));
         getMenu().getSlot(slot + 1).setClickHandler((clickPlayer, clickInformation) -> turnOffColorChoice(clickPlayer, roadFlag));
@@ -194,7 +195,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
         reloadMenuAsync();
     }
 
-    protected ItemStack getStreetLampItem(String id){
+    protected ItemStack getStreetLampItem(String id) {
         return Item.create(Objects.requireNonNull(XMaterial.SEA_LANTERN.get()), "§eStreet Lamp #" + id, ListUtil.createList("§7Click to select this street lamp type."));
     }
 }

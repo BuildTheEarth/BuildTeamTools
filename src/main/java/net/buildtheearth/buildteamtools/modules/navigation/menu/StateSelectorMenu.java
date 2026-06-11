@@ -41,8 +41,8 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
      * Creates a menu for selecting states, dynamically detecting states from build teams.
      *
      * @param menuPlayer The player viewing the menu
-     * @param continent The continent to show states for (e.g., North America for USA)
-     * @param autoLoad Whether to auto-load the menu
+     * @param continent  The continent to show states for (e.g., North America for USA)
+     * @param autoLoad   Whether to auto-load the menu
      */
     public StateSelectorMenu(Player menuPlayer, @NonNull Continent continent, boolean autoLoad) {
         super(4, 3, "USA - States", menuPlayer, autoLoad);
@@ -51,7 +51,7 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
 
         for (BuildTeam team : NetworkModule.getInstance().getBuildTeams()) {
             if (team == null || team.getID() == null) continue;
-            
+
             if (NetworkModule.getInstance().getBuildTeam() != null
                     && team.getID().equals(NetworkModule.getInstance().getBuildTeam().getID())) {
                 continue;
@@ -97,7 +97,7 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
                 }
             }
         }
-        
+
         return cityTeams;
     }
 
@@ -105,10 +105,10 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
     protected void setPreviewItems() {
         setBackItem(BACK_ITEM_SLOT, new CountrySelectorMenu(getMenuPlayer(), continent, false));
 
-        if(stateEntries.size() > 27)
+        if (stateEntries.size() > 27)
             setSwitchPageItems(SWITCH_PAGE_ITEM_SLOT);
         else
-            for(int i = -1; i < 2; i++)
+            for (int i = -1; i < 2; i++)
                 getMenu().getSlot(SWITCH_PAGE_ITEM_SLOT + i).setItem(MenuItems.ITEM_BACKGROUND);
 
         super.setPreviewItems();
@@ -121,9 +121,9 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
         int slot = 0;
         for (StateEntry entry : entries) {
             ArrayList<String> stateLore = ListUtil.createList(
-                "",
-                "§eBuild Team:", entry.buildTeam.getBlankName(),
-                ""
+                    "",
+                    "§eBuild Team:", entry.buildTeam.getBlankName(),
+                    ""
             );
             if (entry.hasSubCities) {
                 getCityTeamsForState(entry.stateRegion).forEach(cityTeam ->
@@ -137,22 +137,23 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
             }
 
             getMenu().getSlot(slot).setItem(
-                Item.createCustomHeadBase64(
-                        entry.stateRegion.getHeadBase64(),
-                        "§6§l" + entry.stateRegion.getName(),
-                        stateLore
-                )
+                    Item.createCustomHeadBase64(
+                            entry.stateRegion.getHeadBase64(),
+                            "§6§l" + entry.stateRegion.getName(),
+                            stateLore
+                    )
             );
             slot++;
         }
     }
 
     @Override
-    protected void setMenuItemsAsync() {}
+    protected void setMenuItemsAsync() {
+    }
 
     @Override
     protected void setItemClickEventsAsync() {
-        if(stateEntries.size() > 27)
+        if (stateEntries.size() > 27)
             setSwitchPageItemClickEvents(SWITCH_PAGE_ITEM_SLOT);
     }
 
@@ -166,8 +167,8 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
             getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
 
-                ChatHelper.logDebug("Clicked the state: %s (HasCities: %s)", 
-                    entry.stateRegion.getName(), entry.hasSubCities);
+                ChatHelper.logDebug("Clicked the state: %s (HasCities: %s)",
+                        entry.stateRegion.getName(), entry.hasSubCities);
 
                 if (entry.hasSubCities) { // New York City
                     List<BuildTeam> cityTeams = getCityTeamsForState(entry.stateRegion);
@@ -197,5 +198,6 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
     }
 
     @Override
-    protected void setPaginatedMenuItemsAsync(List<?> source) {}
+    protected void setPaginatedMenuItemsAsync(List<?> source) {
+    }
 }

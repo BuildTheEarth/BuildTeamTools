@@ -31,7 +31,8 @@ public class NavigatorOpenListener implements Listener {
         if (event.getCurrentItem() == null) return;
 
         //Checks to see if the navigator item was clicked on
-        if (event.getCurrentItem().getType() != NavigationModule.getInstance().getNavigatorComponent().getItem().getType()) return;
+        if (event.getCurrentItem().getType() != NavigationModule.getInstance().getNavigatorComponent().getItem().getType())
+            return;
 
         //Extract the player
         if (!(event.getWhoClicked() instanceof Player player)) return;

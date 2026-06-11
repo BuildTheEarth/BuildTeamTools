@@ -29,6 +29,7 @@ public class API {
 
     /**
      * Sends a get request to an API
+     *
      * @param url The URL to perform a get request on
      * @return The result of the get request as a string
      * @throws IOException When something went wrong performing the get request
@@ -45,6 +46,7 @@ public class API {
 
     /**
      * Sends an asynchronous get request to an API
+     *
      * @param url The URL to perform a get request on
      */
     public static void getAsync(String url, ApiResponseCallback callback) {
@@ -59,7 +61,7 @@ public class API {
                     if (response.isSuccessful()) {
                         String responseBody = response.body().string();
                         callback.onResponse(responseBody);
-                    } else if(BuildTeamTools.getInstance().isDebug())
+                    } else if (BuildTeamTools.getInstance().isDebug())
                         callback.onFailure(new IOException("\nUnexpected code: \n" + response + "\n Response Body:\n" + response.body().string()));
                     else
                         callback.onFailure(new IOException("Unexpected code " + response.code()));
@@ -76,7 +78,8 @@ public class API {
 
     /**
      * Sends a put request to an API
-     * @param url The URL to perform a put request on
+     *
+     * @param url         The URL to perform a put request on
      * @param requestBody The request body to include in the put request
      * @return The result of the put request as a string
      * @throws IOException When something went wrong performing the put request
@@ -94,9 +97,10 @@ public class API {
 
     /**
      * Sends an asynchronous put request to an API
-     * @param url The URL to perform a put request on
+     *
+     * @param url         The URL to perform a put request on
      * @param requestBody The request body to include in the put request
-     * @param callback The callback to handle the API response or failure
+     * @param callback    The callback to handle the API response or failure
      */
     public static void putAsync(String url, RequestBody requestBody, ApiResponseCallback callback) {
         Request request = new Request.Builder()
@@ -111,11 +115,11 @@ public class API {
                     if (response.isSuccessful()) {
                         String responseBody = response.body().string();
                         callback.onResponse(responseBody);
-                    } else if(BuildTeamTools.getInstance().isDebug()) {
+                    } else if (BuildTeamTools.getInstance().isDebug()) {
                         Buffer buffer = new Buffer();
                         requestBody.writeTo(buffer);
-                        callback.onFailure(new IOException("\nUnexpected code: \n" + response + "\n Request Body:\n" + buffer.readUtf8() +"\n Response Body:\n" + response.body().string()));
-                    }else {
+                        callback.onFailure(new IOException("\nUnexpected code: \n" + response + "\n Request Body:\n" + buffer.readUtf8() + "\n Response Body:\n" + response.body().string()));
+                    } else {
                         callback.onFailure(new IOException("Unexpected code " + response.code()));
                     }
                 }
@@ -130,7 +134,8 @@ public class API {
 
     /**
      * Sends a post request to an API
-     * @param url The URL to perform a post request on
+     *
+     * @param url         The URL to perform a post request on
      * @param requestBody The request body to include in the post request
      * @return The result of the post request as a string
      * @throws IOException When something went wrong performing the post request
@@ -148,9 +153,10 @@ public class API {
 
     /**
      * Sends an asynchronous post request to an API
-     * @param url The URL to perform a post request on
+     *
+     * @param url         The URL to perform a post request on
      * @param requestBody The request body to include in the post request
-     * @param callback The callback to handle the API response or failure
+     * @param callback    The callback to handle the API response or failure
      */
     public static void postAsync(String url, RequestBody requestBody, ApiResponseCallback callback) {
         Request request = new Request.Builder()
@@ -165,11 +171,11 @@ public class API {
                     if (response.isSuccessful()) {
                         String responseBody = response.body().string();
                         callback.onResponse(responseBody);
-                    } else if(BuildTeamTools.getInstance().isDebug()) {
+                    } else if (BuildTeamTools.getInstance().isDebug()) {
                         Buffer buffer = new Buffer();
                         requestBody.writeTo(buffer);
-                        callback.onFailure(new IOException("\nUnexpected code: \n" + response + "\n Request Body:\n" + buffer.readUtf8() +"\n Response Body:\n" + response.body().string()));
-                    }else
+                        callback.onFailure(new IOException("\nUnexpected code: \n" + response + "\n Request Body:\n" + buffer.readUtf8() + "\n Response Body:\n" + response.body().string()));
+                    } else
                         callback.onFailure(new IOException("Unexpected code: " + response.code()));
                 }
             }
@@ -183,7 +189,8 @@ public class API {
 
     /**
      * Sends a delete request to an API with a request body
-     * @param url The URL to perform a delete request on
+     *
+     * @param url         The URL to perform a delete request on
      * @param requestBody The request body to include in the delete request
      * @return The result of the delete request as a string
      * @throws IOException When something went wrong performing the delete request
@@ -201,9 +208,10 @@ public class API {
 
     /**
      * Sends an asynchronous delete request to an API with a request body
-     * @param url The URL to perform a delete request on
+     *
+     * @param url         The URL to perform a delete request on
      * @param requestBody The request body to include in the delete request
-     * @param callback The callback to handle the API response or failure
+     * @param callback    The callback to handle the API response or failure
      */
     public static void deleteAsync(String url, RequestBody requestBody, ApiResponseCallback callback) {
         Request request = new Request.Builder()
@@ -230,7 +238,6 @@ public class API {
             }
         });
     }
-
 
 
     public static JSONArray createJSONArray(String jsonString) {

@@ -24,7 +24,7 @@ public class WallColorMenu extends BlockListMenu {
         super.setItemClickEventsAsync();
 
         // Set click event for next item
-        if(canProceed())
+        if (canProceed())
             getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
                 Settings settings = GeneratorModule.getInstance().getHouse().getPlayerSettings().get(clickPlayer.getUniqueId());
 

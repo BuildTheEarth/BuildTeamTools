@@ -93,7 +93,7 @@ public class GeneratorModule extends Module {
     @Override
     public void registerListeners() {
         super.registerListeners(
-            new GeneratorListener()
+                new GeneratorListener()
         );
     }
 
@@ -110,9 +110,9 @@ public class GeneratorModule extends Module {
             return;
 
         // Tick all commands in the queue
-        for(Command command : new ArrayList<>(generatorCommands)){
+        for (Command command : new ArrayList<>(generatorCommands)) {
             if (command.getOperations().isEmpty()) {
-                if(!command.isFinished())
+                if (!command.isFinished())
                     command.finish();
                 generatorCommands.remove(command);
                 continue;
@@ -137,10 +137,11 @@ public class GeneratorModule extends Module {
 
     /**
      * Checks if a player is currently generating.
+     *
      * @param p The player to check.
      * @return True if the player is currently generating, false otherwise.
      */
-    public boolean isGenerating(Player p){
+    public boolean isGenerating(Player p) {
         for (Command command : generatorCommands)
             if (command.getPlayer().getUniqueId().equals(p.getUniqueId()))
                 return true;

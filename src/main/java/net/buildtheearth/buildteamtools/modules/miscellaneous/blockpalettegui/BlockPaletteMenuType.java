@@ -42,6 +42,7 @@ public enum BlockPaletteMenuType {
     private final Supplier<ItemStack[]> itemSupplier;
 
     private static final Map<String, BlockPaletteMenuType> keyToType = new HashMap<>();
+
     static {
         for (BlockPaletteMenuType type : values()) {
             keyToType.put(type.filterKey.toLowerCase(), type);
@@ -64,7 +65,9 @@ public enum BlockPaletteMenuType {
         this.itemSupplier = itemSupplier;
     }
 
-    /** Lookup enum by filter key (case-insensitive) */
+    /**
+     * Lookup enum by filter key (case-insensitive)
+     */
     public static BlockPaletteMenuType getMenuType(String key) {
         if (key == null) return null;
         return keyToType.get(key.toLowerCase());

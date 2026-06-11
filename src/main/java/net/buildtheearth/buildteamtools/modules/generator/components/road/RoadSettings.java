@@ -14,7 +14,7 @@ public class RoadSettings extends Settings {
     public static List<String> streetLampTypes = new ArrayList<>();
 
 
-    public RoadSettings(Player player){
+    public RoadSettings(Player player) {
         super(player);
 
         File directory = new File(GeneratorUtils.getWorldEditSchematicsFolderPath() + "/GeneratorCollections/roadpack/");
@@ -27,7 +27,7 @@ public class RoadSettings extends Settings {
         }
     }
 
-    public void setDefaultValues(){
+    public void setDefaultValues() {
 
         // Lane Count (Default: Fixed Value)
         setValue(RoadFlag.LANE_COUNT, 2);

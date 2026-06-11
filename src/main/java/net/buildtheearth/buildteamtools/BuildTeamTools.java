@@ -58,7 +58,8 @@ public class BuildTeamTools extends JavaPlugin {
     public void onDisable() {
         try {
             ModuleHandler.getInstance().disableAll(null);
-        } catch (NoClassDefFoundError ignored) {}
+        } catch (NoClassDefFoundError ignored) {
+        }
     }
 
 
@@ -68,7 +69,7 @@ public class BuildTeamTools extends JavaPlugin {
     }
 
     public FileConfiguration getConfig(ConfigUtil configType) {
-        if(ConfigUtil.getInstance() == null)
+        if (ConfigUtil.getInstance() == null)
             return null;
 
         return ConfigUtil.getInstance().configs[configType.ordinal()];

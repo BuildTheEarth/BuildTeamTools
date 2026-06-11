@@ -44,7 +44,7 @@ public class ExploreMenu extends AbstractMenu {
     @Override
     protected void setItemClickEventsAsync() {
         // Set click events for the continent items
-        for(Continent continent : Continent.values()) {
+        for (Continent continent : Continent.values()) {
             getMenu().getSlot(continent.getSlot()).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
 
@@ -57,7 +57,8 @@ public class ExploreMenu extends AbstractMenu {
 
 
     @Override
-    protected void setMenuItemsAsync() {}
+    protected void setMenuItemsAsync() {
+    }
 
 
     @Override

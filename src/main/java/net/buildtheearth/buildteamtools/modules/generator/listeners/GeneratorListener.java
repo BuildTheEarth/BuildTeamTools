@@ -17,9 +17,9 @@ public class GeneratorListener implements Listener {
     public void onCommand(PlayerCommandPreprocessEvent e) {
         Player p = e.getPlayer();
 
-        if(!GeneratorModule.getInstance().isGenerating(p))
+        if (!GeneratorModule.getInstance().isGenerating(p))
             return;
-        if(!e.getMessage().startsWith("//"))
+        if (!e.getMessage().startsWith("//"))
             return;
 
         e.setCancelled(true);
@@ -28,14 +28,14 @@ public class GeneratorListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onInteract(PlayerInteractEvent e){
+    public void onInteract(PlayerInteractEvent e) {
         Player p = e.getPlayer();
 
-        if(!GeneratorModule.getInstance().isGenerating(p))
+        if (!GeneratorModule.getInstance().isGenerating(p))
             return;
-        if(e.getItem() == null)
+        if (e.getItem() == null)
             return;
-        if(e.getItem().getType() != Material.WOODEN_AXE)
+        if (e.getItem().getType() != Material.WOODEN_AXE)
             return;
 
         e.setCancelled(true);

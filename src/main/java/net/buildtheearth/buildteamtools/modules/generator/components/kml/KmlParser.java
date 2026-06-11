@@ -10,14 +10,12 @@ import java.util.List;
 public class KmlParser {
     private final Player player;
 
-    public KmlParser(Player player){
+    public KmlParser(Player player) {
         this.player = player;
     }
 
-    
-    
-    public List<List<Coordinate>> extractCoordinates(String kmlString)
-    {       
+
+    public List<List<Coordinate>> extractCoordinates(String kmlString) {
         List<List<Coordinate>> result_lists = new ArrayList<>();
 
         //https://github.com/micromata/javaapiforkml
@@ -49,21 +47,20 @@ public class KmlParser {
         }
 
         return result_lists;
-            
+
     }
 
-    /** 
+    /**
      * returns all line-strings (also called "paths" or "poly-lines") from the KML content.
      * A linestring is a list of geo-coordinates that are interpreted as beeing connected by straight lines.
      * Note that a linestring is not automatically "closed", startpoint and endpoint can be different.
-     * 
+     * <p>
      * Note: Each placemark can have multiple linestrings when using the type "MultiGeometry".
-     * 
+     *
      * @param kmlString KML content
      * @return List<LineString>: A list of LineString objects, which themselves are lists of geocoordiantes.
      */
-    public List<LineString> extractLinestrings(String kmlString)
-    {       
+    public List<LineString> extractLinestrings(String kmlString) {
         List<LineString> linestrings = new ArrayList<>();
 
         //https://github.com/micromata/javaapiforkml
@@ -93,118 +90,104 @@ public class KmlParser {
         }
 
         return linestrings;
-            
+
     }
 
-    
-    /** 
+
+    /**
      * Finds all placemarks in the KML Document
+     *
      * @param container the document to search
      * @return List<Placemark>: the list of Placemark objects in the document
      */
-    private List<Placemark> findPlacemarks(Document container){
+    private List<Placemark> findPlacemarks(Document container) {
 
         //recursive search for placemarks in the document,            returns list of placemarks
         List<Placemark> placemarks = new ArrayList<>();
 
-         for (Feature feature : container.getFeature())
-         {
-            if (feature instanceof Placemark)  
-                placemarks.add((Placemark)feature);
-            //else if (feature instanceof Folder)
-            //    placemarks += findPlacemarks(feature);
-            else if (feature instanceof Document)
-            {
+        for (Feature feature : container.getFeature()) {
+            if (feature instanceof Placemark)
+                placemarks.add((Placemark) feature);
+                //else if (feature instanceof Folder)
+                //    placemarks += findPlacemarks(feature);
+            else if (feature instanceof Document) {
                 placemarks.addAll(findPlacemarks((Document) feature));
             }
         }
 
-        
+
         return placemarks;
     }
 
-    
-    /** 
+
+    /**
      * returns all LineStrings in the given KML Placemark
      * A placemark can have different geometry types. The type MultiGeometry can be used to create
      * arbitrarily complex hierarchies of Geometries.
-     * 
+     * <p>
      * This method only cares about LineString and MultiGeometry.
-     * 
+     * <p>
      * A placemark can have multiple linestrings when using the type "MultiGeometry".
-     * 
+     *
      * @param placemark the placemark to search
      * @return List<LineString>: A list of LineString objects, which themselves are lists of geocoordiantes.
      */
-    private List<LineString> findLineStrings(Placemark placemark){
+    private List<LineString> findLineStrings(Placemark placemark) {
         List<LineString> lines = new ArrayList<>();
 
         Geometry geom = placemark.getGeometry();
 
-        
-        if (geom instanceof LineString)
-        {
-            lines.add( (LineString) geom);
+
+        if (geom instanceof LineString) {
+            lines.add((LineString) geom);
         } else if (geom instanceof MultiGeometry mg) {
-            for (Geometry subgeom : mg.getGeometry())
-            {
-                if (subgeom instanceof LineString)
-                {
-                    lines.add( (LineString) subgeom);
-                } 
+            for (Geometry subgeom : mg.getGeometry()) {
+                if (subgeom instanceof LineString) {
+                    lines.add((LineString) subgeom);
+                }
             }
-        }
-        else {
+        } else {
             this.player.sendMessage(
-                String.format("§cPlacemark has geometry of unsupported type %s", geom.getClass().getName())); 
+                    String.format("§cPlacemark has geometry of unsupported type %s", geom.getClass().getName()));
         }
 
         return lines;
     }
 
-    /** 
+    /**
      * returns all coordinates in the geometry/geometriees of the KML Placemark geometry
      * A placemark can have different geometry types. The type MultiGeometry can be used to create
      * arbitrarily complex hierarchies of Geometries. We only support one layer of MultiGeometry,
-     *  so a Placemark geometry will only ever have List<List<Coordinate>> without any option to stack more levels of lists
-     *
+     * so a Placemark geometry will only ever have List<List<Coordinate>> without any option to stack more levels of lists
      *
      * @param geom the placemark to search
      */
-    private List<List<Coordinate>> getCoordinates(Geometry geom){
+    private List<List<Coordinate>> getCoordinates(Geometry geom) {
         List<List<Coordinate>> geometry_coords = new ArrayList<>();
 
         if (geom instanceof MultiGeometry mg) {
-            for (Geometry subgeom : mg.getGeometry())
-            {
+            for (Geometry subgeom : mg.getGeometry()) {
                 geometry_coords.add(getGeometryCoordinatesNoMulti(subgeom));//
             }
-        } else
-        {
+        } else {
             geometry_coords.add(getGeometryCoordinatesNoMulti(geom));
         }
 
         return geometry_coords;
     }
 
-    private List<Coordinate> getGeometryCoordinatesNoMulti(Geometry geom){
-        if (geom instanceof LineString)
-        {
+    private List<Coordinate> getGeometryCoordinatesNoMulti(Geometry geom) {
+        if (geom instanceof LineString) {
             return ((LineString) geom).getCoordinates();
-        }      
-        else if (geom instanceof LinearRing)
-        {
+        } else if (geom instanceof LinearRing) {
             return ((LinearRing) geom).getCoordinates();
-        } 
-        else if (geom instanceof Polygon)
-        {
+        } else if (geom instanceof Polygon) {
             return ((Polygon) geom).getOuterBoundaryIs().getLinearRing().getCoordinates();
-        }
-        else if (geom instanceof MultiGeometry){ 
-            this.player.sendMessage("§cPlacemark uses a MultiGeometry inside MultiGeometry, this is not supported!"); 
-        }else {
+        } else if (geom instanceof MultiGeometry) {
+            this.player.sendMessage("§cPlacemark uses a MultiGeometry inside MultiGeometry, this is not supported!");
+        } else {
             this.player.sendMessage(
-                String.format("§cPlacemark has geometry of unsupported type %s", geom.getClass().getName())); 
+                    String.format("§cPlacemark has geometry of unsupported type %s", geom.getClass().getName()));
         }
 
         return new ArrayList<Coordinate>();

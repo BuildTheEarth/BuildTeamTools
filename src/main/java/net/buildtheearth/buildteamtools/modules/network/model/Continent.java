@@ -29,16 +29,16 @@ public enum Continent {
 
     public List<Region> getCountries() {
         List<Region> countries = new ArrayList<>();
-        for(Region region : regions)
-            if(region.getType() == RegionType.COUNTRY)
+        for (Region region : regions)
+            if (region.getType() == RegionType.COUNTRY)
                 countries.add(region);
 
         return countries;
     }
 
     public static @NonNull Continent getByLabel(String label) {
-        for(Continent continent : Continent.values())
-            if(continent.getLabel().equalsIgnoreCase(label)) return continent;
+        for (Continent continent : Continent.values())
+            if (continent.getLabel().equalsIgnoreCase(label)) return continent;
 
         return Continent.OTHER;
     }

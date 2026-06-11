@@ -17,13 +17,14 @@ import org.jetbrains.annotations.NotNull;
 public class GeneratorCommand implements CommandExecutor {
 
 
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String cmdLabel, String @NotNull [] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String cmdLabel,
+                             String @NotNull [] args) {
         if (!(sender instanceof Player p)) {
             sender.sendMessage("§cOnly players can execute this command.");
             return true;
         }
 
-        if(!p.hasPermission(Permissions.GENERATOR_USE)) {
+        if (!p.hasPermission(Permissions.GENERATOR_USE)) {
             p.sendMessage(ChatHelper.getErrorString("You don't have permission to use this command!"));
             return true;
         }
@@ -48,7 +49,8 @@ public class GeneratorCommand implements CommandExecutor {
 
             // Command Usage: /gen rail ...
             case "rail":
-                p.sendMessage(Component.text("This generator have some serious issues and is currently disabled.", NamedTextColor.DARK_RED));
+                p.sendMessage(Component.text("This generator have some serious issues and is currently disabled.",
+                        NamedTextColor.DARK_RED));
                 //GeneratorModule.getInstance().getRail().analyzeCommand(p, args);
                 return true;
 
@@ -59,7 +61,8 @@ public class GeneratorCommand implements CommandExecutor {
 
             // Command Usage: /gen field ...
             case "field":
-                p.sendMessage(Component.text("This generator have some serious issues and is currently disabled.", NamedTextColor.DARK_RED));
+                p.sendMessage(Component.text("This generator have some serious issues and is currently disabled.",
+                        NamedTextColor.DARK_RED));
                 //GeneratorModule.getInstance().getField().analyzeCommand(p, args);
                 return true;
 
@@ -73,7 +76,8 @@ public class GeneratorCommand implements CommandExecutor {
                 ChatHelper.sendMessageBox(sender, "Generator History for " + p.getName(), () -> {
                     for (History.HistoryEntry history : GeneratorModule.getInstance().getPlayerHistory(p).getHistoryEntries()) {
                         long timeDifference = System.currentTimeMillis() - history.getTimeCreated();
-                        p.sendMessage("§e- " + history.getGeneratorType().name() + " §7-§e " + Utils.toDate(timeDifference) + " ago §7-§e " + history.getWorldEditCommandCount() + " Commands executed");
+                        p.sendMessage("§e- " + history.getGeneratorType().name() + " §7-§e " + Utils.toDate(timeDifference) +
+                                " ago §7-§e " + history.getWorldEditCommandCount() + " Commands executed");
                     }
                 });
                 return true;

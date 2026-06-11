@@ -67,7 +67,7 @@ public class TpllComponent extends ModuleComponent {
 
     public void processQueueForPlayer(@NonNull Player player) {
         ChatHelper.logDebug("Trying to process tpll queue for player: %s", player.displayName());
-        if(!tpllQueue.containsKey(player.getUniqueId())) return;
+        if (!tpllQueue.containsKey(player.getUniqueId())) return;
         Location tpllTarget = tpllQueue.get(player.getUniqueId());
         if (tpllTarget == null) return;
 
@@ -87,8 +87,9 @@ public class TpllComponent extends ModuleComponent {
 
     /**
      * Sends a plugin message with a tpll request to the target server and sends the player there.
-     * @param player The player to send to the new server.
-     * @param coordinates The coordinates to send the player to on join.
+     *
+     * @param player           The player to send to the new server.
+     * @param coordinates      The coordinates to send the player to on join.
      * @param targetServerName The server to send the player to.
      */
     public void tpllPlayer(@NotNull Player player, double @NotNull [] coordinates, String targetServerName) {

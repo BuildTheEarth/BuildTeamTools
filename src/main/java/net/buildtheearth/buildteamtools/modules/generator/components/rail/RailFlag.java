@@ -9,7 +9,7 @@ public enum RailFlag implements Flag {
     private final String flag;
     private final FlagType flagType;
 
-    RailFlag(String flag, FlagType flagType){
+    RailFlag(String flag, FlagType flagType) {
         this.flag = flag;
         this.flagType = flagType;
     }
@@ -24,9 +24,9 @@ public enum RailFlag implements Flag {
         return flagType;
     }
 
-    public static RailFlag byString(String flag){
-        for(RailFlag railFlag : RailFlag.values())
-            if(railFlag.getFlag().equalsIgnoreCase(flag))
+    public static RailFlag byString(String flag) {
+        for (RailFlag railFlag : RailFlag.values())
+            if (railFlag.getFlag().equalsIgnoreCase(flag))
                 return railFlag;
 
         return null;

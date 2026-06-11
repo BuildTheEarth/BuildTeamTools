@@ -28,13 +28,15 @@ public class TreeTypeMenu extends NameListMenu {
         super(player, TREE_TYPE_INV_NAME, getTreeTypes(), new GeneratorMenu(player, false), autoLoad);
     }
 
-    /** Get a list of all tree types */
+    /**
+     * Get a list of all tree types
+     */
     private static @NonNull List<MutablePair<ItemStack, String>> getTreeTypes() {
         List<MutablePair<ItemStack, String>> treeTypes = new ArrayList<>();
 
         treeTypes.add(new MutablePair<>(new Item(Objects.requireNonNull(XMaterial.LIME_CONCRETE.parseItem())).setDisplayName("Any").build(), "Any"));
 
-        for(TreeType treeType : TreeType.values())
+        for (TreeType treeType : TreeType.values())
             treeTypes.add(new MutablePair<>(Item.create(Objects.requireNonNull(XMaterial.OAK_SAPLING.get()), StringUtils.capitalize(treeType.getName())), treeType.getName()));
 
         return treeTypes;
@@ -45,7 +47,7 @@ public class TreeTypeMenu extends NameListMenu {
         super.setItemClickEventsAsync();
 
         // Set click event for next item
-        if(canProceed())
+        if (canProceed())
             getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
                 Settings settings = GeneratorModule.getInstance().getTree().getPlayerSettings().get(clickPlayer.getUniqueId());
 

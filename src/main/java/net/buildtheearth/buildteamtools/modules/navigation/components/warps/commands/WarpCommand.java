@@ -28,7 +28,7 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
         }
 
         // Check if the build team is loaded
-        if(NetworkModule.getInstance().getBuildTeam() == null){
+        if (NetworkModule.getInstance().getBuildTeam() == null) {
             sender.sendMessage(ChatHelper.getErrorString("The Warp Module is currently disabled because the Build Team failed to load!"));
             return true;
         }
@@ -68,7 +68,7 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
         // Find the warp with the given key
         Warp warp = NavigationModule.getInstance().getWarpsComponent().getWarpByName(key);
 
-        if(warp == null) {
+        if (warp == null) {
             player.sendMessage(ChatHelper.getErrorString("The warp with the name %s does not exist in this team!", key));
             return true;
         }

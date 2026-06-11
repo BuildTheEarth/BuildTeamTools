@@ -141,7 +141,7 @@ public class HeadFactory {
      * {@code TYPE_LETTER_X}. If the letter is invalid,
      * a QUESTION_MARK fallback texture is used.
      *
-     * @param type  letter style/type (e.g. WOODEN, STONE)
+     * @param type   letter style/type (e.g. WOODEN, STONE)
      * @param letter character input (A–Z)
      * @param name   display name
      * @param lore   optional lore (can be null)

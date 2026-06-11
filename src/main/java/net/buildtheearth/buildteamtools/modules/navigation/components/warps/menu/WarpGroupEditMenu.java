@@ -44,10 +44,11 @@ public class WarpGroupEditMenu extends AbstractMenu {
     private final WarpGroup warpGroup;
     private final boolean alreadyExists;
 
-    /** In this menu the player can update a warp.
+    /**
+     * In this menu the player can update a warp.
      * This can be used for example to change the name of a warp in the {@link WarpMenu}.
      *
-     * @param player  The player that is viewing the menu.
+     * @param player    The player that is viewing the menu.
      * @param warpGroup The warp that is being updated.
      */
     public WarpGroupEditMenu(Player player, WarpGroup warpGroup, boolean alreadyExists, boolean autoLoad) {
@@ -148,7 +149,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
             BookMenu bookMenu = new BookMenu(clickPlayer, "§6§lChange Description", clickPlayer.getName(), description, 240);
 
             bookMenu.onComplete(text -> {
-                if(text == null) {
+                if (text == null) {
                     clickPlayer.sendMessage("§cA problem occurred while saving the description.");
                     new WarpGroupEditMenu(clickPlayer, warpGroup, alreadyExists, true);
                     return;
@@ -156,7 +157,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
 
                 // Combine the first page to a single string
                 StringBuilder finalText = new StringBuilder(text.getFirst()[0]);
-                for(int i = 1; i < text.getFirst().length; i++)
+                for (int i = 1; i < text.getFirst().length; i++)
                     finalText.append("<br>").append(text.getFirst()[i]);
 
                 warpGroup.setDescription(finalText.toString());
@@ -180,7 +181,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
                         Integer selectedSlot = AlpsUtils.tryParseInt(stateSnapshot.getText());
 
                         // Make sure that the slot is a valid number and between 0 and 26
-                        if(!stateSnapshot.getText().matches("-?\\d+")
+                        if (!stateSnapshot.getText().matches("-?\\d+")
                                 || selectedSlot == null
                                 || selectedSlot < -1
                                 || selectedSlot > 26) {
@@ -199,7 +200,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
                                 .map(WarpGroup::getName)
                                 .findFirst();
 
-                        if(selectedSlot != -1 && warpGroups.isPresent()) {
+                        if (selectedSlot != -1 && warpGroups.isPresent()) {
                             return Arrays.asList(AnvilGUI.ResponseAction.close(),
                                     AnvilGUI.ResponseAction.run(() -> {
                                         clickPlayer.closeInventory();
@@ -240,7 +241,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
-            if(clickPlayer.hasPermission(Permissions.WARP_GROUP_DELETE)) {
+            if (clickPlayer.hasPermission(Permissions.WARP_GROUP_DELETE)) {
                 BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
                 if (buildTeam != null) {
                     buildTeam.deleteWarpGroup(clickPlayer, warpGroup);

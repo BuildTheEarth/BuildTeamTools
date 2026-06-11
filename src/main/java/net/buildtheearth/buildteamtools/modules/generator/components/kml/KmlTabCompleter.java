@@ -11,19 +11,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class KmlTabCompleter implements TabCompleter{
-    public KmlTabCompleter(){
+public class KmlTabCompleter implements TabCompleter {
+    public KmlTabCompleter() {
         //compile list of block material types for completion
         blocktypes = new ArrayList<String>();
-        for(Material mat : Material.values()) {
+        for (Material mat : Material.values()) {
             if (mat.isBlock())
                 blocktypes.add(mat.toString().toLowerCase());
-        }        
+        }
     }
 
 
-    public List<String> onTabComplete(@NonNull CommandSender sender, @NonNull Command command, @NonNull String alias, String @NonNull [] args)
-    {
+    public List<String> onTabComplete(@NonNull CommandSender sender, @NonNull Command command, @NonNull String alias, String @NonNull [] args) {
         //the player can use /geopoints and /geopath with a single argument: "undo" or Blocktype
         //
         List<String> completions = new ArrayList<>();
@@ -32,18 +31,17 @@ public class KmlTabCompleter implements TabCompleter{
             //alias kml only has undo as return option
             if (alias.equalsIgnoreCase("kml"))
                 completions.add("undo");
-            else if (args.length > 0){
+            else if (args.length > 0) {
                 //player has started to type an argument
                 //allowed arguments are blocktype and/or -extend:blocktype
-                String currentArg = args[args.length-1];
-                if (currentArg.startsWith("-")){
-                    if (currentArg.startsWith("-extend:")){
+                String currentArg = args[args.length - 1];
+                if (currentArg.startsWith("-")) {
+                    if (currentArg.startsWith("-extend:")) {
                         addMatchingBlocktypeCompletions(currentArg, completions, "-extend:");
-                    }else{
+                    } else {
                         completions.add("-extend:");
                     }
-                }
-                else {
+                } else {
                     //add all blocktypes that match the characters of the argument
                     addMatchingBlocktypeCompletions(currentArg, completions, "");
                 }
@@ -58,12 +56,11 @@ public class KmlTabCompleter implements TabCompleter{
         return completions;
     }
 
-    private void addMatchingBlocktypeCompletions(String currentArg, List<String> completions, String prefix)
-    {
+    private void addMatchingBlocktypeCompletions(String currentArg, List<String> completions, String prefix) {
         //add all blocktypes that match the characters of the argument
         String argWithoutPrefix = currentArg.substring(prefix.length());
-        for (String blocktype : blocktypes){
-            if (blocktype.startsWith(argWithoutPrefix.toLowerCase())){
+        for (String blocktype : blocktypes) {
+            if (blocktype.startsWith(argWithoutPrefix.toLowerCase())) {
                 completions.add(prefix + blocktype);
             }
         }

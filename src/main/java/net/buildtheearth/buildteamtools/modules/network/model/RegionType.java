@@ -18,8 +18,8 @@ public enum RegionType {
     }
 
     public static @NonNull RegionType getByLabel(String label) {
-        for(RegionType continent : RegionType.values())
-            if(continent.getLabel().equalsIgnoreCase(label)) return continent;
+        for (RegionType continent : RegionType.values())
+            if (continent.getLabel().equalsIgnoreCase(label)) return continent;
 
         return RegionType.COUNTRY;
     }

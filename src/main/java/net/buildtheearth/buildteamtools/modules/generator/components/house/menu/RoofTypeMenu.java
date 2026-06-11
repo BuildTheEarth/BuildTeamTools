@@ -22,7 +22,7 @@ public class RoofTypeMenu extends AbstractMenu {
 
     public static final String ROOF_COLOR_INV_NAME = "Choose a Roof Type";
 
-    public static final  int FLAT_ROOF_ITEM_SLOT = 9;
+    public static final int FLAT_ROOF_ITEM_SLOT = 9;
     public static final int GABLE_ROOF_ITEM_SLOT = 11;
     public static final int STEEP_SLAB_ROOF_ITEM_SLOT = 13;
     public static final int MEDIUM_SLAB_ROOF_ITEM_SLOT = 15;

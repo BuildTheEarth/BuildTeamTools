@@ -50,11 +50,12 @@ public class WarpEditMenu extends AbstractMenu {
     private final Warp warp;
     private final boolean alreadyExists;
 
-    /** In this menu the player can update a warp.
+    /**
+     * In this menu the player can update a warp.
      * This can be used for example to change the name of a warp in the {@link WarpMenu}.
      *
-     * @param player  The player that is viewing the menu.
-     * @param warp The warp that is being updated.
+     * @param player The player that is viewing the menu.
+     * @param warp   The warp that is being updated.
      */
     public WarpEditMenu(Player player, Warp warp, boolean alreadyExists, boolean autoLoad) {
         super(4, WARP_UPDATE_INV_NAME, player, autoLoad);
@@ -62,7 +63,7 @@ public class WarpEditMenu extends AbstractMenu {
         this.warp = warp;
         this.alreadyExists = alreadyExists;
 
-        if(!this.alreadyExists){
+        if (!this.alreadyExists) {
             NAME_SLOT = 18;
             GROUP_SLOT = 20;
             HIGHLIGHT_SLOT = 22;
@@ -81,7 +82,7 @@ public class WarpEditMenu extends AbstractMenu {
         getMenu().getSlot(WARP_SLOT).setItem(warp.getMaterialItem());
 
         // Set the location item if the warp already exists. Otherwise, the location is set automatically on creation.
-        if(alreadyExists){
+        if (alreadyExists) {
             ArrayList<String> locationLore = ListUtil.createList("", "§eWorld: §7" + warp.getWorldName(), "§eLatitude: §7" + warp.getLat(), "§eLongitude: §7" + warp.getLon(), "§eElevation: §7" + warp.getY());
             getMenu().getSlot(LOCATION_SLOT).setItem(Item.create(Objects.requireNonNull(XMaterial.COMPASS.get()), "§6§lChange Location", locationLore));
 
@@ -113,7 +114,7 @@ public class WarpEditMenu extends AbstractMenu {
         getMenu().getSlot(HIGHLIGHT_SLOT).setItem(Item.create(Objects.requireNonNull(XMaterial.NETHER_STAR.get()), warp.isHighlight() ? "§6§lMake Normal" : "§6§lMake Highlight", highlightLore));
 
         // Set the delete item
-        if(alreadyExists)
+        if (alreadyExists)
             getMenu().getSlot(DELETE_SLOT).setItem(Item.create(Objects.requireNonNull(XMaterial.BARRIER.get()), "§c§lDelete Warp", ListUtil.createList("", "§8Click to delete the warp.")));
     }
 
@@ -143,7 +144,7 @@ public class WarpEditMenu extends AbstractMenu {
                 GeographicalCoordinate coordinate = Projection.toGeo(new MinecraftCoordinate(location.getX(), location.getZ()));
 
                 //Get the country belonging to the coordinates
-                CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(new double[] {coordinate.latitude(), coordinate.longitude()} );
+                CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(new double[]{coordinate.latitude(), coordinate.longitude()});
 
                 future.thenAccept(result -> {
                     String regionName = result[0];
@@ -152,7 +153,7 @@ public class WarpEditMenu extends AbstractMenu {
                     //Check if the team owns this region/country
                     boolean ownsRegion = NetworkModule.getInstance().ownsRegion(regionName, countryCodeCCA2);
 
-                    if(!ownsRegion) {
+                    if (!ownsRegion) {
                         clickPlayer.sendMessage(ChatHelper.getErrorString("This team does not own the country %s!", result[0]));
                         return;
                     }
@@ -171,7 +172,8 @@ public class WarpEditMenu extends AbstractMenu {
                 }).exceptionally(e -> {
                     Throwable cause = e.getCause() != null ? e.getCause() : e;
                     clickPlayer.sendMessage(ChatHelper.getErrorString("Failed to change location: %s", cause.getMessage()));
-                    BuildTeamTools.getInstance().getComponentLogger().error("An error occurred while changing the location of the warp!", e);                    return null;
+                    BuildTeamTools.getInstance().getComponentLogger().error("An error occurred while changing the location of the warp!", e);
+                    return null;
                 });
             } catch (OutOfProjectionBoundsException e) {
                 clickPlayer.sendMessage(ChatHelper.getErrorString("Cannot set location here: %s", e.getMessage()));
@@ -242,12 +244,12 @@ public class WarpEditMenu extends AbstractMenu {
         });
 
         // Set click event for the delete item
-        if(alreadyExists)
+        if (alreadyExists)
             getMenu().getSlot(DELETE_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
-                if(clickPlayer.hasPermission(Permissions.WARP_DELETE)) {
+                if (clickPlayer.hasPermission(Permissions.WARP_DELETE)) {
                     BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
                     if (buildTeam != null) {
                         buildTeam.deleteWarp(clickPlayer, warp);

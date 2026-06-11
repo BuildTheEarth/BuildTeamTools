@@ -84,8 +84,7 @@ public class BlockPaletteCommand implements CommandExecutor, TabCompleter {
             // only "menu" or "filter"
             List<String> top = Arrays.asList("menu", "filter");
             StringUtil.copyPartialMatches(args[0], top, completions);
-        }
-        else if (args.length > 1 && args[0].equalsIgnoreCase("filter")) {
+        } else if (args.length > 1 && args[0].equalsIgnoreCase("filter")) {
             // suggest from BlockPalletMenuType.FILTER_OPTIONS
             StringUtil.copyPartialMatches(
                     args[args.length - 1],

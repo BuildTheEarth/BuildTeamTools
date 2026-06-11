@@ -28,7 +28,6 @@ public class StatsModule extends Module {
     private HashMap<UUID, StatsPlayer> statsPlayerList;
 
 
-
     private static StatsModule instance = null;
 
     public StatsModule() {
@@ -38,7 +37,6 @@ public class StatsModule extends Module {
     public static StatsModule getInstance() {
         return instance == null ? instance = new StatsModule() : instance;
     }
-
 
 
     @Override
@@ -68,7 +66,7 @@ public class StatsModule extends Module {
 
     @Override
     public void disable() {
-        if(!isEnabled())
+        if (!isEnabled())
             return;
 
         updateAndSave();

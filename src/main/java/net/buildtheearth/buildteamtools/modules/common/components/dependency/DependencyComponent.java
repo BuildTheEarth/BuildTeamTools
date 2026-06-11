@@ -17,7 +17,6 @@ public class DependencyComponent extends ModuleComponent {
     }
 
 
-
     /**
      * Checks if the plugin "WorldEdit" is enabled.
      *
@@ -27,10 +26,10 @@ public class DependencyComponent extends ModuleComponent {
         return BuildTeamTools.getInstance().getServer().getPluginManager().isPluginEnabled("WorldEdit");
     }
 
-    public boolean isLegacyWorldEdit(){
-        if(isFastAsyncWorldEditEnabled())
+    public boolean isLegacyWorldEdit() {
+        if (isFastAsyncWorldEditEnabled())
             return false;
-        if(!isWorldEditEnabled())
+        if (!isWorldEditEnabled())
             return false;
 
         String version = Objects.requireNonNull(BuildTeamTools.getInstance().getServer().getPluginManager()
@@ -68,7 +67,8 @@ public class DependencyComponent extends ModuleComponent {
     }
 
     /**
-     * Checks if the plugin <a href="https://github.com/AlpsBTE/Plot-System-Terra">PlotSystem-Terra</a> by BTE Alps is already enabled.
+     * Checks if the plugin <a href="https://github.com/AlpsBTE/Plot-System-Terra">PlotSystem-Terra</a>
+     * by BTE Alps is already enabled.
      *
      * @return True if PlotSystemTerra is enabled, false if it is not enabled
      */

@@ -618,76 +618,213 @@ public class MenuItems {
         return items;
     }
 
-    public static List<ItemStack> getSlabs()           { return bySuffix("_SLAB"); }
-    public static List<ItemStack> getStairs()          { return bySuffix("_STAIRS"); }
-    public static List<ItemStack> getFences()          { return bySuffix("_FENCE"); }
-    public static List<ItemStack> getLogs()            { return bySuffix("_LOG"); }
-    public static List<ItemStack> getWoods()           { return bySuffix("_WOOD"); }
-    public static List<ItemStack> getLeaves()          { return bySuffix("_LEAVES"); }
-    public static List<ItemStack> getGlass()           { return bySuffix("_GLASS", "_STAINED_GLASS"); }
-    public static List<ItemStack> getWools()           { return bySuffix("_WOOL"); }
-    public static List<ItemStack> getCarpets()         { return bySuffix("_CARPET"); }
+    public static List<ItemStack> getSlabs() {
+        return bySuffix("_SLAB");
+    }
+
+    public static List<ItemStack> getStairs() {
+        return bySuffix("_STAIRS");
+    }
+
+    public static List<ItemStack> getFences() {
+        return bySuffix("_FENCE");
+    }
+
+    public static List<ItemStack> getLogs() {
+        return bySuffix("_LOG");
+    }
+
+    public static List<ItemStack> getWoods() {
+        return bySuffix("_WOOD");
+    }
+
+    public static List<ItemStack> getLeaves() {
+        return bySuffix("_LEAVES");
+    }
+
+    public static List<ItemStack> getGlass() {
+        return bySuffix("_GLASS", "_STAINED_GLASS");
+    }
+
+    public static List<ItemStack> getWools() {
+        return bySuffix("_WOOL");
+    }
+
+    public static List<ItemStack> getCarpets() {
+        return bySuffix("_CARPET");
+    }
 
     // Added categories from module version:
-    public static List<ItemStack> getTerracotta()      { return bySuffix("_TERRACOTTA"); }
-    public static List<ItemStack> getConcrete()        { return bySuffix("_CONCRETE"); }
-    public static List<ItemStack> getConcretePowder()  { return bySuffix("_CONCRETE_POWDER"); }
-    public static List<ItemStack> getBeds()            { return bySuffix("_BED"); }
-    public static List<ItemStack> getCandles()         { return bySuffix("_CANDLE"); }
-    public static List<ItemStack> getBanners()         { return bySuffix("_BANNER"); }
-    public static List<ItemStack> getGlassPanes()      { return bySuffix("_GLASS_PANE"); }
-    public static List<ItemStack> getSigns()           { return bySuffix("_SIGN"); }
-    public static List<ItemStack> getShulkerBoxes()    { return bySuffix("_SHULKER_BOX"); }
-    public static List<ItemStack> getGates()           { return bySuffix("_GATE"); }
-    public static List<ItemStack> getWalls()           { return bySuffix("_WALL"); }
+    public static List<ItemStack> getTerracotta() {
+        return bySuffix("_TERRACOTTA");
+    }
+
+    public static List<ItemStack> getConcrete() {
+        return bySuffix("_CONCRETE");
+    }
+
+    public static List<ItemStack> getConcretePowder() {
+        return bySuffix("_CONCRETE_POWDER");
+    }
+
+    public static List<ItemStack> getBeds() {
+        return bySuffix("_BED");
+    }
+
+    public static List<ItemStack> getCandles() {
+        return bySuffix("_CANDLE");
+    }
+
+    public static List<ItemStack> getBanners() {
+        return bySuffix("_BANNER");
+    }
+
+    public static List<ItemStack> getGlassPanes() {
+        return bySuffix("_GLASS_PANE");
+    }
+
+    public static List<ItemStack> getSigns() {
+        return bySuffix("_SIGN");
+    }
+
+    public static List<ItemStack> getShulkerBoxes() {
+        return bySuffix("_SHULKER_BOX");
+    }
+
+    public static List<ItemStack> getGates() {
+        return bySuffix("_GATE");
+    }
+
+    public static List<ItemStack> getWalls() {
+        return bySuffix("_WALL");
+    }
 
     // ----------------- ARRAY convenience (for wrapper) -----------------
-    public static ItemStack[] getBlocksByColorArray()  { return toArray(getBlocksByColor()); }
-    public static ItemStack[] getSlabsArray()          { return toArray(getSlabs()); }
-    public static ItemStack[] getStairsArray()         { return toArray(getStairs()); }
-    public static ItemStack[] getWallsArray()          { return toArray(getWalls()); }
-    public static ItemStack[] getLogsArray()           { return toArray(getLogs()); }
-    public static ItemStack[] getLeavesArray()         { return toArray(getLeaves()); }
-    public static ItemStack[] getFencesArray()         { return toArray(getFences()); }
-    public static ItemStack[] getGlassArray()          { return toArray(getGlass()); }
-    public static ItemStack[] getCarpetArray()         { return toArray(getCarpets()); }
-    public static ItemStack[] getWoolArray()           { return toArray(getWools()); }
-    public static ItemStack[] getTerracottaArray()     { return toArray(getTerracotta()); }
-    public static ItemStack[] getConcreteArray()       { return toArray(getConcrete()); }
-    public static ItemStack[] getConcretePowderArray() { return toArray(getConcretePowder()); }
-    public static ItemStack[] getBedsArray()           { return toArray(getBeds()); }
-    public static ItemStack[] getCandlesArray()        { return toArray(getCandles()); }
-    public static ItemStack[] getBannersArray()        { return toArray(getBanners()); }
-    public static ItemStack[] getGlassPanesArray()     { return toArray(getGlassPanes()); }
-    public static ItemStack[] getSignsArray()          { return toArray(getSigns()); }
-    public static ItemStack[] getShulkerBoxesArray()   { return toArray(getShulkerBoxes()); }
-    public static ItemStack[] getGatesArray()          { return toArray(getGates()); }
+    public static ItemStack[] getBlocksByColorArray() {
+        return toArray(getBlocksByColor());
+    }
+
+    public static ItemStack[] getSlabsArray() {
+        return toArray(getSlabs());
+    }
+
+    public static ItemStack[] getStairsArray() {
+        return toArray(getStairs());
+    }
+
+    public static ItemStack[] getWallsArray() {
+        return toArray(getWalls());
+    }
+
+    public static ItemStack[] getLogsArray() {
+        return toArray(getLogs());
+    }
+
+    public static ItemStack[] getLeavesArray() {
+        return toArray(getLeaves());
+    }
+
+    public static ItemStack[] getFencesArray() {
+        return toArray(getFences());
+    }
+
+    public static ItemStack[] getGlassArray() {
+        return toArray(getGlass());
+    }
+
+    public static ItemStack[] getCarpetArray() {
+        return toArray(getCarpets());
+    }
+
+    public static ItemStack[] getWoolArray() {
+        return toArray(getWools());
+    }
+
+    public static ItemStack[] getTerracottaArray() {
+        return toArray(getTerracotta());
+    }
+
+    public static ItemStack[] getConcreteArray() {
+        return toArray(getConcrete());
+    }
+
+    public static ItemStack[] getConcretePowderArray() {
+        return toArray(getConcretePowder());
+    }
+
+    public static ItemStack[] getBedsArray() {
+        return toArray(getBeds());
+    }
+
+    public static ItemStack[] getCandlesArray() {
+        return toArray(getCandles());
+    }
+
+    public static ItemStack[] getBannersArray() {
+        return toArray(getBanners());
+    }
+
+    public static ItemStack[] getGlassPanesArray() {
+        return toArray(getGlassPanes());
+    }
+
+    public static ItemStack[] getSignsArray() {
+        return toArray(getSigns());
+    }
+
+    public static ItemStack[] getShulkerBoxesArray() {
+        return toArray(getShulkerBoxes());
+    }
+
+    public static ItemStack[] getGatesArray() {
+        return toArray(getGates());
+    }
 
     /**
      * Filter selector (array form) mirroring the module's getItemsByFilter(String).
      */
     public static ItemStack[] getItemsByFilterArray(String filter) {
         switch (filter.toLowerCase(Locale.ROOT)) {
-            case "slabs":            return getSlabsArray();
-            case "stairs":           return getStairsArray();
-            case "walls":            return getWallsArray();
-            case "logs":             return getLogsArray();
-            case "leaves":           return getLeavesArray();
-            case "fences":           return getFencesArray();
-            case "carpet":           return getCarpetArray();
-            case "wool":             return getWoolArray();
-            case "terracotta":       return getTerracottaArray();
-            case "concrete":         return getConcreteArray();
-            case "concrete_powder":  return getConcretePowderArray();
-            case "bed":              return getBedsArray();
-            case "candle":           return getCandlesArray();
-            case "banner":           return getBannersArray();
-            case "glass_pane":       return getGlassPanesArray();
-            case "signs":            return getSignsArray();
-            case "shulker_boxes":    return getShulkerBoxesArray();
-            case "gates":            return getGatesArray();
-            case "glass":            return getGlassArray();
-            default:                 return getBlocksByColorArray();
+            case "slabs":
+                return getSlabsArray();
+            case "stairs":
+                return getStairsArray();
+            case "walls":
+                return getWallsArray();
+            case "logs":
+                return getLogsArray();
+            case "leaves":
+                return getLeavesArray();
+            case "fences":
+                return getFencesArray();
+            case "carpet":
+                return getCarpetArray();
+            case "wool":
+                return getWoolArray();
+            case "terracotta":
+                return getTerracottaArray();
+            case "concrete":
+                return getConcreteArray();
+            case "concrete_powder":
+                return getConcretePowderArray();
+            case "bed":
+                return getBedsArray();
+            case "candle":
+                return getCandlesArray();
+            case "banner":
+                return getBannersArray();
+            case "glass_pane":
+                return getGlassPanesArray();
+            case "signs":
+                return getSignsArray();
+            case "shulker_boxes":
+                return getShulkerBoxesArray();
+            case "gates":
+                return getGatesArray();
+            case "glass":
+                return getGlassArray();
+            default:
+                return getBlocksByColorArray();
         }
     }
 
@@ -716,56 +853,105 @@ public class MenuItems {
      */
     public static XMaterial convertStairToBlock(XMaterial stair) {
         switch (stair) {
-            case QUARTZ_STAIRS: return QUARTZ_BLOCK;
-            case POLISHED_BLACKSTONE_BRICK_STAIRS: return POLISHED_BLACKSTONE_BRICKS;
-            case POLISHED_BLACKSTONE_STAIRS: return POLISHED_BLACKSTONE;
-            case BLACKSTONE_STAIRS: return BLACKSTONE;
-            case DEEPSLATE_TILE_STAIRS: return DEEPSLATE_TILES;
-            case DEEPSLATE_BRICK_STAIRS: return DEEPSLATE_BRICKS;
-            case POLISHED_DEEPSLATE_STAIRS: return POLISHED_DEEPSLATE;
-            case COBBLED_DEEPSLATE_STAIRS: return COBBLED_DEEPSLATE;
-            case STONE_BRICK_STAIRS: return STONE_BRICKS;
-            case POLISHED_ANDESITE_STAIRS: return POLISHED_ANDESITE;
-            case STONE_STAIRS: return STONE;
-            case ANDESITE_STAIRS: return ANDESITE;
-            case POLISHED_DIORITE_STAIRS: return POLISHED_DIORITE;
-            case DIORITE_STAIRS: return DIORITE;
-            case SMOOTH_QUARTZ_STAIRS: return SMOOTH_QUARTZ;
-            case CHERRY_STAIRS: return CHERRY_PLANKS;
-            case PURPUR_STAIRS: return PURPUR_BLOCK;
-            case WARPED_STAIRS: return WARPED_PLANKS;
-            case DARK_PRISMARINE_STAIRS: return DARK_PRISMARINE;
-            case OXIDIZED_CUT_COPPER_STAIRS: return OXIDIZED_CUT_COPPER;
-            case PRISMARINE_BRICK_STAIRS: return PRISMARINE_BRICKS;
-            case PRISMARINE_STAIRS: return PRISMARINE;
-            case WEATHERED_CUT_COPPER_STAIRS: return WEATHERED_CUT_COPPER;
-            case MOSSY_COBBLESTONE_STAIRS: return MOSSY_COBBLESTONE;
-            case MOSSY_STONE_BRICK_STAIRS: return MOSSY_STONE_BRICKS;
-            case EXPOSED_CUT_COPPER_STAIRS: return EXPOSED_CUT_COPPER;
-            case POLISHED_GRANITE_STAIRS: return POLISHED_GRANITE;
-            case GRANITE_STAIRS: return GRANITE;
-            case JUNGLE_STAIRS: return JUNGLE_PLANKS;
-            case MUD_BRICK_STAIRS: return MUD_BRICKS;
-            case BIRCH_STAIRS: return BIRCH_PLANKS;
-            case END_STONE_BRICK_STAIRS: return END_STONE_BRICKS;
-            case SANDSTONE_STAIRS: return SANDSTONE;
-            case SMOOTH_SANDSTONE_STAIRS: return SMOOTH_SANDSTONE;
-            case BAMBOO_MOSAIC_STAIRS: return BAMBOO_MOSAIC;
-            case BAMBOO_STAIRS: return BAMBOO_PLANKS;
-            case RED_SANDSTONE_STAIRS: return RED_SANDSTONE;
-            case SMOOTH_RED_SANDSTONE_STAIRS: return SMOOTH_RED_SANDSTONE;
-            case ACACIA_STAIRS: return ACACIA_PLANKS;
-            case BRICK_STAIRS: return BRICKS;
-            case CUT_COPPER_STAIRS: return CUT_COPPER;
-            case RED_NETHER_BRICK_STAIRS: return RED_NETHER_BRICKS;
-            case MANGROVE_STAIRS: return MANGROVE_PLANKS;
-            case CRIMSON_STAIRS: return CRIMSON_PLANKS;
-            case NETHER_BRICK_STAIRS: return NETHER_BRICKS;
-            case DARK_OAK_STAIRS: return DARK_OAK_PLANKS;
-            case SPRUCE_STAIRS: return SPRUCE_PLANKS;
-            case OAK_STAIRS: return OAK_PLANKS;
+            case QUARTZ_STAIRS:
+                return QUARTZ_BLOCK;
+            case POLISHED_BLACKSTONE_BRICK_STAIRS:
+                return POLISHED_BLACKSTONE_BRICKS;
+            case POLISHED_BLACKSTONE_STAIRS:
+                return POLISHED_BLACKSTONE;
+            case BLACKSTONE_STAIRS:
+                return BLACKSTONE;
+            case DEEPSLATE_TILE_STAIRS:
+                return DEEPSLATE_TILES;
+            case DEEPSLATE_BRICK_STAIRS:
+                return DEEPSLATE_BRICKS;
+            case POLISHED_DEEPSLATE_STAIRS:
+                return POLISHED_DEEPSLATE;
+            case COBBLED_DEEPSLATE_STAIRS:
+                return COBBLED_DEEPSLATE;
+            case STONE_BRICK_STAIRS:
+                return STONE_BRICKS;
+            case POLISHED_ANDESITE_STAIRS:
+                return POLISHED_ANDESITE;
+            case STONE_STAIRS:
+                return STONE;
+            case ANDESITE_STAIRS:
+                return ANDESITE;
+            case POLISHED_DIORITE_STAIRS:
+                return POLISHED_DIORITE;
+            case DIORITE_STAIRS:
+                return DIORITE;
+            case SMOOTH_QUARTZ_STAIRS:
+                return SMOOTH_QUARTZ;
+            case CHERRY_STAIRS:
+                return CHERRY_PLANKS;
+            case PURPUR_STAIRS:
+                return PURPUR_BLOCK;
+            case WARPED_STAIRS:
+                return WARPED_PLANKS;
+            case DARK_PRISMARINE_STAIRS:
+                return DARK_PRISMARINE;
+            case OXIDIZED_CUT_COPPER_STAIRS:
+                return OXIDIZED_CUT_COPPER;
+            case PRISMARINE_BRICK_STAIRS:
+                return PRISMARINE_BRICKS;
+            case PRISMARINE_STAIRS:
+                return PRISMARINE;
+            case WEATHERED_CUT_COPPER_STAIRS:
+                return WEATHERED_CUT_COPPER;
+            case MOSSY_COBBLESTONE_STAIRS:
+                return MOSSY_COBBLESTONE;
+            case MOSSY_STONE_BRICK_STAIRS:
+                return MOSSY_STONE_BRICKS;
+            case EXPOSED_CUT_COPPER_STAIRS:
+                return EXPOSED_CUT_COPPER;
+            case POLISHED_GRANITE_STAIRS:
+                return POLISHED_GRANITE;
+            case GRANITE_STAIRS:
+                return GRANITE;
+            case JUNGLE_STAIRS:
+                return JUNGLE_PLANKS;
+            case MUD_BRICK_STAIRS:
+                return MUD_BRICKS;
+            case BIRCH_STAIRS:
+                return BIRCH_PLANKS;
+            case END_STONE_BRICK_STAIRS:
+                return END_STONE_BRICKS;
+            case SANDSTONE_STAIRS:
+                return SANDSTONE;
+            case SMOOTH_SANDSTONE_STAIRS:
+                return SMOOTH_SANDSTONE;
+            case BAMBOO_MOSAIC_STAIRS:
+                return BAMBOO_MOSAIC;
+            case BAMBOO_STAIRS:
+                return BAMBOO_PLANKS;
+            case RED_SANDSTONE_STAIRS:
+                return RED_SANDSTONE;
+            case SMOOTH_RED_SANDSTONE_STAIRS:
+                return SMOOTH_RED_SANDSTONE;
+            case ACACIA_STAIRS:
+                return ACACIA_PLANKS;
+            case BRICK_STAIRS:
+                return BRICKS;
+            case CUT_COPPER_STAIRS:
+                return CUT_COPPER;
+            case RED_NETHER_BRICK_STAIRS:
+                return RED_NETHER_BRICKS;
+            case MANGROVE_STAIRS:
+                return MANGROVE_PLANKS;
+            case CRIMSON_STAIRS:
+                return CRIMSON_PLANKS;
+            case NETHER_BRICK_STAIRS:
+                return NETHER_BRICKS;
+            case DARK_OAK_STAIRS:
+                return DARK_OAK_PLANKS;
+            case SPRUCE_STAIRS:
+                return SPRUCE_PLANKS;
+            case OAK_STAIRS:
+                return OAK_PLANKS;
             case COBBLESTONE_STAIRS:
-            default: return COBBLESTONE;
+            default:
+                return COBBLESTONE;
         }
     }
 }

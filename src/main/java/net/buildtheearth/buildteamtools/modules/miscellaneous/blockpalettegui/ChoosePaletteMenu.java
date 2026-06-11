@@ -102,8 +102,11 @@ public class ChoosePaletteMenu extends AbstractMenu {
                 String title = (on ? "§a✔ " : "§c✘ ") + type.getReadableName();
 
                 ItemStack[] supplied = null;
-                try { supplied = (type.getItemSupplier() != null) ? type.getItemSupplier().get() : null; }
-                catch (Exception e) { plugin.getLogger().log(Level.SEVERE, "Supplier failed for " + key, e); }
+                try {
+                    supplied = (type.getItemSupplier() != null) ? type.getItemSupplier().get() : null;
+                } catch (Exception e) {
+                    plugin.getLogger().log(Level.SEVERE, "Supplier failed for " + key, e);
+                }
 
                 ItemStack icon;
                 if (supplied != null && supplied.length > 0 && supplied[0] != null) {
@@ -192,7 +195,8 @@ public class ChoosePaletteMenu extends AbstractMenu {
                                 if (typeKey.equals(key)) {
                                     ItemStack[] items = (type.getItemSupplier() != null) ? type.getItemSupplier().get() : null;
                                     List<String> blockNames = new ArrayList<>();
-                                    if (items != null) for (ItemStack it : items) if (it != null) blockNames.add(it.getType().name());
+                                    if (items != null)
+                                        for (ItemStack it : items) if (it != null) blockNames.add(it.getType().name());
                                     new EditPaletteMenu(manager, p, plugin, key, type.getReadableName(), "", blockNames).open();
                                     return;
                                 }
@@ -221,8 +225,11 @@ public class ChoosePaletteMenu extends AbstractMenu {
     }
 
     private boolean hasEditPermission() {
-        try { return getMenuPlayer().hasPermission(EDIT_PERMISSION); }
-        catch (Exception e) { return false; }
+        try {
+            return getMenuPlayer().hasPermission(EDIT_PERMISSION);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public void open() {
@@ -241,7 +248,8 @@ public class ChoosePaletteMenu extends AbstractMenu {
                 meta.setLore(lore);
                 stack.setItemMeta(meta);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     private List<String> getLore(ItemStack stack) {
@@ -249,13 +257,16 @@ public class ChoosePaletteMenu extends AbstractMenu {
             if (stack != null && stack.hasItemMeta() && stack.getItemMeta().hasLore()) {
                 return new ArrayList<>(Objects.requireNonNull(stack.getItemMeta().getLore()));
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         return Collections.emptyList();
     }
 
     private void logError(String ctx, Throwable t) {
-        try { plugin.getLogger().log(Level.SEVERE, "[ChoosePalleteMenu] " + ctx + " failed: " + t.getMessage(), t); }
-        catch (Exception ignore) {}
+        try {
+            plugin.getLogger().log(Level.SEVERE, "[ChoosePalleteMenu] " + ctx + " failed: " + t.getMessage(), t);
+        } catch (Exception ignore) {
+        }
     }
 
     private String toTitleCase(String s) {

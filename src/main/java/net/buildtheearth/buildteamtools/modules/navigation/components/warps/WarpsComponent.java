@@ -56,24 +56,25 @@ public class WarpsComponent extends ModuleComponent {
      */
     public void addWarpToQueue(@NotNull ByteArrayDataInput in, Player player) {
         // Extracts the warp key from the plugin message
-            String warpKey = in.readUTF();
+        String warpKey = in.readUTF();
         Warp warp = getWarpByKey(warpKey);
 
-            if (warp == null) {
-                player.sendMessage(ChatHelper.getErrorString("The warp you tried to warp to does not exist anymore."));
-                return;
-            }
+        if (warp == null) {
+            player.sendMessage(ChatHelper.getErrorString("The warp you tried to warp to does not exist anymore."));
+            return;
+        }
 
-            Location targetWarpLocation = NavUtils.getLocationFromCoordinatesYawPitch(new GeographicalCoordinate(warp.getLat(), warp.getLon()), warp.getYaw(), warp.getPitch());
-            targetWarpLocation.setY(warp.getY());
-            targetWarpLocation.setWorld(Bukkit.getWorld(warp.getWorldName()));
+        Location targetWarpLocation = NavUtils.getLocationFromCoordinatesYawPitch(new GeographicalCoordinate(warp.getLat(), warp.getLon()), warp.getYaw(), warp.getPitch());
+        targetWarpLocation.setY(warp.getY());
+        targetWarpLocation.setWorld(Bukkit.getWorld(warp.getWorldName()));
 
-            // Adds the event to the list, to be dealt with by the join listener
-            warpQueue.put(player.getUniqueId(), targetWarpLocation);
+        // Adds the event to the list, to be dealt with by the join listener
+        warpQueue.put(player.getUniqueId(), targetWarpLocation);
     }
 
     /**
      * Checks if there is a warp in the queue of the current server and teleports the player if this is the case
+     *
      * @param player the player to check the queue for
      */
     public void processQueueForPlayer(Player player) {
@@ -83,7 +84,7 @@ public class WarpsComponent extends ModuleComponent {
             return;
         }
 
-        if(player.teleport(targetWarpLocation)) {
+        if (player.teleport(targetWarpLocation)) {
             ChatHelper.sendSuccessfulMessage(player, "Successfully warped you to the desired location!");
         } else {
             player.sendMessage(ChatHelper.getErrorString("Something went wrong trying to warp you to the desired location."));
@@ -96,8 +97,9 @@ public class WarpsComponent extends ModuleComponent {
     /**
      * Sends a plugin message to add the warp to the queue of the target server
      * Then switches the player to that server
+     *
      * @param player The player to warp
-     * @param warp The warp to teleport the player to
+     * @param warp   The warp to teleport the player to
      */
     public void warpPlayer(Player player, @NotNull Warp warp) {
         // If the warp is in the same team, just teleport the player
@@ -106,7 +108,7 @@ public class WarpsComponent extends ModuleComponent {
             ChatHelper.logDebug("Warping player %s to warp %s", player.getName(), warp.getName());
             Location loc = NavUtils.getLocationFromCoordinatesYawPitch(new GeographicalCoordinate(warp.getLat(), warp.getLon()), warp.getYaw(), warp.getPitch());
 
-            if(loc.getWorld() == null) {
+            if (loc.getWorld() == null) {
                 World world = Bukkit.getWorld(warp.getWorldName()) == null ? player.getWorld() : Bukkit.getWorld(warp.getWorldName());
                 loc.setWorld(world);
             }
@@ -155,7 +157,8 @@ public class WarpsComponent extends ModuleComponent {
         createWarp(creator, group);
     }
 
-    /** Creates a warp at the player's location and opens the warp edit menu.
+    /**
+     * Creates a warp at the player's location and opens the warp edit menu.
      *
      * @param creator The player that is creating the warp
      */
@@ -166,7 +169,7 @@ public class WarpsComponent extends ModuleComponent {
             GeographicalCoordinate coordinate = Projection.toGeo(new MinecraftCoordinate(location.getX(), location.getZ()));
 
             //Get the country belonging to the coordinates
-            CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(new double[] { coordinate.latitude(), coordinate.longitude() });
+            CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(new double[]{coordinate.latitude(), coordinate.longitude()});
 
             future.thenAccept(result -> {
                 String regionName = result[0];
@@ -175,7 +178,7 @@ public class WarpsComponent extends ModuleComponent {
                 //Check if the team owns this region/country
                 boolean ownsRegion = NetworkModule.getInstance().ownsRegion(regionName, countryCodeCCA2);
 
-                if(!ownsRegion) {
+                if (!ownsRegion) {
                     creator.sendMessage(ChatHelper.getErrorString("This team does not own the country %s!", result[0]));
                     return;
                 }
@@ -217,7 +220,7 @@ public class WarpsComponent extends ModuleComponent {
     //          GETTER           //
     // ------------------------- //
 
-    public Warp getWarpByName(String name){
+    public Warp getWarpByName(String name) {
         BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
         if (buildTeam == null) return null;
         return getWarpByName(buildTeam, name);

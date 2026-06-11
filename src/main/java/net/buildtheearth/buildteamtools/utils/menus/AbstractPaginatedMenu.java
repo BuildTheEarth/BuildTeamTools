@@ -151,7 +151,6 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
 
         return HeadFactory.head(HeadTexture.WHITE_ARROW_RIGHT, "§eNext Page §7- §f" + (getPage() + 1));
     }
-    
 
 
     /**
@@ -179,7 +178,7 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
         reloadMenuAsync(true);
     }
 
-    protected void setSwitchPageItems(int switchPageItemSlot){
+    protected void setSwitchPageItems(int switchPageItemSlot) {
         int currentPage = getPage();
 
         // Set previous page item
@@ -192,7 +191,7 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
         getMenu().getSlot(switchPageItemSlot + 1).setItem(getNextPageItem());
     }
 
-    protected void setSwitchPageItemClickEvents(int switchPageItemSlot){
+    protected void setSwitchPageItemClickEvents(int switchPageItemSlot) {
         // Set click event for previous page item
         getMenu().getSlot(switchPageItemSlot - 1).setClickHandler((clickPlayer, clickInformation) -> {
             if (hasPreviousPage()) {

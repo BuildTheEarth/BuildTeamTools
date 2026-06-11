@@ -59,7 +59,7 @@ public abstract class AbstractMenu {
      * NOTE: This method gets called before class is loaded!
      */
     protected void setPreviewItems() {
-        if(getMask() != null) getMask().apply(getMenu());
+        if (getMask() != null) getMask().apply(getMenu());
         getMenu().open(getMenuPlayer());
     }
 
@@ -70,7 +70,7 @@ public abstract class AbstractMenu {
     protected void reloadMenuAsync() {
         setPreviewItems();
         Bukkit.getScheduler().runTaskAsynchronously(BuildTeamTools.getInstance(), () -> {
-            try{
+            try {
                 setMenuItemsAsync();
                 setItemClickEventsAsync();
             } catch (Exception e) {
@@ -101,15 +101,15 @@ public abstract class AbstractMenu {
      * It places the items in the open inventory of the player with the given slot as the current value item as a reference.
      * The plus and minus items are placed to the left and right of the current value item.
      *
-     * @param sliderColor Color of the slider
+     * @param sliderColor    Color of the slider
      * @param sliderItemSlot Slot of the current value item in the center
-     * @param sliderName Name of the slider
-     * @param value Current value of the slider
-     * @param minValue Minimum value of the slider
-     * @param maxValue Maximum value of the slider
-     * @param valueType Type of the value (e.g. "m", "°C", "°F", "blocks", "chunks", "seconds", "minutes", "hours", "days", "weeks", "months", "years", ...)
+     * @param sliderName     Name of the slider
+     * @param value          Current value of the slider
+     * @param minValue       Minimum value of the slider
+     * @param maxValue       Maximum value of the slider
+     * @param valueType      Type of the value (e.g. "m", "°C", "°F", "blocks", "chunks", "seconds", "minutes", "hours", "days", "weeks", "months", "years", ...)
      */
-    protected void createCounter(HeadColor sliderColor, int sliderItemSlot, String sliderName, int value, int minValue, int maxValue, String valueType){
+    protected void createCounter(HeadColor sliderColor, int sliderItemSlot, String sliderName, int value, int minValue, int maxValue, String valueType) {
         // Set previous page item
         getMenu().getSlot(sliderItemSlot - 1).setItem(HeadFactory.getCounterMinusItem(sliderColor, sliderName, value, minValue));
 
@@ -127,15 +127,15 @@ public abstract class AbstractMenu {
      * It places the items in the open inventory of the player with the given slot as the current block item as a reference.
      * To the left and right of the block item are toggle off items that let the player disable that feature if he doesn't want to use it.
      *
-     * @param sliderColor Color of the slider
+     * @param sliderColor    Color of the slider
      * @param sliderItemSlot Slot of the current block item in the center
-     * @param sliderName Name of the slider
-     * @param current Current block item
+     * @param sliderName     Name of the slider
+     * @param current        Current block item
      */
-    protected void setChoiceItems(HeadColor sliderColor, int sliderItemSlot, String sliderName, ItemStack current){
+    protected void setChoiceItems(HeadColor sliderColor, int sliderItemSlot, String sliderName, ItemStack current) {
         sliderName = "§e" + sliderName;
 
-        if(current == null) {
+        if (current == null) {
             // Set previous page item
             getMenu().getSlot(sliderItemSlot - 1).setItem(HeadFactory.colorizedHead(sliderColor, HeadTexture.WHITE_BLANK, sliderName + ": §c§lOFF"));
 
@@ -144,7 +144,7 @@ public abstract class AbstractMenu {
 
             // Set next page item
             getMenu().getSlot(sliderItemSlot + 1).setItem(HeadFactory.colorizedHead(sliderColor, HeadTexture.WHITE_BLANK, sliderName + ": §c§lOFF"));
-        }else{
+        } else {
             ItemMeta meta = current.getItemMeta();
             meta.setDisplayName(sliderName);
             current.setItemMeta(meta);
@@ -160,11 +160,12 @@ public abstract class AbstractMenu {
         }
     }
 
-    /** Sets the back item in the given slot
+    /**
+     * Sets the back item in the given slot
      *
      * @param slot Slot of the back item
      */
-    protected void setBackItem(int slot, AbstractMenu backMenu){
+    protected void setBackItem(int slot, AbstractMenu backMenu) {
         getMenu().getSlot(slot).setItem(HeadFactory.head(HeadTexture.WHITE_BACKWARD, "§eBack"));
         getMenu().getSlot(slot).setClickHandler((clickPlayer, clickInformation) -> Bukkit.getScheduler().scheduleSyncDelayedTask(BuildTeamTools.getInstance(), () -> {
             clickPlayer.closeInventory();

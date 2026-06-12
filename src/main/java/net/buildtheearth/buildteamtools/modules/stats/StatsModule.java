@@ -51,13 +51,6 @@ public class StatsModule extends Module {
             return;
         }
 
-        try {
-            if (!Bukkit.getServerConfig().isProxyEnabled()) {
-                shutdown("The Build Team have to be connected to the BtE Network (Proxy).");
-                return;
-            }
-        } catch (NoSuchMethodError e) { /* it's fine - we assume proxy is enabled This Method only exist in 1.21.5+ */}
-
         statsServer = new StatsServer();
         statsPlayerList = new HashMap<>();
 

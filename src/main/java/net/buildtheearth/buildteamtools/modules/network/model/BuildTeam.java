@@ -2,6 +2,7 @@ package net.buildtheearth.buildteamtools.modules.network.model;
 
 import com.alpsbte.alpslib.utils.ChatHelper;
 import lombok.Getter;
+import lombok.Setter;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.Warp;
@@ -28,7 +29,8 @@ public class BuildTeam {
     @Getter
     private final String serverName;
     @Getter
-    private final boolean isConnected;
+    @Setter
+    private boolean isConnected;
     @Getter
     private final boolean hasBTToolsInstalled;
     @Getter
@@ -59,7 +61,7 @@ public class BuildTeam {
         if (isConnected && NetworkModule.getInstance().getBuildTeam() != null && NetworkModule.getInstance().getBuildTeam().isConnected())
             this.IP = null;
         else
-            this.IP = serverIP;
+            this.IP = (!isConnected) ? serverIP : tag.toLowerCase() + ".buildtheearth.net";
     }
 
     public void createWarp(Player creator, Warp warp) {

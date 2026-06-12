@@ -19,6 +19,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -216,19 +218,25 @@ public class NetworkAPI {
             }
 
 
-            private String getMainServerName(JSONObject teamObject) {
+            private @Nullable String getMainServerName(@NonNull JSONObject teamObject) {
                 String mainServerIP = (String) teamObject.get("MainServerIP");
 
                 Object serversObject = teamObject.get("Servers");
                 if (!(serversObject instanceof JSONArray serversArray)) return null;
 
+                String serverName = null;
+
                 for (Object object : serversArray.toArray()) {
                     if (!(object instanceof JSONObject serverObject)) return null;
 
                     String serverIP = (String) serverObject.get("IP");
-                    if (serverIP.equals(mainServerIP)) return (String) serverObject.get("Name");
+                    if (serverIP.equals(mainServerIP)) {
+                        serverName = (String) serverObject.get("Name");
+                        break;
+                    }
+                    if (serverName == null) serverName = (String) serverObject.get("ServerName");
                 }
-                return null;
+                return serverName;
             }
 
             private int getArea(JSONObject regionObject) {
@@ -267,6 +275,7 @@ public class NetworkAPI {
                     NetworkModule networkModule = NetworkModule.getInstance();
                     BuildTeam buildTeam = networkModule.getBuildTeamByID(teamID);
                     networkModule.setBuildTeam(buildTeam);
+                    validateBuildTeamConnectionState(buildTeam);
                     if (!buildTeam.isHasBTToolsInstalled()) setBuildTeamToolsInstalled(true);
                 } catch (Exception e) {
                     future.completeExceptionally(e);
@@ -285,6 +294,21 @@ public class NetworkAPI {
         });
 
         return future;
+    }
+
+    /**
+     * Ensures the BuildTeam connection state is consistent with the server's
+     * proxy configuration. On versions prior to 1.21.5, proxy detection is
+     * unavailable and the state is left unchanged.
+     */
+    private static void validateBuildTeamConnectionState(@NonNull BuildTeam buildTeam) {
+        try {
+            if (buildTeam.isConnected() && !Bukkit.getServerConfig().isProxyEnabled()) {
+                buildTeam.setConnected(false);
+                BuildTeamTools.getInstance().getComponentLogger().warn("The server is configured as not being a proxy, but the " +
+                        "network API indicates that the build team is connected to the Network.");
+            }
+        } catch (NoSuchMethodError e) { /* it's fine - we assume proxy is enabled. This Method only exists in 1.21.5+ */}
     }
 
     public static void createWarp(Warp warp, API.ApiResponseCallback callback) {

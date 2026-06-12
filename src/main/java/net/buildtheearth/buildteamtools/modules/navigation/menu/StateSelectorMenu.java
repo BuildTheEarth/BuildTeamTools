@@ -20,7 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 
 public class StateSelectorMenu extends AbstractPaginatedMenu {
 
@@ -29,6 +28,9 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
 
     public static final int BACK_ITEM_SLOT = 27;
     public static final int SWITCH_PAGE_ITEM_SLOT = 34;
+
+    private static final String NEW_YORK_STATE_NAME = "New York";
+    private static final String NEW_YORK_CITY_NAME = "New York City";
 
     /**
      * Helper class to represent a state entry which can be either from a build team's regions
@@ -47,104 +49,158 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
     public StateSelectorMenu(Player menuPlayer, @NonNull Continent continent, boolean autoLoad) {
         super(4, 3, "USA - States", menuPlayer, autoLoad);
         this.continent = continent;
-        this.stateEntries = new ArrayList<>();
+        this.stateEntries = loadStateEntries(continent);
+    }
 
-        for (BuildTeam team : NetworkModule.getInstance().getBuildTeams()) {
-            if (team == null || team.getID() == null) continue;
+    private @NonNull List<StateEntry> loadStateEntries(@NonNull Continent continent) {
+        List<StateEntry> entries = new ArrayList<>();
 
-            if (NetworkModule.getInstance().getBuildTeam() != null
-                    && team.getID().equals(NetworkModule.getInstance().getBuildTeam().getID())) {
+        NetworkModule networkModule = NetworkModule.getInstance();
+        BuildTeam currentTeam = networkModule.getBuildTeam();
+
+        for (BuildTeam team : networkModule.getBuildTeams()) {
+            if (shouldSkipTeam(team, currentTeam)) {
                 continue;
             }
 
-            for (Region region : team.getRegions()) {
-                if (region.getType() == RegionType.STATE && region.getContinent() == continent) {
-                    boolean hasSubCities = hasCitiesForState(region);
-                    stateEntries.add(new StateEntry(region, team, hasSubCities));
-                }
-            }
+            addStateEntriesForTeam(entries, team, continent);
         }
 
-        if (!stateEntries.isEmpty()) {
-            stateEntries.sort(Comparator.comparing(entry -> entry.stateRegion.getName()));
+        entries.sort(Comparator.comparing(entry -> entry.stateRegion.getName()));
+        return entries;
+    }
+
+    private boolean shouldSkipTeam(BuildTeam team, BuildTeam currentTeam) {
+        if (team == null || team.getID() == null) {
+            return true;
         }
+
+        if (currentTeam == null) {
+            return false;
+        }
+
+        return team.getID().equals(currentTeam.getID());
+    }
+
+    private void addStateEntriesForTeam(
+            @NonNull List<StateEntry> entries,
+            @NonNull BuildTeam team,
+            @NonNull Continent continent
+    ) {
+        for (Region region : team.getRegions()) {
+            if (!isStateInContinent(region, continent)) {
+                continue;
+            }
+
+            entries.add(new StateEntry(region, team, hasCitiesForState(region)));
+        }
+    }
+
+    private boolean isStateInContinent(@NonNull Region region, @NonNull Continent continent) {
+        return region.getType() == RegionType.STATE && region.getContinent() == continent;
     }
 
     /**
      * Checks if there are any city build teams that belong to the given state.
-     * Hardcoded - currently only NYC
+     * <p>
+     * Temporary workaround: city-to-state relationships are not available yet,
+     * so New York is treated as the only state with city-level build teams.
      */
     private boolean hasCitiesForState(@NonNull Region stateRegion) {
-        String stateName = stateRegion.getName();
-
-        return Objects.equals(stateName, "New York");
+        return NEW_YORK_STATE_NAME.equals(stateRegion.getName());
     }
 
-    /**
-     * Gets all city build teams for a given state region.
-     * Hardcoded - currently just returns NYC because we don't have a way to connect Cities to States
-     */
-    private @NonNull List<BuildTeam> getCityTeamsForState(Region stateRegion) {
+    private @NonNull List<BuildTeam> getCityTeamsForState(@NonNull Region stateRegion) {
+        if (!hasCitiesForState(stateRegion)) {
+            return List.of();
+        }
+
         List<BuildTeam> cityTeams = new ArrayList<>();
 
         for (BuildTeam team : NetworkModule.getInstance().getBuildTeams()) {
-            if (team == null || team.getID() == null) continue;
+            if (team == null || team.getID() == null) {
+                continue;
+            }
 
-            for (Region region : team.getRegions()) {
-                if (region.getType() == RegionType.CITY && region.getName().equals("New York City")) {
-                    cityTeams.add(team);
-                    break; // Only add the team once
-                }
+            if (hasNewYorkCityRegion(team)) {
+                cityTeams.add(team);
             }
         }
 
         return cityTeams;
     }
 
+    private boolean hasNewYorkCityRegion(@NonNull BuildTeam team) {
+        for (Region region : team.getRegions()) {
+            if (region.getType() != RegionType.CITY) {
+                continue;
+            }
+
+            if (NEW_YORK_CITY_NAME.equals(region.getName())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     @Override
     protected void setPreviewItems() {
         setBackItem(BACK_ITEM_SLOT, new CountrySelectorMenu(getMenuPlayer(), continent, false));
-
-        if (stateEntries.size() > 27)
-            setSwitchPageItems(SWITCH_PAGE_ITEM_SLOT);
-        else
-            for (int i = -1; i < 2; i++)
-                getMenu().getSlot(SWITCH_PAGE_ITEM_SLOT + i).setItem(MenuItems.ITEM_BACKGROUND);
+        setPaginationControls();
 
         super.setPreviewItems();
     }
 
+    private void setPaginationControls() {
+        if (stateEntries.size() > 27) {
+            setSwitchPageItems(SWITCH_PAGE_ITEM_SLOT);
+            return;
+        }
+
+        for (int i = -1; i < 2; i++) {
+            getMenu().getSlot(SWITCH_PAGE_ITEM_SLOT + i).setItem(MenuItems.ITEM_BACKGROUND);
+        }
+    }
+
     @Override
     protected void setPaginatedPreviewItems(@NotNull List<?> source) {
-        List<StateEntry> entries = source.stream().map(l -> (StateEntry) l).toList();
+        List<StateEntry> entries = source.stream()
+                .map(StateEntry.class::cast)
+                .toList();
 
         int slot = 0;
         for (StateEntry entry : entries) {
-            ArrayList<String> stateLore = ListUtil.createList(
-                    "",
-                    "§eBuild Team:", entry.buildTeam.getBlankName(),
-                    ""
-            );
-            if (entry.hasSubCities) {
-                getCityTeamsForState(entry.stateRegion).forEach(cityTeam ->
-                        stateLore.add(3, cityTeam.getBlankName()));
-            }
-
-            if (entry.hasSubCities) {
-                stateLore.add("§8Click to view cities!");
-            } else {
-                stateLore.add("§8Click to join this state's server!");
-            }
-
             getMenu().getSlot(slot).setItem(
                     Item.createCustomHeadBase64(
                             entry.stateRegion.getHeadBase64(),
                             "§6§l" + entry.stateRegion.getName(),
-                            stateLore
+                            createStateLore(entry)
                     )
             );
+
             slot++;
         }
+    }
+
+    private @NonNull ArrayList<String> createStateLore(@NonNull StateEntry entry) {
+        ArrayList<String> stateLore = ListUtil.createList(
+                "",
+                "§eBuild Team:",
+                entry.buildTeam.getBlankName(),
+                ""
+        );
+
+        if (!entry.hasSubCities) {
+            stateLore.add("§8Click to join this state's server!");
+            return stateLore;
+        }
+
+        getCityTeamsForState(entry.stateRegion).forEach(cityTeam ->
+                stateLore.add(3, cityTeam.getBlankName()));
+
+        stateLore.add("§8Click to view cities!");
+        return stateLore;
     }
 
     @Override
@@ -159,24 +215,32 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPaginatedItemClickEventsAsync(@NotNull List<?> source) {
-        List<StateEntry> entries = source.stream().map(l -> (StateEntry) l).toList();
+        List<StateEntry> entries = source.stream()
+                .map(StateEntry.class::cast)
+                .toList();
 
         int slot = 0;
         for (StateEntry entry : entries) {
-            final int _slot = slot;
-            getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
+            int currentSlot = slot;
+
+            getMenu().getSlot(currentSlot).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
 
-                ChatHelper.logDebug("Clicked the state: %s (HasCities: %s)",
-                        entry.stateRegion.getName(), entry.hasSubCities);
+                ChatHelper.logDebug(
+                        "Clicked the state: %s (HasCities: %s)",
+                        entry.stateRegion.getName(),
+                        entry.hasSubCities
+                );
 
-                if (entry.hasSubCities) { // New York City
-                    List<BuildTeam> cityTeams = getCityTeamsForState(entry.stateRegion);
-                    new CitySelectorMenu(entry.stateRegion, cityTeams, clickPlayer, true);
-                } else {
+                if (!entry.hasSubCities) {
                     NavUtils.switchToTeam(entry.buildTeam, clickPlayer);
+                    return;
                 }
+
+                List<BuildTeam> cityTeams = getCityTeamsForState(entry.stateRegion);
+                new CitySelectorMenu(entry.stateRegion, cityTeams, clickPlayer, true);
             });
+
             slot++;
         }
     }

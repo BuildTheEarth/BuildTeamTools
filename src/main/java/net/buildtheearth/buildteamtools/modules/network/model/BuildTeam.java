@@ -106,9 +106,11 @@ public class BuildTeam {
         NetworkAPI.createWarpGroup(warpGroup, new API.ApiResponseCallback() {
             @Override
             public void onResponse(String response) {
-                NetworkModule.getInstance().updateCache().thenRun(() -> refreshBluemapMarkers()).exceptionally(e -> {
-                    BuildTeamTools.getInstance().getComponentLogger().warn("Failed to update cache after warp group creation.",
-                            e);
+                NetworkModule.getInstance().updateCache()
+                        .thenRun(() -> refreshBluemapMarkers())
+                        .exceptionally(e -> {
+                            BuildTeamTools.getInstance().getComponentLogger()
+                                    .warn("Failed to update cache after warp group creation.", e);
                     return null;
                 });
             }

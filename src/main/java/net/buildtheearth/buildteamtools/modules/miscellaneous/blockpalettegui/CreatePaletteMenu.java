@@ -2,7 +2,9 @@ package net.buildtheearth.buildteamtools.modules.miscellaneous.blockpalettegui;
 
 import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
+import lombok.Getter;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,13 +19,14 @@ import org.ipvp.canvas.mask.Mask;
 
 import java.util.*;
 
+
 public class CreatePaletteMenu extends AbstractMenu {
 
-    private static final int NAME_SLOT        = 11;
+    private static final int NAME_SLOT = 11;
     private static final int DESCRIPTION_SLOT = 13;
-    private static final int BLOCKS_SLOT      = 15;
-    private static final int BACK_SLOT        = 18;
-    private static final int APPLY_SLOT       = 26;
+    private static final int BLOCKS_SLOT = 15;
+    private static final int BACK_SLOT = 18;
+    private static final int APPLY_SLOT = 26;
 
     private static final String BACK_HEAD =
             "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90"
@@ -43,8 +46,9 @@ public class CreatePaletteMenu extends AbstractMenu {
 
     private final BlockPaletteManager manager;
     private final JavaPlugin plugin;
+    @Getter
     private final Player player;
-    private final java.util.logging.Logger logger;
+    private final ComponentLogger logger;
 
     private String name = "Unnamed";
     private String description = "";
@@ -56,45 +60,43 @@ public class CreatePaletteMenu extends AbstractMenu {
     private static final Map<UUID, Listener> ACTIVE_CHAT = new HashMap<>();
     private boolean awaitingInput = false;
 
-    private enum InputMode { NONE, NAME, DESCRIPTION }
+    private enum InputMode {NONE, NAME, DESCRIPTION}
 
     public CreatePaletteMenu(BlockPaletteManager manager, Player player, JavaPlugin plugin) {
         super(3, "Create Palette", player);
         this.manager = manager;
         this.plugin = plugin;
         this.player = player;
-        this.logger = plugin.getLogger();
+        this.logger = plugin.getComponentLogger();
     }
-
-    public Player getPlayer() { return player; }
 
     @Override
     protected Mask getMask() {
-        ItemStack filler = Item.create(XMaterial.GRAY_STAINED_GLASS_PANE.parseMaterial(), " ");
+        ItemStack filler = Item.create(Objects.requireNonNull(XMaterial.GRAY_STAINED_GLASS_PANE.get()), " ");
         return BinaryMask.builder(getMenu())
                 .item(filler)
-                .pattern("111111111")
-                .pattern("111111111")
-                .pattern("111111111")
+                .pattern(BinaryMask.FULL_PATTERN)
+                .pattern(BinaryMask.FULL_PATTERN)
+                .pattern(BinaryMask.FULL_PATTERN)
                 .build();
     }
 
     @Override
     protected void setMenuItemsAsync() {
-        logger.info("Setting menu items for CreatePalleteMenu for player " + player.getName() + ". Blocks: " + blocks);
+        logger.info("Setting menu items for CreatePalleteMenu for player {}. Blocks: {}", player.getName(), blocks);
 
         getMenu().getSlot(NAME_SLOT).setItem(
-                Item.create(XMaterial.NAME_TAG.parseMaterial(), "§eSet Name",
+                Item.create(Objects.requireNonNull(XMaterial.NAME_TAG.get()), "§eSet Name",
                         new ArrayList<>(List.of("§7Current: §f" + name)))
         );
 
         getMenu().getSlot(DESCRIPTION_SLOT).setItem(
-                Item.create(XMaterial.WRITABLE_BOOK.parseMaterial(), "§eSet Description",
+                Item.create(Objects.requireNonNull(XMaterial.WRITABLE_BOOK.get()), "§eSet Description",
                         new ArrayList<>(List.of("§7Current: §f" + (description.isEmpty() ? "None" : description))))
         );
 
         getMenu().getSlot(BLOCKS_SLOT).setItem(
-                Item.create(XMaterial.STONE.parseMaterial(), "§eSet Blocks",
+                Item.create(Objects.requireNonNull(XMaterial.STONE.get()), "§eSet Blocks",
                         new ArrayList<>(List.of("§7Selected: §f" + blocks.size())))
         );
 
@@ -140,9 +142,9 @@ public class CreatePaletteMenu extends AbstractMenu {
         // Blocks
         getMenu().getSlot(BLOCKS_SLOT).setClickHandler((p, i) -> {
             p.closeInventory();
-            logger.info("Opening ChoosePalleteBlocksMenu from CreatePalleteMenu for player " + p.getName() + ". Current blocks: " + blocks);
+            logger.info("Opening ChoosePalleteBlocksMenu from CreatePalleteMenu for player {}. Current blocks: {}", p.getName(), blocks);
             new ChoosePaletteBlocksMenu(manager, p, plugin, blocks, updatedBlocks -> {
-                logger.info("Received updated blocks for player " + p.getName() + ": " + updatedBlocks);
+                logger.info("Received updated blocks for player {}: {}", p.getName(), updatedBlocks);
                 blocks.clear();
                 blocks.addAll(updatedBlocks);
                 setMenuItemsAsync();
@@ -163,7 +165,7 @@ public class CreatePaletteMenu extends AbstractMenu {
                 return;
             }
             unregisterChatListener();
-            logger.info("Apply clicked in CreatePalleteMenu by " + p.getName() + ". Name: " + name + ", Blocks: " + blocks);
+            logger.info("Apply clicked in CreatePalleteMenu by {}. Name: {}, Blocks: {}", p.getName(), name, blocks);
             if (name.equals("Unnamed")) {
                 p.sendMessage("§cPlease set a valid name for the palette.");
                 return;
@@ -254,7 +256,7 @@ public class CreatePaletteMenu extends AbstractMenu {
     }
 
     public void open() {
-        logger.info("Opening CreatePalleteMenu for player " + player.getName() + ". Current blocks: " + blocks);
+        logger.info("Opening CreatePalleteMenu for player {}. Current blocks: {}", player.getName(), blocks);
         setMenuItemsAsync();
         getMenu().open(player);
     }

@@ -17,26 +17,28 @@ import org.ipvp.canvas.mask.Mask;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Objects;
 
 public class AddressTypeSelectionMenu extends AbstractMenu {
 
-    public static String ADDRESS_TYPE_INV_NAME = "Select an Address Type";
-    public final int BUILDING_SLOT = 10;
-    public final int STREET_SLOT = 11;
-    public final int CITY_SLOT = 12;
-    public final int STATE_SLOT = 13;
-    public final int COUNTRY_SLOT = 14;
-    public final int CUSTOM_SLOT = 15;
-    public final int BACK_ITEM_SLOT = 27;
+    public static final String ADDRESS_TYPE_INV_NAME = "Select an Address Type";
+    public static final int BUILDING_SLOT = 10;
+    public static final int STREET_SLOT = 11;
+    public static final int CITY_SLOT = 12;
+    public static final int STATE_SLOT = 13;
+    public static final int COUNTRY_SLOT = 14;
+    public static final int CUSTOM_SLOT = 15;
+    public static final int BACK_ITEM_SLOT = 27;
 
     private final Warp warp;
     private final boolean alreadyExists;
 
-    /** In this menu the player can select an address type for a warp.
+    /**
+     * In this menu the player can select an address type for a warp.
      * This can be used for example to change the AddressType of a warp in the {@link WarpMenu}.
      *
-     * @param menuPlayer  The player that is viewing the menu.
-     * @param warp The warp that is being updated with the selected warp group.
+     * @param menuPlayer    The player that is viewing the menu.
+     * @param warp          The warp that is being updated with the selected warp group.
      * @param alreadyExists Whether the warp already exists.
      */
     public AddressTypeSelectionMenu(Player menuPlayer, Warp warp, boolean alreadyExists) {
@@ -64,7 +66,7 @@ public class AddressTypeSelectionMenu extends AbstractMenu {
         getMenu().getSlot(CITY_SLOT).setItem(new Item(XMaterial.LIGHT_BLUE_DYE.parseItem()).setDisplayName("§6§lCity").setLore(cityLore).build());
         getMenu().getSlot(STATE_SLOT).setItem(new Item(XMaterial.LIGHT_BLUE_DYE.parseItem()).setDisplayName("§6§lState").setLore(stateLore).build());
         getMenu().getSlot(COUNTRY_SLOT).setItem(new Item(XMaterial.LIGHT_BLUE_DYE.parseItem()).setDisplayName("§6§lCountry").setLore(countryLore).build());
-        getMenu().getSlot(CUSTOM_SLOT).setItem(Item.create(XMaterial.NAME_TAG.parseMaterial(), "§6§lCustom Address", ListUtil.createList("", "§7If no other address type fits,", "§7enter a custom address.")));
+        getMenu().getSlot(CUSTOM_SLOT).setItem(Item.create(Objects.requireNonNull(XMaterial.NAME_TAG.get()), "§6§lCustom Address", ListUtil.createList("", "§7If no other address type fits,", "§7enter a custom address.")));
 
         setBackItem(BACK_ITEM_SLOT, new WarpEditMenu(getMenuPlayer(), warp, alreadyExists, false));
     }
@@ -124,7 +126,7 @@ public class AddressTypeSelectionMenu extends AbstractMenu {
                         );
                     })
                     .text("Address")
-                    .itemLeft(Item.create(XMaterial.NAME_TAG.parseMaterial(), "§6§lChange Address"))
+                    .itemLeft(Item.create(Objects.requireNonNull(XMaterial.NAME_TAG.get()), "§6§lChange Address"))
                     .title("§8Enter the address")
                     .plugin(BuildTeamTools.getInstance())
                     .open(clickPlayer);
@@ -135,9 +137,9 @@ public class AddressTypeSelectionMenu extends AbstractMenu {
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
                 .item(MenuItems.ITEM_BACKGROUND)
-                .pattern("000000000")
-                .pattern("000000000")
-                .pattern("000000000")
+                .pattern(BinaryMask.EMPTY_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
                 .pattern("011111111")
                 .build();
     }

@@ -12,7 +12,6 @@ import org.ipvp.canvas.mask.Mask;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * A menu that allows the player to select a block from a list of blocks. It is possible to switch pages and to proceed to the next menu once a block has been selected. It is also possible to select multiple blocks.
@@ -25,7 +24,7 @@ public class BlockListMenu extends AbstractPaginatedMenu {
     public static final int NEXT_ITEM_SLOT = 35;
     public static final int BACK_ITEM_SLOT = 27;
 
-    public ArrayList<String> selectedMaterials;
+    public List<String> selectedMaterials;
     private final List<ItemStack> items;
 
     private final AbstractMenu backMenu;
@@ -40,12 +39,12 @@ public class BlockListMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPreviewItems() {
-        if(backMenu != null)
+        if (backMenu != null)
             setBackItem(BACK_ITEM_SLOT, backMenu);
 
         setSwitchPageItems(SWITCH_PAGE_ITEM_SLOT);
 
-        if(canProceed())
+        if (canProceed())
             getMenu().getSlot(NEXT_ITEM_SLOT).setItem(HeadFactory.head(HeadTexture.CHECKMARK, "§eNext"));
         else
             getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.ITEM_BACKGROUND);
@@ -54,7 +53,8 @@ public class BlockListMenu extends AbstractPaginatedMenu {
     }
 
     @Override
-    protected void setMenuItemsAsync() {}
+    protected void setMenuItemsAsync() {
+    }
 
     @Override
     protected void setItemClickEventsAsync() {
@@ -67,9 +67,9 @@ public class BlockListMenu extends AbstractPaginatedMenu {
 
         return BinaryMask.builder(getMenu())
                 .item(MenuItems.ITEM_BACKGROUND)
-                .pattern("000000000")
-                .pattern("000000000")
-                .pattern("000000000")
+                .pattern(BinaryMask.EMPTY_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
                 .pattern(backSlot + "11000110")
                 .build();
     }
@@ -81,11 +81,11 @@ public class BlockListMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPaginatedPreviewItems(List<?> source) {
-        if(selectedMaterials == null)
+        if (selectedMaterials == null)
             selectedMaterials = new ArrayList<>();
 
         // Set pagignated items
-        List<ItemStack> items = source.stream().map(l -> (ItemStack) l).collect(Collectors.toList());
+        List<ItemStack> items = source.stream().map(l -> (ItemStack) l).toList();
         int slot = 0;
         for (ItemStack item : items) {
             if (selectedMaterials.contains(Item.getUppercaseMaterialString(item)))
@@ -102,14 +102,14 @@ public class BlockListMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPaginatedItemClickEventsAsync(List<?> source) {
-        List<ItemStack> items = source.stream().map(l -> (ItemStack) l).collect(Collectors.toList());
+        List<ItemStack> itemStacks = source.stream().map(l -> (ItemStack) l).toList();
         int slot = 0;
-        for (ItemStack item : items) {
+        for (ItemStack ignored : itemStacks) {
             final int _slot = slot;
             getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
                 String type = Item.getUppercaseMaterialString(getMenu().getSlot(_slot).getItem(getMenuPlayer()));
 
-                if(selectedMaterials.contains(type))
+                if (selectedMaterials.contains(type))
                     selectedMaterials.remove(type);
                 else
                     selectedMaterials.add(type);
@@ -125,7 +125,7 @@ public class BlockListMenu extends AbstractPaginatedMenu {
      *
      * @return true if the player has selected at least one block, false otherwise.
      */
-    protected boolean canProceed(){
+    protected boolean canProceed() {
         return !selectedMaterials.isEmpty();
     }
 }

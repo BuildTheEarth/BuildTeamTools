@@ -17,12 +17,12 @@ public class FieldSettings extends Settings {
     public void setDefaultValues() {
         // Crop Type (Default: Random)
         CropType cropType = (CropType) Utils.pickRandom(CropType.values());
-        if(cropType != null)
+        if (cropType != null)
             setValue(FieldFlag.CROP_TYPE, cropType);
 
         // Crop Stage (Default: Random)
         CropStage cropStage = CropStage.FALLBACK;
-        if(cropType != null){
+        if (cropType != null) {
             if (cropType.equals(CropType.POTATO)) {
                 cropStage = (CropStage) Utils.pickRandom(new CropStage[]{CropStage.LOW, CropStage.TALL});
             } else if (cropType.equals(CropType.CORN)) {
@@ -33,12 +33,12 @@ public class FieldSettings extends Settings {
                 cropStage = (CropStage) Utils.pickRandom(new CropStage[]{CropStage.DRY, CropStage.WET});
             }
         }
-        if(cropStage != null)
+        if (cropStage != null)
             setValue(FieldFlag.CROP_STAGE, cropStage);
-        
+
         // Fence (Default: Random)
         ItemStack block = (ItemStack) Utils.pickRandom(MenuItems.getFences().toArray());
-        if(block != null)
+        if (block != null)
             setValue(FieldFlag.FENCE, new XMaterial[]{XMaterial.matchXMaterial(block)});
     }
 

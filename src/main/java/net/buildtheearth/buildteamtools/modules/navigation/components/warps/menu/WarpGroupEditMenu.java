@@ -7,6 +7,7 @@ import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
+import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
@@ -21,10 +22,7 @@ import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static net.buildtheearth.buildteamtools.modules.navigation.components.warps.menu.WarpEditMenu.CONFIRM_SLOT;
 
@@ -46,10 +44,11 @@ public class WarpGroupEditMenu extends AbstractMenu {
     private final WarpGroup warpGroup;
     private final boolean alreadyExists;
 
-    /** In this menu the player can update a warp.
+    /**
+     * In this menu the player can update a warp.
      * This can be used for example to change the name of a warp in the {@link WarpMenu}.
      *
-     * @param player  The player that is viewing the menu.
+     * @param player    The player that is viewing the menu.
      * @param warpGroup The warp that is being updated.
      */
     public WarpGroupEditMenu(Player player, WarpGroup warpGroup, boolean alreadyExists, boolean autoLoad) {
@@ -76,22 +75,22 @@ public class WarpGroupEditMenu extends AbstractMenu {
 
         // Set the name item
         ArrayList<String> nameLore = ListUtil.createList("", "§eCurrent Name: ", warpGroup.getName());
-        getMenu().getSlot(NAME_SLOT).setItem(Item.create(XMaterial.NAME_TAG.get(), "§6§lChange Name", nameLore));
+        getMenu().getSlot(NAME_SLOT).setItem(Item.create(Objects.requireNonNull(XMaterial.NAME_TAG.get()), "§6§lChange Name", nameLore));
 
         // Set the Description item
-        getMenu().getSlot(DESCRIPTION_SLOT).setItem(Item.create(XMaterial.BOOK.get(), "§6§lChange Description", warpGroup.getDescriptionLore()));
+        getMenu().getSlot(DESCRIPTION_SLOT).setItem(Item.create(Objects.requireNonNull(XMaterial.BOOK.get()), "§6§lChange Description", warpGroup.getDescriptionLore()));
 
         // Set the Slot item
         int slot = warpGroup.getSlot();
         ArrayList<String> slotLore = ListUtil.createList("", "§eSlot: ", slot < 0 || slot >= 27 ? "§7Auto" : String.valueOf(slot));
-        getMenu().getSlot(SLOT_SLOT).setItem(new Item(XMaterial.ITEM_FRAME.get()).setDisplayName("§6§lChange Slot").setLore(slotLore).build());
+        getMenu().getSlot(SLOT_SLOT).setItem(new Item(Objects.requireNonNull(XMaterial.ITEM_FRAME.get())).setDisplayName("§6§lChange Slot").setLore(slotLore).build());
 
         // Set the Material item
         ArrayList<String> materialLore = ListUtil.createList("", "§eMaterial: ", warpGroup.getMaterial() == null ? "§7Default" : warpGroup.getMaterial());
         getMenu().getSlot(MATERIAL_SLOT).setItem(new Item(warpGroup.getMaterialItem()).setDisplayName("§6§lChange Material").setLore(materialLore).build());
 
         // Set the delete item
-        getMenu().getSlot(DELETE_SLOT).setItem(Item.create(XMaterial.BARRIER.get(), "§c§lDelete Warp Group", ListUtil.createList("", "§8Click to delete the warp group.")));
+        getMenu().getSlot(DELETE_SLOT).setItem(Item.create(Objects.requireNonNull(XMaterial.BARRIER.get()), "§c§lDelete Warp Group", ListUtil.createList("", "§8Click to delete the warp group.")));
     }
 
     @Override
@@ -101,10 +100,13 @@ public class WarpGroupEditMenu extends AbstractMenu {
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
-            if(alreadyExists)
-                NetworkModule.getInstance().getBuildTeam().updateWarpGroup(clickPlayer, warpGroup);
-            else
-                NetworkModule.getInstance().getBuildTeam().createWarpGroup(clickPlayer, warpGroup);
+            BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
+            if (buildTeam != null) {
+                if (alreadyExists)
+                    buildTeam.updateWarpGroup(clickPlayer, warpGroup);
+                else
+                    buildTeam.createWarpGroup(clickPlayer, warpGroup);
+            }
         });
 
         // Set click event for the name item
@@ -131,7 +133,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
                         );
                     })
                     .text("Name")
-                    .itemLeft(Item.create(XMaterial.NAME_TAG.get(), "§6§lChange Name"))
+                    .itemLeft(Item.create(Objects.requireNonNull(XMaterial.NAME_TAG.get()), "§6§lChange Name"))
                     .title("§8Change the warp name")
                     .plugin(BuildTeamTools.getInstance())
                     .open(clickPlayer);
@@ -147,7 +149,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
             BookMenu bookMenu = new BookMenu(clickPlayer, "§6§lChange Description", clickPlayer.getName(), description, 240);
 
             bookMenu.onComplete(text -> {
-                if(text == null) {
+                if (text == null) {
                     clickPlayer.sendMessage("§cA problem occurred while saving the description.");
                     new WarpGroupEditMenu(clickPlayer, warpGroup, alreadyExists, true);
                     return;
@@ -155,7 +157,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
 
                 // Combine the first page to a single string
                 StringBuilder finalText = new StringBuilder(text.getFirst()[0]);
-                for(int i = 1; i < text.getFirst().length; i++)
+                for (int i = 1; i < text.getFirst().length; i++)
                     finalText.append("<br>").append(text.getFirst()[i]);
 
                 warpGroup.setDescription(finalText.toString());
@@ -179,7 +181,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
                         Integer selectedSlot = AlpsUtils.tryParseInt(stateSnapshot.getText());
 
                         // Make sure that the slot is a valid number and between 0 and 26
-                        if(!stateSnapshot.getText().matches("-?\\d+")
+                        if (!stateSnapshot.getText().matches("-?\\d+")
                                 || selectedSlot == null
                                 || selectedSlot < -1
                                 || selectedSlot > 26) {
@@ -198,7 +200,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
                                 .map(WarpGroup::getName)
                                 .findFirst();
 
-                        if(selectedSlot != -1 && warpGroups.isPresent()) {
+                        if (selectedSlot != -1 && warpGroups.isPresent()) {
                             return Arrays.asList(AnvilGUI.ResponseAction.close(),
                                     AnvilGUI.ResponseAction.run(() -> {
                                         clickPlayer.closeInventory();
@@ -220,7 +222,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
                         );
                     })
                     .text("Enter slot 0-26. Set -1 for auto.")
-                    .itemLeft(Item.create(XMaterial.ITEM_FRAME.get(), "§6§lChange Slot"))
+                    .itemLeft(Item.create(Objects.requireNonNull(XMaterial.ITEM_FRAME.get()), "§6§lChange Slot"))
                     .title("§8Change the warp slot")
                     .plugin(BuildTeamTools.getInstance())
                     .open(clickPlayer);
@@ -239,8 +241,11 @@ public class WarpGroupEditMenu extends AbstractMenu {
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
-            if(clickPlayer.hasPermission(Permissions.WARP_GROUP_DELETE)) {
-                NetworkModule.getInstance().getBuildTeam().deleteWarpGroup(clickPlayer, warpGroup);
+            if (clickPlayer.hasPermission(Permissions.WARP_GROUP_DELETE)) {
+                BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
+                if (buildTeam != null) {
+                    buildTeam.deleteWarpGroup(clickPlayer, warpGroup);
+                }
             } else {
                 clickPlayer.sendMessage(ChatHelper.getErrorString("You don't have the permission to delete warp groups!"));
             }
@@ -252,9 +257,9 @@ public class WarpGroupEditMenu extends AbstractMenu {
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
                 .item(MenuItems.ITEM_BACKGROUND)
-                .pattern("000000000")
-                .pattern("000000000")
-                .pattern("000000000")
+                .pattern(BinaryMask.EMPTY_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
                 .pattern("111111110")
                 .build();
     }

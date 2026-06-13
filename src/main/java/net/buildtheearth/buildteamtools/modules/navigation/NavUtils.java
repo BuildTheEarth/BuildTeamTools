@@ -43,7 +43,9 @@ public class NavUtils {
         UnsafeValues unsafeValues = Bukkit.getUnsafe();
         int serverProtocolVersion = unsafeValues.getProtocolVersion();
 
-        ChatHelper.logDebug("Transfer check - Player protocol: %d, Server protocol: %s, BuildTeam: %s, Allows transfers:  %b, IP: %s", playerVersion, serverProtocolVersion, targetBuildTeam.getBlankName(), targetBuildTeam.isAllowsTransfers(), targetBuildTeam.getIP());
+        ChatHelper.logDebug("Transfer check - Player protocol: %d, Server protocol: %s, BuildTeam: %s, Allows transfers:  %b, " +
+                        "IP: %s", playerVersion, serverProtocolVersion, targetBuildTeam.getBlankName(),
+                targetBuildTeam.isAllowsTransfers(), targetBuildTeam.getIP());
 
         return targetBuildTeam.isAllowsTransfers() && playerVersion >= 766 && serverProtocolVersion >= 766;
     }
@@ -67,14 +69,16 @@ public class NavUtils {
         comp.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, serverIP));
         comp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§eClick to copy").create()));
 
-        String notConnected = "§cThe team " + teamName + " does not run on Minecraft Version 1.20.5+ yet & is not connected to the network. Meanwhile please use this Server IP to connect to their server:";
+        String notConnected = "§cThe team " + teamName + " does not run on Minecraft Version 1.20.5+ yet & is not connected to " +
+                "the network. Meanwhile please use this Server IP to connect to their server:";
 
         player.closeInventory();
         player.sendMessage(notConnected);
         player.sendMessage("");
         player.spigot().sendMessage(comp);
         player.sendMessage("");
-        player.sendMessage("§cPress Ctrl + A and Ctrl + C to copy the ip → Press ESC → Back to Menu → Multiplayer → Add Server → Ctrl+V → Done → Join.");
+        player.sendMessage("§cPress Ctrl + A and Ctrl + C to copy the ip → Press ESC → Back to Menu → Multiplayer → Add Server " +
+                "→ Ctrl+V → Done → Join.");
     }
 
     /**
@@ -87,8 +91,9 @@ public class NavUtils {
         player.sendMessage("IP of " + buildteam + " is missing in Network API.");
     }
 
-    public static @Nullable NavSwitchType determineSwitchPossibilityOrMsgPlayerIfNone(@NotNull Player player, @NotNull BuildTeam targetBuildTeam) {
-        if (targetBuildTeam.isConnected() && targetBuildTeam.getServerName() != null) {
+    public static @Nullable NavSwitchType determineSwitchPossibilityOrMsgPlayerIfNone(@NotNull Player player,
+                                                                                      @NotNull BuildTeam targetBuildTeam) {
+        if (targetBuildTeam.isConnected() && targetBuildTeam.getServerName() != null && NetworkModule.getInstance().getBuildTeam() != null && NetworkModule.getInstance().getBuildTeam().isConnected()) {
             return NavSwitchType.NETWORK;
         } else if (targetBuildTeam.getIP() != null) {
             if (isTransferCapable(player, targetBuildTeam)) {
@@ -132,7 +137,8 @@ public class NavUtils {
      * Bukkits @see World::getHighestBlockYAt() already returns elevation+1, and this method deliberately
      * adds one to the location elevation on top.
      * </p>
-     * The world is extracted from the server config's "earth world". If no earth world is specified then the height defaults to 64
+     * The world is extracted from the server config's "earth world". If no earth world is specified then the height defaults
+     * to 64
      * and the world is nullified.
      *
      * @param coordinate Latitude and longitude of the location
@@ -164,7 +170,8 @@ public class NavUtils {
      * Bukkits @see World::getHighestBlockYAt() already returns elevation+1, and this method deliberately
      * adds one to the location elevation on top.
      * </p>
-     * The world is extracted from the server config's "earth world". If no earth world is specified then the height defaults to 64
+     * The world is extracted from the server config's "earth world". If no earth world is specified then the height defaults
+     * to 64
      * and the world is nullified.
      *
      * @param coordinate Latitude and longitude of the location

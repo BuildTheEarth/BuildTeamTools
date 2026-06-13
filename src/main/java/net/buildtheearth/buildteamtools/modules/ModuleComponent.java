@@ -24,11 +24,11 @@ public abstract class ModuleComponent {
     }
 
 
-    public void enable(){
+    public void enable() {
         enabled = true;
     }
 
-    public void disable(){
+    public void disable() {
         enabled = false;
     }
 }

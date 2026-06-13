@@ -51,7 +51,7 @@ public class ModuleHandler {
     /**
      * Enables a specific module
      *
-     * @param module {@link Module}
+     * @param module   {@link Module}
      * @param executor the sender, if it's triggered via command, else null, when it's called by btt on plugin start.
      * @return True if successfully enabled, false if not
      */
@@ -85,14 +85,13 @@ public class ModuleHandler {
         }
 
 
-
         if (executor != null) {
             if (module.isEnabled() && BuildTeamTools.getInstance().isDebug())
                 ChatHelper.log("Successfully enabled %s Module", module.getModuleName());
             else {
                 String reason = "";
 
-                if(module.getError() != null && !module.getError().isEmpty())
+                if (module.getError() != null && !module.getError().isEmpty())
                     reason = " Reason: §c" + module.getError();
 
                 ChatHelper.logError("Failed to enable the %s Module%s", module.getModuleName(), reason);
@@ -119,30 +118,30 @@ public class ModuleHandler {
     /**
      * Disables a specific module
      *
-     * @param module {@link Module}
+     * @param module   {@link Module}
      * @param executor the sender, if it's triggered via command, else null - when it's called by btt on plugin stop).
      * @return True if successfully disabled, false if not
      */
     public boolean disable(@NotNull Module module, @Nullable CommandSender executor) {
         boolean contains = false;
-        for(Module m : modules)
+        for (Module m : modules)
             if (m.getModuleName().equals(module.getModuleName())) {
                 contains = true;
                 break;
             }
 
-        if(!contains)
+        if (!contains)
             return false;
 
         module.disable();
 
         if (!module.isEnabled()) {
-            if(BuildTeamTools.getInstance().isDebug())
+            if (BuildTeamTools.getInstance().isDebug())
                 ChatHelper.log("Successfully disabled %s Module", module.getModuleName());
         } else {
             String reason = "";
 
-            if(module.getError() != null && !module.getError().isEmpty())
+            if (module.getError() != null && !module.getError().isEmpty())
                 reason = " Reason: §c" + module.getError();
 
             ChatHelper.logError("Failed to disable the %s Module%s", module.getModuleName(), reason);
@@ -164,7 +163,8 @@ public class ModuleHandler {
         return true;
     }
 
-    /** Enables all modules
+    /**
+     * Enables all modules
      *
      * @param executor the player, if it's triggered via command, else null (when it's called by btt on plugin start).
      */
@@ -177,7 +177,8 @@ public class ModuleHandler {
             sendBuildTeamToolsConsoleStartupMessage();
     }
 
-    /** Disables all modules
+    /**
+     * Disables all modules
      *
      * @param executor the player, if it's triggered via command, else null (when it's called by btt on plugin stop).
      */
@@ -195,27 +196,30 @@ public class ModuleHandler {
         enableAll(executor);
     }
 
-    private void sendBuildTeamToolsConsoleStartupMessage(){
+    private void sendBuildTeamToolsConsoleStartupMessage() {
         Bukkit.getConsoleSender().sendMessage(" ");
         Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "--------------- BuildTeamTools V" + BuildTeamTools.getInstance().getDescription().getVersion() + " ----------------");
         Bukkit.getConsoleSender().sendMessage(" ");
 
         for (Module module : new ArrayList<>(modules))
             if (module.isEnabled())
-                Bukkit.getConsoleSender().sendMessage("§7[§aOK§7] Successfully loaded §e" + module.getModuleName() + " Module§7.");
+                Bukkit.getConsoleSender().sendMessage("§7[§aOK§7] Successfully loaded §e" + module.getModuleName() + " Module§7" +
+                        ".");
             else {
                 String reason = "";
 
                 if (module.getError() != null && !module.getError().isEmpty())
                     reason = " Reason: §c" + module.getError();
 
-                Bukkit.getConsoleSender().sendMessage( "§7[§cX§7]  Failed to load the §e" + module.getModuleName() + " Module§7." + reason);
+                Bukkit.getConsoleSender().sendMessage("§7[§cX§7]  Failed to load the §e" + module.getModuleName() + " Module§7" +
+                        "." + reason);
             }
 
         Bukkit.getConsoleSender().sendMessage(" ");
         Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "------------------------------------------------------------");
         Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_GRAY + "> " + ChatColor.GRAY + "Made by §bBuildTheEarth");
-        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_GRAY + "> " + ChatColor.GRAY + "GitHub:" + ChatColor.WHITE + " https://github.com/BuildTheEarth/BuildTeamTools");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_GRAY + "> " + ChatColor.GRAY + "GitHub:" + ChatColor.WHITE + " " +
+                "https://github.com/BuildTheEarth/BuildTeamTools");
         Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "------------------------------------------------------------");
         Bukkit.getConsoleSender().sendMessage(" ");
     }

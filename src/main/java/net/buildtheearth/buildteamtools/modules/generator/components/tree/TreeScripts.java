@@ -7,6 +7,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NonNull;
 
+import java.util.Objects;
+
 public class TreeScripts {
 
     public static void treescript_v_1_0(@NonNull Player p, @NonNull Tree tree) {
@@ -19,7 +21,7 @@ public class TreeScripts {
 
         // In case the player is holding no item, give him a diamond sword
         if (p.getInventory().getItemInMainHand().getType() == Material.AIR)
-            p.getInventory().setItem(p.getInventory().getHeldItemSlot(), Item.create(XMaterial.DIAMOND_SWORD.get()));
+            p.getInventory().setItem(p.getInventory().getHeldItemSlot(), Item.create(Objects.requireNonNull(XMaterial.DIAMOND_SWORD.get())));
 
         if (treeType.getName().equalsIgnoreCase("any")) {
             p.chat("/schbr $GeneratorCollections/treepack/* -place:bottom -yoff:2");

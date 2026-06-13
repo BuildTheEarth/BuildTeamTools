@@ -27,7 +27,15 @@ public class OpenStreetMapAPI extends API {
 
                 ChatHelper.logDebug("Response from OpenStreetMap: %s", jsonObject);
 
-                JSONObject featuresObject = (JSONObject) ((JSONArray) jsonObject.get("features")).getFirst();
+                JSONArray featuresArray = (JSONArray) jsonObject.get("features");
+
+                if (featuresArray == null || featuresArray.isEmpty()) {
+                    future.completeExceptionally(new IllegalStateException("No location data found for these coordinates. The " +
+                            "location may be in the ocean or outside mapped areas."));
+                    return;
+                }
+
+                JSONObject featuresObject = (JSONObject) featuresArray.getFirst();
 
                 JSONObject propertiesObject = (JSONObject) featuresObject.get("properties");
 

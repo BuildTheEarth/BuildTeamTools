@@ -31,10 +31,10 @@ public class NavigatorComponent extends ModuleComponent {
     }
 
 
-    private void disableWorldEditNavigationWand(){
+    private void disableWorldEditNavigationWand() {
         // Check if WorldEdit is enabled
-        if(!CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled()
-        &&! CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled())
+        if (!CommonModule.getInstance().getDependencyComponent().isWorldEditEnabled()
+                && !CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled())
             return;
 
         try {
@@ -42,7 +42,7 @@ public class NavigatorComponent extends ModuleComponent {
 
             // Check which version of WorldEdit or FastAsyncWorldEdit is being used
             if (CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled()
-            || !CommonModule.getInstance().getDependencyComponent().isLegacyWorldEdit()) {
+                    || !CommonModule.getInstance().getDependencyComponent().isLegacyWorldEdit()) {
 
                 // For FastAsyncWorldEdit, set the navigation wand to a String
                 Field navigationWandField = config.getClass().getField("navigationWand");
@@ -55,7 +55,7 @@ public class NavigatorComponent extends ModuleComponent {
                 navigationWandField.set(config, 399);
             }
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace(); // Handle the error properly
+            BuildTeamTools.getInstance().getComponentLogger().error("Error configuring navigator wand", e);
         }
     }
 
@@ -65,7 +65,7 @@ public class NavigatorComponent extends ModuleComponent {
     public void toggle(Player player) {
         Inventory inventory = player.getInventory();
 
-        if(!inventory.contains(getItem())) {
+        if (!inventory.contains(getItem())) {
             inventory.setItem(getSlot(), getItem());
             ChatHelper.sendSuccessfulMessage(player, "You turned the navigator %s.", "on");
         } else {

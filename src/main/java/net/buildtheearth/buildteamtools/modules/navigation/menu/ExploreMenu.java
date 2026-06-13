@@ -13,6 +13,7 @@ import org.ipvp.canvas.mask.Mask;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
 
 /**
  * The ExploreMenu for the BTE universal navigator.<br>
@@ -34,7 +35,7 @@ public class ExploreMenu extends AbstractMenu {
         // Create the continent items
         for (Continent continent : Continent.values()) {
             ArrayList<String> continentLore = new ArrayList<>(Collections.singletonList(ChatHelper.getStandardString(false, "Visit countries in %s", continent.getLabel())));
-            getMenu().getSlot(continent.getSlot()).setItem(Item.create(XMaterial.COMPASS.get(), "§e§l" + continent.getLabel(), 1, continentLore));
+            getMenu().getSlot(continent.getSlot()).setItem(Item.create(Objects.requireNonNull(XMaterial.COMPASS.get()), "§e§l" + continent.getLabel(), 1, continentLore));
         }
 
         super.setPreviewItems();
@@ -43,7 +44,7 @@ public class ExploreMenu extends AbstractMenu {
     @Override
     protected void setItemClickEventsAsync() {
         // Set click events for the continent items
-        for(Continent continent : Continent.values()) {
+        for (Continent continent : Continent.values()) {
             getMenu().getSlot(continent.getSlot()).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
 
@@ -56,7 +57,8 @@ public class ExploreMenu extends AbstractMenu {
 
 
     @Override
-    protected void setMenuItemsAsync() {}
+    protected void setMenuItemsAsync() {
+    }
 
 
     @Override
@@ -65,10 +67,10 @@ public class ExploreMenu extends AbstractMenu {
 
         return BinaryMask.builder(getMenu())
                 .item(MenuItems.ITEM_BACKGROUND)
-                .pattern("111111111")
+                .pattern(BinaryMask.FULL_PATTERN)
                 .pattern("010101010")
                 .pattern("111101111")
-                .pattern("111111111")
+                .pattern(BinaryMask.FULL_PATTERN)
                 .build();
     }
 

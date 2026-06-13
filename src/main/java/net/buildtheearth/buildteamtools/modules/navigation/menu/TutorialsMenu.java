@@ -4,7 +4,8 @@ import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.Mask;
 
-/** The Tutorials Menu for the BTE universal navigator.<br>
+/**
+ * The Tutorials Menu for the BTE universal navigator.<br>
  * <br>
  * Accessed from the main menu, this menu will contain a list of tutorials for the player to view.<br>
  * <br>
@@ -29,10 +30,12 @@ public class TutorialsMenu extends AbstractMenu {
 
 
     @Override
-    protected void setMenuItemsAsync() {}
+    protected void setMenuItemsAsync() {
+    }
 
     @Override
-    protected void setItemClickEventsAsync() {}
+    protected void setItemClickEventsAsync() {
+    }
 
     @Override
     protected Mask getMask() {

@@ -21,7 +21,7 @@ public class FieldScripts extends Script {
 
         //Bukkit.getScheduler().runTaskAsynchronously(BuildTeamTools.getInstance(), this::fieldScript_v_1_0);
     }
-    
+
     public void fieldScript_v_1_0() {
         HashMap<Flag, Object> flags = getGeneratorComponent().getPlayerSettings().get(getPlayer().getUniqueId()).getValues();
 
@@ -34,9 +34,8 @@ public class FieldScripts extends Script {
         List<Vector> points = GeneratorUtils.getSelectionPointsFromRegion(getRegion());
 
         float yaw = getPlayer().getLocation().getYaw();
-        if(yaw < 0) yaw += 360;
-        if(yaw > 360) yaw -= 360;
-
+        if (yaw < 0) yaw += 360;
+        if (yaw > 360) yaw -= 360;
 
 
         // ----------- PREPARATION 01 ----------
@@ -44,8 +43,10 @@ public class FieldScripts extends Script {
 
         // Create a cuboid selection of the field area to scan enough blocks
         GeneratorUtils.createCuboidSelection(getPlayer(),
-                new Vector(getRegion().getMinimumPoint().x(), getRegion().getMinimumPoint().y(), getRegion().getMinimumPoint().z()),
-                new Vector(getRegion().getMaximumPoint().x(), getRegion().getMaximumPoint().y(), getRegion().getMaximumPoint().z())
+                new Vector(getRegion().getMinimumPoint().x(), getRegion().getMinimumPoint().y(),
+                        getRegion().getMinimumPoint().z()),
+                new Vector(getRegion().getMaximumPoint().x(), getRegion().getMaximumPoint().y(),
+                        getRegion().getMaximumPoint().z())
         );
 
         // Expand the selection to make sure the field is big enough
@@ -53,7 +54,8 @@ public class FieldScripts extends Script {
         expandSelection(new Vector(-10, 0, -10));
 
         // Scan the blocks in the selection without replacing anything
-        Block[][][] blocks = GeneratorUtils.prepareScriptSession(localSession, actor, getPlayer(),weWorld, 20, true, false, false);
+        Block[][][] blocks = GeneratorUtils.prepareScriptSession(localSession, actor, getPlayer(), weWorld, 20, true, false,
+                false);
 
 
         // ----------- PREPARATION 02 ----------
@@ -63,8 +65,7 @@ public class FieldScripts extends Script {
         GeneratorUtils.createPolySelection(getPlayer(), points, blocks);
 
         // Replace all unnecessary blocks with air without reading any blocks
-        GeneratorUtils.prepareScriptSession(localSession, actor, getPlayer(),weWorld, 20, false, true, true);
-
+        GeneratorUtils.prepareScriptSession(localSession, actor, getPlayer(), weWorld, 20, false, true, true);
 
 
         // ----------- PREPARATION 03 ----------
@@ -76,12 +77,14 @@ public class FieldScripts extends Script {
             boolean requiresAlternatingLines = cropType.equals(CropType.VINEYARD) || cropType.equals(CropType.PEAR);
 
             // Get the directory containing all schematic files.
-            File directory = new File(GeneratorUtils.getWorldEditSchematicsFolderPath() + "/GeneratorCollections/fieldpack/" + (requiresAlternatingLines ? "striped/" : "normal/"));
+            File directory =
+                    new File(GeneratorUtils.getWorldEditSchematicsFolderPath() + "/GeneratorCollections/fieldpack/" + (requiresAlternatingLines ? "striped/" : "normal/"));
 
             File[] schematics = directory.getAbsoluteFile().listFiles();
 
-            if(schematics == null) {
-                getPlayer().sendMessage("§c§lERROR: §cNo schematics found! If this error persists, you might need to reinstall the GeneratorCollections.");
+            if (schematics == null) {
+                getPlayer().sendMessage("§c§lERROR: §cNo schematics found! If this error persists, you might need to reinstall " +
+                        "the GeneratorCollections.");
                 return;
             }
 
@@ -90,7 +93,7 @@ public class FieldScripts extends Script {
             short[] availableDirections = new short[schematicAmount];
 
             // Get an array with all available schematic line directions
-            for(int i = 0; i < schematicAmount; i++)
+            for (int i = 0; i < schematicAmount; i++)
                 availableDirections[i] = Short.parseShort(schematics[i].getName().replace(".schematic", ""));
 
             // Calculate which direction should be used
@@ -112,7 +115,8 @@ public class FieldScripts extends Script {
             }
 
             setGmask("<0");
-            String path = "/GeneratorCollections/fieldpack/" + (requiresAlternatingLines ? "striped/" : "normal/") + (directionToUse < 100 ? "0" + directionToUse : directionToUse) + ".schematic";
+            String path =
+                    "/GeneratorCollections/fieldpack/" + (requiresAlternatingLines ? "striped/" : "normal/") + (directionToUse < 100 ? "0" + directionToUse : directionToUse) + ".schematic";
             createCommand("//schem load " + path);
             createCommand("//replace #solid #copy");
             setGmask(null);

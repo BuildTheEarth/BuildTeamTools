@@ -26,12 +26,12 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
 
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String @NotNull [] args) {
 
-        if(!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS)){
+        if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS)) {
             sender.sendMessage("§cYou don't have permission to execute this command.");
             return true;
         }
 
-        if(args.length == 0){
+        if (args.length == 0) {
             sendBuildTeamToolsInfo(sender);
             return true;
         }
@@ -48,8 +48,8 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        if(args[0].equalsIgnoreCase("communicators")) {
-            if(!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_COMMUNICATORS)){
+        if (args[0].equalsIgnoreCase("communicators")) {
+            if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_COMMUNICATORS)) {
                 sender.sendMessage("§cYou don't have permission to execute this command.");
                 return true;
             }
@@ -62,12 +62,12 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args[0].equalsIgnoreCase("cache")) {
-            if(!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_CACHE)){
+            if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_CACHE)) {
                 sender.sendMessage("§cYou don't have permission to execute this command.");
                 return true;
             }
 
-            if(args.length > 1 && args[1].equalsIgnoreCase("update")) {
+            if (args.length > 1 && args[1].equalsIgnoreCase("update")) {
                 StatsModule.getInstance().updateAndSave();
                 NetworkModule.getInstance().updateCache();
                 sender.sendMessage("§7Cache successfully updated.");
@@ -80,17 +80,17 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args[0].equalsIgnoreCase("debug")) {
-            if(!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_DEBUG)){
+            if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_DEBUG)) {
                 sender.sendMessage("§cYou don't have permission to execute this command.");
                 return true;
             }
 
-            if(args.length <= 1) {
+            if (args.length == 1) {
                 sender.sendMessage("§cYou need to add a value: true/false");
                 return true;
             }
 
-            if(!args[1].equalsIgnoreCase("true") && !args[1].equalsIgnoreCase("false")) {
+            if (!args[1].equalsIgnoreCase("true") && !args[1].equalsIgnoreCase("false")) {
                 sender.sendMessage("§cYou need to set the value to true or false.");
                 return true;
             }
@@ -103,7 +103,7 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args[0].equalsIgnoreCase("checkForUpdates")) {
-            if(!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_CHECK_FOR_UPDATES)){
+            if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_CHECK_FOR_UPDATES)) {
                 sender.sendMessage("§cYou don't have permission to execute this command.");
                 return true;
             }
@@ -117,8 +117,8 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        if(args[0].equalsIgnoreCase("reload-config")) {
-            if(!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_RELOAD)){
+        if (args[0].equalsIgnoreCase("reload-config")) {
+            if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_RELOAD)) {
                 sender.sendMessage("§cYou don't have permission to execute this command.");
                 return true;
             }
@@ -133,18 +133,17 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
-        if(args.length == 1)
+        if (args.length == 1)
             return Arrays.asList("help", "communicators", "checkForUpdates", "cache", "debug", "reload-config");
 
         List<String> debugSuggestions = Utils.getTabCompleterArgs(args, "debug", 2, Arrays.asList("true", "false"));
-        if(debugSuggestions != null)
+        if (debugSuggestions != null)
             return debugSuggestions;
 
-        List<String> cacheSuggestions = Utils.getTabCompleterArgs(args, "cache", 2, Collections.singletonList("upload"));
-        return cacheSuggestions;
+        return Utils.getTabCompleterArgs(args, "cache", 2, Collections.singletonList("upload"));
     }
 
-    public static void sendBuildTeamToolsInfo(CommandSender sender){
+    public static void sendBuildTeamToolsInfo(CommandSender sender) {
         ChatHelper.sendMessageBox(sender, "Build Team Tools", () -> {
 
             String buildTeamID = "-";
@@ -167,18 +166,18 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
             boolean debug = BuildTeamTools.getInstance().isDebug();
 
             sender.sendMessage("§eStatus: " + status);
-            sender.sendMessage("§eVersion: §7" + BuildTeamTools.getInstance().getDescription().getVersion());
+            sender.sendMessage("§eVersion: §7" + BuildTeamTools.getInstance().getPluginMeta().getVersion());
 
-            if(debug)
+            if (debug)
                 sender.sendMessage("§eDebug Mode: §a§lON");
 
             sender.sendMessage("§eModules:");
             for (Module module : ModuleHandler.getInstance().getModules()) {
                 TextComponent comp = new TextComponent("§7- " + module.getModuleName() + " §7[" + (module.isEnabled() ? "§a§l✔" : "§c§l✖") + "§7]");
 
-                if(!module.isEnabled() && module.getError() != null && !module.getError().isEmpty())
+                if (!module.isEnabled() && module.getError() != null && !module.getError().isEmpty())
                     comp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§c" + module.getError()).create()));
-                else if(!module.isEnabled())
+                else if (!module.isEnabled())
                     comp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§cDisabled").create()));
                 else
                     comp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§aEnabled").create()));
@@ -186,7 +185,7 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
                 sender.spigot().sendMessage(comp);
             }
 
-            if(NetworkModule.getInstance().getBuildTeam() != null){
+            if (NetworkModule.getInstance().getBuildTeam() != null) {
 
                 List<String> regions = new ArrayList<>();
                 List<String> continents = new ArrayList<>();

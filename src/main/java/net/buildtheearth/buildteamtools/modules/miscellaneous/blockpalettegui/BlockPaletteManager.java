@@ -65,8 +65,13 @@ public class BlockPaletteManager {
             this.blocks = new ArrayList<>(blocks != null ? blocks : new ArrayList<>());
         }
 
-        public List<String> getBlocks() { return new ArrayList<>(blocks); }
-        public void setBlocks(List<String> blocks) { this.blocks = new ArrayList<>(blocks); }
+        public List<String> getBlocks() {
+            return new ArrayList<>(blocks);
+        }
+
+        public void setBlocks(List<String> blocks) {
+            this.blocks = new ArrayList<>(blocks);
+        }
     }
 
     /* =======================
@@ -115,7 +120,10 @@ public class BlockPaletteManager {
     /* =======================
        Menus & paging
        ======================= */
-    /** Open de standaard blocklist (die filters respecteert). */
+
+    /**
+     * Open de standaard blocklist (die filters respecteert).
+     */
     public void openBlockMenu(Player player) {
         PaletteBlockListMenu.open(this, player, plugin, false);
     }
@@ -128,13 +136,21 @@ public class BlockPaletteManager {
         openBlockMenu(player);
     }
 
-    int getPlayerPage(Player player) { return playerPageMap.getOrDefault(player.getUniqueId(), 0); }
-    void setPlayerPage(Player player, int page) { playerPageMap.put(player.getUniqueId(), page); }
+    int getPlayerPage(Player player) {
+        return playerPageMap.getOrDefault(player.getUniqueId(), 0);
+    }
+
+    void setPlayerPage(Player player, int page) {
+        playerPageMap.put(player.getUniqueId(), page);
+    }
 
     /* =======================
        Filters (normalized!)
        ======================= */
-    /** Always returns a *normalized* set of the player's filters (lowercase_with_underscores). */
+
+    /**
+     * Always returns a *normalized* set of the player's filters (lowercase_with_underscores).
+     */
     public Set<String> getPlayerFilters(Player player) {
         List<String> raw = playerFilterMap.getOrDefault(player.getUniqueId(), Collections.emptyList());
         Set<String> normalized = new LinkedHashSet<>();
@@ -142,14 +158,18 @@ public class BlockPaletteManager {
         return normalized;
     }
 
-    /** Returns a *normalized* list of filters, with "color" as default if none set. */
+    /**
+     * Returns a *normalized* list of filters, with "color" as default if none set.
+     */
     List<String> getFilters(Player player) {
         Set<String> s = getPlayerFilters(player);
         if (s.isEmpty()) return Collections.singletonList("color");
         return new ArrayList<>(s);
     }
 
-    /** Store a normalized copy of the filter set for this player. */
+    /**
+     * Store a normalized copy of the filter set for this player.
+     */
     public void updatePlayerFilters(Player player, Set<String> filters) {
         List<String> normalized = new ArrayList<>();
         for (String f : filters) normalized.add(normalizeKey(f));
@@ -157,7 +177,9 @@ public class BlockPaletteManager {
         plugin.getLogger().info("[BlockPalletManager] Filters for " + player.getName() + " -> " + normalized);
     }
 
-    /** Convenience method used by commands; normalizes filters and opens block menu. */
+    /**
+     * Convenience method used by commands; normalizes filters and opens block menu.
+     */
     public void setPlayerFiltersAndOpen(Player player, String... filters) {
         List<String> normalized = new ArrayList<>();
         if (filters == null || filters.length == 0) {
@@ -171,7 +193,9 @@ public class BlockPaletteManager {
         openBlockMenu(player);
     }
 
-    /** Combineer custom palettes + predefined filters (via BlockPalletMenuType). */
+    /**
+     * Combineer custom palettes + predefined filters (via BlockPalletMenuType).
+     */
     ItemStack[] getItemsForFilters(java.util.List<String> filters) {
         // Normalize incoming filters defensively
         java.util.List<String> normalized = new java.util.ArrayList<>();
@@ -202,7 +226,7 @@ public class BlockPaletteManager {
                     ItemStack[] items = null;
                     try {
                         items = (type.getItemSupplier() != null) ? type.getItemSupplier().get() : null;
-                    } catch (Throwable t) {
+                    } catch (Exception t) {
                         plugin.getLogger().log(java.util.logging.Level.SEVERE,
                                 "[BlockPalletManager] Supplier failed for " + key + ": " + t.getMessage(), t);
                     }
@@ -254,10 +278,15 @@ public class BlockPaletteManager {
         if (!paletteFile.exists()) {
             try {
                 File parent = paletteFile.getParentFile();
-                if (parent != null) parent.mkdirs();
+                if (parent != null && !parent.exists() && !parent.mkdirs()) {
+                    plugin.getLogger().warning("Failed to create parent directories for palettes.yml at: " + parent.getPath());
+                }
 
-                paletteFile.createNewFile();
-                plugin.getLogger().info("Created new palettes.yml file at: " + paletteFile.getPath());
+
+                boolean created = paletteFile.createNewFile();
+                if (created) {
+                    plugin.getLogger().info("Created new palettes.yml file at: " + paletteFile.getPath());
+                }
             } catch (IOException e) {
                 plugin.getLogger().severe("Failed to create palettes.yml: " + e.getMessage());
                 return;
@@ -269,14 +298,15 @@ public class BlockPaletteManager {
             return;
         }
 
-        for (String key : paletteConfig.getConfigurationSection("palettes").getKeys(false)) {
+        for (String key : Objects.requireNonNull(paletteConfig.getConfigurationSection("palettes")).getKeys(false)) {
             String name = paletteConfig.getString("palettes." + key + ".name", "Unnamed");
             String description = paletteConfig.getString("palettes." + key + ".description", "");
             List<String> blocks = new ArrayList<>();
             List<?> rawBlocks = paletteConfig.getList("palettes." + key + ".blocks", Collections.emptyList());
             for (Object block : rawBlocks) {
                 if (block instanceof String) blocks.add((String) block);
-                else plugin.getLogger().warning("Invalid block entry in palette " + key + ": " + block + " is not a string");
+                else
+                    plugin.getLogger().warning("Invalid block entry in palette " + key + ": " + block + " is not a string");
             }
             palettes.put(normalizeKey(key), new Palette(name, description, blocks));
         }
@@ -286,7 +316,10 @@ public class BlockPaletteManager {
     /* =======================
        Key normalization
        ======================= */
-    /** Normalize keys to lowercase_with_underscores so GUI + commands match. */
+
+    /**
+     * Normalize keys to lowercase_with_underscores so GUI + commands match.
+     */
     private String normalizeKey(String input) {
         if (input == null) return "";
         // 1) lowercase, 2) trim, 3) replace spaces with underscores, 4) collapse multiple underscores

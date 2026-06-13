@@ -28,7 +28,7 @@ public class RoofColorMenu extends BlockListMenu {
         setSwitchPageItemClickEvents(SWITCH_PAGE_ITEM_SLOT);
 
         // Set click event for next item
-        if(canProceed())
+        if (canProceed())
             getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
                 Settings settings = GeneratorModule.getInstance().getHouse().getPlayerSettings().get(clickPlayer.getUniqueId());
 
@@ -53,12 +53,13 @@ public class RoofColorMenu extends BlockListMenu {
      * @return the roof blocks
      */
     private static List<ItemStack> getRoofBlocks(Player player) {
-        RoofType roofType = (RoofType) GeneratorModule.getInstance().getHouse().getPlayerSettings().get(player.getUniqueId()).getValues().get(HouseFlag.ROOF_TYPE);
+        RoofType roofType =
+                (RoofType) GeneratorModule.getInstance().getHouse().getPlayerSettings().get(player.getUniqueId()).getValues().get(HouseFlag.ROOF_TYPE);
 
-        if(roofType == null)
+        if (roofType == null)
             return new ArrayList<>();
 
-        switch (roofType){
+        switch (roofType) {
             case FLATTER_SLABS:
             case MEDIUM_SLABS:
             case STEEP_SLABS:

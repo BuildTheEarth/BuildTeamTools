@@ -53,7 +53,8 @@ public class PlotSystemModule extends Module {
         }
 
         // If the DataMode is set to API, check if the NetworkModule is enabled
-        String dataMode = BuildTeamTools.getInstance().getConfig(ConfigUtil.PLOTSYSTEM).getString(ConfigPaths.PlotSystem.DATA_MODE);
+        String dataMode = BuildTeamTools.getInstance().getConfig(ConfigUtil.PLOTSYSTEM).getString(ConfigPaths.PlotSystem
+        .DATA_MODE);
         if (dataMode == null || dataMode.equalsIgnoreCase("API")) {
 
             // Check if the API Key is configured

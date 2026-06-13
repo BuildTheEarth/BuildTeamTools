@@ -13,6 +13,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class BookMenu {
@@ -32,12 +33,13 @@ public class BookMenu {
 
     private long time;
 
-    /** Creates a new book menu to edit large amounts of text
+    /**
+     * Creates a new book menu to edit large amounts of text
      *
-     * @param player The player that is viewing the menu
-     * @param bookTitle The title of the book
-     * @param bookAuthor The author of the book
-     * @param pages The pages of the book
+     * @param player         The player that is viewing the menu
+     * @param bookTitle      The title of the book
+     * @param bookAuthor     The author of the book
+     * @param pages          The pages of the book
      * @param maxWaitingTime The maximum time the player has to edit the book in seconds
      */
     public BookMenu(Player player, String bookTitle, String bookAuthor, List<String[]> pages, long maxWaitingTime) {
@@ -54,17 +56,17 @@ public class BookMenu {
         this.task = Bukkit.getScheduler().runTaskTimer(BuildTeamTools.getInstance(), () -> {
             checkForBookUpdate();
 
-            if(time >= maxWaitingTime)
+            if (time >= maxWaitingTime)
                 cancel("§cYou took too long to edit the book. The book has been closed. Please try again.");
 
             time++;
         }, 20, 20);
 
-        ItemStack item = Item.create(XMaterial.WRITABLE_BOOK.parseMaterial(), bookTitle);
+        ItemStack item = Item.create(Objects.requireNonNull(XMaterial.WRITABLE_BOOK.get()), bookTitle);
         BookMeta bookMeta = (BookMeta) item.getItemMeta();
         bookMeta.setTitle(bookTitle);
         bookMeta.setAuthor(bookAuthor);
-        for(String[] page : bookPages)
+        for (String[] page : bookPages)
             bookMeta.addPage(String.join("\n", page));
 
         item.setItemMeta(bookMeta);
@@ -73,7 +75,7 @@ public class BookMenu {
         player.closeInventory();
         player.getInventory().clear();
 
-        for(int i = 0; i < 9; i++)
+        for (int i = 0; i < 9; i++)
             player.getInventory().setItem(i, MenuItems.ITEM_BACKGROUND);
 
         player.getInventory().setHeldItemSlot(4);
@@ -87,20 +89,20 @@ public class BookMenu {
         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0F, 1.0F);
     }
 
-    private void checkForBookUpdate(){
+    private void checkForBookUpdate() {
         ItemStack item = player.getInventory().getItem(4);
 
-        if(item == null)
+        if (item == null)
             return;
 
-        if(item.getType() != XMaterial.WRITABLE_BOOK.parseMaterial()
-        && item.getType() != XMaterial.WRITTEN_BOOK.parseMaterial())
+        if (item.getType() != Objects.requireNonNull(XMaterial.WRITABLE_BOOK.get())
+                && item.getType() != Objects.requireNonNull(XMaterial.WRITTEN_BOOK.get()))
             return;
 
         BookMeta meta = (BookMeta) item.getItemMeta();
 
         boolean hasChanged = false;
-        for(int i = 0; i < bookPages.size(); i++){
+        for (int i = 0; i < bookPages.size(); i++) {
             // Join the page array to a string
             String text = String.join("", bookPages.get(i))
                     .replace("§0", "")
@@ -118,7 +120,7 @@ public class BookMenu {
                     .replace("\n", "")
                     .replace("<br>", "");
 
-            if(!text.equals(textBook))
+            if (!text.equals(textBook))
                 hasChanged = true;
         }
 
@@ -126,7 +128,7 @@ public class BookMenu {
             return;
 
         List<String[]> newPages = new ArrayList<>();
-        for(int x = 0; x < bookPages.size(); x++){
+        for (int x = 0; x < bookPages.size(); x++) {
             String text = meta.getPage(x + 1)
                     .replace("<br>", "")
                     .replace("\r", "")
@@ -134,12 +136,12 @@ public class BookMenu {
 
             String[] lines = text.split("\n");
 
-            for(int i = 0; i < lines.length; i++)
-                if(lines[i].toCharArray().length > 30)
+            for (int i = 0; i < lines.length; i++)
+                if (lines[i].length() > 30)
                     lines[i] = lines[i].replaceAll("(.{30})", "$1\n");
 
             StringBuilder editedText = new StringBuilder(lines[0]);
-            for(int i = 1; i < lines.length; i++)
+            for (int i = 1; i < lines.length; i++)
                 editedText.append("\n").append(lines[i]);
 
             editedText = new StringBuilder(editedText.toString().replace("\n ", "<br>")
@@ -155,10 +157,10 @@ public class BookMenu {
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
         player.getInventory().clear();
 
-        for(int i = 0; i < cachedInventory.length; i++)
+        for (int i = 0; i < cachedInventory.length; i++)
             player.getInventory().setItem(i, cachedInventory[i]);
 
-        if(task != null)
+        if (task != null)
             task.cancel();
 
         if (onPageComplete != null)
@@ -169,14 +171,14 @@ public class BookMenu {
         this.onPageComplete = consumer;
     }
 
-    private void cancel(String reason){
-        if(task != null)
+    private void cancel(String reason) {
+        if (task != null)
             task.cancel();
         if (onPageComplete != null)
             onPageComplete.accept(null);
 
         player.getInventory().clear();
-        for(int i = 0; i < cachedInventory.length; i++)
+        for (int i = 0; i < cachedInventory.length; i++)
             player.getInventory().setItem(i, cachedInventory[i]);
 
         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);

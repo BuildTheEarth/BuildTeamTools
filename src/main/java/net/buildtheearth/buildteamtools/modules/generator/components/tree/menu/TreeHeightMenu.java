@@ -16,6 +16,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class TreeHeightMenu extends NameListMenu {
 
@@ -31,10 +32,10 @@ public class TreeHeightMenu extends NameListMenu {
     private static @NonNull List<MutablePair<ItemStack, String>> getTreeHeights() {
         List<MutablePair<ItemStack, String>> treeHeights = new ArrayList<>();
 
-        treeHeights.add(MutablePair.of(new Item(XMaterial.LIME_CONCRETE.parseItem()).setDisplayName("Any").build(), "Any"));
+        treeHeights.add(MutablePair.of(new Item(Objects.requireNonNull(XMaterial.LIME_CONCRETE.parseItem())).setDisplayName("Any").build(), "Any"));
 
         GeneratorModule.getInstance().getTree().getHeights().forEach(h ->
-                treeHeights.add(MutablePair.of(Item.create(XMaterial.PAPER.get(), StringUtils.capitalize(h)), h)));
+                treeHeights.add(MutablePair.of(Item.create(Objects.requireNonNull(XMaterial.PAPER.get()), StringUtils.capitalize(h)), h)));
 
         return treeHeights;
     }

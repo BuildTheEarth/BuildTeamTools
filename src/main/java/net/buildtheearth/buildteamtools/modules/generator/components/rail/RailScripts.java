@@ -101,7 +101,8 @@ public class RailScripts extends Script {
         operations++;
 
         commands.add("//gmask =(sqrt((x-(" + xPos + "))^2+(z-(" + zPos + "))^2)%3)-2");
-        commands.add("//replace \"0 =queryRel(0,0,1,145,-1)||queryRel(0,0,-1,145,-1)||queryRel(1,0,0,145,-1)||queryRel(-1,0,0,145,-1)\" 44:0");
+        commands.add("//replace \"0 =queryRel(0,0,1,145,-1)||queryRel(0,0,-1,145,-1)||queryRel(1,0,0,145,-1)||queryRel(-1,0,0,
+        145,-1)\" 44:0");
         operations++;
         commands.add("//replace \"!145 !0 <145\" 43:0");
         operations++;
@@ -121,7 +122,9 @@ public class RailScripts extends Script {
             GeneratorUtils.createCuboidSelection(commands, pos1, pos2);
         }
 
-        GeneratorModule.getInstance().getGeneratorCommands().add(new Command(getPlayer(), getGeneratorComponent(), commands, operations, regionBlocks));
-        GeneratorModule.getInstance().getPlayerHistory(getPlayer()).addHistoryEntry(new History.HistoryEntry(GeneratorType.RAILWAY, operations));*/
+        GeneratorModule.getInstance().getGeneratorCommands().add(new Command(getPlayer(), getGeneratorComponent(), commands,
+        operations, regionBlocks));
+        GeneratorModule.getInstance().getPlayerHistory(getPlayer()).addHistoryEntry(new History.HistoryEntry(GeneratorType
+        .RAILWAY, operations));*/
     }
 }

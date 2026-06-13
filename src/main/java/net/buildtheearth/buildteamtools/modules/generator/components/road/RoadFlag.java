@@ -31,7 +31,7 @@ public enum RoadFlag implements Flag {
     private final String flag;
     private final FlagType flagType;
 
-    RoadFlag(String flag, FlagType flagType){
+    RoadFlag(String flag, FlagType flagType) {
         this.flag = flag;
         this.flagType = flagType;
     }
@@ -46,9 +46,9 @@ public enum RoadFlag implements Flag {
         return flagType;
     }
 
-    public static RoadFlag byString(String flag){
-        for(RoadFlag roadFlag : RoadFlag.values())
-            if(roadFlag.getFlag().equalsIgnoreCase(flag))
+    public static RoadFlag byString(String flag) {
+        for (RoadFlag roadFlag : RoadFlag.values())
+            if (roadFlag.getFlag().equalsIgnoreCase(flag))
                 return roadFlag;
 
         return null;

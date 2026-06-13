@@ -16,7 +16,7 @@ earth-world: world
 
 # The modules that should be disabled
 disabled-modules:
-  #- "module-name"
+#- "module-name"
 
 # Enable or disable the debug mode
 debug: false

@@ -56,24 +56,25 @@ public class WarpsComponent extends ModuleComponent {
      */
     public void addWarpToQueue(@NotNull ByteArrayDataInput in, Player player) {
         // Extracts the warp key from the plugin message
-            String warpKey = in.readUTF();
+        String warpKey = in.readUTF();
         Warp warp = getWarpByKey(warpKey);
 
-            if (warp == null) {
-                player.sendMessage(ChatHelper.getErrorString("The warp you tried to warp to does not exist anymore."));
-                return;
-            }
+        if (warp == null) {
+            player.sendMessage(ChatHelper.getErrorString("The warp you tried to warp to does not exist anymore."));
+            return;
+        }
 
-            Location targetWarpLocation = NavUtils.getLocationFromCoordinatesYawPitch(new GeographicalCoordinate(warp.getLat(), warp.getLon()), warp.getYaw(), warp.getPitch());
-            targetWarpLocation.setY(warp.getY());
-            targetWarpLocation.setWorld(Bukkit.getWorld(warp.getWorldName()));
+        Location targetWarpLocation = NavUtils.getLocationFromCoordinatesYawPitch(new GeographicalCoordinate(warp.getLat(), warp.getLon()), warp.getYaw(), warp.getPitch());
+        targetWarpLocation.setY(warp.getY());
+        targetWarpLocation.setWorld(Bukkit.getWorld(warp.getWorldName()));
 
-            // Adds the event to the list, to be dealt with by the join listener
-            warpQueue.put(player.getUniqueId(), targetWarpLocation);
+        // Adds the event to the list, to be dealt with by the join listener
+        warpQueue.put(player.getUniqueId(), targetWarpLocation);
     }
 
     /**
      * Checks if there is a warp in the queue of the current server and teleports the player if this is the case
+     *
      * @param player the player to check the queue for
      */
     public void processQueueForPlayer(Player player) {
@@ -83,7 +84,7 @@ public class WarpsComponent extends ModuleComponent {
             return;
         }
 
-        if(player.teleport(targetWarpLocation)) {
+        if (player.teleport(targetWarpLocation)) {
             ChatHelper.sendSuccessfulMessage(player, "Successfully warped you to the desired location!");
         } else {
             player.sendMessage(ChatHelper.getErrorString("Something went wrong trying to warp you to the desired location."));
@@ -96,16 +97,18 @@ public class WarpsComponent extends ModuleComponent {
     /**
      * Sends a plugin message to add the warp to the queue of the target server
      * Then switches the player to that server
+     *
      * @param player The player to warp
-     * @param warp The warp to teleport the player to
+     * @param warp   The warp to teleport the player to
      */
     public void warpPlayer(Player player, @NotNull Warp warp) {
         // If the warp is in the same team, just teleport the player
-        if(warp.getWarpGroup().getBuildTeam().getID().equals(NetworkModule.getInstance().getBuildTeam().getID())) {
+        BuildTeam currentTeam = NetworkModule.getInstance().getBuildTeam();
+        if (currentTeam != null && warp.getWarpGroup().getBuildTeam().getID().equals(currentTeam.getID())) {
             ChatHelper.logDebug("Warping player %s to warp %s", player.getName(), warp.getName());
             Location loc = NavUtils.getLocationFromCoordinatesYawPitch(new GeographicalCoordinate(warp.getLat(), warp.getLon()), warp.getYaw(), warp.getPitch());
 
-            if(loc.getWorld() == null) {
+            if (loc.getWorld() == null) {
                 World world = Bukkit.getWorld(warp.getWorldName()) == null ? player.getWorld() : Bukkit.getWorld(warp.getWorldName());
                 loc.setWorld(world);
             }
@@ -144,14 +147,18 @@ public class WarpsComponent extends ModuleComponent {
     }
 
     public static void createWarp(Player creator) {
-        WarpGroup group = getOtherWarpGroup(NetworkModule.getInstance().getBuildTeam().getWarpGroups());
+        BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
+        if (buildTeam == null || buildTeam.getWarpGroups() == null) return;
+
+        WarpGroup group = getOtherWarpGroup(buildTeam.getWarpGroups());
         if (group == null) {
             group = NavUtils.createOtherWarpGroup(NetworkModule.getInstance().getBuildTeam());
         }
         createWarp(creator, group);
     }
 
-    /** Creates a warp at the player's location and opens the warp edit menu.
+    /**
+     * Creates a warp at the player's location and opens the warp edit menu.
      *
      * @param creator The player that is creating the warp
      */
@@ -162,7 +169,7 @@ public class WarpsComponent extends ModuleComponent {
             GeographicalCoordinate coordinate = Projection.toGeo(new MinecraftCoordinate(location.getX(), location.getZ()));
 
             //Get the country belonging to the coordinates
-            CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(new double[] { coordinate.latitude(), coordinate.longitude() });
+            CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(new double[]{coordinate.latitude(), coordinate.longitude()});
 
             future.thenAccept(result -> {
                 String regionName = result[0];
@@ -171,7 +178,7 @@ public class WarpsComponent extends ModuleComponent {
                 //Check if the team owns this region/country
                 boolean ownsRegion = NetworkModule.getInstance().ownsRegion(regionName, countryCodeCCA2);
 
-                if(!ownsRegion) {
+                if (!ownsRegion) {
                     creator.sendMessage(ChatHelper.getErrorString("This team does not own the country %s!", result[0]));
                     return;
                 }
@@ -186,12 +193,13 @@ public class WarpsComponent extends ModuleComponent {
                         new WarpEditMenu(creator, warp, false, true));
 
             }).exceptionally(e -> {
-                creator.sendMessage(ChatHelper.getErrorString("An error occurred while creating the warp! %s", e.getMessage()));
+                Throwable cause = e.getCause() != null ? e.getCause() : e;
+                creator.sendMessage(ChatHelper.getErrorString("Failed to create warp: %s", cause.getMessage()));
                 BuildTeamTools.getInstance().getComponentLogger().error("An error occurred while creating the warp!", e);
                 return null;
             });
         } catch (OutOfProjectionBoundsException e) {
-            ChatHelper.sendErrorMessage(creator, e.getMessage());
+            creator.sendMessage(ChatHelper.getErrorString("Cannot create warp here: %s", e.getMessage()));
         }
     }
 
@@ -212,11 +220,14 @@ public class WarpsComponent extends ModuleComponent {
     //          GETTER           //
     // ------------------------- //
 
-    public Warp getWarpByName(String name){
-        return getWarpByName(NetworkModule.getInstance().getBuildTeam(), name);
+    public Warp getWarpByName(String name) {
+        BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
+        if (buildTeam == null) return null;
+        return getWarpByName(buildTeam, name);
     }
 
     public Warp getWarpByName(@NotNull BuildTeam buildTeam, String name) {
+        if (buildTeam.getWarpGroups() == null) return null;
         return buildTeam.getWarpGroups().stream().flatMap(warpGroup -> warpGroup.getWarps().stream())
                 .filter(warp1 -> warp1.getName() != null && warp1.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
@@ -230,15 +241,20 @@ public class WarpsComponent extends ModuleComponent {
 
     public Warp getWarpByKey(String key) {
         ChatHelper.logDebug("Retrieving warp with key %s", key);
-        return NetworkModule.getInstance().getBuildTeam().getWarpGroups().stream().flatMap(warpGroup -> warpGroup.getWarps().stream())
+        BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
+        if (buildTeam == null || buildTeam.getWarpGroups() == null) return null;
+        return buildTeam.getWarpGroups().stream().flatMap(warpGroup -> warpGroup.getWarps().stream())
                 .filter(warp1 -> warp1.getId().toString().equals(key)).findFirst().orElse(null);
     }
 
     public static void openWarpMenu(@NotNull Player player) {
-        openWarpMenu(player, NetworkModule.getInstance().getBuildTeam(), null);
+        BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
+        if (buildTeam == null) return;
+        openWarpMenu(player, buildTeam, null);
     }
 
     public static void openWarpMenu(@NotNull Player player, @NotNull BuildTeam buildTeam, @Nullable AbstractMenu menu) {
+        if (buildTeam.getWarpGroups() == null) return;
         int warpGroupCount = buildTeam.getWarpGroups().size();
 
         switch (warpGroupCount) {

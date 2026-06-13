@@ -82,17 +82,20 @@ public class MiscModule extends Module {
             try {
                 k = c.getConstructor(BlockPaletteManager.class, JavaPlugin.class);
                 return k.newInstance(manager, plugin);
-            } catch (NoSuchMethodException ignored) {}
+            } catch (NoSuchMethodException ignored) {
+            }
 
             try {
                 k = c.getConstructor(BlockPaletteManager.class);
                 return k.newInstance(manager);
-            } catch (NoSuchMethodException ignored) {}
+            } catch (NoSuchMethodException ignored) {
+            }
 
             try {
                 k = c.getConstructor(JavaPlugin.class);
                 return k.newInstance(plugin);
-            } catch (NoSuchMethodException ignored) {}
+            } catch (NoSuchMethodException ignored) {
+            }
 
             return c.getDeclaredConstructor().newInstance();
         } catch (Exception t) {

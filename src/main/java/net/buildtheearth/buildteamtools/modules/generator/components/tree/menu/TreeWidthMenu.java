@@ -17,6 +17,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class TreeWidthMenu extends NameListMenu {
 
@@ -32,10 +33,10 @@ public class TreeWidthMenu extends NameListMenu {
     private static @NonNull List<MutablePair<ItemStack, String>> getTreeWidths() {
         List<MutablePair<ItemStack, String>> treeWidths = new ArrayList<>();
 
-        treeWidths.add(new MutablePair<>(new Item(XMaterial.LIME_CONCRETE.parseItem()).setDisplayName("Any").build(), "Any"));
+        treeWidths.add(new MutablePair<>(new Item(Objects.requireNonNull(XMaterial.LIME_CONCRETE.parseItem())).setDisplayName("Any").build(), "Any"));
 
         for (TreeWidth treeWidth : TreeWidth.values())
-            treeWidths.add(new MutablePair<>(Item.create(XMaterial.JUNGLE_SAPLING.get(), StringUtils.capitalize(treeWidth.getName())), treeWidth.getName()));
+            treeWidths.add(new MutablePair<>(Item.create(Objects.requireNonNull(XMaterial.JUNGLE_SAPLING.get()), StringUtils.capitalize(treeWidth.getName())), treeWidth.getName()));
 
         return treeWidths;
     }

@@ -28,37 +28,40 @@ public enum FlagType {
     @Getter
     private final Class<?> classType;
 
-    FlagType(Class<?> classType){
+    FlagType(Class<?> classType) {
         this.classType = classType;
     }
 
-    /** Validates that the given flag value is of the correct type
+    /**
+     * Validates that the given flag value is of the correct type
      *
-     * @param flag The flag to validate
+     * @param flag  The flag to validate
      * @param value The value to validate
      * @return The error message if the value is invalid, null if the value is valid
      */
-    public static String validateFlagType(Flag flag, Object value){
-        if(value == null)
+    public static String validateFlagType(Flag flag, Object value) {
+        if (value == null)
             return null;
 
-        if(!flag.getFlagType().getClassType().isInstance(value))
-            return ChatHelper.getErrorString("Invalid value for flag %s: expected %s, got %s", flag.getFlag(), flag.getFlagType().getClassType().getSimpleName(), value.getClass().getSimpleName());
+        if (!flag.getFlagType().getClassType().isInstance(value))
+            return ChatHelper.getErrorString("Invalid value for flag %s: expected %s, got %s", flag.getFlag(),
+                    flag.getFlagType().getClassType().getSimpleName(), value.getClass().getSimpleName());
 
         return null;
     }
 
-    /** Converts the given string to the correct type for the flag
+    /**
+     * Converts the given string to the correct type for the flag
      *
-     * @param flag The flag to convert the value for
+     * @param flag  The flag to convert the value for
      * @param value The value to convert
      * @return The converted value
      */
-    public static Object convertToFlagType(Flag flag, String value){
-        if(value == null)
+    public static Object convertToFlagType(Flag flag, String value) {
+        if (value == null)
             return null;
 
-        switch (flag.getFlagType()){
+        switch (flag.getFlagType()) {
             case STRING:
                 return value;
             case INTEGER:
@@ -75,7 +78,7 @@ public enum FlagType {
                 String[] values = value.split(",");
                 XMaterial[] materials = new XMaterial[values.length];
 
-                for(int i = 0; i < values.length; i++)
+                for (int i = 0; i < values.length; i++)
                     materials[i] = Item.convertStringToXMaterial(values[i]);
 
                 return materials;

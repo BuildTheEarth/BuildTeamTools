@@ -10,6 +10,7 @@ import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.stats.StatsModule;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,7 +28,7 @@ public class PluginMessagingComponent extends ModuleComponent implements PluginM
     }
 
     @Override
-    public void onPluginMessageReceived(String channel, Player player, byte[] message) {
+    public void onPluginMessageReceived(@NonNull String channel, @NonNull Player player, byte @NonNull [] message) {
         if (channel.equals("BuildTeam")) {
 
             // If the player is not on the list of people communicating with the network, add his uuid to that list
@@ -44,6 +45,7 @@ public class PluginMessagingComponent extends ModuleComponent implements PluginM
 
             if (subChannel.equalsIgnoreCase("Ping")) {
                 // Do something? not sure what tbh
+                ChatHelper.logDebug("Received Ping from %s", player.getName());
             }
 
             // Reset the stats cache

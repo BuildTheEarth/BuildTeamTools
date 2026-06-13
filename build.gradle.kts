@@ -5,32 +5,91 @@ plugins {
     alias(libs.plugins.shadow)
 }
 
+repositories {
+    mavenCentral()
+    //mavenLocal() // NEVER use in Production/Commits!
+    maven {
+        url = uri("https://repo.papermc.io/repository/maven-public/")
+    }
+
+    maven {
+        url = uri("https://maven.buildtheearth.net/releases")
+    }
+
+    maven {
+        url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+    }
+
+    maven {
+        url = uri("https://mvn.alps-bte.com/repository/alps-bte/")
+    }
+
+    maven {
+        url = uri("https://repo.onarandombox.com/content/groups/public/")
+    }
+
+    maven {
+        url = uri("https://repo.codemc.io/repository/maven-snapshots/")
+    }
+
+    maven {
+        url = uri("https://repo.codemc.io/repository/maven-public/")
+    }
+
+    maven {
+        url = uri("https://jitpack.io")
+    }
+
+    maven {
+        url = uri("https://repo.dmulloy2.net/repository/public/")
+    }
+
+    maven {
+        url = uri("https://maven.daporkchop.net/")
+    }
+
+    maven {
+        url = uri("https://download.java.net/maven/2")
+    }
+
+    maven {
+        url = uri("https://maven.enginehub.org/repo/")
+    }
+
+    maven {
+        url = uri("https://mvn.wesjd.net/")
+    }
+    maven { url = uri("https://jitpack.io") }
+
+    maven("https://repo.bluecolored.de/releases")
+}
+
 dependencies {
     //implementation(libs.com.alpsbte.alpslib.alpslib.libpsterra) CURRENTLY BROKEN
     implementation(libs.alpslib.io)
-    implementation(libs.alpslib.utils)   {
+    implementation(libs.alpslib.utils) {
         exclude(group = "com.github.cryptomorin", module = "XSeries")
     }
-    implementation(libs.com.alpsbte.canvas)
-    implementation(libs.com.github.cryptomorin.xseries)
-    implementation(libs.net.wesjd.anvilgui)
-    implementation(libs.micycle.clipper2)
-    implementation(libs.org.json.json)
-    implementation(libs.com.google.code.gson.gson)
-    implementation(libs.com.squareup.okhttp3.okhttp.jvm)
+    implementation(libs.alpsbte.canvas)
+    implementation(libs.xseries)
+    implementation(libs.anvilgui)
+    implementation(libs.clipper2)
+    implementation(libs.json)
+    implementation(libs.googlecode.gson)
+    implementation(libs.okhttp.jvm)
     implementation(libs.javaapiforkml) {
         exclude(group = "com.sun.xml.bind", module = "jaxb-xjc") // Else Remapping will yell of duplicated classes
     }
-    implementation(libs.com.googlecode.json.simple)
+    implementation(libs.googlecode.json.simple)
     implementation(libs.bstats.bukkit)
     implementation(platform(libs.fawe.bom))
-    implementation(libs.net.buildtheearth.projection) {
+    implementation(libs.buildtheearth.projection) {
         exclude(group = "com.google.guava", module = "guava")
     }
 
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core")
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") { isTransitive = false }
-    compileOnly(libs.io.papermc.paper.paper.api)
+    compileOnly(libs.paper.api)
     compileOnly(libs.bluemap.api)
 }
 
@@ -38,7 +97,7 @@ val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDe
 val details = versionDetails()
 
 group = "net.buildtheearth"
-version = "0.2.0" + "-alpha" //+ details.gitHash + "-SNAPSHOT"
+version = "0.2.1" + "-SNAPSHOT+" + details.commitDistance + "-" + details.branchName + "-" + details.gitHash
 description = "BuildTeamTools"
 java.sourceCompatibility = JavaVersion.VERSION_21
 java.targetCompatibility = JavaVersion.VERSION_21

@@ -1,9 +1,11 @@
 package net.buildtheearth.buildteamtools.modules.navigation.components.warps.menu;
 
 import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
+import net.buildtheearth.buildteamtools.modules.navigation.components.warps.WarpsComponent;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
+import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
@@ -25,11 +27,12 @@ public class WarpMenu extends AbstractPaginatedMenu {
     private final boolean hasBackItem;
     private final WarpGroup warpGroup;
 
-    /** In this menu the player can view the warps in a warp group.
+    /**
+     * In this menu the player can view the warps in a warp group.
      * He can then select a warp to edit it or teleport to the warp's location.
      *
-     * @param menuPlayer The player that is viewing the menu
-     * @param warpGroup The warp group that the menu is for
+     * @param menuPlayer  The player that is viewing the menu
+     * @param warpGroup   The warp group that the menu is for
      * @param hasBackItem Whether the menu has a back item
      */
     public WarpMenu(Player menuPlayer, WarpGroup warpGroup, boolean hasBackItem, boolean autoLoad) {
@@ -40,7 +43,7 @@ public class WarpMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setMenuItemsAsync() {
-        if(hasBackItem)
+        if (hasBackItem)
             setBackItem(BACK_ITEM_SLOT, new WarpGroupMenu(getMenuPlayer(), warpGroup.getBuildTeam(), false, false));
     }
 
@@ -51,9 +54,9 @@ public class WarpMenu extends AbstractPaginatedMenu {
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
                 .item(MenuItems.ITEM_BACKGROUND)
-                .pattern("000000000")
-                .pattern("000000000")
-                .pattern("000000000")
+                .pattern(BinaryMask.EMPTY_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
                 .pattern("011111111")
                 .build();
     }
@@ -64,8 +67,9 @@ public class WarpMenu extends AbstractPaginatedMenu {
         List<Warp> warps = warpGroup.getWarps().stream().sorted((warp1, warp2) -> warp1.getName().compareToIgnoreCase(warp2.getName())).collect(Collectors.toList());
 
         // Add a "create warp" item if the player has permission
+        BuildTeam currentTeam = NetworkModule.getInstance().getBuildTeam();
         if (getMenuPlayer().hasPermission(Permissions.WARP_CREATE)
-                && NetworkModule.getInstance().getBuildTeam().equals(warpGroup.getBuildTeam()))
+                && currentTeam != null && currentTeam.equals(warpGroup.getBuildTeam()))
             warps.add(new Warp(null, "%create-warp%", null, null, null, null, null, null, 0, 0, 0, 0, 0, false));
 
         return warps;
@@ -81,7 +85,7 @@ public class WarpMenu extends AbstractPaginatedMenu {
         for (Warp warp : warps) {
 
             // Create a "create warp" item if the player has permission
-            if(warp.getName().equals("%create-warp%") && getMenuPlayer().hasPermission(Permissions.WARP_CREATE) && slot == warps.size() - 1){
+            if (warp.getName().equals("%create-warp%") && getMenuPlayer().hasPermission(Permissions.WARP_CREATE) && slot == warps.size() - 1) {
                 getMenu().getSlot(slot).setItem(HeadFactory.head(HeadTexture.GREEN_PLUS, "§a§lCreate a new Warp", ListUtil.createList("§8Click to create a new warp.")));
                 slot++;
                 continue;
@@ -108,8 +112,8 @@ public class WarpMenu extends AbstractPaginatedMenu {
                 clickPlayer.closeInventory();
 
                 // Create a click action for the "Create Warp" item if the player has permission
-                if(warp.getName().equals("%create-warp%") && getMenuPlayer().hasPermission(Permissions.WARP_CREATE) && _slot == warps.size() - 1){
-                    NavigationModule.getInstance().getWarpsComponent().createWarp(clickPlayer, warpGroup);
+                if (warp.getName().equals("%create-warp%") && getMenuPlayer().hasPermission(Permissions.WARP_CREATE) && _slot == warps.size() - 1) {
+                    WarpsComponent.createWarp(clickPlayer, warpGroup);
                     return;
                 }
 

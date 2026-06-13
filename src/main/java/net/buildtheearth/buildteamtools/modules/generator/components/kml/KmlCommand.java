@@ -383,9 +383,9 @@ public class KmlCommand implements CommandExecutor {
             result.addAll(PolygonTools.rasterizeTriangle(tri));
 
             //dEBUG: ALL triangle borders
-            result.addAll(LineRasterization.rasterizeLine(tri.getVertex1(), tri.getVertex2()));
-            result.addAll(LineRasterization.rasterizeLine(tri.getVertex1(), tri.getVertex3()));
-            result.addAll(LineRasterization.rasterizeLine(tri.getVertex2(), tri.getVertex3()));
+            result.addAll(LineRasterization.rasterizeLine(tri.vertex1(), tri.vertex2()));
+            result.addAll(LineRasterization.rasterizeLine(tri.vertex1(), tri.vertex3()));
+            result.addAll(LineRasterization.rasterizeLine(tri.vertex2(), tri.vertex3()));
         }
         return result;
     }

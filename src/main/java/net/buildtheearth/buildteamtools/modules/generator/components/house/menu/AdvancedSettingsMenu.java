@@ -64,16 +64,17 @@ public class AdvancedSettingsMenu extends AbstractMenu {
     }
 
     @Override
-    protected void setMenuItemsAsync() {}
+    protected void setMenuItemsAsync() {
+    }
 
     @Override
     protected void setItemClickEventsAsync() {
-        setSliderClickEvents(HouseFlag.FLOOR_COUNT, FLOOR_COUNT_SLOT,  1, 10);
-        setSliderClickEvents(HouseFlag.FLOOR_HEIGHT, FLOOR_HEIGHT_SLOT,  1, 10);
-        setSliderClickEvents(HouseFlag.BASE_HEIGHT, BASE_HEIGHT_SLOT,  0, 10);
-        setSliderClickEvents(HouseFlag.WINDOW_WIDTH, WINDOW_WIDTH_SLOT,  1, 5);
-        setSliderClickEvents(HouseFlag.WINDOW_HEIGHT, WINDOW_HEIGHT_SLOT,  1, 5);
-        setSliderClickEvents(HouseFlag.WINDOW_DISTANCE, WINDOW_DISTANCE_SLOT,  1, 6);
+        setSliderClickEvents(HouseFlag.FLOOR_COUNT, FLOOR_COUNT_SLOT, 1, 10);
+        setSliderClickEvents(HouseFlag.FLOOR_HEIGHT, FLOOR_HEIGHT_SLOT, 1, 10);
+        setSliderClickEvents(HouseFlag.BASE_HEIGHT, BASE_HEIGHT_SLOT, 0, 10);
+        setSliderClickEvents(HouseFlag.WINDOW_WIDTH, WINDOW_WIDTH_SLOT, 1, 5);
+        setSliderClickEvents(HouseFlag.WINDOW_HEIGHT, WINDOW_HEIGHT_SLOT, 1, 5);
+        setSliderClickEvents(HouseFlag.WINDOW_DISTANCE, WINDOW_DISTANCE_SLOT, 1, 6);
 
 
         // Set click events items
@@ -89,7 +90,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
                 .item(MenuItems.ITEM_BACKGROUND)
-                .pattern("111111111")
+                .pattern(BinaryMask.FULL_PATTERN)
                 .pattern("100010001")
                 .pattern("100010001")
                 .pattern("100010001")
@@ -107,15 +108,14 @@ public class AdvancedSettingsMenu extends AbstractMenu {
             if (value > minValue) {
                 Settings settings = house.getPlayerSettings().get(clickPlayer.getUniqueId());
 
-                if(!(settings instanceof HouseSettings))
+                if (!(settings instanceof HouseSettings houseSettings))
                     return;
 
-                HouseSettings houseSettings = (HouseSettings) settings;
                 houseSettings.setValue(houseFlag, value - 1);
 
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
                 reloadMenuAsync();
-            }else{
+            } else {
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
             }
         });
@@ -127,15 +127,14 @@ public class AdvancedSettingsMenu extends AbstractMenu {
             if (value < maxValue) {
                 Settings settings = house.getPlayerSettings().get(clickPlayer.getUniqueId());
 
-                if(!(settings instanceof HouseSettings))
+                if (!(settings instanceof HouseSettings houseSettings))
                     return;
 
-                HouseSettings houseSettings = (HouseSettings) settings;
                 houseSettings.setValue(houseFlag, value + 1);
 
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
                 reloadMenuAsync();
-            }else{
+            } else {
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
 
             }

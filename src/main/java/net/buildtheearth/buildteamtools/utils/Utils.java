@@ -26,7 +26,7 @@ public class Utils {
             i++;
         }
 
-        if (currentLine.length() > 0) {
+        if (!currentLine.isEmpty()) {
             lines.add(currentLine.toString().trim());
         }
 
@@ -110,14 +110,14 @@ public class Utils {
      * Returns a list of suggestions for the tab completer.
      * If the player is already typing the argument, only the suggestions that start with the argument will be returned.
      *
-     * @param args         the args[] from the onTabComplete method
-     * @param parentArg    the parent argument
-     * @param argPos       the position of the argument
-     * @param suggestions  the suggestions as a list
+     * @param args        the args[] from the onTabComplete method
+     * @param parentArg   the parent argument
+     * @param argPos      the position of the argument
+     * @param suggestions the suggestions as a list
      * @return a list of suggestions for the tab completer filtered by the player's input
      */
-    public static List<String> getTabCompleterArgs(String[] args, String parentArg, int argPos, List<String> suggestions){
-        if(args.length == argPos && args[0].equalsIgnoreCase(parentArg))
+    public static List<String> getTabCompleterArgs(String[] args, String parentArg, int argPos, List<String> suggestions) {
+        if (args.length == argPos && args[0].equalsIgnoreCase(parentArg))
             return suggestions.stream().filter(s -> s.toLowerCase().startsWith(args[argPos - 1].toLowerCase())).collect(Collectors.toList());
         return null;
     }

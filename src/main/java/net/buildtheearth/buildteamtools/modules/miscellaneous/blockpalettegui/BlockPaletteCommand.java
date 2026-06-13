@@ -7,6 +7,7 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.StringUtil;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 
@@ -27,16 +28,14 @@ public class BlockPaletteCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender,
-                             Command command,
-                             String label,
-                             String[] args) {
-        if (!(sender instanceof Player)) {
+    public boolean onCommand(@NonNull CommandSender sender,
+                             @NonNull Command command,
+                             @NonNull String label,
+                             String @NonNull [] args) {
+        if (!(sender instanceof Player player)) {
             sender.sendMessage("This command can only be used by players.");
             return true;
         }
-
-        Player player = (Player) sender;
 
         // /bp ⇒ open block menu with remembered filters (do NOT reset to "color")
         if (args.length == 0) {
@@ -75,18 +74,17 @@ public class BlockPaletteCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender,
-                                      Command cmd,
-                                      String alias,
-                                      String[] args) {
+    public List<String> onTabComplete(@NonNull CommandSender sender,
+                                      @NonNull Command cmd,
+                                      @NonNull String alias,
+                                      @NonNull String[] args) {
         List<String> completions = new ArrayList<>();
 
         if (args.length == 1) {
             // only "menu" or "filter"
             List<String> top = Arrays.asList("menu", "filter");
             StringUtil.copyPartialMatches(args[0], top, completions);
-        }
-        else if (args.length > 1 && args[0].equalsIgnoreCase("filter")) {
+        } else if (args.length > 1 && args[0].equalsIgnoreCase("filter")) {
             // suggest from BlockPalletMenuType.FILTER_OPTIONS
             StringUtil.copyPartialMatches(
                     args[args.length - 1],

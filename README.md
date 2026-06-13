@@ -53,7 +53,8 @@ BuildTheEarth.
 Whether you're a casual creator or an experienced builder, the plugin provides powerful features such as Generators,
 Navigators, Warps, Statistics and more to streamline your workflow.
 
-Its primary goal is to significantly speed up the building process by eliminating repetitive tasks while also providing an intuitive entry point for newcomers to the project.
+Its primary goal is to significantly speed up the building process by eliminating repetitive tasks while also providing an
+intuitive entry point for newcomers to the project.
 
 ## Features
 
@@ -77,20 +78,26 @@ outdated.*
 <br/><br/>
 
 <!-- INSTALLATION -->
+
 ## Installation
+
 💻 **Requirements:**
 
 - A Server running Paper 1.18 - **1.21.x**.
 
 🚩 **How to install:**
+
 1. Download BuildTeamTools [here](https://www.spigotmc.org/resources/buildteamtools.101854/).
 2. Place the downloaded plugin in your server's **../plugins** folder.
 3. *(Optional)* Some modules require initial configuration or dependencies to run:
->  - To activate the **Navigation Module**, please configure an **API Key** in the config.yml file.
+
+> - To activate the **Navigation Module**, please configure an **API Key** in the config.yml file.
 >  - To activate the **Network Module**, please configure an **API Key** in the config.yml file.
->  - To activate the **Generator Module**, please install the [FastAsyncWorldEdit](https://modrinth.com/plugin/fastasyncworldedit/versions/) plugin.
+>  - To activate the **Generator Module**, please install
+     the [FastAsyncWorldEdit](https://modrinth.com/plugin/fastasyncworldedit/versions/) plugin.
 >  - To activate the **Tree Generator Component**, install
      the [SchematicBrushReborn v1](https://www.spigotmc.org/resources/schematic-brush-reborn.79441/history) plugin.
+
 4. Restart your server.
 5. Done!
 
@@ -114,11 +121,11 @@ Click the links below for more information, or see the [wiki](https://resources.
 
 - [Navigation](https://resources.buildtheearth.net/s/btt/doc/navigation-module-T7I0PWPsTD)
 - [Generators](https://resources.buildtheearth.net/s/btt/doc/generator-module-13zqgI4yFA)
-  - [Houses](https://resources.buildtheearth.net/s/btt/doc/house-generator-YKQunon6Bp)
-  - [Roads](https://resources.buildtheearth.net/s/btt/doc/road-generator-QqKBBP0nqO)
-  - [Railways [Currently Broken]](https://resources.buildtheearth.net/s/btt/doc/rail-generator-EfgKXdBvk1)
-  - [Trees](https://resources.buildtheearth.net/s/btt/doc/tree-generator-pnDmYC9hzW)
-  - [Fields [Currently Broken]](https://resources.buildtheearth.net/s/btt/doc/field-generator-OqIN2BrZT7)
+    - [Houses](https://resources.buildtheearth.net/s/btt/doc/house-generator-YKQunon6Bp)
+    - [Roads](https://resources.buildtheearth.net/s/btt/doc/road-generator-QqKBBP0nqO)
+    - [Railways [Currently Broken]](https://resources.buildtheearth.net/s/btt/doc/rail-generator-EfgKXdBvk1)
+    - [Trees](https://resources.buildtheearth.net/s/btt/doc/tree-generator-pnDmYC9hzW)
+    - [Fields [Currently Broken]](https://resources.buildtheearth.net/s/btt/doc/field-generator-OqIN2BrZT7)
 - [Statistics](https://resources.buildtheearth.net/s/btt/doc/statistics-module-iM7IfoKroF)
 - [Miscellaneous](https://resources.buildtheearth.net/doc/miscellaneous-appUzeNc5I)
-  - [Block Palette GUI](https://resources.buildtheearth.net/doc/block-palette-gui-hW8InCtxcq)
+    - [Block Palette GUI](https://resources.buildtheearth.net/doc/block-palette-gui-hW8InCtxcq)

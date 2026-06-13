@@ -27,19 +27,20 @@ public class History {
     @Getter
     private final ArrayList<HistoryEntry> undoHistoryEntries;
 
-    public History(Player p){
+    public History(Player p) {
         this.p = p;
         this.historyEntries = new ArrayList<>();
         this.undoHistoryEntries = new ArrayList<>();
     }
 
-    public void addHistoryEntry(HistoryEntry entry){
+    public void addHistoryEntry(HistoryEntry entry) {
         historyEntries.add(entry);
     }
 
-    public void undoCommand(Player p){
-        if(getHistoryEntries().isEmpty()){
-            p.sendMessage("§cYou didn't generate any structures yet. Use /gen to create one. You can only undo the last structure.");
+    public void undoCommand(Player p) {
+        if (getHistoryEntries().isEmpty()) {
+            p.sendMessage("§cYou didn't generate any structures yet. Use /gen to create one. You can only undo the last " +
+                    "structure.");
             return;
         }
 
@@ -56,7 +57,7 @@ public class History {
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(BuildTeamTools.getInstance(), () -> {
             ChatHelper.sendSuccessfulMessage(p, "Successfully %s the last structure.", "undid");
-            p.sendMessage(ChatHelper.getStandardComponent(true,"Use %s to undo it.", "/gen redo")
+            p.sendMessage(ChatHelper.getStandardComponent(true, "Use %s to undo it.", "/gen redo")
                     .clickEvent(ClickEvent.runCommand("/gen redo"))
                     .hoverEvent(HoverEvent.showText(Component.text("Click to redo the last structure.", NamedTextColor.GRAY)))
             );
@@ -64,9 +65,10 @@ public class History {
         }, 20L);
     }
 
-    public void redoCommand(Player p){
-        if(getUndoHistoryEntries().isEmpty()){
-            p.sendMessage("§cYou didn't undo any structures yet. Use /gen undo to undo one. You can only redo the last structure.");
+    public void redoCommand(Player p) {
+        if (getUndoHistoryEntries().isEmpty()) {
+            p.sendMessage("§cYou didn't undo any structures yet. Use /gen undo to undo one. You can only redo the last " +
+                    "structure.");
             return;
         }
 
@@ -83,8 +85,8 @@ public class History {
 
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(BuildTeamTools.getInstance(), () -> {
-            ChatHelper.sendSuccessfulMessage(p,"Successfully %s the last structure.", "redid");
-            p.sendMessage(ChatHelper.getStandardComponent(true,"Use %s to undo it.", "/gen undo")
+            ChatHelper.sendSuccessfulMessage(p, "Successfully %s the last structure.", "redid");
+            p.sendMessage(ChatHelper.getStandardComponent(true, "Use %s to undo it.", "/gen undo")
                     .clickEvent(ClickEvent.runCommand("/gen undo"))
                     .hoverEvent(HoverEvent.showText(Component.text("Click to undo the last structure.", NamedTextColor.GRAY)))
             );

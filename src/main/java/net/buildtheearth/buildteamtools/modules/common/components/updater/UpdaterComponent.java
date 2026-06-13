@@ -10,9 +10,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.jspecify.annotations.NonNull;
 
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.util.logging.Level;
 
@@ -21,7 +23,7 @@ public class UpdaterComponent extends ModuleComponent {
     private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36";
     private static final String DOWNLOAD = "/download";
     private static final String VERSIONS = "/versions";
-    private static final String PAGE = "?page=";
+    private static final String PAGE_PATH = "?page=";
     private static final String API_RESOURCE = "https://api.spiget.org/v2/resources/";
     // Direct download link
     private String downloadLink;
@@ -48,16 +50,10 @@ public class UpdaterComponent extends ModuleComponent {
     // Updater thread
     private Thread thread;
 
-    private File pluginFile;
-
     private boolean updateInstalled;
     private String newVersion;
 
-
-
-
-
-    public UpdaterComponent(Plugin plugin, int id, File file, UpdateType updateType, boolean logger) {
+    public UpdaterComponent(@NonNull Plugin plugin, int id, File file, UpdateType updateType, boolean logger) {
         super("Updater");
 
         this.plugin = plugin;
@@ -72,35 +68,19 @@ public class UpdaterComponent extends ModuleComponent {
 
 
     public String checkForUpdates() {
-        if(thread != null && thread.isAlive())
+        if (thread != null && thread.isAlive())
             return "Update check is already running.";
 
         thread = new Thread(new UpdaterRunnable());
         thread.start();
 
-        String resultMessage = "";
-        switch (result) {
-            case BAD_ID:
-                resultMessage = "Failed to update the plugin: Wrong Spigot ID.";
-                break;
-            case FAILED:
-                resultMessage = "Failed to update the plugin.";
-                break;
-            case NO_UPDATE:
-                resultMessage = "The plugin is up to date.";
-                break;
-            case SUCCESS:
-                resultMessage = "Plugin successfully updated.";
-                break;
-            case UPDATE_FOUND:
-                resultMessage = "Found an update for the plugin.";
-                break;
-            default:
-                resultMessage = "No result for update search.";
-                break;
-        }
-
-        return resultMessage;
+        return switch (result) {
+            case BAD_ID -> "Failed to update the plugin: Wrong Spigot ID.";
+            case FAILED -> "Failed to update the plugin.";
+            case NO_UPDATE -> "The plugin is up to date.";
+            case SUCCESS -> "Plugin successfully updated.";
+            case UPDATE_FOUND -> "Found an update for the plugin.";
+        };
     }
 
     /**
@@ -165,7 +145,7 @@ public class UpdaterComponent extends ModuleComponent {
      */
     private boolean checkResource(String link) {
         try {
-            URL url = new URL(link);
+            URL url = new URI(link).toURL();
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.addRequestProperty("User-Agent", USER_AGENT);
 
@@ -178,7 +158,7 @@ public class UpdaterComponent extends ModuleComponent {
             }
             connection.disconnect();
         } catch (Exception e) {
-            e.printStackTrace();
+            plugin.getComponentLogger().error("Error checking resource ID", e);
         }
 
         return true;
@@ -191,7 +171,7 @@ public class UpdaterComponent extends ModuleComponent {
         try {
             String page = Integer.toString(this.page);
 
-            URL url = new URL(API_RESOURCE + id + VERSIONS + PAGE + page);
+            URL url = new URI(API_RESOURCE + id + VERSIONS + PAGE_PATH + page).toURL();
 
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.addRequestProperty("User-Agent", USER_AGENT);
@@ -199,14 +179,14 @@ public class UpdaterComponent extends ModuleComponent {
             InputStream inputStream = connection.getInputStream();
             InputStreamReader reader = new InputStreamReader(inputStream);
 
-            JsonElement element = new JsonParser().parse(reader);
+            JsonElement element = JsonParser.parseReader(reader);
             JsonArray jsonArray = element.getAsJsonArray();
 
             if (jsonArray.size() == 10 && !emptyPage) {
                 connection.disconnect();
                 this.page++;
                 checkUpdate();
-            } else if (jsonArray.size() == 0) {
+            } else if (jsonArray.isEmpty()) {
                 emptyPage = true;
                 this.page--;
                 checkUpdate();
@@ -217,14 +197,14 @@ public class UpdaterComponent extends ModuleComponent {
                 JsonObject object = element.getAsJsonObject();
                 element = object.get("name");
 
-                version = element.toString().replaceAll("\"", "").replace("v", "");
+                version = element.toString().replace("\"", "").replace("v", "");
                 if (logger) {
-                    plugin.getLogger().info("Current version on this server: " + plugin.getDescription().getVersion());
-                    plugin.getLogger().info("Latest version available: " + version);
+                    plugin.getComponentLogger().info("Current version on this server: {}", plugin.getPluginMeta().getVersion());
+                    plugin.getComponentLogger().info("Latest version available: {}", version);
                 }
                 if (logger)
                     plugin.getLogger().info("Checking for update...");
-                if (shouldUpdate(version, plugin.getDescription().getVersion()) && updateType == UpdateType.VERSION_CHECK) {
+                if (shouldUpdate(version, plugin.getPluginMeta().getVersion()) && updateType == UpdateType.VERSION_CHECK) {
                     result = Result.UPDATE_FOUND;
                     if (logger)
                         plugin.getLogger().info("Update found!");
@@ -233,7 +213,7 @@ public class UpdaterComponent extends ModuleComponent {
                         plugin.getLogger().info("Downloading update... version not checked");
                     download();
                 } else if (updateType == UpdateType.CHECK_DOWNLOAD) {
-                    if (shouldUpdate(version, plugin.getDescription().getVersion())) {
+                    if (shouldUpdate(version, plugin.getPluginMeta().getVersion())) {
                         if (logger)
                             plugin.getLogger().info("Update found, downloading now...");
                         download();
@@ -249,7 +229,7 @@ public class UpdaterComponent extends ModuleComponent {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            plugin.getComponentLogger().error("Error reading update information", e);
         }
     }
 
@@ -259,7 +239,7 @@ public class UpdaterComponent extends ModuleComponent {
      * @param newVersion remote version
      * @param oldVersion current version
      */
-    public boolean shouldUpdate(String newVersion, String oldVersion) {
+    public boolean shouldUpdate(@NonNull String newVersion, String oldVersion) {
         // If version has format 1.0.0
         if (newVersion.contains(".")) {
             String[] newVersionSplit = newVersion.split("\\.");
@@ -295,15 +275,19 @@ public class UpdaterComponent extends ModuleComponent {
         FileOutputStream fout = null;
 
         try {
-            URL url = new URL(downloadLink);
+            URL url = new URI(downloadLink).toURL();
 
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.addRequestProperty("User-Agent", USER_AGENT);
             InputStream inputStream = connection.getInputStream();
 
             in = new BufferedInputStream(inputStream);
-            if (!updateFolder.exists())
-                updateFolder.mkdirs();
+            if (!updateFolder.exists()) {
+                boolean created = updateFolder.mkdirs();
+                if (!created && logger) {
+                    plugin.getLogger().log(Level.WARNING, "Could not create update folder");
+                }
+            }
             fout = new FileOutputStream(new File(updateFolder, file.getName()));
 
             final byte[] data = new byte[4096];
@@ -312,7 +296,7 @@ public class UpdaterComponent extends ModuleComponent {
                 fout.write(data, 0, count);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            plugin.getComponentLogger().error("Error downloading update", e);
             if (logger)
                 plugin.getLogger().log(Level.SEVERE, "Updater tried to download the update, but was unsuccessful.");
             result = Result.FAILED;
@@ -322,16 +306,14 @@ public class UpdaterComponent extends ModuleComponent {
                     in.close();
                 }
             } catch (final IOException e) {
-                this.plugin.getLogger().log(Level.SEVERE, null, e);
-                e.printStackTrace();
+                this.plugin.getLogger().log(Level.SEVERE, "Error closing input stream", e);
             }
             try {
                 if (fout != null) {
                     fout.close();
                 }
             } catch (final IOException e) {
-                e.printStackTrace();
-                this.plugin.getLogger().log(Level.SEVERE, null, e);
+                this.plugin.getLogger().log(Level.SEVERE, "Error closing output stream", e);
             }
 
             setUpdateInstalled(version);
@@ -347,6 +329,7 @@ public class UpdaterComponent extends ModuleComponent {
                 thread.join();
             } catch (InterruptedException e) {
                 this.plugin.getLogger().log(Level.SEVERE, null, e);
+                Thread.currentThread().interrupt();
             }
         }
     }

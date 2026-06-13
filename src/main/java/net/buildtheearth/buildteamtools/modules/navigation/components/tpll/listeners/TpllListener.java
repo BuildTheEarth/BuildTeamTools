@@ -33,7 +33,7 @@ public class TpllListener implements Listener {
 
     // Target server name for teleportation
     private BuildTeam targetBuildTeam;
-    
+
     @EventHandler
     public void onTpll(PlayerCommandPreprocessEvent event) {
         // Check if the NavigationModule is enabled
@@ -79,6 +79,7 @@ public class TpllListener implements Listener {
         String[] splitMessage = event.getMessage().split(" ");
         if (splitMessage.length < 3) return false;
         splitMessage[1] = splitMessage[1].replace(",", " ").trim();
+        splitMessage[2] = splitMessage[2].replace(",", " ").trim();
         ChatHelper.logDebug("Command had the correct length (%s).", splitMessage.length);
 
         Double oLat = AlpsUtils.tryParseDouble(splitMessage[1]);
@@ -106,7 +107,9 @@ public class TpllListener implements Listener {
                     String countryName = address[0];
                     Region region = Region.getByName(countryName);
 
-                    if (!Objects.equals(region.getBuildTeam().getID(), networkModule.getBuildTeam().getID())) {
+                    BuildTeam currentTeam = networkModule.getBuildTeam();
+                    if (region != null && region.getBuildTeam() != null && currentTeam != null
+                            && !Objects.equals(region.getBuildTeam().getID(), currentTeam.getID())) {
                         targetBuildTeam = region.getBuildTeam();
                         return CompletableFuture.completedFuture(true);
                     }

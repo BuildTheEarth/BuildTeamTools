@@ -23,23 +23,28 @@ public class WarpGroup {
     @Getter
     private final BuildTeam buildTeam;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String name;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String description;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private int slot;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String material;
 
     @Getter
     private final List<Warp> warps;
 
     // Slot which is used internally by the navigation module when auto slot is enabled
-    @Getter @Setter
+    @Getter
+    @Setter
     private int internalSlot = -1;
 
     public WarpGroup(BuildTeam buildTeam, String name, String description, int slot, String material) {
@@ -61,7 +66,7 @@ public class WarpGroup {
         this.warps = new ArrayList<>();
     }
 
-    public JSONObject toJSON(){
+    public JSONObject toJSON() {
         JSONObject json = new JSONObject();
 
         json.put("id", id.toString());
@@ -77,26 +82,26 @@ public class WarpGroup {
         String itemName = "§6§l" + getName();
         ArrayList<String> lore = getDescriptionLore();
 
-        if(material == null)
-            return  HeadFactory.letter(
+        if (material == null)
+            return HeadFactory.letter(
                     LetterType.WOODEN,
                     name.charAt(0),
                     itemName,
                     lore
             );
-        else if(material.startsWith("http://textures.minecraft.net/texture/"))
+        else if (material.startsWith("http://textures.minecraft.net/texture/"))
             return Item.createCustomHeadTextureURL(material, itemName, lore);
 
         Material matchedMaterial = Material.matchMaterial(this.material.split(":")[0]);
 
-        if(matchedMaterial == null)
+        if (matchedMaterial == null)
             return HeadFactory.letter(
                     LetterType.STONE,
                     name.charAt(0),
                     itemName,
                     lore
             );
-        else if(!this.material.contains(":"))
+        else if (!this.material.contains(":"))
             return Item.create(matchedMaterial, itemName, lore);
         else
             return Item.create(matchedMaterial, itemName, Short.parseShort(this.material.split(":")[1]), lore);

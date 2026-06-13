@@ -39,18 +39,23 @@ public class NetworkModule extends Module {
     @Setter
     private @Nullable BuildTeam buildTeam;
 
-    /** A list of players that are communicating with this server. */
+    /**
+     * A list of players that are communicating with this server.
+     */
     @Getter
     private final List<UUID> communicators = new ArrayList<>();
 
-    /** A list of all build teams of BuildTheEarth. */
+    /**
+     * A list of all build teams of BuildTheEarth.
+     */
     @Getter
     private final List<BuildTeam> buildTeams = new ArrayList<>();
 
-    /** A list of all regions of BuildTheEarth. */
+    /**
+     * A list of all regions of BuildTheEarth.
+     */
     @Getter
     private final List<Region> regions = new ArrayList<>();
-
 
 
     private static NetworkModule instance = null;
@@ -90,17 +95,14 @@ public class NetworkModule extends Module {
     }
 
     @Override
-    public void registerListeners(){
+    public void registerListeners() {
         super.registerListeners(new NetworkJoinListener(), new NetworkQuitListener());
     }
 
 
-
-
-
-
-
-    /** Updates the cache of the proxy. */
+    /**
+     * Updates the cache of the proxy.
+     */
     public CompletableFuture<Boolean> updateCache() {
         CompletableFuture<Boolean> future = new CompletableFuture<>();
 
@@ -150,7 +152,7 @@ public class NetworkModule extends Module {
     /**
      * Sends a player server switch request to the proxy. The player will then be sent to the target server.
      *
-     * @param player   The player aiming to switch server
+     * @param player       The player aiming to switch server
      * @param targetServer The name of the server the player must switch to
      */
     public void switchServer(Player player, String targetServer) {
@@ -160,15 +162,16 @@ public class NetworkModule extends Module {
         player.sendPluginMessage(BuildTeamTools.getInstance(), "BungeeCord", out.toByteArray());
     }
 
-    /** Returns all regions of the given region type.
+    /**
+     * Returns all regions of the given region type.
      *
      * @param regionType The region type to get the regions of
      * @return A list of all regions of the given region type
      */
     public static @NotNull List<Region> getRegionsByRegionType(RegionType regionType) {
         ArrayList<Region> regions = new ArrayList<>();
-        for(Region region : NetworkModule.getInstance().getRegions())
-            if(region.getType().equals(regionType))
+        for (Region region : NetworkModule.getInstance().getRegions())
+            if (region.getType().equals(regionType))
                 regions.add(region);
 
         return regions;
@@ -176,9 +179,12 @@ public class NetworkModule extends Module {
 
     public boolean ownsRegion(String regionName, String countryCodeCca2) {
         AtomicBoolean ownsRegion = new AtomicBoolean(false);
-        buildTeam.getRegions().forEach(region -> {
-            if(region.getName().equals(regionName) || region.getCountryCodeCca2().equals(countryCodeCca2)) ownsRegion.set(true);
-        });
+        if (buildTeam != null && buildTeam.getRegions() != null) {
+            buildTeam.getRegions().forEach(region -> {
+                if (region.getName().equals(regionName) || region.getCountryCodeCca2().equals(countryCodeCca2))
+                    ownsRegion.set(true);
+            });
+        }
 
         return ownsRegion.get();
     }
@@ -186,7 +192,8 @@ public class NetworkModule extends Module {
 
     // Getters & Setters
 
-    /** Returns the BuildTeam of the given teamID.
+    /**
+     * Returns the BuildTeam of the given teamID.
      *
      * @param teamID The ID of the BuildTeam
      * @return The BuildTeam with the given ID

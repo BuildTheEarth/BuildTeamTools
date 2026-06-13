@@ -54,7 +54,7 @@ public class Script {
         GeneratorUtils.setGmask(localSession, null);
     }
 
-    protected void finish(Block[][][] blocks, List<Vector> points){
+    protected void finish(Block[][][] blocks, List<Vector> points) {
         createSelection(points);
         //setGmask(null);
 
@@ -67,13 +67,13 @@ public class Script {
      * Get the block state for a stair in the given direction, half and shape
      *
      * @param blockType The block type of the stair
-     * @param facing The direction the stair is facing (north, east, south, west)
-     * @param half The site of the bigger part of the stair (top, bottom)
-     * @param shape The shape of the stair (straight, inner_left, inner_right, outer_left, outer_right)
+     * @param facing    The direction the stair is facing (north, east, south, west)
+     * @param half      The site of the bigger part of the stair (top, bottom)
+     * @param shape     The shape of the stair (straight, inner_left, inner_right, outer_left, outer_right)
      * @return The block state for the stair
      */
-    protected BlockState getStair(BlockType blockType, String facing, String half, String shape){
-        if(blockType == null)
+    protected BlockState getStair(BlockType blockType, String facing, String half, String shape) {
+        if (blockType == null)
             return null;
 
         BlockState blockState = blockType.getDefaultState();
@@ -88,11 +88,11 @@ public class Script {
      * Get the block state for a slab with the given type
      *
      * @param blockType The block type of the slab
-     * @param type The type of the slab (top, bottom, double)
+     * @param type      The type of the slab (top, bottom, double)
      * @return The block state for the slab
      */
-    protected BlockState getSlab(BlockType blockType, String type){
-        if(blockType == null)
+    protected BlockState getSlab(BlockType blockType, String type) {
+        if (blockType == null)
             return null;
 
         BlockState blockState = blockType.getDefaultState();
@@ -106,7 +106,7 @@ public class Script {
      *
      * @param command The command to add
      */
-    public void createCommand(String command){
+    public void createCommand(String command) {
         operations.add(new Operation(command));
     }
 
@@ -116,14 +116,15 @@ public class Script {
      * <p/>
      * In Async WorldEdit operations such as FAWE, the commands might be executed in parallel.
      * Unfortunately there is currently no way to check in the FAWE API if a command was processed or not.
-     * That's why break points are used in specific places to make sure that the next command is only executed after the previous command has finished.
+     * That's why break points are used in specific places to make sure that the next command is only executed after the
+     * previous command has finished.
      * <p/>
      * If the next command relies on changes that the previous command made, a break point should be added.
      * The break point adds a command to the list which changes the Pos2 of the Region to a Barrier block.
      * <p/>
      * <b>Note</b>: This method clears the current gmask of the player so don't use it if you want to keep the current gmask.
      */
-    public void createBreakPoint(){
+    public void createBreakPoint() {
         operations.add(new Operation(Operation.OperationType.BREAKPOINT));
     }
 
@@ -135,7 +136,7 @@ public class Script {
      * @param location        The location where the schematic should be pasted
      * @param rotation        The rotation at which the schematic should be pasted
      */
-    public void pasteSchematic(String pathToSchematic, Location location, double rotation){
+    public void pasteSchematic(String pathToSchematic, Location location, double rotation) {
         operations.add(new Operation(Operation.OperationType.PASTE_SCHEMATIC, pathToSchematic, location, rotation));
         changes++;
     }
@@ -148,11 +149,11 @@ public class Script {
      *
      * @param points The list of points to create the selection from
      */
-    public void createSelection(List<Vector> points){
-        if(points.size() < 2)
+    public void createSelection(List<Vector> points) {
+        if (points.size() < 2)
             throw new IllegalArgumentException("The list of points must contain at least 2 points");
 
-        if(points.size() == 2)
+        if (points.size() == 2)
             createCuboidSelection(points.get(0), points.get(1));
         else
             createPolySelection(points);
@@ -165,7 +166,7 @@ public class Script {
      * @param vector1 Position 1
      * @param vector2 Position 2
      */
-    public void createCuboidSelection(Vector vector1, Vector vector2){
+    public void createCuboidSelection(Vector vector1, Vector vector2) {
         operations.add(new Operation(Operation.OperationType.CUBOID_SELECTION, vector1, vector2));
     }
 
@@ -175,7 +176,7 @@ public class Script {
      *
      * @param points The list of points to create the selection from
      */
-    public void createPolySelection(List<Vector> points){
+    public void createPolySelection(List<Vector> points) {
         operations.add(new Operation(Operation.OperationType.POLYGONAL_SELECTION, (Object) points.toArray(new Vector[0])));
     }
 
@@ -184,7 +185,7 @@ public class Script {
      * This method is used to clear the history of the LocalSession.
      * It creates a new Operation with type CLEAR_HISTORY and adds it to the list of operations to execute.
      */
-    public void clearHistory(){
+    public void clearHistory() {
         operations.add(new Operation(Operation.OperationType.CLEAR_HISTORY));
     }
 
@@ -192,8 +193,8 @@ public class Script {
      * This method is used to set the gmask of the player.
      *
      * @param mask The mask to set. If the mask is null, the gmask will be disabled.
-      */
-    public void setGmask(String mask){
+     */
+    public void setGmask(String mask) {
         operations.add(new Operation(Operation.OperationType.SET_GMASK, mask));
     }
 
@@ -210,25 +211,30 @@ public class Script {
      * It creates a new Operation with type REPLACE_BLOCKS and adds it to the list of operations to execute.
      *
      * @param from The block type to replace
-     * @param to The block types to replace with
+     * @param to   The block types to replace with
      */
-    public void replaceBlocks(BlockState[] from, BlockState[] to){
+    public void replaceBlocks(BlockState[] from, BlockState[] to) {
         operations.add(new Operation(Operation.OperationType.REPLACE_BLOCKSTATES, from, to));
         changes++;
     }
-    public void replaceBlocks(BlockState[] from, BlockState to){
+
+    public void replaceBlocks(BlockState[] from, BlockState to) {
         replaceBlocks(from, new BlockState[]{to});
     }
-    public void replaceBlocks(BlockState from, BlockState[] to){
+
+    public void replaceBlocks(BlockState from, BlockState[] to) {
         replaceBlocks(new BlockState[]{from}, to);
     }
-    public void replaceBlocks(XMaterial from, XMaterial[] to){
+
+    public void replaceBlocks(XMaterial from, XMaterial[] to) {
         replaceBlocks(new BlockState[]{GeneratorUtils.getBlockState(from)}, GeneratorUtils.getBlockState(to));
     }
-    public void replaceBlocks(XMaterial from, XMaterial to){
+
+    public void replaceBlocks(XMaterial from, XMaterial to) {
         replaceBlocks(from, new XMaterial[]{to});
     }
-    public void replaceBlocks(BlockState from, BlockState to){
+
+    public void replaceBlocks(BlockState from, BlockState to) {
         replaceBlocks(new BlockState[]{from}, new BlockState[]{to});
     }
 
@@ -236,38 +242,46 @@ public class Script {
      * Set blocks with a mask.
      * It creates a new Operation with type SET_BLOCKS_WITH_EXPRESSION_MASK and adds it to the list of operations to execute.
      *
-     * @param masks The expression masks
+     * @param masks      The expression masks
      * @param blockState The blockState to set the blocks to
      * @param iterations The number of iterations to execute
      */
     public void setBlocksWithMask(List<String> masks, BlockState[] blockState, int iterations) {
-        operations.add(new Operation(Operation.OperationType.REPLACE_BLOCKSTATES_WITH_MASKS, masks.toArray(new String[0]), null, blockState, iterations));
+        operations.add(new Operation(Operation.OperationType.REPLACE_BLOCKSTATES_WITH_MASKS, masks.toArray(new String[0]), null
+                , blockState, iterations));
         changes += masks.size();
     }
+
     public void setBlocksWithMask(List<String> masks, XMaterial[] blockState, int iterations) {
         setBlocksWithMask(masks, GeneratorUtils.getBlockState(blockState), iterations);
     }
+
     public void setBlocksWithMask(String mask, XMaterial[] blockState) {
         List<String> masks = new ArrayList<>();
         masks.add(mask);
         setBlocksWithMask(masks, blockState, 1);
     }
+
     public void setBlocksWithMask(List<String> masks, XMaterial material, int iterations) {
         setBlocksWithMask(masks, new XMaterial[]{material}, iterations);
     }
+
     public void setBlocksWithMask(String mask, XMaterial material, int iterations) {
         List<String> masks = new ArrayList<>();
         masks.add(mask);
         setBlocksWithMask(masks, new XMaterial[]{material}, iterations);
     }
+
     public void setBlocksWithMask(String mask, XMaterial material) {
         setBlocksWithMask(mask, material, 1);
     }
+
     public void setBlocksWithMask(String mask, BlockState blockState, int iterations) {
         List<String> masks = new ArrayList<>();
         masks.add(mask);
         setBlocksWithMask(masks, new BlockState[]{blockState}, iterations);
     }
+
     public void setBlocksWithMask(String mask, BlockState blockState) {
         setBlocksWithMask(mask, blockState, 1);
     }
@@ -277,29 +291,35 @@ public class Script {
      * Replace blocks with an expression mask.
      * It creates a new Operation with type REPLACE_BLOCKS_WITH_EXPRESSION_MASK and adds it to the list of operations to execute.
      *
-     * @param masks The expression masks
-     * @param from The block type to replace
-     * @param to The block types to replace with
+     * @param masks      The expression masks
+     * @param from       The block type to replace
+     * @param to         The block types to replace with
      * @param iterations The number of iterations to execute
      */
     public void replaceBlocksWithMask(List<String> masks, BlockState from, BlockState[] to, int iterations) {
-        operations.add(new Operation(Operation.OperationType.REPLACE_BLOCKSTATES_WITH_MASKS, masks.toArray(new String[0]), from, to, iterations));
+        operations.add(new Operation(Operation.OperationType.REPLACE_BLOCKSTATES_WITH_MASKS, masks.toArray(new String[0]), from
+                , to, iterations));
         changes += masks.size();
     }
+
     public void replaceBlocksWithMask(List<String> masks, XMaterial from, XMaterial[] to, int iterations) {
         replaceBlocksWithMask(masks, GeneratorUtils.getBlockState(from), GeneratorUtils.getBlockState(to), iterations);
     }
+
     public void replaceBlocksWithMask(List<String> masks, BlockState from, BlockState to, int iterations) {
         replaceBlocksWithMask(masks, from, new BlockState[]{to}, iterations);
     }
+
     public void replaceBlocksWithMask(List<String> masks, XMaterial from, XMaterial to, int iterations) {
         replaceBlocksWithMask(masks, GeneratorUtils.getBlockState(from), GeneratorUtils.getBlockState(to), iterations);
     }
+
     public void replaceBlocksWithMask(String mask, XMaterial from, XMaterial to, int iterations) {
         List<String> masks = new ArrayList<>();
         masks.add(mask);
         replaceBlocksWithMask(masks, from, to, iterations);
     }
+
     public void replaceBlocksWithMask(String mask, XMaterial from, XMaterial to) {
         replaceBlocksWithMask(mask, from, to, 1);
     }
@@ -309,23 +329,24 @@ public class Script {
         masks.add(mask);
         replaceBlocksWithMask(masks, from, to, iterations);
     }
+
     public void replaceBlocksWithMask(String mask, BlockState from, BlockState to) {
         replaceBlocksWithMask(mask, from, to, 1);
     }
-
 
 
     /**
      * Draw a curve with an expression mask.
      * It creates a new Operation with type DRAW_CURVE_WITH_MASKS and adds it to the list of operations to execute.
      *
-     * @param masks The expression masks
-     * @param points The points to draw the curve through
-     * @param blocks The block states to set the blocks to
+     * @param masks          The expression masks
+     * @param points         The points to draw the curve through
+     * @param blocks         The block states to set the blocks to
      * @param matchElevation Whether the elevation of the points should be matched to the region
      */
     public void drawCurveWithMask(List<String> masks, List<Vector> points, BlockState[] blocks, boolean matchElevation) {
-        operations.add(new Operation(Operation.OperationType.DRAW_CURVE_WITH_MASKS, masks.toArray(new String[0]), points.toArray(new Vector[0]), blocks, matchElevation));
+        operations.add(new Operation(Operation.OperationType.DRAW_CURVE_WITH_MASKS, masks.toArray(new String[0]),
+                points.toArray(new Vector[0]), blocks, matchElevation));
         changes += masks.size();
     }
 
@@ -356,27 +377,32 @@ public class Script {
      * Draw a poly line with an expression mask.
      * It creates a new Operation with type DRAW_POLY_LINE_WITH_MASKS and adds it to the list of operations to execute.
      *
-     * @param masks The expression masks
-     * @param points The points to draw the poly line through
-     * @param blocks The block states to set the blocks to
+     * @param masks          The expression masks
+     * @param points         The points to draw the poly line through
+     * @param blocks         The block states to set the blocks to
      * @param matchElevation Whether the elevation of the points should be matched to the region
      */
-    public void drawPolyLineWithMask(List<String> masks, List<Vector> points, BlockState[] blocks, boolean matchElevation, boolean connectLineEnds) {
-        operations.add(new Operation(Operation.OperationType.DRAW_POLY_LINE_WITH_MASKS, masks.toArray(new String[0]), points.toArray(new Vector[0]), blocks, matchElevation, connectLineEnds));
+    public void drawPolyLineWithMask(List<String> masks, List<Vector> points, BlockState[] blocks, boolean matchElevation,
+                                     boolean connectLineEnds) {
+        operations.add(new Operation(Operation.OperationType.DRAW_POLY_LINE_WITH_MASKS, masks.toArray(new String[0]),
+                points.toArray(new Vector[0]), blocks, matchElevation, connectLineEnds));
         changes += masks.size();
     }
 
-    public void drawPolyLineWithMask(List<String> masks, List<Vector> points, XMaterial[] blocks, boolean matchElevation, boolean connectLineEnds) {
+    public void drawPolyLineWithMask(List<String> masks, List<Vector> points, XMaterial[] blocks, boolean matchElevation,
+                                     boolean connectLineEnds) {
         drawPolyLineWithMask(masks, points, GeneratorUtils.getBlockState(blocks), matchElevation, connectLineEnds);
     }
 
-    public void drawPolyLineWithMask(String mask, List<Vector> points, XMaterial[] blocks, boolean matchElevation, boolean connectLineEnds) {
+    public void drawPolyLineWithMask(String mask, List<Vector> points, XMaterial[] blocks, boolean matchElevation,
+                                     boolean connectLineEnds) {
         List<String> masks = new ArrayList<>();
         masks.add(mask);
         drawPolyLineWithMask(masks, points, blocks, matchElevation, connectLineEnds);
     }
 
-    public void drawPolyLineWithMask(String mask, List<Vector> points, XMaterial block, boolean matchElevation, boolean connectLineEnds) {
+    public void drawPolyLineWithMask(String mask, List<Vector> points, XMaterial block, boolean matchElevation,
+                                     boolean connectLineEnds) {
         drawPolyLineWithMask(mask, points, new XMaterial[]{block}, matchElevation, connectLineEnds);
     }
 
@@ -389,19 +415,19 @@ public class Script {
     }
 
 
-
     /**
      * Draw a line with an expression mask.
      * It creates a new Operation with type DRAW_LINE_WITH_MASKS and adds it to the list of operations to execute.
      *
-     * @param masks The expression masks
-     * @param point1 The start point of the line
-     * @param point2 The end point of the line
-     * @param blocks The block states to set the blocks to
+     * @param masks          The expression masks
+     * @param point1         The start point of the line
+     * @param point2         The end point of the line
+     * @param blocks         The block states to set the blocks to
      * @param matchElevation Whether the elevation of the points should be matched to the region
      */
     public void drawLineWithMask(List<String> masks, Vector point1, Vector point2, BlockState[] blocks, boolean matchElevation) {
-        operations.add(new Operation(Operation.OperationType.DRAW_LINE_WITH_MASKS, masks.toArray(new String[0]), point1, point2, blocks, matchElevation));
+        operations.add(new Operation(Operation.OperationType.DRAW_LINE_WITH_MASKS, masks.toArray(new String[0]), point1, point2
+                , blocks, matchElevation));
         changes += masks.size();
     }
 

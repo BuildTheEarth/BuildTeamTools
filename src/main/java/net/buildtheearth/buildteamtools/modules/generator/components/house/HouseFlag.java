@@ -24,7 +24,7 @@ public enum HouseFlag implements Flag {
     private final String flag;
     private final FlagType flagType;
 
-    HouseFlag(String flag, FlagType flagType){
+    HouseFlag(String flag, FlagType flagType) {
         this.flag = flag;
         this.flagType = flagType;
     }
@@ -39,9 +39,9 @@ public enum HouseFlag implements Flag {
         return flagType;
     }
 
-    public static HouseFlag byString(String flag){
-        for(HouseFlag houseFlag : HouseFlag.values())
-            if(houseFlag.getFlag().equalsIgnoreCase(flag))
+    public static HouseFlag byString(String flag) {
+        for (HouseFlag houseFlag : HouseFlag.values())
+            if (houseFlag.getFlag().equalsIgnoreCase(flag))
                 return houseFlag;
         return null;
     }

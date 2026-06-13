@@ -17,18 +17,15 @@ import org.ipvp.canvas.mask.Mask;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.UUID;
 
 public class StatsMenu extends AbstractMenu {
 
-    private final static ItemStack GLOBAL_HEAD = HeadFactory.head(HeadTexture.EARTH, "§eGlobal Statistics", ListUtil.createList("error"));
-    private final static ItemStack ACHIEVEMENTS_HEAD = HeadFactory.head(HeadTexture.GOLDEN_CUP, "§eAchievements", ListUtil.createList("error"));
-    private final byte PLAYER_HEAD_SLOT = 4;
-    private final byte TEAM_HEAD_SLOT = 20;
-    private final byte GLOBAL_HEAD_SLOT = 22;
-    private final byte ACHIEVEMENT_HEAD_SLOT = 24;
+    private static final ItemStack GLOBAL_HEAD = HeadFactory.head(HeadTexture.EARTH, "§eGlobal Statistics", ListUtil.createList("error"));
+    private static final ItemStack ACHIEVEMENTS_HEAD = HeadFactory.head(HeadTexture.GOLDEN_CUP, "§eAchievements", ListUtil.createList("error"));
     private final ItemStack PLAYER_HEAD = Item.createPlayerHead("&ePersonal Statistics", getMenuPlayer().getName());
-    private final ItemStack TEAM_HEAD = Item.create(XMaterial.STONE.parseMaterial(), "Placeholder", ListUtil.createList("placeholder")); //TODO GET HEAD BASED ON COUNTRY/TEAM
+    private final ItemStack TEAM_HEAD = Item.create(Objects.requireNonNull(XMaterial.STONE.get()), "Placeholder", ListUtil.createList("placeholder")); //TODO GET HEAD BASED ON COUNTRY/TEAM
 
 
     public StatsMenu(Player p) {
@@ -43,11 +40,15 @@ public class StatsMenu extends AbstractMenu {
     protected void setPreviewItems() {
         setupLores();
 
+        byte playerHeadSlot = 4;
+        byte teamHeadSlot = 20;
+        byte globalHeadSlot = 22;
+        byte achievementHeadSlot = 24;
 
-        getMenu().getSlot(PLAYER_HEAD_SLOT).setItem(PLAYER_HEAD);
-        getMenu().getSlot(TEAM_HEAD_SLOT).setItem(TEAM_HEAD);
-        getMenu().getSlot(GLOBAL_HEAD_SLOT).setItem(GLOBAL_HEAD);
-        getMenu().getSlot(ACHIEVEMENT_HEAD_SLOT).setItem(ACHIEVEMENTS_HEAD);
+        getMenu().getSlot(playerHeadSlot).setItem(PLAYER_HEAD);
+        getMenu().getSlot(teamHeadSlot).setItem(TEAM_HEAD);
+        getMenu().getSlot(globalHeadSlot).setItem(GLOBAL_HEAD);
+        getMenu().getSlot(achievementHeadSlot).setItem(ACHIEVEMENTS_HEAD);
         super.setPreviewItems();
     }
 
@@ -79,7 +80,7 @@ public class StatsMenu extends AbstractMenu {
                 .item(MenuItems.ITEM_BACKGROUND)
                 .pattern("111101111")
                 .pattern("110101011")
-                .pattern("111111111")
+                .pattern(BinaryMask.FULL_PATTERN)
                 .pattern("111101111")
                 .build();
     }

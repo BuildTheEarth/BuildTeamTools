@@ -34,14 +34,14 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
         this.regions = new ArrayList<>(continent.getCountries());
 
         // Add USA region to North America because it is being built by multiple teams
-        if(continent == Continent.NORTH_AMERICA)
+        if (continent == Continent.NORTH_AMERICA)
             regions.add(
-                new Region("USA",
-                    Continent.NORTH_AMERICA,
-                        new BuildTeam(null, null, null, "4 Teams", null, false, false, false, ""),
-                    "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGNhYzk3NzRkYTEyMTcyNDg1MzJjZTE0N2Y3ODMxZjY3YTEyZmRjY2ExY2YwY2I0YjM4NDhkZTZiYzk0YjQifX19"
-                    , 9372610, "US", "USA"
-                )
+                    new Region("USA",
+                            Continent.NORTH_AMERICA,
+                            new BuildTeam("USA", null, null, "3 Teams", null, false, false, false, ""),
+                            "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGNhYzk3NzRkYTEyMTcyNDg1MzJjZTE0N2Y3ODMxZjY3YTEyZmRjY2ExY2YwY2I0YjM4NDhkZTZiYzk0YjQifX19"
+                            , 9372610, "US", "USA"
+                    )
             );
 
         if (!regions.isEmpty()) {
@@ -51,11 +51,11 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
             // Remove all regions that don't have a build team
             regions.removeAll(regions.stream().filter(region ->
                     region.getBuildTeam() == null
-                    || region.getHeadBase64() == null
-                    || region.getBuildTeam().getID() == null
-                    || (
+                            || region.getHeadBase64() == null
+                            || region.getBuildTeam().getID() == null
+                            || (
                             NetworkModule.getInstance().getBuildTeam() != null
-                        && region.getBuildTeam().getID().equals(NetworkModule.getInstance().getBuildTeam().getID())
+                                    && region.getBuildTeam().getID().equals(NetworkModule.getInstance().getBuildTeam().getID())
                     )
             ).toList());
         }
@@ -68,10 +68,10 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
         setBackItem(BACK_ITEM_SLOT, new ExploreMenu(getMenuPlayer(), false));
 
         // If there are more than 27 countries, add the switch page items, otherwise add glass panes
-        if(regions.size() > 27)
+        if (regions.size() > 27)
             setSwitchPageItems(SWITCH_PAGE_ITEM_SLOT);
         else
-            for(int i = -1; i < 2; i++)
+            for (int i = -1; i < 2; i++)
                 getMenu().getSlot(SWITCH_PAGE_ITEM_SLOT + i).setItem(MenuItems.ITEM_BACKGROUND);
 
         super.setPreviewItems();
@@ -85,14 +85,16 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
         int slot = 0;
 
         for (Region region : countries) {
-            ArrayList<String> countryLore = ListUtil.createList("", "§eBuild Team:", region.getBuildTeam().getBlankName(), "", "§eArea:", formatArea(region.getArea()) + " km²", "", "§8Click to join this country's server!");
+            ArrayList<String> countryLore = ListUtil.createList("", "§eBuild Team:", region.getBuildTeam().getBlankName(), "",
+                    "§eArea:", formatArea(region.getArea()) + " km²", "", "§8Click to join this country's server!");
             if (!region.getBuildTeam().getWarpGroups().isEmpty()) {
                 countryLore.add("Right click to open the warp group menu!");
             }
             getMenu().getSlot(slot).setItem(
-                    Item.createCustomHeadBase64(region.getHeadBase64() == null ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19" : region.getHeadBase64(),
-              "§6§l" + region.getName(),
-                    countryLore)
+                    Item.createCustomHeadBase64(region.getHeadBase64() == null ?
+                                    "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19" : region.getHeadBase64(),
+                            "§6§l" + region.getName(),
+                            countryLore)
             );
             slot++;
         }
@@ -104,7 +106,7 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setItemClickEventsAsync() {
-        if(regions.size() > 27)
+        if (regions.size() > 27)
             setSwitchPageItemClickEvents(SWITCH_PAGE_ITEM_SLOT);
     }
 
@@ -118,7 +120,13 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
             getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
 
-                ChatHelper.logDebug("Clicked Region: %s", clickedRegion.getName() + " (" + clickedRegion.getCountryCodeCca3() + ")");
+                ChatHelper.logDebug("Clicked Region: %s",
+                        clickedRegion.getName() + " (" + clickedRegion.getCountryCodeCca3() + ")");
+
+                if (clickedRegion.getCountryCodeCca3().equalsIgnoreCase("USA")) {
+                    new StateSelectorMenu(clickPlayer, clickedRegion.getContinent(), true);
+                    return;
+                }
 
                 if (clickInformation.getClickType().isRightClick() &&
                         clickPlayer.hasPermission(Permissions.WARP_USE) &&
@@ -136,9 +144,9 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
                 .item(MenuItems.ITEM_BACKGROUND)
-                .pattern("000000000")
-                .pattern("000000000")
-                .pattern("000000000")
+                .pattern(BinaryMask.EMPTY_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
                 .pattern("011111000")
                 .build();
     }

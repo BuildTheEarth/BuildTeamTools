@@ -1,5 +1,8 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.house;
 
+import lombok.Getter;
+
+@Getter
 public enum RoofType {
 
     FLAT("FLAT"),
@@ -25,7 +28,4 @@ public enum RoofType {
         return null;
     }
 
-    public String getType() {
-        return type;
-    }
 }

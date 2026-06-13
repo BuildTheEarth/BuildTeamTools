@@ -19,12 +19,12 @@ import java.util.*;
 
 public class EditPaletteMenu extends AbstractMenu {
 
-    private static final int NAME_SLOT        = 10;
+    private static final int NAME_SLOT = 10;
     private static final int DESCRIPTION_SLOT = 12;
-    private static final int BLOCKS_SLOT      = 14;
-    private static final int DELETE_SLOT      = 16;
-    private static final int BACK_SLOT        = 18;
-    private static final int APPLY_SLOT       = 26;
+    private static final int BLOCKS_SLOT = 14;
+    private static final int DELETE_SLOT = 16;
+    private static final int BACK_SLOT = 18;
+    private static final int APPLY_SLOT = 26;
 
     private static final String BACK_HEAD =
             "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90"
@@ -57,7 +57,7 @@ public class EditPaletteMenu extends AbstractMenu {
     private static final Map<UUID, Listener> ACTIVE_CHAT = new HashMap<>();
     private boolean awaitingInput = false;
 
-    private enum InputMode { NONE, NAME, DESCRIPTION }
+    private enum InputMode {NONE, NAME, DESCRIPTION}
 
     public EditPaletteMenu(BlockPaletteManager manager, Player player, JavaPlugin plugin,
                            String paletteKey, String name, String description, List<String> blocks) {
@@ -74,12 +74,12 @@ public class EditPaletteMenu extends AbstractMenu {
 
     @Override
     protected Mask getMask() {
-        ItemStack filler = Item.create(XMaterial.GRAY_STAINED_GLASS_PANE.parseMaterial(), " ");
+        ItemStack filler = Item.create(Objects.requireNonNull(XMaterial.GRAY_STAINED_GLASS_PANE.get()), " ");
         return BinaryMask.builder(getMenu())
                 .item(filler)
-                .pattern("111111111")
-                .pattern("111111111")
-                .pattern("111111111")
+                .pattern(BinaryMask.FULL_PATTERN)
+                .pattern(BinaryMask.FULL_PATTERN)
+                .pattern(BinaryMask.FULL_PATTERN)
                 .build();
     }
 
@@ -88,22 +88,22 @@ public class EditPaletteMenu extends AbstractMenu {
         logger.info("Setting menu items for EditPalleteMenu for player " + player.getName() + ". Blocks: " + blocks);
 
         getMenu().getSlot(NAME_SLOT).setItem(
-                Item.create(XMaterial.NAME_TAG.parseMaterial(), "§eSet Name",
+                Item.create(Objects.requireNonNull(XMaterial.NAME_TAG.get()), "§eSet Name",
                         new ArrayList<>(List.of("§7Current: §f" + name)))
         );
 
         getMenu().getSlot(DESCRIPTION_SLOT).setItem(
-                Item.create(XMaterial.WRITABLE_BOOK.parseMaterial(), "§eSet Description",
+                Item.create(Objects.requireNonNull(XMaterial.WRITABLE_BOOK.get()), "§eSet Description",
                         new ArrayList<>(List.of("§7Current: §f" + (description.isEmpty() ? "None" : description))))
         );
 
         getMenu().getSlot(BLOCKS_SLOT).setItem(
-                Item.create(XMaterial.STONE.parseMaterial(), "§eSet Blocks",
+                Item.create(Objects.requireNonNull(XMaterial.STONE.get()), "§eSet Blocks",
                         new ArrayList<>(List.of("§7Selected: §f" + blocks.size())))
         );
 
         getMenu().getSlot(DELETE_SLOT).setItem(
-                Item.create(XMaterial.BARRIER.parseMaterial(), "§cDelete Palette",
+                Item.create(Objects.requireNonNull(XMaterial.BARRIER.get()), "§cDelete Palette",
                         new ArrayList<>(List.of("§7Click to delete this palette" + (isPredefinedFilter() ? " (Cannot delete predefined filter)" : ""))))
         );
 

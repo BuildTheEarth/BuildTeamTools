@@ -9,6 +9,7 @@ import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.api.OpenStreetMapAPI;
+import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
@@ -28,6 +29,7 @@ import org.ipvp.canvas.mask.Mask;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 public class WarpEditMenu extends AbstractMenu {
@@ -48,11 +50,12 @@ public class WarpEditMenu extends AbstractMenu {
     private final Warp warp;
     private final boolean alreadyExists;
 
-    /** In this menu the player can update a warp.
+    /**
+     * In this menu the player can update a warp.
      * This can be used for example to change the name of a warp in the {@link WarpMenu}.
      *
-     * @param player  The player that is viewing the menu.
-     * @param warp The warp that is being updated.
+     * @param player The player that is viewing the menu.
+     * @param warp   The warp that is being updated.
      */
     public WarpEditMenu(Player player, Warp warp, boolean alreadyExists, boolean autoLoad) {
         super(4, WARP_UPDATE_INV_NAME, player, autoLoad);
@@ -60,7 +63,7 @@ public class WarpEditMenu extends AbstractMenu {
         this.warp = warp;
         this.alreadyExists = alreadyExists;
 
-        if(!this.alreadyExists){
+        if (!this.alreadyExists) {
             NAME_SLOT = 18;
             GROUP_SLOT = 20;
             HIGHLIGHT_SLOT = 22;
@@ -79,15 +82,15 @@ public class WarpEditMenu extends AbstractMenu {
         getMenu().getSlot(WARP_SLOT).setItem(warp.getMaterialItem());
 
         // Set the location item if the warp already exists. Otherwise, the location is set automatically on creation.
-        if(alreadyExists){
+        if (alreadyExists) {
             ArrayList<String> locationLore = ListUtil.createList("", "§eWorld: §7" + warp.getWorldName(), "§eLatitude: §7" + warp.getLat(), "§eLongitude: §7" + warp.getLon(), "§eElevation: §7" + warp.getY());
-            getMenu().getSlot(LOCATION_SLOT).setItem(Item.create(XMaterial.COMPASS.parseMaterial(), "§6§lChange Location", locationLore));
+            getMenu().getSlot(LOCATION_SLOT).setItem(Item.create(Objects.requireNonNull(XMaterial.COMPASS.get()), "§6§lChange Location", locationLore));
 
         }
 
         // Set the name item
         ArrayList<String> nameLore = ListUtil.createList("", "§eCurrent Name: ", warp.getName());
-        getMenu().getSlot(NAME_SLOT).setItem(Item.create(XMaterial.NAME_TAG.parseMaterial(), "§6§lChange Name", nameLore));
+        getMenu().getSlot(NAME_SLOT).setItem(Item.create(Objects.requireNonNull(XMaterial.NAME_TAG.get()), "§6§lChange Name", nameLore));
 
         // Set the group item
         ArrayList<String> groupLore = ListUtil.createList("", "§eCurrent Group: ", warp.getWarpGroup().getName());
@@ -100,7 +103,7 @@ public class WarpEditMenu extends AbstractMenu {
 
         // Set the address type item
         ArrayList<String> addressTypeLore = ListUtil.createList("", "§eAddress Type: ", warp.getAddressType() == null ? "§7City" : warp.getAddressType().getName());
-        getMenu().getSlot(ADDRESS_TYPE_SLOT).setItem(Item.create(XMaterial.PAPER.parseMaterial(), "§6§lChange Address Type", addressTypeLore));
+        getMenu().getSlot(ADDRESS_TYPE_SLOT).setItem(Item.create(Objects.requireNonNull(XMaterial.PAPER.get()), "§6§lChange Address Type", addressTypeLore));
 
         // Set the material item
         ArrayList<String> materialLore = ListUtil.createList("", "§eMaterial: ", warp.getMaterial() == null ? "§7Default" : warp.getMaterial());
@@ -108,11 +111,11 @@ public class WarpEditMenu extends AbstractMenu {
 
         // Set the highlight item
         ArrayList<String> highlightLore = ListUtil.createList("", "§eIs Highlight: ", "" + warp.isHighlight());
-        getMenu().getSlot(HIGHLIGHT_SLOT).setItem(Item.create(XMaterial.NETHER_STAR.parseMaterial(), warp.isHighlight() ? "§6§lMake Normal" : "§6§lMake Highlight", highlightLore));
+        getMenu().getSlot(HIGHLIGHT_SLOT).setItem(Item.create(Objects.requireNonNull(XMaterial.NETHER_STAR.get()), warp.isHighlight() ? "§6§lMake Normal" : "§6§lMake Highlight", highlightLore));
 
         // Set the delete item
-        if(alreadyExists)
-            getMenu().getSlot(DELETE_SLOT).setItem(Item.create(XMaterial.BARRIER.parseMaterial(), "§c§lDelete Warp", ListUtil.createList("", "§8Click to delete the warp.")));
+        if (alreadyExists)
+            getMenu().getSlot(DELETE_SLOT).setItem(Item.create(Objects.requireNonNull(XMaterial.BARRIER.get()), "§c§lDelete Warp", ListUtil.createList("", "§8Click to delete the warp.")));
     }
 
     @Override
@@ -122,10 +125,13 @@ public class WarpEditMenu extends AbstractMenu {
             clickPlayer.closeInventory();
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
-            if(alreadyExists)
-                NetworkModule.getInstance().getBuildTeam().updateWarp(clickPlayer, warp);
-            else
-                NetworkModule.getInstance().getBuildTeam().createWarp(clickPlayer, warp);
+            BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
+            if (buildTeam != null) {
+                if (alreadyExists)
+                    buildTeam.updateWarp(clickPlayer, warp);
+                else
+                    buildTeam.createWarp(clickPlayer, warp);
+            }
         });
 
         // Set click event for the location item
@@ -138,7 +144,7 @@ public class WarpEditMenu extends AbstractMenu {
                 GeographicalCoordinate coordinate = Projection.toGeo(new MinecraftCoordinate(location.getX(), location.getZ()));
 
                 //Get the country belonging to the coordinates
-                CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(new double[] {coordinate.latitude(), coordinate.longitude()} );
+                CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(new double[]{coordinate.latitude(), coordinate.longitude()});
 
                 future.thenAccept(result -> {
                     String regionName = result[0];
@@ -147,7 +153,7 @@ public class WarpEditMenu extends AbstractMenu {
                     //Check if the team owns this region/country
                     boolean ownsRegion = NetworkModule.getInstance().ownsRegion(regionName, countryCodeCCA2);
 
-                    if(!ownsRegion) {
+                    if (!ownsRegion) {
                         clickPlayer.sendMessage(ChatHelper.getErrorString("This team does not own the country %s!", result[0]));
                         return;
                     }
@@ -164,12 +170,13 @@ public class WarpEditMenu extends AbstractMenu {
 
                     new WarpEditMenu(clickPlayer, warp, alreadyExists, true);
                 }).exceptionally(e -> {
-                    clickPlayer.sendMessage(ChatHelper.getErrorString("An error occurred while changing the location of the warp!"));
-                    e.printStackTrace();
+                    Throwable cause = e.getCause() != null ? e.getCause() : e;
+                    clickPlayer.sendMessage(ChatHelper.getErrorString("Failed to change location: %s", cause.getMessage()));
+                    BuildTeamTools.getInstance().getComponentLogger().error("An error occurred while changing the location of the warp!", e);
                     return null;
                 });
             } catch (OutOfProjectionBoundsException e) {
-                clickPlayer.sendMessage(ChatHelper.getErrorString("An error occurred while changing the location of the warp!"));
+                clickPlayer.sendMessage(ChatHelper.getErrorString("Cannot set location here: %s", e.getMessage()));
             }
         });
 
@@ -198,7 +205,7 @@ public class WarpEditMenu extends AbstractMenu {
                         );
                     })
                     .text("Name")
-                    .itemLeft(Item.create(XMaterial.NAME_TAG.parseMaterial(), "§6§lChange Name"))
+                    .itemLeft(Item.create(Objects.requireNonNull(XMaterial.NAME_TAG.get()), "§6§lChange Name"))
                     .title("§8Change the warp name")
                     .plugin(BuildTeamTools.getInstance())
                     .open(clickPlayer);
@@ -237,13 +244,16 @@ public class WarpEditMenu extends AbstractMenu {
         });
 
         // Set click event for the delete item
-        if(alreadyExists)
+        if (alreadyExists)
             getMenu().getSlot(DELETE_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
                 clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
-                if(clickPlayer.hasPermission(Permissions.WARP_DELETE)) {
-                    NetworkModule.getInstance().getBuildTeam().deleteWarp(clickPlayer, warp);
+                if (clickPlayer.hasPermission(Permissions.WARP_DELETE)) {
+                    BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
+                    if (buildTeam != null) {
+                        buildTeam.deleteWarp(clickPlayer, warp);
+                    }
                 } else {
                     clickPlayer.sendMessage(ChatHelper.getErrorString("You don't have the required permission to delete warps!"));
                 }
@@ -254,9 +264,9 @@ public class WarpEditMenu extends AbstractMenu {
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
                 .item(MenuItems.ITEM_BACKGROUND)
-                .pattern("000000000")
-                .pattern("000000000")
-                .pattern("000000000")
+                .pattern(BinaryMask.EMPTY_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
                 .pattern("111111110")
                 .build();
     }

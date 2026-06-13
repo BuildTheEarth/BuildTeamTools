@@ -16,7 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A menu that allows the player to select a block from a list of blocks. It is possible to switch pages and to proceed to the next menu once a block has been selected. It is also possible to select multiple blocks.
+ * A menu that allows the player to select a block from a list of blocks. It is possible to switch pages and to proceed to the
+ * next menu once a block has been selected. It is also possible to select multiple blocks.
  * To change the items that are displayed in the menu, override the {@link #getSource()} method.
  * To perform an action when a block is selected, override the {@link #setItemClickEventsAsync()} method.
  */
@@ -32,7 +33,8 @@ public class NameListMenu extends AbstractPaginatedMenu {
     private final AbstractMenu backMenu;
 
 
-    public NameListMenu(Player player, String invName, List<MutablePair<ItemStack, String>> items, AbstractMenu backMenu, boolean autoLoad) {
+    public NameListMenu(Player player, String invName, List<MutablePair<ItemStack, String>> items, AbstractMenu backMenu,
+                        boolean autoLoad) {
         super(4, 3, invName, player, autoLoad);
 
         this.items = items;
@@ -71,9 +73,9 @@ public class NameListMenu extends AbstractPaginatedMenu {
 
         return BinaryMask.builder(getMenu())
                 .item(MenuItems.ITEM_BACKGROUND)
-                .pattern("000000000")
-                .pattern("000000000")
-                .pattern("000000000")
+                .pattern(BinaryMask.EMPTY_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
+                .pattern(BinaryMask.EMPTY_PATTERN)
                 .pattern(backSlot + "11000110")
                 .build();
     }

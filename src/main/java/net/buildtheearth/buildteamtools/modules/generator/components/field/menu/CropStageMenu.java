@@ -20,6 +20,7 @@ import org.ipvp.canvas.mask.Mask;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class CropStageMenu extends AbstractMenu {
 
@@ -39,30 +40,31 @@ public class CropStageMenu extends AbstractMenu {
     @Override
     protected void setPreviewItems() {
         Field field = GeneratorModule.getInstance().getField();
-        CropType cropType = (CropType) field.getPlayerSettings().get(getMenuPlayer().getUniqueId()).getValues().get(FieldFlag.CROP_TYPE);
+        CropType type = (CropType) field.getPlayerSettings().get(getMenuPlayer().getUniqueId()).getValues().get(FieldFlag.CROP_TYPE);
 
-        ItemStack itemOne = Item.create(XMaterial.BARRIER.parseMaterial());
-        ItemStack itemTwo = Item.create(XMaterial.BARRIER.parseMaterial());
+        ItemStack itemOne = Item.create(Objects.requireNonNull(XMaterial.BARRIER.get()));
+        ItemStack itemTwo = Item.create(Objects.requireNonNull(XMaterial.BARRIER.get()));
 
         ArrayList<String> typeLore = ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information");
-        switch (cropType) {
-            case POTATO:
+        itemTwo = switch (type) {
+            case POTATO -> {
                 itemOne = new Item(XMaterial.SHORT_GRASS.parseItem()).setDisplayName("§bLow").setLore(typeLore).build();
-                itemTwo = new Item(XMaterial.TALL_GRASS.parseItem()).setDisplayName("§bTall").setLore(typeLore).build();
-                break;
-            case WHEAT:
-                itemOne = Item.create(XMaterial.BIRCH_FENCE.parseMaterial(), "§bLight", typeLore);
-                itemTwo = Item.create(XMaterial.DARK_OAK_FENCE.parseMaterial(), "§bDark", typeLore);
-                break;
-            case CORN:
+                yield new Item(XMaterial.TALL_GRASS.parseItem()).setDisplayName("§bTall").setLore(typeLore).build();
+            }
+            case WHEAT -> {
+                itemOne = Item.create(Objects.requireNonNull(XMaterial.BIRCH_FENCE.get()), "§bLight", typeLore);
+                yield Item.create(Objects.requireNonNull(XMaterial.DARK_OAK_FENCE.get()), "§bDark", typeLore);
+            }
+            case CORN -> {
                 itemOne = new Item(XMaterial.SHORT_GRASS.parseItem()).setDisplayName("§bHarvested").setLore(typeLore).build();
-                itemTwo = new Item(XMaterial.TALL_GRASS.parseItem()).setDisplayName("§bTall").setLore(typeLore).build();
-                break;
-            case OTHER:
-                itemOne = Item.create(XMaterial.DEAD_BUSH.parseMaterial(), "§bDry", typeLore);
-                itemTwo = Item.create(XMaterial.WATER_BUCKET.parseMaterial(), "§bWet", typeLore);
-                break;
-        }
+                yield new Item(XMaterial.TALL_GRASS.parseItem()).setDisplayName("§bTall").setLore(typeLore).build();
+            }
+            case OTHER -> {
+                itemOne = Item.create(Objects.requireNonNull(XMaterial.DEAD_BUSH.get()), "§bDry", typeLore);
+                yield Item.create(Objects.requireNonNull(XMaterial.WATER_BUCKET.get()), "§bWet", typeLore);
+            }
+            default -> itemTwo;
+        };
 
 
         // Set items
@@ -89,20 +91,13 @@ public class CropStageMenu extends AbstractMenu {
             }
 
             CropStage cropstage = CropStage.FALLBACK;
-            switch (cropType) {
-                case POTATO:
-                    cropstage = CropStage.LOW;
-                    break;
-                case WHEAT:
-                    cropstage = CropStage.LIGHT;
-                    break;
-                case CORN:
-                    cropstage = CropStage.HARVESTED;
-                    break;
-                case OTHER:
-                    cropstage = CropStage.DRY;
-                    break;
-            }
+            cropstage = switch (cropType) {
+                case POTATO -> CropStage.LOW;
+                case WHEAT -> CropStage.LIGHT;
+                case CORN -> CropStage.HARVESTED;
+                case OTHER -> CropStage.DRY;
+                default -> cropstage;
+            };
 
             performClickAction(clickPlayer, cropstage);
         }));
@@ -128,10 +123,9 @@ public class CropStageMenu extends AbstractMenu {
     private void performClickAction(Player p, CropStage cropStage) {
         Settings settings = GeneratorModule.getInstance().getField().getPlayerSettings().get(p.getUniqueId());
 
-        if (!(settings instanceof FieldSettings))
+        if (!(settings instanceof FieldSettings fieldSettings))
             return;
 
-        FieldSettings fieldSettings = (FieldSettings) settings;
         fieldSettings.setValue(FieldFlag.CROP_STAGE, cropStage);
 
         p.closeInventory();
@@ -178,7 +172,7 @@ public class CropStageMenu extends AbstractMenu {
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
                 .item(MenuItems.ITEM_BACKGROUND)
-                .pattern("111111111")
+                .pattern(BinaryMask.FULL_PATTERN)
                 .pattern("110111011")
                 .pattern("011111111")
                 .build();

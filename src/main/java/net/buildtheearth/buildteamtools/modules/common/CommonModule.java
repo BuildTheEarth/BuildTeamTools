@@ -60,7 +60,8 @@ public class CommonModule extends Module {
         try {
             YamlFileFactory.registerPlugin(BuildTeamTools.getInstance());
             ConfigUtil.init();
-            ChatHelper.init(BuildTeamTools.getInstance(), BuildTeamTools.getInstance().isDebug(), BuildTeamTools.PREFIX, BuildTeamTools.CONSOLE_PREFIX);
+            ChatHelper.init(BuildTeamTools.getInstance(), BuildTeamTools.getInstance().isDebug(), BuildTeamTools.PREFIX,
+                    BuildTeamTools.CONSOLE_PREFIX);
         } catch (ConfigNotImplementedException ex) { // Fine?
         }
 
@@ -71,7 +72,9 @@ public class CommonModule extends Module {
         BuildTeamTools.getInstance().setDebug(BuildTeamTools.getInstance().getConfig().getBoolean(ConfigPaths.DEBUG, false));
 
         // Initialize the components
-        updaterComponent = new UpdaterComponent(BuildTeamTools.getInstance(), BuildTeamTools.SPIGOT_PROJECT_ID, BuildTeamTools.getInstance().getPluginFile(), UpdaterComponent.UpdateType.CHECK_DOWNLOAD, BuildTeamTools.getInstance().isDebug());
+        updaterComponent = new UpdaterComponent(BuildTeamTools.getInstance(), BuildTeamTools.SPIGOT_PROJECT_ID,
+                BuildTeamTools.getInstance().getPluginFile(), UpdaterComponent.UpdateType.CHECK_DOWNLOAD,
+                BuildTeamTools.getInstance().isDebug());
         pluginMessagingComponent = new PluginMessagingComponent();
         dependencyComponent = new DependencyComponent();
         versionComponent = new VersionComponent();

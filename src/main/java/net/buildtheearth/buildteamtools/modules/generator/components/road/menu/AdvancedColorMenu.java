@@ -27,14 +27,13 @@ public class AdvancedColorMenu extends BlockListMenu {
         super.setItemClickEventsAsync();
 
         // Set click event for next item
-        if(canProceed())
+        if (canProceed())
             getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
                 Settings settings = GeneratorModule.getInstance().getRoad().getPlayerSettings().get(clickPlayer.getUniqueId());
 
-                if(!(settings instanceof RoadSettings))
+                if (!(settings instanceof RoadSettings roadSettings))
                     return;
 
-                RoadSettings roadSettings = (RoadSettings) settings;
                 roadSettings.setValue(roadFlag, Item.createStringFromItemStringList(selectedMaterials));
 
                 clickPlayer.closeInventory();

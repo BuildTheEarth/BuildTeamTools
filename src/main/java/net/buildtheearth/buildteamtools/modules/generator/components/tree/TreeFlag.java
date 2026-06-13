@@ -17,14 +17,14 @@ public enum TreeFlag implements Flag {
     @Getter
     private final FlagType flagType;
 
-    TreeFlag(String flag, FlagType flagType){
+    TreeFlag(String flag, FlagType flagType) {
         this.flag = flag;
         this.flagType = flagType;
     }
 
     public static @Nullable TreeFlag byString(String flag) {
-        for(TreeFlag treeFlag : TreeFlag.values())
-            if(treeFlag.getFlag().equalsIgnoreCase(flag))
+        for (TreeFlag treeFlag : TreeFlag.values())
+            if (treeFlag.getFlag().equalsIgnoreCase(flag))
                 return treeFlag;
 
         return null;

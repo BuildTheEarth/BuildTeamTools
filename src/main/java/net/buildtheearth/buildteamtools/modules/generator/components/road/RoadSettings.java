@@ -14,18 +14,20 @@ public class RoadSettings extends Settings {
     public static List<String> streetLampTypes = new ArrayList<>();
 
 
-    public RoadSettings(Player player){
+    public RoadSettings(Player player) {
         super(player);
 
         File directory = new File(GeneratorUtils.getWorldEditSchematicsFolderPath() + "/GeneratorCollections/roadpack/");
         File[] files = directory.listFiles();
 
-        for(File file : files)
-            if(file.getName().contains("streetlamp"))
-                streetLampTypes.add(file.getName().replace(".schematic", "").replace("streetlamp", ""));
+        if (files != null) {
+            for (File file : files)
+                if (file.getName().contains("streetlamp"))
+                    streetLampTypes.add(file.getName().replace(".schematic", "").replace("streetlamp", ""));
+        }
     }
 
-    public void setDefaultValues(){
+    public void setDefaultValues() {
 
         // Lane Count (Default: Fixed Value)
         setValue(RoadFlag.LANE_COUNT, 2);

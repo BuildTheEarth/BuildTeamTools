@@ -1,6 +1,7 @@
 package net.buildtheearth.buildteamtools.modules.network.api;
 
 import com.alpsbte.alpslib.utils.ChatHelper;
+import net.buildtheearth.model.GeographicalCoordinate;
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -14,9 +15,10 @@ public class OpenStreetMapAPI extends API {
      * @param coordinates The latitude & longitude coordinates to get the country, region & city/town from
      * @return The country name and country code belonging to this location
      */
-    public static @NotNull CompletableFuture<String[]> getCountryFromLocationAsync(double @NotNull [] coordinates) {
+    public static @NotNull CompletableFuture<String[]> getCountryFromLocationAsync(@NotNull GeographicalCoordinate coordinates) {
         CompletableFuture<String[]> future = new CompletableFuture<>();
-        String url = "https://photon.komoot.io/reverse?lat=" + coordinates[0] + "&lon=" + coordinates[1] + "&lang=en";
+        String url = "https://photon.komoot.io/reverse?lat=" + coordinates.latitude() + "&lon=" + coordinates.longitude() +
+                "&lang=en";
 
         ChatHelper.logDebug("Requesting country from location: %s", url);
 

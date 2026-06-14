@@ -65,7 +65,8 @@ public class WarpsComponent extends ModuleComponent {
             return;
         }
 
-        Location targetWarpLocation = NavUtils.getLocationFromCoordinatesYawPitch(new GeographicalCoordinate(warp.getLat(), warp.getLon()), warp.getYaw(), warp.getPitch());
+        Location targetWarpLocation = NavUtils.getLocationFromCoordinatesYawPitch(warp.getCoordinate(), warp.getYaw(),
+                warp.getPitch());
         targetWarpLocation.setY(warp.getY());
         targetWarpLocation.setWorld(Bukkit.getWorld(warp.getWorldName()));
 
@@ -107,7 +108,7 @@ public class WarpsComponent extends ModuleComponent {
         BuildTeam currentTeam = NetworkModule.getInstance().getBuildTeam();
         if (currentTeam != null && warp.getWarpGroup().getBuildTeam().getID().equals(currentTeam.getID())) {
             ChatHelper.logDebug("Warping player %s to warp %s", player.getName(), warp.getName());
-            Location loc = NavUtils.getLocationFromCoordinatesYawPitch(new GeographicalCoordinate(warp.getLat(), warp.getLon()), warp.getYaw(), warp.getPitch());
+            Location loc = NavUtils.getLocationFromCoordinatesYawPitch(warp.getCoordinate(), warp.getYaw(), warp.getPitch());
 
             if (loc.getWorld() == null) {
                 World world = Bukkit.getWorld(warp.getWorldName()) == null ? player.getWorld() : Bukkit.getWorld(warp.getWorldName());
@@ -170,7 +171,7 @@ public class WarpsComponent extends ModuleComponent {
             GeographicalCoordinate coordinate = Projection.toGeo(new MinecraftCoordinate(location.getX(), location.getZ()));
 
             //Get the country belonging to the coordinates
-            CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(new double[]{coordinate.latitude(), coordinate.longitude()});
+            CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(coordinate);
 
             future.thenAccept(result -> {
                 String regionName = result[0];
@@ -188,7 +189,8 @@ public class WarpsComponent extends ModuleComponent {
                 String name = creator.getName() + "'s Warp";
 
                 // Create an instance of the warp POJO
-                Warp warp = new Warp(group, name, countryCodeCCA2, "cca2", null, null, null, location.getWorld().getName(), coordinate.latitude(), coordinate.longitude(), location.getY(), location.getYaw(), location.getPitch(), false);
+                Warp warp = new Warp(group, name, countryCodeCCA2, "cca2", null, null, null, location.getWorld().getName(),
+                        coordinate, location.getY(), location.getYaw(), location.getPitch(), false);
 
                 Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), () ->
                         new WarpEditMenu(creator, warp, false, true));
@@ -207,8 +209,8 @@ public class WarpsComponent extends ModuleComponent {
     /**
      * Creates a warp at the given location.
      */
-    public static void createWarp(@NonNull Location location, String name, WarpGroup group) {
-        double[] coordinates = CoordinateConversion.convertToGeo(location.getX(), location.getZ());
+    public static void createWarp(@NonNull Location location, String name, WarpGroup group) throws OutOfProjectionBoundsException {
+        GeographicalCoordinate coordinates = Projection.toGeo(new MinecraftCoordinate(location.getX(), location.getZ()));
 
         //Get the country belonging to the coordinates
         CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(coordinates);
@@ -226,7 +228,7 @@ public class WarpsComponent extends ModuleComponent {
 
             // Create an instance of the warp POJO
             Warp warp = new Warp(group, name, countryCodeCCA2, "cca2", null, null, null, location.getWorld().getName(),
-                    coordinates[0], coordinates[1], location.getY(), location.getYaw(), location.getPitch(), false);
+                    coordinates, location.getY(), location.getYaw(), location.getPitch(), false);
 
             Objects.requireNonNull(NetworkModule.getInstance().getBuildTeam()).createWarp(null, warp);
         }).exceptionally(e -> {

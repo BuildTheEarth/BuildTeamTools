@@ -12,6 +12,7 @@ import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractPaginatedMenu;
+import net.buildtheearth.model.GeographicalCoordinate;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
@@ -70,7 +71,8 @@ public class WarpMenu extends AbstractPaginatedMenu {
         BuildTeam currentTeam = NetworkModule.getInstance().getBuildTeam();
         if (getMenuPlayer().hasPermission(Permissions.WARP_CREATE)
                 && currentTeam != null && currentTeam.equals(warpGroup.getBuildTeam()))
-            warps.add(new Warp(null, "%create-warp%", null, null, null, null, null, null, 0, 0, 0, 0, 0, false));
+            warps.add(new Warp(null, "%create-warp%", null, null, null, null, null, null, new GeographicalCoordinate(0, 0), 0,
+                    0, 0, false));
 
         return warps;
     }

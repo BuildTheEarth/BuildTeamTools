@@ -8,6 +8,7 @@ import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Region;
+import net.buildtheearth.model.GeographicalCoordinate;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
@@ -27,9 +28,7 @@ public class TpllListener implements Listener {
     // Proxy manager to handle network-related operations
     private final NetworkModule networkModule = NetworkModule.getInstance();
 
-    // Latitude and longitude coordinates for teleportation
-    private double lon;
-    private double lat;
+    private GeographicalCoordinate coordinate;
 
     // Target server name for teleportation
     private BuildTeam targetBuildTeam;
@@ -42,7 +41,7 @@ public class TpllListener implements Listener {
         // Check if the command is a TPLL command
         if (!isTpllCommand(event)) return;
 
-        ChatHelper.logDebug("Intercepted TPLL command wit lat and lon: %s %s", lat, lon);
+        ChatHelper.logDebug("Intercepted TPLL command wit lat and lon: %s %s", coordinate.latitude(), coordinate.longitude());
 
         // Check if teleportation interception is required
         shouldIntercept().thenAcceptAsync(shouldIntercept -> {
@@ -51,11 +50,11 @@ public class TpllListener implements Listener {
                 var type = NavUtils.determineSwitchPossibilityOrMsgPlayerIfNone(event.getPlayer(), targetBuildTeam);
                 if (type != null) {
                     if (type == NavUtils.NavSwitchType.NETWORK) {
-                        NavigationModule.getInstance().getTpllComponent().tpllPlayer(event.getPlayer(),
-                                new double[]{lat, lon}, targetBuildTeam.getServerName());
+                        NavigationModule.getInstance().getTpllComponent().tpllPlayer(event.getPlayer(), coordinate,
+                                targetBuildTeam.getServerName());
                     } else if (type == NavUtils.NavSwitchType.TRANSFER) {
-                        NavigationModule.getInstance().getTpllComponent().tpllPlayerTransfer(event.getPlayer(),
-                                new double[]{lat, lon}, targetBuildTeam.getIP());
+                        NavigationModule.getInstance().getTpllComponent().tpllPlayerTransfer(event.getPlayer(), coordinate,
+                                targetBuildTeam.getIP());
                     }
                     event.setCancelled(true);
                 }
@@ -89,8 +88,7 @@ public class TpllListener implements Listener {
             return false;
         }
 
-        this.lat = oLat;
-        this.lon = oLon;
+        coordinate = new GeographicalCoordinate(oLat, oLon);
         return true;
     }
 
@@ -100,7 +98,7 @@ public class TpllListener implements Listener {
      * @return A CompletableFuture representing whether teleportation interception is required.
      */
     private @NotNull CompletableFuture<Boolean> shouldIntercept() {
-        return OpenStreetMapAPI.getCountryFromLocationAsync(new double[]{lat, lon})
+        return OpenStreetMapAPI.getCountryFromLocationAsync(coordinate)
                 .thenComposeAsync(address -> {
                     if (address == null) return CompletableFuture.completedFuture(false);
 

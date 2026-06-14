@@ -80,7 +80,7 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
             }
 
             // check if the given source is valid
-            WarpMigrationSource source = WarpMigrationSource.fromString(args[1]);
+            WarpMigrationSource source = WarpMigrationSource.fromString(args[1].toLowerCase());
             if (source == null) {
                 player.sendMessage(ChatHelper.getErrorString("Invalid source: %s", args[1]));
                 player.sendMessage(ChatHelper.getErrorString("Valid sources are: %s",
@@ -89,8 +89,8 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
             }
 
             WarpMigrator migrator = new WarpMigrator(source);
-            player.sendMessage(ChatHelper.getStandardString(false, "Migrating the warps..."));
-            migrator.migrate().whenComplete((result, throwable) -> {
+            player.sendMessage(ChatHelper.getStandardString(true, "Migrating the warps..."));
+            migrator.migrate(player).whenComplete((result, throwable) -> {
                 if (throwable != null) {
                     player.sendMessage(ChatHelper.getErrorString("Something went wrong while migrating the warps: %s",
                             throwable.getMessage()));

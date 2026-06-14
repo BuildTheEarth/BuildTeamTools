@@ -6,21 +6,23 @@ import com.earth2me.essentials.Warps;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.WarpsComponent;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 public class EssentialsWarpMigrator implements IWarpMigrator {
     @Override
-    public CompletableFuture<Void> migrate() {
+    public CompletableFuture<Void> migrate(Player player) {
         return CompletableFuture.runAsync(() -> {
             try {
-                Essentials essentials = (Essentials) Essentials.getProvidingPlugin(Essentials.class);
+                Essentials essentials = JavaPlugin.getPlugin(Essentials.class);
                 Warps warps = essentials.getWarps();
                 for (String warp : warps.getList()) {
                     WarpGroup group =
                             WarpsComponent.getOtherWarpGroup(Objects.requireNonNull(NetworkModule.getInstance().getBuildTeam()).getWarpGroups());
-                    WarpsComponent.createWarp(warps.getWarp(warp), warp, group);
+                    WarpsComponent.createWarp(warps.getWarp(warp), warp, group, player);
                 }
             } catch (Exception e) {
                 ChatHelper.logError("An error occurred while migrating the essentials warps!\n(this probably means essentials " +

@@ -209,7 +209,7 @@ public class WarpsComponent extends ModuleComponent {
     /**
      * Creates a warp at the given location.
      */
-    public static void createWarp(@NonNull Location location, String name, WarpGroup group) throws OutOfProjectionBoundsException {
+    public static void createWarp(@NonNull Location location, String name, WarpGroup group, Player creator) throws OutOfProjectionBoundsException {
         GeographicalCoordinate coordinates = Projection.toGeo(new MinecraftCoordinate(location.getX(), location.getZ()));
 
         //Get the country belonging to the coordinates
@@ -219,10 +219,14 @@ public class WarpsComponent extends ModuleComponent {
             String regionName = result[0];
             String countryCodeCCA2 = result[1].toUpperCase();
 
+            BuildTeamTools.getInstance().getComponentLogger().debug("Creating warp at {}", location);
+
             //Check if the team owns this region/country
             boolean ownsRegion = NetworkModule.getInstance().ownsRegion(regionName, countryCodeCCA2);
 
             if (!ownsRegion) {
+                creator.sendMessage(ChatHelper.getErrorString("Warp %s cannot be created. This team does not own the country %s" +
+                        " (Country code %s)!", name, regionName, countryCodeCCA2));
                 return;
             }
 
@@ -230,9 +234,11 @@ public class WarpsComponent extends ModuleComponent {
             Warp warp = new Warp(group, name, countryCodeCCA2, "cca2", null, null, null, location.getWorld().getName(),
                     coordinates, location.getY(), location.getYaw(), location.getPitch(), false);
 
-            Objects.requireNonNull(NetworkModule.getInstance().getBuildTeam()).createWarp(null, warp);
+            Objects.requireNonNull(NetworkModule.getInstance().getBuildTeam()).createWarp(creator, warp, true);
         }).exceptionally(e -> {
             BuildTeamTools.getInstance().getComponentLogger().error("An error occurred while creating the warp!", e);
+            Throwable cause = e.getCause() != null ? e.getCause() : e;
+            creator.sendMessage(ChatHelper.getErrorString("Failed to create warp %s: %s", name, cause.getMessage()));
             return null;
         });
     }

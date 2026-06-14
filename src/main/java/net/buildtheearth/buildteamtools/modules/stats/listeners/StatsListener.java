@@ -1,5 +1,6 @@
 package net.buildtheearth.buildteamtools.modules.stats.listeners;
 
+import io.papermc.paper.event.player.AsyncChatEvent;
 import net.buildtheearth.buildteamtools.modules.stats.StatsModule;
 import net.buildtheearth.buildteamtools.modules.stats.model.StatsPlayerType;
 import net.buildtheearth.buildteamtools.modules.stats.model.StatsServerType;
@@ -8,7 +9,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
@@ -42,7 +42,7 @@ public class StatsListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onMessage(AsyncPlayerChatEvent e) {
+    public void onMessage(AsyncChatEvent e) {
         StatsModule.getInstance().getStatsServer().addValue(StatsServerType.MESSAGES, 1);
         StatsModule.getInstance().getStatsPlayer(e.getPlayer().getUniqueId()).addValue(StatsPlayerType.MESSAGES, 1);
     }

@@ -2,16 +2,17 @@ package net.buildtheearth.buildteamtools.modules.miscellaneous.blockpalettegui;
 
 import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
+import io.papermc.paper.event.player.AsyncChatEvent;
 import lombok.Getter;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.ipvp.canvas.mask.BinaryMask;
@@ -204,14 +205,14 @@ public class CreatePaletteMenu extends AbstractMenu {
 
     private class ChatInputListener implements Listener {
         @EventHandler
-        public void onPlayerChat(AsyncPlayerChatEvent event) {
+        public void onPlayerChat(AsyncChatEvent event) {
             if (!event.getPlayer().getUniqueId().equals(player.getUniqueId())) return;
 
             // Alleen als we echt in input-modus zijn
             if (inputMode == InputMode.NONE) return;
 
             event.setCancelled(true);
-            String message = event.getMessage().trim();
+            String message = PlainTextComponentSerializer.plainText().serialize(event.message());
 
             if (message.equalsIgnoreCase("cancel")) {
                 if (inputMode == InputMode.NAME) name = "Unnamed";

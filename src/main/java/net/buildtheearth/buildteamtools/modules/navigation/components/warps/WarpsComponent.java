@@ -32,6 +32,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -201,6 +202,37 @@ public class WarpsComponent extends ModuleComponent {
         } catch (OutOfProjectionBoundsException e) {
             creator.sendMessage(ChatHelper.getErrorString("Cannot create warp here: %s", e.getMessage()));
         }
+    }
+
+    /**
+     * Creates a warp at the given location.
+     */
+    public static void createWarp(@NonNull Location location, String name, WarpGroup group) {
+        double[] coordinates = CoordinateConversion.convertToGeo(location.getX(), location.getZ());
+
+        //Get the country belonging to the coordinates
+        CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(coordinates);
+
+        future.thenAccept(result -> {
+            String regionName = result[0];
+            String countryCodeCCA2 = result[1].toUpperCase();
+
+            //Check if the team owns this region/country
+            boolean ownsRegion = NetworkModule.getInstance().ownsRegion(regionName, countryCodeCCA2);
+
+            if (!ownsRegion) {
+                return;
+            }
+
+            // Create an instance of the warp POJO
+            Warp warp = new Warp(group, name, countryCodeCCA2, "cca2", null, null, null, location.getWorld().getName(),
+                    coordinates[0], coordinates[1], location.getY(), location.getYaw(), location.getPitch(), false);
+
+            Objects.requireNonNull(NetworkModule.getInstance().getBuildTeam()).createWarp(null, warp);
+        }).exceptionally(e -> {
+            BuildTeamTools.getInstance().getComponentLogger().error("An error occurred while creating the warp!", e);
+            return null;
+        });
     }
 
 

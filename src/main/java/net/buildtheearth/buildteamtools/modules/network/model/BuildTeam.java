@@ -67,7 +67,9 @@ public class BuildTeam {
     public void createWarp(Player creator, Warp warp) {
         // Check if the team owns that warp
         if (!warp.getWarpGroup().getBuildTeam().getID().equals(this.getID())) {
+            if (creator != null) {
             creator.sendMessage(ChatHelper.getErrorString("You can only create warps for your own team!"));
+            }
             return;
         }
 
@@ -86,8 +88,10 @@ public class BuildTeam {
             @Override
             public void onFailure(IOException e) {
                 warp.getWarpGroup().getWarps().remove(warp);
-                creator.sendMessage(ChatHelper.getErrorString("Failed to sync warp %s to the network! It has been removed " +
+                if (creator != null) {
+                    creator.sendMessage(ChatHelper.getErrorString("Failed to sync warp %s to the network! It has been removed " +
                         "locally. Please try again.", warp.getName()));
+                }
                 BuildTeamTools.getInstance().getComponentLogger().error("Failed to create warp via API", e);
             }
         });

@@ -38,7 +38,11 @@ public class BuildteamCommand implements CommandExecutor, TabCompleter {
             player.sendMessage(ChatHelper.getErrorString("Usage: /%s <buildteam>", label));
             return true;
         } else {
-            String buildTeamName = args[0];
+            String buildTeamName;
+            if (args.length > 1) buildTeamName = String.join(" ", args);
+            else {
+                buildTeamName = args[0];
+            }
             var teams = NetworkModule.getInstance().getBuildTeams().stream()
                     .filter(buildTeam -> buildTeam.getTag().equalsIgnoreCase(buildTeamName) || buildTeam.getBlankName().equalsIgnoreCase(buildTeamName)).toArray();
             if (teams.length == 0 || !(teams[0] instanceof BuildTeam bt)) {

@@ -4,6 +4,7 @@ import com.alpsbte.alpslib.utils.ChatHelper;
 import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.WarpMigrator;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.WarpsComponent;
+import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.MigrationResult;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.WarpMigrationSource;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
@@ -26,13 +27,13 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, String @NonNull [] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(ChatHelper.getErrorString("This command can only be used by a player!"));
+            sender.sendMessage(ChatHelper.getErrorComponent("This command can only be used by a player!"));
             return true;
         }
 
-        // Check if the build team is loaded
         if (NetworkModule.getInstance().getBuildTeam() == null) {
-            sender.sendMessage(ChatHelper.getErrorString("The Warp Module is currently disabled because the Build Team failed to load!"));
+            sender.sendMessage(ChatHelper.getErrorComponent("The Warp Module is currently disabled because the Build Team " +
+                    "failed to load!"));
             return true;
         }
 
@@ -42,88 +43,107 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        // WARP CREATE
         if (args[0].equalsIgnoreCase("create")) {
-            // Check if the player has the required permissions
-            if (!player.hasPermission(Permissions.WARP_CREATE)) {
-                player.sendMessage(ChatHelper.getErrorString("You don't have the required %s to %s warps.", "permission", "create"));
-                return true;
-            }
-
-            // Check if the command has only one argument
-            if (args.length > 1) {
-                player.sendMessage(ChatHelper.getErrorString("Usage: /warp create"));
-                return true;
-            }
-
-            player.sendActionBar(ChatHelper.getStandardString(false, "Creating the warp..."));
-
-            WarpsComponent.createWarp(player);
-            return true;
+            return handleCreateCommand(player, args);
         }
 
-        // WARP MIGRATE
         if (args[0].equalsIgnoreCase("migrate")) {
-            // Check if the player has the required permissions
-            if (!player.hasPermission(Permissions.WARP_MIGRATE)) {
-                player.sendMessage(ChatHelper.getErrorString("You don't have the required %s to %s warps.", "permission",
-                        "migrate"));
-                return true;
-            }
+            return handleMigrateCommand(player, args);
+        }
 
-            // check if the command has the correct amount of arguments
-            if (args.length != 2) {
-                player.sendMessage(ChatHelper.getErrorString("Usage: /warp migrate <source>"));
-                player.sendMessage(ChatHelper.getErrorString("Valid sources are: %s",
-                        Arrays.toString(WarpMigrationSource.values())));
-                return true;
-            }
+        return handleWarpTeleport(player, args);
+    }
 
-            // check if the given source is valid
-            WarpMigrationSource source = WarpMigrationSource.fromString(args[1].toLowerCase());
-            if (source == null) {
-                player.sendMessage(ChatHelper.getErrorString("Invalid source: %s", args[1]));
-                player.sendMessage(ChatHelper.getErrorString("Valid sources are: %s",
-                        Arrays.toString(WarpMigrationSource.values())));
-                return true;
-            }
-
-            WarpMigrator migrator = new WarpMigrator(source);
-            player.sendMessage(ChatHelper.getStandardString(true, "Migrating the warps..."));
-            migrator.migrate(player).whenComplete((result, throwable) -> {
-                if (throwable != null) {
-                    player.sendMessage(ChatHelper.getErrorString("Something went wrong while migrating the warps: %s",
-                            throwable.getMessage()));
-                    return;
-                }
-                player.sendMessage(ChatHelper.getSuccessComponent("Successfully migrated the warps!"));
-            });
+    private boolean handleCreateCommand(@NonNull Player player, String @NonNull [] args) {
+        if (!player.hasPermission(Permissions.WARP_CREATE)) {
+            player.sendMessage(ChatHelper.getErrorComponent("You don't have the required %s to %s warps.", "permission",
+                    "create"));
             return true;
         }
 
+        if (args.length > 1) {
+            player.sendMessage(ChatHelper.getErrorComponent("Usage: /warp create"));
+            return true;
+        }
 
-        // Combine the args to one warp name
+        player.sendActionBar(ChatHelper.getStandardComponent(false, "Creating the warp..."));
+        WarpsComponent.createWarp(player);
+        return true;
+    }
+
+    private boolean handleMigrateCommand(@NonNull Player player, String @NonNull [] args) {
+        if (!player.hasPermission(Permissions.WARP_MIGRATE)) {
+            player.sendMessage(ChatHelper.getErrorString("You don't have the required %s to %s warps.", "permission",
+                    "migrate"));
+            return true;
+        }
+
+        if (args.length != 2) {
+            player.sendMessage(ChatHelper.getErrorComponent("Usage: /warp migrate <source>"));
+            player.sendMessage(ChatHelper.getErrorComponent("Valid sources are: %s",
+                    Arrays.toString(WarpMigrationSource.values())));
+            return true;
+        }
+
+        WarpMigrationSource source = WarpMigrationSource.fromString(args[1].toLowerCase());
+        if (source == null) {
+            player.sendMessage(ChatHelper.getErrorComponent("Invalid source: %s", args[1]));
+            player.sendMessage(ChatHelper.getErrorComponent("Valid sources are: %s",
+                    Arrays.toString(WarpMigrationSource.values())));
+            return true;
+        }
+
+        WarpMigrator migrator = new WarpMigrator(source);
+        player.sendMessage(ChatHelper.getStandardComponent(true, "Migrating the warps..."));
+        migrator.migrate(player).whenComplete((result, throwable) ->
+                handleMigrationResult(player, result, throwable));
+        return true;
+    }
+
+    private void handleMigrationResult(@NonNull Player player, @NonNull MigrationResult result, @Nullable Throwable throwable) {
+        if (throwable != null) {
+            player.sendMessage(ChatHelper.getErrorComponent("Something went wrong while migrating the warps: %s",
+                    throwable.getMessage()));
+            return;
+        }
+
+        if (!result.success()) {
+            player.sendMessage(ChatHelper.getErrorComponent("Migration failed: %s", result.errorMessage()));
+            return;
+        }
+
+        if (result.migratedCount() == 0 && result.failedCount() == 0) {
+            player.sendMessage(ChatHelper.getStandardComponent(false, "No warps found to migrate."));
+        } else if (result.failedCount() == 0) {
+            player.sendMessage(ChatHelper.getSuccessComponent("Successfully migrated %d warp(s)!",
+                    result.migratedCount()));
+        } else if (result.migratedCount() == 0) {
+            player.sendMessage(ChatHelper.getErrorComponent("Failed to migrate all %d warp(s)!", result.failedCount()));
+        } else {
+            player.sendMessage(ChatHelper.getStandardComponent(false, "Migration completed: %d warp(s) migrated, %d failed.",
+                    result.migratedCount(), result.failedCount()));
+        }
+    }
+
+    private boolean handleWarpTeleport(@NonNull Player player, String @NonNull [] args) {
         String key = String.join(" ", args);
 
         if (!checkForWarpUsePermissionAndMessage(player)) return true;
 
-        // Find the warp with the given key
         Warp warp = NavigationModule.getInstance().getWarpsComponent().getWarpByName(key);
 
         if (warp == null) {
-            player.sendMessage(ChatHelper.getErrorString("The warp with the name %s does not exist in this team!", key));
+            player.sendMessage(ChatHelper.getErrorComponent("The warp with the name %s does not exist in this team!", key));
             return true;
         }
 
         NavigationModule.getInstance().getWarpsComponent().warpPlayer(player, warp);
-
         return true;
     }
 
     private static boolean checkForWarpUsePermissionAndMessage(@NonNull Player player) {
-        // Check if the player has the required permission
         if (!player.hasPermission(Permissions.WARP_USE)) {
-            player.sendMessage(ChatHelper.getErrorString("You don't have the required %s to %s warps.", "permission", "use"));
+            player.sendMessage(ChatHelper.getErrorComponent("You don't have the required %s to %s warps.", "permission", "use"));
             return false;
         }
         return true;

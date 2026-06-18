@@ -20,6 +20,7 @@ public abstract class Permissions {
     public static final String WARP_CREATE = "btt.warp.create";
     public static final String WARP_EDIT = "btt.warp.edit";
     public static final String WARP_DELETE = "btt.warp.delete";
+    public static final String WARP_MIGRATE = "btt.warp.migrate";
 
     public static final String WARP_GROUP_CREATE = "btt.warp.group.create";
     public static final String WARP_GROUP_EDIT = "btt.warp.group.edit";

@@ -89,28 +89,28 @@ public class TpllComponent extends ModuleComponent {
      * Sends a plugin message with a tpll request to the target server and sends the player there.
      *
      * @param player           The player to send to the new server.
-     * @param coordinates      The coordinates to send the player to on join.
+     * @param coordinate      The coordinate to send the player to on join.
      * @param targetServerName The server to send the player to.
      */
-    public void tpllPlayer(@NotNull Player player, double @NotNull [] coordinates, String targetServerName) {
+    public void tpllPlayer(@NotNull Player player, @NotNull GeographicalCoordinate coordinate, String targetServerName) {
         ChatHelper.logDebug("Starting universal tpll teleportation for %s to %s.", player.getDisplayName(), targetServerName);
         // Send a plugin message to the target server which adds the tpll to the queue
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("TPLL");
         out.writeUTF(targetServerName);
         out.writeUTF(player.getUniqueId().toString());
-        out.writeUTF(String.valueOf(coordinates[0]));
-        out.writeUTF(String.valueOf(coordinates[1]));
+        out.writeUTF(String.valueOf(coordinate.latitude()));
+        out.writeUTF(String.valueOf(coordinate.longitude()));
         player.sendPluginMessage(BuildTeamTools.getInstance(), "btt:buildteam", out.toByteArray());
 
         // Switch the player to the target server
         ChatHelper.logDebug("Teleported player to the target server.");
     }
 
-    public void tpllPlayerTransfer(@NotNull Player player, double @NotNull [] coordinates, String ip) {
+    public void tpllPlayerTransfer(@NotNull Player player, @NotNull GeographicalCoordinate coordinate, String ip) {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
-        out.writeDouble(coordinates[0]);
-        out.writeDouble(coordinates[1]);
+        out.writeDouble(coordinate.latitude());
+        out.writeDouble(coordinate.longitude());
         player.storeCookie(TPLL_COOKIE_KEY, out.toByteArray());
         NavUtils.transferPlayer(player, ip);
     }

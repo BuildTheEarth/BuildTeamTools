@@ -83,7 +83,9 @@ public class WarpEditMenu extends AbstractMenu {
 
         // Set the location item if the warp already exists. Otherwise, the location is set automatically on creation.
         if (alreadyExists) {
-            ArrayList<String> locationLore = ListUtil.createList("", "§eWorld: §7" + warp.getWorldName(), "§eLatitude: §7" + warp.getLat(), "§eLongitude: §7" + warp.getLon(), "§eElevation: §7" + warp.getY());
+            ArrayList<String> locationLore = ListUtil.createList("", "§eWorld: §7" + warp.getWorldName(),
+                    "§eLatitude: §7" + warp.getCoordinate().latitude(), "§eLongitude: §7" + warp.getCoordinate().longitude(),
+                    "§eElevation: §7" + warp.getY());
             getMenu().getSlot(LOCATION_SLOT).setItem(Item.create(Objects.requireNonNull(XMaterial.COMPASS.get()), "§6§lChange Location", locationLore));
 
         }
@@ -144,7 +146,7 @@ public class WarpEditMenu extends AbstractMenu {
                 GeographicalCoordinate coordinate = Projection.toGeo(new MinecraftCoordinate(location.getX(), location.getZ()));
 
                 //Get the country belonging to the coordinates
-                CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(new double[]{coordinate.latitude(), coordinate.longitude()});
+                CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(coordinate);
 
                 future.thenAccept(result -> {
                     String regionName = result[0];
@@ -161,8 +163,7 @@ public class WarpEditMenu extends AbstractMenu {
                     warp.setCountryCode(countryCodeCCA2);
                     warp.setWorldName(location.getWorld().getName());
                     warp.setY(location.getY());
-                    warp.setLat(coordinate.latitude());
-                    warp.setLon(coordinate.longitude());
+                    warp.setCoordinate(coordinate);
                     warp.setYaw(location.getYaw());
                     warp.setPitch(location.getPitch());
 

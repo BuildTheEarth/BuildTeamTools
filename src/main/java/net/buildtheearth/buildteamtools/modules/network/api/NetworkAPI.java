@@ -12,6 +12,7 @@ import net.buildtheearth.buildteamtools.modules.network.model.Continent;
 import net.buildtheearth.buildteamtools.modules.network.model.Region;
 import net.buildtheearth.buildteamtools.modules.network.model.RegionType;
 import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
+import net.buildtheearth.model.GeographicalCoordinate;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import org.bukkit.Bukkit;
@@ -160,7 +161,9 @@ public class NetworkAPI {
                             if (warpGroup == null)
                                 warpGroup = otherWarpGroup;
 
-                            Warp warp = new Warp(warpID, warpGroup, warpName, countryCode, "cca3", address, addressType, material, warpWorldName, warpLat, warpLon, warpHeight, warpYaw, warpPitch, isHighlight);
+                            Warp warp = new Warp(warpID, warpGroup, warpName, countryCode, "cca3", address, addressType,
+                                    material, warpWorldName, new GeographicalCoordinate(warpLat, warpLon), warpHeight, warpYaw,
+                                    warpPitch, isHighlight);
 
                             // If the warp belongs to a warp group, add it to that, otherwise add it to the "other" warp group.
                             boolean added = false;

@@ -15,7 +15,6 @@ import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
 import net.buildtheearth.buildteamtools.utils.io.ConfigUtil;
-import net.buildtheearth.model.GeographicalCoordinate;
 import net.buildtheearth.model.MinecraftCoordinate;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -151,7 +150,7 @@ public class BluemapComponent extends ModuleComponent {
     private void addWarpMarker(@NotNull MarkerSet markerSet, @NotNull Warp warp) {
         // Convert geographic coordinates to Minecraft world coordinates
         try {
-            MinecraftCoordinate coordinate = Projection.toMinecraft(new GeographicalCoordinate(warp.getLat(), warp.getLon()));
+            MinecraftCoordinate coordinate = Projection.toMinecraft(warp.getCoordinate());
 
             // Create a POI marker for the warp
             POIMarker marker = POIMarker.builder()

@@ -8,6 +8,7 @@ import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.Utils;
 import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.LetterType;
+import net.buildtheearth.model.GeographicalCoordinate;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.json.JSONObject;
@@ -55,11 +56,7 @@ public class Warp {
 
     @Getter
     @Setter
-    private double lat;
-
-    @Getter
-    @Setter
-    private double lon;
+    private GeographicalCoordinate coordinate;
 
     @Getter
     @Setter
@@ -81,10 +78,12 @@ public class Warp {
      * Create a warp with a random warp ID.
      */
     public Warp(WarpGroup warpGroup, String name, String countryCode, String countryCodeType, String address,
-                AddressType addressType, String material, String worldName, double lat, double lon, double y, float yaw,
+                AddressType addressType, String material, String worldName, GeographicalCoordinate coordinate, double y,
+                float yaw,
                 float pitch, boolean isHighlight) {
-        this(UUID.randomUUID(), warpGroup, name, countryCode, countryCodeType, address, addressType, material, worldName, lat,
-                lon, y, yaw, pitch, isHighlight);
+        this(UUID.randomUUID(), warpGroup, name, countryCode, countryCodeType, address, addressType, material, worldName,
+                coordinate,
+                y, yaw, pitch, isHighlight);
     }
 
     public ItemStack getMaterialItem() {
@@ -131,8 +130,8 @@ public class Warp {
         json.put("countryCode", countryCode);
         json.put("countryCodeType", countryCodeType);
         json.put("worldName", worldName);
-        json.put("lat", lat);
-        json.put("lon", lon);
+        json.put("lat", coordinate.latitude());
+        json.put("lon", coordinate.longitude());
         json.put("y", y);
         json.put("yaw", yaw);
         json.put("pitch", pitch);

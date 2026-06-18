@@ -32,6 +32,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -64,7 +65,8 @@ public class WarpsComponent extends ModuleComponent {
             return;
         }
 
-        Location targetWarpLocation = NavUtils.getLocationFromCoordinatesYawPitch(new GeographicalCoordinate(warp.getLat(), warp.getLon()), warp.getYaw(), warp.getPitch());
+        Location targetWarpLocation = NavUtils.getLocationFromCoordinatesYawPitch(warp.getCoordinate(), warp.getYaw(),
+                warp.getPitch());
         targetWarpLocation.setY(warp.getY());
         targetWarpLocation.setWorld(Bukkit.getWorld(warp.getWorldName()));
 
@@ -106,7 +108,7 @@ public class WarpsComponent extends ModuleComponent {
         BuildTeam currentTeam = NetworkModule.getInstance().getBuildTeam();
         if (currentTeam != null && warp.getWarpGroup().getBuildTeam().getID().equals(currentTeam.getID())) {
             ChatHelper.logDebug("Warping player %s to warp %s", player.getName(), warp.getName());
-            Location loc = NavUtils.getLocationFromCoordinatesYawPitch(new GeographicalCoordinate(warp.getLat(), warp.getLon()), warp.getYaw(), warp.getPitch());
+            Location loc = NavUtils.getLocationFromCoordinatesYawPitch(warp.getCoordinate(), warp.getYaw(), warp.getPitch());
 
             if (loc.getWorld() == null) {
                 World world = Bukkit.getWorld(warp.getWorldName()) == null ? player.getWorld() : Bukkit.getWorld(warp.getWorldName());
@@ -169,7 +171,7 @@ public class WarpsComponent extends ModuleComponent {
             GeographicalCoordinate coordinate = Projection.toGeo(new MinecraftCoordinate(location.getX(), location.getZ()));
 
             //Get the country belonging to the coordinates
-            CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(new double[]{coordinate.latitude(), coordinate.longitude()});
+            CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(coordinate);
 
             future.thenAccept(result -> {
                 String regionName = result[0];
@@ -187,7 +189,8 @@ public class WarpsComponent extends ModuleComponent {
                 String name = creator.getName() + "'s Warp";
 
                 // Create an instance of the warp POJO
-                Warp warp = new Warp(group, name, countryCodeCCA2, "cca2", null, null, null, location.getWorld().getName(), coordinate.latitude(), coordinate.longitude(), location.getY(), location.getYaw(), location.getPitch(), false);
+                Warp warp = new Warp(group, name, countryCodeCCA2, "cca2", null, null, null, location.getWorld().getName(),
+                        coordinate, location.getY(), location.getYaw(), location.getPitch(), false);
 
                 Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), () ->
                         new WarpEditMenu(creator, warp, false, true));
@@ -201,6 +204,43 @@ public class WarpsComponent extends ModuleComponent {
         } catch (OutOfProjectionBoundsException e) {
             creator.sendMessage(ChatHelper.getErrorString("Cannot create warp here: %s", e.getMessage()));
         }
+    }
+
+    /**
+     * Creates a warp at the given location.
+     */
+    public static void createWarp(@NonNull Location location, String name, WarpGroup group, Player creator) throws OutOfProjectionBoundsException {
+        GeographicalCoordinate coordinates = Projection.toGeo(new MinecraftCoordinate(location.getX(), location.getZ()));
+
+        //Get the country belonging to the coordinates
+        CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(coordinates);
+
+        future.thenAccept(result -> {
+            String regionName = result[0];
+            String countryCodeCCA2 = result[1].toUpperCase();
+
+            BuildTeamTools.getInstance().getComponentLogger().debug("Creating warp at {}", location);
+
+            //Check if the team owns this region/country
+            boolean ownsRegion = NetworkModule.getInstance().ownsRegion(regionName, countryCodeCCA2);
+
+            if (!ownsRegion) {
+                creator.sendMessage(ChatHelper.getErrorString("Warp %s cannot be created. This team does not own the country %s" +
+                        " (Country code %s)!", name, regionName, countryCodeCCA2));
+                return;
+            }
+
+            // Create an instance of the warp POJO
+            Warp warp = new Warp(group, name, countryCodeCCA2, "cca2", null, null, null, location.getWorld().getName(),
+                    coordinates, location.getY(), location.getYaw(), location.getPitch(), false);
+
+            Objects.requireNonNull(NetworkModule.getInstance().getBuildTeam()).createWarp(creator, warp, true);
+        }).exceptionally(e -> {
+            BuildTeamTools.getInstance().getComponentLogger().error("An error occurred while creating the warp!", e);
+            Throwable cause = e.getCause() != null ? e.getCause() : e;
+            creator.sendMessage(ChatHelper.getErrorString("Failed to create warp %s: %s", name, cause.getMessage()));
+            return null;
+        });
     }
 
 

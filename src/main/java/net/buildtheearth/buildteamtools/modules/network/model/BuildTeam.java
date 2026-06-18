@@ -11,6 +11,7 @@ import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.api.API;
 import net.buildtheearth.buildteamtools.modules.network.api.NetworkAPI;
 import org.bukkit.entity.Player;
+import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -64,15 +65,19 @@ public class BuildTeam {
             this.IP = (!isConnected) ? serverIP : tag.toLowerCase() + ".buildtheearth.net";
     }
 
-    public void createWarp(Player creator, Warp warp) {
-        // Check if the team owns that warp
+    public void createWarp(Player creator, @NonNull Warp warp) {
+        createWarp(creator, warp, false);
+    }
+
+    public void createWarp(@NonNull Player creator, @NonNull Warp warp, boolean reducedMessages) {
         if (!warp.getWarpGroup().getBuildTeam().getID().equals(this.getID())) {
-            creator.sendMessage(ChatHelper.getErrorString("You can only create warps for your own team!"));
+            creator.sendMessage(ChatHelper.getErrorString("Could not create warp %s. You can only create warps for your own " +
+                    "team! Id's have not matched", warp.getName()));
             return;
         }
 
         warp.getWarpGroup().getWarps().add(warp);
-        ChatHelper.sendSuccessfulMessage(creator, "Successfully created the warp %s!", warp.getName());
+        if (!reducedMessages) ChatHelper.sendSuccessfulMessage(creator, "Successfully created the warp %s!", warp.getName());
 
         NetworkAPI.createWarp(warp, new API.ApiResponseCallback() {
             @Override

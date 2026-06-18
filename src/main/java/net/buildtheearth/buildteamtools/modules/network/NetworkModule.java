@@ -1,5 +1,6 @@
 package net.buildtheearth.buildteamtools.modules.network;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import lombok.Getter;
@@ -181,6 +182,7 @@ public class NetworkModule extends Module {
         AtomicBoolean ownsRegion = new AtomicBoolean(false);
         if (buildTeam != null && buildTeam.getRegions() != null) {
             buildTeam.getRegions().forEach(region -> {
+                ChatHelper.logDebug("Checking region: %s against %s, %s", region.toString(), regionName, countryCodeCca2);
                 if (region.getName().equals(regionName) || region.getCountryCodeCca2().equals(countryCodeCca2))
                     ownsRegion.set(true);
             });

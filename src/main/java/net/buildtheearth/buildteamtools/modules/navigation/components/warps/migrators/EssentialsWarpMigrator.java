@@ -48,6 +48,11 @@ public class EssentialsWarpMigrator implements IWarpMigrator {
         try {
             WarpGroup group =
                     WarpsComponent.getOtherWarpGroup(Objects.requireNonNull(NetworkModule.getInstance().getBuildTeam()).getWarpGroups());
+            if (group != null && group.getWarps().stream().anyMatch(w -> w.getName().equalsIgnoreCase(warp))) {
+                ChatHelper.sendErrorMessage(player, "Warp '%s' already exists in the database, skipping migration.", warp);
+                return false;
+            }
+
             if (group == null) {
                 group = NavUtils.createOtherWarpGroup(NetworkModule.getInstance().getBuildTeam());
             }

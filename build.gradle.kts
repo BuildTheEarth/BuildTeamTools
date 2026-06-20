@@ -7,65 +7,25 @@ plugins {
 
 repositories {
     mavenCentral()
-    //mavenLocal() // NEVER use in Production/Commits!
-    maven {
-        url = uri("https://repo.papermc.io/repository/maven-public/")
-    }
+    // mavenLocal() // NEVER use in Production/Commits!
+    maven("https://repo.papermc.io/repository/maven-public/")
 
-    maven {
-        url = uri("https://maven.buildtheearth.net/releases")
-    }
+    maven("https://maven.buildtheearth.net/releases") // BuildTheEarth Projection
 
-    maven {
-        url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-    }
+    maven("https://mvn.alps-bte.com/repository/alps-bte/") // AlpsLib
 
-    maven {
-        url = uri("https://mvn.alps-bte.com/repository/alps-bte/")
-    }
+    maven("https://maven.enginehub.org/repo/") // WorldEdit
 
-    maven {
-        url = uri("https://repo.onarandombox.com/content/groups/public/")
-    }
+    maven("https://mvn.wesjd.net/") // Anvilgui
 
-    maven {
-        url = uri("https://repo.codemc.io/repository/maven-snapshots/")
-    }
+    maven("https://repo.bluecolored.de/releases") // BlueMap
 
-    maven {
-        url = uri("https://repo.codemc.io/repository/maven-public/")
-    }
+    maven("https://repo.essentialsx.net/releases/")
 
-    maven {
-        url = uri("https://jitpack.io")
-    }
+    // Alps Lib Geo - can be removed once https://github.com/AlpsBTE/Alps-Lib/pull/17 is merged & version is set to 1.0.0
+    maven("https://mvn.alps-bte.com/repository/alps-bte-snapshots/")
 
-    maven {
-        url = uri("https://repo.dmulloy2.net/repository/public/")
-    }
-
-    maven {
-        url = uri("https://maven.daporkchop.net/")
-    }
-
-    maven {
-        url = uri("https://download.java.net/maven/2")
-    }
-
-    maven {
-        url = uri("https://maven.enginehub.org/repo/")
-    }
-
-    maven {
-        url = uri("https://mvn.wesjd.net/")
-    }
-    maven { url = uri("https://jitpack.io") }
-
-    maven("https://repo.bluecolored.de/releases")
-
-    maven {
-        url = uri("https://repo.essentialsx.net/releases/")
-    }
+    maven("https://jitpack.io") // Clipper2
 }
 
 dependencies {

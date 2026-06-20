@@ -11,7 +11,7 @@ alpslib-libpsterra = "1.1.4"
 # https://mvn.alps-bte.com/service/rest/repository/browse/alps-bte/com/alpsbte/alpslib/alpslib-utils/
 alpslib-utils = "1.4.6"
 # https://mvn.alps-bte.com/service/rest/repository/browse/alps-bte/com/alpsbte/alpslib/alpslib-geo/
-alpslib-geo = "1.0.0"
+alpslib-geo = "1.0.0-SNAPSHOT"
 # https://github.com/WesJD/AnvilGUI https://mvn.wesjd.net/
 anvilgui = "1.10.13-SNAPSHOT"
 # Ref: https://github.com/BlueMap-Minecraft/BlueMapAPI
@@ -37,7 +37,7 @@ okhttp-jvm = "5.4.0"
 # @pin 26.1+ required Java 25 - # https://artifactory.papermc.io/ui/native/universe/io/papermc/paper/paper-api/
 paper-api = "1.21.11-R0.1-SNAPSHOT"
 # https://github.com/CryptoMorin/XSeries/releases
-xseries = "13.8.0"
+xseries = "13.7.0"
 #
 # Plugins
 # https://github.com/palantir/gradle-git-version/releases

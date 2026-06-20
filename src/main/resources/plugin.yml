@@ -44,9 +44,40 @@ commands:
     usage: /buildteam <team>
     aliases: [ bt ]
 permissions:
+  btt.permpack.visitor:
+    description: Contains all permissions for visitors / everyone
+    default: op
+    children:
+      btt.navigator.use: true
+      btt.warp.use: true
+      btt.bp.use: true
+  btt.permpack.builder:
+    description: Contains all permissions for builders / trusted players
+    default: op
+    children:
+      btt.generator.use: true
+  btt.permpack.admin:
+    description: Contains all permissions for admins
+    default: op
+    children:
+      btt.command.use: true
+      btt.command.cache: true
+      btt.command.checkForUpdates: true
+      btt.command.communicators: true
+      btt.command.debug: true
+      btt.command.reload: true
+      btt.warp.create: true
+      btt.warp.edit: true
+      btt.warp.delete: true
+      btt.warp.group.create: true
+      btt.warp.group.edit: true
+      btt.warp.group.delete: true
+      btt.notify.update: true
+      btt.bp.edit: true
+
   btt.bp.use:
     description: Allows players to use /blockpalette
-    default: true
+    default: op
   btt.bp.edit:
     description: Allows players to create and edit custom block palettes
     default: op

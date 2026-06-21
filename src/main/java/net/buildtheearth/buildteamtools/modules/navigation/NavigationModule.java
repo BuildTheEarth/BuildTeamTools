@@ -1,5 +1,7 @@
 package net.buildtheearth.buildteamtools.modules.navigation;
 
+import com.alpsbte.alpslib.geo.rgc.RgcHandler;
+import com.alpsbte.alpslib.utils.ChatHelper;
 import lombok.Getter;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.Module;
@@ -22,6 +24,19 @@ import net.buildtheearth.buildteamtools.utils.WikiLinks;
 import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
 import net.buildtheearth.buildteamtools.utils.io.ConfigUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 
 /**
  * Manages all things related to universal tpll
@@ -37,7 +52,9 @@ public class NavigationModule extends Module {
     private TpllComponent tpllComponent;
     @Getter
     private BluemapComponent bluemapComponent;
-
+    @Getter
+    @Nullable
+    private RgcHandler rgcHandler = null;
 
     private static NavigationModule instance = null;
 
@@ -61,19 +78,83 @@ public class NavigationModule extends Module {
         navigatorComponent = new NavigatorComponent();
         tpllComponent = new TpllComponent();
 
-        // Check if BlueMap plugin is enabled and config allows BlueMap integration
-        boolean bluemapConfigEnabled = BuildTeamTools.getInstance().getConfig(ConfigUtil.NAVIGATION)
-                .getBoolean(ConfigPaths.Navigation.BLUEMAP_ENABLED, true);
+        var navConfig = BuildTeamTools.getInstance().getConfig(ConfigUtil.NAVIGATION);
+        initializeRgcHandler(navConfig);
+        initializeBluemapComponent(navConfig);
 
-        if (Bukkit.getPluginManager().isPluginEnabled("BlueMap") && bluemapConfigEnabled) {
-            bluemapComponent = new BluemapComponent();
-        }
-
-        if (BuildTeamTools.getInstance().getConfig(ConfigUtil.NAVIGATION).getBoolean(ConfigPaths.Navigation.NAVIGATOR_ITEM_ENABLED, false)) {
+        if (navConfig.getBoolean(ConfigPaths.Navigation.NAVIGATOR_ITEM_ENABLED, false)) {
             registerListeners(new NavigatorJoinListener(), new NavigatorOpenListener());
         }
 
         super.enable();
+    }
+
+    private void initializeRgcHandler(@NonNull FileConfiguration navConfig) {
+        if (!navConfig.getBoolean(ConfigPaths.Navigation.RGC_LOCAL_DB_ENABLED, false)) {
+            return;
+        }
+
+        File rgcFile = resolveRgcDatabaseFile(navConfig);
+        ChatHelper.logDebug("Reverse Geocode local database support is enabled. Checking for local database file at: %s", rgcFile.getAbsolutePath());
+
+        if (rgcFile.exists()) {
+            rgcHandler = createRgcHandler(rgcFile);
+            return;
+        }
+
+        downloadRgcDatabaseAsync(rgcFile, navConfig);
+    }
+
+    private @NonNull File resolveRgcDatabaseFile(@NonNull FileConfiguration navConfig) {
+        String path = navConfig.getString(ConfigPaths.Navigation.RGC_LOCAL_DB_PATH, "bs.file");
+        return BuildTeamTools.getInstance().getDataPath()
+                .resolve("modules/navigation")
+                .resolve(path)
+                .toFile();
+    }
+
+    @Contract("_ -> new")
+    private @NonNull RgcHandler createRgcHandler(File rgcFile) {
+        return new RgcHandler(rgcFile, BuildTeamTools.getInstance().getSLF4JLogger(), false);
+    }
+
+    private void downloadRgcDatabaseAsync(File rgcFile, FileConfiguration navConfig) {
+        BuildTeamTools.getInstance().getComponentLogger().info(
+                "Reverse Geocode local database is enabled but the file does not exist at the specified path, installing it from the configured url.");
+        Bukkit.getScheduler().runTaskAsynchronously(BuildTeamTools.getInstance(), () -> {
+            try {
+                downloadRgcDatabase(rgcFile, navConfig);
+                Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), () -> {
+                    rgcHandler = createRgcHandler(rgcFile);
+                    BuildTeamTools.getInstance().getComponentLogger().info(
+                            "Successfully downloaded Reverse Geocode local database and enabled local database support for Reverse Geocoding.");
+                });
+            } catch (Exception e) {
+                BuildTeamTools.getInstance().getComponentLogger().error(
+                        "Failed to download Reverse Geocode local database from the configured url, disabling local database support for Reverse Geocoding.", e);
+                navConfig.set(ConfigPaths.Navigation.RGC_LOCAL_DB_ENABLED, false);
+            }
+        });
+    }
+
+    private void downloadRgcDatabase(@NonNull File rgcFile, FileConfiguration navConfig) throws IOException {
+        if (!rgcFile.getParentFile().mkdirs()) {
+            BuildTeamTools.getInstance().getComponentLogger().warn(
+                    "Failed to create parent directories for Reverse Geocode local database file. Make sure the plugin has the necessary permissions to create directories and files in the plugin data folder.");
+        }
+        URL url = URI.create(navConfig.getString(ConfigPaths.Navigation.RGC_LOCAL_DB_UPDATE_URL, "")).toURL();
+        try (ReadableByteChannel readableByteChannel = Channels.newChannel(url.openStream());
+             FileOutputStream fileOutputStream = new FileOutputStream(rgcFile)) {
+            FileChannel fileChannel = fileOutputStream.getChannel();
+            fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+        }
+    }
+
+    private void initializeBluemapComponent(@NonNull FileConfiguration navConfig) {
+        boolean bluemapConfigEnabled = navConfig.getBoolean(ConfigPaths.Navigation.BLUEMAP_ENABLED, true);
+        if (Bukkit.getPluginManager().isPluginEnabled("BlueMap") && bluemapConfigEnabled) {
+            bluemapComponent = new BluemapComponent();
+        }
     }
 
     @Override

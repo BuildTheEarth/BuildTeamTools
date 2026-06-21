@@ -1,6 +1,5 @@
 package net.buildtheearth.buildteamtools.modules.navigation.components.warps.menu;
 
-import com.alpsbte.alpslib.utils.ChatHelper;
 import com.google.gson.Gson;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
@@ -27,22 +26,22 @@ import java.util.List;
 
 public class WarpGroupMenu extends AbstractPaginatedMenu {
 
-    public static final int BACK_ITEM_SLOT = 27;
+    // Bottom bar (row 4, slots 27-35):
+    // 27=back  28=bg  29=prev  30=bg  31=bg  32=bg  33=next  34=bg  35=create(admin)
+    // setSwitchPageItems(slot) places prev at slot-1 and next at slot+1 — so center=31 gives prev=30, next=32.
+    // But we want prev=29 and next=33 to leave room for the plus at 35.
+    // We call setSwitchPageItems(31) which uses 30 and 32 — that's fine, 35 is untouched.
 
-    public static final int ALTERNATE_PLUS_SLOT = 35;
+    public static final int BACK_ITEM_SLOT = 27;
+    public static final int SWITCH_PAGE_ITEM_SLOT = 31;
+    public static final int PLUS_SLOT = 35;
+    private static final int ITEMS_PER_PAGE = 27;
 
     private final boolean hasBackItem;
     private final BuildTeam buildTeam;
-    private AbstractMenu backMenue;
+    private AbstractMenu backMenu;
     private final boolean showPlusItem;
 
-    /**
-     * In this menu the player can select a warp group to view the warps in each warp group.
-     *
-     * @param menuPlayer  The player that is viewing the menu
-     * @param buildTeam   The build team that the menu is for
-     * @param hasBackItem Whether the menu has a back item - only true on overrides or when country selector menu
-     */
     public WarpGroupMenu(Player menuPlayer, BuildTeam buildTeam, boolean hasBackItem, boolean autoLoad) {
         super(4, 3, "Warp Menu", menuPlayer, autoLoad);
         this.hasBackItem = hasBackItem;
@@ -54,45 +53,121 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
 
     public WarpGroupMenu(Player menuPlayer, BuildTeam buildTeam, boolean hasBackItem, boolean autoLoad, AbstractMenu menu) {
         this(menuPlayer, buildTeam, hasBackItem, autoLoad);
-        this.backMenue = menu;
+        this.backMenu = menu;
+    }
+
+    @Override
+    protected void setPreviewItems() {
+        if (hasBackItem)
+            setBackItem(BACK_ITEM_SLOT, backMenu);
+        else
+            getMenu().getSlot(BACK_ITEM_SLOT).setItem(MenuItems.ITEM_BACKGROUND);
+
+        for (int i = 28; i <= 35; i++)
+            getMenu().getSlot(i).setItem(MenuItems.ITEM_BACKGROUND);
+
+        if (isPaginated())
+            setSwitchPageItems(SWITCH_PAGE_ITEM_SLOT);
+
+        super.setPreviewItems();
     }
 
     @Override
     protected void setMenuItemsAsync() {
-        if (hasBackItem) {
-            ChatHelper.logDebug("Setting back item for warp group menu");
-            setBackItem(BACK_ITEM_SLOT, backMenue);
-        }
     }
 
     @Override
     protected void setItemClickEventsAsync() {
-        // No items need to be set here
+        if (isPaginated())
+            setSwitchPageItemClickEvents(SWITCH_PAGE_ITEM_SLOT);
     }
 
     @Override
     protected void setPaginatedPreviewItems(@NotNull List<?> source) {
         List<WarpGroup> warpGroups = source.stream().map(l -> (WarpGroup) l).toList();
 
-        getMenu().getSlot(ALTERNATE_PLUS_SLOT).setItem(MenuItems.ITEM_BACKGROUND);
-        recalculateAutoSlots(warpGroups);
+        for (int i = 0; i < ITEMS_PER_PAGE; i++)
+            getMenu().getSlot(i).setItem(MenuItems.ITEM_BACKGROUND);
 
-        // Create the country items
-        for (WarpGroup warpGroup : warpGroups) {
-            getMenu().getSlot(getWarpGroupSlot(warpGroup)).setItem(warpGroup.getMaterialItem());
+        getMenu().getSlot(PLUS_SLOT).setItem(MenuItems.ITEM_BACKGROUND);
+
+        if (isPaginated()) {
+            int slot = 0;
+            for (WarpGroup warpGroup : warpGroups) {
+                getMenu().getSlot(slot).setItem(warpGroup.getMaterialItem());
+                slot++;
+            }
+        } else {
+            List<WarpGroup> all = getSource().stream().map(l -> (WarpGroup) l).toList();
+            recalculateAutoSlots(all);
+            for (WarpGroup warpGroup : warpGroups) {
+                int slot = getWarpGroupSlot(warpGroup);
+                if (slot >= 0) getMenu().getSlot(slot).setItem(warpGroup.getMaterialItem());
+            }
         }
 
-        // Create a create warp group item if the player has permission
-        if (showPlusItem) {
-            getMenu().getSlot(ALTERNATE_PLUS_SLOT).setItem(
-                    HeadFactory.head(HeadTexture.GREEN_PLUS, "§a§lCreate a new Warp Group", ListUtil.createList("§8Click to create a new warp group."))
+        if (showPlusItem && !hasNextPage()) {
+            getMenu().getSlot(PLUS_SLOT).setItem(
+                    HeadFactory.head(HeadTexture.GREEN_PLUS, "§a§lCreate a new Warp Group",
+                            ListUtil.createList("§8Click to create a new warp group."))
             );
         }
     }
 
     @Override
     protected void setPaginatedMenuItemsAsync(List<?> source) {
-        // All Items set above in setPaginatedPreviewItems
+    }
+
+    @Override
+    protected void setPaginatedItemClickEventsAsync(@NotNull List<?> source) {
+        List<WarpGroup> warpGroups = source.stream().map(l -> (WarpGroup) l).toList();
+
+        for (int i = 0; i < ITEMS_PER_PAGE; i++)
+            getMenu().getSlot(i).setClickHandler(null);
+        getMenu().getSlot(PLUS_SLOT).setClickHandler(null);
+
+        if (isPaginated()) {
+            int slot = 0;
+            for (WarpGroup warpGroup : warpGroups) {
+                setClickHandlerForSlot(slot, warpGroup);
+                slot++;
+            }
+        } else {
+            for (WarpGroup warpGroup : warpGroups) {
+                int slot = getWarpGroupSlot(warpGroup);
+                if (slot >= 0) setClickHandlerForSlot(slot, warpGroup);
+            }
+        }
+
+        if (showPlusItem && !hasNextPage()) {
+            getMenu().getSlot(PLUS_SLOT).setClickHandler((clickPlayer, clickInformation) ->
+                    NavigationModule.getInstance().getWarpsComponent().createWarpGroup(clickPlayer));
+        }
+    }
+
+    private void setClickHandlerForSlot(int slot, @NotNull WarpGroup warpGroup) {
+        getMenu().getSlot(slot).setClickHandler((clickPlayer, clickInformation) -> {
+            clickPlayer.closeInventory();
+            if (clickInformation.getClickType().isRightClick() && clickPlayer.hasPermission(Permissions.WARP_GROUP_EDIT))
+                new WarpGroupEditMenu(clickPlayer, warpGroup, true, true);
+            else
+                leftClickAction(clickPlayer, warpGroup);
+        });
+    }
+
+    protected void leftClickAction(Player clickPlayer, @NotNull WarpGroup warpGroup) {
+        new WarpMenu(clickPlayer, warpGroup, true, true);
+    }
+
+    protected int getWarpGroupSlot(@NotNull WarpGroup g) {
+        int s = g.getSlot();
+        if (s >= 0 && s < ITEMS_PER_PAGE) return s;
+        int a = g.getInternalSlot();
+        return (a >= 0 && a < ITEMS_PER_PAGE) ? a : -1;
+    }
+
+    private boolean isPaginated() {
+        return getSource().size() > ITEMS_PER_PAGE;
     }
 
     @Override
@@ -102,120 +177,62 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
                 .pattern(BinaryMask.EMPTY_PATTERN)
                 .pattern(BinaryMask.EMPTY_PATTERN)
                 .pattern(BinaryMask.EMPTY_PATTERN)
-                .pattern("111111110")
+                .pattern("111111111")
                 .build();
     }
 
     @Override
     protected List<?> getSource() {
-        // Get the warp groups in the build team sorted by name
-        List<WarpGroup> warpGroups;
-
         String mode = BuildTeamTools.getInstance().getConfig(ConfigUtil.NAVIGATION)
                 .getString(ConfigPaths.Navigation.WARPS_GROUP_SORTING_MODE, "");
 
+        List<WarpGroup> warpGroups;
         if (mode.equalsIgnoreCase("name")) {
-            warpGroups = buildTeam.getWarpGroups().stream().sorted((warpGroup1, warpGroup2) -> warpGroup1.getName().compareToIgnoreCase(warpGroup2.getName())).toList();
-        } else warpGroups = new ArrayList<>(buildTeam.getWarpGroups());
-
+            warpGroups = buildTeam.getWarpGroups().stream()
+                    .sorted((a, b) -> a.getName().compareToIgnoreCase(b.getName()))
+                    .toList();
+        } else {
+            warpGroups = new ArrayList<>(buildTeam.getWarpGroups());
+        }
         return warpGroups;
     }
 
-    @Override
-    protected void setPaginatedItemClickEventsAsync(@NotNull List<?> source) {
-        List<WarpGroup> warpGroups = source.stream().map(l -> (WarpGroup) l).toList();
-
-        for (WarpGroup warpGroup : warpGroups) {
-            setClickEventForSlot(warpGroup);
-        }
-    }
-
-    protected void setClickEventForSlot(@NotNull WarpGroup warpGroup) {
-        final int _slot = getWarpGroupSlot(warpGroup);
-
-        getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
-            clickPlayer.closeInventory();
-
-            if (clickInformation.getClickType().isRightClick() && clickPlayer.hasPermission(Permissions.WARP_GROUP_EDIT))
-                new WarpGroupEditMenu(clickPlayer, warpGroup, true, true);
-            else
-                leftClickAction(clickPlayer, warpGroup);
-        });
-
-        getMenu().getSlot(ALTERNATE_PLUS_SLOT).setClickHandler((clickPlayer, clickInformation)
-                -> NavigationModule.getInstance().getWarpsComponent().createWarpGroup(clickPlayer));
-    }
-
-    protected void leftClickAction(Player clickPlayer, @NotNull WarpGroup warpGroup) {
-        new WarpMenu(clickPlayer, warpGroup, true, true);
-    }
-
-    protected int getWarpGroupSlot(@NotNull WarpGroup g) {
-        int s = g.getSlot();
-        if (s >= 0 && s <= 26) return s;
-        int a = g.getInternalSlot();
-        return a >= 0 && a <= 26 ? a : -1;
-    }
-
-    /**
-     * Recalculates automatic slot assignments for the given warp groups.
-     * <p>
-     * Preserves valid explicit slots (0..26). For groups with an invalid slot,
-     * assigns the first available slot in ascending order; if none remain, sets -1.
-     * Any group with a valid explicit slot has its internal auto slot cleared (-1).
-     *
-     * @param warpGroups groups to update
-     * @return The next free slot or -1 if it's outside the range
-     */
     private static int recalculateAutoSlots(@NotNull List<WarpGroup> warpGroups) {
-        final int MAX = 27;
-
-        // 1) Calculate all free slots
+        final int MAX = ITEMS_PER_PAGE;
         ArrayDeque<Integer> free = getFreeSlots(warpGroups, MAX);
 
-        // 2) Assign auto slots only where needed
         for (WarpGroup g : warpGroups) {
             int s = g.getSlot();
             if (s >= 0 && s < MAX) {
-                g.setInternalSlot(-1); // explicit slot → clear auto
+                g.setInternalSlot(-1);
             } else {
-                Integer next = free.pollFirst(); // next free, or null if none
+                Integer next = free.pollFirst();
                 g.setInternalSlot(next != null ? next : -1);
             }
         }
 
-        // 3) Return next free slot - mainly used for plus slot
-        Integer next = free.pollFirst(); // next free, or null if none
-
-        if (BuildTeamTools.getInstance().isDebug() && BuildTeamTools.getInstance().getComponentLogger().isInfoEnabled()) {
-            BuildTeamTools.getInstance().getComponentLogger().info("Free slot: {}.", free);
+        if (BuildTeamTools.getInstance().isDebug()) {
             BuildTeamTools.getInstance().getComponentLogger().info("Auto slots: {}.",
-                    new Gson().toJson(warpGroups.stream().map(warpGroup -> new WarpGropSlotDebug(
-                            warpGroup.getName(),
-                            warpGroup.getSlot(),
-                            warpGroup.getInternalSlot())).toList()));
+                    new Gson().toJson(warpGroups.stream().map(wg ->
+                            new WarpGroupSlotDebug(wg.getName(), wg.getSlot(), wg.getInternalSlot())).toList()));
         }
 
+        Integer next = free.pollFirst();
         return next != null ? next : -1;
     }
 
     private static @NotNull ArrayDeque<Integer> getFreeSlots(@NotNull List<WarpGroup> warpGroups, int max) {
-        // 1) Mark occupied (explicit) slots
         boolean[] taken = new boolean[max];
         for (WarpGroup g : warpGroups) {
             int s = g.getSlot();
             if (s >= 0 && s < max) taken[s] = true;
         }
-
-        // 2) Build the free-slot queue (ascending)
         ArrayDeque<Integer> free = new ArrayDeque<>();
-        for (int i = 0; i < max; i++) {
+        for (int i = 0; i < max; i++)
             if (!taken[i]) free.add(i);
-        }
-
         return free;
     }
 
-    private record WarpGropSlotDebug(String name, int slot, int internalSlot) {
+    private record WarpGroupSlotDebug(String name, int slot, int internalSlot) {
     }
 }

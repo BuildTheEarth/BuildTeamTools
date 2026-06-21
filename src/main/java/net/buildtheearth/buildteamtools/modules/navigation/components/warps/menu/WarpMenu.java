@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 public class WarpMenu extends AbstractPaginatedMenu {
 
     public static final int BACK_ITEM_SLOT = 27;
+    public static final int SWITCH_PAGE_ITEM_SLOT = 34;
 
     private final boolean hasBackItem;
     private final WarpGroup warpGroup;
@@ -43,13 +44,29 @@ public class WarpMenu extends AbstractPaginatedMenu {
     }
 
     @Override
-    protected void setMenuItemsAsync() {
+    protected void setPreviewItems() {
         if (hasBackItem)
             setBackItem(BACK_ITEM_SLOT, new WarpGroupMenu(getMenuPlayer(), warpGroup.getBuildTeam(), false, false));
+
+        List<?> source = getSource();
+        if (source.size() > 27)
+            setSwitchPageItems(SWITCH_PAGE_ITEM_SLOT);
+        else
+            for (int i = -1; i < 2; i++)
+                getMenu().getSlot(SWITCH_PAGE_ITEM_SLOT + i).setItem(MenuItems.ITEM_BACKGROUND);
+
+        super.setPreviewItems();
     }
 
     @Override
-    protected void setItemClickEventsAsync() { /* Not needed */ }
+    protected void setMenuItemsAsync() {
+    }
+
+    @Override
+    protected void setItemClickEventsAsync() {
+        if (getSource().size() > 27)
+            setSwitchPageItemClickEvents(SWITCH_PAGE_ITEM_SLOT);
+    }
 
     @Override
     protected Mask getMask() {
@@ -58,21 +75,21 @@ public class WarpMenu extends AbstractPaginatedMenu {
                 .pattern(BinaryMask.EMPTY_PATTERN)
                 .pattern(BinaryMask.EMPTY_PATTERN)
                 .pattern(BinaryMask.EMPTY_PATTERN)
-                .pattern("011111111")
+                .pattern("011111000")
                 .build();
     }
 
     @Override
     protected List<?> getSource() {
-        // Get the warps in the warp group sorted by name
-        List<Warp> warps = warpGroup.getWarps().stream().sorted((warp1, warp2) -> warp1.getName().compareToIgnoreCase(warp2.getName())).collect(Collectors.toList());
+        List<Warp> warps = warpGroup.getWarps().stream()
+                .sorted((a, b) -> a.getName().compareToIgnoreCase(b.getName()))
+                .collect(Collectors.toList());
 
-        // Add a "create warp" item if the player has permission
         BuildTeam currentTeam = NetworkModule.getInstance().getBuildTeam();
         if (getMenuPlayer().hasPermission(Permissions.WARP_CREATE)
                 && currentTeam != null && currentTeam.equals(warpGroup.getBuildTeam()))
-            warps.add(new Warp(null, "%create-warp%", null, null, null, null, null, null, new GeographicalCoordinate(0, 0), 0,
-                    0, 0, false));
+            warps.add(new Warp(warpGroup, "%create-warp%", null, null, null, null, null, null,
+                    new GeographicalCoordinate(0, 0), 0.0, 0.0f, 0.0f, false));
 
         return warps;
     }
@@ -81,27 +98,21 @@ public class WarpMenu extends AbstractPaginatedMenu {
     protected void setPaginatedPreviewItems(@NotNull List<?> source) {
         List<Warp> warps = source.stream().map(l -> (Warp) l).toList();
 
-        // Create the country items
         int slot = 0;
-
         for (Warp warp : warps) {
-
-            // Create a "create warp" item if the player has permission
-            if (warp.getName().equals("%create-warp%") && getMenuPlayer().hasPermission(Permissions.WARP_CREATE) && slot == warps.size() - 1) {
-                getMenu().getSlot(slot).setItem(HeadFactory.head(HeadTexture.GREEN_PLUS, "§a§lCreate a new Warp", ListUtil.createList("§8Click to create a new warp.")));
-                slot++;
-                continue;
+            if (isCreateWarpPlaceholder(warp, slot, warps.size())) {
+                getMenu().getSlot(slot).setItem(HeadFactory.head(HeadTexture.GREEN_PLUS, "§a§lCreate a new Warp",
+                        ListUtil.createList("§8Click to create a new warp.")));
+            } else {
+                getMenu().getSlot(slot).setItem(warp.getMaterialItem());
             }
-
-            getMenu().getSlot(slot).setItem(warp.getMaterialItem());
             slot++;
         }
-
-
     }
 
     @Override
-    protected void setPaginatedMenuItemsAsync(List<?> source) {/* Not needed */}
+    protected void setPaginatedMenuItemsAsync(List<?> source) {
+    }
 
     @Override
     protected void setPaginatedItemClickEventsAsync(@NotNull List<?> source) {
@@ -109,17 +120,17 @@ public class WarpMenu extends AbstractPaginatedMenu {
 
         int slot = 0;
         for (Warp warp : warps) {
-            final int _slot = slot;
-            getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
+            final int currentSlot = slot;
+            getMenu().getSlot(currentSlot).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
 
-                // Create a click action for the "Create Warp" item if the player has permission
-                if (warp.getName().equals("%create-warp%") && getMenuPlayer().hasPermission(Permissions.WARP_CREATE) && _slot == warps.size() - 1) {
+                if (isCreateWarpPlaceholder(warp, currentSlot, warps.size())) {
                     WarpsComponent.createWarp(clickPlayer, warpGroup);
                     return;
                 }
 
-                if (clickInformation.getClickType().isRightClick() && clickPlayer.hasPermission(Permissions.WARP_EDIT)
+                if (clickInformation.getClickType().isRightClick()
+                        && clickPlayer.hasPermission(Permissions.WARP_EDIT)
                         && warp.getWarpGroup().getBuildTeam().equals(NetworkModule.getInstance().getBuildTeam()))
                     new WarpEditMenu(clickPlayer, warp, true, true);
                 else
@@ -127,5 +138,11 @@ public class WarpMenu extends AbstractPaginatedMenu {
             });
             slot++;
         }
+    }
+
+    private boolean isCreateWarpPlaceholder(@NotNull Warp warp, int slot, int totalSize) {
+        return warp.getName().equals("%create-warp%")
+                && getMenuPlayer().hasPermission(Permissions.WARP_CREATE)
+                && slot == totalSize - 1;
     }
 }

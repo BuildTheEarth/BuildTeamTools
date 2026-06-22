@@ -5,12 +5,10 @@ import com.alpsbte.alpslib.utils.GeneratorUtils;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
 import lombok.Getter;
-import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
@@ -35,83 +33,72 @@ public class History {
 
     public void addHistoryEntry(HistoryEntry entry) {
         historyEntries.add(entry);
+        undoHistoryEntries.clear();
     }
 
     public void undoCommand(Player p) {
         if (getHistoryEntries().isEmpty()) {
-            p.sendMessage("§cYou didn't generate any structures yet. Use /gen to create one. You can only undo the last " +
-                    "structure.");
+            p.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
+                    "You didn't generate any structures yet. Use /gen to create one. You can only undo the last structure."
+            )));
             return;
         }
 
-        LocalSession session = getHistoryEntries().get(0).getScript().getLocalSession();
-        Actor actor = getHistoryEntries().get(0).getScript().getActor();
-        int worldEditCommandCount = getHistoryEntries().get(0).getWorldEditCommandCount();
+        HistoryEntry entry = getHistoryEntries().getLast();
 
-        GeneratorUtils.undo(session, p, actor, worldEditCommandCount);
+        if (entry.hasBlockChanges()) {
+            entry.applyUndo();
+        } else {
+            LocalSession session = entry.getScript().getLocalSession();
+            Actor actor = entry.getScript().getActor();
+            int worldEditCommandCount = entry.getWorldEditCommandCount();
 
-        getUndoHistoryEntries().add(getHistoryEntries().get(0));
-        getHistoryEntries().clear();
+            GeneratorUtils.undo(session, p, actor, worldEditCommandCount);
+        }
+
+        getUndoHistoryEntries().add(entry);
+        getHistoryEntries().remove(entry);
 
         p.playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_DESTROY_EGG, 1.0F, 1.0F);
 
-        Bukkit.getScheduler().scheduleSyncDelayedTask(BuildTeamTools.getInstance(), () -> {
-            ChatHelper.sendSuccessfulMessage(p, "Successfully %s the last structure.", "undid");
-            p.sendMessage(ChatHelper.getStandardComponent(true, "Use %s to undo it.", "/gen redo")
-                    .clickEvent(ClickEvent.runCommand("/gen redo"))
-                    .hoverEvent(HoverEvent.showText(Component.text("Click to redo the last structure.", NamedTextColor.GRAY)))
-            );
-            p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
-        }, 20L);
+        ChatHelper.sendSuccessfulMessage(p, "Successfully %s the last structure.", "undid");
+        p.sendMessage(ChatHelper.getStandardComponent(true, "Use %s to redo it.", "/gen redo")
+                .clickEvent(ClickEvent.runCommand("/gen redo"))
+                .hoverEvent(HoverEvent.showText(Component.text("Click to redo the last structure.", NamedTextColor.GRAY)))
+        );
+        p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
     }
 
     public void redoCommand(Player p) {
         if (getUndoHistoryEntries().isEmpty()) {
-            p.sendMessage("§cYou didn't undo any structures yet. Use /gen undo to undo one. You can only redo the last " +
-                    "structure.");
+            p.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
+                    "You didn't undo any structures yet. Use /gen undo to undo one. You can only redo the last structure."
+            )));
             return;
         }
 
-        LocalSession session = getUndoHistoryEntries().get(0).getScript().getLocalSession();
-        Actor actor = getUndoHistoryEntries().get(0).getScript().getActor();
-        int worldEditCommandCount = getUndoHistoryEntries().get(0).getWorldEditCommandCount();
+        HistoryEntry entry = getUndoHistoryEntries().getLast();
 
-        GeneratorUtils.redo(session, p, actor, worldEditCommandCount);
+        if (entry.hasBlockChanges()) {
+            entry.applyRedo();
+        } else {
+            LocalSession session = entry.getScript().getLocalSession();
+            Actor actor = entry.getScript().getActor();
+            int worldEditCommandCount = entry.getWorldEditCommandCount();
 
-        getHistoryEntries().add(getUndoHistoryEntries().get(0));
-        getUndoHistoryEntries().clear();
+            GeneratorUtils.redo(session, p, actor, worldEditCommandCount);
+        }
+
+        getHistoryEntries().add(entry);
+        getUndoHistoryEntries().remove(entry);
 
         p.playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_DESTROY_EGG, 1.0F, 1.0F);
 
-
-        Bukkit.getScheduler().scheduleSyncDelayedTask(BuildTeamTools.getInstance(), () -> {
-            ChatHelper.sendSuccessfulMessage(p, "Successfully %s the last structure.", "redid");
-            p.sendMessage(ChatHelper.getStandardComponent(true, "Use %s to undo it.", "/gen undo")
-                    .clickEvent(ClickEvent.runCommand("/gen undo"))
-                    .hoverEvent(HoverEvent.showText(Component.text("Click to undo the last structure.", NamedTextColor.GRAY)))
-            );
-            p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
-        }, 20L);
-    }
-
-    public static class HistoryEntry {
-
-        @Getter
-        private final GeneratorType generatorType;
-        @Getter
-        private final long timeCreated;
-        @Getter
-        private final Script script;
-        @Getter
-        private final int worldEditCommandCount;
-
-        public HistoryEntry(GeneratorType generatorType, Script script) {
-            this.generatorType = generatorType;
-            this.timeCreated = System.currentTimeMillis();
-            this.worldEditCommandCount = script.getChanges();
-            this.script = script;
-        }
+        ChatHelper.sendSuccessfulMessage(p, "Successfully %s the last structure.", "redid");
+        p.sendMessage(ChatHelper.getStandardComponent(true, "Use %s to undo it.", "/gen undo")
+                .clickEvent(ClickEvent.runCommand("/gen undo"))
+                .hoverEvent(HoverEvent.showText(Component.text("Click to undo the last structure.", NamedTextColor.GRAY)))
+        );
+        p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
     }
 }
-
-

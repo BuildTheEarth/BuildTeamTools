@@ -11,8 +11,10 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import lombok.Getter;
-import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.buildtheearth.buildteamtools.modules.common.CommonModule;
+import net.buildtheearth.buildteamtools.modules.generator.listeners.GeneratorListener;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,7 +23,8 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -54,7 +57,11 @@ public class Command {
     @Getter
     private final LocalSession localSession;
 
-    private final int totalCommands;
+    private final long totalProgressWeight;
+    private final long progressStartPercentage;
+    private final long progressEndPercentage;
+    private final long progressRangePercentage;
+    private long completedProgressWeight;
 
     @Getter
     private long percentage;
@@ -65,6 +72,7 @@ public class Command {
     private RegionSelector tempRegionSelector;
     private Material oldMaterial;
     private BlockData oldBlockData;
+    private boolean failed;
 
     @Getter
     private boolean isFinished;
@@ -80,49 +88,48 @@ public class Command {
         this.localSession = script.localSession;
         this.blocks = blocks;
 
-        this.totalCommands = operations.size();
+        this.totalProgressWeight = Math.max(1L, operations.stream().mapToLong(Operation::getProgressWeight).sum());
+        this.progressStartPercentage = script.getProgressStartPercentage();
+        this.progressEndPercentage = script.getProgressEndPercentage();
+        this.progressRangePercentage = progressEndPercentage - progressStartPercentage;
+        this.percentage = progressStartPercentage;
+
         minMax = GeneratorUtils.getMinMaxPoints(getRegion());
     }
 
-    /**
-     * Processes the commands from the command queue to prevent the server from freezing.
-     */
+    /** Processes the commands from the command queue to prevent the server from freezing. */
     public void tick() {
         if (operations.isEmpty()) {
-            if (!isFinished)
+            if (!isFinished && !failed)
                 finish();
             return;
         }
 
-        percentage = (int) Math.round((double) (totalCommands - operations.size()) / (double) totalCommands * 100);
+        percentage = calculateProgressPercentage();
 
-        if (!breakPointActive && !threadActive)
-            player.sendActionBar("§a§lGenerator Progress: §7" + percentage + "%");
-        else
-            player.sendActionBar("§e§lGenerator Progress: §7" + percentage + "%");
+        sendProgressActionBar(!breakPointActive && !threadActive ? NamedTextColor.GREEN : NamedTextColor.YELLOW);
 
         if (threadActive)
             return;
 
-
         // Process commands in batches of MAX_COMMANDS_PER_SERVER_TICK
-        for (int i = 0; i < MAX_COMMANDS_PER_SERVER_TICK; ) {
+        for (int i = 0; i < MAX_COMMANDS_PER_SERVER_TICK;) {
             if (operations.isEmpty()) {
-                if (!isFinished)
+                if (!isFinished && !failed)
                     finish();
                 break;
             }
 
-
             Operation command = operations.get(0);
             processOperation(command);
 
-            if (breakPointActive || threadActive)
+            if (breakPointActive || threadActive || command.getProgressWeight() > 1L)
                 break;
 
             // Skip WorldEdit commands that take no time to execute
             if (command.getOperationType() == Operation.OperationType.COMMAND) {
-                String commandString = (String) command.getValues().get(0);
+                String commandString = command.get(0, String.class);
+
                 if (commandString.startsWith("//gmask")
                         || commandString.startsWith("//mask")
                         || commandString.startsWith("//pos")
@@ -135,9 +142,7 @@ public class Command {
         }
     }
 
-    /**
-     * Processes a single command.
-     */
+    /** Processes a single command. */
     public void processOperation(Operation operation) {
         CompletableFuture<Void> future = null;
 
@@ -149,7 +154,7 @@ public class Command {
                     if (command.contains("%%XYZ/"))
                         command = convertXYZ(command);
 
-                    player.chat(command);
+                    runInternalGeneratorCommand(command);
                     break;
 
                 case BREAKPOINT:
@@ -186,35 +191,100 @@ public class Command {
                     break;
 
                 case REPLACE_BLOCKSTATES_WITH_MASKS:
-                    future = GeneratorUtils.replaceBlocksWithMasks(localSession, actor, weWorld, Arrays.asList((String[]) operation.get(0)), (BlockState) operation.get(1), (BlockState[]) operation.get(2), (Integer) operation.get(3));
+                    future = GeneratorUtils.replaceBlocksWithMasks(
+                            localSession,
+                            actor,
+                            weWorld,
+                            toList(operation.get(0, String[].class)),
+                            operation.get(1, BlockState.class),
+                            operation.get(2, BlockState[].class),
+                            operation.get(3, Integer.class)
+                    );
                     break;
 
                 case REPLACE_BLOCKSTATES:
-                    future = GeneratorUtils.replaceBlocks(localSession, actor, weWorld, (BlockState[]) operation.get(0), (BlockState[]) operation.get(1));
+                    future = GeneratorUtils.replaceBlocks(
+                            localSession,
+                            actor,
+                            weWorld,
+                            operation.get(0, BlockState[].class),
+                            operation.get(1, BlockState[].class)
+                    );
+                    break;
+
+                case SET_BLOCKSTATES_AT_POSITIONS:
+                    future = GeneratorUtils.setBlockStatesAtPositions(
+                            localSession,
+                            actor,
+                            weWorld,
+                            toList(operation.get(0, Vector[].class)),
+                            toList(operation.get(1, BlockState[].class))
+                    );
                     break;
 
                 case DRAW_CURVE_WITH_MASKS:
-                    future = GeneratorUtils.drawCurveWithMasks(localSession, actor, weWorld, blocks, Arrays.asList((String[]) operation.get(0)), Arrays.asList((Vector[]) operation.get(1)), (BlockState[]) operation.get(2), (Boolean) operation.get(3));
+                    future = GeneratorUtils.drawCurveWithMasks(
+                            localSession,
+                            actor,
+                            weWorld,
+                            blocks,
+                            toList(operation.get(0, String[].class)),
+                            toList(operation.get(1, Vector[].class)),
+                            operation.get(2, BlockState[].class),
+                            operation.get(3, Boolean.class)
+                    );
                     break;
 
                 case DRAW_POLY_LINE_WITH_MASKS:
-                    future = GeneratorUtils.drawPolyLineWithMasks(localSession, actor, weWorld, blocks, Arrays.asList((String[]) operation.get(0)), Arrays.asList((Vector[]) operation.get(1)), (BlockState[]) operation.get(2), (Boolean) operation.get(3), (Boolean) operation.get(4));
+                    future = GeneratorUtils.drawPolyLineWithMasks(
+                            localSession,
+                            actor,
+                            weWorld,
+                            blocks,
+                            toList(operation.get(0, String[].class)),
+                            toList(operation.get(1, Vector[].class)),
+                            operation.get(2, BlockState[].class),
+                            operation.get(3, Boolean.class),
+                            operation.get(4, Boolean.class)
+                    );
                     break;
 
                 case DRAW_LINE_WITH_MASKS:
-                    future = GeneratorUtils.drawLineWithMasks(localSession, actor, weWorld, blocks, Arrays.asList((String[]) operation.get(0)), (Vector) operation.get(1), (Vector) operation.get(2), (BlockState[]) operation.get(3), (Boolean) operation.get(4));
+                    future = GeneratorUtils.drawLineWithMasks(
+                            localSession,
+                            actor,
+                            weWorld,
+                            blocks,
+                            toList(operation.get(0, String[].class)),
+                            operation.get(1, Vector.class),
+                            operation.get(2, Vector.class),
+                            operation.get(3, BlockState[].class),
+                            operation.get(4, Boolean.class)
+                    );
                     break;
 
                 case PASTE_SCHEMATIC:
-                    future = GeneratorUtils.pasteSchematic(localSession, actor, weWorld, blocks, (String) operation.get(0), (Location) operation.get(1), (double) operation.get(2));
+                    future = GeneratorUtils.pasteSchematic(
+                            localSession,
+                            actor,
+                            weWorld,
+                            blocks,
+                            operation.get(0, String.class),
+                            operation.get(1, Location.class),
+                            operation.get(2, Double.class)
+                    );
                     break;
 
                 case CUBOID_SELECTION:
-                    GeneratorUtils.createCuboidSelection(getPlayer(), (Vector) operation.get(0), (Vector) operation.get(1));
+                    GeneratorUtils.createCuboidSelection(
+                            getPlayer(),
+                            operation.get(0, Vector.class),
+                            operation.get(1, Vector.class)
+                    );
                     break;
 
                 case POLYGONAL_SELECTION:
-                    GeneratorUtils.createPolySelection(getPlayer(), Arrays.asList((Vector[]) operation.get(0)), blocks);
+                    GeneratorUtils.createPolySelection(getPlayer(), toList(operation.get(0, Vector[].class)), blocks);
                     break;
 
                 case CLEAR_HISTORY:
@@ -222,43 +292,102 @@ public class Command {
                     break;
 
                 case SET_GMASK:
-                    GeneratorUtils.setGmask(localSession, (String) operation.get(0));
+                    GeneratorUtils.setGmask(localSession, operation.get(0, String.class));
                     break;
 
                 case EXPAND_SELECTION:
-                    GeneratorUtils.expandSelection(localSession, (Vector) operation.get(0));
+                    GeneratorUtils.expandSelection(localSession, operation.get(0, Vector.class));
                     break;
             }
         } catch (Exception e) {
-            if (operation != null)
-                ChatHelper.logError("Error while processing command: " + operation.getOperationType() + " - " + operation.getValuesAsString());
-            else
-                ChatHelper.logError("Error while processing command.");
-            BuildTeamTools.getInstance().getComponentLogger().error("Command processing error", e);
+            ChatHelper.logError("Error while processing command: " + operation.getOperationType() + " - " + operation.getValuesAsString());
+            ChatHelper.logError("Generator command processing failed.", e);
+            failGeneration();
+            return;
         }
 
         if (future != null) {
             threadActive = true;
+
             // Ensure we clear threadActive and remove the operation regardless of success or exception
             future.whenComplete((v, ex) -> {
                 threadActive = false;
+
                 if (ex != null) {
                     ChatHelper.logError("Async operation failed: " + operation.getOperationType() + " - " + operation.getValuesAsString());
-                    BuildTeamTools.getInstance().getComponentLogger().error("Async operation failed", ex);
+                    ChatHelper.logError("Generator async operation failed.", new Exception(ex));
+                    failGeneration();
+                    return;
                 }
-                // Remove the processed operation from the queue
-                operations.removeFirst();
-            });
 
-        } else if (!breakPointActive)
-            operations.removeFirst();
+                completeOperation(operation);
+            });
+        } else if (!breakPointActive) {
+            completeOperation(operation);
+        }
     }
 
-    /**
-     * Converts the XYZ coordinates in a command to the highest block at that location while skipping certain blocks.
-     */
+    private long calculateProgressPercentage() {
+        if (operations.isEmpty())
+            return progressEndPercentage;
+
+        long scaledProgress = progressStartPercentage + Math.round(
+                (double) completedProgressWeight / (double) totalProgressWeight * progressRangePercentage
+        );
+        long maxVisibleProgress = Math.max(progressStartPercentage, progressEndPercentage - 1L);
+
+        return Math.max(progressStartPercentage, Math.min(scaledProgress, maxVisibleProgress));
+    }
+
+    private void completeOperation(Operation operation) {
+        completedProgressWeight += operation.getProgressWeight();
+        operations.removeFirst();
+    }
+
+    private void failGeneration() {
+        if (isFinished)
+            return;
+
+        failed = true;
+        isFinished = true;
+        operations.clear();
+        sendGeneratorError();
+        sendFailureActionBar();
+    }
+
+    private void sendGeneratorError() {
+        generatorComponent.sendError(player);
+    }
+
+    private void sendFailureActionBar() {
+        player.sendActionBar(Component.text("Generator failed.", NamedTextColor.RED));
+    }
+
+    private void sendProgressActionBar(NamedTextColor color) {
+        player.sendActionBar(ChatHelper.getStandardComponent(false, "Generator Progress: %s", percentage + "%").color(color));
+    }
+
+    private void runInternalGeneratorCommand(String command) {
+        GeneratorListener.queueInternalGeneratorCommand(player, command);
+
+        try {
+            player.chat(command);
+        } finally {
+            GeneratorListener.removeInternalGeneratorCommand(player, command);
+        }
+    }
+
+    private static <T> List<T> toList(T[] values) {
+        List<T> list = new ArrayList<>(values.length);
+        Collections.addAll(list, values);
+        return list;
+    }
+
+    /** Converts the XYZ coordinates in a command to the highest block at that location while skipping certain blocks. */
     public String convertXYZ(String command) {
-        String xyz = command.split("%%XYZ/")[1].split("/%%")[0];
+        String[] commandParts = command.split("%%XYZ/", 2);
+        String[] xyzParts = commandParts[1].split("/%%", 2);
+        String xyz = xyzParts[0];
 
         String[] xyzSplit = xyz.split(",");
         int x = Integer.parseInt(xyzSplit[0]);
@@ -269,22 +398,19 @@ public class Command {
 
         if (blocks != null)
             maxHeight = GeneratorUtils.getMaxHeight(blocks, x, z, MenuItems.getIgnoredMaterials());
+
         if (maxHeight == 0)
             maxHeight = y;
 
-        String commandSuffix = "";
-        if (command.split("/%%").length > 1)
-            commandSuffix = command.split("/%%")[1];
+        String commandSuffix = xyzParts.length > 1 ? xyzParts[1] : "";
 
-        return command.split("%%XYZ/")[0] + x + "," + maxHeight + "," + z + commandSuffix;
+        return commandParts[0] + x + "," + maxHeight + "," + z + commandSuffix;
     }
 
-
-    /**
-     * Called when the command queue is finished.
-     */
+    /** Called when the command queue is finished. */
     public void finish() {
-        player.sendActionBar("§a§lGenerator Progress: §7100%");
+        percentage = progressEndPercentage;
+        sendProgressActionBar(NamedTextColor.GREEN);
         isFinished = true;
         generatorComponent.sendSuccessMessage(player);
     }

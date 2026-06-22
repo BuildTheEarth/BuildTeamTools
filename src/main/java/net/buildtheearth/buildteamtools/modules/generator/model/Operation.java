@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +20,7 @@ public class Operation {
         CUBOID_SELECTION(Vector.class, Vector.class),
         POLYGONAL_SELECTION(Vector[].class),
         REPLACE_BLOCKSTATES(BlockState[].class, BlockState[].class),
+        SET_BLOCKSTATES_AT_POSITIONS(Vector[].class, BlockState[].class),
         REPLACE_BLOCKSTATES_WITH_MASKS(String[].class, BlockState.class, BlockState[].class, Integer.class),
         DRAW_CURVE_WITH_MASKS(String[].class, Vector[].class, BlockState[].class, Boolean.class),
         DRAW_POLY_LINE_WITH_MASKS(String[].class, Vector[].class, BlockState[].class, Boolean.class, Boolean.class),
@@ -65,7 +67,8 @@ public class Operation {
             if (values[i] != null && !values[i].getClass().equals(operationType.getValueTypes()[i]))
                 throw new IllegalArgumentException("OperationType " + operationType + " must have a value type of " + operationType.getValueTypes()[i] + " at index " + i + ". Provided: " + values[i].getClass());
 
-        this.values = Arrays.asList(values);
+        this.values = new ArrayList<>(values.length);
+        Collections.addAll(this.values, values);
         this.operationType = operationType;
     }
 
@@ -80,33 +83,42 @@ public class Operation {
         return values.get(i);
     }
 
+    public <T> T get(int i, Class<T> type) {
+        return type.cast(values.get(i));
+    }
+
+    public long getProgressWeight() {
+        if (values == null)
+            return 0L;
+
+        return switch (operationType) {
+            case CUBOID_SELECTION, POLYGONAL_SELECTION, CLEAR_HISTORY, SET_GMASK, EXPAND_SELECTION, BREAKPOINT -> 0L;
+            case SET_BLOCKSTATES_AT_POSITIONS -> ((Vector[]) values.get(0)).length;
+            case REPLACE_BLOCKSTATES_WITH_MASKS -> (long) ((String[]) values.get(0)).length * (Integer) values.get(3);
+            case DRAW_CURVE_WITH_MASKS, DRAW_POLY_LINE_WITH_MASKS -> ((Vector[]) values.get(1)).length;
+            default -> 1L;
+        };
+    }
+
     public String getValuesAsString() {
         StringBuilder builder = new StringBuilder();
         for (Object value : values) {
-            if (value == null) {
-                builder.append("null, ");
-                continue;
-            }
-
-            String valueString = value.toString();
-
-            if (value instanceof BlockState)
-                valueString = ((BlockState) value).getBlockType().getNamespace();
-            else if (value instanceof Vector[])
-                valueString = Arrays.toString((Vector[]) value);
-            else if (value instanceof BlockState[])
-                valueString = Arrays.toString((BlockState[]) value);
-            else if (value instanceof String[])
-                valueString = Arrays.toString((String[]) value);
-            else if (value instanceof Boolean)
-                valueString = ((Boolean) value).toString();
-            else if (value instanceof Double)
-                valueString = String.valueOf(value);
-            else if (value instanceof Integer)
-                valueString = String.valueOf(value);
-
-            builder.append(valueString).append(", ");
+            builder.append(getValueAsString(value)).append(", ");
         }
         return builder.toString();
+    }
+
+    private String getValueAsString(Object value) {
+        return switch (value) {
+            case null -> "null";
+            case BlockState blockState -> blockState.getBlockType().getNamespace();
+            case Vector[] vectors -> Arrays.toString(vectors);
+            case BlockState[] blockStates -> Arrays.toString(blockStates);
+            case String[] strings -> Arrays.toString(strings);
+            case Boolean bool -> bool.toString();
+            case Double doubleValue -> String.valueOf(doubleValue);
+            case Integer integer -> String.valueOf(integer);
+            default -> value.toString();
+        };
     }
 }

@@ -21,7 +21,7 @@ public interface Flag {
             case HOUSE -> HouseFlag.byString(flag);
             case ROAD -> RoadFlag.byString(flag);
             case TREE -> TreeFlag.byString(flag);
-            case RAILWAY -> RailFlag.byString(flag);
+            case RAIL -> RailFlag.byString(flag);
             case FIELD -> FieldFlag.byString(flag);
         };
     }

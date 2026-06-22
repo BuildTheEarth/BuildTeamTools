@@ -7,6 +7,7 @@ import lombok.Setter;
 import net.buildtheearth.buildteamtools.modules.generator.components.field.CropStage;
 import net.buildtheearth.buildteamtools.modules.generator.components.field.CropType;
 import net.buildtheearth.buildteamtools.modules.generator.components.house.RoofType;
+import net.buildtheearth.buildteamtools.modules.generator.components.rail.RailType;
 import net.buildtheearth.buildteamtools.modules.generator.components.tree.TreeWidth;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -85,6 +86,9 @@ public abstract class Settings {
                     break;
                 case CROP_STAGE:
                     valueStr = new StringBuilder(((CropStage) valueObject).getIdentifier());
+                    break;
+                case RAIL_TYPE:
+                    valueStr = new StringBuilder(((RailType) valueObject).getIdentifier());
                     break;
                 case TREE_WIDTH:
                     valueStr = new StringBuilder(((TreeWidth) valueObject).getName());

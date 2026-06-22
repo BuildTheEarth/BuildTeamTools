@@ -40,6 +40,10 @@ public class Script {
     protected final LocalSession localSession;
     @Getter
     private int changes = 0;
+    @Getter
+    private long progressStartPercentage = 0L;
+    @Getter
+    private long progressEndPercentage = 100L;
 
 
     public Script(Player player, GeneratorComponent generatorComponent) {
@@ -56,10 +60,17 @@ public class Script {
 
     protected void finish(Block[][][] blocks, List<Vector> points) {
         createSelection(points);
-        //setGmask(null);
 
         GeneratorModule.getInstance().getGeneratorCommands().add(new Command(this, blocks));
-        GeneratorModule.getInstance().getPlayerHistory(getPlayer()).addHistoryEntry(new History.HistoryEntry(getGeneratorComponent().getGeneratorType(), this));
+        GeneratorModule.getInstance().getPlayerHistory(getPlayer()).addHistoryEntry(new HistoryEntry(getGeneratorComponent().getGeneratorType(), this));
+    }
+
+    protected void setProgressRange(long startPercentage, long endPercentage) {
+        if (startPercentage < 0L || endPercentage > 100L || startPercentage > endPercentage)
+            throw new IllegalArgumentException("Progress range must be between 0 and 100 and start before end");
+
+        this.progressStartPercentage = startPercentage;
+        this.progressEndPercentage = endPercentage;
     }
 
 
@@ -108,6 +119,19 @@ public class Script {
      */
     public void createCommand(String command) {
         operations.add(new Operation(command));
+    }
+
+    /**
+     * Adds a command to the operation list and counts it as one undoable change.
+     *
+     * Use this for generator commands that actually modify blocks, such as //line,
+     * //set or //replace. Do not use this for pure selection commands.
+     *
+     * @param command The command to add
+     */
+    public void createUndoableCommand(String command) {
+        operations.add(new Operation(command));
+        changes++;
     }
 
     /**
@@ -238,6 +262,18 @@ public class Script {
         replaceBlocks(new BlockState[]{from}, new BlockState[]{to});
     }
 
+    public void setBlockStatesAtPositions(List<Vector> positions, List<BlockState> blockStates) {
+        if (positions.size() != blockStates.size())
+            throw new IllegalArgumentException("Position and BlockState lists must have the same size");
+
+        operations.add(new Operation(
+                Operation.OperationType.SET_BLOCKSTATES_AT_POSITIONS,
+                positions.toArray(new Vector[0]),
+                blockStates.toArray(new BlockState[0])
+        ));
+        changes += positions.size();
+    }
+
     /**
      * Set blocks with a mask.
      * It creates a new Operation with type SET_BLOCKS_WITH_EXPRESSION_MASK and adds it to the list of operations to execute.
@@ -345,9 +381,8 @@ public class Script {
      * @param matchElevation Whether the elevation of the points should be matched to the region
      */
     public void drawCurveWithMask(List<String> masks, List<Vector> points, BlockState[] blocks, boolean matchElevation) {
-        operations.add(new Operation(Operation.OperationType.DRAW_CURVE_WITH_MASKS, masks.toArray(new String[0]),
-                points.toArray(new Vector[0]), blocks, matchElevation));
-        changes += masks.size();
+        operations.add(new Operation(Operation.OperationType.DRAW_CURVE_WITH_MASKS, masks.toArray(new String[0]), points.toArray(new Vector[0]), blocks, matchElevation));
+        changes += Math.max(1, masks.size());
     }
 
     public void drawCurveWithMask(List<String> masks, List<Vector> points, XMaterial[] blocks, boolean matchElevation) {
@@ -382,11 +417,9 @@ public class Script {
      * @param blocks         The block states to set the blocks to
      * @param matchElevation Whether the elevation of the points should be matched to the region
      */
-    public void drawPolyLineWithMask(List<String> masks, List<Vector> points, BlockState[] blocks, boolean matchElevation,
-                                     boolean connectLineEnds) {
-        operations.add(new Operation(Operation.OperationType.DRAW_POLY_LINE_WITH_MASKS, masks.toArray(new String[0]),
-                points.toArray(new Vector[0]), blocks, matchElevation, connectLineEnds));
-        changes += masks.size();
+    public void drawPolyLineWithMask(List<String> masks, List<Vector> points, BlockState[] blocks, boolean matchElevation, boolean connectLineEnds) {
+        operations.add(new Operation(Operation.OperationType.DRAW_POLY_LINE_WITH_MASKS, masks.toArray(new String[0]), points.toArray(new Vector[0]), blocks, matchElevation, connectLineEnds));
+        changes += Math.max(1, masks.size());
     }
 
     public void drawPolyLineWithMask(List<String> masks, List<Vector> points, XMaterial[] blocks, boolean matchElevation,
@@ -426,9 +459,8 @@ public class Script {
      * @param matchElevation Whether the elevation of the points should be matched to the region
      */
     public void drawLineWithMask(List<String> masks, Vector point1, Vector point2, BlockState[] blocks, boolean matchElevation) {
-        operations.add(new Operation(Operation.OperationType.DRAW_LINE_WITH_MASKS, masks.toArray(new String[0]), point1, point2
-                , blocks, matchElevation));
-        changes += masks.size();
+        operations.add(new Operation(Operation.OperationType.DRAW_LINE_WITH_MASKS, masks.toArray(new String[0]), point1, point2, blocks, matchElevation));
+        changes += Math.max(1, masks.size());
     }
 
     public void drawLineWithMask(List<String> masks, Vector point1, Vector point2, XMaterial[] blocks, boolean matchElevation) {
@@ -451,5 +483,9 @@ public class Script {
 
     public void drawLine(Vector point1, Vector point2, XMaterial block, boolean matchElevation) {
         drawLineWithMask(new ArrayList<>(), point1, point2, new XMaterial[]{block}, matchElevation);
+    }
+
+    public void drawLine(Vector point1, Vector point2, BlockState[] blocks, boolean matchElevation) {
+        drawLineWithMask(new ArrayList<>(), point1, point2, blocks, matchElevation);
     }
 }

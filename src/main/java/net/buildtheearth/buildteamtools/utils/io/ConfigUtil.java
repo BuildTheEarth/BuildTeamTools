@@ -32,7 +32,8 @@ import java.nio.file.Paths;
 public enum ConfigUtil {
     MAIN,
     PLOTSYSTEM,
-    NAVIGATION;
+    NAVIGATION,
+    GENERATOR;
 
     private static ConfigurationUtil configUtilInstance;
 
@@ -40,9 +41,10 @@ public enum ConfigUtil {
         if (configUtilInstance != null) return;
 
         configUtilInstance = new ConfigurationUtil(new ConfigurationUtil.ConfigFile[]{
-                new ConfigurationUtil.ConfigFile(Paths.get("config.yml"), 1.4, false),
+                new ConfigurationUtil.ConfigFile(Paths.get("config.yml"), 1.5, false),
                 new ConfigurationUtil.ConfigFile(Paths.get("modules", "plotsystem", "config.yml"), 1.6, false),
                 new ConfigurationUtil.ConfigFile(Paths.get("modules", "navigation", "config.yml"), 1.7, false),
+                new ConfigurationUtil.ConfigFile(Paths.get("modules", "generator", "config.yml"), 1.0, false),
         });
     }
 

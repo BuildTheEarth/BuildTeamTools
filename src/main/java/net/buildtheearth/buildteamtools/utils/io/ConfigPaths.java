@@ -1,6 +1,9 @@
 package net.buildtheearth.buildteamtools.utils.io;
 
-public abstract class ConfigPaths {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class ConfigPaths {
 
     // General Behaviour
     public static final String LANGUAGE = "language";
@@ -13,6 +16,24 @@ public abstract class ConfigPaths {
 
     public static final String DISABLED_MODULES = "disabled-modules";
 
+    @UtilityClass
+    public static class Generator {
+
+        @UtilityClass
+        public static class Rail {
+
+            private static final String PREFIX = "rail.";
+
+            public static final String MAX_CONTROL_POINTS = PREFIX + "max-control-points";
+            public static final String MAX_PATH_POINTS = PREFIX + "max-path-points";
+            public static final String MAX_BLOCK_PLACEMENTS = PREFIX + "max-block-placements";
+            public static final String MAX_PREPARED_REGION_VOLUME = PREFIX + "max-prepared-region-volume";
+            public static final String MAX_PREPARED_REGION_AXIS_LENGTH = PREFIX + "max-prepared-region-axis-length";
+            public static final String BLOCK_PLACEMENT_BATCH_SIZE = PREFIX + "block-placement-batch-size";
+        }
+    }
+
+    @UtilityClass
     public static class Navigation {
 
         // Navigator.Item
@@ -53,6 +74,7 @@ public abstract class ConfigPaths {
         public static final String RGC_LOCAL_DB_PATH = RGC_LOCAL_DB + "path";
     }
 
+    @UtilityClass
     public static class PlotSystem {
 
         // Data Mode

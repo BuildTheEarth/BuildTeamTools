@@ -3,6 +3,7 @@ package net.buildtheearth.buildteamtools.modules.generator.commands;
 import com.alpsbte.alpslib.utils.ChatHelper;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
 import net.buildtheearth.buildteamtools.modules.generator.menu.GeneratorMenu;
+import net.buildtheearth.buildteamtools.modules.generator.model.GeneratorType;
 import net.buildtheearth.buildteamtools.modules.generator.model.HistoryEntry;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.buildteamtools.utils.Utils;
@@ -14,21 +15,14 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class GeneratorCommand implements CommandExecutor, TabCompleter {
 
-    private static final List<String> SUB_COMMANDS = List.of(
-            "house",
-            "road",
-            "rail",
-            "tree",
-            "field",
-            "history",
-            "undo",
-            "redo"
-    );
-
+    private static final List<String> HISTORY_COMMANDS = List.of("history", "undo", "redo");
+    private static final List<String> SUB_COMMANDS = createSubCommands();
     private static final List<String> HELP_ARGUMENTS = List.of("help", "info", "?");
 
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String cmdLabel, String @NotNull [] args) {
@@ -49,29 +43,11 @@ public class GeneratorCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        GeneratorType generatorType = GeneratorType.fromCommandName(args[0]);
+        if (generatorType != null)
+            return runGeneratorCommand(p, args, generatorType);
+
         switch (args[0].toLowerCase()) {
-            case "house":
-                GeneratorModule.getInstance().getHouse().analyzeCommand(p, args);
-                return true;
-
-            case "road":
-                GeneratorModule.getInstance().getRoad().analyzeCommand(p, args);
-                return true;
-
-            case "rail":
-                GeneratorModule.getInstance().getRail().analyzeCommand(p, args);
-                return true;
-
-            case "tree":
-                GeneratorModule.getInstance().getTree().analyzeCommand(p, args);
-                return true;
-
-            case "field":
-                p.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
-                        "This generator has serious issues and is currently disabled."
-                )));
-                return true;
-
             case "history":
                 if (GeneratorModule.getInstance().getPlayerHistory(p).getHistoryEntries().isEmpty()) {
                     p.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
@@ -114,12 +90,8 @@ public class GeneratorCommand implements CommandExecutor, TabCompleter {
                 "Generator Command",
                 () -> sender.sendMessage(ChatHelper.getStandardComponent(
                                 false,
-                                "Generators: %s, %s, %s, %s, %s",
-                                "/gen house help",
-                                "/gen road help",
-                                "/gen rail help",
-                                "/gen tree help",
-                                "/gen field help")
+                                "Generators: " + createPlaceholders(GeneratorType.values().length),
+                                (Object[]) getGeneratorHelpCommands())
                         .appendNewline()
                         .append(ChatHelper.getStandardComponent(
                                 false,
@@ -149,12 +121,20 @@ public class GeneratorCommand implements CommandExecutor, TabCompleter {
         return List.of();
     }
 
+    private boolean runGeneratorCommand(Player player, String[] args, GeneratorType generatorType) {
+        if (generatorType == GeneratorType.FIELD) {
+            player.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
+                    "This generator has serious issues and is currently disabled."
+            )));
+            return true;
+        }
+
+        generatorType.getComponent(GeneratorModule.getInstance()).analyzeCommand(player, args);
+        return true;
+    }
+
     private boolean isGeneratorSubCommand(String value) {
-        return value.equalsIgnoreCase("house")
-                || value.equalsIgnoreCase("road")
-                || value.equalsIgnoreCase("rail")
-                || value.equalsIgnoreCase("tree")
-                || value.equalsIgnoreCase("field");
+        return GeneratorType.fromCommandName(value) != null;
     }
 
     private List<String> getMatchingCompletions(List<String> options, String input) {
@@ -166,5 +146,26 @@ public class GeneratorCommand implements CommandExecutor, TabCompleter {
                 completions.add(option);
 
         return completions;
+    }
+
+    private static List<String> createSubCommands() {
+        List<String> commands = new ArrayList<>();
+
+        Arrays.stream(GeneratorType.values())
+                .map(GeneratorType::getCommandName)
+                .forEach(commands::add);
+
+        commands.addAll(HISTORY_COMMANDS);
+        return List.copyOf(commands);
+    }
+
+    private static String[] getGeneratorHelpCommands() {
+        return Arrays.stream(GeneratorType.values())
+                .map(type -> "/gen " + type.getCommandName() + " help")
+                .toArray(String[]::new);
+    }
+
+    private static String createPlaceholders(int count) {
+        return String.join(", ", Collections.nCopies(count, "%s"));
     }
 }

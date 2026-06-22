@@ -7,6 +7,7 @@ import lombok.Getter;
 import net.buildtheearth.buildteamtools.modules.generator.components.field.CropStage;
 import net.buildtheearth.buildteamtools.modules.generator.components.field.CropType;
 import net.buildtheearth.buildteamtools.modules.generator.components.house.RoofType;
+import net.buildtheearth.buildteamtools.modules.generator.components.rail.RailType;
 import net.buildtheearth.buildteamtools.modules.generator.components.tree.TreeType;
 import net.buildtheearth.buildteamtools.modules.generator.components.tree.TreeWidth;
 
@@ -22,6 +23,7 @@ public enum FlagType {
     ROOF_TYPE(RoofType.class),
     CROP_TYPE(CropType.class),
     CROP_STAGE(CropStage.class),
+    RAIL_TYPE(RailType.class),
     TREE_TYPE(TreeType.class),
     TREE_WIDTH(TreeWidth.class);
 
@@ -88,6 +90,8 @@ public enum FlagType {
                 return CropType.getByIdentifier(value);
             case CROP_STAGE:
                 return CropStage.getByIdentifier(value);
+            case RAIL_TYPE:
+                return RailType.byString(value);
             case TREE_TYPE:
                 return TreeType.byString(value);
             case TREE_WIDTH:

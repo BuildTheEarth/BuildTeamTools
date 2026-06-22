@@ -7,7 +7,7 @@ public enum GeneratorType {
 
     HOUSE("House", WikiLinks.Gen.HOUSE),
     ROAD("Road", WikiLinks.Gen.ROAD),
-    RAILWAY("Railway", WikiLinks.Gen.RAIL),
+    RAIL("Rail", WikiLinks.Gen.RAIL),
     TREE("Tree", WikiLinks.Gen.TREE),
     FIELD("Field", WikiLinks.Gen.FIELD);
 

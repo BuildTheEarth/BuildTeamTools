@@ -55,7 +55,7 @@ public class Rail extends GeneratorComponent {
             return;
         }
 
-        if (!GeneratorModule.getInstance().getRail().checkForPlayer(player)) {
+        if (!checkForPlayer(player)) {
             preparingPlayers.remove(player.getUniqueId());
             return;
         }

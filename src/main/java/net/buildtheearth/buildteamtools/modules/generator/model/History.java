@@ -61,11 +61,12 @@ public class History {
 
         p.playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_DESTROY_EGG, 1.0F, 1.0F);
 
-        ChatHelper.sendSuccessfulMessage(p, "Successfully %s the last structure.", "undid");
-        p.sendMessage(ChatHelper.getStandardComponent(true, "Use %s to redo it.", "/gen redo")
+        Component redoMessage = ChatHelper.getStandardComponent(false, "Use %s to redo it.", "/gen redo")
                 .clickEvent(ClickEvent.runCommand("/gen redo"))
-                .hoverEvent(HoverEvent.showText(Component.text("Click to redo the last structure.", NamedTextColor.GRAY)))
-        );
+                .hoverEvent(HoverEvent.showText(Component.text("Click to redo the last structure.", NamedTextColor.GRAY)));
+        p.sendMessage(ChatHelper.getSuccessComponent("Successfully %s the last structure.", "undid")
+                .appendNewline()
+                .append(redoMessage));
         p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
     }
 
@@ -94,11 +95,12 @@ public class History {
 
         p.playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_DESTROY_EGG, 1.0F, 1.0F);
 
-        ChatHelper.sendSuccessfulMessage(p, "Successfully %s the last structure.", "redid");
-        p.sendMessage(ChatHelper.getStandardComponent(true, "Use %s to undo it.", "/gen undo")
+        Component undoMessage = ChatHelper.getStandardComponent(false, "Use %s to undo it.", "/gen undo")
                 .clickEvent(ClickEvent.runCommand("/gen undo"))
-                .hoverEvent(HoverEvent.showText(Component.text("Click to undo the last structure.", NamedTextColor.GRAY)))
-        );
+                .hoverEvent(HoverEvent.showText(Component.text("Click to undo the last structure.", NamedTextColor.GRAY)));
+        p.sendMessage(ChatHelper.getSuccessComponent("Successfully %s the last structure.", "redid")
+                .appendNewline()
+                .append(undoMessage));
         p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
     }
 }

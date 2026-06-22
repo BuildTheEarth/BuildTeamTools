@@ -158,13 +158,19 @@ public class RailScripts extends Script {
         preparationProgress.completeStage(RAIL_BLOCK_BUILD_PROGRESS);
 
         if (railBlocks.size() > limits.maxBlockPlacements()) {
-            sendRailError("Rail Generator would place " + railBlocks.size() + " blocks. The limit is "
-                    + limits.maxBlockPlacements() + ". Split the rail into smaller selections.");
+            sendRailError(
+                    "Rail Generator would place %s blocks. The limit is %s. Split the rail into smaller selections.",
+                    railBlocks.size(),
+                    limits.maxBlockPlacements()
+            );
             return false;
         }
 
-        sendRailInfo("Rail Generator queued " + railBlocks.size() + " block changes over "
-                + centerPath.size() + " path points.");
+        sendRailInfo(
+                "Rail Generator queued %s block changes over %s path points.",
+                railBlocks.size(),
+                centerPath.size()
+        );
 
         preparationProgress.startStage(RAIL_BLOCK_BUILD_PROGRESS, QUEUE_OPERATIONS_PROGRESS, QUEUE_OPERATIONS_ESTIMATED_MILLIS);
         queueRailBlockPlacements(railBlocks);
@@ -238,8 +244,11 @@ public class RailScripts extends Script {
         }
 
         if (centerPath.size() > limits.maxPathPoints()) {
-            sendRailError("Rail Generator path has " + centerPath.size() + " points. The limit is "
-                    + limits.maxPathPoints() + ". Split the rail into smaller selections.");
+            sendRailError(
+                    "Rail Generator path has %s points. The limit is %s. Split the rail into smaller selections.",
+                    centerPath.size(),
+                    limits.maxPathPoints()
+            );
             return false;
         }
 
@@ -285,24 +294,27 @@ public class RailScripts extends Script {
         }
 
         if (volume > limits.maxPreparedRegionVolume()) {
-            sendRailError("Rail Generator selection would prepare " + volume + " blocks. The limit is "
-                    + limits.maxPreparedRegionVolume() + ". Split the rail into smaller selections.");
+            sendRailError(
+                    "Rail Generator selection would prepare %s blocks. The limit is %s. Split the rail into smaller selections.",
+                    volume,
+                    limits.maxPreparedRegionVolume()
+            );
             return false;
         }
 
         return true;
     }
 
-    private void sendRailInfo(String message) {
+    private void sendRailInfo(String message, Object... values) {
         if (!canContinue()) return;
 
-        getPlayer().sendMessage(ChatHelper.getStandardComponent(true, message));
+        getPlayer().sendMessage(ChatHelper.getStandardComponent(true, message, values));
     }
 
-    private void sendRailError(String message) {
+    private void sendRailError(String message, Object... values) {
         if (!canContinue()) return;
 
-        getPlayer().sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(message)));
+        getPlayer().sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(message, values)));
     }
 
     private void runOnMainThread(Runnable runnable) {

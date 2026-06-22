@@ -109,24 +109,25 @@ public class GeneratorCommand implements CommandExecutor, TabCompleter {
     }
 
     public static void sendHelp(CommandSender sender) {
-        ChatHelper.sendMessageBox(sender, "Generator Command", () -> {
-            sender.sendMessage(ChatHelper.getStandardComponent(
-                    false,
-                    "Generators: %s, %s, %s, %s, %s",
-                    "/gen house help",
-                    "/gen road help",
-                    "/gen rail help",
-                    "/gen tree help",
-                    "/gen field help"
-            ));
-            sender.sendMessage(ChatHelper.getStandardComponent(
-                    false,
-                    "History: %s, %s, %s",
-                    "/gen history",
-                    "/gen undo",
-                    "/gen redo"
-            ));
-        });
+        ChatHelper.sendMessageBox(
+                sender,
+                "Generator Command",
+                () -> sender.sendMessage(ChatHelper.getStandardComponent(
+                                false,
+                                "Generators: %s, %s, %s, %s, %s",
+                                "/gen house help",
+                                "/gen road help",
+                                "/gen rail help",
+                                "/gen tree help",
+                                "/gen field help")
+                        .appendNewline()
+                        .append(ChatHelper.getStandardComponent(
+                                false,
+                                "History: %s, %s, %s",
+                                "/gen history",
+                                "/gen undo",
+                                "/gen redo")))
+        );
     }
 
     @Override

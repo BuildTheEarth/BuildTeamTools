@@ -84,18 +84,24 @@ public abstract class GeneratorComponent extends ModuleComponent implements Wiki
     }
 
     public void sendHelp(@NonNull Player p) {
-        String wikiPage = getWikiPage();
-        Component wikiLink = Component.text(wikiPage, NamedTextColor.YELLOW)
+        sendMoreInformation(p, generatorType);
+    }
+
+    public static void sendMoreInformation(@NonNull Player p, @NonNull GeneratorType generatorType) {
+        p.sendMessage(createMoreInformationComponent(generatorType));
+    }
+
+    public static Component createMoreInformationComponent(@NonNull GeneratorType generatorType) {
+        String wikiPage = generatorType.getWikiPage();
+        return ChatHelper.getStandardComponent(true, "Open generator documentation: %s", wikiPage)
                 .clickEvent(ClickEvent.openUrl(wikiPage))
                 .hoverEvent(HoverEvent.showText(Component.text("Click to open this page", NamedTextColor.GRAY)));
-
-        p.sendMessage(ChatHelper.PREFIX_COMPONENT.append(wikiLink));
     }
 
     public void sendError(Player p) {
         p.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
                 "There was an error while generating the %s. Please contact the admins.",
-                generatorType.getName().toLowerCase()
+                generatorType.getName()
         )));
     }
 
@@ -127,7 +133,7 @@ public abstract class GeneratorComponent extends ModuleComponent implements Wiki
                 .clickEvent(ClickEvent.runCommand("/gen undo"))
                 .hoverEvent(HoverEvent.showText(Component.text("Click to undo last generation", NamedTextColor.GRAY)));
 
-        TextComponent message = getMessage()
+        Component message = ChatHelper.getSuccessComponent("%s successfully generated.", generatorType.getName())
                 .append(Component.text(" "))
                 .append(copyCommand)
                 .append(Component.text(" "))
@@ -135,21 +141,6 @@ public abstract class GeneratorComponent extends ModuleComponent implements Wiki
 
         p.sendMessage(message);
         p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
-    }
-
-    private @NonNull TextComponent getMessage() {
-        String type = switch (generatorType) {
-            case HOUSE -> "House";
-            case ROAD -> "Road";
-            case RAIL -> "Rail";
-            case TREE -> "Tree";
-            case FIELD -> "Field";
-        };
-
-        return ChatHelper.PREFIX_COMPONENT
-                .append(Component.text(type, NamedTextColor.GRAY))
-                .append(Component.text(" successfully ", NamedTextColor.GREEN))
-                .append(Component.text("generated.", NamedTextColor.GRAY));
     }
 
     /**

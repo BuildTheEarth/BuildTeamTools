@@ -11,7 +11,6 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import lombok.Getter;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.buildtheearth.buildteamtools.modules.common.CommonModule;
 import net.buildtheearth.buildteamtools.modules.generator.listeners.GeneratorListener;
@@ -300,8 +299,12 @@ public class Command {
                     break;
             }
         } catch (Exception e) {
-            ChatHelper.logError("Error while processing command: " + operation.getOperationType() + " - " + operation.getValuesAsString());
-            ChatHelper.logError("Generator command processing failed.", e);
+            ChatHelper.logError(
+                    "Generator command processing failed: %s - %s",
+                    e,
+                    operation.getOperationType(),
+                    operation.getValuesAsString()
+            );
             failGeneration();
             return;
         }
@@ -314,8 +317,12 @@ public class Command {
                 threadActive = false;
 
                 if (ex != null) {
-                    ChatHelper.logError("Async operation failed: " + operation.getOperationType() + " - " + operation.getValuesAsString());
-                    ChatHelper.logError("Generator async operation failed.", new Exception(ex));
+                    ChatHelper.logError(
+                            "Generator async operation failed: %s - %s",
+                            new Exception(ex),
+                            operation.getOperationType(),
+                            operation.getValuesAsString()
+                    );
                     failGeneration();
                     return;
                 }
@@ -360,7 +367,7 @@ public class Command {
     }
 
     private void sendFailureActionBar() {
-        player.sendActionBar(Component.text("Generator failed.", NamedTextColor.RED));
+        player.sendActionBar(ChatHelper.getErrorComponent("Generator failed."));
     }
 
     private void sendProgressActionBar(NamedTextColor color) {

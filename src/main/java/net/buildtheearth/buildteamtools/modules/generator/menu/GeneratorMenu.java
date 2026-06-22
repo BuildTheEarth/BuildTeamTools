@@ -1,7 +1,6 @@
 package net.buildtheearth.buildteamtools.modules.generator.menu;
 
 import com.alpsbte.alpslib.utils.item.Item;
-import com.alpsbte.alpslib.utils.ChatHelper;
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.buildteamtools.modules.common.CommonModule;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
@@ -19,14 +18,11 @@ import net.buildtheearth.buildteamtools.modules.generator.components.tree.Tree;
 import net.buildtheearth.buildteamtools.modules.generator.components.tree.TreeSettings;
 import net.buildtheearth.buildteamtools.modules.generator.components.tree.menu.TreeTypeMenu;
 import net.buildtheearth.buildteamtools.modules.generator.model.GeneratorCollections;
+import net.buildtheearth.buildteamtools.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.buildteamtools.modules.generator.model.GeneratorType;
 import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -249,12 +245,7 @@ public class GeneratorMenu extends AbstractMenu {
     }
 
     private void sendMoreInformation(@NonNull Player clickPlayer, @NonNull GeneratorType generator) {
-        String wikiPage = generator.getWikiPage();
-        Component documentationLink = ChatHelper.getStandardComponent(true, "Open generator documentation: %s", wikiPage)
-                .clickEvent(ClickEvent.openUrl(wikiPage))
-                .hoverEvent(HoverEvent.showText(Component.text("Click to open this page", NamedTextColor.GRAY)));
-
-        clickPlayer.sendMessage(documentationLink);
+        GeneratorComponent.sendMoreInformation(clickPlayer, generator);
     }
 
     @Override

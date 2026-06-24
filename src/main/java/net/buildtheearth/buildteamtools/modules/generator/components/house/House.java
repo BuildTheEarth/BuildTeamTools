@@ -17,7 +17,7 @@ public class House extends GeneratorComponent {
         if (GeneratorUtils.checkForNoWorldEditSelection(p))
             return false;
 
-        if (getPlayerSettings().get(p.getUniqueId()).getBlocks() == null) // Needed because block checks are made afterwards
+        if (getPlayerSettings().get(p.getUniqueId()).getBlocks() == null)
             getPlayerSettings().get(p.getUniqueId()).setBlocks(GeneratorUtils.analyzeRegion(p, p.getWorld()));
 
         Block[][][] blocks = getPlayerSettings().get(p.getUniqueId()).getBlocks();

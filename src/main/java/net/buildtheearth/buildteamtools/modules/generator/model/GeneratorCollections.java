@@ -71,7 +71,6 @@ public class GeneratorCollections {
         }
     }
 
-
     /**
      * Returns the latest release version of a repository on GitHub
      *

@@ -1,12 +1,18 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.rail;
 
+import lombok.Getter;
 import net.buildtheearth.buildteamtools.modules.generator.model.Flag;
 import net.buildtheearth.buildteamtools.modules.generator.model.FlagType;
+import org.jspecify.annotations.Nullable;
 
 public enum RailFlag implements Flag {
-    LANE_COUNT("c", FlagType.INTEGER);
 
+    RAIL_TYPE("t", FlagType.RAIL_TYPE);
+
+    @Getter
     private final String flag;
+
+    @Getter
     private final FlagType flagType;
 
     RailFlag(String flag, FlagType flagType) {
@@ -14,20 +20,11 @@ public enum RailFlag implements Flag {
         this.flagType = flagType;
     }
 
-    @Override
-    public String getFlag() {
-        return flag;
-    }
-
-    @Override
-    public FlagType getFlagType() {
-        return flagType;
-    }
-
-    public static RailFlag byString(String flag) {
-        for (RailFlag railFlag : RailFlag.values())
+    public static @Nullable RailFlag byString(String flag) {
+        for (RailFlag railFlag : RailFlag.values()) {
             if (railFlag.getFlag().equalsIgnoreCase(flag))
                 return railFlag;
+        }
 
         return null;
     }

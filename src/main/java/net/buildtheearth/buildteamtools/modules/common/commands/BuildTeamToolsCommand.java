@@ -45,10 +45,7 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
                 sender.sendMessage("§e/btt help §8- §7List of all sub commands.");
                 sender.sendMessage("§e/btt reload-config §8- §7Reload all configs for the modules");
             });
-            return true;
-        }
-
-        if (args[0].equalsIgnoreCase("communicators")) {
+        } else if (args[0].equalsIgnoreCase("communicators")) {
             if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_COMMUNICATORS)) {
                 Utils.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_COMMUNICATORS);
                 return true;
@@ -58,10 +55,7 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
                 for (UUID uuid : NetworkModule.getInstance().getCommunicators())
                     sender.sendMessage("§7- §e" + uuid.toString());
             });
-            return true;
-        }
-
-        if (args[0].equalsIgnoreCase("cache")) {
+        } else if (args[0].equalsIgnoreCase("cache")) {
             if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_CACHE)) {
                 Utils.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_CACHE);
                 return true;
@@ -72,7 +66,6 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
                 if (NetworkModule.getInstance().getBuildTeam() != null) NetworkModule.getInstance().enableDisabledModules();
                 StatsModule.getInstance().updateAndSave();
                 sender.sendMessage(ChatHelper.getSuccessComponent("Cache successfully updated."));
-                return true;
             }
 
             if (StatsModule.getInstance().isEnabled()) {
@@ -82,10 +75,7 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
                 sender.sendMessage(ChatHelper.getErrorComponent("The Stats Module is not enabled, so there is no cache to show" +
                         "."));
             }
-            return true;
-        }
-
-        if (args[0].equalsIgnoreCase("debug")) {
+        } else if (args[0].equalsIgnoreCase("debug")) {
             if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_DEBUG)) {
                 Utils.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_DEBUG);
                 return true;
@@ -94,33 +84,15 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
             if (args.length == 1 || (!args[1].equalsIgnoreCase("on") && !args[1].equalsIgnoreCase("off"))) {
                 sender.sendMessage(ChatHelper.getStandardComponent(true, "Current Debug Mode: %s. You need to add a value: " +
                         "on/off to change it", BuildTeamTools.getInstance().isDebug() ? "ON" : "OFF"));
-                return true;
             }
 
             boolean debug = args[1].equalsIgnoreCase("on");
 
             BuildTeamTools.getInstance().setDebug(debug);
             sender.sendMessage(ChatHelper.getStandardComponent(true, "Debug Mode was set to: %s", debug));
-            return true;
-        }
-
-        if (args[0].equalsIgnoreCase("checkForUpdates")) {
-            if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_CHECK_FOR_UPDATES)) {
-                Utils.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_CHECK_FOR_UPDATES);
-                return true;
-            }
-
-            boolean wasDebug = BuildTeamTools.getInstance().isDebug();
-
-            BuildTeamTools.getInstance().setDebug(true);
-            String result = CommonModule.getInstance().getUpdaterComponent().checkForUpdates();
-            BuildTeamTools.getInstance().setDebug(wasDebug);
-            sender.sendMessage(ChatHelper.getStandardComponent(true, "Checked for updates. %s Please take a look at the console" +
-                    " for details.", result));
-            return true;
-        }
-
-        if (args[0].equalsIgnoreCase("reload-config")) {
+        } else if (args[0].equalsIgnoreCase("checkForUpdates")) {
+            CommonModule.getInstance().getUpdaterComponent().checkForUpdates(sender);
+        } else if (args[0].equalsIgnoreCase("reload-config")) {
             if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_RELOAD)) {
                 Utils.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_RELOAD);
                 return true;
@@ -135,15 +107,26 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
 
             sender.sendMessage(ChatHelper.getStandardString("All configs have been reloaded. For some changes to apply you have" +
                     " to restart the server."));
+        } else if (args[0].equalsIgnoreCase("update")) {
+            updateCommand(sender);
         }
 
         return true;
     }
 
+    private void updateCommand(@NotNull CommandSender sender) {
+        if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_UPDATE)) {
+            Utils.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_UPDATE);
+            return;
+        }
+
+        CommonModule.getInstance().getUpdaterComponent().update(sender, true);
+    }
+
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
         if (args.length == 1)
-            return Arrays.asList("help", "communicators", "checkForUpdates", "cache", "debug", "reload-config");
+            return Arrays.asList("help", "communicators", "checkForUpdates", "cache", "debug", "reload-config", "update");
 
         List<String> debugSuggestions = Utils.getTabCompleterArgs(args, "debug", 2, Arrays.asList("true", "false"));
         if (debugSuggestions != null)

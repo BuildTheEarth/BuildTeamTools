@@ -18,8 +18,11 @@ earth-world: world
 disabled-modules:
 #- "module-name"
 
+# Enable or disable the auto-update on restart feature
+auto-update: true
+
 # Enable or disable the debug mode
 debug: false
 
 # NOTE: Do not change
-config-version: 1.4
+config-version: 1.5

@@ -66,6 +66,7 @@ permissions:
       btt.command.communicators: true
       btt.command.debug: true
       btt.command.reload: true
+      btt.command.update: true
       btt.warp.create: true
       btt.warp.edit: true
       btt.warp.delete: true

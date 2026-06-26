@@ -1,6 +1,9 @@
 package net.buildtheearth.buildteamtools.modules.network.model;
 
-public abstract class Permissions {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class Permissions {
 
     public static final String BUILD_TEAM_TOOLS = "btt.command.use";
     public static final String BUILD_TEAM_TOOLS_CACHE = "btt.command.cache";
@@ -8,6 +11,7 @@ public abstract class Permissions {
     public static final String BUILD_TEAM_TOOLS_COMMUNICATORS = "btt.command.communicators";
     public static final String BUILD_TEAM_TOOLS_DEBUG = "btt.command.debug";
     public static final String BUILD_TEAM_TOOLS_RELOAD = "btt.command.reload";
+    public static final String BUILD_TEAM_TOOLS_UPDATE = "btt.command.update";
 
 
     public static final String GENERATOR_USE = "btt.generator.use";

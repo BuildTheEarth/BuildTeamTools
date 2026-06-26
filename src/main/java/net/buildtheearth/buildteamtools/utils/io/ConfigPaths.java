@@ -16,6 +16,8 @@ public class ConfigPaths {
 
     public static final String DISABLED_MODULES = "disabled-modules";
 
+    public static final String AUTO_UPDATE = "auto-update";
+
     @UtilityClass
     public static class Generator {
 

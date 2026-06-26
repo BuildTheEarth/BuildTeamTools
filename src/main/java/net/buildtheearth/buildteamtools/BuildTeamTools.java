@@ -18,16 +18,13 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-
 /**
  * The parent of all modules of the Build Team Tools plugin
  */
 public class BuildTeamTools extends JavaPlugin {
 
-    public static int SPIGOT_PROJECT_ID = 101854;
-    public static String PREFIX = "§9§lBTE §8> §7";
-    public static String CONSOLE_PREFIX = "[BuildTeamTools] ";
+    public static final String PREFIX = "§9§lBTE §8> §7";
+    public static final String CONSOLE_PREFIX = "[BuildTeamTools] ";
 
     @Getter
     private boolean debug;
@@ -56,10 +53,7 @@ public class BuildTeamTools extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        try {
-            ModuleHandler.getInstance().disableAll(null);
-        } catch (NoClassDefFoundError ignored) {
-        }
+        ModuleHandler.getInstance().disableAll(null);
     }
 
 
@@ -83,10 +77,6 @@ public class BuildTeamTools extends JavaPlugin {
     @Override
     public void saveConfig() {
         ConfigUtil.getInstance().saveFiles();
-    }
-
-    public File getPluginFile() {
-        return this.getFile();
     }
 
     public void setDebug(boolean debug) {

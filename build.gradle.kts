@@ -25,6 +25,8 @@ repositories {
     // Alps Lib Geo - can be removed once https://github.com/AlpsBTE/Alps-Lib/pull/17 is merged & version is set to 1.0.0
     maven("https://mvn.alps-bte.com/repository/alps-bte-snapshots/")
 
+    maven("https://repo.lushplugins.org/releases") // PluginUpdater
+
     maven("https://jitpack.io") // Clipper2
 }
 
@@ -51,6 +53,8 @@ dependencies {
     implementation(libs.buildtheearth.projection) {
         exclude(group = "com.google.guava", module = "guava")
     }
+    implementation(libs.pluginupdater.common)
+    implementation(libs.pluginupdater.paper)
 
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core")
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") { isTransitive = false }

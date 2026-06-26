@@ -72,9 +72,7 @@ public class CommonModule extends Module {
         BuildTeamTools.getInstance().setDebug(BuildTeamTools.getInstance().getConfig().getBoolean(ConfigPaths.DEBUG, false));
 
         // Initialize the components
-        updaterComponent = new UpdaterComponent(BuildTeamTools.getInstance(), BuildTeamTools.SPIGOT_PROJECT_ID,
-                BuildTeamTools.getInstance().getPluginFile(), UpdaterComponent.UpdateType.CHECK_DOWNLOAD,
-                BuildTeamTools.getInstance().isDebug());
+        updaterComponent = new UpdaterComponent(BuildTeamTools.getInstance());
         pluginMessagingComponent = new PluginMessagingComponent();
         dependencyComponent = new DependencyComponent();
         versionComponent = new VersionComponent();

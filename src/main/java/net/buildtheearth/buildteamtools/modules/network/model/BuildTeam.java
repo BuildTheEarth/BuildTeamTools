@@ -218,11 +218,16 @@ public class BuildTeam {
         });
     }
 
-    public void deleteWarpGroup(Player deleter, WarpGroup warpGroup) {
-        // Check if the team owns that warp group
+    public void deleteWarpGroup(Player deleter, WarpGroup warpGroup, boolean deleteWarps) {
         if (!warpGroup.getBuildTeam().getID().equals(this.getID())) {
             deleter.sendMessage(ChatHelper.getErrorString("You can only delete warp groups for your own team!"));
             return;
+        }
+
+        if (deleteWarps) {
+            for (Warp warp : warpGroup.getWarps()) {
+                deleteWarp(deleter, warp);
+            }
         }
 
         this.warpGroups.remove(warpGroup);
@@ -247,7 +252,6 @@ public class BuildTeam {
             }
         });
     }
-
     /**
      * Refreshes BlueMap markers for all warp groups.
      * <p>

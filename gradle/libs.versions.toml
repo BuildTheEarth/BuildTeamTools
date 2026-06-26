@@ -38,6 +38,8 @@ okhttp-jvm = "5.4.0"
 paper-api = "1.21.11-R0.1-SNAPSHOT"
 # https://github.com/CryptoMorin/XSeries/releases
 xseries = "13.7.0"
+# https://github.com/OakLoaf/PluginUpdater/releases https://repo.lushplugins.org/#/releases/org/lushplugins/pluginupdater/updater.paper-api
+pluginupdater = "3.0.0"
 #
 # Plugins
 # https://github.com/palantir/gradle-git-version/releases
@@ -65,6 +67,8 @@ javaapiforkml = { module = "uk.m0nom:javaapiforkml", version.ref = "javaapiforkm
 json = { module = "org.json:json", version.ref = "json" }
 okhttp-jvm = { module = "com.squareup.okhttp3:okhttp-jvm", version.ref = "okhttp-jvm" }
 paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper-api" }
+pluginupdater-paper = { module = "org.lushplugins.pluginupdater:updater.paper-api", version.ref = "pluginupdater" }
+pluginupdater-common = { module = "org.lushplugins.pluginupdater:updater.common-api", version.ref = "pluginupdater" }
 xseries = { module = "com.github.cryptomorin:XSeries", version.ref = "xseries" }
 
 [plugins]

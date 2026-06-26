@@ -1,86 +1,91 @@
 package net.buildtheearth.buildteamtools.modules.common.components.updater;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.alpsbte.alpslib.utils.ChatHelper;
+import io.papermc.paper.util.Tick;
+import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.ModuleComponent;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
+import net.buildtheearth.buildteamtools.utils.Utils;
+import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.jspecify.annotations.NonNull;
+import org.lushplugins.pluginupdater.api.exception.InvalidVersionFormatException;
+import org.lushplugins.pluginupdater.api.updater.Updater;
+import org.lushplugins.pluginupdater.api.version.VersionDifference;
+import org.lushplugins.pluginupdater.api.version.comparator.SemVerComparator;
+import org.lushplugins.pluginupdater.api.version.comparator.VersionComparator;
+import org.lushplugins.pluginupdater.paper.api.PaperUpdater;
+import org.lushplugins.pluginupdater.paper.api.notification.PaperUpdateNotifier;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
-import java.util.logging.Level;
+import java.time.Duration;
 
 
 public class UpdaterComponent extends ModuleComponent {
-    private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36";
-    private static final String DOWNLOAD = "/download";
-    private static final String VERSIONS = "/versions";
-    private static final String PAGE_PATH = "?page=";
-    private static final String API_RESOURCE = "https://api.spiget.org/v2/resources/";
-    // Direct download link
-    private String downloadLink;
-    // Provided plugin
-    private final Plugin plugin;
-    // The folder where update will be downloaded
-    private final File updateFolder;
-    // The plugin file
-    private final File file;
-    // ID of a project
-    private final int id;
-    // return a page
-    private int page = 1;
-    // Set the update type
-    private final UpdateType updateType;
-    // Get the outcome result
-    private Result result = Result.SUCCESS;
-    // If next page is empty set it to true, and get info from previous page.
-    private boolean emptyPage;
-    // Version returned from spigot
-    private String version;
-    // If true updater is going to log progress to the console.
-    private final boolean logger;
-    // Updater thread
-    private Thread thread;
 
-    private boolean updateInstalled;
-    private String newVersion;
+    private final Updater updater;
 
-    public UpdaterComponent(@NonNull Plugin plugin, int id, File file, UpdateType updateType, boolean logger) {
+    public UpdaterComponent(@NonNull BuildTeamTools plugin) {
         super("Updater");
+        var updaterBuilder = PaperUpdater.builder(plugin)
+                .github("BuildTheEarth/BuildTeamTools")
+                .notify(true)
+                .notificationPermission(Permissions.NOTIFY_UPDATE);
+        updater = updaterBuilder.build();
 
-        this.plugin = plugin;
-        this.updateFolder = plugin.getServer().getUpdateFolderFile();
-        this.id = id;
-        this.file = file;
-        this.updateType = updateType;
-        this.logger = logger;
+        if (plugin.getConfig().getBoolean(ConfigPaths.AUTO_UPDATE)) Bukkit.getScheduler()
+                .runTaskLaterAsynchronously(plugin, () -> update(plugin.getServer().getConsoleSender(), false),
+                        Tick.tick().fromDuration(Duration.ofSeconds(30)));
+    }
 
-        downloadLink = API_RESOURCE + id;
+    public void update(CommandSender sender, boolean checkMsg) {
+        if (updater.isAlreadyDownloaded() || !updater.isUpdateAvailable()) {
+            if (checkMsg) sender.sendMessage(ChatHelper
+                    .getStandardComponent(true, "It looks like there is no new update available!"));
+            return;
+        }
+
+
+        updater.attemptDownload().thenAccept(success -> {
+            if (Boolean.TRUE.equals(success)) {
+                sender.sendMessage(ChatHelper.getSuccessComponent("Successfully updated plugin to version %s, " +
+                        "restart the server to apply changes!", updater.getPluginData().getLatestVersion()));
+                notifyAllPlayersAboutUpdate(sender);
+            } else {
+                sender.sendMessage(ChatHelper.getErrorComponent("Failed to update plugin to version %s.",
+                        updater.getPluginData().getLatestVersion()));
+            }
+        });
     }
 
 
-    public String checkForUpdates() {
-        if (thread != null && thread.isAlive())
-            return "Update check is already running.";
+    public void checkForUpdates(@NonNull CommandSender sender) {
+        if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_CHECK_FOR_UPDATES)) {
+            Utils.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_CHECK_FOR_UPDATES);
+            return;
+        }
 
-        thread = new Thread(new UpdaterRunnable());
-        thread.start();
+        updater.checkForUpdate().thenAcceptAsync(update -> {
+            if (!Boolean.TRUE.equals(update)) {
+                sender.sendMessage(ChatHelper.getSuccessComponent("The BuildTeamTools plugin is up to date."));
+                return;
+            }
 
-        return switch (result) {
-            case BAD_ID -> "Failed to update the plugin: Wrong Spigot ID.";
-            case FAILED -> "Failed to update the plugin.";
-            case NO_UPDATE -> "The plugin is up to date.";
-            case SUCCESS -> "Plugin successfully updated.";
-            case UPDATE_FOUND -> "Found an update for the plugin.";
-        };
+            if (!sender.hasPermission(Permissions.NOTIFY_UPDATE)) {
+                sender.sendMessage(ChatHelper.getErrorComponent("A new update is available for the BuildTeamTools plugin. " +
+                        "You don't have the permission (%s) to get the detailed notification.", Permissions.NOTIFY_UPDATE));
+                return;
+            }
+
+            if (sender instanceof Player p && updater.getNotifier() instanceof PaperUpdateNotifier paperUpdater) {
+                paperUpdater.handle(p);
+            } else {
+                sender.sendMessage(ChatHelper.getSuccessComponent("New update available for BuildTeamTools plugin: v%s" +
+                        ".", updater.getPluginData().getLatestVersion()));
+            }
+        });
     }
 
     /**
@@ -89,281 +94,61 @@ public class UpdaterComponent extends ModuleComponent {
      *
      * @param p The Player to notify
      */
-    public void notifyUpdate(Player p) {
-        if (!updateInstalled)
-            return;
+    public void notifyUpdate(@NonNull Player p) {
+        if (!updater.getPluginData().isAlreadyDownloaded()) return;
 
         if (p.hasPermission(Permissions.NOTIFY_UPDATE)) {
             p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
             p.sendMessage("");
-            p.sendMessage("§6§l[BuildTeam Plugin] §eThe server automatically installed a new update (v" + newVersion + ").");
+            p.sendMessage("§6§l[BuildTeam Plugin] §eThe server automatically installed a new update (v" + updater.getPluginData().getLatestVersion() + ").");
             p.sendMessage("§6>> §ePlease restart or reload the server to activate it.");
             p.sendMessage("");
         }
     }
 
     /**
-     * Sets the current version of the plugin that is installed
-     *
-     * @param newVersion The current installed version
+     * Notifies all online players with the permission about the update.
      */
-    public void setUpdateInstalled(String newVersion) {
-        this.newVersion = newVersion;
-        this.updateInstalled = true;
-
+    public void notifyAllPlayersAboutUpdate(CommandSender exceptPlayer) {
         for (Player p : Bukkit.getOnlinePlayers()) {
-            notifyUpdate(p);
+            if (!p.equals(exceptPlayer)) notifyUpdate(p);
         }
     }
 
     /**
-     * Get the result of the update.
-     *
-     * @return result of the update.
-     * @see Result
-     */
-    public Result getResult() {
-        waitThread();
-        return result;
-    }
-
-    /**
-     * Get the latest version from spigot.
-     *
-     * @return latest version.
-     */
-    public String getVersion() {
-        waitThread();
-        return version;
-    }
-
-    /**
-     * Check if id of resource is valid
-     *
-     * @param link link of the resource
-     * @return true if id of resource is valid
-     */
-    private boolean checkResource(String link) {
-        try {
-            URL url = new URI(link).toURL();
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.addRequestProperty("User-Agent", USER_AGENT);
-
-            int code = connection.getResponseCode();
-
-            if (code != 200) {
-                connection.disconnect();
-                result = Result.BAD_ID;
-                return false;
-            }
-            connection.disconnect();
-        } catch (Exception e) {
-            plugin.getComponentLogger().error("Error checking resource ID", e);
-        }
-
-        return true;
-    }
-
-    /**
-     * Checks if there is any update available.
-     */
-    private void checkUpdate() {
-        try {
-            String page = Integer.toString(this.page);
-
-            URL url = new URI(API_RESOURCE + id + VERSIONS + PAGE_PATH + page).toURL();
-
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.addRequestProperty("User-Agent", USER_AGENT);
-
-            InputStream inputStream = connection.getInputStream();
-            InputStreamReader reader = new InputStreamReader(inputStream);
-
-            JsonElement element = JsonParser.parseReader(reader);
-            JsonArray jsonArray = element.getAsJsonArray();
-
-            if (jsonArray.size() == 10 && !emptyPage) {
-                connection.disconnect();
-                this.page++;
-                checkUpdate();
-            } else if (jsonArray.isEmpty()) {
-                emptyPage = true;
-                this.page--;
-                checkUpdate();
-            } else if (jsonArray.size() < 10) {
-                if (logger)
-                    plugin.getLogger().info("Found " + jsonArray.size() + " versions.");
-                element = jsonArray.get(jsonArray.size() - 1);
-                JsonObject object = element.getAsJsonObject();
-                element = object.get("name");
-
-                version = element.toString().replace("\"", "").replace("v", "");
-                if (logger) {
-                    plugin.getComponentLogger().info("Current version on this server: {}", plugin.getPluginMeta().getVersion());
-                    plugin.getComponentLogger().info("Latest version available: {}", version);
-                }
-                if (logger)
-                    plugin.getLogger().info("Checking for update...");
-                if (shouldUpdate(version, plugin.getPluginMeta().getVersion()) && updateType == UpdateType.VERSION_CHECK) {
-                    result = Result.UPDATE_FOUND;
-                    if (logger)
-                        plugin.getLogger().info("Update found!");
-                } else if (updateType == UpdateType.DOWNLOAD) {
-                    if (logger)
-                        plugin.getLogger().info("Downloading update... version not checked");
-                    download();
-                } else if (updateType == UpdateType.CHECK_DOWNLOAD) {
-                    if (shouldUpdate(version, plugin.getPluginMeta().getVersion())) {
-                        if (logger)
-                            plugin.getLogger().info("Update found, downloading now...");
-                        download();
-                    } else {
-                        if (logger)
-                            plugin.getLogger().info("Update not necessary. Plugin is at the latest version.");
-                        result = Result.NO_UPDATE;
-                    }
-                } else {
-                    if (logger)
-                        plugin.getLogger().info("Update not found");
-                    result = Result.NO_UPDATE;
-                }
-            }
-        } catch (Exception e) {
-            plugin.getComponentLogger().error("Error reading update information", e);
-        }
-    }
-
-    /**
-     * Checks if plugin should be updated
+     * Checks if it should be updated
      *
      * @param newVersion remote version
      * @param oldVersion current version
+     * @param source The source of the version check, used for logging. Should be a human-readable string.
      */
-    public boolean shouldUpdate(@NonNull String newVersion, String oldVersion) {
-        // If version has format 1.0.0
-        if (newVersion.contains(".")) {
-            String[] newVersionSplit = newVersion.split("\\.");
-            String[] oldVersionSplit = oldVersion.split("\\.");
-
-            for (int i = 0; i < newVersionSplit.length; i++) {
-                try {
-                    if (Integer.parseInt(newVersionSplit[i]) > Integer.parseInt(oldVersionSplit[i]))
-                        return true;
-                    else if (Integer.parseInt(newVersionSplit[i]) < Integer.parseInt(oldVersionSplit[i]))
-                        return false;
-                } catch (NumberFormatException e) {
-                    return !newVersion.equalsIgnoreCase(oldVersion);
-                }
-            }
-
-            return false;
-
-            // If version is an integer
-        } else if (newVersion.matches("[0-9]+")) {
-            return Integer.parseInt(newVersion) > Integer.parseInt(oldVersion);
-
-            // If version has a different format
-        } else
-            return !newVersion.equalsIgnoreCase(oldVersion);
+    public boolean shouldUpdate(@NonNull String newVersion, String oldVersion, String source) {
+        return switch (getVersionDifference(newVersion, oldVersion, source)) {
+            case MAJOR, MINOR, PATCH, BUILD -> true;
+            case UNKNOWN, LATEST -> false;
+        };
     }
 
-    /**
-     * Downloads the file
-     */
-    private void download() {
-        BufferedInputStream in = null;
-        FileOutputStream fout = null;
 
+    /**
+     * Checks the (Semver) difference of the two provided versions. Parser also works for kinda server versions.
+     *
+     * @param latestVersion  The latest available version that will be checked against
+     * @param currentVersion The currently installed version
+     * @param source         The source of the version check, used for logging. Should be a human-readable string.
+     * @return The difference between the two versions. Unknown and latest mean the version is up to date/newer.
+     */
+    public VersionDifference getVersionDifference(@NonNull String latestVersion, String currentVersion, String source) {
+
+        VersionComparator comparator = SemVerComparator.INSTANCE;
+        VersionDifference versionDifference;
         try {
-            URL url = new URI(downloadLink).toURL();
-
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.addRequestProperty("User-Agent", USER_AGENT);
-            InputStream inputStream = connection.getInputStream();
-
-            in = new BufferedInputStream(inputStream);
-            if (!updateFolder.exists()) {
-                boolean created = updateFolder.mkdirs();
-                if (!created && logger) {
-                    plugin.getLogger().log(Level.WARNING, "Could not create update folder");
-                }
-            }
-            fout = new FileOutputStream(new File(updateFolder, file.getName()));
-
-            final byte[] data = new byte[4096];
-            int count;
-            while ((count = in.read(data, 0, 4096)) != -1) {
-                fout.write(data, 0, count);
-            }
-        } catch (Exception e) {
-            plugin.getComponentLogger().error("Error downloading update", e);
-            if (logger)
-                plugin.getLogger().log(Level.SEVERE, "Updater tried to download the update, but was unsuccessful.");
-            result = Result.FAILED;
-        } finally {
-            try {
-                if (in != null) {
-                    in.close();
-                }
-            } catch (final IOException e) {
-                this.plugin.getLogger().log(Level.SEVERE, "Error closing input stream", e);
-            }
-            try {
-                if (fout != null) {
-                    fout.close();
-                }
-            } catch (final IOException e) {
-                this.plugin.getLogger().log(Level.SEVERE, "Error closing output stream", e);
-            }
-
-            setUpdateInstalled(version);
+            versionDifference = comparator.getVersionDifference(currentVersion, latestVersion);
+        } catch (InvalidVersionFormatException e) {
+            ChatHelper.logError("Failed to compare versions for '%s': %s", e, source);
+            return VersionDifference.UNKNOWN;
         }
-    }
 
-    /**
-     * Updater depends on thread's completion, so it is necessary to wait for thread to finish.
-     */
-    private void waitThread() {
-        if (thread != null && thread.isAlive()) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                this.plugin.getLogger().log(Level.SEVERE, null, e);
-                Thread.currentThread().interrupt();
-            }
-        }
-    }
-
-    public enum UpdateType {
-        // Checks only the version
-        VERSION_CHECK,
-        // Downloads without checking the version
-        DOWNLOAD,
-        // If updater finds new version automatically it downloads it.
-        CHECK_DOWNLOAD
-
-    }
-
-    public enum Result {
-
-        UPDATE_FOUND,
-
-        NO_UPDATE,
-
-        SUCCESS,
-
-        FAILED,
-
-        BAD_ID
-    }
-
-    public class UpdaterRunnable implements Runnable {
-
-        public void run() {
-            if (checkResource(downloadLink)) {
-                downloadLink = downloadLink + DOWNLOAD;
-                checkUpdate();
-            }
-        }
+        return versionDifference;
     }
 }

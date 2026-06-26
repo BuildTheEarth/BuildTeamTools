@@ -7,12 +7,14 @@ import lombok.Getter;
 import lombok.Setter;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.Module;
+import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
 import net.buildtheearth.buildteamtools.modules.network.api.NetworkAPI;
 import net.buildtheearth.buildteamtools.modules.network.listeners.NetworkJoinListener;
 import net.buildtheearth.buildteamtools.modules.network.listeners.NetworkQuitListener;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Region;
 import net.buildtheearth.buildteamtools.modules.network.model.RegionType;
+import net.buildtheearth.buildteamtools.modules.stats.StatsModule;
 import net.buildtheearth.buildteamtools.utils.WikiLinks;
 import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
 import org.bukkit.Bukkit;
@@ -125,6 +127,11 @@ public class NetworkModule extends Module {
         }
 
         return future;
+    }
+
+    public void enableDisabledModules() {
+        if (!StatsModule.getInstance().isEnabled()) StatsModule.getInstance().enable();
+        if (!NavigationModule.getInstance().isEnabled()) NavigationModule.getInstance().enable();
     }
 
     /**

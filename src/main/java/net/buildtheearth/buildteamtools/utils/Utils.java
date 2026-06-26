@@ -1,5 +1,8 @@
 package net.buildtheearth.buildteamtools.utils;
 
+import com.alpsbte.alpslib.utils.ChatHelper;
+import org.bukkit.command.CommandSender;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -120,5 +123,10 @@ public class Utils {
         if (args.length == argPos && args[0].equalsIgnoreCase(parentArg))
             return suggestions.stream().filter(s -> s.toLowerCase().startsWith(args[argPos - 1].toLowerCase())).collect(Collectors.toList());
         return null;
+    }
+
+    public static void sendNoPermissionMessage(CommandSender sender, String permission) {
+        sender.sendMessage(ChatHelper.getErrorComponent("You don't have permission to execute this command. Required " +
+                "permission: " + permission));
     }
 }

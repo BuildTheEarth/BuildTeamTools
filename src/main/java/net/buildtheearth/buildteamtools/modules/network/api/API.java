@@ -10,13 +10,19 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A helper class to allow for smoother API usage
  */
 public class API {
 
-    private static final OkHttpClient httpClient = new OkHttpClient();
+    private static final OkHttpClient httpClient = new OkHttpClient().newBuilder()
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .callTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .build();
 
     /**
      * A callback function to be able to handle the result of an API request

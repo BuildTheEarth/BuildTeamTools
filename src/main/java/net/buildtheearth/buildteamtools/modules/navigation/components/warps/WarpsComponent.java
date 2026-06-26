@@ -301,7 +301,7 @@ public class WarpsComponent extends ModuleComponent {
 
         switch (warpGroupCount) {
             case 0 -> player.sendMessage(ChatHelper.getErrorString("This server does not have any warps yet!"));
-            case 1 -> new WarpMenu(player, buildTeam.getWarpGroups().getFirst(), false, true);
+            case 1 -> new WarpMenu(player, buildTeam.getWarpGroups().getFirst(), null, true);
             default -> new WarpGroupMenu(player, buildTeam, menu != null, true, menu);
         }
     }

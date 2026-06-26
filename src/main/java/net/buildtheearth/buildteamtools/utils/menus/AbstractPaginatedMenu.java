@@ -17,7 +17,7 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
     private int totalItemsAmount;
     private int currentPage = 0;
 
-    public AbstractPaginatedMenu(int rows, int pagedRows, String title, Player menuPlayer, boolean autoLoad) {
+    protected AbstractPaginatedMenu(int rows, int pagedRows, String title, Player menuPlayer, boolean autoLoad) {
         super(rows, title, menuPlayer, false);
 
         this.maxItemsPerPage = pagedRows * 9;
@@ -136,7 +136,7 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
      * @return The previous page item.
      */
     private ItemStack getPreviousPageItem() {
-        if (currentPage <= 1)
+        if (currentPage < 1)
             return HeadFactory.head(HeadTexture.WHITE_BLANK, " ");
 
         return HeadFactory.head(HeadTexture.WHITE_ARROW_LEFT, "§ePrevious Page §7- §f" + (getPage() - 1));
@@ -179,8 +179,6 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
     }
 
     protected void setSwitchPageItems(int switchPageItemSlot) {
-        int currentPage = getPage();
-
         // Set previous page item
         getMenu().getSlot(switchPageItemSlot - 1).setItem(getPreviousPageItem());
 

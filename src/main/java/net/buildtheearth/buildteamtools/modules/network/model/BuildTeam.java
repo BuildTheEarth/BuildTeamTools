@@ -218,30 +218,16 @@ public class BuildTeam {
         });
     }
 
-    public void deleteWarpGroup(Player deleter, WarpGroup warpGroup) {
+    public void deleteWarpGroup(Player deleter, WarpGroup warpGroup, boolean deleteWarps) {
         if (!warpGroup.getBuildTeam().getID().equals(this.getID())) {
             deleter.sendMessage(ChatHelper.getErrorString("You can only delete warp groups for your own team!"));
             return;
         }
 
-        List<Warp> warpsToDelete = new ArrayList<>(warpGroup.getWarps());
-
-        for (Warp warp : warpsToDelete) {
-            warpGroup.getWarps().remove(warp);
-            NetworkAPI.deleteWarp(warp, new API.ApiResponseCallback() {
-                @Override
-                public void onResponse(String response) {
-                }
-
-                @Override
-                public void onFailure(IOException e) {
-                    warpGroup.getWarps().add(warp);
-                    deleter.sendMessage(ChatHelper.getErrorString("Failed to delete warp %s from the network! Aborting group " +
-                            "deletion.", warp.getName()));
-                    BuildTeamTools.getInstance().getComponentLogger().error("Failed to delete warp via API during group " +
-                            "deletion", e);
-                }
-            });
+        if (deleteWarps) {
+            for (Warp warp : warpGroup.getWarps()) {
+                deleteWarp(deleter, warp);
+            }
         }
 
         this.warpGroups.remove(warpGroup);

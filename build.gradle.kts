@@ -49,11 +49,15 @@ dependencies {
     }
     implementation(libs.googlecode.json.simple)
     implementation(libs.bstats.bukkit)
-    implementation(platform(libs.fawe.bom))
+    implementation(platform(libs.fawe.bom)) {
+        exclude(group = "com.google.guava", module = "guava")
+    }
     implementation(libs.buildtheearth.projection) {
         exclude(group = "com.google.guava", module = "guava")
     }
-    implementation(libs.pluginupdater.common)
+    implementation(libs.pluginupdater.common) {
+        exclude(group = "com.google.guava", module = "guava")
+    }
     implementation(libs.pluginupdater.paper)
 
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core")

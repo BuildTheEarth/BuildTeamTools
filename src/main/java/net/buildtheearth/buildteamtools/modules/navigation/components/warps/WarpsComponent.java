@@ -20,7 +20,6 @@ import net.buildtheearth.buildteamtools.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import net.buildtheearth.model.GeographicalCoordinate;
-import net.buildtheearth.model.MinecraftCoordinate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -168,7 +167,7 @@ public class WarpsComponent extends ModuleComponent {
         // Get the geographic coordinates of the player's location.
         Location location = creator.getLocation();
         try {
-            GeographicalCoordinate coordinate = Projection.toGeo(new MinecraftCoordinate(location.getX(), location.getZ()));
+            GeographicalCoordinate coordinate = Projection.toGeo(location.getX(), location.getZ());
 
             //Get the country belonging to the coordinates
             CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(coordinate);
@@ -212,7 +211,7 @@ public class WarpsComponent extends ModuleComponent {
      * Creates a warp at the given location.
      */
     public static void createWarp(@NonNull Location location, String name, WarpGroup group, Player creator) throws OutOfProjectionBoundsException {
-        GeographicalCoordinate coordinates = Projection.toGeo(new MinecraftCoordinate(location.getX(), location.getZ()));
+        GeographicalCoordinate coordinates = Projection.toGeo(location.getX(), location.getZ());
 
         //Get the country belonging to the coordinates
         CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(coordinates);

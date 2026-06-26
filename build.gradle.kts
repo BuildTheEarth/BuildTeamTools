@@ -1,3 +1,6 @@
+import com.palantir.gradle.gitversion.VersionDetails
+import groovy.lang.Closure
+
 plugins {
     java
     alias(libs.plugins.lombok)
@@ -69,11 +72,15 @@ dependencies {
     }
 }
 
-val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDetails> by extra
+fun Project.versionDetails(): VersionDetails {
+    val closure = extra["versionDetails"] as? Closure<*>
+        ?: error("Palantir git-version did not expose versionDetails")
+    return closure.call() as VersionDetails
+}
 val details = versionDetails()
 
 group = "net.buildtheearth"
-version = "0.2.1" + "-SNAPSHOT+" + details.commitDistance + "-" + details.branchName + "-" + details.gitHash
+version = "0.3.0" //+ "-SNAPSHOT+" + details.commitDistance + "-" + details.branchName + "-" + details.gitHash
 description = "BuildTeamTools"
 java.sourceCompatibility = JavaVersion.VERSION_21
 java.targetCompatibility = JavaVersion.VERSION_21

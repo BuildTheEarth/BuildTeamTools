@@ -9,17 +9,17 @@ alpslib-io = "1.2.5"
 #  https://mvn.alps-bte.com/service/rest/repository/browse/alps-bte/com/alpsbte/alpslib/alpslib-libpsterra/
 alpslib-libpsterra = "1.1.4"
 # https://mvn.alps-bte.com/service/rest/repository/browse/alps-bte/com/alpsbte/alpslib/alpslib-utils/
-alpslib-utils = "1.4.6"
+alpslib-utils = "1.5.0"
 # https://mvn.alps-bte.com/service/rest/repository/browse/alps-bte/com/alpsbte/alpslib/alpslib-geo/
 alpslib-geo = "1.0.0-SNAPSHOT"
 # https://github.com/WesJD/AnvilGUI https://mvn.wesjd.net/
 anvilgui = "1.10.13-SNAPSHOT"
-# Ref: https://github.com/BlueMap-Minecraft/BlueMapAPI
+# Ref: https://github.com/BlueMap-Minecraft/BlueMapAPI - Newer Versions require Java 25
 bluemap-api = "2.7.8"
 # https://central.sonatype.com/artifact/org.bstats/bstats-bukkit
 bstats = "3.2.1"
 # Ref: https://github.com/BuildTheEarth/projection
-buildtheearth-projection = "1.0.4"
+buildtheearth-projection = "1.0.5"
 # @pin Waiting for dependency update in alps - lib - Used in AlpsLib-Utils#GeneratorUtils https://github.com/micycle1/Clipper2-java/releases
 clipper2 = "1.5.4"
 # Ref: https://github.com/IntellectualSites/bom
@@ -36,8 +36,8 @@ json = "20260522"
 okhttp-jvm = "5.4.0"
 # @pin 26.1+ required Java 25 - # https://artifactory.papermc.io/ui/native/universe/io/papermc/paper/paper-api/
 paper-api = "1.21.11-R0.1-SNAPSHOT"
-# https://github.com/CryptoMorin/XSeries/releases
-xseries = "13.7.0"
+# @pin XSeries messed up the releases - can be remove once a newer version then 13.8.0 is released https://github.com/CryptoMorin/XSeries/releases
+xseries = "13.7.1"
 # https://github.com/OakLoaf/PluginUpdater/releases https://repo.lushplugins.org/#/releases/org/lushplugins/pluginupdater/updater.paper-api
 pluginupdater = "3.0.0"
 #
@@ -47,7 +47,7 @@ git-version = "5.0.0"
 # https://plugins.gradle.org/plugin/io.freefair.lombok
 lombok-plugin = "9.5.0"
 # https://github.com/GradleUp/shadow/releases
-shadow = "9.4.2"
+shadow = "9.4.3"
 
 [libraries]
 alpsbte-canvas = { module = "com.alpsbte:canvas", version.ref = "alpsbte-canvas" }

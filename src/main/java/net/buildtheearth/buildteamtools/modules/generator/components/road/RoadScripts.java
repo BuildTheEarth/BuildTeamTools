@@ -53,7 +53,7 @@ public class RoadScripts extends Script {
 
         polyRegionLine = new ArrayList<>(points);
         polyRegionLine = GeneratorUtils.extendPolyLine(polyRegionLine);
-        polyRegionPoints = GeneratorUtils.shiftPoints(polyRegionLine, max_width + 2, true);
+        polyRegionPoints = GeneratorUtils.shiftPoints(polyRegionLine, max_width + 2d, true);
 
 
         // Create a region from the points
@@ -125,7 +125,8 @@ public class RoadScripts extends Script {
 
         List<Vector> streetLampPointsMid = new ArrayList<>(oneMeterPoints);
         streetLampPointsMid = GeneratorUtils.reducePoints(streetLampPointsMid, streetLampDistance + 1, streetLampDistance + 1);
-        List<List<Vector>> streetLampPoints = GeneratorUtils.shiftPointsAll(streetLampPointsMid, road_width + sidewalkWidth * 2);
+        List<List<Vector>> streetLampPoints = GeneratorUtils.shiftPointsAll(streetLampPointsMid,
+                (double) road_width + sidewalkWidth * 2);
 
         // Shorten the points to prevent the road from being too long
         List<Vector> innerPoints = new ArrayList<>(points);
@@ -167,13 +168,13 @@ public class RoadScripts extends Script {
                 drawCurveWithMask(mask, path, XMaterial.YELLOW_WOOL, true);
 
                 // Close the circles (curves are not able to end at the beginning)
-                drawLineWithMask(mask, path.get(0), path.get(path.size() - 1), XMaterial.YELLOW_WOOL, true);
+                drawLineWithMask(mask, path.getFirst(), path.getLast(), XMaterial.YELLOW_WOOL, true);
             }
         }
 
         // Draw another yellow line close to the sidewalk to spread the yellow wool faster and everywhere on the road.
         if (road_width > 10) {
-            List<List<Vector>> yellowWoolLineNearSidewalk = GeneratorUtils.shiftPointsAll(innerPoints, road_width - 4);
+            List<List<Vector>> yellowWoolLineNearSidewalk = GeneratorUtils.shiftPointsAll(innerPoints, road_width - 4d);
             for (List<Vector> path : yellowWoolLineNearSidewalk)
                 drawPolyLineWithMask(mask, path, XMaterial.YELLOW_WOOL, true, true);
         }
@@ -183,8 +184,10 @@ public class RoadScripts extends Script {
         // Draw the sidewalk
         if (isSidewalk) {
             // The outer sidewalk edge lines
-            List<List<Vector>> sidewalkPointsOut = GeneratorUtils.shiftPointsAll(fiveMeterPoints, road_width + sidewalkWidth * 2);
-            List<List<Vector>> sidewalkPointsMid = GeneratorUtils.shiftPointsAll(innerPoints, road_width + sidewalkWidth);
+            List<List<Vector>> sidewalkPointsOut = GeneratorUtils.shiftPointsAll(fiveMeterPoints,
+                    (double) road_width + sidewalkWidth * 2);
+            List<List<Vector>> sidewalkPointsMid = GeneratorUtils.shiftPointsAll(innerPoints,
+                    (double) road_width + sidewalkWidth);
             List<List<Vector>> sidewalkPointsIn = GeneratorUtils.shiftPointsAll(fiveMeterPoints, road_width);
 
 
@@ -375,7 +378,7 @@ public class RoadScripts extends Script {
                     for (List<Vector> path : roadMarkingPointsList) {
 
                         // Connect the line ends to prevent gaps
-                        path.add(path.get(0));
+                        path.add(path.getFirst());
 
                         List<Vector> markingsOneMeterPoints = new ArrayList<>(path);
                         markingsOneMeterPoints = GeneratorUtils.populatePoints(markingsOneMeterPoints, 1);
@@ -458,10 +461,7 @@ public class RoadScripts extends Script {
                     pasteSchematic("/GeneratorCollections/roadpack/streetlamp" + streetLampType + ".schematic", loc, angle);
                 }
 
-            // Fix streetlamp schematics for versions above 1.12
-            if (CommonModule.getInstance().getVersionComponent().is_1_20()) {
-                setBlocksWithMask("minecraft:cobblestone_wall", XMaterial.COBBLESTONE_WALL);
-            }
+            setBlocksWithMask("minecraft:cobblestone_wall", XMaterial.COBBLESTONE_WALL);
         }
 
 
@@ -472,7 +472,6 @@ public class RoadScripts extends Script {
 
     private int normalizeAngle(int angle) {
         // Define the allowed angles
-        //int[] allowedAngles = {0, 45, 90, 135, 180, 225, 270, 315, 360};
         int[] allowedAngles = {0, 90, 180, 270};
 
         // Find the closest allowed angle

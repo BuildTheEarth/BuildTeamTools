@@ -10,7 +10,6 @@ import net.buildtheearth.buildteamtools.modules.common.commands.BuildTeamToolsCo
 import net.buildtheearth.buildteamtools.modules.common.components.dependency.DependencyComponent;
 import net.buildtheearth.buildteamtools.modules.common.components.pluginmessaging.PluginMessagingComponent;
 import net.buildtheearth.buildteamtools.modules.common.components.updater.UpdaterComponent;
-import net.buildtheearth.buildteamtools.modules.common.components.version.VersionComponent;
 import net.buildtheearth.buildteamtools.modules.common.listeners.CommandListener;
 import net.buildtheearth.buildteamtools.modules.common.listeners.ExceptionListener;
 import net.buildtheearth.buildteamtools.modules.common.metrics.MetricsManager;
@@ -35,9 +34,6 @@ public class CommonModule extends Module {
     private PluginMessagingComponent pluginMessagingComponent;
     @Getter
     private DependencyComponent dependencyComponent;
-
-    @Getter
-    private VersionComponent versionComponent;
 
 
     private long time;
@@ -75,7 +71,6 @@ public class CommonModule extends Module {
         updaterComponent = new UpdaterComponent(BuildTeamTools.getInstance());
         pluginMessagingComponent = new PluginMessagingComponent();
         dependencyComponent = new DependencyComponent();
-        versionComponent = new VersionComponent();
 
         MetricsManager.init(BuildTeamTools.getInstance());
 

@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class BuildTeamTools extends JavaPlugin {
 
-    public static final String PREFIX = "§9§lBTE §8> §7";
+    public static final String PREFIX = "&9&lBTE &8> &7";
     public static final String CONSOLE_PREFIX = "[BuildTeamTools] ";
 
     @Getter

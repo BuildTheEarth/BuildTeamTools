@@ -26,36 +26,57 @@ import java.time.Duration;
 public class UpdaterComponent extends ModuleComponent {
 
     private final Updater updater;
+    private final BuildTeamTools plugin;
 
     public UpdaterComponent(@NonNull BuildTeamTools plugin) {
         super("Updater");
-        var updaterBuilder = PaperUpdater.builder(plugin)
+        updater = PaperUpdater.builder(plugin)
                 .github("BuildTheEarth/BuildTeamTools")
                 .notify(true)
-                .notificationPermission(Permissions.NOTIFY_UPDATE);
-        updater = updaterBuilder.build();
+                .notificationMessage("<#ffe27a>A new <#e0c01b>%plugin% <#ffe27a>update is now available! " +
+                        "<#e0c01b>%current_version% <#ffe27a>-> <#e0c01b>%latest_version%") // Default message is no minimsg
+                .notificationPermission(Permissions.NOTIFY_UPDATE)
+                .build();
+        this.plugin = plugin;
 
-        if (plugin.getConfig().getBoolean(ConfigPaths.AUTO_UPDATE)) Bukkit.getScheduler()
-                .runTaskLaterAsynchronously(plugin, () -> update(plugin.getServer().getConsoleSender(), false),
-                        Tick.tick().fromDuration(Duration.ofSeconds(30)));
+        if (plugin.getConfig().getBoolean(ConfigPaths.AUTO_UPDATE)) runAutoUpdateAfterCheck();
+    }
+
+    private void runAutoUpdateAfterCheck() {
+        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
+            if (updater.getPluginData().hasCheckRan()) {
+                update(Bukkit.getConsoleSender(), false);
+                return;
+            }
+
+            updater.checkForUpdate().thenAcceptAsync(update -> {
+                if (Boolean.TRUE.equals(update)) {
+                    update(Bukkit.getConsoleSender(), false);
+                }
+            });
+        }, Tick.tick().fromDuration(Duration.ofSeconds(1)));
     }
 
     public void update(CommandSender sender, boolean checkMsg) {
         if (updater.isAlreadyDownloaded() || !updater.isUpdateAvailable()) {
-            if (checkMsg) sender.sendMessage(ChatHelper
-                    .getStandardComponent(true, "It looks like there is no new update available!"));
+            if (checkMsg) {
+                sender.sendMessage(ChatHelper.getStandardComponent(
+                        true,
+                        "It looks like there is no new update available!"
+                ));
+            }
             return;
         }
 
 
         updater.attemptDownload().thenAccept(success -> {
             if (Boolean.TRUE.equals(success)) {
-                sender.sendMessage(ChatHelper.getSuccessComponent("Successfully updated plugin to version %s, " +
-                        "restart the server to apply changes!", updater.getPluginData().getLatestVersion()));
+                sender.sendMessage(ChatHelper.getSuccessComponent(
+                        "Successfully updated plugin to version %s, restart the server to apply changes!",
+                        updater.getPluginData().getLatestVersion()
+                ));
+
                 notifyAllPlayersAboutUpdate(sender);
-            } else {
-                sender.sendMessage(ChatHelper.getErrorComponent("Failed to update plugin to version %s.",
-                        updater.getPluginData().getLatestVersion()));
             }
         });
     }
@@ -67,23 +88,38 @@ public class UpdaterComponent extends ModuleComponent {
             return;
         }
 
-        updater.checkForUpdate().thenAcceptAsync(update -> {
+        updater.checkForUpdate().whenCompleteAsync((update, throwable) -> {
+            if (throwable != null) {
+                sender.sendMessage(ChatHelper.getErrorComponent(
+                        "Could not check for updates. The update API rejected the request or is unavailable. Error: ",
+                        throwable.getMessage()
+                ));
+                return;
+            }
+
             if (!Boolean.TRUE.equals(update)) {
-                sender.sendMessage(ChatHelper.getSuccessComponent("The BuildTeamTools plugin is up to date."));
+                sender.sendMessage(ChatHelper.getSuccessComponent(
+                        "The BuildTeamTools plugin is up to date."
+                ));
                 return;
             }
 
             if (!sender.hasPermission(Permissions.NOTIFY_UPDATE)) {
-                sender.sendMessage(ChatHelper.getErrorComponent("A new update is available for the BuildTeamTools plugin. " +
-                        "You don't have the permission (%s) to get the detailed notification.", Permissions.NOTIFY_UPDATE));
+                sender.sendMessage(ChatHelper.getErrorComponent(
+                        "A new update is available for the BuildTeamTools plugin. " +
+                                "You don't have the permission (%s) to get the detailed notification.",
+                        Permissions.NOTIFY_UPDATE
+                ));
                 return;
             }
 
             if (sender instanceof Player p && updater.getNotifier() instanceof PaperUpdateNotifier paperUpdater) {
                 paperUpdater.handle(p);
             } else {
-                sender.sendMessage(ChatHelper.getSuccessComponent("New update available for BuildTeamTools plugin: v%s" +
-                        ".", updater.getPluginData().getLatestVersion()));
+                sender.sendMessage(ChatHelper.getSuccessComponent(
+                        "New update available for BuildTeamTools plugin: v%s.",
+                        updater.getPluginData().getLatestVersion()
+                ));
             }
         });
     }
@@ -110,8 +146,15 @@ public class UpdaterComponent extends ModuleComponent {
      * Notifies all online players with the permission about the update.
      */
     public void notifyAllPlayersAboutUpdate(CommandSender exceptPlayer) {
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            if (!p.equals(exceptPlayer)) notifyUpdate(p);
+        if (!Bukkit.isPrimaryThread()) {
+            Bukkit.getScheduler().runTask(plugin, () -> notifyAllPlayersAboutUpdate(exceptPlayer));
+            return;
+        }
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (!player.equals(exceptPlayer)) {
+                notifyUpdate(player);
+            }
         }
     }
 

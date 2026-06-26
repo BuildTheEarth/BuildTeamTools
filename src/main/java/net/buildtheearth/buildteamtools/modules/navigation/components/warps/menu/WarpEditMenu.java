@@ -19,7 +19,6 @@ import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
 import net.buildtheearth.buildteamtools.utils.heads.LetterType;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import net.buildtheearth.model.GeographicalCoordinate;
-import net.buildtheearth.model.MinecraftCoordinate;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -144,7 +143,7 @@ public class WarpEditMenu extends AbstractMenu {
             // Get the geographic coordinates of the player's location.
             Location location = clickPlayer.getLocation();
             try {
-                GeographicalCoordinate coordinate = Projection.toGeo(new MinecraftCoordinate(location.getX(), location.getZ()));
+                GeographicalCoordinate coordinate = Projection.toGeo(location.getX(), location.getZ());
 
                 //Get the country belonging to the coordinates
                 CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(coordinate);

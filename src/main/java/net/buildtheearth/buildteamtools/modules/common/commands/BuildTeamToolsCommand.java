@@ -77,6 +77,7 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
         if (args.length == 1 || (!args[1].equalsIgnoreCase("on") && !args[1].equalsIgnoreCase("off"))) {
             sender.sendMessage(ChatHelper.getStandardComponent(true, "Current Debug Mode: %s. You need to add a value: " +
                     "on/off to change it", BuildTeamTools.getInstance().isDebug() ? "ON" : "OFF"));
+            return;
         }
 
         boolean debug = args[1].equalsIgnoreCase("on");
@@ -138,7 +139,7 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
         if (args.length == 1)
             return Arrays.asList("help", "communicators", "checkForUpdates", "cache", "debug", "reload-config", "update");
 
-        List<String> debugSuggestions = Utils.getTabCompleterArgs(args, "debug", 2, Arrays.asList("true", "false"));
+        List<String> debugSuggestions = Utils.getTabCompleterArgs(args, "debug", 2, Arrays.asList("on", "off"));
         if (debugSuggestions != null)
             return debugSuggestions;
 

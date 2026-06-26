@@ -82,3 +82,4 @@ permissions:
   btt.bp.edit:
     description: Allows players to create and edit custom block palettes
     default: op
+github-repo: "BuildTheEarth/BuildTeamTools"

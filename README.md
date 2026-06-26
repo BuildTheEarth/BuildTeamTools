@@ -22,7 +22,7 @@
     <img src="https://img.shields.io/badge/_DOWNLOAD_STABLE_RELEASE-28A745?style=for-the-badge&logoColor=white" alt="Download Stable Release" height="50">
   </a>
   <br/>
-  <a href="https://github.com/BuildTheEarth/BuildTeamTools/actions/workflows/build.yml">
+  <a href="https://nightly.link/BuildTheEarth/BuildTeamTools/workflows/build/main/Staging-Build">
     <img src="https://img.shields.io/badge/_DOWNLOAD_DEV_BUILD-FFA500?style=for-the-badge&logoColor=white" alt="Download Dev Build" height="40">
   </a>
 </p>
@@ -32,15 +32,14 @@
 <p align="center">
     <a href="https://github.com/BuildTheEarth"><img src="https://go.buildtheearth.net/official-shield" alt="BuildTheEarth Github"></a>
     <a href="https://www.discord.gg/buildtheearth"><img src="https://img.shields.io/discord/690908396404080650?label=Discord&color=768AD4" alt="BuildTheEarth Discord"></a>
-    <a href="https://discord.gg/88YxDHeMSf"><img src="https://img.shields.io/discord/706317564904472627?label=Dev Hub Discord&color=768AD4" alt="BuildTheEarth Dev Hib Discord"></a>
+    <a href="https://go.buildtheearth.net/dc-dev"><img src="https://img.shields.io/discord/706317564904472627?label=Dev%20Hub%20Discord&color=768AD4" alt="BuildTheEarth Dev Hub Discord"></a>
 </p>
 <p align="center">
-    <a href="https://www.spigotmc.org/resources/buildteamtools.101854/"><img src="https://img.shields.io/spiget/downloads/101854?color=green&label=Spigot%20Downloads" alt="Downloads Count"></a>
-    <a href="https://www.spigotmc.org/resources/buildteamtools.101854/"><img src="https://img.shields.io/github/downloads/BuildTheEarth/BuildTeamTools/total?label=GitHub%20Downloads" alt="GitHub Downloads Count"></a>
-    <a href="https://www.spigotmc.org/resources/buildteamtools.101854/"><img src="https://img.shields.io/spiget/version/101854?label=Spigot%20Version" alt="Latest Version"></a>
+    <a href="https://github.com/BuildTheEarth/BuildTeamTools/releases/latest"><img src="https://img.shields.io/github/downloads/BuildTheEarth/BuildTeamTools/total?label=GitHub%20Downloads" alt="GitHub Downloads Count"></a>
+    <a href="https://github.com/BuildTheEarth/BuildTeamTools/releases/latest"><img src="https://img.shields.io/github/v/release/BuildTheEarth/BuildTeamTools" alt="Latest Version"></a>
     <a href="https://bstats.org/plugin/bukkit/BuildTeamTools/29076"><img alt="bStats Players" src="https://img.shields.io/bstats/players/29076?label=Bstats%20players"></a>
     <a href="https://bstats.org/plugin/bukkit/BuildTeamTools/29076"><img alt="bStats Servers" src="https://img.shields.io/bstats/servers/29076"></a>
-    <img src="https://img.shields.io/github/repo-size/BuildTheEarth/BuildTeamTools" alt="Repo Size">
+    <a href="https://bstats.org/plugin/bukkit/BuildTeamTools/29076"><img src="https://img.shields.io/github/repo-size/BuildTheEarth/BuildTeamTools" alt="Repo Size"></a>
     <a href="https://github.com/BuildTheEarth/BuildTeamTools/actions/workflows/qodana_code_quality.yml"><img src="https://github.com/BuildTheEarth/BuildTeamTools/actions/workflows/qodana_code_quality.yml/badge.svg" alt="Qodana"></a>
 </p>
 
@@ -59,7 +58,7 @@ intuitive entry point for newcomers to the project.
 ## Features
 
 🔨 **Easy-to-use** Tools  
-⏱ **Multi-Version** support from `1.18` - `1.21.x`  
+⏱ **Multi-Version** support from `1.18` - `26.x`  
 ✔️ **User-friendly** GUIs and Commands  
 📆 **Automatic** Updates  
 🔌 **Easy setup** and configuration
@@ -83,11 +82,11 @@ outdated.*
 
 💻 **Requirements:**
 
-- A Server running Paper 1.18 - **1.21.x**.
+- A Server running Paper 1.18 - **26.x**.
 
 🚩 **How to install:**
 
-1. Download BuildTeamTools [here](https://www.spigotmc.org/resources/buildteamtools.101854/).
+1. Download BuildTeamTools [here](https://github.com/BuildTheEarth/BuildTeamTools/releases/latest).
 2. Place the downloaded plugin in your server's **../plugins** folder.
 3. *(Optional)* Some modules require initial configuration or dependencies to run:
 

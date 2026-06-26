@@ -12,7 +12,11 @@ import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NonNull;
+import org.lushplugins.pluginupdater.api.exception.InvalidVersionFormatException;
 import org.lushplugins.pluginupdater.api.updater.Updater;
+import org.lushplugins.pluginupdater.api.version.VersionDifference;
+import org.lushplugins.pluginupdater.api.version.comparator.SemVerComparator;
+import org.lushplugins.pluginupdater.api.version.comparator.VersionComparator;
 import org.lushplugins.pluginupdater.paper.api.PaperUpdater;
 import org.lushplugins.pluginupdater.paper.api.notification.PaperUpdateNotifier;
 
@@ -57,27 +61,29 @@ public class UpdaterComponent extends ModuleComponent {
     }
 
 
-    public void checkForUpdates(CommandSender sender) {
+    public void checkForUpdates(@NonNull CommandSender sender) {
         if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_CHECK_FOR_UPDATES)) {
             Utils.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_CHECK_FOR_UPDATES);
             return;
         }
 
         updater.checkForUpdate().thenAcceptAsync(update -> {
-            if (Boolean.TRUE.equals(update)) {
-                if (sender.hasPermission(Permissions.NOTIFY_UPDATE)) {
-                    if (sender instanceof Player p && updater.getNotifier() instanceof PaperUpdateNotifier paperUpdater) {
-                        paperUpdater.handle(p);
-                    } else {
-                        sender.sendMessage(ChatHelper.getSuccessComponent("New update available for BuildTeamTools plugin: v%s" +
-                                ".", updater.getPluginData().getLatestVersion()));
-                    }
-                } else {
-                    sender.sendMessage(ChatHelper.getErrorComponent("A new update is available for the BuildTeamTools plugin. " +
-                            "You don't have the permission (%s) to get the detailed notification.", Permissions.NOTIFY_UPDATE));
-                }
-            } else {
+            if (!Boolean.TRUE.equals(update)) {
                 sender.sendMessage(ChatHelper.getSuccessComponent("The BuildTeamTools plugin is up to date."));
+                return;
+            }
+
+            if (!sender.hasPermission(Permissions.NOTIFY_UPDATE)) {
+                sender.sendMessage(ChatHelper.getErrorComponent("A new update is available for the BuildTeamTools plugin. " +
+                        "You don't have the permission (%s) to get the detailed notification.", Permissions.NOTIFY_UPDATE));
+                return;
+            }
+
+            if (sender instanceof Player p && updater.getNotifier() instanceof PaperUpdateNotifier paperUpdater) {
+                paperUpdater.handle(p);
+            } else {
+                sender.sendMessage(ChatHelper.getSuccessComponent("New update available for BuildTeamTools plugin: v%s" +
+                        ".", updater.getPluginData().getLatestVersion()));
             }
         });
     }
@@ -110,36 +116,39 @@ public class UpdaterComponent extends ModuleComponent {
     }
 
     /**
-     * Checks if plugin should be updated
+     * Checks if it should be updated
      *
      * @param newVersion remote version
      * @param oldVersion current version
+     * @param source The source of the version check, used for logging. Should be a human-readable string.
      */
-    public boolean shouldUpdate(@NonNull String newVersion, String oldVersion) {
-        // If version has format 1.0.0
-        if (newVersion.contains(".")) {
-            String[] newVersionSplit = newVersion.split("\\.");
-            String[] oldVersionSplit = oldVersion.split("\\.");
+    public boolean shouldUpdate(@NonNull String newVersion, String oldVersion, String source) {
+        return switch (getVersionDifference(newVersion, oldVersion, source)) {
+            case MAJOR, MINOR, PATCH, BUILD -> true;
+            case UNKNOWN, LATEST -> false;
+        };
+    }
 
-            for (int i = 0; i < newVersionSplit.length; i++) {
-                try {
-                    if (Integer.parseInt(newVersionSplit[i]) > Integer.parseInt(oldVersionSplit[i]))
-                        return true;
-                    else if (Integer.parseInt(newVersionSplit[i]) < Integer.parseInt(oldVersionSplit[i]))
-                        return false;
-                } catch (NumberFormatException e) {
-                    return !newVersion.equalsIgnoreCase(oldVersion);
-                }
-            }
 
-            return false;
+    /**
+     * Checks the (Semver) difference of the two provided versions. Parser also works for kinda server versions.
+     *
+     * @param latestVersion  The latest available version that will be checked against
+     * @param currentVersion The currently installed version
+     * @param source         The source of the version check, used for logging. Should be a human-readable string.
+     * @return The difference between the two versions. Unknown and latest mean the version is up to date/newer.
+     */
+    public VersionDifference getVersionDifference(@NonNull String latestVersion, String currentVersion, String source) {
 
-            // If version is an integer
-        } else if (newVersion.matches("\\d+")) {
-            return Integer.parseInt(newVersion) > Integer.parseInt(oldVersion);
+        VersionComparator comparator = SemVerComparator.INSTANCE;
+        VersionDifference versionDifference;
+        try {
+            versionDifference = comparator.getVersionDifference(currentVersion, latestVersion);
+        } catch (InvalidVersionFormatException e) {
+            ChatHelper.logError("Failed to compare versions for '%s': %s", e, source);
+            return VersionDifference.UNKNOWN;
+        }
 
-            // If version has a different format
-        } else
-            return !newVersion.equalsIgnoreCase(oldVersion);
+        return versionDifference;
     }
 }

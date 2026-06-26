@@ -19,6 +19,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 
@@ -36,82 +37,91 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        if (args[0].equalsIgnoreCase("help")) {
-            ChatHelper.sendMessageBox(sender, "Build Team Help", () -> {
+        switch (args[0].toLowerCase()) {
+            case "communicators" -> {
+                if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_COMMUNICATORS)) {
+                    Utils.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_COMMUNICATORS);
+                    return true;
+                }
+
+                ChatHelper.sendMessageBox(sender, "Build Team Communicators", () -> {
+                    for (UUID uuid : NetworkModule.getInstance().getCommunicators())
+                        sender.sendMessage("§7- §e" + uuid.toString());
+                });
+            }
+            case "cache" -> cacheCommand(sender, args);
+            case "debug" -> debugCommand(sender, args);
+            case "checkforupdates" -> CommonModule.getInstance().getUpdaterComponent().checkForUpdates(sender);
+            case "reload-config", "reload" -> reloadCommand(sender);
+            case "update" -> updateCommand(sender);
+            default -> ChatHelper.sendMessageBox(sender, "Build Team Help", () -> {
                 sender.sendMessage("§e/btt cache [update] §8- §7View the cache or upload it to the network & update it locally.");
                 sender.sendMessage("§e/btt checkForUpdates §8- §7Check for updates.");
                 sender.sendMessage("§e/btt communicators §8- §7List of players who communicate with the network.");
                 sender.sendMessage("§e/btt debug <true/false> §8- §7Enable or disable debug mode.");
                 sender.sendMessage("§e/btt help §8- §7List of all sub commands.");
                 sender.sendMessage("§e/btt reload-config §8- §7Reload all configs for the modules");
+                sender.sendMessage("§e/btt update §8- §7Update the plugin to the latest version.");
             });
-        } else if (args[0].equalsIgnoreCase("communicators")) {
-            if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_COMMUNICATORS)) {
-                Utils.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_COMMUNICATORS);
-                return true;
-            }
-
-            ChatHelper.sendMessageBox(sender, "Build Team Communicators", () -> {
-                for (UUID uuid : NetworkModule.getInstance().getCommunicators())
-                    sender.sendMessage("§7- §e" + uuid.toString());
-            });
-        } else if (args[0].equalsIgnoreCase("cache")) {
-            if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_CACHE)) {
-                Utils.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_CACHE);
-                return true;
-            }
-
-            if (args.length > 1 && args[1].equalsIgnoreCase("update")) {
-                NetworkModule.getInstance().updateCache();
-                if (NetworkModule.getInstance().getBuildTeam() != null) NetworkModule.getInstance().enableDisabledModules();
-                StatsModule.getInstance().updateAndSave();
-                sender.sendMessage(ChatHelper.getSuccessComponent("Cache successfully updated."));
-            }
-
-            if (StatsModule.getInstance().isEnabled()) {
-                ChatHelper.sendMessageBox(sender, "Build Team Cache", () ->
-                        sender.sendMessage(StatsModule.getInstance().getCurrentCache().toJSONString()));
-            } else {
-                sender.sendMessage(ChatHelper.getErrorComponent("The Stats Module is not enabled, so there is no cache to show" +
-                        "."));
-            }
-        } else if (args[0].equalsIgnoreCase("debug")) {
-            if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_DEBUG)) {
-                Utils.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_DEBUG);
-                return true;
-            }
-
-            if (args.length == 1 || (!args[1].equalsIgnoreCase("on") && !args[1].equalsIgnoreCase("off"))) {
-                sender.sendMessage(ChatHelper.getStandardComponent(true, "Current Debug Mode: %s. You need to add a value: " +
-                        "on/off to change it", BuildTeamTools.getInstance().isDebug() ? "ON" : "OFF"));
-            }
-
-            boolean debug = args[1].equalsIgnoreCase("on");
-
-            BuildTeamTools.getInstance().setDebug(debug);
-            sender.sendMessage(ChatHelper.getStandardComponent(true, "Debug Mode was set to: %s", debug));
-        } else if (args[0].equalsIgnoreCase("checkForUpdates")) {
-            CommonModule.getInstance().getUpdaterComponent().checkForUpdates(sender);
-        } else if (args[0].equalsIgnoreCase("reload-config")) {
-            if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_RELOAD)) {
-                Utils.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_RELOAD);
-                return true;
-            }
-
-            sender.sendMessage(ChatHelper.getStandardComponent(true, "Reloading all configs..."));
-            BuildTeamTools.getInstance().reloadConfig();
-            if (NetworkModule.getInstance().getBuildTeam() == null) {
-                NetworkModule.getInstance().updateCache();
-                if (NetworkModule.getInstance().getBuildTeam() != null) NetworkModule.getInstance().enableDisabledModules();
-            }
-
-            sender.sendMessage(ChatHelper.getStandardString("All configs have been reloaded. For some changes to apply you have" +
-                    " to restart the server."));
-        } else if (args[0].equalsIgnoreCase("update")) {
-            updateCommand(sender);
         }
 
         return true;
+    }
+
+    private static void debugCommand(@NonNull CommandSender sender, String @NonNull [] args) {
+        if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_DEBUG)) {
+            Utils.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_DEBUG);
+            return;
+        }
+
+        if (args.length == 1 || (!args[1].equalsIgnoreCase("on") && !args[1].equalsIgnoreCase("off"))) {
+            sender.sendMessage(ChatHelper.getStandardComponent(true, "Current Debug Mode: %s. You need to add a value: " +
+                    "on/off to change it", BuildTeamTools.getInstance().isDebug() ? "ON" : "OFF"));
+        }
+
+        boolean debug = args[1].equalsIgnoreCase("on");
+
+        BuildTeamTools.getInstance().setDebug(debug);
+        sender.sendMessage(ChatHelper.getStandardComponent(true, "Debug Mode was set to: %s", debug));
+    }
+
+    private static void cacheCommand(@NonNull CommandSender sender, String @NonNull [] args) {
+        if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_CACHE)) {
+            Utils.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_CACHE);
+            return;
+        }
+
+        if (args.length > 1 && args[1].equalsIgnoreCase("update")) {
+            NetworkModule.getInstance().updateCache();
+            if (NetworkModule.getInstance().getBuildTeam() != null) NetworkModule.getInstance().enableDisabledModules();
+            StatsModule.getInstance().updateAndSave();
+            sender.sendMessage(ChatHelper.getSuccessComponent("Cache successfully updated."));
+        }
+
+        if (StatsModule.getInstance().isEnabled()) {
+            ChatHelper.sendMessageBox(sender, "Build Team Cache", () ->
+                    sender.sendMessage(StatsModule.getInstance().getCurrentCache().toJSONString()));
+        } else {
+            sender.sendMessage(ChatHelper.getErrorComponent("The Stats Module is not enabled, so there is no cache to show" +
+                    "."));
+        }
+    }
+
+    private static void reloadCommand(@NonNull CommandSender sender) {
+        if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_RELOAD)) {
+            Utils.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_RELOAD);
+            return;
+        }
+
+        sender.sendMessage(ChatHelper.getStandardComponent(true, "Reloading all configs..."));
+        BuildTeamTools.getInstance().reloadConfig();
+        if (NetworkModule.getInstance().getBuildTeam() == null) {
+            NetworkModule.getInstance().updateCache();
+            if (NetworkModule.getInstance().getBuildTeam() != null) NetworkModule.getInstance().enableDisabledModules();
+        }
+
+        sender.sendMessage(ChatHelper.getStandardString("All configs have been reloaded. For some changes to apply you have" +
+                " to restart the server."));
     }
 
     private void updateCommand(@NotNull CommandSender sender) {

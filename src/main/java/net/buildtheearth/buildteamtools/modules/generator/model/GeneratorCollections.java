@@ -263,7 +263,8 @@ public class GeneratorCollections {
 
             String oldVersion = cfg.getString("version");
 
-            if (!CommonModule.getInstance().getUpdaterComponent().shouldUpdate(generatorCollectionsVersion, oldVersion))
+            if (!CommonModule.getInstance().getUpdaterComponent().shouldUpdate(generatorCollectionsVersion, oldVersion,
+                    "GeneratorCollections"))
                 return true;
             else
                 return installGeneratorCollections(p, true);

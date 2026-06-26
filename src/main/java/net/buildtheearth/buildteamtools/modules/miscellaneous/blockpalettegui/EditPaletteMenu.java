@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 
@@ -60,7 +61,7 @@ public class EditPaletteMenu extends AbstractMenu {
 
     private enum InputMode {NONE, NAME, DESCRIPTION}
 
-    public EditPaletteMenu(BlockPaletteManager manager, Player player, JavaPlugin plugin,
+    public EditPaletteMenu(BlockPaletteManager manager, Player player, @NonNull JavaPlugin plugin,
                            String paletteKey, String name, String description, List<String> blocks) {
         super(3, "Edit Palette: " + name, player);
         this.manager = manager;
@@ -243,10 +244,9 @@ public class EditPaletteMenu extends AbstractMenu {
 
     private class ChatInputListener implements Listener {
         @EventHandler
-        public void onPlayerChat(AsyncChatEvent event) {
+        public void onPlayerChat(@NonNull AsyncChatEvent event) {
             if (!event.getPlayer().getUniqueId().equals(player.getUniqueId())) return;
 
-            // Alleen als we echt in input-modus zijn
             if (inputMode == InputMode.NONE) return;
 
             event.setCancelled(true);

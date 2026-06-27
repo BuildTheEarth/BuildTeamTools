@@ -22,10 +22,10 @@ commands:
   explore:
     description: Opens the BuildTeams explore menu.
     usage: /explore
-  warp:
+  bwarp:
     description: Command for managing warps.
-    usage: /warp <subcommand>
-    aliases: [ warps, wp ]
+    usage: /bwarp <warp>
+    aliases: [ bwarps, wp ]
   warpbt:
     description: Opens the warp menu for the specified BuildTeam
     usage: /warpsbt <team>

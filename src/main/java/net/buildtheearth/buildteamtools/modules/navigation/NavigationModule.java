@@ -159,7 +159,7 @@ public class NavigationModule extends Module {
 
     @Override
     public void registerCommands() {
-        registerCommand("warp", new WarpCommand());
+        registerCommand("bwarp", new WarpCommand());
         registerCommand("navigator", new NavigatorCommand());
         registerCommand("buildteam", new BuildteamCommand());
         registerCommand("warpsbt", new WarpsBtCommand());

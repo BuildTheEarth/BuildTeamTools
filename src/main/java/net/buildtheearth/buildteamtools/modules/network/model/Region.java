@@ -1,6 +1,7 @@
 package net.buildtheearth.buildteamtools.modules.network.model;
 
 import lombok.Getter;
+import org.jspecify.annotations.Nullable;
 
 public class Region {
 
@@ -72,20 +73,13 @@ public class Region {
         this.countryCodeCca3 = countryCodeCca3;
     }
 
-    public static Region getByName(String name) {
-        Region lastRegion = null;
+    public static @Nullable Region getByName(String name) {
         for (Continent continent : Continent.values()) {
             for (Region region : continent.getRegions()) {
-                lastRegion = region;
                 if (region.getName().equals(name)) return region;
             }
         }
-        return lastRegion;
-    }
-
-    // Getter
-    public boolean isConnected() {
-        return buildTeam != null && buildTeam.isConnected();
+        return null;
     }
 }
 

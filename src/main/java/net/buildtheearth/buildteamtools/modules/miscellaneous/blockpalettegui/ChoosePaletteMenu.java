@@ -2,6 +2,7 @@ package net.buildtheearth.buildteamtools.modules.miscellaneous.blockpalettegui;
 
 import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
+import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -19,7 +20,6 @@ public class ChoosePaletteMenu extends AbstractMenu {
 
     private static final int BACK_SLOT = 36;
     private static final int ADD_PALETTE_SLOT = 44;
-    private static final String EDIT_PERMISSION = "btt.bp.edit";
 
     private static final String BACK_HEAD =
             "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90"
@@ -226,7 +226,7 @@ public class ChoosePaletteMenu extends AbstractMenu {
 
     private boolean hasEditPermission() {
         try {
-            return getMenuPlayer().hasPermission(EDIT_PERMISSION);
+            return getMenuPlayer().hasPermission(Permissions.BLOCK_PALETTE_EDIT);
         } catch (Exception e) {
             return false;
         }

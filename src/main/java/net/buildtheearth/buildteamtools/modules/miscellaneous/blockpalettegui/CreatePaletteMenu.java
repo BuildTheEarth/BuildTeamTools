@@ -4,6 +4,7 @@ import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import lombok.Getter;
+import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -44,7 +45,6 @@ public class CreatePaletteMenu extends AbstractMenu {
 
     private static final int MAX_NAME_LENGTH = 32;
     private static final int MAX_DESCRIPTION_LENGTH = 256;
-    private static final String EDIT_PERMISSION = "btt.bp.edit";
 
     private final BlockPaletteManager manager;
     private final JavaPlugin plugin;
@@ -162,7 +162,7 @@ public class CreatePaletteMenu extends AbstractMenu {
 
         // Apply
         getMenu().getSlot(APPLY_SLOT).setClickHandler((p, i) -> {
-            if (!p.hasPermission(EDIT_PERMISSION)) {
+            if (!p.hasPermission(Permissions.BLOCK_PALETTE_EDIT)) {
                 p.sendMessage("§cYou do not have permission to create palettes.");
                 return;
             }

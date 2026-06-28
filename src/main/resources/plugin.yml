@@ -51,6 +51,7 @@ permissions:
       btt.navigator.use: true
       btt.warp.use: true
       btt.bp.use: true
+      btt.global.autotpll: true
   btt.permpack.builder:
     description: Contains all permissions for builders / trusted players
     default: op

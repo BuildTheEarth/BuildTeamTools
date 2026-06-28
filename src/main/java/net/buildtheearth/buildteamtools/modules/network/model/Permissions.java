@@ -32,4 +32,6 @@ public class Permissions {
 
     public static final String NOTIFY_UPDATE = "btt.notify.update";
 
+    public static final String AUTO_TPLL = "btt.global.autotpll";
+
 }

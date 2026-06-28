@@ -17,6 +17,7 @@ import net.buildtheearth.buildteamtools.modules.navigation.components.warps.mode
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.api.OpenStreetMapAPI;
+import net.buildtheearth.buildteamtools.modules.network.api.RegionLookupResult;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import net.buildtheearth.model.GeographicalCoordinate;
@@ -34,6 +35,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 public class WarpsComponent extends ModuleComponent {
 
@@ -169,28 +171,14 @@ public class WarpsComponent extends ModuleComponent {
         try {
             GeographicalCoordinate coordinate = Projection.toGeo(location.getX(), location.getZ());
 
-            //Get the country belonging to the coordinates
-            CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(coordinate);
-
-            future.thenAccept(result -> {
-                String regionName = result[0];
-                String countryCodeCCA2 = result[1].toUpperCase();
-
-                if (countryCodeCCA2.isEmpty()) countryCodeCCA2 = NavUtils.getCCA2FromCountryName(regionName, creator);
-
-                //Check if the team owns this region/country
-                boolean ownsRegion = NetworkModule.getInstance().ownsRegion(regionName, countryCodeCCA2);
-
-                if (!ownsRegion) {
-                    creator.sendMessage(ChatHelper.getErrorString("This team does not own the country %s!", result[0]));
-                    return;
-                }
-
+            WarpsComponent.getOwnedRegionFromLocation(coordinate, creator)
+                    .thenAccept(result -> {
                 // Create a default name for the warp
                 String name = creator.getName() + "'s Warp";
 
                 // Create an instance of the warp POJO
-                Warp warp = new Warp(group, name, countryCodeCCA2, "cca2", null, null, null, location.getWorld().getName(),
+                        Warp warp = new Warp(group, name, result.countryCodeCCA2(), "cca2", null, null, null,
+                                location.getWorld().getName(),
                         coordinate, location.getY(), location.getYaw(), location.getPitch(), false);
 
                 Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), () ->
@@ -211,29 +199,15 @@ public class WarpsComponent extends ModuleComponent {
      * Creates a warp at the given location.
      */
     public static void createWarp(@NonNull Location location, String name, WarpGroup group, Player creator) throws OutOfProjectionBoundsException {
-        GeographicalCoordinate coordinates = Projection.toGeo(location.getX(), location.getZ());
+        GeographicalCoordinate coordinate = Projection.toGeo(location.getX(), location.getZ());
 
-        //Get the country belonging to the coordinates
-        CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(coordinates);
-
-        future.thenAccept(result -> {
-            String regionName = result[0];
-            String countryCodeCCA2 = result[1].toUpperCase();
-
-            BuildTeamTools.getInstance().getComponentLogger().debug("Creating warp at {}", location);
-
-            //Check if the team owns this region/country
-            boolean ownsRegion = NetworkModule.getInstance().ownsRegion(regionName, countryCodeCCA2);
-
-            if (!ownsRegion) {
-                creator.sendMessage(ChatHelper.getErrorString("Warp %s cannot be created. This team does not own the country %s" +
-                        " (Country code %s)!", name, regionName, countryCodeCCA2));
-                return;
-            }
+        getOwnedRegionFromLocation(coordinate, creator)
+                .thenAccept(result -> {
 
             // Create an instance of the warp POJO
-            Warp warp = new Warp(group, name, countryCodeCCA2, "cca2", null, null, null, location.getWorld().getName(),
-                    coordinates, location.getY(), location.getYaw(), location.getPitch(), false);
+                    Warp warp = new Warp(group, name, result.countryCodeCCA2(), "cca2", null, null, null,
+                            location.getWorld().getName(),
+                            coordinate, location.getY(), location.getYaw(), location.getPitch(), false);
 
             Objects.requireNonNull(NetworkModule.getInstance().getBuildTeam()).createWarp(creator, warp, true);
         }).exceptionally(e -> {
@@ -303,5 +277,50 @@ public class WarpsComponent extends ModuleComponent {
             case 1 -> new WarpMenu(player, buildTeam.getWarpGroups().getFirst(), null, true);
             default -> new WarpGroupMenu(player, buildTeam, menu != null, true, menu);
         }
+    }
+
+    public static @NotNull CompletableFuture<RegionLookupResult> getOwnedRegionFromLocation(
+            GeographicalCoordinate coordinate,
+            Player player
+    ) {
+        return getRegionLookupResult(coordinate, false, player)
+                .thenCompose(result -> {
+                    if (ownsRegion(result)) {
+                        return CompletableFuture.completedFuture(result);
+                    }
+
+                    return getRegionLookupResult(coordinate, true, player)
+                            .thenApply(fallbackResult -> {
+                                if (!ownsRegion(fallbackResult)) {
+                                    throw new CompletionException(new IllegalStateException(
+                                            "This team does not own the country " + fallbackResult.regionName() + "!"
+                                    ));
+                                }
+
+                                return fallbackResult;
+                            });
+                });
+    }
+
+    private static @NotNull CompletableFuture<RegionLookupResult> getRegionLookupResult(
+            GeographicalCoordinate coordinate,
+            boolean fallbackLookup,
+            Player player
+    ) {
+        return OpenStreetMapAPI.getCountryFromLocationAsync(coordinate, fallbackLookup)
+                .thenApply(result -> {
+                    if (result.countryCodeCCA2() == null) {
+                        return new RegionLookupResult(result.regionName(), NavUtils.getCCA2FromCountryName(result.regionName(),
+                                player));
+                    }
+                    return result;
+                });
+    }
+
+    private static boolean ownsRegion(@NonNull RegionLookupResult result) {
+        return NetworkModule.getInstance().ownsRegion(
+                result.regionName(),
+                result.countryCodeCCA2()
+        );
     }
 }

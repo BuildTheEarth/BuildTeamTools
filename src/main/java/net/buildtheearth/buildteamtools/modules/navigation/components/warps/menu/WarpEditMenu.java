@@ -6,10 +6,9 @@ import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.OutOfProjectionBoundsException;
 import net.buildtheearth.Projection;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
-import net.buildtheearth.buildteamtools.modules.navigation.NavUtils;
+import net.buildtheearth.buildteamtools.modules.navigation.components.warps.WarpsComponent;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
-import net.buildtheearth.buildteamtools.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.buildteamtools.utils.ListUtil;
@@ -30,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 
 public class WarpEditMenu extends AbstractMenu {
 
@@ -140,45 +138,40 @@ public class WarpEditMenu extends AbstractMenu {
         getMenu().getSlot(LOCATION_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
-            // Get the geographic coordinates of the player's location.
             Location location = clickPlayer.getLocation();
+
             try {
                 GeographicalCoordinate coordinate = Projection.toGeo(location.getX(), location.getZ());
 
-                //Get the country belonging to the coordinates
-                CompletableFuture<String[]> future = OpenStreetMapAPI.getCountryFromLocationAsync(coordinate);
+                WarpsComponent.getOwnedRegionFromLocation(coordinate, clickPlayer)
+                        .thenAccept(result -> {
+                            warp.setCountryCode(result.countryCodeCCA2());
+                            warp.setWorldName(location.getWorld().getName());
+                            warp.setY(location.getY());
+                            warp.setCoordinate(coordinate);
+                            warp.setYaw(location.getYaw());
+                            warp.setPitch(location.getPitch());
 
-                future.thenAccept(result -> {
-                    String regionName = result[0];
-                    String countryCodeCCA2 = result[1].toUpperCase();
+                            clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
-                    if (countryCodeCCA2.isEmpty())
-                        countryCodeCCA2 = NavUtils.getCCA2FromCountryName(regionName, clickPlayer);
+                            new WarpEditMenu(clickPlayer, warp, alreadyExists, true);
+                        })
+                        .exceptionally(e -> {
+                            Throwable cause = e.getCause() != null ? e.getCause() : e;
 
-                    //Check if the team owns this region/country
-                    boolean ownsRegion = NetworkModule.getInstance().ownsRegion(regionName, countryCodeCCA2);
+                            clickPlayer.sendMessage(ChatHelper.getErrorString(
+                                    "Failed to change location: %s",
+                                    cause.getMessage()
+                            ));
 
-                    if (!ownsRegion) {
-                        clickPlayer.sendMessage(ChatHelper.getErrorString("This team does not own the country %s!", result[0]));
-                        return;
-                    }
+                            BuildTeamTools.getInstance().getComponentLogger().error(
+                                    "An error occurred while changing the location of the warp!",
+                                    e
+                            );
 
-                    warp.setCountryCode(countryCodeCCA2);
-                    warp.setWorldName(location.getWorld().getName());
-                    warp.setY(location.getY());
-                    warp.setCoordinate(coordinate);
-                    warp.setYaw(location.getYaw());
-                    warp.setPitch(location.getPitch());
+                            return null;
+                        });
 
-                    clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
-
-                    new WarpEditMenu(clickPlayer, warp, alreadyExists, true);
-                }).exceptionally(e -> {
-                    Throwable cause = e.getCause() != null ? e.getCause() : e;
-                    clickPlayer.sendMessage(ChatHelper.getErrorString("Failed to change location: %s", cause.getMessage()));
-                    BuildTeamTools.getInstance().getComponentLogger().error("An error occurred while changing the location of the warp!", e);
-                    return null;
-                });
             } catch (OutOfProjectionBoundsException e) {
                 clickPlayer.sendMessage(ChatHelper.getErrorString("Cannot set location here: %s", e.getMessage()));
             }
@@ -274,4 +267,5 @@ public class WarpEditMenu extends AbstractMenu {
                 .pattern("111111110")
                 .build();
     }
+
 }

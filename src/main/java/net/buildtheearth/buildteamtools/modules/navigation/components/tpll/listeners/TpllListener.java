@@ -7,6 +7,7 @@ import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.api.OpenStreetMapAPI;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
+import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.buildteamtools.modules.network.model.Region;
 import net.buildtheearth.model.GeographicalCoordinate;
 import org.bukkit.event.EventHandler;
@@ -37,6 +38,8 @@ public class TpllListener implements Listener {
     public void onTpll(PlayerCommandPreprocessEvent event) {
         // Check if the NavigationModule is enabled
         if (!NavigationModule.getInstance().isEnabled()) return;
+
+        if (!event.getPlayer().hasPermission(Permissions.AUTO_TPLL)) return;
 
         // Check if the command is a TPLL command
         if (!isTpllCommand(event)) return;

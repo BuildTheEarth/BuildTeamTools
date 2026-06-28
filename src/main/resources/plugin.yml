@@ -5,6 +5,7 @@ version: ${version}
 description: ${description}
 author: MineFact, frikandelworst, George112n, ELgamer, SirJodelstein, Zoriot
 softdepend: [ WorldEdit, HeadDatabase, PlotSystem-Terra, BlueMap ]
+loadbefore: [ Essentials ]
 
 commands:
   buildteamtools:

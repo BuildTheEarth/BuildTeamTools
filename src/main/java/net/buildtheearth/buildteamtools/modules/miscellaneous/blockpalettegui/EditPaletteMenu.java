@@ -3,6 +3,7 @@ package net.buildtheearth.buildteamtools.modules.miscellaneous.blockpalettegui;
 import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import io.papermc.paper.event.player.AsyncChatEvent;
+import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
@@ -42,7 +43,6 @@ public class EditPaletteMenu extends AbstractMenu {
 
     private static final int MAX_NAME_LENGTH = 32;
     private static final int MAX_DESCRIPTION_LENGTH = 256;
-    private static final String EDIT_PERMISSION = "btt.bp.edit";
 
     private final BlockPaletteManager manager;
     private final JavaPlugin plugin;
@@ -122,7 +122,7 @@ public class EditPaletteMenu extends AbstractMenu {
     protected void setItemClickEventsAsync() {
         // Name
         getMenu().getSlot(NAME_SLOT).setClickHandler((p, i) -> {
-            if (!p.hasPermission(EDIT_PERMISSION)) {
+            if (!p.hasPermission(Permissions.BLOCK_PALETTE_EDIT)) {
                 p.sendMessage("§cYou do not have permission to edit palettes.");
                 return;
             }
@@ -140,7 +140,7 @@ public class EditPaletteMenu extends AbstractMenu {
 
         // Description
         getMenu().getSlot(DESCRIPTION_SLOT).setClickHandler((p, i) -> {
-            if (!p.hasPermission(EDIT_PERMISSION)) {
+            if (!p.hasPermission(Permissions.BLOCK_PALETTE_EDIT)) {
                 p.sendMessage("§cYou do not have permission to edit palettes.");
                 return;
             }
@@ -158,7 +158,7 @@ public class EditPaletteMenu extends AbstractMenu {
 
         // Blocks
         getMenu().getSlot(BLOCKS_SLOT).setClickHandler((p, i) -> {
-            if (!p.hasPermission(EDIT_PERMISSION)) {
+            if (!p.hasPermission(Permissions.BLOCK_PALETTE_EDIT)) {
                 p.sendMessage("§cYou do not have permission to edit palettes.");
                 return;
             }
@@ -175,7 +175,7 @@ public class EditPaletteMenu extends AbstractMenu {
 
         // Delete
         getMenu().getSlot(DELETE_SLOT).setClickHandler((p, i) -> {
-            if (!p.hasPermission(EDIT_PERMISSION)) {
+            if (!p.hasPermission(Permissions.BLOCK_PALETTE_EDIT)) {
                 p.sendMessage("§cYou do not have permission to delete palettes.");
                 return;
             }
@@ -201,7 +201,7 @@ public class EditPaletteMenu extends AbstractMenu {
 
         // Apply
         getMenu().getSlot(APPLY_SLOT).setClickHandler((p, i) -> {
-            if (!p.hasPermission(EDIT_PERMISSION)) {
+            if (!p.hasPermission(Permissions.BLOCK_PALETTE_EDIT)) {
                 p.sendMessage("§cYou do not have permission to edit palettes.");
                 return;
             }

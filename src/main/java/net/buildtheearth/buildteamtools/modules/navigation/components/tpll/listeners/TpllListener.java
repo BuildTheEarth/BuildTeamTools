@@ -101,23 +101,45 @@ public class TpllListener implements Listener {
      * @return A CompletableFuture representing whether teleportation interception is required.
      */
     private @NotNull CompletableFuture<Boolean> shouldIntercept() {
-        return OpenStreetMapAPI.getCountryFromLocationAsync(coordinate)
-                .thenComposeAsync(address -> {
-                    if (address == null) return CompletableFuture.completedFuture(false);
+        return getRegionFromLocation()
+                .thenApplyAsync(region -> {
+                    if (region == null) return false;
 
-                    String countryName = address[0];
-                    Region region = Region.getByName(countryName);
-
+                    BuildTeam regionBuildTeam = region.getBuildTeam();
                     BuildTeam currentTeam = networkModule.getBuildTeam();
-                    if (region != null && region.getBuildTeam() != null && currentTeam != null
-                            && !Objects.equals(region.getBuildTeam().getID(), currentTeam.getID())) {
-                        targetBuildTeam = region.getBuildTeam();
-                        return CompletableFuture.completedFuture(true);
+
+                    if (regionBuildTeam == null || currentTeam == null) return false;
+
+                    if (!Objects.equals(regionBuildTeam.getID(), currentTeam.getID())) {
+                        targetBuildTeam = regionBuildTeam;
+                        return true;
                     }
 
-                    return CompletableFuture.completedFuture(false);
+                    return false;
                 });
     }
 
+    /**
+     * Resolves the region for the current coordinate, falling back to the alternative
+     * OpenStreetMap lookup if the first lookup does not produce a known region.
+     */
+    private @NotNull CompletableFuture<Region> getRegionFromLocation() {
+        return getRegionFromLocation(false)
+                .thenCompose(region -> {
+                    if (region != null) {
+                        return CompletableFuture.completedFuture(region);
+                    }
+
+                    return getRegionFromLocation(true);
+                });
+    }
+
+    /**
+     * Resolves the region for the current coordinate using the requested lookup mode.
+     */
+    private @NotNull CompletableFuture<Region> getRegionFromLocation(boolean fallbackLookup) {
+        return OpenStreetMapAPI.getCountryFromLocationAsync(coordinate, fallbackLookup)
+                .thenApply(address -> Region.getByName(address.regionName()));
+    }
 }
 

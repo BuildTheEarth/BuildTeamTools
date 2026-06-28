@@ -80,7 +80,7 @@ fun Project.versionDetails(): VersionDetails {
 val details = versionDetails()
 
 group = "net.buildtheearth"
-version = "0.3.0" //+ "-SNAPSHOT+" + details.commitDistance + "-" + details.branchName + "-" + details.gitHash
+version = "0.3.1" + "-SNAPSHOT+" + details.commitDistance + "-" + details.branchName + "-" + details.gitHash
 description = "BuildTeamTools"
 java.sourceCompatibility = JavaVersion.VERSION_21
 java.targetCompatibility = JavaVersion.VERSION_21

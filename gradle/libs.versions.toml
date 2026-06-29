@@ -14,7 +14,7 @@ alpslib-utils = "1.5.0"
 alpslib-geo = "1.0.0-SNAPSHOT"
 # https://github.com/WesJD/AnvilGUI https://mvn.wesjd.net/
 anvilgui = "1.10.14-SNAPSHOT"
-# Ref: https://github.com/BlueMap-Minecraft/BlueMapAPI - Newer Versions require Java 25
+# @pin Ref: https://github.com/BlueMap-Minecraft/BlueMapAPI - Newer Versions require Java 25
 bluemap-api = "2.7.8"
 # https://central.sonatype.com/artifact/org.bstats/bstats-bukkit
 bstats = "3.2.1"

@@ -10,16 +10,28 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven("https://repo.papermc.io/repository/maven-public/")
+    // Anvilgui + Alps Lib Geo (for geo it can be removed once https://github.com/AlpsBTE/Alps-Lib/pull/17 is merged & version is set to 1.0.0)
+    maven("https://mvn.alps-bte.com/repository/alps-bte-snapshots/") {
+        content {
+            includeGroup("com.alpsbte.alpslib.alpslib.geo")
+            includeGroup("net.wesjd")
+        }
+    }
     maven("https://maven.buildtheearth.net/releases") // BuildTheEarth Projection
     maven("https://mvn.alps-bte.com/repository/alps-bte/") // AlpsLib
     maven("https://maven.enginehub.org/repo/") // WorldEdit
     //maven("https://mvn.wesjd.net/") // Anvilgui - includes 26.1 module which is build with Java 25, what breaks the Plugin Remapper on Paper 1.21.4 see https://github.com/WesJD/AnvilGUI/issues/408
     maven("https://repo.bluecolored.de/releases") // BlueMap
     maven("https://repo.essentialsx.net/releases/")
-    // Anvilgui + Alps Lib Geo (for geo it can be removed once https://github.com/AlpsBTE/Alps-Lib/pull/17 is merged & version is set to 1.0.0)
-    maven("https://mvn.alps-bte.com/repository/alps-bte-snapshots/")
     maven("https://repo.lushplugins.org/releases") // PluginUpdater
+    maven("https://repo.papermc.io/repository/maven-public/") {
+        content {
+            includeGroup("io.papermc.paper")
+            includeGroup("io.papermc")
+            includeGroup("com.destroystokyo.paper")
+            includeGroup("net.md-5")
+        }
+    }
     maven("https://jitpack.io") // Clipper2
     //mavenLocal() // NEVER use in Production/Commits!
 }
@@ -71,7 +83,7 @@ fun Project.versionDetails(): VersionDetails {
 val details = versionDetails()
 
 group = "net.buildtheearth"
-version = "0.3.1" + "-SNAPSHOT+" + details.commitDistance + "-" + details.branchName + "-" + details.gitHash
+version = "0.3.1" // + "-SNAPSHOT+" + details.commitDistance + "-" + details.branchName + "-" + details.gitHash
 description = "BuildTeamTools"
 java.sourceCompatibility = JavaVersion.VERSION_21
 java.targetCompatibility = JavaVersion.VERSION_21

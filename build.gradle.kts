@@ -13,7 +13,7 @@ repositories {
     // Anvilgui + Alps Lib Geo (for geo it can be removed once https://github.com/AlpsBTE/Alps-Lib/pull/17 is merged & version is set to 1.0.0)
     maven("https://mvn.alps-bte.com/repository/alps-bte-snapshots/") {
         content {
-            includeGroup("com.alpsbte.alpslib.alpslib.geo")
+            includeGroup("com.alpsbte.alpslib")
             includeGroup("net.wesjd")
         }
     }

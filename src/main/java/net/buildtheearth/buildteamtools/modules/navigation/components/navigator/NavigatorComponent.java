@@ -9,18 +9,23 @@ import net.buildtheearth.buildteamtools.modules.ModuleComponent;
 import net.buildtheearth.buildteamtools.modules.common.CommonModule;
 import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
 import net.buildtheearth.buildteamtools.utils.io.ConfigUtil;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
+import org.jspecify.annotations.NonNull;
 
 import java.lang.reflect.Field;
 import java.util.Objects;
 
 public class NavigatorComponent extends ModuleComponent {
 
+    private NamespacedKey navigatorKey;
 
     public NavigatorComponent() {
         super("Navigator");
+        this.navigatorKey = new NamespacedKey(BuildTeamTools.getInstance(), "navigator");
     }
 
     @Override
@@ -62,7 +67,7 @@ public class NavigatorComponent extends ModuleComponent {
     /*
     Toggles the navigator on or off based on the current state
     */
-    public void toggle(Player player) {
+    public void toggle(@NonNull Player player) {
         Inventory inventory = player.getInventory();
 
         if (!inventory.contains(getItem())) {
@@ -75,7 +80,13 @@ public class NavigatorComponent extends ModuleComponent {
     }
 
     public ItemStack getItem() {
-        return Item.edit(Objects.requireNonNull(XMaterial.COMPASS.parseItem()), "§aNavigator");
+        var item = Item.edit(Objects.requireNonNull(XMaterial.COMPASS.parseItem()), "§aNavigator");
+        item.editPersistentDataContainer(pdc -> pdc.set(navigatorKey, PersistentDataType.BOOLEAN, true));
+        return item;
+    }
+
+    public boolean isItem(@NonNull ItemStack item) {
+        return item.getPersistentDataContainer().has(navigatorKey, PersistentDataType.BOOLEAN);
     }
 
     public short getSlot() {

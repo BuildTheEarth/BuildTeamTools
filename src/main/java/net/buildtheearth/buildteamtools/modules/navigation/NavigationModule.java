@@ -82,9 +82,13 @@ public class NavigationModule extends Module {
         initializeRgcHandler(navConfig);
         initializeBluemapComponent(navConfig);
 
-        if (navConfig.getBoolean(ConfigPaths.Navigation.NAVIGATOR_ITEM_ENABLED, false)) {
-            registerListeners(new NavigatorJoinListener(), new NavigatorOpenListener());
+        boolean navItemEnabled = navConfig.getBoolean(ConfigPaths.Navigation.NAVIGATOR_ITEM_ENABLED, false);
+
+        if (navItemEnabled) {
+            registerListeners(new NavigatorOpenListener());
         }
+
+        registerListeners(new NavigatorJoinListener(navigatorComponent, navItemEnabled));
 
         super.enable();
     }

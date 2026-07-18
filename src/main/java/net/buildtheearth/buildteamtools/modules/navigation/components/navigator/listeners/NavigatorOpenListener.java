@@ -11,82 +11,74 @@ import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.PlayerInventory;
+import org.jspecify.annotations.NonNull;
 
 public class NavigatorOpenListener implements Listener {
 
     @EventHandler
-    public void interactEvent(PlayerInteractEvent event) {
+    public void interactEvent(@NonNull PlayerInteractEvent event) {
         if (event.getItem() == null) return;
 
-        if (event.getItem().getType() == NavigationModule.getInstance().getNavigatorComponent().getItem().getType()) {
+        if (NavigationModule.getInstance().getNavigatorComponent().isItem(event.getItem())) {
             event.setCancelled(true);
-            //Open navigator.
             new MainMenu(event.getPlayer());
         }
     }
 
-    //If the player clicks on the navigator in their inventory, open the gui.
+    // If the player clicks on the navigator in their inventory, open the gui.
     @EventHandler
-    public void onClick(InventoryClickEvent event) {
+    public void onClick(@NonNull InventoryClickEvent event) {
         if (event.getCurrentItem() == null) return;
 
-        //Checks to see if the navigator item was clicked on
-        if (event.getCurrentItem().getType() != NavigationModule.getInstance().getNavigatorComponent().getItem().getType())
+        if (!(NavigationModule.getInstance().getNavigatorComponent().isItem(event.getCurrentItem()) && event.getInventory() instanceof PlayerInventory))
             return;
 
-        //Extract the player
         if (!(event.getWhoClicked() instanceof Player player)) return;
 
-        //Cancel the event
         event.setCancelled(true);
 
-        //If item is not in the correct slot, delete it.
+        // If item is not in the correct slot, delete it.
         if (event.getSlot() != NavigationModule.getInstance().getNavigatorComponent().getSlot()) {
             player.getInventory().clear(event.getSlot());
             return;
         }
 
-        //Opens the navigator.
+        // Opens the navigator.
         new MainMenu(player);
     }
 
 
     /*
-
     The following events are to prevent the navigator being moved in the inventory,
     causing duplicate items which are difficult to remove.
-
      */
-
     @EventHandler
-    public void swapHands(PlayerSwapHandItemsEvent e) {
-        if (e.getOffHandItem().equals(NavigationModule.getInstance().getNavigatorComponent().getItem())) {
+    public void swapHands(@NonNull PlayerSwapHandItemsEvent e) {
+        if (NavigationModule.getInstance().getNavigatorComponent().isItem(e.getOffHandItem())) {
             e.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void dropItem(PlayerDropItemEvent e) {
-
-        if (e.getItemDrop().getItemStack().equals(NavigationModule.getInstance().getNavigatorComponent().getItem())) {
+    public void dropItem(@NonNull PlayerDropItemEvent e) {
+        if (NavigationModule.getInstance().getNavigatorComponent().isItem(e.getItemDrop().getItemStack())) {
             e.setCancelled(true);
 
             e.getPlayer().getInventory().setItem(NavigationModule.getInstance().getNavigatorComponent().getSlot(), null);
             e.getPlayer().updateInventory();
         }
-
     }
 
     @EventHandler
-    public void moveItem(InventoryMoveItemEvent e) {
+    public void moveItem(@NonNull InventoryMoveItemEvent e) {
         if (e.getItem().equals(NavigationModule.getInstance().getNavigatorComponent().getItem())) {
             e.setCancelled(true);
         }
-
     }
 
     @EventHandler
-    public void moveItem(InventoryDragEvent e) {
+    public void moveItem(@NonNull InventoryDragEvent e) {
         if (e.getOldCursor().equals(NavigationModule.getInstance().getNavigatorComponent().getItem())) {
             e.setCancelled(true);
         }

@@ -1,5 +1,6 @@
 package net.buildtheearth.buildteamtools.modules.navigation.components.warps.menu;
 
+import jdk.jshell.execution.Util;
 import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.WarpsComponent;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.Warp;
@@ -9,6 +10,7 @@ import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
+import net.buildtheearth.buildteamtools.utils.Utils;
 import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
@@ -27,6 +29,7 @@ public class WarpMenu extends AbstractPaginatedMenu {
 
     public static final int BACK_ITEM_SLOT = 27;
     public static final int SWITCH_PAGE_ITEM_SLOT = 34;
+    public static final int RANDOM_ITEM_SLOT = 31;
 
     private final WarpGroup warpGroup;
     private final AbstractMenu backMenu;
@@ -47,6 +50,12 @@ public class WarpMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setMenuItemsAsync() {
+        if (getMenuPlayer().hasPermission(Permissions.WARP_RANDOM)) {
+            getMenu().getSlot(RANDOM_ITEM_SLOT).setItem(
+                    HeadFactory.head(HeadTexture.DICE, "§a§lTeleport to a random warp", ListUtil.createList("§8Click here to be teleported to a random warp."))
+            );
+        }
+
         if (backMenu != null)
             setBackItem(BACK_ITEM_SLOT, backMenu);
 
@@ -57,6 +66,22 @@ public class WarpMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setItemClickEventsAsync() {
+        getMenu().getSlot(RANDOM_ITEM_SLOT).setClickHandler((player, info) -> {
+            player.closeInventory();
+
+            List<Warp> warps = warpGroup.getWarps();
+
+            if (warps.isEmpty()) {
+                player.sendMessage("§cNo warp available.");
+                return;
+            }
+
+            Warp warp = Utils.pickRandom(warps);
+
+            if (warp != null) {
+                NavigationModule.getInstance().getWarpsComponent().warpPlayer(player, warp);
+            }
+        });
         if (getSource().size() > 27)
             setSwitchPageItemClickEvents(SWITCH_PAGE_ITEM_SLOT);
     }

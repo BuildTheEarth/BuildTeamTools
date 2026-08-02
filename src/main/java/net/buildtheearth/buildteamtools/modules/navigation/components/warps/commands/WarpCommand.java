@@ -109,8 +109,7 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
     private boolean handleRandomWarpCommand(@NonNull Player player, String @NonNull [] args) {
 
         if (!player.hasPermission(Permissions.WARP_RANDOM)) {
-            player.sendMessage(ChatHelper.getErrorString("You don't have the required %s to %s warps.", "permission",
-                    "random"));
+            Utils.sendNoPermissionMessage(player, Permissions.WARP_RANDOM);
             return true;
         }
 

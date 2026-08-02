@@ -10,6 +10,7 @@ import net.buildtheearth.buildteamtools.modules.navigation.components.warps.mode
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
+import net.buildtheearth.buildteamtools.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -18,6 +19,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -49,6 +51,10 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
 
         if (args[0].equalsIgnoreCase("migrate")) {
             return handleMigrateCommand(player, args);
+        }
+
+        if (args[0].equalsIgnoreCase("random")) {
+            return handleRandomWarpCommand(player, args);
         }
 
         return handleWarpTeleport(player, args);
@@ -97,6 +103,38 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
         player.sendMessage(ChatHelper.getStandardComponent(true, "Migrating the warps..."));
         migrator.migrate(player).whenComplete((result, throwable) ->
                 handleMigrationResult(player, result, throwable));
+        return true;
+    }
+
+    private boolean handleRandomWarpCommand(@NonNull Player player, String @NonNull [] args) {
+
+        if (!player.hasPermission(Permissions.WARP_RANDOM)) {
+            Utils.sendNoPermissionMessage(player, Permissions.WARP_RANDOM);
+            return true;
+        }
+
+        if (args.length > 1) {
+            player.sendMessage(ChatHelper.getErrorComponent("Usage: /warp random"));
+            return true;
+        }
+
+        BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
+        if (buildTeam == null) {
+            return true;
+        }
+
+        List<Warp> warps = buildTeam.getWarpGroups().stream()
+                .flatMap(group -> group.getWarps().stream())
+                .toList();
+
+        Warp warp = Utils.pickRandom(warps);
+        if (warp == null) {
+            player.sendMessage("No warp found");
+            return true;
+        }
+
+        NavigationModule.getInstance().getWarpsComponent().warpPlayer(player, warp);
+
         return true;
     }
 
@@ -152,14 +190,25 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
     @Override
     public @Nullable List<String> onTabComplete(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, String @NonNull [] args) {
         if (args.length == 1) {
+            List<String> list = new ArrayList<>();
+            if (sender.hasPermission(Permissions.WARP_CREATE)) list.add("create");
+            if (sender.hasPermission(Permissions.WARP_MIGRATE)) list.add("migrate");
+            if (sender.hasPermission(Permissions.WARP_RANDOM)) list.add("random");
+
             String partial = args[0].toLowerCase();
             BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
             if (buildTeam != null && buildTeam.getWarpGroups() != null) {
-                return buildTeam.getWarpGroups().stream()
+                List<String> warps = buildTeam.getWarpGroups().stream()
                         .flatMap(gr -> gr.getWarps().stream().map(Warp::getName))
                         .filter(s -> s.toLowerCase().startsWith(partial))
                         .toList();
+
+                list.addAll(warps);
             }
+
+            return list.stream()
+                    .filter(s -> s.toLowerCase().startsWith(partial))
+                    .toList();
         }
         return Collections.emptyList();
 

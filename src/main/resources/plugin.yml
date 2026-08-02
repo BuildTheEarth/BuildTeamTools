@@ -50,6 +50,7 @@ permissions:
     children:
       btt.navigator.use: true
       btt.warp.use: true
+      btt.warp.random: true
       btt.bp.use: true
       btt.global.autotpll: true
   btt.permpack.builder:

@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class Utils {
@@ -43,6 +44,13 @@ public class Utils {
         return array[(int) (Math.random() * array.length)];
     }
 
+    public static <T> T pickRandom(List<T> list) {
+        if (list.isEmpty()) {
+            return null;
+        }
+
+        return list.get(ThreadLocalRandom.current().nextInt(list.size()));
+    }
 
     /**
      * Converts the given Time to a time string

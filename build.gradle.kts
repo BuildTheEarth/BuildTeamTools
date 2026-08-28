@@ -73,6 +73,10 @@ dependencies {
     compileOnly("net.essentialsx:EssentialsX:2.19.0") {
         isTransitive = false
     }
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.12.2")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.12.2")
+    testRuntimeOnly(libs.paper.api)
 }
 
 fun Project.versionDetails(): VersionDetails {
@@ -94,6 +98,10 @@ tasks.withType<JavaCompile> {
 
 tasks.withType<Javadoc> {
     options.encoding = "UTF-8"
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 tasks.shadowJar {

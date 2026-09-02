@@ -34,6 +34,10 @@ commands:
     description: kml pasting and parsing
     usage: /kml
     aliases: [ geopoints, geopath, georing, geosurface ]
+  address:
+    description: Get or teleport to an address
+    usage: /address [get|teleport]
+
   blockpalette:
     description: Opens the block palette menu.
     usage: /blockpalette [filter|menu|filter <filter1> <filter2> ...]
@@ -51,6 +55,8 @@ permissions:
       btt.navigator.use: true
       btt.warp.use: true
       btt.warp.random: true
+      btt.address.get: true
+      btt.address.teleport: true
       btt.bp.use: true
       btt.global.autotpll: true
   btt.permpack.builder:

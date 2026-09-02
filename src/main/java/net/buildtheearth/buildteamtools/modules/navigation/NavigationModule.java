@@ -5,6 +5,7 @@ import com.alpsbte.alpslib.utils.ChatHelper;
 import lombok.Getter;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.Module;
+import net.buildtheearth.buildteamtools.modules.navigation.components.address.commands.AddressCommand;
 import net.buildtheearth.buildteamtools.modules.navigation.components.bluemap.BluemapComponent;
 import net.buildtheearth.buildteamtools.modules.navigation.components.navigator.NavigatorComponent;
 import net.buildtheearth.buildteamtools.modules.navigation.components.navigator.commands.BuildteamCommand;
@@ -164,6 +165,7 @@ public class NavigationModule extends Module {
         registerCommand("buildteam", new BuildteamCommand());
         registerCommand("warpsbt", new WarpsBtCommand());
         registerCommand("explore", new ExploreCommand());
+        registerCommand("address", new AddressCommand());
     }
 
     @Override

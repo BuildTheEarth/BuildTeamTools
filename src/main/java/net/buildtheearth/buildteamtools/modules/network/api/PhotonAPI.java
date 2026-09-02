@@ -74,13 +74,15 @@ public class PhotonAPI {
     }
 
     public static @NotNull CompletableFuture<GeographicalCoordinate> getCoordinatesFromAddressAsync(
-            @NotNull String address
+            @NotNull String address,
+            @NotNull String lang
     ) {
         CompletableFuture<GeographicalCoordinate> future = new CompletableFuture<>();
 
         String url = BASE_URL + "api/?q="
                 + URLEncoder.encode(address, StandardCharsets.UTF_8)
-                + "&lang=en";
+                + "&lang="
+                + lang;
 
         API.getAsync(url, new API.ApiResponseCallback() {
             @Override

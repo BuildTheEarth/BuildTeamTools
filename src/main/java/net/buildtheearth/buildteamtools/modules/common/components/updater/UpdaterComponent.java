@@ -5,7 +5,6 @@ import io.papermc.paper.util.Tick;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.ModuleComponent;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
-import net.buildtheearth.buildteamtools.utils.Utils;
 import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -84,7 +83,7 @@ public class UpdaterComponent extends ModuleComponent {
 
     public void checkForUpdates(@NonNull CommandSender sender) {
         if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_CHECK_FOR_UPDATES)) {
-            Utils.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_CHECK_FOR_UPDATES);
+            Permissions.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_CHECK_FOR_UPDATES);
             return;
         }
 

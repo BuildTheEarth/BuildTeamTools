@@ -1,6 +1,8 @@
 package net.buildtheearth.buildteamtools.modules.network.model;
 
 import lombok.experimental.UtilityClass;
+import org.bukkit.command.CommandSender;
+import com.alpsbte.alpslib.utils.ChatHelper;
 
 @UtilityClass
 public class Permissions {
@@ -44,4 +46,17 @@ public class Permissions {
 
     public static final String AUTO_TPLL = "btt.global.autotpll";
 
+    /** Checks permission and sends the standard denial message when access is denied. */
+    public static boolean checkPermission(CommandSender sender, String permission) {
+        if (sender.hasPermission(permission))
+            return true;
+
+        sendNoPermissionMessage(sender, permission);
+        return false;
+    }
+
+    public static void sendNoPermissionMessage(CommandSender sender, String permission) {
+        sender.sendMessage(ChatHelper.getErrorComponent("You don't have permission to execute this command. Required " +
+                "permission: " + permission));
+    }
 }

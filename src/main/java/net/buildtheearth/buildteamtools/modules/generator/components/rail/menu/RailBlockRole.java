@@ -3,9 +3,11 @@ package net.buildtheearth.buildteamtools.modules.generator.components.rail.menu;
 import com.cryptomorin.xseries.XMaterial;
 import lombok.Getter;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * The block slots of a rail type that can be configured in the editor menu.
@@ -16,7 +18,12 @@ enum RailBlockRole {
     RAIL_BLOCK("Choose a Rail Block") {
         @Override
         List<ItemStack> createChoices() {
-            return MenuItems.getBlocksByColor();
+            List<ItemStack> choices = new ArrayList<>();
+            choices.add(new ItemStack(Material.ANVIL));
+            choices.add(new ItemStack(Material.CHIPPED_ANVIL));
+            choices.add(new ItemStack(Material.DAMAGED_ANVIL));
+            choices.addAll(MenuItems.getBlocksByColor());
+            return choices;
         }
 
         @Override
@@ -33,7 +40,7 @@ enum RailBlockRole {
 
         @Override
         void apply(RailTypeDraft draft, XMaterial material) {
-            draft.setBlockBelow(material);
+            draft.setBlocksBelow(List.of(material));
         }
     },
 
@@ -122,6 +129,30 @@ enum RailBlockRole {
     abstract List<ItemStack> createChoices();
 
     abstract void apply(RailTypeDraft draft, XMaterial material);
+
+    List<XMaterial> getSelected(RailTypeDraft draft) {
+        return switch (this) {
+            case BLOCK_BELOW -> draft.getBlocksBelow();
+            case RAIL_BLOCK -> draft.getRailBlocks();
+            case SLEEPER_BLOCK -> draft.getSleeperBlocks();
+            case ICON -> List.of(draft.getIcon());
+            case OVERHEAD_POLE_BLOCK -> draft.getOverheadPoleBlocks();
+            case OVERHEAD_SUPPORT_BLOCK -> draft.getOverheadSupportBlocks();
+            case OVERHEAD_WIRE_BLOCK -> draft.getOverheadWireBlocks();
+        };
+    }
+
+    void apply(RailTypeDraft draft, List<XMaterial> materials) {
+        switch (this) {
+            case BLOCK_BELOW -> draft.setBlocksBelow(List.copyOf(materials));
+            case RAIL_BLOCK -> draft.setRailBlocks(List.copyOf(materials));
+            case SLEEPER_BLOCK -> draft.setSleeperBlocks(List.copyOf(materials));
+            case OVERHEAD_POLE_BLOCK -> draft.setOverheadPoleBlocks(List.copyOf(materials));
+            case OVERHEAD_SUPPORT_BLOCK -> draft.setOverheadSupportBlocks(List.copyOf(materials));
+            case OVERHEAD_WIRE_BLOCK -> draft.setOverheadWireBlocks(List.copyOf(materials));
+            case ICON -> apply(draft, materials.getFirst());
+        }
+    }
 
     boolean isOverheadSetting() {
         return false;

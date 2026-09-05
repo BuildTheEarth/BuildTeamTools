@@ -7,7 +7,6 @@ import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.Rail;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.RailFlag;
-import net.buildtheearth.buildteamtools.modules.generator.components.rail.RailPermissionGuard;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.RailSettings;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.configuration.RailType;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.configuration.RailTypeManager;
@@ -82,8 +81,10 @@ public class RailTypeEditorMenu extends AbstractMenu {
 
         createCounter(HeadColor.WHITE, TRACK_COUNT_SLOT, "Track Count", draft.getTrackCount(),
                 RailType.MIN_TRACK_COUNT, RailType.MAX_TRACK_COUNT, "Tracks");
-        createCounter(HeadColor.LIGHT_GRAY, TRACK_SPACING_SLOT, "Track Spacing", draft.getTrackSpacing(),
-                RailType.MIN_TRACK_SPACING, RailType.MAX_TRACK_SPACING, "Blocks");
+        getMenu().getSlot(TRACK_SPACING_SLOT - 1).setItem(HeadFactory.getCounterMinusItem(
+                HeadColor.LIGHT_GRAY, "Track Spacing", draft.getTrackSpacing(), RailType.MIN_TRACK_SPACING));
+        getMenu().getSlot(TRACK_SPACING_SLOT + 1).setItem(HeadFactory.getCounterPlusItem(
+                HeadColor.LIGHT_GRAY, "Track Spacing", draft.getTrackSpacing(), RailType.MAX_TRACK_SPACING));
         getMenu().getSlot(TRACK_SPACING_SLOT).setItem(Item.create(
                 Objects.requireNonNull(XMaterial.NAME_TAG.get()),
                 yellow("Track Spacings"),
@@ -98,17 +99,17 @@ public class RailTypeEditorMenu extends AbstractMenu {
 
         getMenu().getSlot(RAIL_BLOCK_SLOT).setItem(createBlockItem(
                 "Rail Block",
-                draft.getRailBlock(),
+                draft.getRailBlocks(),
                 "The block the rails are made of."
         ));
         getMenu().getSlot(BLOCK_BELOW_SLOT).setItem(createBlockItem(
-                "Block Below the Rails",
-                draft.getBlockBelow(),
-                "The block placed between and below the rails."
+                "Blocks Below the Rails",
+                draft.getBlocksBelow(),
+                "The material mix placed between and below the rails."
         ));
         getMenu().getSlot(SLEEPER_BLOCK_SLOT).setItem(createBlockItem(
                 "Sleeper Block",
-                draft.getSleeperBlock(),
+                draft.getSleeperBlocks(),
                 "Sleeper Spacing 0 disables sleepers."
         ));
         getMenu().getSlot(ICON_SLOT).setItem(createBlockItem(
@@ -240,7 +241,7 @@ public class RailTypeEditorMenu extends AbstractMenu {
     private void saveRailType(Player clickPlayer) {
         String permission = draft.getIdentifier() == null ? Permissions.RAIL_TYPE_CREATE : Permissions.RAIL_TYPE_EDIT;
 
-        if (!RailPermissionGuard.check(clickPlayer, permission))
+        if (!Permissions.checkPermission(clickPlayer, permission))
             return;
 
         Rail rail = GeneratorModule.getInstance().getRail();
@@ -251,28 +252,28 @@ public class RailTypeEditorMenu extends AbstractMenu {
         RailTypeManager railTypeManager = rail.getRailTypeManager();
         String identifier = draft.getIdentifier() == null ? railTypeManager.getNextCustomIdentifier() : draft.getIdentifier();
         String displayName = draft.getDisplayName() == null
-                ? "Custom Rail " + identifier.substring("custom-".length())
+                ? railTypeManager.getNextCustomDisplayName()
                 : draft.getDisplayName();
 
         RailType railType = RailType.createCustom(new RailType.Configuration()
                 .identifier(identifier)
                 .displayName(displayName)
                 .icon(draft.getIcon())
-                .railBlock(draft.getRailBlock())
-                .blocksBelow(List.of(draft.getBlockBelow()))
-                .sleeperBlock(draft.getSleeperBlock())
+                .railBlocks(draft.getRailBlocks())
+                .blocksBelow(draft.getBlocksBelow())
+                .sleeperBlocks(draft.getSleeperBlocks())
                 .sleeperSpacing(draft.getSleeperSpacing())
                 .trackCount(draft.getTrackCount())
                 .trackSpacing(draft.getTrackSpacing())
                 .trackSpacings(draft.getTrackSpacings())
                 .overheadPolesEnabled(draft.isOverheadPolesEnabled())
-                .overheadPoleBlock(draft.getOverheadPoleBlock())
-                .overheadSupportBlock(draft.getOverheadSupportBlock())
+                .overheadPoleBlocks(draft.getOverheadPoleBlocks())
+                .overheadSupportBlocks(draft.getOverheadSupportBlocks())
                 .overheadPoleSpacing(draft.getOverheadPoleSpacing())
                 .overheadPoleOffset(draft.getOverheadPoleOffset())
                 .overheadPoleHeight(draft.getOverheadPoleHeight())
                 .overheadWiresEnabled(draft.isOverheadWiresEnabled())
-                .overheadWireBlock(draft.getOverheadWireBlock())
+                .overheadWireBlocks(draft.getOverheadWireBlocks())
                 .trackSwitchesEnabled(draft.isTrackSwitchesEnabled()));
 
         String error = railTypeManager.saveRailType(railType);
@@ -332,6 +333,15 @@ public class RailTypeEditorMenu extends AbstractMenu {
         });
     }
 
+    private ItemStack createBlockItem(String name, List<XMaterial> materials, String description) {
+        List<String> lore = new java.util.ArrayList<>();
+        lore.add(gray(description));
+        for (XMaterial material : materials)
+            lore.add(white(RailTypeMenu.formatMaterial(material)));
+        lore.add(gray("Click to choose one or more materials."));
+        Material icon = materials.getFirst().get();
+        return Item.create(icon == null ? Material.BARRIER : icon, yellow(name), lore);
+    }
     private ItemStack createBlockItem(String name, XMaterial material, String description) {
         Material bukkitMaterial = material.get();
 

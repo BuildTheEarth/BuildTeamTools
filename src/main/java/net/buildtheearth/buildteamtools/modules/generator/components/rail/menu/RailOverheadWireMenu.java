@@ -68,15 +68,15 @@ final class RailOverheadWireMenu extends AbstractMenu {
         ));
         getMenu().getSlot(POLE_BLOCK_SLOT).setItem(createBlockItem(
                 "Pole Block",
-                draft.getOverheadPoleBlock()
+                draft.getOverheadPoleBlocks()
         ));
         getMenu().getSlot(SUPPORT_BLOCK_SLOT).setItem(createBlockItem(
                 "Top Support Block",
-                draft.getOverheadSupportBlock()
+                draft.getOverheadSupportBlocks()
         ));
         getMenu().getSlot(WIRE_BLOCK_SLOT).setItem(createBlockItem(
                 "Wire Block",
-                draft.getOverheadWireBlock()
+                draft.getOverheadWireBlocks()
         ));
 
         getMenu().getSlot(POLE_SPACING_SLOT).setItem(createSpacingItem());
@@ -211,16 +211,16 @@ final class RailOverheadWireMenu extends AbstractMenu {
         );
     }
 
-    private ItemStack createBlockItem(String name, XMaterial material) {
-        Material bukkitMaterial = material.get();
+    private ItemStack createBlockItem(String name, List<XMaterial> materials) {
+        Material bukkitMaterial = materials.getFirst().get();
 
         if (bukkitMaterial == null)
             bukkitMaterial = Objects.requireNonNull(XMaterial.BARRIER.get());
 
         return Item.create(
                 bukkitMaterial,
-                yellow(name + ": ") + white(RailTypeMenu.formatMaterial(material)),
-                List.of(gray("Click to choose a different block."))
+                yellow(name + ": ") + RailTypeMenu.formatMaterials(materials),
+                List.of(gray("Click to choose one or more materials."))
         );
     }
 

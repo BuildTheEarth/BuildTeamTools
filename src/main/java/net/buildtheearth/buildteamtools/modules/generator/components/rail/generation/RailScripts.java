@@ -7,7 +7,6 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BlockState;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.RailFlag;
-import net.buildtheearth.buildteamtools.modules.generator.components.rail.RailPermissionGuard;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.RailSettings;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.configuration.RailType;
 import net.buildtheearth.buildteamtools.modules.generator.model.GeneratorComponent;
@@ -119,7 +118,6 @@ public class RailScripts extends Script {
         if (!hasValidCenterPath()) return false;
 
         preparationProgress.startStage(PATH_PROGRESS, SAFETY_CHECK_PROGRESS, SAFETY_CHECK_ESTIMATED_MILLIS);
-        if (!hasSafeEstimatedBlockCount(centerPath)) return false;
 
         int selectionMinY = getSelectionMinY(controlPoints);
         int selectionMaxY = getSelectionMaxY(controlPoints);
@@ -148,6 +146,11 @@ public class RailScripts extends Script {
                 false,
                 false
         );
+        if (blocks == null) {
+            sendRailError("Region not readable. Please report this to the developers of the BuildTeamTool plugin.");
+            return false;
+        }
+
         terrainResolver = new RailTerrainResolver(blocks);
         preparationProgress.completeStage(TERRAIN_PREPARE_PROGRESS);
 
@@ -240,7 +243,6 @@ public class RailScripts extends Script {
         List<Vector> positions = new ArrayList<>(limits.blockPlacementBatchSize());
         List<BlockState> blockStates = new ArrayList<>(limits.blockPlacementBatchSize());
 
-        createCommand("//perf neighbors on");
 
         for (Map.Entry<PositionKey, BlockState> entry : railBlocks.entrySet()) {
             positions.add(entry.getKey().toVector());
@@ -308,16 +310,6 @@ public class RailScripts extends Script {
         }
 
         return true;
-    }
-
-    private boolean hasSafeEstimatedBlockCount(List<Vector> path) {
-        long estimatedBlocks = (long) path.size() * trackCount * 5L;
-
-        if (estimatedBlocks <= limits.maxBlockPlacements())
-            return true;
-
-        sendRailError("Rail Generator would likely place too many blocks. Split the rail into smaller selections.");
-        return false;
     }
 
     private boolean hasSafePreparedSelection(List<Vector> selectionPoints, int minY, int maxY) {
@@ -470,7 +462,7 @@ public class RailScripts extends Script {
         }
 
         return trackCount == RailType.MIN_TRACK_COUNT
-                || RailPermissionGuard.check(getPlayer(), Permissions.RAIL_MULTIPLE_TRACKS);
+                || Permissions.checkPermission(getPlayer(), Permissions.RAIL_MULTIPLE_TRACKS);
     }
 
     private Integer getIntegerSetting(RailFlag flag) {

@@ -7,7 +7,6 @@ import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.Rail;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.RailFlag;
-import net.buildtheearth.buildteamtools.modules.generator.components.rail.RailPermissionGuard;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.RailSettings;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.configuration.RailType;
 import net.buildtheearth.buildteamtools.modules.generator.menu.GeneratorMenu;
@@ -52,7 +51,7 @@ public class RailTypeMenu extends NameListMenu {
     }
 
     private RailTypeMenu(Player player, String searchQuery, Collection<String> selectedForDeletion, boolean autoLoad) {
-        super(player, RAIL_TYPE_INV_NAME, getRailTypes(searchQuery), new GeneratorMenu(player, false), autoLoad);
+        super(player, RAIL_TYPE_INV_NAME, getRailTypes(player, searchQuery), new GeneratorMenu(player, false), autoLoad);
         this.searchQuery = searchQuery;
         this.selectedForDeletion = new LinkedHashSet<>(selectedForDeletion);
         preselectCurrentRailType(player);
@@ -77,7 +76,7 @@ public class RailTypeMenu extends NameListMenu {
             selectedNames.add(identifier);
     }
 
-    private static @NonNull List<MutablePair<ItemStack, String>> getRailTypes(String searchQuery) {
+    private static @NonNull List<MutablePair<ItemStack, String>> getRailTypes(Player player, String searchQuery) {
         List<MutablePair<ItemStack, String>> railTypes = new ArrayList<>();
         Rail rail = GeneratorModule.getInstance().getRail();
 
@@ -92,7 +91,7 @@ public class RailTypeMenu extends NameListMenu {
                     && !railType.getDisplayName().toLowerCase(Locale.ROOT).contains(normalizedQuery))
                 continue;
 
-            railTypes.add(new MutablePair<>(RailTypeMenuItems.createRailTypeItem(railType), railType.getIdentifier()));
+            railTypes.add(new MutablePair<>(RailTypeMenuItems.createRailTypeItem(railType, player), railType.getIdentifier()));
         }
 
         return railTypes;
@@ -122,32 +121,35 @@ public class RailTypeMenu extends NameListMenu {
                 )
         ));
 
-        getMenu().getSlot(CREATE_ITEM_SLOT).setItem(Item.create(
-                Objects.requireNonNull(XMaterial.NETHER_STAR.get()),
-                green("Create a Rail Type"),
-                List.of(gray("Configure and save a custom rail type."))
-        ));
+        if (getMenuPlayer().hasPermission(Permissions.RAIL_TYPE_CREATE))
+            getMenu().getSlot(CREATE_ITEM_SLOT).setItem(Item.create(
+                    Objects.requireNonNull(XMaterial.NETHER_STAR.get()),
+                    green("Create a Rail Type"),
+                    List.of(gray("Configure and save a custom rail type."))
+                ));
 
-        getMenu().getSlot(RELOAD_ITEM_SLOT).setItem(Item.create(
-                Objects.requireNonNull(XMaterial.CLOCK.get()),
-                yellow("Reload Rail Types"),
-                List.of(
-                        gray("Re-reads rail-types.yml from disk,"),
-                        gray("so you can test changes without a restart.")
-                )
-        ));
+        if (getMenuPlayer().hasPermission(Permissions.RAIL_TYPE_EDIT))
+            getMenu().getSlot(RELOAD_ITEM_SLOT).setItem(Item.create(
+                    Objects.requireNonNull(XMaterial.CLOCK.get()),
+                    yellow("Reload Rail Types"),
+                    List.of(
+                            gray("Re-reads rail-types.yml from disk,"),
+                            gray("so you can test changes without a restart.")
+                    )
+                ));
 
-        getMenu().getSlot(BULK_DELETE_ITEM_SLOT).setItem(Item.create(
-                Objects.requireNonNull((selectedForDeletion.isEmpty() ? XMaterial.GRAY_DYE : XMaterial.RED_DYE).get()),
-                selectedForDeletion.isEmpty() ? gray("Bulk Delete") : red("Delete Selected Rail Types"),
-                List.of(
-                        gray("Selected: ") + white(String.valueOf(selectedForDeletion.size())),
-                        gray("Shift+Left-Click custom types to select them."),
-                        selectedForDeletion.isEmpty()
-                                ? darkGray("No custom rail types selected.")
-                                : red("Click to permanently delete all selected types.")
-                )
-        ));
+        if (getMenuPlayer().hasPermission(Permissions.RAIL_TYPE_DELETE))
+            getMenu().getSlot(BULK_DELETE_ITEM_SLOT).setItem(Item.create(
+                    Objects.requireNonNull((selectedForDeletion.isEmpty() ? XMaterial.GRAY_DYE : XMaterial.RED_DYE).get()),
+                    selectedForDeletion.isEmpty() ? gray("Bulk Delete") : red("Delete Selected Rail Types"),
+                    List.of(
+                            gray("Selected: ") + white(String.valueOf(selectedForDeletion.size())),
+                            gray("Shift+Left-Click custom types to select them."),
+                            selectedForDeletion.isEmpty()
+                                    ? darkGray("No custom rail types selected.")
+                                    : red("Click to permanently delete all selected types.")
+                    )
+                ));
     }
 
     @Override
@@ -157,12 +159,15 @@ public class RailTypeMenu extends NameListMenu {
 
         // Render the selection glow on a copy so deselected items lose their glow again.
         for (MutablePair<ItemStack, String> item : pagItems) {
-            ItemStack displayedItem = item.getLeft();
+            RailType currentType = RailType.byString(item.getRight());
+            ItemStack displayedItem = currentType == null ? item.getLeft()
+                    : RailTypeMenuItems.createRailTypeItem(currentType, getMenuPlayer());
 
             if (selectedNames.contains(item.getRight()))
                 displayedItem = RailTypeMenuItems.addSelectionGlow(displayedItem);
 
-            if (selectedForDeletion.contains(item.getRight()))
+            if (getMenuPlayer().hasPermission(Permissions.RAIL_TYPE_DELETE)
+                    && selectedForDeletion.contains(item.getRight()))
                 displayedItem = RailTypeMenuItems.addDeletionMarker(displayedItem);
 
             getMenu().getSlot(slot).setItem(displayedItem);
@@ -180,19 +185,32 @@ public class RailTypeMenu extends NameListMenu {
             final int _slot = slot;
             getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
                 String type = item.getRight().toLowerCase();
+                RailType railType = RailType.byString(type);
+                if (railType == null)
+                    return;
 
-                if (clickInformation.getClickType() == ClickType.SHIFT_LEFT) {
+                if (clickInformation.getClickType() == ClickType.SHIFT_LEFT
+                        && !railType.isBuiltIn() && clickPlayer.hasPermission(Permissions.RAIL_TYPE_DELETE)) {
                     toggleBulkDeleteSelection(clickPlayer, type);
                     return;
                 }
 
-                if (clickInformation.getClickType() == ClickType.SHIFT_RIGHT) {
+                if (clickInformation.getClickType() == ClickType.SHIFT_RIGHT
+                        && !railType.isBuiltIn() && clickPlayer.hasPermission(Permissions.RAIL_TYPE_DELETE)) {
                     deleteCustomRailType(clickPlayer, type);
                     return;
                 }
 
-                if (clickInformation.getClickType() == ClickType.RIGHT) {
-                    openEditorForRailType(clickPlayer, type);
+                if (clickInformation.getClickType() == ClickType.DROP
+                        && clickPlayer.hasPermission(Permissions.RAIL_TYPE_CREATE)) {
+                    openEditorForRailType(clickPlayer, type, true);
+                    return;
+                }
+
+                if (clickInformation.getClickType() == ClickType.RIGHT
+                        && clickPlayer.hasPermission(railType.isBuiltIn()
+                        ? Permissions.RAIL_TYPE_CREATE : Permissions.RAIL_TYPE_EDIT)) {
+                    openEditorForRailType(clickPlayer, type, railType.isBuiltIn());
                     return;
                 }
 
@@ -244,7 +262,7 @@ public class RailTypeMenu extends NameListMenu {
         return railType == null ? identifier : railType.getDisplayName();
     }
 
-    private void openEditorForRailType(Player clickPlayer, String identifier) {
+    private void openEditorForRailType(Player clickPlayer, String identifier, boolean copy) {
         Rail rail = GeneratorModule.getInstance().getRail();
 
         if (rail == null)
@@ -257,27 +275,27 @@ public class RailTypeMenu extends NameListMenu {
             return;
         }
 
-        String permission = railType.isBuiltIn() ? Permissions.RAIL_TYPE_CREATE : Permissions.RAIL_TYPE_EDIT;
+        String permission = copy ? Permissions.RAIL_TYPE_CREATE : Permissions.RAIL_TYPE_EDIT;
 
-        if (!RailPermissionGuard.check(clickPlayer, permission))
+        if (!Permissions.checkPermission(clickPlayer, permission))
             return;
 
         clickPlayer.closeInventory();
         playSound(clickPlayer, Sound.UI_BUTTON_CLICK);
         clickPlayer.sendMessage(ChatHelper.getStandardComponent(
                 true,
-                railType.isBuiltIn()
+                copy
                         ? "Opening an editable copy of rail type '%s'."
                         : "Editing rail type '%s'.",
                 railType.getIdentifier()
         ));
 
         // Built-in types cannot be overwritten, so editing one saves an editable copy instead.
-        new RailTypeEditorMenu(clickPlayer, RailTypeDraft.from(railType, !railType.isBuiltIn()), true);
+        new RailTypeEditorMenu(clickPlayer, RailTypeDraft.from(railType, !copy), true);
     }
 
     private void deleteCustomRailType(Player clickPlayer, String identifier) {
-        if (!RailPermissionGuard.check(clickPlayer, Permissions.RAIL_TYPE_DELETE))
+        if (!Permissions.checkPermission(clickPlayer, Permissions.RAIL_TYPE_DELETE))
             return;
 
         Rail rail = GeneratorModule.getInstance().getRail();
@@ -319,6 +337,9 @@ public class RailTypeMenu extends NameListMenu {
     }
 
     private void toggleBulkDeleteSelection(Player clickPlayer, String identifier) {
+        if (!clickPlayer.hasPermission(Permissions.RAIL_TYPE_DELETE))
+            return;
+
         Rail rail = GeneratorModule.getInstance().getRail();
 
         if (rail == null)
@@ -353,7 +374,7 @@ public class RailTypeMenu extends NameListMenu {
             return;
         }
 
-        if (!RailPermissionGuard.check(clickPlayer, Permissions.RAIL_TYPE_DELETE))
+        if (!Permissions.checkPermission(clickPlayer, Permissions.RAIL_TYPE_DELETE))
             return;
 
         Rail rail = GeneratorModule.getInstance().getRail();
@@ -394,7 +415,7 @@ public class RailTypeMenu extends NameListMenu {
         });
 
         getMenu().getSlot(CREATE_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
-            if (!RailPermissionGuard.check(clickPlayer, Permissions.RAIL_TYPE_CREATE))
+            if (!clickPlayer.hasPermission(Permissions.RAIL_TYPE_CREATE))
                 return;
 
             clickPlayer.closeInventory();
@@ -405,6 +426,9 @@ public class RailTypeMenu extends NameListMenu {
         });
 
         getMenu().getSlot(RELOAD_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
+            if (!clickPlayer.hasPermission(Permissions.RAIL_TYPE_EDIT))
+                return;
+
             Rail rail = GeneratorModule.getInstance().getRail();
 
             if (rail == null)
@@ -422,8 +446,10 @@ public class RailTypeMenu extends NameListMenu {
             new RailTypeMenu(clickPlayer, searchQuery, selectedForDeletion, true);
         });
 
-        getMenu().getSlot(BULK_DELETE_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) ->
-                deleteSelectedRailTypes(clickPlayer));
+        getMenu().getSlot(BULK_DELETE_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
+            if (clickPlayer.hasPermission(Permissions.RAIL_TYPE_DELETE))
+                deleteSelectedRailTypes(clickPlayer);
+        });
 
         if (canProceed())
             getMenu().getSlot(NEXT_ITEM_SLOT).setClickHandler((clickPlayer, clickInformation) ->

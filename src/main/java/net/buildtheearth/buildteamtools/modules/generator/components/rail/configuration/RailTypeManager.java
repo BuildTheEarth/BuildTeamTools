@@ -11,10 +11,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Holds all available rail types and persists player-created rail types to disk.
@@ -24,7 +26,7 @@ public class RailTypeManager {
 
     private static final String FILE_PATH = "modules/generator/rail-types.yml";
     private static final String SCHEMA_VERSION_KEY = "schema-version";
-    static final int CURRENT_SCHEMA_VERSION = 4;
+    static final int CURRENT_SCHEMA_VERSION = 5;
     private static final String TYPES_SECTION = "rail-types";
 
     private static final String KEY_DISPLAY_NAME = "display-name";
@@ -92,6 +94,22 @@ public class RailTypeManager {
             index++;
 
         return "custom-" + index;
+    }
+
+    /** Names are allocated separately from stable identifiers, so renaming frees a display name. */
+    public String getNextCustomDisplayName() {
+        return getNextCustomDisplayName(railTypes.values().stream().map(RailType::getDisplayName).toList());
+    }
+
+    static String getNextCustomDisplayName(Collection<String> displayNames) {
+        Set<String> names = new HashSet<>();
+        for (String displayName : displayNames)
+            names.add(displayName.toLowerCase(Locale.ROOT));
+
+        int index = 1;
+        while (names.contains("custom rail " + index))
+            index++;
+        return "Custom Rail " + index;
     }
 
     public @Nullable RailType byString(@Nullable String value) {
@@ -203,9 +221,9 @@ public class RailTypeManager {
 
         String normalizedIdentifier = identifier.toLowerCase(Locale.ROOT);
         String displayName = section.getString(KEY_DISPLAY_NAME, identifier);
-        XMaterial railBlock = parseMaterial(section.getString(KEY_RAIL_BLOCK));
+        List<XMaterial> railBlocks = parsePalette(section.get(KEY_RAIL_BLOCK));
         List<XMaterial> blocksBelow = parseMaterials(section.getStringList(KEY_BLOCKS_BELOW));
-        XMaterial sleeperBlock = parseMaterial(section.getString(KEY_SLEEPER_BLOCK));
+        List<XMaterial> sleeperBlocks = parsePalette(section.get(KEY_SLEEPER_BLOCK));
         int sleeperSpacing = section.getInt(KEY_SLEEPER_SPACING, RailType.MIN_SLEEPER_SPACING);
         int trackCount = section.getInt(KEY_TRACK_COUNT, RailType.DEFAULT_TRACK_COUNT);
         int trackSpacing = section.getInt(KEY_TRACK_SPACING, RailType.DEFAULT_TRACK_SPACING);
@@ -213,8 +231,8 @@ public class RailTypeManager {
                 ? section.getIntegerList(KEY_TRACK_SPACINGS)
                 : Collections.nCopies(Math.max(0, trackCount - 1), trackSpacing);
         boolean overheadPolesEnabled = section.getBoolean(KEY_OVERHEAD_POLES_ENABLED, false);
-        XMaterial overheadPoleBlock = parseMaterial(section.getString(KEY_OVERHEAD_POLE_BLOCK));
-        XMaterial overheadSupportBlock = parseMaterial(section.getString(KEY_OVERHEAD_SUPPORT_BLOCK));
+        List<XMaterial> overheadPoleBlocks = parsePalette(section.get(KEY_OVERHEAD_POLE_BLOCK));
+        List<XMaterial> overheadSupportBlocks = parsePalette(section.get(KEY_OVERHEAD_SUPPORT_BLOCK));
         int overheadPoleSpacing = section.getInt(
                 KEY_OVERHEAD_POLE_SPACING,
                 RailType.DEFAULT_OVERHEAD_POLE_SPACING
@@ -228,28 +246,28 @@ public class RailTypeManager {
                 RailType.DEFAULT_OVERHEAD_POLE_HEIGHT
         );
         boolean overheadWiresEnabled = section.getBoolean(KEY_OVERHEAD_WIRES_ENABLED, false);
-        XMaterial overheadWireBlock = parseMaterial(section.getString(KEY_OVERHEAD_WIRE_BLOCK));
+        List<XMaterial> overheadWireBlocks = parsePalette(section.get(KEY_OVERHEAD_WIRE_BLOCK));
         boolean trackSwitchesEnabled = section.getBoolean(KEY_TRACK_SWITCHES_ENABLED, false);
 
         String error = RailType.validate(new RailType.Configuration()
                 .identifier(normalizedIdentifier)
                 .displayName(displayName)
-                .icon(railBlock)
-                .railBlock(railBlock)
+                .icon(railBlocks.isEmpty() ? null : railBlocks.getFirst())
+                .railBlocks(railBlocks)
                 .blocksBelow(blocksBelow)
-                .sleeperBlock(sleeperBlock)
+                .sleeperBlocks(sleeperBlocks)
                 .sleeperSpacing(sleeperSpacing)
                 .trackCount(trackCount)
                 .trackSpacing(trackSpacing)
                 .trackSpacings(trackSpacings)
                 .overheadPolesEnabled(overheadPolesEnabled)
-                .overheadPoleBlock(overheadPoleBlock)
-                .overheadSupportBlock(overheadSupportBlock)
+                .overheadPoleBlocks(overheadPoleBlocks)
+                .overheadSupportBlocks(overheadSupportBlocks)
                 .overheadPoleSpacing(overheadPoleSpacing)
                 .overheadPoleOffset(overheadPoleOffset)
                 .overheadPoleHeight(overheadPoleHeight)
                 .overheadWiresEnabled(overheadWiresEnabled)
-                .overheadWireBlock(overheadWireBlock)
+                .overheadWireBlocks(overheadWireBlocks)
                 .trackSwitchesEnabled(trackSwitchesEnabled));
 
         if (error != null) {
@@ -267,22 +285,22 @@ public class RailTypeManager {
         railTypes.put(normalizedIdentifier, new RailType(new RailType.Configuration()
                 .identifier(normalizedIdentifier)
                 .displayName(displayName)
-                .icon(icon == null ? railBlock : icon)
-                .railBlock(railBlock)
+                .icon(icon == null ? railBlocks.getFirst() : icon)
+                .railBlocks(railBlocks)
                 .blocksBelow(blocksBelow)
-                .sleeperBlock(sleeperBlock)
+                .sleeperBlocks(sleeperBlocks)
                 .sleeperSpacing(sleeperSpacing)
                 .trackCount(trackCount)
                 .trackSpacing(trackSpacing)
                 .trackSpacings(trackSpacings)
                 .overheadPolesEnabled(overheadPolesEnabled)
-                .overheadPoleBlock(overheadPoleBlock)
-                .overheadSupportBlock(overheadSupportBlock)
+                .overheadPoleBlocks(overheadPoleBlocks)
+                .overheadSupportBlocks(overheadSupportBlocks)
                 .overheadPoleSpacing(overheadPoleSpacing)
                 .overheadPoleOffset(overheadPoleOffset)
                 .overheadPoleHeight(overheadPoleHeight)
                 .overheadWiresEnabled(overheadWiresEnabled)
-                .overheadWireBlock(overheadWireBlock)
+                .overheadWireBlocks(overheadWireBlocks)
                 .trackSwitchesEnabled(trackSwitchesEnabled), false));
     }
 
@@ -298,13 +316,10 @@ public class RailTypeManager {
 
             config.set(path + "." + KEY_DISPLAY_NAME, railType.getDisplayName());
             config.set(path + "." + KEY_ICON, railType.getIcon().name());
-            config.set(path + "." + KEY_RAIL_BLOCK, railType.getRailBlock().name());
+            config.set(path + "." + KEY_RAIL_BLOCK, railType.getRailBlocks().stream().map(XMaterial::name).toList());
             config.set(path + "." + KEY_BLOCKS_BELOW, railType.getBlocksBelow().stream().map(XMaterial::name).toList());
 
-            XMaterial sleeperBlock = railType.getSleeperBlock();
-
-            if (sleeperBlock != null)
-                config.set(path + "." + KEY_SLEEPER_BLOCK, sleeperBlock.name());
+            config.set(path + "." + KEY_SLEEPER_BLOCK, railType.getSleeperBlocks().stream().map(XMaterial::name).toList());
 
             config.set(path + "." + KEY_SLEEPER_SPACING, railType.getSleeperSpacing());
             config.set(path + "." + KEY_TRACK_COUNT, railType.getTrackCount());
@@ -317,20 +332,11 @@ public class RailTypeManager {
             config.set(path + "." + KEY_OVERHEAD_WIRES_ENABLED, railType.isOverheadWiresEnabled());
             config.set(path + "." + KEY_TRACK_SWITCHES_ENABLED, railType.isTrackSwitchesEnabled());
 
-            XMaterial overheadPoleBlock = railType.getOverheadPoleBlock();
+            config.set(path + "." + KEY_OVERHEAD_POLE_BLOCK, railType.getOverheadPoleBlocks().stream().map(XMaterial::name).toList());
 
-            if (overheadPoleBlock != null)
-                config.set(path + "." + KEY_OVERHEAD_POLE_BLOCK, overheadPoleBlock.name());
+            config.set(path + "." + KEY_OVERHEAD_SUPPORT_BLOCK, railType.getOverheadSupportBlocks().stream().map(XMaterial::name).toList());
 
-            XMaterial overheadSupportBlock = railType.getOverheadSupportBlock();
-
-            if (overheadSupportBlock != null)
-                config.set(path + "." + KEY_OVERHEAD_SUPPORT_BLOCK, overheadSupportBlock.name());
-
-            XMaterial overheadWireBlock = railType.getOverheadWireBlock();
-
-            if (overheadWireBlock != null)
-                config.set(path + "." + KEY_OVERHEAD_WIRE_BLOCK, overheadWireBlock.name());
+            config.set(path + "." + KEY_OVERHEAD_WIRE_BLOCK, railType.getOverheadWireBlocks().stream().map(XMaterial::name).toList());
         }
 
         try {
@@ -383,6 +389,7 @@ public class RailTypeManager {
         migrateVersionOneToTwo(config);
         migrateVersionTwoToThree(config);
         migrateVersionThreeToFour(config);
+        migrateVersionFourToFive(config);
         config.set(SCHEMA_VERSION_KEY, CURRENT_SCHEMA_VERSION);
 
         try {
@@ -452,31 +459,57 @@ public class RailTypeManager {
         }
     }
 
+    static List<XMaterial> parsePalette(Object value) {
+        if (value == null)
+            return List.of();
+        List<?> values = value instanceof List<?> list ? list : List.of(value);
+        List<XMaterial> materials = new ArrayList<>();
+        for (Object entry : values)
+            materials.add(entry instanceof String name ? XMaterial.matchXMaterial(name).orElse(null) : null);
+        return materials;
+    }
+
+    static void migrateVersionFourToFive(YamlConfiguration config) {
+        ConfigurationSection types = config.getConfigurationSection(TYPES_SECTION);
+        if (types == null)
+            return;
+        for (String identifier : types.getKeys(false)) {
+            ConfigurationSection section = types.getConfigurationSection(identifier);
+            if (section == null)
+                continue;
+            for (String key : List.of(KEY_RAIL_BLOCK, KEY_SLEEPER_BLOCK, KEY_OVERHEAD_POLE_BLOCK,
+                    KEY_OVERHEAD_SUPPORT_BLOCK, KEY_OVERHEAD_WIRE_BLOCK)) {
+                Object value = section.get(key);
+                if (value instanceof String)
+                    section.set(key, List.of(value));
+            }
+        }
+    }
     private void setDefault(ConfigurationSection section, String path, Object value) {
         if (!section.contains(path))
             section.set(path, value);
     }
 
-    private RailType.Configuration toConfiguration(RailType railType) {
+    static RailType.Configuration toConfiguration(RailType railType) {
         return new RailType.Configuration()
                 .identifier(railType.getIdentifier())
                 .displayName(railType.getDisplayName())
                 .icon(railType.getIcon())
-                .railBlock(railType.getRailBlock())
+                .railBlocks(railType.getRailBlocks())
                 .blocksBelow(railType.getBlocksBelow())
-                .sleeperBlock(railType.getSleeperBlock())
+                .sleeperBlocks(railType.getSleeperBlocks())
                 .sleeperSpacing(railType.getSleeperSpacing())
                 .trackCount(railType.getTrackCount())
                 .trackSpacing(railType.getTrackSpacing())
                 .trackSpacings(railType.getTrackSpacings())
                 .overheadPolesEnabled(railType.isOverheadPolesEnabled())
-                .overheadPoleBlock(railType.getOverheadPoleBlock())
-                .overheadSupportBlock(railType.getOverheadSupportBlock())
+                .overheadPoleBlocks(railType.getOverheadPoleBlocks())
+                .overheadSupportBlocks(railType.getOverheadSupportBlocks())
                 .overheadPoleSpacing(railType.getOverheadPoleSpacing())
                 .overheadPoleOffset(railType.getOverheadPoleOffset())
                 .overheadPoleHeight(railType.getOverheadPoleHeight())
                 .overheadWiresEnabled(railType.isOverheadWiresEnabled())
-                .overheadWireBlock(railType.getOverheadWireBlock())
+                .overheadWireBlocks(railType.getOverheadWireBlocks())
                 .trackSwitchesEnabled(railType.isTrackSwitchesEnabled());
     }
 }

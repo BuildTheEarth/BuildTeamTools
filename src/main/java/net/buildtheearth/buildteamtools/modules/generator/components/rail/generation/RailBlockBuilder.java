@@ -30,7 +30,7 @@ final class RailBlockBuilder {
 
     private final RailTerrainResolver terrainResolver;
     private final RailType railType;
-    private final BlockType railBlockType;
+    private final List<BlockType> railBlockTypes;
     private final RailPreparationProgress preparationProgress;
     private final long terrainAdjustedPercentage;
     private final long buildFinishedPercentage;
@@ -44,7 +44,7 @@ final class RailBlockBuilder {
     ) {
         this.terrainResolver = terrainResolver;
         this.railType = railType;
-        this.railBlockType = getRailBlockType(railType);
+        this.railBlockTypes = railType.getRailBlocks().stream().map(this::getRailBlockType).toList();
         this.preparationProgress = preparationProgress;
         this.terrainAdjustedPercentage = terrainAdjustedPercentage;
         this.buildFinishedPercentage = buildFinishedPercentage;
@@ -101,8 +101,6 @@ final class RailBlockBuilder {
     }
 
     private void addSleeperBlocks(Map<PositionKey, BlockState> railBlocks, List<Vector> path, Set<PositionKey> centerPositions) {
-        BlockState sleeperBlockState = GeneratorUtils.getBlockState(railType.getSleeperBlock());
-
         for (int index = 0; index < path.size(); index++) {
             if (!isSleeperPoint(index))
                 continue;
@@ -111,8 +109,8 @@ final class RailBlockBuilder {
             RailStep step = getRailStep(path, index, new RailStep(1, 0));
             RailStep perpendicularStep = new RailStep(-step.dz(), step.dx());
 
-            addSleeperBlock(railBlocks, center, perpendicularStep, SLEEPER_SIDE_OFFSET, sleeperBlockState, centerPositions);
-            addSleeperBlock(railBlocks, center, perpendicularStep, -SLEEPER_SIDE_OFFSET, sleeperBlockState, centerPositions);
+            addSleeperBlock(railBlocks, center, perpendicularStep, SLEEPER_SIDE_OFFSET, centerPositions);
+            addSleeperBlock(railBlocks, center, perpendicularStep, -SLEEPER_SIDE_OFFSET, centerPositions);
         }
     }
 
@@ -121,7 +119,6 @@ final class RailBlockBuilder {
             Vector center,
             RailStep perpendicularStep,
             int offset,
-            BlockState sleeperBlockState,
             Set<PositionKey> centerPositions
     ) {
         if (perpendicularStep.dx() == 0 && perpendicularStep.dz() == 0)
@@ -137,7 +134,7 @@ final class RailBlockBuilder {
         if (centerPositions.contains(key) || railBlocks.containsKey(key))
             return;
 
-        railBlocks.put(key, sleeperBlockState);
+        railBlocks.put(key, GeneratorUtils.getBlockState(RailMaterialPalette.select(railType.getSleeperBlocks(), key)));
     }
 
     private int getTotalPathPointCount(List<List<Vector>> railCenterPaths) {
@@ -330,7 +327,7 @@ final class RailBlockBuilder {
 
     private BlockState createCenterBlockState(Vector position, boolean sleeperPoint) {
         if (sleeperPoint)
-            return GeneratorUtils.getBlockState(railType.getSleeperBlock());
+            return GeneratorUtils.getBlockState(RailMaterialPalette.select(railType.getSleeperBlocks(), PositionKey.from(position)));
 
         List<XMaterial> blocksBelow = railType.getBlocksBelow();
         int index = Math.floorMod(
@@ -345,10 +342,11 @@ final class RailBlockBuilder {
             RailSideBlock sideBlock,
             Map<PositionKey, RailSideBlock> sideBlocks
     ) {
+        BlockType railBlockType = RailMaterialPalette.select(railBlockTypes, sideBlock.key());
         Direction preferredDirection = sideBlock.getPreferredFacing();
 
         if (railBlockType.getPropertyMap().containsKey(SHAPE_PROPERTY))
-            return createRailShapeBlockState(
+            return createRailShapeBlockState(railBlockType,
                     resolveSideBlockFacing(sideBlock, sideBlocks),
                     getConnections(sideBlock.key(), sideBlocks)
             );
@@ -359,7 +357,7 @@ final class RailBlockBuilder {
         return GeneratorUtils.getBlockStateWithFacing(railBlockType, preferredDirection);
     }
 
-    private BlockState createRailShapeBlockState(Direction preferredDirection, RailConnections connections) {
+    private BlockState createRailShapeBlockState(BlockType railBlockType, Direction preferredDirection, RailConnections connections) {
         String shape = resolveRailShape(preferredDirection, connections);
 
         try {
@@ -479,8 +477,8 @@ final class RailBlockBuilder {
         return null;
     }
 
-    private BlockType getRailBlockType(RailType railType) {
-        BlockType blockType = Item.convertXMaterialToWEBlockType(railType.getRailBlock());
+    private BlockType getRailBlockType(XMaterial material) {
+        BlockType blockType = Item.convertXMaterialToWEBlockType(material);
 
         return blockType == null ? BlockTypes.ANVIL : blockType;
     }

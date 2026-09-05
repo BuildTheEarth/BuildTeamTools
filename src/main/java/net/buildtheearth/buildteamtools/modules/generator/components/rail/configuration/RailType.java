@@ -41,21 +41,21 @@ public final class RailType {
     private final String identifier;
     private final String displayName;
     private final XMaterial icon;
-    private final XMaterial railBlock;
+    private final List<XMaterial> railBlocks;
     private final List<XMaterial> blocksBelow;
-    private final @Nullable XMaterial sleeperBlock;
+    private final List<XMaterial> sleeperBlocks;
     private final int sleeperSpacing;
     private final int trackCount;
     private final int trackSpacing;
     private final List<Integer> trackSpacings;
     private final boolean overheadPolesEnabled;
-    private final @Nullable XMaterial overheadPoleBlock;
-    private final @Nullable XMaterial overheadSupportBlock;
+    private final List<XMaterial> overheadPoleBlocks;
+    private final List<XMaterial> overheadSupportBlocks;
     private final int overheadPoleSpacing;
     private final int overheadPoleOffset;
     private final int overheadPoleHeight;
     private final boolean overheadWiresEnabled;
-    private final @Nullable XMaterial overheadWireBlock;
+    private final List<XMaterial> overheadWireBlocks;
     private final boolean trackSwitchesEnabled;
     private final boolean builtIn;
 
@@ -65,9 +65,9 @@ public final class RailType {
         this.identifier = configuration.identifier();
         this.displayName = configuration.displayName();
         this.icon = configuration.icon();
-        this.railBlock = configuration.railBlock();
+        this.railBlocks = List.copyOf(configuration.railBlocks());
         this.blocksBelow = configuredBlocksBelow == null ? List.of() : List.copyOf(configuredBlocksBelow);
-        this.sleeperBlock = configuration.sleeperBlock();
+        this.sleeperBlocks = List.copyOf(configuration.sleeperBlocks());
         this.sleeperSpacing = configuration.sleeperSpacing();
         this.trackCount = configuration.trackCount();
         this.trackSpacing = configuration.trackSpacing();
@@ -77,27 +77,47 @@ public final class RailType {
                 configuration.trackSpacing()
         );
         this.overheadPolesEnabled = configuration.overheadPolesEnabled();
-        this.overheadPoleBlock = configuration.overheadPoleBlock();
-        this.overheadSupportBlock = configuration.overheadSupportBlock();
+        this.overheadPoleBlocks = List.copyOf(configuration.overheadPoleBlocks());
+        this.overheadSupportBlocks = List.copyOf(configuration.overheadSupportBlocks());
         this.overheadPoleSpacing = configuration.overheadPoleSpacing();
         this.overheadPoleOffset = configuration.overheadPoleOffset();
         this.overheadPoleHeight = configuration.overheadPoleHeight();
         this.overheadWiresEnabled = configuration.overheadWiresEnabled();
-        this.overheadWireBlock = configuration.overheadWireBlock();
+        this.overheadWireBlocks = List.copyOf(configuration.overheadWireBlocks());
         this.trackSwitchesEnabled = configuration.trackSwitchesEnabled();
         this.builtIn = builtIn;
     }
 
+    public @Nullable XMaterial getRailBlock() {
+        return railBlocks.isEmpty() ? null : railBlocks.getFirst();
+    }
+
+    public @Nullable XMaterial getSleeperBlock() {
+        return sleeperBlocks.isEmpty() ? null : sleeperBlocks.getFirst();
+    }
+
+    public @Nullable XMaterial getOverheadPoleBlock() {
+        return overheadPoleBlocks.isEmpty() ? null : overheadPoleBlocks.getFirst();
+    }
+
+    public @Nullable XMaterial getOverheadSupportBlock() {
+        return overheadSupportBlocks.isEmpty() ? null : overheadSupportBlocks.getFirst();
+    }
+
+    public @Nullable XMaterial getOverheadWireBlock() {
+        return overheadWireBlocks.isEmpty() ? null : overheadWireBlocks.getFirst();
+    }
+
     public boolean hasSleepers() {
-        return sleeperSpacing > 0 && sleeperBlock != null;
+        return sleeperSpacing > 0 && !sleeperBlocks.isEmpty();
     }
 
     public boolean hasOverheadPoles() {
-        return overheadPolesEnabled && overheadPoleBlock != null;
+        return overheadPolesEnabled && !overheadPoleBlocks.isEmpty();
     }
 
     public boolean hasOverheadWires() {
-        return overheadWiresEnabled && overheadWireBlock != null;
+        return overheadWiresEnabled && !overheadWireBlocks.isEmpty();
     }
 
     /**
@@ -182,7 +202,7 @@ public final class RailType {
     }
 
     private static @Nullable String validateBlocks(Configuration configuration) {
-        if (!isPlaceableBlock(configuration.railBlock()))
+        if (!isPlaceablePalette(configuration.railBlocks()))
             return "Rail block must be a valid placeable Minecraft block.";
 
         List<XMaterial> blocksBelow = configuration.blocksBelow();
@@ -204,7 +224,8 @@ public final class RailType {
             return "Sleeper spacing must be between %s and %s. Use 0 to disable sleepers."
                     .formatted(MIN_SLEEPER_SPACING, MAX_SLEEPER_SPACING);
 
-        if (sleeperSpacing > 0 && !isPlaceableBlock(configuration.sleeperBlock()))
+        if ((sleeperSpacing > 0 || !configuration.sleeperBlocks().isEmpty())
+                && !isPlaceablePalette(configuration.sleeperBlocks()))
             return "Sleeper block must be a valid placeable Minecraft block.";
 
         return null;
@@ -252,23 +273,23 @@ public final class RailType {
         if (poleError != null)
             return poleError;
 
-        if (configuration.overheadWiresEnabled() && !isPlaceableBlock(configuration.overheadWireBlock()))
+        if ((configuration.overheadWiresEnabled() || !configuration.overheadWireBlocks().isEmpty())
+                && !isPlaceablePalette(configuration.overheadWireBlocks()))
             return "Overhead wire block must be a valid placeable Minecraft block.";
 
         return null;
     }
 
     private static @Nullable String validateOverheadPoles(Configuration configuration) {
-        if (!configuration.overheadPolesEnabled())
-            return null;
-
-        if (!isPlaceableBlock(configuration.overheadPoleBlock()))
+        if ((configuration.overheadPolesEnabled() || !configuration.overheadPoleBlocks().isEmpty())
+                && !isPlaceablePalette(configuration.overheadPoleBlocks()))
             return "Overhead pole block must be a valid placeable Minecraft block.";
 
-        if (!isPlaceableBlock(configuration.overheadSupportBlock()))
+        if ((configuration.overheadPolesEnabled() || !configuration.overheadSupportBlocks().isEmpty())
+                && !isPlaceablePalette(configuration.overheadSupportBlocks()))
             return "Overhead support block must be a valid placeable Minecraft block.";
 
-        return validateOverheadPoleMeasurements(configuration);
+        return configuration.overheadPolesEnabled() ? validateOverheadPoleMeasurements(configuration) : null;
     }
 
     private static @Nullable String validateOverheadPoleMeasurements(Configuration configuration) {
@@ -297,6 +318,10 @@ public final class RailType {
                 || !identifier.toLowerCase().matches(IDENTIFIER_PATTERN);
     }
 
+    private static boolean isPlaceablePalette(List<XMaterial> materials) {
+        return !materials.isEmpty() && materials.stream().allMatch(RailType::isPlaceableBlock);
+    }
+
     private static boolean isPlaceableBlock(@Nullable XMaterial material) {
         if (material == null)
             return false;
@@ -322,21 +347,21 @@ public final class RailType {
         private @Nullable String identifier;
         private @Nullable String displayName;
         private @Nullable XMaterial icon;
-        private @Nullable XMaterial railBlock;
+        private List<XMaterial> railBlocks = List.of();
         private @Nullable List<XMaterial> blocksBelow;
-        private @Nullable XMaterial sleeperBlock;
+        private List<XMaterial> sleeperBlocks = List.of();
         private int sleeperSpacing;
         private int trackCount;
         private int trackSpacing;
         private @Nullable List<Integer> trackSpacings;
         private boolean overheadPolesEnabled;
-        private @Nullable XMaterial overheadPoleBlock;
-        private @Nullable XMaterial overheadSupportBlock;
+        private List<XMaterial> overheadPoleBlocks = List.of();
+        private List<XMaterial> overheadSupportBlocks = List.of();
         private int overheadPoleSpacing = DEFAULT_OVERHEAD_POLE_SPACING;
         private int overheadPoleOffset = DEFAULT_OVERHEAD_POLE_OFFSET;
         private int overheadPoleHeight = DEFAULT_OVERHEAD_POLE_HEIGHT;
         private boolean overheadWiresEnabled;
-        private @Nullable XMaterial overheadWireBlock;
+        private List<XMaterial> overheadWireBlocks = List.of();
         private boolean trackSwitchesEnabled;
 
         public @Nullable String identifier() {
@@ -366,12 +391,21 @@ public final class RailType {
             return this;
         }
 
+        public List<XMaterial> railBlocks() {
+            return railBlocks;
+        }
+
+        public Configuration railBlocks(List<XMaterial> materials) {
+            this.railBlocks = new java.util.ArrayList<>(materials);
+            return this;
+        }
+
         public @Nullable XMaterial railBlock() {
-            return railBlock;
+            return railBlocks.isEmpty() ? null : railBlocks.getFirst();
         }
 
         public Configuration railBlock(@Nullable XMaterial railBlock) {
-            this.railBlock = railBlock;
+            this.railBlocks = railBlock == null ? List.of() : List.of(railBlock);
             return this;
         }
 
@@ -384,12 +418,21 @@ public final class RailType {
             return this;
         }
 
+        public List<XMaterial> sleeperBlocks() {
+            return sleeperBlocks;
+        }
+
+        public Configuration sleeperBlocks(List<XMaterial> materials) {
+            this.sleeperBlocks = new java.util.ArrayList<>(materials);
+            return this;
+        }
+
         public @Nullable XMaterial sleeperBlock() {
-            return sleeperBlock;
+            return sleeperBlocks.isEmpty() ? null : sleeperBlocks.getFirst();
         }
 
         public Configuration sleeperBlock(@Nullable XMaterial sleeperBlock) {
-            this.sleeperBlock = sleeperBlock;
+            this.sleeperBlocks = sleeperBlock == null ? List.of() : List.of(sleeperBlock);
             return this;
         }
 
@@ -438,21 +481,39 @@ public final class RailType {
             return this;
         }
 
+        public List<XMaterial> overheadPoleBlocks() {
+            return overheadPoleBlocks;
+        }
+
+        public Configuration overheadPoleBlocks(List<XMaterial> materials) {
+            this.overheadPoleBlocks = new java.util.ArrayList<>(materials);
+            return this;
+        }
+
         public @Nullable XMaterial overheadPoleBlock() {
-            return overheadPoleBlock;
+            return overheadPoleBlocks.isEmpty() ? null : overheadPoleBlocks.getFirst();
         }
 
         public Configuration overheadPoleBlock(@Nullable XMaterial overheadPoleBlock) {
-            this.overheadPoleBlock = overheadPoleBlock;
+            this.overheadPoleBlocks = overheadPoleBlock == null ? List.of() : List.of(overheadPoleBlock);
+            return this;
+        }
+
+        public List<XMaterial> overheadSupportBlocks() {
+            return overheadSupportBlocks;
+        }
+
+        public Configuration overheadSupportBlocks(List<XMaterial> materials) {
+            this.overheadSupportBlocks = new java.util.ArrayList<>(materials);
             return this;
         }
 
         public @Nullable XMaterial overheadSupportBlock() {
-            return overheadSupportBlock;
+            return overheadSupportBlocks.isEmpty() ? null : overheadSupportBlocks.getFirst();
         }
 
         public Configuration overheadSupportBlock(@Nullable XMaterial overheadSupportBlock) {
-            this.overheadSupportBlock = overheadSupportBlock;
+            this.overheadSupportBlocks = overheadSupportBlock == null ? List.of() : List.of(overheadSupportBlock);
             return this;
         }
 
@@ -492,12 +553,21 @@ public final class RailType {
             return this;
         }
 
+        public List<XMaterial> overheadWireBlocks() {
+            return overheadWireBlocks;
+        }
+
+        public Configuration overheadWireBlocks(List<XMaterial> materials) {
+            this.overheadWireBlocks = new java.util.ArrayList<>(materials);
+            return this;
+        }
+
         public @Nullable XMaterial overheadWireBlock() {
-            return overheadWireBlock;
+            return overheadWireBlocks.isEmpty() ? null : overheadWireBlocks.getFirst();
         }
 
         public Configuration overheadWireBlock(@Nullable XMaterial overheadWireBlock) {
-            this.overheadWireBlock = overheadWireBlock;
+            this.overheadWireBlocks = overheadWireBlock == null ? List.of() : List.of(overheadWireBlock);
             return this;
         }
 

@@ -6,6 +6,8 @@ import net.buildtheearth.buildteamtools.modules.generator.components.rail.config
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -23,7 +25,7 @@ final class RailTypeMenuItems {
     private RailTypeMenuItems() {
     }
 
-    static ItemStack createRailTypeItem(RailType railType) {
+    static ItemStack createRailTypeItem(RailType railType, Player player) {
         Material icon = railType.getIcon().get();
 
         if (icon == null)
@@ -31,10 +33,15 @@ final class RailTypeMenuItems {
 
         List<String> lore = createConfigurationLore(railType);
 
-        if (railType.isBuiltIn())
+        lore.add(darkGray("Left-Click to select"));
+        if (railType.isBuiltIn() && player.hasPermission(Permissions.RAIL_TYPE_CREATE))
             lore.add(darkGray("Right-Click to create an editable copy"));
-        else {
-            lore.add(darkGray("Right-Click to edit ") + gray("- ") + darkGray("Shift+Right-Click to delete"));
+        if (!railType.isBuiltIn() && player.hasPermission(Permissions.RAIL_TYPE_EDIT))
+            lore.add(darkGray("Right-Click to edit"));
+        if (player.hasPermission(Permissions.RAIL_TYPE_CREATE))
+            lore.add(darkGray("Press your drop key (Q) to create an editable copy"));
+        if (!railType.isBuiltIn() && player.hasPermission(Permissions.RAIL_TYPE_DELETE)) {
+            lore.add(darkGray("Shift+Right-Click to delete"));
             lore.add(darkGray("Shift+Left-Click to select for bulk deletion"));
         }
 
@@ -43,7 +50,7 @@ final class RailTypeMenuItems {
 
     private static List<String> createConfigurationLore(RailType railType) {
         List<String> lore = new ArrayList<>();
-        lore.add(gray("Rail Block: ") + white(formatMaterial(railType.getRailBlock())));
+        lore.add(gray("Rail Block: ") + formatMaterials(railType.getRailBlocks()));
         lore.add(gray("Blocks Below: ") + formatMaterials(railType.getBlocksBelow()));
         addSleeperLore(lore, railType);
         addTrackLore(lore, railType);
@@ -61,7 +68,7 @@ final class RailTypeMenuItems {
         }
 
         lore.add(gray("Sleepers: ")
-                + white(formatMaterial(railType.getSleeperBlock()))
+                + formatMaterials(railType.getSleeperBlocks())
                 + gray(" every ")
                 + white(String.valueOf(railType.getSleeperSpacing()))
                 + gray(" blocks"));
@@ -85,14 +92,16 @@ final class RailTypeMenuItems {
                 : RailMenuText.DISABLED));
 
         if (railType.hasOverheadPoles()) {
-            lore.add(gray("Pole Block: ") + white(formatMaterial(railType.getOverheadPoleBlock())));
-            lore.add(gray("Top Support: ") + white(formatMaterial(railType.getOverheadSupportBlock())));
+            lore.add(gray("Pole Block: ") + formatMaterials(railType.getOverheadPoleBlocks()));
+            lore.add(gray("Top Support: ") + formatMaterials(railType.getOverheadSupportBlocks()));
             lore.add(gray("Pole Spacing: ") + white(String.valueOf(railType.getOverheadPoleSpacing())));
         }
 
         lore.add(gray("Overhead Wires: ") + white(railType.hasOverheadWires()
                 ? RailMenuText.ENABLED
                 : RailMenuText.DISABLED));
+        if (railType.hasOverheadWires())
+            lore.add(gray("Wire Blocks: ") + formatMaterials(railType.getOverheadWireBlocks()));
     }
 
     static ItemStack addSelectionGlow(ItemStack item) {

@@ -10,7 +10,6 @@ import net.buildtheearth.buildteamtools.modules.generator.components.house.House
 import net.buildtheearth.buildteamtools.modules.generator.components.house.RoofType;
 import net.buildtheearth.buildteamtools.modules.generator.components.house.menu.WallColorMenu;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.Rail;
-import net.buildtheearth.buildteamtools.modules.generator.components.rail.RailPermissionGuard;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.RailSettings;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.menu.RailTypeMenu;
 import net.buildtheearth.buildteamtools.modules.generator.components.road.Road;
@@ -243,7 +242,7 @@ public class GeneratorMenu extends AbstractMenu {
 
     private void handleRailClick(Player player, ClickType clickType) {
         if (showTutorialForRightClick(player, clickType, GeneratorType.RAIL)
-                || !RailPermissionGuard.check(player, Permissions.RAIL_TYPE_MENU))
+                || !Permissions.checkPermission(player, Permissions.RAIL_TYPE_MENU))
             return;
 
         Rail rail = GeneratorModule.getInstance().getRail();

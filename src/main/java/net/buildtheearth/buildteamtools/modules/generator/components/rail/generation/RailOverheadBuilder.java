@@ -2,7 +2,6 @@ package net.buildtheearth.buildteamtools.modules.generator.components.rail.gener
 
 import com.alpsbte.alpslib.utils.GeneratorUtils;
 import com.alpsbte.alpslib.utils.item.Item;
-import com.cryptomorin.xseries.XMaterial;
 import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -71,19 +70,11 @@ final class RailOverheadBuilder {
     }
 
     private void addWires(Map<PositionKey, BlockState> blocks, List<List<Vector>> railCenterPaths, int overheadY) {
-        XMaterial wireBlock = railType.getOverheadWireBlock();
-
-        if (wireBlock == null)
-            return;
-
-        BlockType wireBlockType = Item.convertXMaterialToWEBlockType(wireBlock);
-
-        if (wireBlockType == null)
-            return;
+        List<BlockType> wireBlockTypes = railType.getOverheadWireBlocks().stream().map(Item::convertXMaterialToWEBlockType).toList();
 
         for (List<Vector> path : railCenterPaths) {
             List<Vector> wirePath = createOverheadPath(path, overheadY);
-            addPathBlocks(blocks, wirePath, wireBlockType, false);
+            addPathBlocks(blocks, wirePath, wireBlockTypes, false);
         }
     }
 
@@ -94,17 +85,7 @@ final class RailOverheadBuilder {
             int overheadY,
             Set<HorizontalPosition> trackFootprint
     ) {
-        XMaterial poleBlock = railType.getOverheadPoleBlock();
-        XMaterial supportBlock = railType.getOverheadSupportBlock();
-
-        if (poleBlock == null || supportBlock == null)
-            return;
-
-        BlockState poleState = GeneratorUtils.getBlockState(poleBlock);
-        BlockType supportBlockType = Item.convertXMaterialToWEBlockType(supportBlock);
-
-        if (supportBlockType == null)
-            return;
+        List<BlockType> supportBlockTypes = railType.getOverheadSupportBlocks().stream().map(Item::convertXMaterialToWEBlockType).toList();
 
         for (int index = 0; index < leftPath.size(); index += railType.getOverheadPoleSpacing()) {
             Vector leftCenter = leftPath.get(index);
@@ -116,9 +97,9 @@ final class RailOverheadBuilder {
             if (leftPole == null || rightPole == null)
                 continue;
 
-            addPole(blocks, leftPole.x(), leftPole.z(), leftPole.surfaceY(), overheadY, poleState);
-            addPole(blocks, rightPole.x(), rightPole.z(), rightPole.surfaceY(), overheadY, poleState);
-            addPortalSupport(blocks, leftPole.x(), overheadY + 1, leftPole.z(), rightPole.x(), rightPole.z(), supportBlockType);
+            addPole(blocks, leftPole.x(), leftPole.z(), leftPole.surfaceY(), overheadY);
+            addPole(blocks, rightPole.x(), rightPole.z(), rightPole.surfaceY(), overheadY);
+            addPortalSupport(blocks, leftPole.x(), overheadY + 1, leftPole.z(), rightPole.x(), rightPole.z(), supportBlockTypes);
         }
     }
 
@@ -160,11 +141,13 @@ final class RailOverheadBuilder {
             int poleX,
             int poleZ,
             int surfaceY,
-            int topY,
-            BlockState poleState
+            int topY
     ) {
-        for (int y = Math.min(surfaceY, topY); y <= topY; y++)
-            blocks.putIfAbsent(PositionKey.of(poleX, y, poleZ), poleState);
+        for (int y = Math.min(surfaceY, topY); y <= topY; y++) {
+            PositionKey position = PositionKey.of(poleX, y, poleZ);
+            blocks.putIfAbsent(position, GeneratorUtils.getBlockState(
+                    RailMaterialPalette.select(railType.getOverheadPoleBlocks(), position)));
+        }
     }
 
     private void addPortalSupport(
@@ -174,11 +157,11 @@ final class RailOverheadBuilder {
             int startZ,
             int endX,
             int endZ,
-            BlockType supportBlockType
+            List<BlockType> supportBlockTypes
     ) {
         Vector start = new Vector(startX, topY, startZ);
         Vector end = new Vector(endX, topY, endZ);
-        addPathBlocks(blocks, createOrthogonalPath(start, end), supportBlockType, true);
+        addPathBlocks(blocks, createOrthogonalPath(start, end), supportBlockTypes, true);
     }
 
     private RailStep getPerpendicularStep(List<Vector> path, int index, int sideSign) {
@@ -201,12 +184,13 @@ final class RailOverheadBuilder {
     private void addPathBlocks(
             Map<PositionKey, BlockState> blocks,
             List<Vector> path,
-            BlockType blockType,
+            List<BlockType> blockTypes,
             boolean overwrite
     ) {
         Set<PositionKey> positions = createConnectedPathPositions(path);
 
         for (PositionKey position : positions) {
+            BlockType blockType = RailMaterialPalette.select(blockTypes, position);
             BlockState blockState = createPathState(blockType, position, positions);
 
             if (overwrite)

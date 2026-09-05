@@ -109,7 +109,7 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
     private boolean handleRandomWarpCommand(@NonNull Player player, String @NonNull [] args) {
 
         if (!player.hasPermission(Permissions.WARP_RANDOM)) {
-            Utils.sendNoPermissionMessage(player, Permissions.WARP_RANDOM);
+            Permissions.sendNoPermissionMessage(player, Permissions.WARP_RANDOM);
             return true;
         }
 

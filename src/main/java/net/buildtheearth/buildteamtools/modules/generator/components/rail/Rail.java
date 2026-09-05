@@ -59,7 +59,7 @@ public class Rail extends GeneratorComponent {
 
     @Override
     public void generate(Player player) {
-        if (!RailPermissionGuard.check(player, Permissions.RAIL_GENERATOR_USE))
+        if (!Permissions.checkPermission(player, Permissions.RAIL_GENERATOR_USE))
             return;
 
         if (GeneratorModule.getInstance().isGenerating(player) || !preparingPlayers.add(player.getUniqueId())) {

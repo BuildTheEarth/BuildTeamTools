@@ -17,21 +17,21 @@ class RailTypeDraft {
     private String identifier;
     private String displayName;
     private XMaterial icon = XMaterial.RAIL;
-    private XMaterial railBlock = XMaterial.ANVIL;
-    private XMaterial blockBelow = XMaterial.GRAVEL;
-    private XMaterial sleeperBlock = XMaterial.SPRUCE_PLANKS;
+    private List<XMaterial> railBlocks = List.of(XMaterial.ANVIL);
+    private List<XMaterial> blocksBelow = List.of(XMaterial.GRAVEL);
+    private List<XMaterial> sleeperBlocks = List.of(XMaterial.SPRUCE_PLANKS);
     private int sleeperSpacing = RailType.MIN_SLEEPER_SPACING;
     private int trackCount = RailType.DEFAULT_TRACK_COUNT;
     private int trackSpacing = RailType.DEFAULT_TRACK_SPACING;
     private List<Integer> trackSpacings = new java.util.ArrayList<>(List.of(RailType.DEFAULT_TRACK_SPACING));
     private boolean overheadPolesEnabled = true;
-    private XMaterial overheadPoleBlock = XMaterial.LIGHT_GRAY_CONCRETE;
-    private XMaterial overheadSupportBlock = XMaterial.LIGHT_GRAY_CONCRETE;
+    private List<XMaterial> overheadPoleBlocks = List.of(XMaterial.LIGHT_GRAY_CONCRETE);
+    private List<XMaterial> overheadSupportBlocks = List.of(XMaterial.LIGHT_GRAY_CONCRETE);
     private int overheadPoleSpacing = RailType.DEFAULT_OVERHEAD_POLE_SPACING;
     private int overheadPoleOffset = RailType.DEFAULT_OVERHEAD_POLE_OFFSET;
     private int overheadPoleHeight = RailType.DEFAULT_OVERHEAD_POLE_HEIGHT;
     private boolean overheadWiresEnabled = true;
-    private XMaterial overheadWireBlock = XMaterial.IRON_BARS;
+    private List<XMaterial> overheadWireBlocks = List.of(XMaterial.IRON_BARS);
     private boolean trackSwitchesEnabled;
 
     static RailTypeDraft from(RailType railType, boolean keepIdentity) {
@@ -44,29 +44,72 @@ class RailTypeDraft {
         }
 
         draft.icon = railType.getIcon();
-        draft.railBlock = railType.getRailBlock();
-        draft.blockBelow = blocksBelow.isEmpty() ? XMaterial.GRAVEL : blocksBelow.getFirst();
-        draft.sleeperBlock = railType.getSleeperBlock() == null ? XMaterial.SPRUCE_PLANKS : railType.getSleeperBlock();
+        draft.railBlocks = railType.getRailBlocks().isEmpty() ? draft.railBlocks : List.copyOf(railType.getRailBlocks());
+        draft.blocksBelow = blocksBelow.isEmpty() ? List.of(XMaterial.GRAVEL) : List.copyOf(blocksBelow);
+        draft.sleeperBlocks = railType.getSleeperBlocks().isEmpty() ? draft.sleeperBlocks : List.copyOf(railType.getSleeperBlocks());
         draft.sleeperSpacing = railType.getSleeperSpacing();
         draft.trackCount = railType.getTrackCount();
         draft.trackSpacing = railType.getTrackSpacing();
         draft.trackSpacings = new java.util.ArrayList<>(railType.getTrackSpacings());
         draft.overheadPolesEnabled = railType.isOverheadPolesEnabled();
-        draft.overheadPoleBlock = railType.getOverheadPoleBlock() == null
-                ? XMaterial.LIGHT_GRAY_CONCRETE
-                : railType.getOverheadPoleBlock();
-        draft.overheadSupportBlock = railType.getOverheadSupportBlock() == null
-                ? XMaterial.LIGHT_GRAY_CONCRETE
-                : railType.getOverheadSupportBlock();
+        draft.overheadPoleBlocks = railType.getOverheadPoleBlocks().isEmpty() ? draft.overheadPoleBlocks : List.copyOf(railType.getOverheadPoleBlocks());
+        draft.overheadSupportBlocks = railType.getOverheadSupportBlocks().isEmpty() ? draft.overheadSupportBlocks : List.copyOf(railType.getOverheadSupportBlocks());
         draft.overheadPoleSpacing = railType.getOverheadPoleSpacing();
         draft.overheadPoleOffset = railType.getOverheadPoleOffset();
         draft.overheadPoleHeight = railType.getOverheadPoleHeight();
         draft.overheadWiresEnabled = railType.isOverheadWiresEnabled();
-        draft.overheadWireBlock = railType.getOverheadWireBlock() == null
-                ? XMaterial.IRON_BARS
-                : railType.getOverheadWireBlock();
+        draft.overheadWireBlocks = railType.getOverheadWireBlocks().isEmpty() ? draft.overheadWireBlocks : List.copyOf(railType.getOverheadWireBlocks());
         draft.trackSwitchesEnabled = railType.isTrackSwitchesEnabled();
         return draft;
+    }
+
+    XMaterial getBlockBelow() {
+        return blocksBelow.getFirst();
+    }
+
+    // The picker replaces the mix only after the user explicitly chooses a block.
+    void setBlockBelow(XMaterial blockBelow) {
+        blocksBelow = List.of(blockBelow);
+    }
+
+    XMaterial getRailBlock() {
+        return railBlocks.getFirst();
+    }
+
+    void setRailBlock(XMaterial material) {
+        railBlocks = List.of(material);
+    }
+
+    XMaterial getSleeperBlock() {
+        return sleeperBlocks.getFirst();
+    }
+
+    void setSleeperBlock(XMaterial material) {
+        sleeperBlocks = List.of(material);
+    }
+
+    XMaterial getOverheadPoleBlock() {
+        return overheadPoleBlocks.getFirst();
+    }
+
+    void setOverheadPoleBlock(XMaterial material) {
+        overheadPoleBlocks = List.of(material);
+    }
+
+    XMaterial getOverheadSupportBlock() {
+        return overheadSupportBlocks.getFirst();
+    }
+
+    void setOverheadSupportBlock(XMaterial material) {
+        overheadSupportBlocks = List.of(material);
+    }
+
+    XMaterial getOverheadWireBlock() {
+        return overheadWireBlocks.getFirst();
+    }
+
+    void setOverheadWireBlock(XMaterial material) {
+        overheadWireBlocks = List.of(material);
     }
 
     void setTrackCount(int trackCount) {

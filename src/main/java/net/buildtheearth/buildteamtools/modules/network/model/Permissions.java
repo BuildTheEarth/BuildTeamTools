@@ -15,6 +15,12 @@ public class Permissions {
 
 
     public static final String GENERATOR_USE = "btt.generator.use";
+    public static final String RAIL_GENERATOR_USE = "btt.generator.rail.use";
+    public static final String RAIL_TYPE_MENU = "btt.generator.rail.menu";
+    public static final String RAIL_TYPE_CREATE = "btt.generator.rail.create";
+    public static final String RAIL_TYPE_EDIT = "btt.generator.rail.edit";
+    public static final String RAIL_TYPE_DELETE = "btt.generator.rail.delete";
+    public static final String RAIL_MULTIPLE_TRACKS = "btt.generator.rail.multiple";
 
 
     public static final String BLOCK_PALETTE_EDIT = "btt.bp.edit";

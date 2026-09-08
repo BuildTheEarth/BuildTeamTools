@@ -1,4 +1,4 @@
-package net.buildtheearth.buildteamtools.modules.generator.components.rail;
+package net.buildtheearth.buildteamtools.modules.generator.components.rail.generation;
 
 record RailColumnKey(int x, int z) {
 

@@ -1,6 +1,8 @@
 package net.buildtheearth.buildteamtools.modules.network.model;
 
 import lombok.experimental.UtilityClass;
+import org.bukkit.command.CommandSender;
+import com.alpsbte.alpslib.utils.ChatHelper;
 
 @UtilityClass
 public class Permissions {
@@ -15,6 +17,12 @@ public class Permissions {
 
 
     public static final String GENERATOR_USE = "btt.generator.use";
+    public static final String RAIL_GENERATOR_USE = "btt.generator.rail.use";
+    public static final String RAIL_TYPE_MENU = "btt.generator.rail.menu";
+    public static final String RAIL_TYPE_CREATE = "btt.generator.rail.create";
+    public static final String RAIL_TYPE_EDIT = "btt.generator.rail.edit";
+    public static final String RAIL_TYPE_DELETE = "btt.generator.rail.delete";
+    public static final String RAIL_MULTIPLE_TRACKS = "btt.generator.rail.multiple";
 
 
     public static final String BLOCK_PALETTE_EDIT = "btt.bp.edit";
@@ -38,4 +46,17 @@ public class Permissions {
 
     public static final String AUTO_TPLL = "btt.global.autotpll";
 
+    /** Checks permission and sends the standard denial message when access is denied. */
+    public static boolean checkPermission(CommandSender sender, String permission) {
+        if (sender.hasPermission(permission))
+            return true;
+
+        sendNoPermissionMessage(sender, permission);
+        return false;
+    }
+
+    public static void sendNoPermissionMessage(CommandSender sender, String permission) {
+        sender.sendMessage(ChatHelper.getErrorComponent("You don't have permission to execute this command. Required " +
+                "permission: " + permission));
+    }
 }

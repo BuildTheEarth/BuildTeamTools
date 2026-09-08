@@ -1,4 +1,4 @@
-package net.buildtheearth.buildteamtools.modules.generator.components.rail;
+package net.buildtheearth.buildteamtools.modules.generator.components.rail.generation;
 
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import org.bukkit.Material;

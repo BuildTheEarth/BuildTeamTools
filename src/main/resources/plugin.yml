@@ -58,6 +58,9 @@ permissions:
     default: op
     children:
       btt.generator.use: true
+      btt.generator.rail.use: true
+      btt.generator.rail.menu: true
+      btt.generator.rail.multiple: true
   btt.permpack.admin:
     description: Contains all permissions for admins
     default: op
@@ -77,6 +80,28 @@ permissions:
       btt.warp.group.delete: true
       btt.notify.update: true
       btt.bp.edit: true
+      btt.generator.rail.create: true
+      btt.generator.rail.edit: true
+      btt.generator.rail.delete: true
+
+  btt.generator.rail.use:
+    description: Allows players to use the rail generator
+    default: op
+  btt.generator.rail.menu:
+    description: Allows players to open the rail type menu
+    default: op
+  btt.generator.rail.create:
+    description: Allows players to create custom rail types
+    default: op
+  btt.generator.rail.edit:
+    description: Allows players to edit custom rail types
+    default: op
+  btt.generator.rail.delete:
+    description: Allows players to delete custom rail types
+    default: op
+  btt.generator.rail.multiple:
+    description: Allows players to generate multiple parallel tracks
+    default: op
 
   btt.bp.use:
     description: Allows players to use /blockpalette

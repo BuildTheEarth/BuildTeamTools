@@ -12,28 +12,27 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NonNull;
 import org.lushplugins.pluginupdater.api.exception.InvalidVersionFormatException;
+import org.lushplugins.pluginupdater.api.notifier.UpdateNotifier;
 import org.lushplugins.pluginupdater.api.updater.Updater;
+import org.lushplugins.pluginupdater.api.version.Version;
 import org.lushplugins.pluginupdater.api.version.VersionDifference;
 import org.lushplugins.pluginupdater.api.version.comparator.SemVerComparator;
 import org.lushplugins.pluginupdater.api.version.comparator.VersionComparator;
 import org.lushplugins.pluginupdater.paper.api.PaperUpdater;
-import org.lushplugins.pluginupdater.paper.api.notification.PaperUpdateNotifier;
 
 import java.time.Duration;
 
 
 public class UpdaterComponent extends ModuleComponent {
 
-    private final Updater updater;
+    private final Updater<Player> updater;
     private final BuildTeamTools plugin;
 
     public UpdaterComponent(@NonNull BuildTeamTools plugin) {
         super("Updater");
         updater = PaperUpdater.builder(plugin)
-                .github("BuildTheEarth/BuildTeamTools")
+                .github(github -> github.repo("BuildTheEarth/BuildTeamTools"))
                 .notify(true)
-                .notificationMessage("<#ffe27a>A new <#e0c01b>%plugin% <#ffe27a>update is now available! " +
-                        "<#e0c01b>%current_version% <#ffe27a>-> <#e0c01b>%latest_version%") // Default message is no minimsg
                 .notificationPermission(Permissions.NOTIFY_UPDATE)
                 .build();
         this.plugin = plugin;
@@ -43,7 +42,7 @@ public class UpdaterComponent extends ModuleComponent {
 
     private void runAutoUpdateAfterCheck() {
         Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
-            if (updater.getPluginData().hasCheckRan()) {
+            if (updater.pluginData().hasCheckRan()) {
                 update(Bukkit.getConsoleSender(), false);
                 return;
             }
@@ -72,7 +71,7 @@ public class UpdaterComponent extends ModuleComponent {
             if (Boolean.TRUE.equals(success)) {
                 sender.sendMessage(ChatHelper.getSuccessComponent(
                         "Successfully updated plugin to version %s, restart the server to apply changes!",
-                        updater.getPluginData().getLatestVersion()
+                        updater.pluginData().latestVersion().flatMap(Version::version).orElse("unknown")
                 ));
 
                 notifyAllPlayersAboutUpdate(sender);
@@ -112,12 +111,12 @@ public class UpdaterComponent extends ModuleComponent {
                 return;
             }
 
-            if (sender instanceof Player p && updater.getNotifier() instanceof PaperUpdateNotifier paperUpdater) {
-                paperUpdater.handle(p);
+            if (sender instanceof Player p) {
+                updater.notifier().ifPresent((UpdateNotifier<Player> notifier) -> notifier.notify(p, null));
             } else {
                 sender.sendMessage(ChatHelper.getSuccessComponent(
                         "New update available for BuildTeamTools plugin: v%s.",
-                        updater.getPluginData().getLatestVersion()
+                        updater.pluginData().latestVersion().flatMap(Version::version).orElse("unknown")
                 ));
             }
         });
@@ -130,12 +129,13 @@ public class UpdaterComponent extends ModuleComponent {
      * @param p The Player to notify
      */
     public void notifyUpdate(@NonNull Player p) {
-        if (!updater.getPluginData().isAlreadyDownloaded()) return;
+        if (!updater.pluginData().isAlreadyDownloaded()) return;
 
         if (p.hasPermission(Permissions.NOTIFY_UPDATE)) {
             p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
             p.sendMessage("");
-            p.sendMessage("§6§l[BuildTeam Plugin] §eThe server automatically installed a new update (v" + updater.getPluginData().getLatestVersion() + ").");
+            p.sendMessage("§6§l[BuildTeam Plugin] §eThe server automatically installed a new update (v"
+                    + updater.pluginData().latestVersion().flatMap(Version::version).orElse("unknown") + ").");
             p.sendMessage("§6>> §ePlease restart or reload the server to activate it.");
             p.sendMessage("");
         }
@@ -163,8 +163,9 @@ public class UpdaterComponent extends ModuleComponent {
      * @param newVersion remote version
      * @param oldVersion current version
      * @param source The source of the version check, used for logging. Should be a human-readable string.
+     * @return true if the plugin should be updated, false otherwise.
      */
-    public boolean shouldUpdate(@NonNull String newVersion, String oldVersion, String source) {
+    public boolean shouldUpdate(@NonNull Version newVersion, Version oldVersion, String source) {
         return switch (getVersionDifference(newVersion, oldVersion, source)) {
             case MAJOR, MINOR, PATCH, BUILD -> true;
             case UNKNOWN, LATEST -> false;
@@ -180,12 +181,12 @@ public class UpdaterComponent extends ModuleComponent {
      * @param source         The source of the version check, used for logging. Should be a human-readable string.
      * @return The difference between the two versions. Unknown and latest mean the version is up to date/newer.
      */
-    public VersionDifference getVersionDifference(@NonNull String latestVersion, String currentVersion, String source) {
+    public VersionDifference getVersionDifference(@NonNull Version latestVersion, Version currentVersion, String source) {
 
         VersionComparator comparator = SemVerComparator.INSTANCE;
         VersionDifference versionDifference;
         try {
-            versionDifference = comparator.getVersionDifference(currentVersion, latestVersion);
+            versionDifference = comparator.compare(currentVersion, latestVersion);
         } catch (InvalidVersionFormatException e) {
             ChatHelper.logError("Failed to compare versions for '%s': %s", e, source);
             return VersionDifference.UNKNOWN;

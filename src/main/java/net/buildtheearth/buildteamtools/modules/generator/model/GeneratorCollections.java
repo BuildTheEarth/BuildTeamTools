@@ -15,6 +15,8 @@ import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jspecify.annotations.NonNull;
+import org.lushplugins.pluginupdater.api.version.Version;
+import org.lushplugins.pluginupdater.api.version.parser.RegexVersionParser;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -261,9 +263,9 @@ public class GeneratorCollections {
             if (!cfg.contains("version"))
                 return installGeneratorCollections(p, true);
 
-            String oldVersion = cfg.getString("version");
+            Version oldVersion = RegexVersionParser.INSTANCE.parse(cfg.getString("version"));
 
-            if (!CommonModule.getInstance().getUpdaterComponent().shouldUpdate(generatorCollectionsVersion, oldVersion,
+            if (!CommonModule.getInstance().getUpdaterComponent().shouldUpdate(RegexVersionParser.INSTANCE.parse(generatorCollectionsVersion), oldVersion,
                     "GeneratorCollections"))
                 return true;
             else

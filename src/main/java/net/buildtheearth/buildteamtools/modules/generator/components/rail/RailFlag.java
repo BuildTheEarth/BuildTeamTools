@@ -7,7 +7,9 @@ import org.jspecify.annotations.Nullable;
 
 public enum RailFlag implements Flag {
 
-    RAIL_TYPE("t", FlagType.RAIL_TYPE);
+    RAIL_TYPE("t", FlagType.RAIL_TYPE),
+    TRACK_COUNT("c", FlagType.INTEGER),
+    TRACK_SPACING("s", FlagType.INTEGER);
 
     @Getter
     private final String flag;

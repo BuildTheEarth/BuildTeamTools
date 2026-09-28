@@ -24,6 +24,8 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -99,11 +101,18 @@ public class NetworkAPI {
                         boolean hasBuildTeamToolsInstalled = (long) teamObject.get("hasBuildTeamToolsInstalled") == 1;
                         String mainServerIP = (String) teamObject.get("MainServerIP");
                         String teamID = (String) teamObject.get("ID");
-                        String serverName = getMainServerName(teamObject);
+                        MainServerResolver.Resolution mainServerResolution = getMainServerResolution(teamObject);
+                        String serverName = mainServerResolution.serverName();
                         String name = (String) teamObject.get("Name");
                         String blankName = (String) teamObject.get("BlankName");
                         boolean allowsTransfers = (long) teamObject.get("AllowsTransfers") == 1;
                         String tag = (String) teamObject.get("Tag");
+
+                        if (isConnected && mainServerIP != null && serverName == null) {
+                            BuildTeamTools.getInstance().getLogger().warning(String.format(
+                                    "Connected build team has an inconsistent network server mapping: ID=%s, tag=%s, mainServerIP=%s, registeredServerIPs=%s",
+                                    teamID, tag, mainServerIP, mainServerResolution.registeredServerIPs()));
+                        }
 
                         BuildTeam buildTeam = new BuildTeam(teamID, mainServerIP, name, blankName, serverName,
                                 isConnected, hasBuildTeamToolsInstalled, allowsTransfers, tag);
@@ -221,25 +230,27 @@ public class NetworkAPI {
             }
 
 
-            private @Nullable String getMainServerName(@NonNull JSONObject teamObject) {
+            private MainServerResolver.Resolution getMainServerResolution(@NonNull JSONObject teamObject) {
                 String mainServerIP = (String) teamObject.get("MainServerIP");
 
                 Object serversObject = teamObject.get("Servers");
-                if (!(serversObject instanceof JSONArray serversArray)) return null;
+                if (!(serversObject instanceof JSONArray serversArray)) {
+                    return MainServerResolver.resolve(mainServerIP, List.of());
+                }
 
-                String serverName = null;
+                List<MainServerResolver.ServerEntry> servers = new ArrayList<>();
 
                 for (Object object : serversArray.toArray()) {
-                    if (!(object instanceof JSONObject serverObject)) return null;
+                    if (!(object instanceof JSONObject serverObject)) continue;
 
-                    String serverIP = (String) serverObject.get("IP");
-                    if (serverIP.equals(mainServerIP)) {
-                        serverName = (String) serverObject.get("Name");
-                        break;
-                    }
-                    if (serverName == null) serverName = (String) serverObject.get("ServerName");
+                    Object serverIP = serverObject.get("IP");
+                    Object serverName = serverObject.get("Name");
+                    servers.add(new MainServerResolver.ServerEntry(
+                            serverName instanceof String ? (String) serverName : null,
+                            serverIP instanceof String ? (String) serverIP : null));
                 }
-                return serverName;
+
+                return MainServerResolver.resolve(mainServerIP, servers);
             }
 
             private int getArea(JSONObject regionObject) {

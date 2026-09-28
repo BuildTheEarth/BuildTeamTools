@@ -94,8 +94,21 @@ public class NavUtils {
         player.sendMessage("IP of " + buildteam + " is missing in Network API.");
     }
 
+    /**
+     * Sends a message when a connected build team's main IP cannot be mapped to a network server.
+     */
+    public static void sendInvalidNetworkMappingMessage(@NotNull Player player, String buildteam) {
+        player.sendMessage("§cThe team " + buildteam + " is temporarily unavailable because its network server configuration " +
+                "is inconsistent. Please contact a staff member.");
+    }
+
     public static @Nullable NavSwitchType determineSwitchPossibilityOrMsgPlayerIfNone(@NotNull Player player,
                                                                                       @NotNull BuildTeam targetBuildTeam) {
+        if (targetBuildTeam.isNetworkMappingMismatch()) {
+            sendInvalidNetworkMappingMessage(player, targetBuildTeam.getBlankName());
+            return null;
+        }
+
         if (targetBuildTeam.isConnected() && targetBuildTeam.getServerName() != null && NetworkModule.getInstance().getBuildTeam() != null && NetworkModule.getInstance().getBuildTeam().isConnected()) {
             return NavSwitchType.NETWORK;
         }

@@ -24,6 +24,8 @@ public class BuildTeam {
     @Getter
     private final String IP;
     @Getter
+    private final String configuredMainServerIP;
+    @Getter
     private final String name;
     @Getter
     private final String blankName;
@@ -42,6 +44,8 @@ public class BuildTeam {
     private final boolean allowsTransfers;
     @Getter
     private final String tag;
+    @Getter
+    private final boolean networkMappingMismatch;
 
 
     public BuildTeam(String ID, String serverIP, String name, String blankName, String serverName,
@@ -50,6 +54,8 @@ public class BuildTeam {
         this.name = name;
         this.blankName = blankName;
         this.serverName = serverName;
+        this.configuredMainServerIP = serverIP;
+        this.networkMappingMismatch = isConnected && serverIP != null && serverName == null;
         // We need to verify the Data manually, because NwApi is quite scuffed
         this.isConnected = isConnected && (serverName != null && !serverName.isEmpty());
         this.hasBTToolsInstalled = hasBTToolsInstalled;

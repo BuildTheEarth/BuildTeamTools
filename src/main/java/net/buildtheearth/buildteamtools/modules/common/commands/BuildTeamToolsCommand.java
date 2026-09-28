@@ -28,7 +28,7 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String @NotNull [] args) {
 
         if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS)) {
-            Utils.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS);
+            Permissions.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS);
             return true;
         }
 
@@ -40,7 +40,7 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
         switch (args[0].toLowerCase()) {
             case "communicators" -> {
                 if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_COMMUNICATORS)) {
-                    Utils.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_COMMUNICATORS);
+                    Permissions.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_COMMUNICATORS);
                     return true;
                 }
 
@@ -70,7 +70,7 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
 
     private static void debugCommand(@NonNull CommandSender sender, String @NonNull [] args) {
         if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_DEBUG)) {
-            Utils.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_DEBUG);
+            Permissions.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_DEBUG);
             return;
         }
 
@@ -88,7 +88,7 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
 
     private static void cacheCommand(@NonNull CommandSender sender, String @NonNull [] args) {
         if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_CACHE)) {
-            Utils.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_CACHE);
+            Permissions.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_CACHE);
             return;
         }
 
@@ -110,7 +110,7 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
 
     private static void reloadCommand(@NonNull CommandSender sender) {
         if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_RELOAD)) {
-            Utils.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_RELOAD);
+            Permissions.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_RELOAD);
             return;
         }
 
@@ -127,7 +127,7 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
 
     private void updateCommand(@NotNull CommandSender sender) {
         if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_UPDATE)) {
-            Utils.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_UPDATE);
+            Permissions.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_UPDATE);
             return;
         }
 

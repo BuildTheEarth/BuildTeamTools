@@ -7,7 +7,7 @@ import lombok.Getter;
 import net.buildtheearth.buildteamtools.modules.generator.components.field.CropStage;
 import net.buildtheearth.buildteamtools.modules.generator.components.field.CropType;
 import net.buildtheearth.buildteamtools.modules.generator.components.house.RoofType;
-import net.buildtheearth.buildteamtools.modules.generator.components.rail.RailType;
+import net.buildtheearth.buildteamtools.modules.generator.components.rail.configuration.RailType;
 import net.buildtheearth.buildteamtools.modules.generator.components.tree.TreeType;
 import net.buildtheearth.buildteamtools.modules.generator.components.tree.TreeWidth;
 

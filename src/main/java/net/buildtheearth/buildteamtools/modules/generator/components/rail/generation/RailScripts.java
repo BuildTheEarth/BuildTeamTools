@@ -1,12 +1,18 @@
-package net.buildtheearth.buildteamtools.modules.generator.components.rail;
+package net.buildtheearth.buildteamtools.modules.generator.components.rail.generation;
 
 import com.alpsbte.alpslib.utils.ChatHelper;
 import com.alpsbte.alpslib.utils.GeneratorUtils;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BlockState;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.modules.generator.components.rail.RailFlag;
+import net.buildtheearth.buildteamtools.modules.generator.components.rail.RailSettings;
+import net.buildtheearth.buildteamtools.modules.generator.components.rail.configuration.RailType;
 import net.buildtheearth.buildteamtools.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.buildteamtools.modules.generator.model.Script;
 import net.buildtheearth.buildteamtools.modules.generator.model.Settings;
+import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -20,7 +26,7 @@ import java.util.Map;
 public class RailScripts extends Script {
 
     private static final int SELECTION_PADDING = 4;
-    private static final int SELECTION_VERTICAL_PADDING = 12;
+    private static final int SELECTION_VERTICAL_PADDING = RailType.MAX_OVERHEAD_POLE_HEIGHT + 2;
     private static final int PREPARE_SELECTION_EXPANSION = 8;
 
     private static final long BLOCK_PLACEMENT_START_PERCENTAGE = 95L;
@@ -42,23 +48,27 @@ public class RailScripts extends Script {
     private static final long RAIL_BLOCK_BUILD_ESTIMATED_MILLIS = 1_800L;
     private static final long QUEUE_OPERATIONS_ESTIMATED_MILLIS = 300L;
 
-    private static final int DEFAULT_RAIL_LANE_COUNT = 1;
-    private static final int DEFAULT_RAIL_LANE_SPACING = 5;
-
     private Block[][][] blocks;
     private List<Vector> controlPoints = new ArrayList<>();
     private List<Vector> centerPath = new ArrayList<>();
     private RailTerrainResolver terrainResolver;
-    private RailType railType = RailType.STANDARD;
+    private RailType railType = RailType.getDefault();
+    private int trackCount = RailType.DEFAULT_TRACK_COUNT;
+    private List<Integer> trackSpacings = List.of(RailType.DEFAULT_TRACK_SPACING);
     private final RailLimits limits;
     private final RailPreparationProgress preparationProgress;
     private final Runnable preparationFinishedCallback;
     private int railReferenceY;
+    private Region generationRegion;
 
     public RailScripts(Player player, GeneratorComponent generatorComponent, Runnable preparationFinishedCallback) {
         super(player, generatorComponent);
         this.limits = RailLimits.fromConfig();
-        this.preparationProgress = new RailPreparationProgress(player, BLOCK_PLACEMENT_START_PERCENTAGE, PROGRESS_UPDATE_INTERVAL_TICKS);
+        this.preparationProgress = new RailPreparationProgress(
+                player,
+                BLOCK_PLACEMENT_START_PERCENTAGE,
+                PROGRESS_UPDATE_INTERVAL_TICKS
+        );
         this.preparationFinishedCallback = preparationFinishedCallback;
 
         preparationProgress.start();
@@ -90,6 +100,10 @@ public class RailScripts extends Script {
     private boolean prepareSession() {
         if (!canContinue()) return false;
 
+        railType = getRailType();
+
+        if (!resolveTrackLayout()) return false;
+
         controlPoints = getControlPoints();
         railReferenceY = getRailReferenceY(controlPoints);
         preparationProgress.completeStage(CONTROL_POINTS_PROGRESS);
@@ -104,7 +118,6 @@ public class RailScripts extends Script {
         if (!hasValidCenterPath()) return false;
 
         preparationProgress.startStage(PATH_PROGRESS, SAFETY_CHECK_PROGRESS, SAFETY_CHECK_ESTIMATED_MILLIS);
-        if (!hasSafeEstimatedBlockCount(centerPath)) return false;
 
         int selectionMinY = getSelectionMinY(controlPoints);
         int selectionMaxY = getSelectionMaxY(controlPoints);
@@ -121,6 +134,7 @@ public class RailScripts extends Script {
                 selectionMinY,
                 selectionMaxY
         );
+        generationRegion = GeneratorUtils.getWorldEditSelection(getPlayer());
 
         blocks = GeneratorUtils.prepareScriptSession(
                 localSession,
@@ -132,6 +146,11 @@ public class RailScripts extends Script {
                 false,
                 false
         );
+        if (blocks == null) {
+            sendRailError("Region not readable. Please report this to the developers of the BuildTeamTool plugin.");
+            return false;
+        }
+
         terrainResolver = new RailTerrainResolver(blocks);
         preparationProgress.completeStage(TERRAIN_PREPARE_PROGRESS);
 
@@ -141,7 +160,6 @@ public class RailScripts extends Script {
         snapMissingControlPointHeightsToTerrain(controlPoints);
         centerPath = createCenterPath(controlPoints);
         adjustCenterPathToTerrain();
-        railType = getRailType();
         preparationProgress.completeStage(TERRAIN_ADJUST_PROGRESS);
 
         return true;
@@ -154,8 +172,33 @@ public class RailScripts extends Script {
             return false;
 
         preparationProgress.startStage(TERRAIN_ADJUST_PROGRESS, RAIL_BLOCK_BUILD_PROGRESS, RAIL_BLOCK_BUILD_ESTIMATED_MILLIS);
-        Map<PositionKey, BlockState> railBlocks = buildRailBlocks(centerPath);
+        List<List<Vector>> railCenterPaths = new RailLanePathBuilder(controlPoints, terrainResolver, trackCount, trackSpacings)
+                .createRailCenterPaths(centerPath);
+
+        if (railCenterPaths.size() < trackCount) {
+            sendRailError(
+                    "Rail Generator could not create %s parallel tracks with spacing %s along this path. "
+                            + "Reduce the track count or spacings, or use a less sharp curve.",
+                    trackCount,
+                    trackSpacings
+            );
+            return false;
+        }
+
+        if (new RailPathOverlapValidator().hasOverlap(railCenterPaths)) {
+            sendRailError(
+                    "The parallel tracks overlap in this curve. Reduce the track count or spacing, "
+                            + "or make the selected path less sharp."
+            );
+            return false;
+        }
+
+        Map<PositionKey, BlockState> railBlocks = buildRailBlocks(railCenterPaths);
+        new RailOverheadBuilder(terrainResolver, railType).addTo(railBlocks, railCenterPaths);
         preparationProgress.completeStage(RAIL_BLOCK_BUILD_PROGRESS);
+
+        if (!isInsideGenerationRegion(railBlocks))
+            return false;
 
         if (railBlocks.size() > limits.maxBlockPlacements()) {
             sendRailError(
@@ -183,9 +226,23 @@ public class RailScripts extends Script {
         return true;
     }
 
+    private boolean isInsideGenerationRegion(Map<PositionKey, BlockState> railBlocks) {
+        if (generationRegion != null && railBlocks.keySet().stream().allMatch(position -> generationRegion.contains(
+                BlockVector3.at(position.x(), position.y(), position.z())
+        )))
+            return true;
+
+        sendRailError(
+                "The generated railway does not fit inside its safe generation area. "
+                        + "Reduce the track count or spacing, disable overhead poles, or use a less sharp curve."
+        );
+        return false;
+    }
+
     private void queueRailBlockPlacements(Map<PositionKey, BlockState> railBlocks) {
         List<Vector> positions = new ArrayList<>(limits.blockPlacementBatchSize());
         List<BlockState> blockStates = new ArrayList<>(limits.blockPlacementBatchSize());
+
 
         for (Map.Entry<PositionKey, BlockState> entry : railBlocks.entrySet()) {
             positions.add(entry.getKey().toVector());
@@ -253,16 +310,6 @@ public class RailScripts extends Script {
         }
 
         return true;
-    }
-
-    private boolean hasSafeEstimatedBlockCount(List<Vector> path) {
-        long estimatedBlocks = (long) path.size() * getRailLaneCount() * 5L;
-
-        if (estimatedBlocks <= limits.maxBlockPlacements())
-            return true;
-
-        sendRailError("Rail Generator would likely place too many blocks. Split the rail into smaller selections.");
-        return false;
     }
 
     private boolean hasSafePreparedSelection(List<Vector> selectionPoints, int minY, int maxY) {
@@ -358,33 +405,74 @@ public class RailScripts extends Script {
     }
 
     private int getSelectionPadding() {
-        int sideLaneCount = (getRailLaneCount() - 1) / 2;
-        return SELECTION_PADDING + (getRailLaneSpacing() * sideLaneCount) + 2;
+        int totalTrackSpan = trackSpacings.stream().mapToInt(Integer::intValue).sum();
+        int maxLaneOffset = (int) Math.ceil(totalTrackSpan / 2.0D);
+        int overheadPoleOffset = railType.hasOverheadPoles() ? railType.getOverheadPoleOffset() : 0;
+        return SELECTION_PADDING + maxLaneOffset + overheadPoleOffset + 2;
     }
 
     private List<Vector> createCenterPath(List<Vector> points) {
         return GeneratorUtils.removeOrthogonalCorners(GeneratorUtils.createShortestBlockPath(points));
     }
 
-    private Map<PositionKey, BlockState> buildRailBlocks(List<Vector> path) {
+    private Map<PositionKey, BlockState> buildRailBlocks(List<List<Vector>> railCenterPaths) {
         return new RailBlockBuilder(
-                controlPoints,
                 terrainResolver,
                 railType,
                 preparationProgress,
-                getRailLaneCount(),
-                getRailLaneSpacing(),
                 TERRAIN_ADJUST_PROGRESS,
                 RAIL_BLOCK_BUILD_PROGRESS
-        ).build(path);
+        ).build(railCenterPaths);
     }
 
-    private int getRailLaneCount() {
-        return DEFAULT_RAIL_LANE_COUNT;
+    private boolean resolveTrackLayout() {
+        trackCount = railType.getTrackCount();
+        int trackSpacing = railType.getTrackSpacing();
+        trackSpacings = railType.getTrackSpacings();
+
+        Integer trackCountFlag = getIntegerSetting(RailFlag.TRACK_COUNT);
+        Integer trackSpacingFlag = getIntegerSetting(RailFlag.TRACK_SPACING);
+
+        if (trackCountFlag != null)
+            trackCount = trackCountFlag;
+
+        if (trackSpacingFlag != null) {
+            trackSpacing = trackSpacingFlag;
+            trackSpacings = Collections.nCopies(Math.max(0, trackCount - 1), trackSpacing);
+        } else if (trackCount != railType.getTrackCount()) {
+            trackSpacings = Collections.nCopies(Math.max(0, trackCount - 1), trackSpacing);
+        }
+
+        if (trackCount < RailType.MIN_TRACK_COUNT || trackCount > RailType.MAX_TRACK_COUNT) {
+            sendRailError("Track count must be between %s and %s.", RailType.MIN_TRACK_COUNT, RailType.MAX_TRACK_COUNT);
+            return false;
+        }
+
+        if (trackSpacing < RailType.MIN_TRACK_SPACING || trackSpacing > RailType.MAX_TRACK_SPACING) {
+            sendRailError("Track spacing must be between %s and %s.", RailType.MIN_TRACK_SPACING, RailType.MAX_TRACK_SPACING);
+            return false;
+        }
+
+        if (trackSpacings.size() != Math.max(0, trackCount - 1)
+                || trackSpacings.stream().anyMatch(spacing -> spacing < RailType.MIN_TRACK_SPACING
+                || spacing > RailType.MAX_TRACK_SPACING)) {
+            sendRailError("Every track spacing must be between %s and %s.",
+                    RailType.MIN_TRACK_SPACING, RailType.MAX_TRACK_SPACING);
+            return false;
+        }
+
+        return trackCount == RailType.MIN_TRACK_COUNT
+                || Permissions.checkPermission(getPlayer(), Permissions.RAIL_MULTIPLE_TRACKS);
     }
 
-    private int getRailLaneSpacing() {
-        return DEFAULT_RAIL_LANE_SPACING;
+    private Integer getIntegerSetting(RailFlag flag) {
+        Settings settings = getGeneratorComponent().getPlayerSettings().get(getPlayer().getUniqueId());
+
+        if (!(settings instanceof RailSettings railSettings))
+            return null;
+
+        Object value = railSettings.getValues().get(flag);
+        return value instanceof Integer intValue ? intValue : null;
     }
 
     private void snapMissingControlPointHeightsToTerrain(List<Vector> points) {
@@ -400,7 +488,12 @@ public class RailScripts extends Script {
         for (int index = 0; index < centerPath.size(); index++) {
             Vector point = centerPath.get(index);
             point.setY(terrainResolver.getNearestRailSurfaceY(point.getBlockX(), point.getBlockZ(), point.getBlockY()));
-            preparationProgress.update(preparationProgress.scale(index + 1, centerPath.size(), TERRAIN_PREPARE_PROGRESS, TERRAIN_ADJUST_PROGRESS));
+            preparationProgress.update(preparationProgress.scale(
+                    index + 1,
+                    centerPath.size(),
+                    TERRAIN_PREPARE_PROGRESS,
+                    TERRAIN_ADJUST_PROGRESS
+            ));
         }
     }
 
@@ -429,10 +522,10 @@ public class RailScripts extends Script {
         Settings settings = getGeneratorComponent().getPlayerSettings().get(getPlayer().getUniqueId());
 
         if (!(settings instanceof RailSettings railSettings))
-            return RailType.STANDARD;
+            return RailType.getDefault();
 
         Object value = railSettings.getValues().get(RailFlag.RAIL_TYPE);
-        return value instanceof RailType selectedRailType ? selectedRailType : RailType.STANDARD;
+        return value instanceof RailType selectedRailType ? selectedRailType : RailType.getDefault();
     }
 
 }

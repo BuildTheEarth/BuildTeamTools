@@ -1,4 +1,4 @@
-package net.buildtheearth.buildteamtools.modules.generator.components.rail;
+package net.buildtheearth.buildteamtools.modules.generator.components.rail.generation;
 
 import com.alpsbte.alpslib.utils.ChatHelper;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
@@ -6,18 +6,21 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
+
 final class RailPreparationProgress implements Runnable {
 
     private final Player player;
     private final long maxPercentage;
     private final long updateIntervalTicks;
-    private volatile BukkitTask task;
-    private volatile long stageStartPercentage;
-    private volatile long stageEndPercentage;
-    private volatile long stageStartedAtMillis = System.currentTimeMillis();
-    private volatile long stageEstimatedDurationMillis = 1L;
-    private volatile long queuedPercentage = -1L;
-    private volatile long lastSentPercentage = -1L;
+    private final AtomicReference<BukkitTask> task = new AtomicReference<>();
+    private final AtomicLong stageStartPercentage = new AtomicLong();
+    private final AtomicLong stageEndPercentage = new AtomicLong();
+    private final AtomicLong stageStartedAtMillis = new AtomicLong(System.currentTimeMillis());
+    private final AtomicLong stageEstimatedDurationMillis = new AtomicLong(1L);
+    private final AtomicLong queuedPercentage = new AtomicLong(-1L);
+    private final AtomicLong lastSentPercentage = new AtomicLong(-1L);
 
     RailPreparationProgress(Player player, long maxPercentage, long updateIntervalTicks) {
         this.player = player;
@@ -29,36 +32,39 @@ final class RailPreparationProgress implements Runnable {
         if (!canContinue())
             return;
 
-        if (task != null)
+        if (task.get() != null)
             return;
 
-        task = Bukkit.getScheduler().runTaskTimerAsynchronously(
+        BukkitTask newTask = Bukkit.getScheduler().runTaskTimerAsynchronously(
                 BuildTeamTools.getInstance(),
                 this,
                 0L,
                 updateIntervalTicks
         );
+
+        if (!task.compareAndSet(null, newTask))
+            newTask.cancel();
     }
 
     void stop() {
-        BukkitTask currentTask = task;
+        BukkitTask currentTask = task.getAndSet(null);
 
         if (currentTask == null)
             return;
 
         currentTask.cancel();
-        task = null;
     }
 
     void startStage(long startPercentage, long endPercentage, long estimatedDurationMillis) {
         if (!canContinue())
             return;
 
-        stageStartPercentage = clamp(startPercentage);
-        stageEndPercentage = clamp(endPercentage);
-        stageStartedAtMillis = System.currentTimeMillis();
-        stageEstimatedDurationMillis = Math.max(1L, estimatedDurationMillis);
-        update(stageStartPercentage);
+        long clampedStartPercentage = clamp(startPercentage);
+        stageStartPercentage.set(clampedStartPercentage);
+        stageEndPercentage.set(clamp(endPercentage));
+        stageStartedAtMillis.set(System.currentTimeMillis());
+        stageEstimatedDurationMillis.set(Math.max(1L, estimatedDurationMillis));
+        update(clampedStartPercentage);
     }
 
     void completeStage(long percentage) {
@@ -71,14 +77,14 @@ final class RailPreparationProgress implements Runnable {
 
         long clampedPercentage = clamp(percentage);
 
-        if (clampedPercentage <= queuedPercentage)
+        if (clampedPercentage <= queuedPercentage.get())
             return;
 
-        queuedPercentage = clampedPercentage;
-        if (clampedPercentage <= lastSentPercentage)
+        queuedPercentage.set(clampedPercentage);
+        if (clampedPercentage <= lastSentPercentage.get())
             return;
 
-        lastSentPercentage = clampedPercentage;
+        lastSentPercentage.set(clampedPercentage);
         player.sendActionBar(ChatHelper.getStandardComponent(false, "Generator Progress: %s", clampedPercentage + "%"));
     }
 
@@ -86,7 +92,7 @@ final class RailPreparationProgress implements Runnable {
         if (total <= 0)
             return endPercentage;
 
-        double progress = Math.max(0D, Math.min(1D, (double) completed / (double) total));
+        double progress = Math.clamp((double) completed / (double) total, 0D, 1D);
         return startPercentage + Math.round(progress * (endPercentage - startPercentage));
     }
 
@@ -97,14 +103,14 @@ final class RailPreparationProgress implements Runnable {
             return;
         }
 
-        long currentStageStart = stageStartPercentage;
-        long currentStageEnd = stageEndPercentage;
+        long currentStageStart = stageStartPercentage.get();
+        long currentStageEnd = stageEndPercentage.get();
 
         if (currentStageEnd <= currentStageStart)
             return;
 
-        long elapsedMillis = Math.max(0L, System.currentTimeMillis() - stageStartedAtMillis);
-        double progress = Math.min(0.98D, (double) elapsedMillis / (double) stageEstimatedDurationMillis);
+        long elapsedMillis = Math.max(0L, System.currentTimeMillis() - stageStartedAtMillis.get());
+        double progress = Math.clamp((double) elapsedMillis / (double) stageEstimatedDurationMillis.get(), 0D, 0.98D);
         long estimatedPercentage = currentStageStart + (long) Math.floor(progress * (currentStageEnd - currentStageStart));
 
         if (estimatedPercentage >= currentStageEnd)
@@ -114,7 +120,7 @@ final class RailPreparationProgress implements Runnable {
     }
 
     private long clamp(long percentage) {
-        return Math.max(0L, Math.min(maxPercentage, percentage));
+        return Math.clamp(percentage, 0L, maxPercentage);
     }
 
     private boolean canContinue() {

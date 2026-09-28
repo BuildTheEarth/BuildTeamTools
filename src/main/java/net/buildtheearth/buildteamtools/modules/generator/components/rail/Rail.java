@@ -6,9 +6,14 @@ import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
+import lombok.Getter;
+import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
+import net.buildtheearth.buildteamtools.modules.generator.components.rail.configuration.RailTypeManager;
+import net.buildtheearth.buildteamtools.modules.generator.components.rail.generation.RailScripts;
 import net.buildtheearth.buildteamtools.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.buildteamtools.modules.generator.model.GeneratorType;
+import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
@@ -20,8 +25,12 @@ public class Rail extends GeneratorComponent {
 
     private final Set<UUID> preparingPlayers = ConcurrentHashMap.newKeySet();
 
+    @Getter
+    private final RailTypeManager railTypeManager;
+
     public Rail() {
         super(GeneratorType.RAIL);
+        railTypeManager = new RailTypeManager(BuildTeamTools.getInstance().getDataFolder());
     }
 
     @Override
@@ -38,7 +47,7 @@ public class Rail extends GeneratorComponent {
                 "Rail Generator supports cuboid, polygonal and convex WorldEdit selections."
         )));
         player.closeInventory();
-        player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+        playSound(player, Sound.ENTITY_ITEM_BREAK);
         return false;
     }
 
@@ -50,6 +59,9 @@ public class Rail extends GeneratorComponent {
 
     @Override
     public void generate(Player player) {
+        if (!Permissions.checkPermission(player, Permissions.RAIL_GENERATOR_USE))
+            return;
+
         if (GeneratorModule.getInstance().isGenerating(player) || !preparingPlayers.add(player.getUniqueId())) {
             sendAlreadyGeneratingMessage(player);
             return;
@@ -67,6 +79,10 @@ public class Rail extends GeneratorComponent {
         player.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
                 "Rail Generator is already running. Please wait until the current generation is finished."
         )));
-        player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+        playSound(player, Sound.ENTITY_ITEM_BREAK);
+    }
+
+    private void playSound(Player player, Sound sound) {
+        player.playSound(player, sound, 1.0F, 1.0F);
     }
 }

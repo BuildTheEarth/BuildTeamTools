@@ -1,4 +1,4 @@
-package net.buildtheearth.buildteamtools.modules.generator.components.rail;
+package net.buildtheearth.buildteamtools.modules.generator.components.rail.generation;
 
 import org.bukkit.util.Vector;
 

@@ -46,6 +46,9 @@ public class Permissions {
 
     public static final String AUTO_TPLL = "btt.global.autotpll";
 
+    public static final String ADDRESS_GET = "btt.address.get";
+    public static final String ADDRESS_TELEPORT = "btt.address.teleport";
+  
     /** Checks permission and sends the standard denial message when access is denied. */
     public static boolean checkPermission(CommandSender sender, String permission) {
         if (sender.hasPermission(permission))

@@ -5,7 +5,6 @@ import net.buildtheearth.Projection;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.network.api.PhotonAPI;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
-import net.buildtheearth.buildteamtools.utils.Utils;
 import net.buildtheearth.model.GeographicalCoordinate;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -53,7 +52,7 @@ public class AddressCommand implements CommandExecutor, TabCompleter {
 
     private boolean handleGetCommand(@NonNull Player player, String @NonNull [] args) {
         if (!player.hasPermission(Permissions.ADDRESS_GET)) {
-            Utils.sendNoPermissionMessage(player, Permissions.ADDRESS_GET);
+            Permissions.sendNoPermissionMessage(player, Permissions.ADDRESS_GET);
             return true;
         }
 
@@ -128,7 +127,7 @@ public class AddressCommand implements CommandExecutor, TabCompleter {
 
     private boolean handleTeleportCommand(@NonNull Player player, String @NonNull [] args) {
         if (!player.hasPermission(Permissions.ADDRESS_TELEPORT)) {
-            Utils.sendNoPermissionMessage(player, Permissions.ADDRESS_TELEPORT);
+            Permissions.sendNoPermissionMessage(player, Permissions.ADDRESS_TELEPORT);
             return true;
         }
 

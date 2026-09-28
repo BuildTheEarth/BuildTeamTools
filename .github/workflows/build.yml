@@ -19,11 +19,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0       # full history
-          fetch-tags: true     # grab your tags
-          # Make sure we check out by branch name, not just SHA:
-          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
 
       - name: Set up JDK 21
         uses: actions/setup-java@v5

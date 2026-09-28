@@ -115,6 +115,21 @@ public class PhotonAPI {
 
         JSONArray features = (JSONArray) jsonObject.get("features");
 
+        JSONArray coordinates = getCoordinates(features);
+
+        if (coordinates == null || coordinates.size() < 2) {
+            throw new IllegalArgumentException(
+                    "Invalid coordinates in Photon response."
+            );
+        }
+
+        double longitude = ((Number) coordinates.get(0)).doubleValue();
+        double latitude = ((Number) coordinates.get(1)).doubleValue();
+
+        return new GeographicalCoordinate(latitude, longitude);
+    }
+
+    private static JSONArray getCoordinates(JSONArray features) {
         if (features == null || features.isEmpty()) {
             throw new IllegalArgumentException(
                     "No address data found for this address."
@@ -131,17 +146,6 @@ public class PhotonAPI {
             );
         }
 
-        JSONArray coordinates = (JSONArray) geometry.get("coordinates");
-
-        if (coordinates == null || coordinates.size() < 2) {
-            throw new IllegalArgumentException(
-                    "Invalid coordinates in Photon response."
-            );
-        }
-
-        double longitude = ((Number) coordinates.get(0)).doubleValue();
-        double latitude = ((Number) coordinates.get(1)).doubleValue();
-
-        return new GeographicalCoordinate(latitude, longitude);
+        return (JSONArray) geometry.get("coordinates");
     }
 }

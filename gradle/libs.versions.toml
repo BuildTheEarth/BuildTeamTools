@@ -29,25 +29,25 @@ googlecode-gson = "2.14.0"
 # https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple
 googlecode-json-simple = "1.1.1"
 # https://github.com/urbancamo/javaapiforkml
-javaapiforkml = "3.0.11"
+javaapiforkml = "3.1.2"
 # https://mvnrepository.com/artifact/org.json/json
-json = "20260522"
+json = "20260814"
 # https://central.sonatype.com/artifact/com.squareup.okhttp3/okhttp-jvm
-okhttp-jvm = "5.4.0"
+okhttp-jvm = "5.5.0"
 # @pin 26.1+ required Java 25 - # https://artifactory.papermc.io/ui/native/universe/io/papermc/paper/paper-api/
 paper-api = "1.21.11-R0.1-SNAPSHOT"
 # @pin XSeries messed up the releases - can be remove once a newer version then 13.8.0 is released https://github.com/CryptoMorin/XSeries/releases
 xseries = "13.7.1"
 # https://github.com/OakLoaf/PluginUpdater/releases https://repo.lushplugins.org/#/releases/org/lushplugins/pluginupdater/updater.paper-api
-pluginupdater = "3.0.0"
+pluginupdater = "4.1.0"
 #
 # Plugins
 # https://github.com/palantir/gradle-git-version/releases
-git-version = "5.0.0"
+git-version = "5.1.0"
 # https://plugins.gradle.org/plugin/io.freefair.lombok
 lombok-plugin = "9.5.0"
 # https://github.com/GradleUp/shadow/releases
-shadow = "9.4.3"
+shadow = "9.6.1"
 
 [libraries]
 alpsbte-canvas = { module = "com.alpsbte:canvas", version.ref = "alpsbte-canvas" }

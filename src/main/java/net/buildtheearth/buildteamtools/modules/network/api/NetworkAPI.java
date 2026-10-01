@@ -11,7 +11,6 @@ import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Continent;
 import net.buildtheearth.buildteamtools.modules.network.model.Region;
 import net.buildtheearth.buildteamtools.modules.network.model.RegionType;
-import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
 import net.buildtheearth.model.GeographicalCoordinate;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -21,7 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,7 +36,7 @@ public class NetworkAPI {
      * @param installed if the plugin is installed
      */
     public static void setBuildTeamToolsInstalled(boolean installed) {
-        String apiKey = BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY);
+        String apiKey = BuildTeamTools.getInstance().getMainConfig().apiKey();
 
         JSONObject requestBodyJson = new JSONObject();
         requestBodyJson.put("hasBuildTeamToolsInstalled", installed);
@@ -278,7 +276,7 @@ public class NetworkAPI {
     public static @NotNull CompletableFuture<Void> setupCurrentServerData() {
         CompletableFuture<Void> future = new CompletableFuture<>();
 
-        getOneAsync("https://nwapi.buildtheearth.net/api/teams/" + BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY), new API.ApiResponseCallback() {
+        getOneAsync("https://nwapi.buildtheearth.net/api/teams/" + BuildTeamTools.getInstance().getMainConfig().apiKey(), new API.ApiResponseCallback() {
             @Override
             public void onResponse(String response) {
                 try {
@@ -326,28 +324,28 @@ public class NetworkAPI {
     }
 
     public static void createWarp(Warp warp, API.ApiResponseCallback callback) {
-        String apiKey = BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY);
+        String apiKey = BuildTeamTools.getInstance().getMainConfig().apiKey();
 
         RequestBody requestBody = RequestBody.create(warp.toJSON().toString(), MediaType.parse("application/json"));
         API.postAsync("https://nwapi.buildtheearth.net/api/teams/" + apiKey + "/warps", requestBody, callback);
     }
 
     public static void createWarpGroup(WarpGroup warpGroup, API.ApiResponseCallback callback) {
-        String apiKey = BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY);
+        String apiKey = BuildTeamTools.getInstance().getMainConfig().apiKey();
 
         RequestBody requestBody = RequestBody.create(warpGroup.toJSON().toString(), MediaType.parse("application/json"));
         API.postAsync("https://nwapi.buildtheearth.net/api/teams/" + apiKey + "/warpgroups", requestBody, callback);
     }
 
     public static void updateWarp(Warp warp, API.ApiResponseCallback callback) {
-        String apiKey = BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY);
+        String apiKey = BuildTeamTools.getInstance().getMainConfig().apiKey();
 
         RequestBody requestBody = RequestBody.create(warp.toJSON().toString(), MediaType.parse("application/json"));
         API.putAsync("https://nwapi.buildtheearth.net/api/teams/" + apiKey + "/warps", requestBody, callback);
     }
 
     public static void updateWarpGroup(WarpGroup warpGroup, API.ApiResponseCallback callback) {
-        String apiKey = BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY);
+        String apiKey = BuildTeamTools.getInstance().getMainConfig().apiKey();
 
         RequestBody requestBody = RequestBody.create(warpGroup.toJSON().toString(), MediaType.parse("application/json"));
         API.putAsync("https://nwapi.buildtheearth.net/api/teams/" + apiKey + "/warpgroups", requestBody, callback);
@@ -355,7 +353,7 @@ public class NetworkAPI {
 
     @SuppressWarnings("unchecked")
     public static void deleteWarp(Warp warp, API.ApiResponseCallback callback) {
-        String apiKey = BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY);
+        String apiKey = BuildTeamTools.getInstance().getMainConfig().apiKey();
 
         JSONObject requestBodyJson = new JSONObject();
         requestBodyJson.put("key", warp.getId().toString());
@@ -368,7 +366,7 @@ public class NetworkAPI {
 
     @SuppressWarnings("unchecked")
     public static void deleteWarpGroup(WarpGroup warpGroup, API.ApiResponseCallback callback) {
-        String apiKey = BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY);
+        String apiKey = BuildTeamTools.getInstance().getMainConfig().apiKey();
 
         JSONObject requestBodyJson = new JSONObject();
         requestBodyJson.put("key", warpGroup.getId().toString());
@@ -384,7 +382,7 @@ public class NetworkAPI {
         if (buildTeam != null && buildTeam.isConnected())
             return;
 
-        String apiKey = BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY);
+        String apiKey = BuildTeamTools.getInstance().getMainConfig().apiKey();
 
         JSONArray requestBodyArray = new JSONArray();
         for (Player player : Bukkit.getOnlinePlayers())

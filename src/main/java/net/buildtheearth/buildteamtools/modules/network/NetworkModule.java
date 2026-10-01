@@ -16,7 +16,7 @@ import net.buildtheearth.buildteamtools.modules.network.model.Region;
 import net.buildtheearth.buildteamtools.modules.network.model.RegionType;
 import net.buildtheearth.buildteamtools.modules.stats.StatsModule;
 import net.buildtheearth.buildteamtools.utils.WikiLinks;
-import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
+import net.buildtheearth.buildteamtools.utils.io.MainConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -29,6 +29,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@Getter
 public class NetworkModule extends Module {
 
     public static final int CACHE_UPLOAD_SPEED = 20 * 60 * 10 + 20;
@@ -38,42 +39,38 @@ public class NetworkModule extends Module {
      * Information about the build team of this server
      * Nullable if build team is not loaded yet
      */
-    @Getter
     @Setter
     private @Nullable BuildTeam buildTeam;
 
     /**
      * A list of players that are communicating with this server.
      */
-    @Getter
     private final List<UUID> communicators = new ArrayList<>();
 
     /**
      * A list of all build teams of BuildTheEarth.
      */
-    @Getter
     private final List<BuildTeam> buildTeams = new ArrayList<>();
 
     /**
      * A list of all regions of BuildTheEarth.
      */
-    @Getter
     private final List<Region> regions = new ArrayList<>();
 
 
+    @Getter
     private static NetworkModule instance = null;
+    private final MainConfig config;
 
-    public NetworkModule() {
+    public NetworkModule(MainConfig config) {
         super("Network", WikiLinks.ENTRY);
-    }
-
-    public static NetworkModule getInstance() {
-        return instance == null ? instance = new NetworkModule() : instance;
+        this.config = config;
+        instance = this;
     }
 
     @Override
     public void enable() {
-        String apiKey = BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.API_KEY);
+        String apiKey = config.apiKey();
         if (apiKey == null || apiKey.isEmpty() || apiKey.equals(DEFAULT_API_KEY)) {
             shutdown("The API Key was not configured in the config.yml file.");
             return;

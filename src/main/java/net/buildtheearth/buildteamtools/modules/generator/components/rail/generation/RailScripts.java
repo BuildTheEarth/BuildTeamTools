@@ -7,6 +7,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BlockState;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.RailFlag;
+import net.buildtheearth.buildteamtools.modules.generator.components.rail.Rail;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.RailSettings;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.configuration.RailType;
 import net.buildtheearth.buildteamtools.modules.generator.model.GeneratorComponent;
@@ -63,7 +64,7 @@ public class RailScripts extends Script {
 
     public RailScripts(Player player, GeneratorComponent generatorComponent, Runnable preparationFinishedCallback) {
         super(player, generatorComponent);
-        this.limits = RailLimits.fromConfig();
+        this.limits = RailLimits.fromConfig(((Rail) generatorComponent).getConfig());
         this.preparationProgress = new RailPreparationProgress(
                 player,
                 BLOCK_PLACEMENT_START_PERCENTAGE,

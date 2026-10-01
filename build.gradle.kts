@@ -47,6 +47,7 @@ dependencies {
     implementation(libs.xseries)
     implementation(libs.anvilgui)
     implementation(libs.clipper2)
+    implementation(libs.dazzleconf)
     implementation(libs.json)
     implementation(libs.googlecode.gson)
     implementation(libs.okhttp.jvm)

@@ -22,10 +22,8 @@ import net.buildtheearth.buildteamtools.modules.navigation.components.warps.comm
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.listeners.WarpJoinListener;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.utils.WikiLinks;
-import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
-import net.buildtheearth.buildteamtools.utils.io.ConfigUtil;
+import net.buildtheearth.buildteamtools.utils.io.NavigationConfig;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
@@ -38,33 +36,30 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Files;
 
 /**
  * Manages all things related to universal tpll
  */
+@Getter
 public class NavigationModule extends Module {
 
 
-    @Getter
     private WarpsComponent warpsComponent;
-    @Getter
     private NavigatorComponent navigatorComponent;
-    @Getter
     private TpllComponent tpllComponent;
-    @Getter
     private BluemapComponent bluemapComponent;
-    @Getter
     @Nullable
     private RgcHandler rgcHandler = null;
 
+    @Getter
     private static NavigationModule instance = null;
+    private final NavigationConfig config;
 
-    public NavigationModule() {
+    public NavigationModule(NavigationConfig config) {
         super("Navigation", WikiLinks.NAV, NetworkModule.getInstance());
-    }
-
-    public static NavigationModule getInstance() {
-        return instance == null ? instance = new NavigationModule() : instance;
+        this.config = config;
+        instance = this;
     }
 
 
@@ -76,26 +71,23 @@ public class NavigationModule extends Module {
         }
 
         warpsComponent = new WarpsComponent();
-        navigatorComponent = new NavigatorComponent();
+        navigatorComponent = new NavigatorComponent(config);
         tpllComponent = new TpllComponent();
 
-        var navConfig = BuildTeamTools.getInstance().getConfig(ConfigUtil.NAVIGATION);
-        initializeRgcHandler(navConfig);
-        initializeBluemapComponent(navConfig);
+        initializeRgcHandler(config);
+        initializeBluemapComponent(config);
 
-        boolean navItemEnabled = navConfig.getBoolean(ConfigPaths.Navigation.NAVIGATOR_ITEM_ENABLED, false);
-
-        if (navItemEnabled) {
+        if (config.navigatorHotbarItem().navEnabled()) {
             registerListeners(new NavigatorOpenListener());
         }
 
-        registerListeners(new NavigatorJoinListener(navigatorComponent, navItemEnabled));
+        registerListeners(new NavigatorJoinListener(navigatorComponent, config));
 
         super.enable();
     }
 
-    private void initializeRgcHandler(@NonNull FileConfiguration navConfig) {
-        if (!navConfig.getBoolean(ConfigPaths.Navigation.RGC_LOCAL_DB_ENABLED, false)) {
+    private void initializeRgcHandler(@NonNull NavigationConfig navConfig) {
+        if (!navConfig.reverseGeocode().localDatabase().enabled()) {
             return;
         }
 
@@ -110,8 +102,8 @@ public class NavigationModule extends Module {
         downloadRgcDatabaseAsync(rgcFile, navConfig);
     }
 
-    private @NonNull File resolveRgcDatabaseFile(@NonNull FileConfiguration navConfig) {
-        String path = navConfig.getString(ConfigPaths.Navigation.RGC_LOCAL_DB_PATH, "bs.file");
+    private @NonNull File resolveRgcDatabaseFile(@NonNull NavigationConfig navConfig) {
+        String path = navConfig.reverseGeocode().localDatabase().path();
         return BuildTeamTools.getInstance().getDataPath()
                 .resolve("modules/navigation")
                 .resolve(path)
@@ -123,7 +115,7 @@ public class NavigationModule extends Module {
         return new RgcHandler(rgcFile, BuildTeamTools.getInstance().getSLF4JLogger(), false);
     }
 
-    private void downloadRgcDatabaseAsync(File rgcFile, FileConfiguration navConfig) {
+    private void downloadRgcDatabaseAsync(File rgcFile, NavigationConfig navConfig) {
         BuildTeamTools.getInstance().getComponentLogger().info(
                 "Reverse Geocode local database is enabled but the file does not exist at the specified path, installing it from the configured url.");
         Bukkit.getScheduler().runTaskAsynchronously(BuildTeamTools.getInstance(), () -> {
@@ -135,19 +127,25 @@ public class NavigationModule extends Module {
                             "Successfully downloaded Reverse Geocode local database and enabled local database support for Reverse Geocoding.");
                 });
             } catch (Exception e) {
+                try {
+                    Files.deleteIfExists(rgcFile.toPath());
+                } catch (IOException cleanupException) {
+                    BuildTeamTools.getInstance().getComponentLogger().warn(
+                            "Failed to remove the incomplete Reverse Geocode database after download failure.", cleanupException);
+                }
                 BuildTeamTools.getInstance().getComponentLogger().error(
-                        "Failed to download Reverse Geocode local database from the configured url, disabling local database support for Reverse Geocoding.", e);
-                navConfig.set(ConfigPaths.Navigation.RGC_LOCAL_DB_ENABLED, false);
+                        "Failed to download the Reverse Geocode local database from the configured URL. " +
+                                "Reverse Geocoding local database support is unavailable for this session.", e);
             }
         });
     }
 
-    private void downloadRgcDatabase(@NonNull File rgcFile, FileConfiguration navConfig) throws IOException {
+    private void downloadRgcDatabase(@NonNull File rgcFile, NavigationConfig navConfig) throws IOException {
         if (!rgcFile.getParentFile().mkdirs()) {
             BuildTeamTools.getInstance().getComponentLogger().warn(
                     "Failed to create parent directories for Reverse Geocode local database file. Make sure the plugin has the necessary permissions to create directories and files in the plugin data folder.");
         }
-        URL url = URI.create(navConfig.getString(ConfigPaths.Navigation.RGC_LOCAL_DB_UPDATE_URL, "")).toURL();
+        URL url = URI.create(navConfig.reverseGeocode().localDatabase().url()).toURL();
         try (ReadableByteChannel readableByteChannel = Channels.newChannel(url.openStream());
              FileOutputStream fileOutputStream = new FileOutputStream(rgcFile)) {
             FileChannel fileChannel = fileOutputStream.getChannel();
@@ -155,10 +153,10 @@ public class NavigationModule extends Module {
         }
     }
 
-    private void initializeBluemapComponent(@NonNull FileConfiguration navConfig) {
-        boolean bluemapConfigEnabled = navConfig.getBoolean(ConfigPaths.Navigation.BLUEMAP_ENABLED, true);
+    private void initializeBluemapComponent(@NonNull NavigationConfig navConfig) {
+        boolean bluemapConfigEnabled = navConfig.bluemap().enabled();
         if (Bukkit.getPluginManager().isPluginEnabled("BlueMap") && bluemapConfigEnabled) {
-            bluemapComponent = new BluemapComponent();
+            bluemapComponent = new BluemapComponent(navConfig);
         }
     }
 

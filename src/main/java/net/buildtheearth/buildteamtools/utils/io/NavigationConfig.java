@@ -1,6 +1,7 @@
 package net.buildtheearth.buildteamtools.utils.io;
 
 import space.arim.dazzleconf.engine.Comments;
+import space.arim.dazzleconf.engine.liaison.IntegerRange;
 import space.arim.dazzleconf.engine.liaison.SubSection;
 
 @Comments("BuildTeamTools Navigation Module Configuration")
@@ -14,7 +15,7 @@ public interface NavigationConfig {
         return new NavigatorHotbarItem() {};
     }
 
-    @Comments("Configuration for the items displayed in the main navigation menu.")
+    @Comments("Configuration for the items displayed in the main navigation menu. If all items are disabled, the menu is empty.")
     default @SubSection MainMenuItems mainMenuItems() {
         return new MainMenuItems() {};
     }
@@ -38,19 +39,29 @@ public interface NavigationConfig {
         @Comments("Enable or disable giving the navigator item to players when they join.")
         default boolean navEnabled() { return true; }
 
-        @Comments("Hotbar slot where the navigator item is placed.")
-        default int navSlot() { return 0; }
+        @Comments("Hotbar slot where the navigator item is placed (0-8, where 0 is the first slot).")
+        default @IntegerRange(min = 0, max = 8) int navSlot() { return 0; }
     }
 
     interface MainMenuItems {
         @Comments("Build menu item settings.")
         default @SubSection MenuItem buildItem() { return new MenuItem() {}; }
 
-        @Comments("PlotSystem menu item settings.")
-        default @SubSection MenuItem plotsystemItem() { return new MenuItem() {}; }
+        @Comments("PlotSystem menu item settings (enabled by default).")
+        default @SubSection MenuItem plotsystemItem() {
+            return new MenuItem() {
+                @Override
+                public boolean enabled() { return true; }
+            };
+        }
 
-        @Comments("Explore menu item settings.")
-        default @SubSection MenuItem exploreItem() { return new MenuItem() {}; }
+        @Comments("Explore menu item settings (enabled by default).")
+        default @SubSection MenuItem exploreItem() {
+            return new MenuItem() {
+                @Override
+                public boolean enabled() { return true; }
+            };
+        }
 
         @Comments("Tutorial menu item settings.")
         default @SubSection MenuItem tutorialItem() { return new MenuItem() {}; }

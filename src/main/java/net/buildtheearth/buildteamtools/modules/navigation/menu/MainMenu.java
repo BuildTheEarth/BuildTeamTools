@@ -142,22 +142,28 @@ public class MainMenu extends AbstractMenu {
     }
 
     /**
-     * Returns the slots for the Build, Explore and Tutorials items depending on which items are enabled in the config
+     * Returns the slots for enabled main menu items, or an empty deque when all items are disabled.
      *
-     * @return int[] - Slots of the enabled items
+     * @return Slots of the enabled items
      */
     private @NotNull Deque<@NotNull Integer> getSlots() {
+        return getSlots(config().mainMenuItems());
+    }
+
+    static @NotNull Deque<@NotNull Integer> getSlots(NavigationConfig.MainMenuItems items) {
         Deque<Integer> slots = new ArrayDeque<>();
-        boolean buildEnabled = config().mainMenuItems().buildItem().enabled();
-        boolean tutorialsEnabled = config().mainMenuItems().tutorialItem().enabled();
-        boolean plotsystemEnabled = config().mainMenuItems().plotsystemItem().enabled();
-        boolean exploreEnabled = config().mainMenuItems().exploreItem().enabled();
+        boolean buildEnabled = items.buildItem().enabled();
+        boolean tutorialsEnabled = items.tutorialItem().enabled();
+        boolean plotsystemEnabled = items.plotsystemItem().enabled();
+        boolean exploreEnabled = items.exploreItem().enabled();
 
         int enabledItemCount = BooleanUtils.toInteger(buildEnabled) + BooleanUtils.toInteger(tutorialsEnabled) +
                 BooleanUtils.toInteger(plotsystemEnabled) + BooleanUtils.toInteger(exploreEnabled);
 
         // Depending on how many items are enabled, set the slots to the correct positions
         switch (enabledItemCount) {
+            case 0:
+                break;
             case 1:
                 slots.add(13);
                 break;

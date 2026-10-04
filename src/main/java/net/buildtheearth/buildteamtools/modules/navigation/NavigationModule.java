@@ -18,7 +18,7 @@ import net.buildtheearth.buildteamtools.modules.navigation.components.tpll.liste
 import net.buildtheearth.buildteamtools.modules.navigation.components.tpll.listeners.TpllListener;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.WarpsComponent;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.commands.WarpCommand;
-import net.buildtheearth.buildteamtools.modules.navigation.components.warps.commands.WarpsBtCommand;
+import net.buildtheearth.buildteamtools.modules.navigation.components.warps.commands.BtWarpsCommand;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.listeners.WarpJoinListener;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.utils.WikiLinks;
@@ -162,12 +162,12 @@ public class NavigationModule extends Module {
 
     @Override
     public void registerCommands() {
-        registerCommand("warp", new WarpCommand());
-        registerCommand("navigator", new NavigatorCommand());
-        registerCommand("buildteam", new BuildteamCommand());
-        registerCommand("warpsbt", new WarpsBtCommand());
-        registerCommand("explore", new ExploreCommand());
-        registerCommand("address", new AddressCommand());
+        new WarpCommand().register(this);
+        new NavigatorCommand().register(this);
+        new BuildteamCommand().register(this);
+        new BtWarpsCommand().register(this);
+        new ExploreCommand().register(this);
+        new AddressCommand().register(this);
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.alpsbte.alpslib.utils.ChatHelper;
 import lombok.Getter;
 import net.buildtheearth.buildteamtools.modules.ModuleHandler;
 import net.buildtheearth.buildteamtools.modules.common.CommonModule;
+import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
 import net.buildtheearth.buildteamtools.modules.miscellaneous.MiscModule;
 import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
@@ -38,6 +39,8 @@ public class BuildTeamTools extends JavaPlugin {
     private ConfigurationLoader<NavigationConfig> navigationConfigLoader;
     private ConfigurationLoader<GeneratorConfig> generatorConfigLoader;
     private ConfigurationLoader<PlotSystemConfig> plotSystemConfigLoader;
+    @Getter
+    private BttCommandManager commandManager;
 
     @Override
     public void onEnable() {
@@ -53,6 +56,7 @@ public class BuildTeamTools extends JavaPlugin {
         NavigationConfig navigationConfig = navigationConfigLoader.load();
         GeneratorConfig generatorConfig = generatorConfigLoader.load();
         plotSystemConfigLoader.load();
+        commandManager = new BttCommandManager(this);
 
         // Register Modules
         ModuleHandler.getInstance().replaceModules(

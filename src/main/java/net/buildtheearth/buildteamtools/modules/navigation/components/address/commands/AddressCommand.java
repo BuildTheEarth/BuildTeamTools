@@ -3,6 +3,8 @@ package net.buildtheearth.buildteamtools.modules.navigation.components.address.c
 import com.alpsbte.alpslib.utils.ChatHelper;
 import net.buildtheearth.Projection;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.modules.Module;
+import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
 import net.buildtheearth.buildteamtools.modules.network.api.PhotonAPI;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.model.GeographicalCoordinate;
@@ -12,53 +14,64 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
+import org.incendo.cloud.parser.standard.StringParser;
 import org.jspecify.annotations.NonNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-public class AddressCommand implements CommandExecutor, TabCompleter {
-    @Override
-    public boolean onCommand(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, String @NonNull [] args) {
-        if (!(sender instanceof Player player)) {
-            sender.sendMessage(ChatHelper.getErrorComponent("This command can only be used by a player!"));
-            return true;
-        }
+public class AddressCommand {
+    private static final String COMMAND_NAME = "address";
+    private static final String PLAYER_ONLY_MESSAGE = "This command can only be used by a player!";
 
-        if (args.length < 1) {
-            player.sendMessage(ChatHelper.getErrorComponent("Usage: /address <get|teleport>"));
-            return true;
-        }
-
-        if (args[0].equalsIgnoreCase("get")) {
-            return handleGetCommand(player, args);
-        }
-
-        if (args[0].equalsIgnoreCase("teleport")) {
-            return handleTeleportCommand(player, args);
-        }
-
-        player.sendMessage(ChatHelper.getErrorComponent("Usage: /address <get|teleport>"));
-        return true;
+    public void register(Module owner) {
+        var commandManager = BuildTeamTools.getInstance().getCommandManager();
+        commandManager.register(owner, COMMAND_NAME, this::execute,
+                (sender, input) -> {
+                    List<String> options = new java.util.ArrayList<>();
+                    if (sender.hasPermission(Permissions.ADDRESS_GET)) options.add("get");
+                    if (sender.hasPermission(Permissions.ADDRESS_TELEPORT)) options.add("teleport");
+                    return BttCommandManager.matchingSuggestions(options, input);
+                });
+        commandManager.registerSubcommand(owner, COMMAND_NAME, "get",
+                "Look up the address at your current location.",
+                builder -> builder.permission(Permissions.ADDRESS_GET),
+                context -> {
+                    if (context.sender().getSender() instanceof Player player)
+                        handleGetCommand(player);
+                    else
+                        context.sender().getSender().sendMessage(
+                                ChatHelper.getErrorComponent(PLAYER_ONLY_MESSAGE));
+                });
+        commandManager.registerSubcommand(owner, COMMAND_NAME, "teleport",
+                "Find an address and teleport to its coordinates.",
+                builder -> builder.permission(Permissions.ADDRESS_TELEPORT)
+                        .required(COMMAND_NAME, StringParser.greedyStringParser(),
+                                org.incendo.cloud.minecraft.extras.RichDescription.of(
+                                        Component.text("Address to search for"))),
+                context -> {
+                    if (context.sender().getSender() instanceof Player player)
+                        handleTeleportCommand(player, context.get(COMMAND_NAME));
+                    else
+                        context.sender().getSender().sendMessage(
+                                ChatHelper.getErrorComponent(PLAYER_ONLY_MESSAGE));
+                });
     }
 
-    private boolean handleGetCommand(@NonNull Player player, String @NonNull [] args) {
-        if (!player.hasPermission(Permissions.ADDRESS_GET)) {
-            Permissions.sendNoPermissionMessage(player, Permissions.ADDRESS_GET);
-            return true;
+    private void execute(@NonNull CommandSender sender, String @NonNull [] args) {
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(ChatHelper.getErrorComponent(PLAYER_ONLY_MESSAGE));
+            return;
         }
 
-        if (args.length > 1) {
-            player.sendMessage(ChatHelper.getErrorComponent("Usage: /address get"));
-            return true;
+        player.sendMessage(ChatHelper.getErrorComponent("Usage: /btt address <get|teleport>"));
+    }
+
+    private void handleGetCommand(@NonNull Player player) {
+        if (!player.hasPermission(Permissions.ADDRESS_GET)) {
+            Permissions.sendNoPermissionMessage(player, Permissions.ADDRESS_GET);
+            return;
         }
 
         player.sendMessage("Getting closest address...");
@@ -121,23 +134,15 @@ public class AddressCommand implements CommandExecutor, TabCompleter {
             );
         }
 
-
-        return true;
     }
 
-    private boolean handleTeleportCommand(@NonNull Player player, String @NonNull [] args) {
+    private void handleTeleportCommand(@NonNull Player player, String address) {
         if (!player.hasPermission(Permissions.ADDRESS_TELEPORT)) {
             Permissions.sendNoPermissionMessage(player, Permissions.ADDRESS_TELEPORT);
-            return true;
-        }
-
-        if (args.length < 2) {
-            player.sendMessage(ChatHelper.getErrorComponent("Usage: /address teleport <address>"));
-            return true;
+            return;
         }
 
         String lang = player.locale().getLanguage();
-        String address = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 
         PhotonAPI.getCoordinatesFromAddressAsync(address, lang)
                 .thenAccept(coordinates -> {
@@ -160,25 +165,5 @@ public class AddressCommand implements CommandExecutor, TabCompleter {
                     return null;
                 });
 
-        return true;
-    }
-
-    @Override
-    public @Nullable List<String> onTabComplete(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, String @NonNull [] args) {
-        if (args.length != 1) {
-            return Collections.emptyList();
-        }
-        List<String> list = new ArrayList<>();
-
-        if (sender.hasPermission(Permissions.ADDRESS_GET)) list.add("get");
-        if (sender.hasPermission(Permissions.ADDRESS_TELEPORT)) {
-            list.add("teleport");
-            list.add("teleport <id> <street> <city>");
-        }
-
-
-        return list.stream()
-                .filter(entry -> entry.startsWith(args[0].toLowerCase()))
-                .toList();
     }
 }

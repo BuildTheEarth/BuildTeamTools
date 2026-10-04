@@ -10,117 +10,118 @@ import net.buildtheearth.buildteamtools.modules.navigation.components.warps.mode
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
+import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
 import net.buildtheearth.buildteamtools.utils.Utils;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
+import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
+import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.modules.Module;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
+import org.incendo.cloud.parser.standard.EnumParser;
+import org.incendo.cloud.minecraft.extras.RichDescription;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-public class WarpCommand implements CommandExecutor, TabCompleter {
+public class WarpCommand {
 
-    @Override
-    public boolean onCommand(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, String @NonNull [] args) {
+    public void register(Module owner) {
+        var commandManager = BuildTeamTools.getInstance().getCommandManager();
+        commandManager.register(owner, "warp", this::execute, this::suggestions);
+        commandManager.registerSubcommand(owner, "warp", "create", "Create a warp at your current location.",
+                builder -> builder.permission(Permissions.WARP_CREATE),
+                context -> {
+                    CommandSender sender = context.sender().getSender();
+                    if (!(sender instanceof Player player)) {
+                        sender.sendMessage(ChatHelper.getErrorComponent("This command can only be used by a player!"));
+                    } else if (checkWarpModule(sender)) {
+                        handleCreateCommand(player);
+                    }
+                });
+        commandManager.registerSubcommand(owner, "warp", "migrate", "Migrate warps from another warp provider.",
+                builder -> builder.permission(Permissions.WARP_MIGRATE)
+                        .required("source", EnumParser.enumParser(WarpMigrationSource.class),
+                                RichDescription.of(Component.text("Warp migration provider"))),
+                context -> {
+                    CommandSender sender = context.sender().getSender();
+                    if (!(sender instanceof Player player)) {
+                        sender.sendMessage(ChatHelper.getErrorComponent("This command can only be used by a player!"));
+                    } else if (checkWarpModule(sender)) {
+                        handleMigrateCommand(player, context.get("source"));
+                    }
+                });
+        commandManager.registerSubcommand(owner, "warp", "random", "Warp to a random build team warp.",
+                builder -> builder.permission(Permissions.WARP_RANDOM),
+                context -> {
+                    CommandSender sender = context.sender().getSender();
+                    if (!(sender instanceof Player player)) {
+                        sender.sendMessage(ChatHelper.getErrorComponent("This command can only be used by a player!"));
+                    } else if (checkWarpModule(sender)) {
+                        handleRandomWarpCommand(player);
+                    }
+                });
+    }
+
+    private void execute(@NonNull CommandSender sender, String @NonNull [] args) {
         if (!(sender instanceof Player player)) {
             sender.sendMessage(ChatHelper.getErrorComponent("This command can only be used by a player!"));
-            return true;
+            return;
         }
 
-        if (NetworkModule.getInstance().getBuildTeam() == null) {
-            sender.sendMessage(ChatHelper.getErrorComponent("The Warp Module is currently disabled because the Build Team " +
-                    "failed to load!"));
-            return true;
-        }
+        if (!checkWarpModule(sender)) return;
 
         // If no arguments were supplied assume the player wants to open the warp menu
         if (args.length == 0) {
             if (checkForWarpUsePermissionAndMessage(player)) WarpsComponent.openWarpMenu(player);
-            return true;
+            return;
         }
 
-        if (args[0].equalsIgnoreCase("create")) {
-            return handleCreateCommand(player, args);
-        }
-
-        if (args[0].equalsIgnoreCase("migrate")) {
-            return handleMigrateCommand(player, args);
-        }
-
-        if (args[0].equalsIgnoreCase("random")) {
-            return handleRandomWarpCommand(player, args);
-        }
-
-        return handleWarpTeleport(player, args);
+        handleWarpTeleport(player, args);
     }
 
-    private boolean handleCreateCommand(@NonNull Player player, String @NonNull [] args) {
+    private boolean checkWarpModule(CommandSender sender) {
+        if (NetworkModule.getInstance().getBuildTeam() != null) return true;
+        sender.sendMessage(ChatHelper.getErrorComponent("The Warp Module is currently disabled because the Build Team " +
+                "failed to load!"));
+        return false;
+    }
+
+    private void handleCreateCommand(@NonNull Player player) {
         if (!player.hasPermission(Permissions.WARP_CREATE)) {
             player.sendMessage(ChatHelper.getErrorComponent("You don't have the required %s to %s warps.", "permission",
                     "create"));
-            return true;
-        }
-
-        if (args.length > 1) {
-            player.sendMessage(ChatHelper.getErrorComponent("Usage: /warp create"));
-            return true;
+            return;
         }
 
         player.sendActionBar(ChatHelper.getStandardComponent(false, "Creating the warp..."));
         WarpsComponent.createWarp(player);
-        return true;
     }
 
-    private boolean handleMigrateCommand(@NonNull Player player, String @NonNull [] args) {
+    private void handleMigrateCommand(@NonNull Player player, WarpMigrationSource source) {
         if (!player.hasPermission(Permissions.WARP_MIGRATE)) {
             player.sendMessage(ChatHelper.getErrorString("You don't have the required %s to %s warps.", "permission",
                     "migrate"));
-            return true;
-        }
-
-        if (args.length != 2) {
-            player.sendMessage(ChatHelper.getErrorComponent("Usage: /warp migrate <source>"));
-            player.sendMessage(ChatHelper.getErrorComponent("Valid sources are: %s",
-                    Arrays.toString(WarpMigrationSource.values())));
-            return true;
-        }
-
-        WarpMigrationSource source = WarpMigrationSource.fromString(args[1].toLowerCase());
-        if (source == null) {
-            player.sendMessage(ChatHelper.getErrorComponent("Invalid source: %s", args[1]));
-            player.sendMessage(ChatHelper.getErrorComponent("Valid sources are: %s",
-                    Arrays.toString(WarpMigrationSource.values())));
-            return true;
+            return;
         }
 
         WarpMigrator migrator = new WarpMigrator(source);
         player.sendMessage(ChatHelper.getStandardComponent(true, "Migrating the warps..."));
         migrator.migrate(player).whenComplete((result, throwable) ->
                 handleMigrationResult(player, result, throwable));
-        return true;
     }
 
-    private boolean handleRandomWarpCommand(@NonNull Player player, String @NonNull [] args) {
+    private void handleRandomWarpCommand(@NonNull Player player) {
 
         if (!player.hasPermission(Permissions.WARP_RANDOM)) {
             Permissions.sendNoPermissionMessage(player, Permissions.WARP_RANDOM);
-            return true;
-        }
-
-        if (args.length > 1) {
-            player.sendMessage(ChatHelper.getErrorComponent("Usage: /warp random"));
-            return true;
+            return;
         }
 
         BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
         if (buildTeam == null) {
-            return true;
+            return;
         }
 
         List<Warp> warps = buildTeam.getWarpGroups().stream()
@@ -130,12 +131,10 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
         Warp warp = Utils.pickRandom(warps);
         if (warp == null) {
             player.sendMessage("No warp found");
-            return true;
+            return;
         }
 
         NavigationModule.getInstance().getWarpsComponent().warpPlayer(player, warp);
-
-        return true;
     }
 
     private void handleMigrationResult(@NonNull Player player, @NonNull MigrationResult result, @Nullable Throwable throwable) {
@@ -163,20 +162,19 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
         }
     }
 
-    private boolean handleWarpTeleport(@NonNull Player player, String @NonNull [] args) {
+    private void handleWarpTeleport(@NonNull Player player, String @NonNull [] args) {
         String key = String.join(" ", args);
 
-        if (!checkForWarpUsePermissionAndMessage(player)) return true;
+        if (!checkForWarpUsePermissionAndMessage(player)) return;
 
         Warp warp = NavigationModule.getInstance().getWarpsComponent().getWarpByName(key);
 
         if (warp == null) {
             player.sendMessage(ChatHelper.getErrorComponent("The warp with the name %s does not exist in this team!", key));
-            return true;
+            return;
         }
 
         NavigationModule.getInstance().getWarpsComponent().warpPlayer(player, warp);
-        return true;
     }
 
     private static boolean checkForWarpUsePermissionAndMessage(@NonNull Player player) {
@@ -187,30 +185,20 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
-    @Override
-    public @Nullable List<String> onTabComplete(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, String @NonNull [] args) {
-        if (args.length == 1) {
-            List<String> list = new ArrayList<>();
-            if (sender.hasPermission(Permissions.WARP_CREATE)) list.add("create");
-            if (sender.hasPermission(Permissions.WARP_MIGRATE)) list.add("migrate");
-            if (sender.hasPermission(Permissions.WARP_RANDOM)) list.add("random");
-
-            String partial = args[0].toLowerCase();
+    private List<String> suggestions(CommandSender sender, String input) {
+        String[] arguments = input.trim().split("\\s+");
+        if (input.isBlank() || arguments.length == 1) {
+            List<String> options = new ArrayList<>();
+            if (sender.hasPermission(Permissions.WARP_CREATE)) options.add("create");
+            if (sender.hasPermission(Permissions.WARP_MIGRATE)) options.add("migrate");
+            if (sender.hasPermission(Permissions.WARP_RANDOM)) options.add("random");
             BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
-            if (buildTeam != null && buildTeam.getWarpGroups() != null) {
-                List<String> warps = buildTeam.getWarpGroups().stream()
-                        .flatMap(gr -> gr.getWarps().stream().map(Warp::getName))
-                        .filter(s -> s.toLowerCase().startsWith(partial))
-                        .toList();
-
-                list.addAll(warps);
-            }
-
-            return list.stream()
-                    .filter(s -> s.toLowerCase().startsWith(partial))
-                    .toList();
+            if (buildTeam != null && buildTeam.getWarpGroups() != null)
+                buildTeam.getWarpGroups().stream().flatMap(group -> group.getWarps().stream())
+                        .map(Warp::getName).forEach(options::add);
+            return BttCommandManager.matchingSuggestions(options, input);
         }
-        return Collections.emptyList();
-
+        return List.of();
     }
+
 }

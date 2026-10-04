@@ -10,95 +10,111 @@ import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.buildteamtools.modules.network.model.Region;
 import net.buildtheearth.buildteamtools.modules.stats.StatsModule;
-import net.buildtheearth.buildteamtools.utils.Utils;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
-public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
+public class BuildTeamToolsCommand {
 
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String @NotNull [] args) {
-
-        if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS)) {
-            Permissions.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS);
-            return true;
-        }
-
-        if (args.length == 0) {
-            sendBuildTeamToolsInfo(sender);
-            return true;
-        }
-
-        switch (args[0].toLowerCase()) {
-            case "communicators" -> {
-                if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_COMMUNICATORS)) {
-                    Permissions.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_COMMUNICATORS);
-                    return true;
-                }
-
-                ChatHelper.sendMessageBox(sender, "Build Team Communicators", () -> {
-                    for (UUID uuid : NetworkModule.getInstance().getCommunicators())
-                        sender.sendMessage("§7- §e" + uuid.toString());
-                });
-            }
-            case "cache" -> cacheCommand(sender, args);
-            case "debug" -> debugCommand(sender, args);
-            case "checkforupdates" -> CommonModule.getInstance().getUpdaterComponent().checkForUpdates(sender);
-            case "reload-config", "reload" -> reloadCommand(sender);
-            case "update" -> updateCommand(sender);
-            default -> ChatHelper.sendMessageBox(sender, "Build Team Help", () -> {
-                sender.sendMessage("§e/btt cache [update] §8- §7View the cache or upload it to the network & update it locally.");
-                sender.sendMessage("§e/btt checkForUpdates §8- §7Check for updates.");
-                sender.sendMessage("§e/btt communicators §8- §7List of players who communicate with the network.");
-                sender.sendMessage("§e/btt debug <true/false> §8- §7Enable or disable debug mode.");
-                sender.sendMessage("§e/btt help §8- §7List of all sub commands.");
-                sender.sendMessage("§e/btt reload-config §8- §7Reload all configs for the modules");
-                sender.sendMessage("§e/btt update §8- §7Update the plugin to the latest version.");
-            });
-        }
-
-        return true;
+    public void register(Module owner) {
+        var commandManager = BuildTeamTools.getInstance().getCommandManager();
+        commandManager.registerRoot(owner, BuildTeamToolsCommand::sendBuildTeamToolsInfo);
+        commandManager.registerRootHelp(owner);
+        commandManager.registerRootSubcommand(owner, "communicators",
+                "List players currently communicating with the network.",
+                Permissions.BUILD_TEAM_TOOLS_COMMUNICATORS,
+                (sender, label, args) -> communicatorsCommand(sender, args));
+        commandManager.registerRootSubcommand(owner, "cache",
+                "View the network cache or upload and refresh it.",
+                Permissions.BUILD_TEAM_TOOLS_CACHE,
+                (sender, label, args) -> cacheCommand(sender));
+        commandManager.registerRootNestedSubcommand(owner, "cache", "update",
+                "Upload and refresh the network cache.",
+                Permissions.BUILD_TEAM_TOOLS_CACHE, context -> updateCacheCommand(context.sender().getSender()));
+        commandManager.registerRootSubcommand(owner, "debug",
+                "Show or change debug mode.",
+                Permissions.BUILD_TEAM_TOOLS_DEBUG,
+                (sender, label, args) -> debugCommand(sender));
+        commandManager.registerRootNestedSubcommand(owner, "debug", "on",
+                "Enable debug mode.",
+                Permissions.BUILD_TEAM_TOOLS_DEBUG, context -> setDebugMode(context.sender().getSender(), true));
+        commandManager.registerRootNestedSubcommand(owner, "debug", "off",
+                "Disable debug mode.",
+                Permissions.BUILD_TEAM_TOOLS_DEBUG, context -> setDebugMode(context.sender().getSender(), false));
+        commandManager.registerRootSubcommand(owner, "checkforupdates",
+                "Check whether a plugin update is available.",
+                Permissions.BUILD_TEAM_TOOLS_CHECK_FOR_UPDATES,
+                (sender, label, args) -> checkForUpdatesCommand(sender, args));
+        commandManager.registerRootSubcommand(owner, "reload-config",
+                "Reload module configuration files.",
+                Permissions.BUILD_TEAM_TOOLS_RELOAD,
+                (sender, label, args) -> reloadCommand(sender));
+        commandManager.registerRootSubcommand(owner, "reload",
+                "Reload module configuration files.",
+                Permissions.BUILD_TEAM_TOOLS_RELOAD,
+                (sender, label, args) -> reloadCommand(sender));
+        commandManager.registerRootSubcommand(owner, "update",
+                "Update the plugin to the latest version.",
+                Permissions.BUILD_TEAM_TOOLS_UPDATE,
+                (sender, label, args) -> updateCommand(sender));
     }
 
-    private static void debugCommand(@NonNull CommandSender sender, String @NonNull [] args) {
+    private void communicatorsCommand(@NotNull CommandSender sender, String @NotNull [] args) {
+        ChatHelper.sendMessageBox(sender, "Build Team Communicators", () -> {
+            for (UUID uuid : NetworkModule.getInstance().getCommunicators())
+                sender.sendMessage("§7- §e" + uuid);
+        });
+    }
+
+    private void checkForUpdatesCommand(@NotNull CommandSender sender, String @NotNull [] args) {
+        CommonModule.getInstance().getUpdaterComponent().checkForUpdates(sender);
+    }
+
+    private static void debugCommand(@NonNull CommandSender sender) {
         if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_DEBUG)) {
             Permissions.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_DEBUG);
             return;
         }
 
-        if (args.length == 1 || (!args[1].equalsIgnoreCase("on") && !args[1].equalsIgnoreCase("off"))) {
-            sender.sendMessage(ChatHelper.getStandardComponent(true, "Current Debug Mode: %s. You need to add a value: " +
-                    "on/off to change it", BuildTeamTools.getInstance().isDebug() ? "ON" : "OFF"));
-            return;
-        }
+        sender.sendMessage(ChatHelper.getStandardComponent(true, "Current Debug Mode: %s.",
+                BuildTeamTools.getInstance().isDebug() ? "ON" : "OFF"));
+    }
 
-        boolean debug = args[1].equalsIgnoreCase("on");
-
+    private static void setDebugMode(@NonNull CommandSender sender, boolean debug) {
         BuildTeamTools.getInstance().setDebug(debug);
         sender.sendMessage(ChatHelper.getStandardComponent(true, "Debug Mode was set to: %s", debug));
     }
 
-    private static void cacheCommand(@NonNull CommandSender sender, String @NonNull [] args) {
+    private static void cacheCommand(@NonNull CommandSender sender) {
         if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_CACHE)) {
             Permissions.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_CACHE);
             return;
         }
 
-        if (args.length > 1 && args[1].equalsIgnoreCase("update")) {
-            NetworkModule.getInstance().updateCache();
-            if (NetworkModule.getInstance().getBuildTeam() != null) NetworkModule.getInstance().enableDisabledModules();
-            StatsModule.getInstance().updateAndSave();
-            sender.sendMessage(ChatHelper.getSuccessComponent("Cache successfully updated."));
+        displayCache(sender);
+    }
+
+    private static void updateCacheCommand(@NonNull CommandSender sender) {
+        if (!sender.hasPermission(Permissions.BUILD_TEAM_TOOLS_CACHE)) {
+            Permissions.sendNoPermissionMessage(sender, Permissions.BUILD_TEAM_TOOLS_CACHE);
+            return;
         }
 
+        NetworkModule.getInstance().updateCache();
+        if (NetworkModule.getInstance().getBuildTeam() != null) NetworkModule.getInstance().enableDisabledModules();
+        StatsModule.getInstance().updateAndSave();
+        sender.sendMessage(ChatHelper.getSuccessComponent("Cache successfully updated."));
+        displayCache(sender);
+    }
+
+    private static void displayCache(CommandSender sender) {
         if (StatsModule.getInstance().isEnabled()) {
             ChatHelper.sendMessageBox(sender, "Build Team Cache", () ->
                     sender.sendMessage(StatsModule.getInstance().getCurrentCache().toJSONString()));
@@ -132,18 +148,6 @@ public class BuildTeamToolsCommand implements CommandExecutor, TabCompleter {
         }
 
         CommonModule.getInstance().getUpdaterComponent().update(sender, true);
-    }
-
-    @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
-        if (args.length == 1)
-            return Arrays.asList("help", "communicators", "checkForUpdates", "cache", "debug", "reload-config", "update");
-
-        List<String> debugSuggestions = Utils.getTabCompleterArgs(args, "debug", 2, Arrays.asList("on", "off"));
-        if (debugSuggestions != null)
-            return debugSuggestions;
-
-        return Utils.getTabCompleterArgs(args, "cache", 2, Collections.singletonList("update"));
     }
 
     public static void sendBuildTeamToolsInfo(CommandSender sender) {

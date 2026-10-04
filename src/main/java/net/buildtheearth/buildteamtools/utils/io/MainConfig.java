@@ -1,6 +1,7 @@
 package net.buildtheearth.buildteamtools.utils.io;
 
 import space.arim.dazzleconf.engine.Comments;
+import space.arim.dazzleconf.engine.liaison.SubSection;
 
 import java.util.List;
 
@@ -36,5 +37,41 @@ public interface MainConfig {
     @Comments("Enable or disable debug mode")
     default boolean debug() {
         return false;
+    }
+
+    @Comments("Command names and aliases. Changes require a server restart.")
+    default @SubSection Commands commands() {
+        return new Commands() {};
+    }
+
+    interface Commands {
+        @Comments("Standalone command labels. An empty list disables standalone registration for that feature.")
+        @Comments("Canonical /btt subcommands are always registered. Changes require a restart.")
+        default @SubSection Aliases aliases() {
+            return new Aliases() {};
+        }
+    }
+
+    interface Aliases {
+        @Comments("Aliases are registered at server startup. Restart the server after changing them.")
+        default List<String> btt() { return List.of("buildteamtools"); }
+
+        default List<String> generate() { return List.of("generate", "gen", "g"); }
+        default List<String> kml() { return List.of("kml"); }
+        @Comments("Aliases for the KML points command.")
+        default List<String> geopoints() { return List.of("geopoints"); }
+        @Comments("Aliases for the KML path command.")
+        default List<String> geopath() { return List.of("geopath"); }
+        @Comments("Aliases for the KML closed-path command.")
+        default List<String> georing() { return List.of("georing"); }
+        @Comments("Aliases for the KML filled-surface command.")
+        default List<String> geosurface() { return List.of("geosurface"); }
+        default List<String> navigator() { return List.of("navigator", "nav", "navigate"); }
+        default List<String> buildteam() { return List.of("buildteam", "bt"); }
+        default List<String> btwarps() { return List.of("btwarps", "btwarp", "wbt", "wpt", "buildteamwarps"); }
+        default List<String> explore() { return List.of("explore"); }
+        default List<String> address() { return List.of("address"); }
+        default List<String> warp() { return List.of("warp", "warps", "wp"); }
+        default List<String> blockpalette() { return List.of("blockpalette", "bp", "blocks"); }
     }
 }

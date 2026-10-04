@@ -10,7 +10,6 @@ import net.buildtheearth.buildteamtools.modules.generator.commands.GeneratorComm
 import net.buildtheearth.buildteamtools.modules.generator.components.field.Field;
 import net.buildtheearth.buildteamtools.modules.generator.components.house.House;
 import net.buildtheearth.buildteamtools.modules.generator.components.kml.KmlCommand;
-import net.buildtheearth.buildteamtools.modules.generator.components.kml.KmlTabCompleter;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.Rail;
 import net.buildtheearth.buildteamtools.modules.generator.components.road.Road;
 import net.buildtheearth.buildteamtools.modules.generator.components.tree.Tree;
@@ -87,8 +86,8 @@ public class GeneratorModule extends Module {
 
     @Override
     public void registerCommands() {
-        registerCommand("generate", new GeneratorCommand());
-        registerCommand("kml", new KmlCommand(), new KmlTabCompleter());
+        new GeneratorCommand().register(this);
+        new KmlCommand().register(this);
     }
 
     @Override

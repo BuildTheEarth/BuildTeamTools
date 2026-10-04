@@ -1,7 +1,6 @@
 package net.buildtheearth.buildteamtools.modules.plotsystem;
 
 import net.buildtheearth.buildteamtools.modules.Module;
-import net.buildtheearth.buildteamtools.modules.plotsystem.commands.PlotSystemTerraCommand;
 import net.buildtheearth.buildteamtools.utils.WikiLinks;
 
 public class PlotSystemModule extends Module {
@@ -115,11 +114,6 @@ public class PlotSystemModule extends Module {
         super.enable();*/
     }
 
-
-    @Override
-    public void registerCommands() {
-        registerCommand("plotsystemterra", new PlotSystemTerraCommand());
-    }
 
     @Override
     public void registerListeners() {

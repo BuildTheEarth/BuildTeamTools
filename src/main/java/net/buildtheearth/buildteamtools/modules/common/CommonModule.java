@@ -8,7 +8,6 @@ import net.buildtheearth.buildteamtools.modules.common.commands.BuildTeamToolsCo
 import net.buildtheearth.buildteamtools.modules.common.components.dependency.DependencyComponent;
 import net.buildtheearth.buildteamtools.modules.common.components.pluginmessaging.PluginMessagingComponent;
 import net.buildtheearth.buildteamtools.modules.common.components.updater.UpdaterComponent;
-import net.buildtheearth.buildteamtools.modules.common.listeners.CommandListener;
 import net.buildtheearth.buildteamtools.modules.common.listeners.ExceptionListener;
 import net.buildtheearth.buildteamtools.modules.common.metrics.MetricsManager;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
@@ -72,12 +71,12 @@ public class CommonModule extends Module {
 
     @Override
     public void registerCommands() {
-        registerCommand("buildteamtools", new BuildTeamToolsCommand());
+        new BuildTeamToolsCommand().register(this);
     }
 
     @Override
     public void registerListeners() {
-        super.registerListeners(new MenuFunctionListener(), new CommandListener(), new ExceptionListener());
+        super.registerListeners(new MenuFunctionListener(), new ExceptionListener());
     }
 
 

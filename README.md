@@ -58,7 +58,7 @@ intuitive entry point for newcomers to the project.
 ## Features
 
 🔨 **Easy-to-use** Tools  
-⏱ **Multi-Version** support from `1.18` - `26.x`  
+⏱ **Multi-Version** support from `1.20.6` - `26.x`<br/>
 ✔️ **User-friendly** GUIs and Commands  
 📆 **Automatic** Updates  
 🔌 **Easy setup** and configuration
@@ -82,7 +82,7 @@ outdated.*
 
 💻 **Requirements:**
 
-- A Server running Paper 1.18 - **26.x**.
+- A Server running Paper 1.20.6 - **26.x**.
 
 🚩 **How to install:**
 
@@ -101,6 +101,17 @@ outdated.*
 5. Done!
 
 **For more help, please see the [wiki](https://resources.buildtheearth.net/s/btt).**
+
+Use `/btt help` for in-game command help. Feature commands and their subcommands
+also work under `/btt`, for example `/btt warp migrate essentials`. Configured
+aliases share the same command tree and permissions; alias changes require a restart.
+Every standalone label, including `/warp`, must be listed in `commands.aliases`.
+Set a feature's list to `[]` to expose it only under `/btt`; clear all lists
+(including `btt`) to register only the `/btt` root. Default lists include the
+canonical standalone labels. Existing configurations must add those labels
+explicitly if they should remain available. The build-team warp command is
+`/btt btwarps`, with default standalone labels `btwarps`, `btwarp`, `wbt`,
+`wpt`, and `buildteamwarps`; rename the old `warpsbt` config key to `btwarps`.
 
 ## Contributors
 

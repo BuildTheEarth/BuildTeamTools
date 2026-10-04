@@ -3,18 +3,13 @@ package net.buildtheearth.buildteamtools.modules;
 import com.alpsbte.alpslib.utils.ChatHelper;
 import com.alpsbte.alpslib.utils.WikiDocumented;
 import lombok.Getter;
-import lombok.NonNull;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.PluginCommand;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -36,12 +31,6 @@ public abstract class Module implements WikiDocumented {
 
     @Getter
     private final List<Listener> listeners = new ArrayList<>();
-
-    @Getter
-    private final HashMap<PluginCommand, CommandExecutor> commands = new HashMap<>();
-
-    @Getter
-    private final HashMap<PluginCommand, TabCompleter> tabCompleter = new HashMap<>();
 
     @Getter
     private final List<Module> dependsOnModules = new ArrayList<>();
@@ -74,7 +63,6 @@ public abstract class Module implements WikiDocumented {
     public void enable() {
         checkForModuleDependencies();
 
-        loadCommands();
         loadListeners();
 
         enabled = true;
@@ -113,48 +101,6 @@ public abstract class Module implements WikiDocumented {
     protected void registerCommands() {
     }
 
-    /**
-     * Registers a command for the module.
-     * Note that this method will only register the command in the module, but it won't load it in Bukkit.
-     * To load the command, use the loadCommands() method.
-     *
-     * @param command  The command to register
-     * @param executor The executor for the command. If the executor is also a TabCompleter, the TabCompleter will be
-     *                 registered as well.
-     */
-    protected void registerCommand(@NonNull String command, @NonNull CommandExecutor executor) {
-        this.commands.put(BuildTeamTools.getInstance().getCommand(command), executor);
-
-        if (executor instanceof TabCompleter tc)
-            this.tabCompleter.put(BuildTeamTools.getInstance().getCommand(command), tc);
-    }
-
-    /**
-     * Registers a command for the module.
-     * Note that this method will only register the command in the module, but it won't load it in Bukkit.
-     * To load the command, use the loadCommands() method.
-     *
-     * @param command      The command to register
-     * @param executor     The executor for the command.
-     * @param tabCompleter The tab completer for the command. Only needed to specify if the TabCompleter is in a different
-     *                     class than the executor.
-     */
-    protected void registerCommand(@NonNull String command, @NonNull CommandExecutor executor,
-                                   @NonNull TabCompleter tabCompleter) {
-        this.commands.put(BuildTeamTools.getInstance().getCommand(command), executor);
-        this.tabCompleter.put(BuildTeamTools.getInstance().getCommand(command), tabCompleter);
-    }
-
-    /**
-     * Loads the commands for the module into Bukkit
-     */
-    private void loadCommands() {
-        for (var command : commands.entrySet())
-            command.getKey().setExecutor(command.getValue());
-
-        for (var command : tabCompleter.entrySet())
-            command.getKey().setTabCompleter(command.getValue());
-    }
 
 
     /**

@@ -1,9 +1,14 @@
 package net.buildtheearth.buildteamtools.utils.io;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import space.arim.dazzleconf.Configuration;
+import space.arim.dazzleconf.LoadResult;
 import space.arim.dazzleconf.ReloadShell;
 import space.arim.dazzleconf.StandardErrorPrint;
+import space.arim.dazzleconf.backend.Backend;
+import space.arim.dazzleconf.backend.CommentData;
+import space.arim.dazzleconf.backend.DataTree;
 import space.arim.dazzleconf.backend.PathRoot;
 import space.arim.dazzleconf.backend.yaml.YamlBackend;
 
@@ -38,21 +43,49 @@ public class ConfigurationLoader<C> {
     }
 
     /**
-     * Reloads the configuration delegate. Existing references returned by {@link #getConfig()} see the new values.
+     * Reloads the configuration delegate and removes the obsolete config-version entry and its attached comments.
+     * Existing references returned by {@link #getConfig()} see the new values.
      */
     public void reload() {
         try {
             Files.createDirectories(dataFolder);
             Path configFile = dataFolder.resolve("config.yml");
-            C loaded = configuration.configureOrFallback(
-                    new YamlBackend(new PathRoot(configFile)),
-                    new StandardErrorPrint(output -> logger.warn("Failed to load configuration: {}", output.printString()))
-            );
-            reloadShell.setCurrentDelegate(loaded);
+            YamlBackend backend = new YamlBackend(new PathRoot(configFile));
+            LoadResult<C> result = configuration.configureWith(backend);
+            if (result.isFailure()) {
+                new StandardErrorPrint(output -> logger.warn("Failed to load configuration: {}", output.printString()))
+                        .onError(result.getErrorContexts());
+                reloadShell.setCurrentDelegate(configuration.loadDefaults());
+                return;
+            }
+            removeLegacyConfigVersion(backend);
+            reloadShell.setCurrentDelegate(result.getOrThrow());
         } catch (IOException | RuntimeException ex) {
             logger.error("Failed to load configuration from {}", dataFolder.resolve("config.yml"), ex);
             reloadShell.setCurrentDelegate(configuration.loadDefaults());
         }
+    }
+
+    private void removeLegacyConfigVersion(@NonNull YamlBackend backend) {
+        Backend.Document document = backend.read(configuration.makeErrorSource()).getOrThrow();
+        if (document == null) {
+            return;
+        }
+        DataTree.Mut data = document.data().intoMut();
+        if (data.remove("config-version") == null) {
+            return;
+        }
+        backend.write(new Backend.Document() {
+            @Override
+            public @NonNull CommentData comments() {
+                return document.comments();
+            }
+
+            @Override
+            public @NonNull DataTree data() {
+                return data;
+            }
+        });
     }
 
     /**

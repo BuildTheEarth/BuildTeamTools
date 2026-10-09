@@ -69,7 +69,6 @@ public interface MainConfig {
         default List<String> navigator() { return List.of("navigator", "nav", "navigate"); }
         default List<String> buildteam() { return List.of("buildteam", "bt"); }
         default List<String> btwarps() { return List.of("btwarps", "btwarp", "wbt", "wpt", "buildteamwarps"); }
-        default List<String> explore() { return List.of("explore"); }
         default List<String> address() { return List.of("address"); }
         default List<String> warp() { return List.of("warp", "warps", "wp"); }
         default List<String> blockpalette() { return List.of("blockpalette", "bp", "blocks"); }

@@ -68,10 +68,10 @@ public interface NavigationConfig {
     }
 
     interface MenuItem {
-        @Comments("Enable or disable this menu item.")
+        @Comments("Enable or disable this menu item and its Build, PlotSystem, or Tutorials navigator shortcut.")
         default boolean enabled() { return false; }
 
-        @Comments("Command or action executed when this menu item is clicked.")
+        @Comments("Command or action executed when this menu item is clicked. Also used by the Build, PlotSystem, and Tutorials navigator shortcuts.")
         default String action() { return "/command"; }
     }
 

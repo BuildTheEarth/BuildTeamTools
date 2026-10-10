@@ -4,11 +4,14 @@ import com.alpsbte.alpslib.utils.ChatHelper;
 import com.cryptomorin.xseries.XMaterial;
 import de.micromata.opengis.kml.v_2_2_0.Coordinate;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.modules.Module;
+import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
 import net.buildtheearth.buildteamtools.modules.navigation.NavUtils;
 import net.buildtheearth.buildteamtools.utils.BlockLocation;
 import net.buildtheearth.buildteamtools.utils.LineRasterization;
 import net.buildtheearth.buildteamtools.utils.PolygonTools;
 import net.buildtheearth.model.GeographicalCoordinate;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,11 +20,11 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.command.BlockCommandSender;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.incendo.cloud.minecraft.extras.RichDescription;
+import org.incendo.cloud.parser.standard.StringParser;
 import org.jspecify.annotations.NonNull;
 
 import java.util.*;
@@ -45,7 +48,80 @@ import java.util.concurrent.Executors;
  * direct use of the /kml command is restricted to CommandBlockSender
  *
  */
-public class KmlCommand implements CommandExecutor {
+public class KmlCommand {
+    private static final String GEOPOINTS_COMMAND = "geopoints";
+    private static final String GEOPATH_COMMAND = "geopath";
+    private static final String GEORING_COMMAND = "georing";
+    private static final String GEOSURFACE_COMMAND = "geosurface";
+    private static final String EXTEND_PREFIX = "-extend:";
+    private static final String INVALID_BLOCK_METADATA_MESSAGE =
+            "§cServer received /btt kml command with invalid blocktype string metadata. Using bricks as fallback.";
+
+    public void register(Module owner) {
+        var aliases = BuildTeamTools.getInstance().getMainConfig().commands().aliases();
+        var commandManager = BuildTeamTools.getInstance().getCommandManager();
+        commandManager.registerAliased(owner, "kml", aliases.kml(), this::execute, this::suggestions);
+        registerMode(owner, GEOPOINTS_COMMAND, aliases.geopoints());
+        registerMode(owner, GEOPATH_COMMAND, aliases.geopath());
+        registerMode(owner, GEORING_COMMAND, aliases.georing());
+        registerMode(owner, GEOSURFACE_COMMAND, aliases.geosurface());
+        registerUndo(owner, "kml");
+        registerUndo(owner, GEOPOINTS_COMMAND);
+        registerUndo(owner, GEOPATH_COMMAND);
+        registerUndo(owner, GEORING_COMMAND);
+        registerUndo(owner, GEOSURFACE_COMMAND);
+    }
+
+    private void registerUndo(Module owner, String commandName) {
+        BuildTeamTools.getInstance().getCommandManager().registerSubcommand(owner, commandName, "undo",
+                "Undo the last KML block operation.",
+                builder -> builder.optional("arguments", StringParser.greedyStringParser(),
+                        RichDescription.of(Component.text("Additional command-block KML content"))),
+                context -> {
+                    String trailingArguments = context.<String>optional("arguments").orElse("");
+                    String[] trailing = trailingArguments.isBlank()
+                            ? new String[0]
+                            : trailingArguments.trim().split("\\s+");
+                    String[] args = new String[trailing.length + 1];
+                    args[0] = "undo";
+                    System.arraycopy(trailing, 0, args, 1, trailing.length);
+
+                    CommandSender sender = context.sender().getSender();
+                    switch (sender) {
+                        case BlockCommandSender commandBlockSender -> processKml(commandBlockSender.getBlock(), args);
+                        case Player player -> undoCommand(player);
+                        default -> execute(sender, commandName, args);
+                    }
+                });
+    }
+
+    private void registerMode(Module owner, String mode, List<String> aliases) {
+        BuildTeamTools.getInstance().getCommandManager().registerAliased(owner, mode, aliases,
+                (sender, label, arguments) -> execute(sender, mode, arguments), this::suggestions);
+    }
+
+    private List<String> suggestions(CommandSender sender, String label, String input) {
+        if (label.equalsIgnoreCase("kml")) {
+            return BttCommandManager.matchingSuggestions(List.of("undo"), input);
+        }
+        String partial = input.substring(input.lastIndexOf(' ') + 1).toLowerCase(Locale.ROOT);
+        List<String> suggestions = new ArrayList<>();
+        if (partial.startsWith(EXTEND_PREFIX)) {
+            String blockPrefix = partial.substring(EXTEND_PREFIX.length());
+            BLOCK_TYPES.stream().filter(block -> block.startsWith(blockPrefix))
+                    .map(block -> EXTEND_PREFIX + block).forEach(suggestions::add);
+        } else {
+            BLOCK_TYPES.stream().filter(block -> block.startsWith(partial)).forEach(suggestions::add);
+            if (EXTEND_PREFIX.startsWith(partial)) suggestions.add(EXTEND_PREFIX);
+        }
+        suggestions.add("undo");
+        return suggestions;
+    }
+
+    private static final List<String> BLOCK_TYPES = Arrays.stream(Material.values())
+            .filter(Material::isBlock)
+            .map(material -> material.name().toLowerCase(Locale.ROOT))
+            .toList();
 
     /**
      * Handles the execution of KML-related commands (/geopoints, /geopath, /georing, /kml).
@@ -57,34 +133,34 @@ public class KmlCommand implements CommandExecutor {
      * </ul>
      *
      * @param sender The command sender (Player or CommandBlock)
-     * @param cmd    The command object
      * @param alias  The alias used to invoke this command (geopoints/geopath/georing/kml)
      * @param args   Command arguments (KML content if from CommandBlock, block type if from Player)
-     * @return true if the command was handled successfully, false otherwise
      */
-    public boolean onCommand(@NonNull CommandSender sender, @NonNull Command cmd, @NonNull String alias, String @NonNull [] args) {
+    private void execute(@NonNull CommandSender sender, @NonNull String alias, String @NonNull [] args) {
         if (sender instanceof BlockCommandSender cmdbSender) {
             Block senderBlock = cmdbSender.getBlock();
 
-            return processKml(senderBlock, args);
+            processKml(senderBlock, args);
+            return;
         }
 
         if (!(sender instanceof Player p)) {
             sender.sendMessage("§cOnly players can execute this command.");
-            return false;
+            return;
         }
 
         if (args.length > 0 && args[0].equals("undo")) {
-            return undoCommand(p);
+            undoCommand(p);
+            return;
         }
 
         //check if alias is geopoints or geopath (direct /kml is only allowed for undo)
         if (alias.equals("kml")) {
-            sender.sendMessage("§cPlease use /geopoints or /geopath to execute this command.");
-            return false;
+            sender.sendMessage("§cPlease use /btt geopoints or /btt geopath to execute this command.");
+            return;
         }
 
-        return createPasteUI(p, cmd, alias, args);
+        createPasteUI(p, alias, args);
     }
 
     /**
@@ -182,7 +258,7 @@ public class KmlCommand implements CommandExecutor {
         if (playerName.isEmpty() || blocktypeString.isEmpty()) {
             //invalid metadata, cancel
             //send error message to all players within 50m of the command block
-            ChatHelper.sendMessageToPlayersNearLocation(senderBlock.getLocation(), "§cReceived /kml command from CommandBlock without sufficient metadata.\nThis command can only be executed from a CommandBlock created with the /kml command!", 50);
+            ChatHelper.sendMessageToPlayersNearLocation(senderBlock.getLocation(), "§cReceived /btt kml command from CommandBlock without sufficient metadata.\nThis command can only be executed from a CommandBlock created with a /btt geo command!", 50);
             return false;
         }
 
@@ -197,13 +273,13 @@ public class KmlCommand implements CommandExecutor {
         Material matchedBlockMaterial = Material.matchMaterial(blocktypeString);
         final Material blockMaterial = (matchedBlockMaterial != null && matchedBlockMaterial.isBlock()) ? matchedBlockMaterial : Material.BRICKS;
         if (matchedBlockMaterial == null || !matchedBlockMaterial.isBlock()) {
-            player.sendMessage("§cServer received /kml command with invalid blocktype string metadata. Using bricks as fallback.");
+            player.sendMessage(INVALID_BLOCK_METADATA_MESSAGE);
         }
 
         Material matchedExtendMaterial = Material.matchMaterial(extendToGroundBlockType);
         final Material extendMaterial = (matchedExtendMaterial != null && matchedExtendMaterial.isBlock()) ? matchedExtendMaterial : Material.BRICKS;
         if (matchedExtendMaterial == null || !matchedExtendMaterial.isBlock()) {
-            player.sendMessage("§cServer received /kml command with invalid blocktype string metadata. Using bricks as fallback.");
+            player.sendMessage(INVALID_BLOCK_METADATA_MESSAGE);
         }
 
         //parse kml
@@ -310,7 +386,7 @@ public class KmlCommand implements CommandExecutor {
                     debugMessage.append("Some blocks are >1000 blocks from your location (max distance 1000). ");
                 }
                 if (!preventedUnloadedChunkChanges[0] && !preventedFarChanges[0]) {
-                    debugMessage.append("No positions were calculated from the KML. Check your coordinates and alias (/geopoints, /geopath, /georing).");
+                    debugMessage.append("No positions were calculated from the KML. Check your coordinates and command (/btt geopoints, /btt geopath, /btt georing).");
                 }
                 player.sendMessage(debugMessage.toString());
                 return;
@@ -350,7 +426,7 @@ public class KmlCommand implements CommandExecutor {
                 Material material = Material.matchMaterial(previousCommandBlockType);
 
                 if (material == null) {
-                    player.sendMessage("§cServer received /kml command with invalid blocktype string metadata. Using bricks as fallback.");
+                    player.sendMessage(INVALID_BLOCK_METADATA_MESSAGE);
                     material = Material.BRICKS;
                 }
 
@@ -411,18 +487,17 @@ public class KmlCommand implements CommandExecutor {
      * After creation, the player should:
      * <ol>
      *   <li>Right-click the CommandBlock</li>
-     *   <li>Paste the KML content after "/kml "</li>
+     *   <li>Paste the KML content after "/btt kml "</li>
      *   <li>Set the CommandBlock to "Always Active"</li>
      *   <li>Confirm to execute</li>
      * </ol>
      *
      * @param player The player creating the CommandBlock UI
-     * @param cmd    The command object (unused)
      * @param alias  The command alias used (determines operation mode)
      * @param args   Command arguments (block type and extend options)
      * @return true if the CommandBlock was created successfully
      */
-    public boolean createPasteUI(Player player, Command cmd, String alias, String @NonNull [] args) {
+    public boolean createPasteUI(Player player, String alias, String @NonNull [] args) {
         //The command either creates a command-block at the player location
         //arguments are an 
         //  optional blocktype 
@@ -430,11 +505,10 @@ public class KmlCommand implements CommandExecutor {
         String blocktype = "BRICKS";
         boolean extendToGround = false;
         String extendToGroundBlockType = "GREEN_WOOL";
-        String prefix_extendParam = "-extend:";
         for (String arg : args) {
-            if (arg.startsWith(prefix_extendParam)) {
+            if (arg.startsWith(EXTEND_PREFIX)) {
                 extendToGround = true;
-                extendToGroundBlockType = arg.substring(prefix_extendParam.length()).toUpperCase();
+                extendToGroundBlockType = arg.substring(EXTEND_PREFIX.length()).toUpperCase();
 
                 if (Material.matchMaterial(extendToGroundBlockType) == null) {
                     player.sendMessage(String.format("§cInvalid block type for extend parameter '%s'. Using bricks as fallback.", extendToGroundBlockType));
@@ -464,7 +538,7 @@ public class KmlCommand implements CommandExecutor {
         //for now, user has to manually set the command to "auto" to get it immediately triggered on confirm
         CommandBlock cmdBlock = (CommandBlock) block.getState();
 
-        cmdBlock.setCommand("/kml "); //ready to paste kml content
+        cmdBlock.setCommand("/btt kml "); //ready to paste kml content
         cmdBlock.setMetadata("kmlPlayerName", new FixedMetadataValue(BuildTeamTools.getInstance(), player.getName()));
         //cmdBlock.setMetadata("kmlPlayerID", new FixedMetadataValue(BuildTeamTools.getInstance(), p.getUniqueId()));
         cmdBlock.setMetadata("kmlBlocktype", new FixedMetadataValue(BuildTeamTools.getInstance(), blocktype));
@@ -617,10 +691,10 @@ public class KmlCommand implements CommandExecutor {
      */
     private BlockCreationMode commandToCreationMode(@NonNull String command) {
         return switch (command) {
-            case "geopoints" -> BlockCreationMode.POINTS;
-            case "geopath" -> BlockCreationMode.PATH;
-            case "georing" -> BlockCreationMode.CLOSED_PATH;
-            case "geosurface" ->
+            case GEOPOINTS_COMMAND -> BlockCreationMode.POINTS;
+            case GEOPATH_COMMAND -> BlockCreationMode.PATH;
+            case GEORING_COMMAND -> BlockCreationMode.CLOSED_PATH;
+            case GEOSURFACE_COMMAND ->
                     throw new UnsupportedOperationException("Operation mode 'filled surface' is not yet implemented");
             //return BlockCreationMode.FILLED;
             default -> throw new IllegalArgumentException(command);

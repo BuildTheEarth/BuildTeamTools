@@ -26,6 +26,7 @@ public class Permissions {
 
 
     public static final String BLOCK_PALETTE_EDIT = "btt.bp.edit";
+    public static final String BLOCK_PALETTE_USE = "btt.bp.use";
 
 
     public static final String NAVIGATOR_USE = "btt.navigator.use";

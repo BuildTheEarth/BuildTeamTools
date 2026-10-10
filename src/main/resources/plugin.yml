@@ -1,52 +1,11 @@
 name: BuildTeamTools
 main: net.buildtheearth.buildteamtools.BuildTeamTools
-api-version: 1.13
+api-version: 1.20.6
 version: ${version}
 description: ${description}
 author: MineFact, frikandelworst, George112n, ELgamer, SirJodelstein, Zoriot
 softdepend: [ WorldEdit, HeadDatabase, PlotSystem-Terra, BlueMap ]
 
-commands:
-  buildteamtools:
-    description: Main command of the Build Team Tools plugin.
-    usage: /buildteamtools
-    aliases: [ btt ]
-  generate:
-    description: Allows usage of the Generator Tool.
-    usage: /generate
-    aliases: [ gen, g ]
-  navigator:
-    description: Opens the universal navigator.
-    usage: /navigator
-    aliases: [ nav, navigate ]
-  explore:
-    description: Opens the BuildTeams explore menu.
-    usage: /explore
-  warp:
-    description: Command for managing warps.
-    usage: /warp <subcommand>
-    aliases: [ warps, wp ]
-  warpbt:
-    description: Opens the warp menu for the specified BuildTeam
-    usage: /warpsbt <team>
-    aliases: [ wbt, wpt, warpsbuildteam, warpsbt ]
-  kml:
-    description: kml pasting and parsing
-    usage: /kml
-    aliases: [ geopoints, geopath, georing, geosurface ]
-  address:
-    description: Get or teleport to an address
-    usage: /address [get|teleport]
-
-  blockpalette:
-    description: Opens the block palette menu.
-    usage: /blockpalette [filter|menu|filter <filter1> <filter2> ...]
-    aliases: [ bp, blocks ]
-    permission: btt.bp.use
-  buildteam:
-    description: Sends the player to the specified BuildTeam
-    usage: /buildteam <team>
-    aliases: [ bt ]
 permissions:
   btt.permpack.visitor:
     description: Contains all permissions for visitors / everyone
@@ -115,4 +74,5 @@ permissions:
   btt.bp.edit:
     description: Allows players to create and edit custom block palettes
     default: op
+
 github-repo: "BuildTheEarth/BuildTeamTools"

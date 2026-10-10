@@ -1,73 +1,64 @@
 package net.buildtheearth.buildteamtools.modules.navigation.components.navigator.commands;
 
 import com.alpsbte.alpslib.utils.ChatHelper;
+import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.modules.Module;
+import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
 import net.buildtheearth.buildteamtools.modules.navigation.NavUtils;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.incendo.cloud.parser.standard.StringParser;
 import org.jspecify.annotations.NonNull;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class BuildteamCommand implements CommandExecutor, TabCompleter {
+public class BuildteamCommand {
 
-    @Override
-    public boolean onCommand(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, String @NonNull [] args) {
-        return btCommand(sender, label, args, Permissions.NAVIGATOR_USE);
+    public void register(Module owner) {
+        BuildTeamTools.getInstance().getCommandManager().registerRequiredArgument(owner, "buildteam",
+                "buildteam", "Build team name or tag",
+                StringParser.greedyStringParser(),
+                Permissions.NAVIGATOR_USE,
+                (sender, input) -> suggestions(input),
+                (sender, buildTeamName) -> btCommand(sender, buildTeamName, Permissions.NAVIGATOR_USE));
     }
 
-    protected boolean btCommand(@NonNull CommandSender sender, @NonNull String label, String[] args, String permission) {
+    protected void btCommand(@NonNull CommandSender sender, String buildTeamName, String permission) {
         if (!(sender instanceof Player player)) {
             sender.sendMessage(ChatHelper.getErrorString("You must be a %s to %s this command!", "player", "execute"));
-            return true;
+            return;
         }
 
         if (!player.hasPermission(permission)) {
             player.sendMessage(ChatHelper.getErrorString("You don't have permission to use this command!"));
-            return true;
+            return;
         }
 
-        if (args.length < 1) {
-            player.sendMessage(ChatHelper.getErrorString("Usage: /%s <buildteam>", label));
-            return true;
-        } else {
-            String buildTeamName;
-            if (args.length > 1) buildTeamName = String.join(" ", args);
-            else {
-                buildTeamName = args[0];
-            }
-            var teams = NetworkModule.getInstance().getBuildTeams().stream()
-                    .filter(buildTeam -> buildTeam.getTag().equalsIgnoreCase(buildTeamName) || buildTeam.getBlankName().equalsIgnoreCase(buildTeamName)).toArray();
-            if (teams.length == 0 || !(teams[0] instanceof BuildTeam bt)) {
-                player.sendMessage(ChatHelper.getErrorString("Build team '%s' does not exist!", buildTeamName));
-                return true;
-            }
-            execute(player, bt);
+        BuildTeam team = NetworkModule.getInstance().getBuildTeams().stream()
+                .filter(buildTeam -> buildTeam.getTag().equalsIgnoreCase(buildTeamName)
+                        || buildTeam.getBlankName().equalsIgnoreCase(buildTeamName))
+                .findFirst()
+                .orElse(null);
+        if (team == null) {
+            player.sendMessage(ChatHelper.getErrorString("Build team '%s' does not exist!", buildTeamName));
+            return;
         }
-        return true;
+        execute(player, team);
     }
 
     public void execute(Player player, BuildTeam team) {
         NavUtils.switchToTeam(team, player);
     }
 
-    @Override
-    public List<String> onTabComplete(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, String @NonNull [] args) {
-        if (args.length >= 1) {
-            String partial = args[0].toLowerCase();
-            return NetworkModule.getInstance().getBuildTeams().stream()
-                    .flatMap(bt -> Stream.of(bt.getTag(), bt.getBlankName()))
-                    .filter(s -> s.toLowerCase().contains(partial))
-                    .toList();
-        }
-        return Collections.emptyList();
+    protected List<String> suggestions(String input) {
+        List<String> candidates = NetworkModule.getInstance().getBuildTeams().stream()
+                .flatMap(team -> Stream.of(team.getTag(), team.getBlankName()))
+                .toList();
+        return BttCommandManager.matchingSuggestions(candidates, input);
     }
-}
 
+}

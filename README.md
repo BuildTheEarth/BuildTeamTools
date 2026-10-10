@@ -58,7 +58,7 @@ intuitive entry point for newcomers to the project.
 ## Features
 
 🔨 **Easy-to-use** Tools  
-⏱ **Multi-Version** support from `1.18` - `26.x`  
+⏱ **Multi-Version** support from `1.20.6` - `26.x`<br/>
 ✔️ **User-friendly** GUIs and Commands  
 📆 **Automatic** Updates  
 🔌 **Easy setup** and configuration
@@ -82,7 +82,7 @@ outdated.*
 
 💻 **Requirements:**
 
-- A Server running Paper 1.18 - **26.x**.
+- A Server running Paper 1.20.6 - **26.x**.
 
 🚩 **How to install:**
 
@@ -101,6 +101,11 @@ outdated.*
 5. Done!
 
 **For more help, please see the [wiki](https://resources.buildtheearth.net/s/btt).**
+
+Use `/btt help` for in-game command help. See the
+[Commands & Permissions](https://resources.buildtheearth.net/s/btt/doc/commands-permissions-wbqTdIlhWx)
+and [Configuration](https://resources.buildtheearth.net/s/btt/doc/configuration-tpEHSZ6Zt2)
+pages for the maintained command and configuration documentation.
 
 ## Contributors
 

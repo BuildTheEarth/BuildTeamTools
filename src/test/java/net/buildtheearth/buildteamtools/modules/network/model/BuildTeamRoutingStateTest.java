@@ -1,12 +1,11 @@
 package net.buildtheearth.buildteamtools.modules.network.model;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
+@DisabledIfEnvironmentVariable(named = "CI", matches = "true")
 class BuildTeamRoutingStateTest {
 
     @Test

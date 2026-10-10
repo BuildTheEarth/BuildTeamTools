@@ -102,16 +102,10 @@ outdated.*
 
 **For more help, please see the [wiki](https://resources.buildtheearth.net/s/btt).**
 
-Use `/btt help` for in-game command help. Feature commands and their subcommands
-also work under `/btt`, for example `/btt warp migrate essentials`. Configured
-aliases share the same command tree and permissions; alias changes require a restart.
-Every standalone label, including `/warp`, must be listed in `commands.aliases`.
-Set a feature's list to `[]` to expose it only under `/btt`; clear all lists
-(including `btt`) to register only the `/btt` root. Default lists include the
-canonical standalone labels. Existing configurations must add those labels
-explicitly if they should remain available. The build-team warp command is
-`/btt btwarps`, with default standalone labels `btwarps`, `btwarp`, `wbt`,
-`wpt`, and `buildteamwarps`; rename the old `warpsbt` config key to `btwarps`.
+Use `/btt help` for in-game command help. See the
+[Commands & Permissions](https://resources.buildtheearth.net/s/btt/doc/commands-permissions-wbqTdIlhWx)
+and [Configuration](https://resources.buildtheearth.net/s/btt/doc/configuration-tpEHSZ6Zt2)
+pages for the maintained command and configuration documentation.
 
 ## Contributors
 

@@ -13,8 +13,7 @@ import net.buildtheearth.buildteamtools.modules.navigation.components.warps.mode
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
-import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
-import net.buildtheearth.buildteamtools.utils.io.ConfigUtil;
+import net.buildtheearth.buildteamtools.utils.io.NavigationConfig;
 import net.buildtheearth.model.MinecraftCoordinate;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -57,12 +56,11 @@ public class BluemapComponent extends ModuleComponent {
      * organized by world.
      * </p>
      */
-    public BluemapComponent() {
+    public BluemapComponent(NavigationConfig config) {
         super("BlueMap");
 
         // Check if BlueMap integration is enabled in config
-        boolean isEnabled = BuildTeamTools.getInstance().getConfig(ConfigUtil.NAVIGATION)
-                .getBoolean(ConfigPaths.Navigation.BLUEMAP_ENABLED, true);
+        boolean isEnabled = config.bluemap().enabled();
 
         if (!isEnabled) {
             BuildTeamTools.getInstance().getComponentLogger().info(

@@ -10,13 +10,14 @@ import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.plotsystem.PlotSystemModule;
 import net.buildtheearth.buildteamtools.modules.stats.StatsModule;
-import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
-import net.buildtheearth.buildteamtools.utils.io.ConfigUtil;
+import net.buildtheearth.buildteamtools.utils.io.ConfigurationLoader;
+import net.buildtheearth.buildteamtools.utils.io.GeneratorConfig;
+import net.buildtheearth.buildteamtools.utils.io.MainConfig;
+import net.buildtheearth.buildteamtools.utils.io.NavigationConfig;
+import net.buildtheearth.buildteamtools.utils.io.PlotSystemConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * The parent of all modules of the Build Team Tools plugin
@@ -33,17 +34,32 @@ public class BuildTeamTools extends JavaPlugin {
     private static BuildTeamTools instance = null;
 
     private World earthWorld;
+    private ConfigurationLoader<MainConfig> mainConfigLoader;
+    private ConfigurationLoader<NavigationConfig> navigationConfigLoader;
+    private ConfigurationLoader<GeneratorConfig> generatorConfigLoader;
+    private ConfigurationLoader<PlotSystemConfig> plotSystemConfigLoader;
 
     @Override
     public void onEnable() {
         instance = this;
+        mainConfigLoader = new ConfigurationLoader<>(MainConfig.class, getDataFolder().toPath(), getSLF4JLogger());
+        navigationConfigLoader = new ConfigurationLoader<>(NavigationConfig.class,
+                getDataFolder().toPath().resolve("modules/navigation"), getSLF4JLogger());
+        generatorConfigLoader = new ConfigurationLoader<>(GeneratorConfig.class,
+                getDataFolder().toPath().resolve("modules/generator"), getSLF4JLogger());
+        plotSystemConfigLoader = new ConfigurationLoader<>(PlotSystemConfig.class,
+                getDataFolder().toPath().resolve("modules/plotsystem"), getSLF4JLogger());
+        MainConfig mainConfig = mainConfigLoader.load();
+        NavigationConfig navigationConfig = navigationConfigLoader.load();
+        GeneratorConfig generatorConfig = generatorConfigLoader.load();
+        plotSystemConfigLoader.load();
 
         // Register Modules
-        ModuleHandler.getInstance().registerModules(
-                CommonModule.getInstance(),
-                NetworkModule.getInstance(),
-                GeneratorModule.getInstance(),
-                NavigationModule.getInstance(),
+        ModuleHandler.getInstance().replaceModules(
+                new CommonModule(mainConfig),
+                new NetworkModule(mainConfig),
+                new GeneratorModule(generatorConfig),
+                new NavigationModule(navigationConfig),
                 MiscModule.getInstance(),
                 StatsModule.getInstance(),
                 PlotSystemModule.getInstance()
@@ -58,25 +74,19 @@ public class BuildTeamTools extends JavaPlugin {
 
 
     @Override
-    public @NotNull FileConfiguration getConfig() {
-        return getConfig(ConfigUtil.MAIN);
-    }
-
-    public FileConfiguration getConfig(ConfigUtil configType) {
-        if (ConfigUtil.getInstance() == null)
-            return null;
-
-        return ConfigUtil.getInstance().configs[configType.ordinal()];
-    }
-
-    @Override
     public void reloadConfig() {
-        ConfigUtil.getInstance().reloadFiles();
+        mainConfigLoader.reload();
+        navigationConfigLoader.reload();
+        generatorConfigLoader.reload();
+        plotSystemConfigLoader.reload();
+    }
+
+    public MainConfig getMainConfig() {
+        return mainConfigLoader.getConfig();
     }
 
     @Override
     public void saveConfig() {
-        ConfigUtil.getInstance().saveFiles();
     }
 
     public void setDebug(boolean debug) {
@@ -88,7 +98,7 @@ public class BuildTeamTools extends JavaPlugin {
         if (earthWorld != null)
             return earthWorld;
 
-        String worldName = BuildTeamTools.getInstance().getConfig().getString(ConfigPaths.EARTH_WORLD);
+        String worldName = getMainConfig().earthWorld();
         if (worldName == null || worldName.isEmpty())
             return null;
 

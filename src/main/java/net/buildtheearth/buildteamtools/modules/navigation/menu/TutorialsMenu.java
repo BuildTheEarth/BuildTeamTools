@@ -23,7 +23,7 @@ public class TutorialsMenu extends AbstractMenu {
 
     @Override
     protected void setPreviewItems() {
-        setBackItem(BACK_BUTTON_SLOT, new MainMenu(getMenuPlayer()));
+        setBackItem(BACK_BUTTON_SLOT, new MainMenu(getMenuPlayer(), false));
 
         super.setPreviewItems();
     }

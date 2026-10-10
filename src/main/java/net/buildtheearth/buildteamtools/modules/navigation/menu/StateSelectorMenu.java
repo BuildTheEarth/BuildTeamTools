@@ -52,13 +52,15 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
         this.stateEntries = loadStateEntries(continent);
     }
 
-    private @NonNull List<StateEntry> loadStateEntries(@NonNull Continent continent) {
-        List<StateEntry> entries = new ArrayList<>();
-
+    private static @NonNull List<StateEntry> loadStateEntries(@NonNull Continent continent) {
         NetworkModule networkModule = NetworkModule.getInstance();
-        BuildTeam currentTeam = networkModule.getBuildTeam();
+        return loadStateEntries(continent, networkModule.getBuildTeams(), networkModule.getBuildTeam());
+    }
 
-        for (BuildTeam team : networkModule.getBuildTeams()) {
+    private static @NonNull List<StateEntry> loadStateEntries(
+            @NonNull Continent continent, @NonNull List<BuildTeam> teams, BuildTeam currentTeam) {
+        List<StateEntry> entries = new ArrayList<>();
+        for (BuildTeam team : teams) {
             if (shouldSkipTeam(team, currentTeam)) {
                 continue;
             }
@@ -70,7 +72,7 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
         return entries;
     }
 
-    private boolean shouldSkipTeam(BuildTeam team, BuildTeam currentTeam) {
+    private static boolean shouldSkipTeam(BuildTeam team, BuildTeam currentTeam) {
         if (team == null || team.getID() == null) {
             return true;
         }
@@ -82,7 +84,7 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
         return team.getID().equals(currentTeam.getID());
     }
 
-    private void addStateEntriesForTeam(
+    private static void addStateEntriesForTeam(
             @NonNull List<StateEntry> entries,
             @NonNull BuildTeam team,
             @NonNull Continent continent
@@ -96,7 +98,7 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
         }
     }
 
-    private boolean isStateInContinent(@NonNull Region region, @NonNull Continent continent) {
+    private static boolean isStateInContinent(@NonNull Region region, @NonNull Continent continent) {
         return region.getType() == RegionType.STATE && region.getContinent() == continent;
     }
 
@@ -106,18 +108,35 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
      * Temporary workaround: city-to-state relationships are not available yet,
      * so New York is treated as the only state with city-level build teams.
      */
-    private boolean hasCitiesForState(@NonNull Region stateRegion) {
+    private static boolean hasCitiesForState(@NonNull Region stateRegion) {
         return NEW_YORK_STATE_NAME.equals(stateRegion.getName());
     }
 
-    private @NonNull List<BuildTeam> getCityTeamsForState(@NonNull Region stateRegion) {
+    public static @NonNull List<Region> getCityStates() {
+        NetworkModule networkModule = NetworkModule.getInstance();
+        return getCityStates(networkModule.getBuildTeams(), networkModule.getBuildTeam());
+    }
+
+    static @NonNull List<Region> getCityStates(@NonNull List<BuildTeam> teams, BuildTeam currentTeam) {
+        return loadStateEntries(Continent.NORTH_AMERICA, teams, currentTeam).stream()
+                .filter(StateEntry::hasSubCities)
+                .map(StateEntry::stateRegion)
+                .toList();
+    }
+
+    public static @NonNull List<BuildTeam> getCityTeamsForState(@NonNull Region stateRegion) {
+        return getCityTeamsForState(stateRegion, NetworkModule.getInstance().getBuildTeams());
+    }
+
+    static @NonNull List<BuildTeam> getCityTeamsForState(
+            @NonNull Region stateRegion, @NonNull List<BuildTeam> teams) {
         if (!hasCitiesForState(stateRegion)) {
             return List.of();
         }
 
         List<BuildTeam> cityTeams = new ArrayList<>();
 
-        for (BuildTeam team : NetworkModule.getInstance().getBuildTeams()) {
+        for (BuildTeam team : teams) {
             if (team == null || team.getID() == null) {
                 continue;
             }
@@ -130,7 +149,7 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
         return cityTeams;
     }
 
-    private boolean hasNewYorkCityRegion(@NonNull BuildTeam team) {
+    private static boolean hasNewYorkCityRegion(@NonNull BuildTeam team) {
         for (Region region : team.getRegions()) {
             if (region.getType() != RegionType.CITY) {
                 continue;

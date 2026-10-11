@@ -1,6 +1,7 @@
 package net.buildtheearth.buildteamtools.utils.io;
 
 import space.arim.dazzleconf.engine.Comments;
+import space.arim.dazzleconf.engine.liaison.SubSection;
 
 import java.util.List;
 
@@ -24,6 +25,8 @@ public interface MainConfig {
     }
 
     @Comments("The modules that should be disabled. E.g. \"Generator\"")
+    @Comments("Commands belonging to disabled or failed-to-enable modules are not registered.")
+    @Comments("Restart the server after changing this setting.")
     default List<String> disabledModules() {
         return List.of();
     }
@@ -36,5 +39,42 @@ public interface MainConfig {
     @Comments("Enable or disable debug mode")
     default boolean debug() {
         return false;
+    }
+
+    @Comments("Command settings. Changes require a server restart.")
+    default @SubSection Commands commands() {
+        return new Commands() {};
+    }
+
+    interface Commands {
+        @Comments("Standalone command labels (e.g. /warp). Keep a command's own name in its list,")
+        @Comments("otherwise it is no longer available standalone. An empty list disables the standalone command.")
+        @Comments("/btt <command> is always available.")
+        default @SubSection Labels labels() {
+            return new Labels() {};
+        }
+    }
+
+    interface Labels {
+        @Comments("Extra aliases for /btt. /btt itself is always registered.")
+        default List<String> btt() { return List.of("buildteamtools"); }
+
+        default List<String> generate() { return List.of("generate", "gen", "g"); }
+        default List<String> kml() { return List.of("kml"); }
+        @Comments("Aliases for the KML points command.")
+        default List<String> geopoints() { return List.of("geopoints"); }
+        @Comments("Aliases for the KML path command.")
+        default List<String> geopath() { return List.of("geopath"); }
+        @Comments("Aliases for the KML closed-path command.")
+        default List<String> georing() { return List.of("georing"); }
+        @Comments("Aliases for the KML filled-surface command.")
+        default List<String> geosurface() { return List.of("geosurface"); }
+        default List<String> navigator() { return List.of("navigator", "nav", "navigate"); }
+        default List<String> buildteam() { return List.of("buildteam", "bt"); }
+        default List<String> btwarps() { return List.of("btwarps", "btwarp", "wbt", "wpt", "buildteamwarps"); }
+        default List<String> explore() { return List.of("explore"); }
+        default List<String> address() { return List.of("address"); }
+        default List<String> warp() { return List.of("warp", "warps", "wp"); }
+        default List<String> blockpalette() { return List.of("blockpalette", "bp", "blocks"); }
     }
 }

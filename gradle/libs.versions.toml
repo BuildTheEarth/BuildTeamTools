@@ -22,6 +22,10 @@ bstats = "3.2.1"
 buildtheearth-projection = "1.0.5"
 # @pin Waiting for dependency update in alps - lib - Used in AlpsLib-Utils#GeneratorUtils https://github.com/micycle1/Clipper2-java/releases
 clipper2 = "1.5.4"
+# https://github.com/Incendo/cloud
+cloud-core = "2.1.0"
+# https://github.com/Incendo/cloud-minecraft
+cloud-minecraft = "2.0.1"
 # Ref https://github.com/A248/DazzleConf/releases
 dazzleconf = "2.0.0-M3"
 # Ref: https://github.com/IntellectualSites/bom
@@ -61,6 +65,9 @@ bluemap-api = { module = "de.bluecolored:bluemap-api", version.ref = "bluemap-ap
 bstats-bukkit = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }
 buildtheearth-projection = { module = "net.buildtheearth:projection", version.ref = "buildtheearth-projection" }
 clipper2 = { module = "com.github.micycle1:Clipper2-java", version.ref = "clipper2" }
+cloud-core = { module = "org.incendo:cloud-core", version.ref = "cloud-core" }
+cloud-paper = { module = "org.incendo:cloud-paper", version.ref = "cloud-minecraft" }
+cloud-minecraft-extras = { module = "org.incendo:cloud-minecraft-extras", version.ref = "cloud-minecraft" }
 dazzleconf = { module = "space.arim.dazzleconf:dazzleconf-yaml", version.ref = "dazzleconf" }
 com-alpsbte-alpslib-alpslib-libpsterra = { module = "com.alpsbte.alpslib:alpslib-libpsterra", version.ref = "alpslib-libpsterra" }
 fawe-bom = { module = "com.intellectualsites.bom:bom-newest", version.ref = "fawe-bom" }

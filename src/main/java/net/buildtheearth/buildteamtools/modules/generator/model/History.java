@@ -39,7 +39,7 @@ public class History {
     public void undoCommand(Player p) {
         if (getHistoryEntries().isEmpty()) {
             p.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
-                    "You didn't generate any structures yet. Use /gen to create one. You can only undo the last structure."
+                    "You didn't generate any structures yet. Use /btt generate to create one. You can only undo the last structure."
             )));
             return;
         }
@@ -61,8 +61,8 @@ public class History {
 
         p.playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_DESTROY_EGG, 1.0F, 1.0F);
 
-        Component redoMessage = ChatHelper.getStandardComponent(false, "Use %s to redo it.", "/gen redo")
-                .clickEvent(ClickEvent.runCommand("/gen redo"))
+        Component redoMessage = ChatHelper.getStandardComponent(false, "Use %s to redo it.", "/btt generate redo")
+                .clickEvent(ClickEvent.runCommand("/btt generate redo"))
                 .hoverEvent(HoverEvent.showText(Component.text("Click to redo the last structure.", NamedTextColor.GRAY)));
         p.sendMessage(ChatHelper.getSuccessComponent("Successfully %s the last structure.", "undid")
                 .appendNewline()
@@ -73,7 +73,7 @@ public class History {
     public void redoCommand(Player p) {
         if (getUndoHistoryEntries().isEmpty()) {
             p.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
-                    "You didn't undo any structures yet. Use /gen undo to undo one. You can only redo the last structure."
+                    "You didn't undo any structures yet. Use /btt generate undo to undo one. You can only redo the last structure."
             )));
             return;
         }
@@ -95,8 +95,8 @@ public class History {
 
         p.playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_DESTROY_EGG, 1.0F, 1.0F);
 
-        Component undoMessage = ChatHelper.getStandardComponent(false, "Use %s to undo it.", "/gen undo")
-                .clickEvent(ClickEvent.runCommand("/gen undo"))
+        Component undoMessage = ChatHelper.getStandardComponent(false, "Use %s to undo it.", "/btt generate undo")
+                .clickEvent(ClickEvent.runCommand("/btt generate undo"))
                 .hoverEvent(HoverEvent.showText(Component.text("Click to undo the last structure.", NamedTextColor.GRAY)));
         p.sendMessage(ChatHelper.getSuccessComponent("Successfully %s the last structure.", "redid")
                 .appendNewline()

@@ -116,7 +116,7 @@ public abstract class GeneratorComponent extends ModuleComponent implements Wiki
             case FIELD -> "field";
         };
 
-        StringBuilder command = new StringBuilder("/gen " + type);
+        StringBuilder command = new StringBuilder("/btt generate " + type);
 
         for (var flag : flags.entrySet())
             command.append(" -").append(flag.getKey().getFlag()).append(" ").append(flag.getValue());
@@ -130,7 +130,7 @@ public abstract class GeneratorComponent extends ModuleComponent implements Wiki
                 .hoverEvent(HoverEvent.showText(Component.text("Click to copy command", NamedTextColor.GRAY)));
 
         TextComponent undo = Component.text("[UNDO]", NamedTextColor.RED, TextDecoration.BOLD)
-                .clickEvent(ClickEvent.runCommand("/gen undo"))
+                .clickEvent(ClickEvent.runCommand("/btt generate undo"))
                 .hoverEvent(HoverEvent.showText(Component.text("Click to undo last generation", NamedTextColor.GRAY)));
 
         Component message = ChatHelper.getSuccessComponent("%s successfully generated.", generatorType.getName())

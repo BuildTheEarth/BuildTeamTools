@@ -3,7 +3,6 @@ package net.buildtheearth.buildteamtools.modules;
 import com.alpsbte.alpslib.utils.ChatHelper;
 import lombok.Getter;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
-import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -49,6 +48,20 @@ public class ModuleHandler {
     }
 
     /**
+     * Replaces the registered modules, disabling the previous instances first.
+     *
+     * <p>This is used when the plugin is re-enabled so modules bound to newly
+     * loaded configuration shells become the active instances.</p>
+     *
+     * @param modules the module instances for the current plugin lifecycle
+     */
+    public void replaceModules(Module @NotNull ... modules) {
+        disableAll(null);
+        this.modules.clear();
+        registerModules(modules);
+    }
+
+    /**
      * Enables a specific module
      *
      * @param module   {@link Module}
@@ -60,8 +73,8 @@ public class ModuleHandler {
             if (m.getModuleName().equals(module.getModuleName()) && m.isEnabled())
                 return false;
 
-        if (!module.getModuleName().equals("Common") && BuildTeamTools.getInstance().getConfig()
-                .getStringList(ConfigPaths.DISABLED_MODULES).stream().anyMatch(module.getModuleName()::equalsIgnoreCase)) {
+        if (!module.getModuleName().equals("Common") && BuildTeamTools.getInstance().getMainConfig()
+                .disabledModules().stream().anyMatch(module.getModuleName()::equalsIgnoreCase)) {
             module.shutdown("This module is disabled in the config.");
         } else {
             boolean containsDisabledDependencyModule = false;

@@ -4,11 +4,10 @@ import com.alpsbte.alpslib.utils.ChatHelper;
 import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import com.sk89q.worldedit.WorldEdit;
-import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.ModuleComponent;
 import net.buildtheearth.buildteamtools.modules.common.CommonModule;
-import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
-import net.buildtheearth.buildteamtools.utils.io.ConfigUtil;
+import net.buildtheearth.buildteamtools.utils.io.NavigationConfig;
+import net.buildtheearth.buildteamtools.BuildTeamTools;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -23,8 +22,11 @@ public class NavigatorComponent extends ModuleComponent {
 
     private final NamespacedKey navigatorKey;
 
-    public NavigatorComponent() {
+    private final NavigationConfig config;
+
+    public NavigatorComponent(NavigationConfig config) {
         super("Navigator");
+        this.config = config;
         this.navigatorKey = new NamespacedKey(BuildTeamTools.getInstance(), "navigator");
     }
 
@@ -90,7 +92,7 @@ public class NavigatorComponent extends ModuleComponent {
     }
 
     public short getSlot() {
-        return (short) BuildTeamTools.getInstance().getConfig(ConfigUtil.NAVIGATION).getInt(ConfigPaths.Navigation.NAVIGATOR_ITEM_SLOT);
+        return (short) config.navigatorHotbarItem().navSlot();
     }
 
 

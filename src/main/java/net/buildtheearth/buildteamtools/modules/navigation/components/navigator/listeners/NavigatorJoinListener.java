@@ -1,6 +1,7 @@
 package net.buildtheearth.buildteamtools.modules.navigation.components.navigator.listeners;
 
 import net.buildtheearth.buildteamtools.modules.navigation.components.navigator.NavigatorComponent;
+import net.buildtheearth.buildteamtools.utils.io.NavigationConfig;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -11,11 +12,11 @@ import org.jspecify.annotations.NonNull;
 public final class NavigatorJoinListener implements Listener {
 
     private final NavigatorComponent navigator;
-    private final boolean giveNavigatorOnJoin;
+    private final NavigationConfig config;
 
-    public NavigatorJoinListener(@NonNull NavigatorComponent navigator, boolean giveNavigatorOnJoin) {
+    public NavigatorJoinListener(@NonNull NavigatorComponent navigator, NavigationConfig config) {
         this.navigator = navigator;
-        this.giveNavigatorOnJoin = giveNavigatorOnJoin;
+        this.config = config;
     }
 
     @EventHandler
@@ -25,6 +26,6 @@ public final class NavigatorJoinListener implements Listener {
         int navigatorSlot = navigator.getSlot();
 
         inventory.removeItem(navigatorItem);
-        if (giveNavigatorOnJoin) inventory.setItem(navigatorSlot, navigatorItem);
+        if (config.navigatorHotbarItem().navEnabled()) inventory.setItem(navigatorSlot, navigatorItem);
     }
 }

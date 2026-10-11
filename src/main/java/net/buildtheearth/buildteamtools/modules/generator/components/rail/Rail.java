@@ -14,6 +14,7 @@ import net.buildtheearth.buildteamtools.modules.generator.components.rail.genera
 import net.buildtheearth.buildteamtools.modules.generator.model.GeneratorComponent;
 import net.buildtheearth.buildteamtools.modules.generator.model.GeneratorType;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
+import net.buildtheearth.buildteamtools.utils.io.GeneratorConfig;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
@@ -27,9 +28,12 @@ public class Rail extends GeneratorComponent {
 
     @Getter
     private final RailTypeManager railTypeManager;
+    @Getter
+    private final GeneratorConfig config;
 
-    public Rail() {
+    public Rail(GeneratorConfig config) {
         super(GeneratorType.RAIL);
+        this.config = config;
         railTypeManager = new RailTypeManager(BuildTeamTools.getInstance().getDataFolder());
     }
 

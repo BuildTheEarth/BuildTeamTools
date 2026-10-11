@@ -1,7 +1,5 @@
 package net.buildtheearth.buildteamtools.modules.common;
 
-import com.alpsbte.alpslib.io.YamlFileFactory;
-import com.alpsbte.alpslib.io.config.ConfigNotImplementedException;
 import com.alpsbte.alpslib.utils.ChatHelper;
 import lombok.Getter;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
@@ -19,8 +17,7 @@ import net.buildtheearth.buildteamtools.modules.stats.StatsModule;
 import net.buildtheearth.buildteamtools.modules.stats.model.StatsPlayerType;
 import net.buildtheearth.buildteamtools.modules.stats.model.StatsServerType;
 import net.buildtheearth.buildteamtools.utils.WikiLinks;
-import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
-import net.buildtheearth.buildteamtools.utils.io.ConfigUtil;
+import net.buildtheearth.buildteamtools.utils.io.MainConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.MenuFunctionListener;
@@ -39,33 +36,26 @@ public class CommonModule extends Module {
     private long time;
 
 
+    @Getter
     private static CommonModule instance = null;
+    @Getter
+    private final MainConfig config;
 
-    public CommonModule() {
+    public CommonModule(MainConfig config) {
         super("Common", WikiLinks.ENTRY);
-    }
-
-    public static CommonModule getInstance() {
-        return instance == null ? instance = new CommonModule() : instance;
+        this.config = config;
+        instance = this;
     }
 
 
     @Override
     public void enable() {
         // Try to load the configuration, if it throws an exception disable the plugin.
-        try {
-            YamlFileFactory.registerPlugin(BuildTeamTools.getInstance());
-            ConfigUtil.init();
-            ChatHelper.init(BuildTeamTools.getInstance(), BuildTeamTools.getInstance().isDebug(), BuildTeamTools.PREFIX,
-                    BuildTeamTools.CONSOLE_PREFIX);
-        } catch (ConfigNotImplementedException ex) { // Fine?
-        }
-
-        // Reload the configuration file
-        ConfigUtil.getInstance().reloadFiles();
+        ChatHelper.init(BuildTeamTools.getInstance(), BuildTeamTools.getInstance().isDebug(), BuildTeamTools.PREFIX,
+                BuildTeamTools.CONSOLE_PREFIX);
 
         // Set the debug mode
-        BuildTeamTools.getInstance().setDebug(BuildTeamTools.getInstance().getConfig().getBoolean(ConfigPaths.DEBUG, false));
+        BuildTeamTools.getInstance().setDebug(config.debug());
 
         // Initialize the components
         updaterComponent = new UpdaterComponent(BuildTeamTools.getInstance());

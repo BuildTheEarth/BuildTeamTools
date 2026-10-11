@@ -11,8 +11,6 @@ import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
-import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
-import net.buildtheearth.buildteamtools.utils.io.ConfigUtil;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractPaginatedMenu;
 import org.bukkit.entity.Player;
@@ -177,8 +175,7 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
 
     @Override
     protected List<?> getSource() {
-        String mode = BuildTeamTools.getInstance().getConfig(ConfigUtil.NAVIGATION)
-                .getString(ConfigPaths.Navigation.WARPS_GROUP_SORTING_MODE, "");
+        String mode = NavigationModule.getInstance().getConfig().warps().sortingMode();
 
         List<WarpGroup> warpGroups;
         if (mode.equalsIgnoreCase("name")) {

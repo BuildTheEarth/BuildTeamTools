@@ -5,7 +5,6 @@ import io.papermc.paper.util.Tick;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.ModuleComponent;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
-import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
@@ -37,7 +36,7 @@ public class UpdaterComponent extends ModuleComponent {
                 .build();
         this.plugin = plugin;
 
-        if (plugin.getConfig().getBoolean(ConfigPaths.AUTO_UPDATE)) runAutoUpdateAfterCheck();
+        if (plugin.getMainConfig().autoUpdate()) runAutoUpdateAfterCheck();
     }
 
     private void runAutoUpdateAfterCheck() {

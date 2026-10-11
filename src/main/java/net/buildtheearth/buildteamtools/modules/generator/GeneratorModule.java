@@ -19,6 +19,7 @@ import net.buildtheearth.buildteamtools.modules.generator.model.Command;
 import net.buildtheearth.buildteamtools.modules.generator.model.GeneratorCollections;
 import net.buildtheearth.buildteamtools.modules.generator.model.History;
 import net.buildtheearth.buildteamtools.utils.WikiLinks;
+import net.buildtheearth.buildteamtools.utils.io.GeneratorConfig;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -44,14 +45,14 @@ public class GeneratorModule extends Module {
     @Getter
     private Field field;
 
+    @Getter
     private static GeneratorModule instance = null;
+    private final GeneratorConfig config;
 
-    public GeneratorModule() {
+    public GeneratorModule(GeneratorConfig config) {
         super("Generator", WikiLinks.GEN);
-    }
-
-    public static GeneratorModule getInstance() {
-        return instance == null ? instance = new GeneratorModule() : instance;
+        this.config = config;
+        instance = this;
     }
 
     @Override
@@ -66,7 +67,7 @@ public class GeneratorModule extends Module {
 
         house = new House();
         road = new Road();
-        rail = new Rail();
+        rail = new Rail(config);
         tree = new Tree();
         field = new Field();
 

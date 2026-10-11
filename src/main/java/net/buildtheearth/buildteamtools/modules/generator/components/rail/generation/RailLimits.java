@@ -1,9 +1,6 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.rail.generation;
 
-import net.buildtheearth.buildteamtools.BuildTeamTools;
-import net.buildtheearth.buildteamtools.utils.io.ConfigPaths;
-import net.buildtheearth.buildteamtools.utils.io.ConfigUtil;
-import org.bukkit.configuration.file.FileConfiguration;
+import net.buildtheearth.buildteamtools.utils.io.GeneratorConfig;
 
 record RailLimits(
         int maxControlPoints,
@@ -40,48 +37,41 @@ record RailLimits(
     // Hard cap for per-tick placement batches to keep the server responsive.
     private static final int MAX_BLOCK_PLACEMENT_BATCH_SIZE = 2_000;
 
-    static RailLimits fromConfig() {
-        FileConfiguration config = BuildTeamTools.getInstance().getConfig(ConfigUtil.GENERATOR);
+    static RailLimits fromConfig(GeneratorConfig config) {
 
         return new RailLimits(
                 getBoundedInt(
-                        config,
-                        ConfigPaths.Generator.Rail.MAX_CONTROL_POINTS,
+                        config.rail().maxControlPoints(),
                         DEFAULT_MAX_CONTROL_POINTS,
                         2,
                         MAX_CONTROL_POINTS
                 ),
                 getBoundedInt(
-                        config,
-                        ConfigPaths.Generator.Rail.MAX_PATH_POINTS,
+                        config.rail().maxPathPoints(),
                         DEFAULT_MAX_PATH_POINTS,
                         2,
                         MAX_PATH_POINTS
                 ),
                 getBoundedInt(
-                        config,
-                        ConfigPaths.Generator.Rail.MAX_BLOCK_PLACEMENTS,
+                        config.rail().maxBlockPlacements(),
                         DEFAULT_MAX_BLOCK_PLACEMENTS,
                         1,
                         MAX_BLOCK_PLACEMENTS
                 ),
                 getBoundedLong(
-                        config,
-                        ConfigPaths.Generator.Rail.MAX_PREPARED_REGION_VOLUME,
+                        config.rail().maxPreparedRegionVolume(),
                         DEFAULT_MAX_PREPARED_REGION_VOLUME,
                         1L,
                         MAX_PREPARED_REGION_VOLUME
                 ),
                 getBoundedInt(
-                        config,
-                        ConfigPaths.Generator.Rail.MAX_PREPARED_REGION_AXIS_LENGTH,
+                        config.rail().maxPreparedRegionAxisLength(),
                         DEFAULT_MAX_PREPARED_REGION_AXIS_LENGTH,
                         1,
                         MAX_PREPARED_REGION_AXIS_LENGTH
                 ),
                 getBoundedInt(
-                        config,
-                        ConfigPaths.Generator.Rail.BLOCK_PLACEMENT_BATCH_SIZE,
+                        config.rail().blockPlacementBatchSize(),
                         DEFAULT_BLOCK_PLACEMENT_BATCH_SIZE,
                         1,
                         MAX_BLOCK_PLACEMENT_BATCH_SIZE
@@ -89,11 +79,11 @@ record RailLimits(
         );
     }
 
-    private static int getBoundedInt(FileConfiguration config, String path, int fallback, int minimum, int maximum) {
-        return Math.clamp(config.getInt(path, fallback), minimum, maximum);
+    private static int getBoundedInt(int value, int fallback, int minimum, int maximum) {
+        return Math.clamp(value == 0 ? fallback : value, minimum, maximum);
     }
 
-    private static long getBoundedLong(FileConfiguration config, String path, long fallback, long minimum, long maximum) {
-        return Math.clamp(config.getLong(path, fallback), minimum, maximum);
+    private static long getBoundedLong(long value, long fallback, long minimum, long maximum) {
+        return Math.clamp(value == 0 ? fallback : value, minimum, maximum);
     }
 }

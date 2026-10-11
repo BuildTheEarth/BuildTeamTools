@@ -90,7 +90,7 @@ public final class BttCommandManager {
 
         List<String> aliases = validatedAliases(
                 "btt",
-                config.commands().aliases().btt(),
+                config.commands().labels().btt(),
                 true
         );
         aliasesByCommand.put("btt", aliases);
@@ -415,36 +415,37 @@ public final class BttCommandManager {
     }
 
     private List<Command.Builder<CommandSourceStack>> featureBuilders(String name) {
-        List<String> aliases = aliasesByCommand.get(name);
-        if (aliases == null) {
+        List<String> labels = aliasesByCommand.get(name);
+        if (labels == null) {
             throw new IllegalStateException("Register command '" + name + "' before its subcommands.");
         }
         List<Command.Builder<CommandSourceStack>> builders = new ArrayList<>();
-        if (!aliases.isEmpty()) {
-            builders.add(manager.commandBuilder(aliases.getFirst(),
-                    aliases.subList(1, aliases.size()).toArray(String[]::new)));
+        // The list is the standalone labels, so an empty list means no standalone command.
+        if (!labels.isEmpty()) {
+            builders.add(manager.commandBuilder(labels.getFirst(),
+                    labels.subList(1, labels.size()).toArray(String[]::new)));
         }
-        String[] subcommandAliases = aliases.stream().filter(alias -> !alias.equals(name)).toArray(String[]::new);
+        String[] subcommandAliases = labels.stream().filter(label -> !label.equals(name)).toArray(String[]::new);
         builders.add(rootBuilder().literal(name, descriptionFor(name), subcommandAliases));
         return builders;
     }
 
     private List<String> configuredAliases(String name) {
-        MainConfig.Aliases aliases = config.commands().aliases();
+        MainConfig.Labels labels = config.commands().labels();
         return switch (name) {
-            case "generate" -> aliases.generate();
-            case "kml" -> aliases.kml();
-            case "geopoints" -> aliases.geopoints();
-            case "geopath" -> aliases.geopath();
-            case "georing" -> aliases.georing();
-            case "geosurface" -> aliases.geosurface();
-            case "navigator" -> aliases.navigator();
-            case "buildteam" -> aliases.buildteam();
-            case "btwarps" -> aliases.btwarps();
-            case "explore" -> aliases.explore();
-            case "address" -> aliases.address();
-            case "warp" -> aliases.warp();
-            case "blockpalette" -> aliases.blockpalette();
+            case "generate" -> labels.generate();
+            case "kml" -> labels.kml();
+            case "geopoints" -> labels.geopoints();
+            case "geopath" -> labels.geopath();
+            case "georing" -> labels.georing();
+            case "geosurface" -> labels.geosurface();
+            case "navigator" -> labels.navigator();
+            case "buildteam" -> labels.buildteam();
+            case "btwarps" -> labels.btwarps();
+            case "explore" -> labels.explore();
+            case "address" -> labels.address();
+            case "warp" -> labels.warp();
+            case "blockpalette" -> labels.blockpalette();
             default -> List.of();
         };
     }

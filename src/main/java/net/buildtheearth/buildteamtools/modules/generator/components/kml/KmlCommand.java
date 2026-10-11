@@ -58,7 +58,7 @@ public class KmlCommand {
             "§cServer received /btt kml command with invalid blocktype string metadata. Using bricks as fallback.";
 
     public void register(Module owner) {
-        var aliases = BuildTeamTools.getInstance().getMainConfig().commands().aliases();
+        var aliases = BuildTeamTools.getInstance().getMainConfig().commands().labels();
         var commandManager = BuildTeamTools.getInstance().getCommandManager();
         commandManager.registerAliased(owner, "kml", aliases.kml(), this::execute, this::suggestions);
         registerMode(owner, GEOPOINTS_COMMAND, aliases.geopoints());

@@ -211,8 +211,8 @@ class BttCommandManagerTest {
 
     @Test
     void emptyAliasListsRegisterOnlyTheBttRootAndKeepAllFeatureRoutes() {
-        MainConfig.Aliases noAliases = (MainConfig.Aliases) Proxy.newProxyInstance(
-                MainConfig.Aliases.class.getClassLoader(), new Class<?>[]{MainConfig.Aliases.class},
+        MainConfig.Labels noAliases = (MainConfig.Labels) Proxy.newProxyInstance(
+                MainConfig.Labels.class.getClassLoader(), new Class<?>[]{MainConfig.Labels.class},
                 (proxy, method, args) -> List.of());
         manager = new TestManager();
         commands = new BttCommandManager(manager, new MainConfig() {
@@ -220,7 +220,7 @@ class BttCommandManagerTest {
             public Commands commands() {
                 return new Commands() {
                     @Override
-                    public Aliases aliases() {
+                    public Labels labels() {
                         return noAliases;
                     }
                 };
@@ -272,8 +272,8 @@ class BttCommandManagerTest {
             public Commands commands() {
                 return new Commands() {
                     @Override
-                    public Aliases aliases() {
-                        return new Aliases() {
+                    public Labels labels() {
+                        return new Labels() {
                             @Override
                             public List<String> warp() {
                                 return List.of("travel");

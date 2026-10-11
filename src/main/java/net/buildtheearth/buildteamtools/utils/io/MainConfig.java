@@ -41,21 +41,22 @@ public interface MainConfig {
         return false;
     }
 
-    @Comments("Command names and aliases. Changes require a server restart.")
+    @Comments("Command settings. Changes require a server restart.")
     default @SubSection Commands commands() {
         return new Commands() {};
     }
 
     interface Commands {
-        @Comments("Standalone command labels. An empty list disables standalone registration for that feature.")
-        @Comments("Canonical /btt subcommands are registered for enabled modules. Changes require a restart.")
-        default @SubSection Aliases aliases() {
-            return new Aliases() {};
+        @Comments("Standalone command labels (e.g. /warp). Keep a command's own name in its list,")
+        @Comments("otherwise it is no longer available standalone. An empty list disables the standalone command.")
+        @Comments("/btt <command> is always available.")
+        default @SubSection Labels labels() {
+            return new Labels() {};
         }
     }
 
-    interface Aliases {
-        @Comments("Aliases are registered at server startup. Restart the server after changing them.")
+    interface Labels {
+        @Comments("Extra aliases for /btt. /btt itself is always registered.")
         default List<String> btt() { return List.of("buildteamtools"); }
 
         default List<String> generate() { return List.of("generate", "gen", "g"); }

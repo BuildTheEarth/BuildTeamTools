@@ -23,10 +23,7 @@ import org.json.simple.JSONValue;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 @UtilityClass
@@ -40,11 +37,15 @@ public class NetworkAPI {
     public static void setBuildTeamToolsInstalled(boolean installed) {
         String apiKey = BuildTeamTools.getInstance().getMainConfig().apiKey();
 
-        JSONObject requestBodyJson = new JSONObject();
+        Map<String, Boolean> requestBodyJson = new HashMap<>();
         requestBodyJson.put("hasBuildTeamToolsInstalled", installed);
-        String requestBodyString = requestBodyJson.toString();
 
-        RequestBody requestBody = RequestBody.create(requestBodyString, MediaType.parse("application/json"));
+        String requestBodyString = JSONValue.toJSONString(requestBodyJson);
+
+        RequestBody requestBody = RequestBody.create(
+                requestBodyString,
+                MediaType.parse("application/json")
+        );
 
         API.putAsync("https://nwapi.buildtheearth.net/api/teams/" + apiKey + "/hasBuildTeamToolsInstalled", requestBody, new API.ApiResponseCallback() {
             @Override

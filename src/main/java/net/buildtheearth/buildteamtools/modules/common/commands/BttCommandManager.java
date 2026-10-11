@@ -12,27 +12,21 @@ import org.incendo.cloud.Command;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.component.DefaultValue;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.exception.ArgumentParseException;
 import org.incendo.cloud.exception.InvalidCommandSenderException;
 import org.incendo.cloud.exception.InvalidSyntaxException;
 import org.incendo.cloud.exception.NoPermissionException;
+import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.minecraft.extras.MinecraftHelp;
 import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.incendo.cloud.paper.PaperCommandManager;
-import org.incendo.cloud.permission.Permission;
 import org.incendo.cloud.parser.ParserDescriptor;
 import org.incendo.cloud.parser.standard.StringParser;
+import org.incendo.cloud.permission.Permission;
 import org.incendo.cloud.setting.ManagerSetting;
 import org.incendo.cloud.suggestion.SuggestionProvider;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -226,7 +220,7 @@ public final class BttCommandManager {
             CommandHandler handler,
             SuggestionHandler suggestions
     ) {
-        registerAliased(owner, name, aliases, handler, suggestions, (Permission) null);
+        registerAliased(owner, name, aliases, handler, suggestions, null);
     }
 
     public void registerAliased(
@@ -307,19 +301,6 @@ public final class BttCommandManager {
     ) {
         registerRequiredArgument(owner, name, argumentName, argumentDescription, parser,
                 null, (sender, input) -> List.of(), handler);
-    }
-
-    public <T> void registerRequiredArgument(
-            Module owner,
-            String name,
-            String argumentName,
-            String argumentDescription,
-            ParserDescriptor<CommandSourceStack, T> parser,
-            BiFunction<CommandSender, String, List<String>> suggestions,
-            BiConsumer<CommandSender, T> handler
-    ) {
-        registerRequiredArgument(owner, name, argumentName, argumentDescription, parser,
-                null, suggestions, handler);
     }
 
     public <T> void registerRequiredArgument(

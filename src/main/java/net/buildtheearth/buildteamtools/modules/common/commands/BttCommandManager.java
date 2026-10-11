@@ -23,6 +23,7 @@ import org.incendo.cloud.paper.PaperCommandManager;
 import org.incendo.cloud.permission.Permission;
 import org.incendo.cloud.parser.ParserDescriptor;
 import org.incendo.cloud.parser.standard.StringParser;
+import org.incendo.cloud.setting.ManagerSetting;
 import org.incendo.cloud.suggestion.SuggestionProvider;
 
 import java.util.ArrayList;
@@ -55,6 +56,7 @@ public final class BttCommandManager {
     private final MinecraftHelp<CommandSourceStack> help;
     private final Set<String> claimedLabels = new HashSet<>(COMMAND_NAMES);
     private final Map<String, List<String>> aliasesByCommand = new HashMap<>();
+    private final List<PendingCommandRegistration> pendingRegistrations = new ArrayList<>();
 
     public BttCommandManager(BuildTeamTools plugin) {
         this(PaperCommandManager.builder()
@@ -66,6 +68,7 @@ public final class BttCommandManager {
         this.manager = manager;
         this.config = config;
         this.logger = logger;
+        manager.settings().set(ManagerSetting.ALLOW_UNSAFE_REGISTRATION, true);
         help = MinecraftHelp.create("/btt help", manager, CommandSourceStack::getSender);
 
         manager.exceptionController().registerHandler(InvalidSyntaxException.class, context ->
@@ -83,22 +86,26 @@ public final class BttCommandManager {
     }
 
     public void registerRoot(Module owner, Consumer<CommandSender> handler) {
+        if (isConfiguredDisabled(owner)) return;
+
         List<String> aliases = validatedAliases(
                 "btt",
                 config.commands().aliases().btt(),
                 true
         );
         aliasesByCommand.put("btt", aliases);
-        try {
-            manager.command(manager.commandBuilder("btt", aliases.toArray(String[]::new))
-                    .commandDescription(description("Show BuildTeamTools status and connection information."))
-                    .permission(Permissions.BUILD_TEAM_TOOLS)
-                    .handler(context -> execute(owner, context.sender().getSender(), "btt",
-                            () -> handler.accept(context.sender().getSender()))));
-        } catch (RuntimeException exception) {
-            logger.log(Level.SEVERE, "Failed to register the BTT command root.", exception);
-            throw exception;
-        }
+        registerWhenEnabled(owner, () -> {
+            try {
+                manager.command(manager.commandBuilder("btt", aliases.toArray(String[]::new))
+                        .commandDescription(description("Show BuildTeamTools status and connection information."))
+                        .permission(Permissions.BUILD_TEAM_TOOLS)
+                        .handler(context -> execute(owner, context.sender().getSender(), "btt",
+                                () -> handler.accept(context.sender().getSender()))));
+            } catch (RuntimeException exception) {
+                logger.log(Level.SEVERE, "Failed to register the BTT command root.", exception);
+                throw exception;
+            }
+        });
     }
 
     public void registerRootSubcommand(
@@ -108,15 +115,17 @@ public final class BttCommandManager {
             String permission,
             CommandHandler handler
     ) {
-        manager.command(rootBuilder()
-                .literal(name, description(description))
-                .commandDescription(description(description))
-                .permission(Permission.allOf(
-                        Permission.of(Permissions.BUILD_TEAM_TOOLS),
-                        Permission.of(permission)
-                ))
-                .handler(context -> execute(owner, context.sender().getSender(), name, () ->
-                        handler.execute(context.sender().getSender(), name, new String[0]))));
+        if (isConfiguredDisabled(owner)) return;
+
+        registerWhenEnabled(owner, () -> manager.command(rootBuilder()
+                        .literal(name, description(description))
+                        .commandDescription(description(description))
+                        .permission(Permission.allOf(
+                                Permission.of(Permissions.BUILD_TEAM_TOOLS),
+                                Permission.of(permission)
+                        ))
+                        .handler(context -> execute(owner, context.sender().getSender(), name, () ->
+                                handler.execute(context.sender().getSender(), name, new String[0])))));
     }
 
     public void registerRootNestedSubcommand(
@@ -127,27 +136,31 @@ public final class BttCommandManager {
             String permission,
             Consumer<CommandContext<CommandSourceStack>> handler
     ) {
+        if (isConfiguredDisabled(owner)) return;
+
         RichDescription parentDescription = description(rootSubcommandDescription(parent));
-        manager.command(rootBuilder()
-                .literal(parent, parentDescription)
-                .literal(name, description(description))
-                .commandDescription(description(description))
-                .permission(Permission.allOf(
-                        Permission.of(Permissions.BUILD_TEAM_TOOLS),
-                        Permission.of(permission)
-                ))
-                .handler(context -> execute(owner, context.sender().getSender(),
-                        parent + " " + name, () -> handler.accept(context))));
+        registerWhenEnabled(owner, () -> manager.command(rootBuilder()
+                        .literal(parent, parentDescription)
+                        .literal(name, description(description))
+                        .commandDescription(description(description))
+                        .permission(Permission.allOf(
+                                Permission.of(Permissions.BUILD_TEAM_TOOLS),
+                                Permission.of(permission)
+                        ))
+                        .handler(context -> execute(owner, context.sender().getSender(),
+                                parent + " " + name, () -> handler.accept(context)))));
     }
 
     public void registerRootHelp(Module owner) {
-        manager.command(rootBuilder()
-                .literal("help", description("Show available commands or details for a command."))
-                .optional("query", ARGUMENT_PARSER, DefaultValue.constant(""))
-                .commandDescription(description("Show available commands or details for a command."))
-                .permission(Permissions.BUILD_TEAM_TOOLS)
-                .handler(context -> execute(owner, context.sender().getSender(), "btt help", () ->
-                        help.queryCommands(context.<String>optional("query").orElse(""), context.sender()))));
+        if (isConfiguredDisabled(owner)) return;
+
+        registerWhenEnabled(owner, () -> manager.command(rootBuilder()
+                        .literal("help", description("Show available commands or details for a command."))
+                        .optional("query", ARGUMENT_PARSER, DefaultValue.constant(""))
+                        .commandDescription(description("Show available commands or details for a command."))
+                        .permission(Permissions.BUILD_TEAM_TOOLS)
+                        .handler(context -> execute(owner, context.sender().getSender(), "btt help", () ->
+                                help.queryCommands(context.<String>optional("query").orElse(""), context.sender())))));
     }
 
     public void register(Module owner, String name, BiConsumer<CommandSender, String[]> handler) {
@@ -159,6 +172,19 @@ public final class BttCommandManager {
             Module owner,
             String name,
             String permission,
+            BiConsumer<CommandSender, String[]> handler,
+            BiFunction<CommandSender, String, List<String>> suggestions
+    ) {
+        registerAliased(owner, name, configuredAliases(name),
+                (sender, label, arguments) -> handler.accept(sender, arguments),
+                (sender, label, input) -> suggestions.apply(sender, input),
+                Permission.of(permission));
+    }
+
+    public void register(
+            Module owner,
+            String name,
+            Permission permission,
             BiConsumer<CommandSender, String[]> handler,
             BiFunction<CommandSender, String, List<String>> suggestions
     ) {
@@ -200,36 +226,51 @@ public final class BttCommandManager {
             CommandHandler handler,
             SuggestionHandler suggestions
     ) {
-        registerAliased(owner, name, aliases, handler, suggestions, null);
+        registerAliased(owner, name, aliases, handler, suggestions, (Permission) null);
     }
 
-    private void registerAliased(
+    public void registerAliased(
             Module owner,
             String name,
             List<String> aliases,
             CommandHandler handler,
             SuggestionHandler suggestions,
-            String permission
+            Permission permission
     ) {
+        registerAliasedInternal(owner, name, aliases, handler, suggestions, permission);
+    }
+
+    private void registerAliasedInternal(
+            Module owner,
+            String name,
+            List<String> aliases,
+            CommandHandler handler,
+            SuggestionHandler suggestions,
+            Permission permission
+    ) {
+        if (isConfiguredDisabled(owner)) return;
+
         List<String> validAliases = validatedAliases(name, aliases, false);
         aliasesByCommand.put(name, validAliases);
-        try {
-            for (var base : featureBuilders(name)) {
-                var builder = base
-                        .commandDescription(descriptionFor(name))
-                        .optional("arguments", ARGUMENT_PARSER,
-                                suggestionProvider((sender, input) ->
-                                        suggestions.suggest(sender.getSender(), name, input)));
-                if (permission != null) builder = builder.permission(permission);
-                manager.command(builder.handler(context ->
-                        execute(owner, context.sender().getSender(), name, () ->
-                                handler.execute(context.sender().getSender(), name,
-                                        splitArguments(context.<String>optional("arguments").orElse(""))))));
+        registerWhenEnabled(owner, () -> {
+            try {
+                for (var base : featureBuilders(name)) {
+                    var builder = base
+                            .commandDescription(descriptionFor(name))
+                            .optional("arguments", ARGUMENT_PARSER,
+                                    suggestionProvider((sender, input) ->
+                                            suggestions.suggest(sender.getSender(), name, input)));
+                    if (permission != null) builder = builder.permission(permission);
+                    manager.command(builder.handler(context ->
+                            execute(owner, context.sender().getSender(), name, () ->
+                                    handler.execute(context.sender().getSender(), name,
+                                            splitArguments(context.<String>optional("arguments").orElse(""))))));
+                }
+            } catch (RuntimeException exception) {
+                logger.log(Level.SEVERE, "Failed to register command '" + name + "'.", exception);
+                throw exception;
             }
-        } catch (RuntimeException exception) {
-            logger.log(Level.SEVERE, "Failed to register command '" + name + "'.", exception);
-            throw exception;
-        }
+        });
     }
 
     public void registerNoArguments(Module owner, String name, Consumer<CommandSender> handler) {
@@ -242,14 +283,18 @@ public final class BttCommandManager {
             String permission,
             Consumer<CommandSender> handler
     ) {
+        if (isConfiguredDisabled(owner)) return;
+
         List<String> aliases = validatedAliases(name, configuredAliases(name), false);
         aliasesByCommand.put(name, aliases);
-        for (var base : featureBuilders(name)) {
-            var builder = base.commandDescription(descriptionFor(name));
-            if (permission != null) builder = builder.permission(permission);
-            manager.command(builder.handler(context -> execute(owner, context.sender().getSender(), name,
-                    () -> handler.accept(context.sender().getSender()))));
-        }
+        registerWhenEnabled(owner, () -> {
+            for (var base : featureBuilders(name)) {
+                var builder = base.commandDescription(descriptionFor(name));
+                if (permission != null) builder = builder.permission(permission);
+                manager.command(builder.handler(context -> execute(owner, context.sender().getSender(), name,
+                        () -> handler.accept(context.sender().getSender()))));
+            }
+        });
     }
 
     public <T> void registerRequiredArgument(
@@ -287,16 +332,20 @@ public final class BttCommandManager {
             BiFunction<CommandSender, String, List<String>> suggestions,
             BiConsumer<CommandSender, T> handler
     ) {
+        if (isConfiguredDisabled(owner)) return;
+
         List<String> aliases = validatedAliases(name, configuredAliases(name), false);
         aliasesByCommand.put(name, aliases);
-        for (var base : featureBuilders(name)) {
-            var builder = base.commandDescription(descriptionFor(name))
-                    .required(argumentName, parser, description(argumentDescription),
-                            suggestionProvider((sender, input) -> suggestions.apply(sender.getSender(), input)));
-            if (permission != null) builder = builder.permission(permission);
-            manager.command(builder.handler(context -> execute(owner, context.sender().getSender(), name, () ->
-                    handler.accept(context.sender().getSender(), context.get(argumentName)))));
-        }
+        registerWhenEnabled(owner, () -> {
+            for (var base : featureBuilders(name)) {
+                var builder = base.commandDescription(descriptionFor(name))
+                        .required(argumentName, parser, description(argumentDescription),
+                                suggestionProvider((sender, input) -> suggestions.apply(sender.getSender(), input)));
+                if (permission != null) builder = builder.permission(permission);
+                manager.command(builder.handler(context -> execute(owner, context.sender().getSender(), name, () ->
+                        handler.accept(context.sender().getSender(), context.get(argumentName)))));
+            }
+        });
     }
 
     public void registerSubcommand(
@@ -307,14 +356,57 @@ public final class BttCommandManager {
             UnaryOperator<Command.Builder<CommandSourceStack>> argumentBuilder,
             Consumer<CommandContext<CommandSourceStack>> handler
     ) {
+        if (isConfiguredDisabled(owner)) return;
+
         RichDescription richDescription = description(description);
-        for (var base : featureBuilders(commandName)) {
-            var builder = base
-                    .literal(subcommand, richDescription)
-                    .commandDescription(richDescription);
-            manager.command(argumentBuilder.apply(builder)
-                    .handler(context -> execute(owner, context.sender().getSender(),
-                            commandName + " " + subcommand, () -> handler.accept(context))));
+        registerWhenEnabled(owner, () -> {
+            for (var base : featureBuilders(commandName)) {
+                var builder = base
+                        .literal(subcommand, richDescription)
+                        .commandDescription(richDescription);
+                manager.command(argumentBuilder.apply(builder)
+                        .handler(context -> execute(owner, context.sender().getSender(),
+                                commandName + " " + subcommand, () -> handler.accept(context))));
+            }
+        });
+    }
+
+    private boolean isConfiguredDisabled(Module owner) {
+        return owner != null
+                && !owner.getModuleName().equalsIgnoreCase("Common")
+                && config.disabledModules().stream()
+                .anyMatch(owner.getModuleName()::equalsIgnoreCase);
+    }
+
+    public void registerEnabledCommands() {
+        registerPending(null, false);
+    }
+
+    public void registerEnabledCommands(Module owner) {
+        if (owner.isEnabled()) {
+            registerPending(owner, true);
+        }
+    }
+
+    private void registerPending(Module owner, boolean matchOwner) {
+        var iterator = pendingRegistrations.iterator();
+        while (iterator.hasNext()) {
+            PendingCommandRegistration pending = iterator.next();
+            boolean matches = matchOwner
+                    ? pending.owner() == owner
+                    : pending.owner() == null || pending.owner().isEnabled();
+            if (matches) {
+                pending.registration().run();
+                iterator.remove();
+            }
+        }
+    }
+
+    private void registerWhenEnabled(Module owner, Runnable registration) {
+        if (owner != null && owner.isEnabled()) {
+            registration.run();
+        } else {
+            pendingRegistrations.add(new PendingCommandRegistration(owner, registration));
         }
     }
 
@@ -454,5 +546,8 @@ public final class BttCommandManager {
     @FunctionalInterface
     public interface SuggestionHandler {
         List<String> suggest(CommandSender sender, String label, String input);
+    }
+
+    private record PendingCommandRegistration(Module owner, Runnable registration) {
     }
 }

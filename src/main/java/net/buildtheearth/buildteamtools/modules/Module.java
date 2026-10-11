@@ -66,6 +66,9 @@ public abstract class Module implements WikiDocumented {
         loadListeners();
 
         enabled = true;
+        BuildTeamTools plugin = BuildTeamTools.getInstance();
+        if (plugin != null && plugin.getCommandManager() != null)
+            plugin.getCommandManager().registerEnabledCommands(this);
     }
 
     /**

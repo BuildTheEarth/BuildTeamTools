@@ -69,6 +69,7 @@ public class BuildTeamTools extends JavaPlugin {
                 PlotSystemModule.getInstance()
         );
         ModuleHandler.getInstance().enableAll(null);
+        commandManager.registerEnabledCommands();
     }
 
     @Override

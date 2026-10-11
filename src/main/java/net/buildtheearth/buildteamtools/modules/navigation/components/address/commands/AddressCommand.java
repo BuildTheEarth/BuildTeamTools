@@ -16,6 +16,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.incendo.cloud.permission.Permission;
 import org.incendo.cloud.parser.standard.StringParser;
 import org.jspecify.annotations.NonNull;
 
@@ -27,7 +28,12 @@ public class AddressCommand {
 
     public void register(Module owner) {
         var commandManager = BuildTeamTools.getInstance().getCommandManager();
-        commandManager.register(owner, COMMAND_NAME, this::execute,
+        commandManager.register(owner, COMMAND_NAME,
+                Permission.anyOf(
+                        Permission.of(Permissions.ADDRESS_GET),
+                        Permission.of(Permissions.ADDRESS_TELEPORT)
+                ),
+                this::execute,
                 (sender, input) -> {
                     List<String> options = new java.util.ArrayList<>();
                     if (sender.hasPermission(Permissions.ADDRESS_GET)) options.add("get");

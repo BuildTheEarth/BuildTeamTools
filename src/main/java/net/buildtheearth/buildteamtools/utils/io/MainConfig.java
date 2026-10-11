@@ -25,6 +25,8 @@ public interface MainConfig {
     }
 
     @Comments("The modules that should be disabled. E.g. \"Generator\"")
+    @Comments("Commands belonging to disabled or failed-to-enable modules are not registered.")
+    @Comments("Restart the server after changing this setting.")
     default List<String> disabledModules() {
         return List.of();
     }
@@ -46,7 +48,7 @@ public interface MainConfig {
 
     interface Commands {
         @Comments("Standalone command labels. An empty list disables standalone registration for that feature.")
-        @Comments("Canonical /btt subcommands are always registered. Changes require a restart.")
+        @Comments("Canonical /btt subcommands are registered for enabled modules. Changes require a restart.")
         default @SubSection Aliases aliases() {
             return new Aliases() {};
         }

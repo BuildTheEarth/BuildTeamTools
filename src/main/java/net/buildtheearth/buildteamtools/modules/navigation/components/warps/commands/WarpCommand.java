@@ -29,7 +29,7 @@ public class WarpCommand {
 
     public void register(Module owner) {
         var commandManager = BuildTeamTools.getInstance().getCommandManager();
-        commandManager.register(owner, "warp", this::execute, this::suggestions);
+        commandManager.register(owner, "warp", Permissions.WARP_USE, this::execute, this::suggestions);
         commandManager.registerSubcommand(owner, "warp", "create", "Create a warp at your current location.",
                 builder -> builder.permission(Permissions.WARP_CREATE),
                 context -> {

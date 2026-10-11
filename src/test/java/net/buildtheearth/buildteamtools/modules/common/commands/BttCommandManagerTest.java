@@ -60,9 +60,69 @@ class BttCommandManagerTest {
         commands.registerRootNestedSubcommand(null, "cache", "update", "Update cache",
                 Permissions.BUILD_TEAM_TOOLS_CACHE, ignored -> {});
 
+        commands.registerEnabledCommands();
         assertEquals(1, manager.commandTree().rootNodes().size());
         assertSame(parse("btt help warp").command(), parse("buildteamtools help warp").command());
         assertSame(parse("btt cache update").command(), parse("buildteamtools cache update").command());
+    }
+
+    @Test
+    void rootCommandRequiresItsDeclaredPermission() {
+        manager.deniedPermissions = Set.of(Permissions.BUILD_TEAM_TOOLS);
+
+        assertParseFailure(NoPermissionException.class, "btt");
+        assertParseFailure(NoPermissionException.class, "buildteamtools");
+    }
+
+    @Test
+    void configuredDisabledModuleCommandsAreNotRegistered() {
+        manager = new TestManager();
+        commands = new BttCommandManager(manager, new MainConfig() {
+            @Override
+            public List<String> disabledModules() {
+                return List.of("Test");
+            }
+        }, Logger.getAnonymousLogger());
+        commands.registerRoot(null, ignored -> {});
+        commands.register(new EnabledModule(), "warp", (sender, args) -> {});
+
+        assertParseFailure(NoSuchCommandException.class, "wp");
+        assertParseFailure(InvalidSyntaxException.class, "btt warp");
+    }
+
+    @Test
+    void disabledModuleCommandsRequireTheModuleToBeEnabled() {
+        Module owner = new DisabledModule();
+        commands.register(owner, "warp", (sender, args) -> {});
+
+        assertParseFailure(NoSuchCommandException.class, "wp");
+        assertParseFailure(InvalidSyntaxException.class, "btt warp");
+    }
+
+    @Test
+    void commandsForModulesThatFailStartupAreNotRegistered() {
+        Module owner = new FailedStartupModule();
+        commands.register(owner, "warp", (sender, args) -> {});
+        owner.enable();
+
+        assertParseFailure(NoSuchCommandException.class, "wp");
+        assertParseFailure(InvalidSyntaxException.class, "btt warp");
+    }
+
+    @Test
+    void commandsAreRegisteredWhenDisabledModuleIsEnabledLater() {
+        Module owner = new DisabledModule();
+        commands.register(owner, "warp", (sender, args) -> {});
+        commands.registerEnabledCommands();
+
+        assertParseFailure(NoSuchCommandException.class, "wp");
+
+        manager.finalizeRegistration();
+        owner.enable();
+        commands.registerEnabledCommands(owner);
+
+        assertNotNull(parse("wp").command());
+        assertNotNull(parse("btt warp").command());
     }
 
     @Test
@@ -168,26 +228,36 @@ class BttCommandManagerTest {
         }, Logger.getAnonymousLogger());
         commands.registerRoot(null, ignored -> {});
         commands.registerRootHelp(null);
-        for (String name : List.of("generate", "kml", "geopoints", "geopath", "georing", "geosurface",
-                "warp", "address", "blockpalette")) {
+        List<String> featureCommands = List.of("generate", "kml", "geopoints", "geopath", "georing", "geosurface",
+                "warp", "address", "blockpalette");
+        for (String name : featureCommands) {
             commands.register(null, name, (sender, args) -> {});
-            parse("btt " + name);
-            assertParseFailure(NoSuchCommandException.class, name);
         }
-        for (String name : List.of("navigator", "explore")) {
+        List<String> noArgumentCommands = List.of("navigator", "explore");
+        for (String name : noArgumentCommands) {
             commands.registerNoArguments(null, name, ignored -> {});
-            parse("btt " + name);
-            assertParseFailure(NoSuchCommandException.class, name);
         }
-        for (String name : List.of("buildteam", "btwarps")) {
+        List<String> argumentCommands = List.of("buildteam", "btwarps");
+        for (String name : argumentCommands) {
             commands.registerRequiredArgument(null, name, "team", "Build team",
                     StringParser.greedyStringParser(), (sender, team) -> {});
-            assertEquals("New York", parse("btt " + name + " New York").<String>get("team"));
-            assertParseFailure(NoSuchCommandException.class, name + " New York");
         }
         commands.registerSubcommand(null, "warp", "migrate", "Migrate warps",
                 builder -> builder.required("source", EnumParser.enumParser(WarpMigrationSource.class)),
                 ignored -> {});
+
+        for (String name : featureCommands) {
+            parse("btt " + name);
+            assertParseFailure(NoSuchCommandException.class, name);
+        }
+        for (String name : noArgumentCommands) {
+            parse("btt " + name);
+            assertParseFailure(NoSuchCommandException.class, name);
+        }
+        for (String name : argumentCommands) {
+            assertEquals("New York", parse("btt " + name + " New York").<String>get("team"));
+            assertParseFailure(NoSuchCommandException.class, name + " New York");
+        }
         assertEquals(WarpMigrationSource.ESSENTIALS, parse("btt warp migrate essentials").get("source"));
         assertEquals(1, manager.commandTree().rootNodes().size());
         assertParseFailure(NoSuchCommandException.class, "buildteamtools help");
@@ -223,6 +293,7 @@ class BttCommandManagerTest {
     }
 
     private CommandContext<CommandSourceStack> parse(String input) {
+        commands.registerEnabledCommands();
         var context = new CommandContext<>(sender, manager);
         Command<CommandSourceStack> command = manager.commandTree()
                 .parse(context, CommandInput.of(input), Runnable::run).join();
@@ -247,6 +318,10 @@ class BttCommandManagerTest {
         public boolean hasPermission(CommandSourceStack sender, String permission) {
             return !deniedPermissions.contains(permission);
         }
+
+        private void finalizeRegistration() {
+            super.lockRegistration();
+        }
     }
 
     private static final class EnabledModule extends Module {
@@ -257,6 +332,31 @@ class BttCommandManagerTest {
         @Override
         public boolean isEnabled() {
             return true;
+        }
+
+        @Override
+        public void registerListeners() {
+        }
+    }
+
+    private static final class DisabledModule extends Module {
+        private DisabledModule() {
+            super("Test", "");
+        }
+
+        @Override
+        public void registerListeners() {
+        }
+    }
+
+    private static final class FailedStartupModule extends Module {
+        private FailedStartupModule() {
+            super("Test", "");
+        }
+
+        @Override
+        public void enable() {
+            shutdown("Test module startup failed.");
         }
 
         @Override

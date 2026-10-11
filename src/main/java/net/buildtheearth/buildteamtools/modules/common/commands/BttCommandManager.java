@@ -45,7 +45,7 @@ public final class BttCommandManager {
     private static final Set<String> COMMAND_NAMES = Set.of(
             "btt", "generate", "kml", "geopoints", "geopath", "georing", "geosurface",
             "navigator", "buildteam", "btwarps", "explore", "address", "warp", "blockpalette",
-            "help", "communicators", "cache", "debug", "checkforupdates", "reload-config", "reload", "update"
+            "help", "communicators", "cache", "debug", "checkforupdates", "reload-config", "update"
     );
     private static final ParserDescriptor<CommandSourceStack, String> ARGUMENT_PARSER =
             StringParser.greedyStringParser();

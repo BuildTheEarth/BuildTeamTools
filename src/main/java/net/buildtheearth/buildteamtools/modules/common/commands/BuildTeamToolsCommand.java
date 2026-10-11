@@ -56,10 +56,6 @@ public class BuildTeamToolsCommand {
                 "Reload module configuration files.",
                 Permissions.BUILD_TEAM_TOOLS_RELOAD,
                 (sender, label, args) -> reloadCommand(sender));
-        commandManager.registerRootSubcommand(owner, "reload",
-                "Reload module configuration files.",
-                Permissions.BUILD_TEAM_TOOLS_RELOAD,
-                (sender, label, args) -> reloadCommand(sender));
         commandManager.registerRootSubcommand(owner, "update",
                 "Update the plugin to the latest version.",
                 Permissions.BUILD_TEAM_TOOLS_UPDATE,

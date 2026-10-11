@@ -6,17 +6,15 @@ import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.Module;
 import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
 import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
-import net.buildtheearth.buildteamtools.modules.navigation.components.warps.WarpsComponent;
 import net.buildtheearth.buildteamtools.modules.navigation.menu.CitySelectorMenu;
 import net.buildtheearth.buildteamtools.modules.navigation.menu.CountrySelectorMenu;
 import net.buildtheearth.buildteamtools.modules.navigation.menu.ExploreMenu;
 import net.buildtheearth.buildteamtools.modules.navigation.menu.MainMenu;
 import net.buildtheearth.buildteamtools.modules.navigation.menu.StateSelectorMenu;
-import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
-import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Continent;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.buildteamtools.modules.network.model.Region;
+import net.buildtheearth.buildteamtools.utils.io.NavigationConfig;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -24,7 +22,6 @@ import org.incendo.cloud.Command;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.incendo.cloud.parser.standard.StringParser;
-import org.incendo.cloud.permission.Permission;
 import org.incendo.cloud.suggestion.SuggestionProvider;
 import org.jspecify.annotations.NonNull;
 
@@ -86,17 +83,20 @@ public class NavigatorCommand {
                     openPlayer(sender, player -> new CitySelectorMenu(
                             state, StateSelectorMenu.getCityTeamsForState(state), player, true));
                 });
-        registerSubcommand(owner, "warps", "Open this build team's warp menu.",
-                builder -> builder.permission(Permission.allOf(
-                        Permission.of(Permissions.NAVIGATOR_USE),
-                        Permission.of(Permissions.WARP_USE))),
-                context -> openWarps(context.sender().getSender()));
-        registerSubcommand(owner, "build", "Run the configured Build menu action.",
-                context -> openPlayer(context.sender().getSender(), MainMenu::openBuild));
-        registerSubcommand(owner, "plotsystem", "Run the configured Plot System menu action.",
-                context -> openPlayer(context.sender().getSender(), MainMenu::openPlotSystem));
-        registerSubcommand(owner, "tutorials", "Open the tutorial menu or run its configured action.",
-                context -> openPlayer(context.sender().getSender(), MainMenu::openTutorials));
+        // The module constructor registers commands before its own config field is set
+        NavigationConfig.MainMenuItems items = BuildTeamTools.getInstance().getNavigationConfig().mainMenuItems();
+        if (items.buildItem().enabled()) {
+            registerSubcommand(owner, "build", "Run the configured Build menu action.",
+                    context -> openPlayer(context.sender().getSender(), MainMenu::openBuild));
+        }
+        if (items.plotsystemItem().enabled()) {
+            registerSubcommand(owner, "plotsystem", "Run the configured Plot System menu action.",
+                    context -> openPlayer(context.sender().getSender(), MainMenu::openPlotSystem));
+        }
+        if (items.tutorialItem().enabled()) {
+            registerSubcommand(owner, "tutorials", "Open the tutorial menu or run its configured action.",
+                    context -> openPlayer(context.sender().getSender(), MainMenu::openTutorials));
+        }
         registerSubcommand(owner, "toggle", "Toggle the navigator hotbar item.",
                 context -> openPlayer(context.sender().getSender(),
                         NavigationModule.getInstance().getNavigatorComponent()::toggle));
@@ -127,19 +127,6 @@ public class NavigatorCommand {
 
     private void openNavigator(@NonNull CommandSender sender) {
         openPlayer(sender, MainMenu::new);
-    }
-
-    private void openWarps(@NonNull CommandSender sender) {
-        if (!(sender instanceof Player player)) {
-            sendPlayerOnlyMessage(sender);
-            return;
-        }
-        BuildTeam team = NetworkModule.getInstance().getBuildTeam();
-        if (team == null || team.getWarpGroups() == null) {
-            player.sendMessage(ChatHelper.getErrorString("The build team's warps are currently unavailable."));
-            return;
-        }
-        WarpsComponent.openWarpMenu(player, team, new MainMenu(player, false));
     }
 
     private void openPlayer(@NonNull CommandSender sender, Consumer<Player> action) {

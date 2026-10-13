@@ -43,6 +43,7 @@ permissions:
       btt.warp.group.create: true
       btt.warp.group.edit: true
       btt.warp.group.delete: true
+      btt.map.create: true
       btt.notify.update: true
       btt.bp.edit: true
       btt.generator.rail.create: true
@@ -73,6 +74,10 @@ permissions:
     default: op
   btt.bp.edit:
     description: Allows players to create and edit custom block palettes
+    default: op
+
+  btt.map.create:
+    description: Allows players to create map claims from WorldEdit selections
     default: op
 
 github-repo: "BuildTheEarth/BuildTeamTools"

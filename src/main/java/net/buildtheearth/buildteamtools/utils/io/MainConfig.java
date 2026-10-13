@@ -74,6 +74,7 @@ public interface MainConfig {
         default List<String> btwarps() { return List.of("btwarps", "btwarp", "wbt", "wpt", "buildteamwarps"); }
         default List<String> address() { return List.of("address"); }
         default List<String> warp() { return List.of("warp", "warps", "wp"); }
+        default List<String> map() { return List.of("map"); }
         default List<String> blockpalette() { return List.of("blockpalette", "bp", "blocks"); }
     }
 }

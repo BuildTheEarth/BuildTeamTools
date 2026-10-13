@@ -10,6 +10,12 @@ plugins {
 
 repositories {
     mavenCentral()
+    // The web API client snapshot is currently only available from the local Maven repository.
+    mavenLocal {
+        content {
+            includeModule("com.alpsbte.alpslib", "web-api-client")
+        }
+    }
     // Anvilgui + Alps Lib Geo (for geo it can be removed once https://github.com/AlpsBTE/Alps-Lib/pull/17 is merged & version is set to 1.0.0)
     maven("https://mvn.alps-bte.com/repository/alps-bte-snapshots/") {
         content {
@@ -33,10 +39,10 @@ repositories {
         }
     }
     maven("https://jitpack.io") // Clipper2
-    //mavenLocal() // NEVER use in Production/Commits!
 }
 
 dependencies {
+    implementation("com.alpsbte.alpslib:web-api-client:1.0.0-SNAPSHOT")
     //implementation(libs.com.alpsbte.alpslib.alpslib.libpsterra) CURRENTLY BROKEN
     implementation(libs.alpslib.io)
     implementation(libs.alpslib.utils) {

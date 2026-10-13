@@ -9,7 +9,7 @@ alpslib-io = "1.2.5"
 #  https://mvn.alps-bte.com/service/rest/repository/browse/alps-bte/com/alpsbte/alpslib/alpslib-libpsterra/
 alpslib-libpsterra = "1.1.4"
 # https://mvn.alps-bte.com/service/rest/repository/browse/alps-bte/com/alpsbte/alpslib/alpslib-utils/
-alpslib-utils = "1.5.2"
+alpslib-utils = "1.6.0"
 # https://mvn.alps-bte.com/service/rest/repository/browse/alps-bte/com/alpsbte/alpslib/alpslib-geo/
 alpslib-geo = "1.0.0-SNAPSHOT"
 # https://github.com/WesJD/AnvilGUI https://mvn.wesjd.net/

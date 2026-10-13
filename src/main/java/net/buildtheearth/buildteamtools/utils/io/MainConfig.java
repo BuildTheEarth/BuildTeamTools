@@ -19,6 +19,12 @@ public interface MainConfig {
         return "00000000-0000-0000-0000-000000000000";
     }
 
+    @Comments("Web API authentication credential for creating map claims.")
+    @Comments("Keep this private; claim creation is unavailable when this is empty.")
+    default String webApiToken() {
+        return "";
+    }
+
     @Comments("The main world using the custom BTE Dynmaxion projection")
     default String earthWorld() {
         return "world";
@@ -74,6 +80,7 @@ public interface MainConfig {
         default List<String> btwarps() { return List.of("btwarps", "btwarp", "wbt", "wpt", "buildteamwarps"); }
         default List<String> address() { return List.of("address"); }
         default List<String> warp() { return List.of("warp", "warps", "wp"); }
+        default List<String> map() { return List.of("map"); }
         default List<String> blockpalette() { return List.of("blockpalette", "bp", "blocks"); }
     }
 }

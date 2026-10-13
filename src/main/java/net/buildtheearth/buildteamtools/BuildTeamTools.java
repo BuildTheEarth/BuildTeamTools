@@ -6,6 +6,7 @@ import net.buildtheearth.buildteamtools.modules.ModuleHandler;
 import net.buildtheearth.buildteamtools.modules.common.CommonModule;
 import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
+import net.buildtheearth.buildteamtools.modules.map.MapModule;
 import net.buildtheearth.buildteamtools.modules.miscellaneous.MiscModule;
 import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
@@ -63,6 +64,7 @@ public class BuildTeamTools extends JavaPlugin {
                 new CommonModule(mainConfig),
                 new NetworkModule(mainConfig),
                 new GeneratorModule(generatorConfig),
+                new MapModule(),
                 new NavigationModule(navigationConfig),
                 MiscModule.getInstance(),
                 StatsModule.getInstance(),

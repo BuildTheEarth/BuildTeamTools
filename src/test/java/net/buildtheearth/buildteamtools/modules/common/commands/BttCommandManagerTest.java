@@ -128,7 +128,7 @@ class BttCommandManagerTest {
     @Test
     void allDefaultFeatureAliasesRegisterWithoutAmbiguity() {
         for (String name : List.of("generate", "kml", "geopoints", "geopath", "georing", "geosurface",
-                "warp", "address", "blockpalette")) {
+                "warp", "address", "map", "blockpalette")) {
             commands.register(null, name, (sender, args) -> {});
         }
         commands.registerNoArguments(null, "navigator", Permissions.NAVIGATOR_USE, ignored -> {});
@@ -139,6 +139,9 @@ class BttCommandManagerTest {
         }
 
         assertSame(parse("navigator").command(), parse("nav").command());
+        assertNotNull(parse("map").command());
+        assertNotNull(parse("btt map").command());
+        assertNotNull(parse("buildteamtools map").command());
         assertSame(parse("btt navigator").command(), parse("buildteamtools navigate").command());
         assertSame(parse("buildteam New York").command(), parse("bt New York").command());
         assertEquals("New York", parse("buildteamtools bt New York").<String>get("team"));
@@ -150,12 +153,18 @@ class BttCommandManagerTest {
     @Test
     void subcommandsRetainArgumentsPermissionsAndHandlersForEveryAlias() throws Exception {
         AtomicInteger invocations = new AtomicInteger();
+        AtomicInteger mapInvocations = new AtomicInteger();
         Module owner = new EnabledModule();
         commands.register(null, "warp", (sender, args) -> {});
+        commands.register(null, "map", (sender, args) -> {});
         commands.registerSubcommand(owner, "warp", "migrate", "Migrate warps",
                 builder -> builder.permission(Permissions.WARP_MIGRATE)
                         .required("source", EnumParser.enumParser(WarpMigrationSource.class)),
                 ignored -> invocations.incrementAndGet());
+        commands.registerSubcommand(owner, "map", "create", "Create a map claim",
+                builder -> builder.permission(Permissions.MAP_CREATE)
+                        .required("name", StringParser.greedyStringParser()),
+                context -> mapInvocations.incrementAndGet());
 
         for (String input : List.of("warp migrate essentials", "wp migrate essentials",
                 "btt warp migrate essentials", "buildteamtools wp migrate essentials")) {
@@ -167,6 +176,14 @@ class BttCommandManagerTest {
         assertEquals(4, invocations.get());
         assertParseFailure(InvalidSyntaxException.class, "wp migrate");
         assertParseFailure(ArgumentParseException.class, "btt warp migrate invalid");
+        for (String input : List.of("map create Old Town", "btt map create Old Town",
+                "buildteamtools map create Old Town")) {
+            var context = parse(input);
+            assertEquals("Old Town", context.<String>get("name"));
+            assertEquals(Permissions.MAP_CREATE, context.command().commandPermission().permissionString());
+            context.command().commandExecutionHandler().execute(context);
+        }
+        assertEquals(3, mapInvocations.get());
         manager.deniedPermissions = Set.of(Permissions.WARP_MIGRATE);
         assertParseFailure(NoPermissionException.class, "wp migrate essentials");
         assertParseFailure(NoPermissionException.class, "buildteamtools wp migrate essentials");

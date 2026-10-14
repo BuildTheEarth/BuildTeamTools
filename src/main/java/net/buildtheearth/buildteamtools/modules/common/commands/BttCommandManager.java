@@ -425,7 +425,7 @@ public final class BttCommandManager {
             case "btwarps" -> labels.btwarps();
             case "address" -> labels.address();
             case "warp" -> labels.warp();
-            case "map" -> labels.map();
+            case "map" -> List.of("map");
             case "blockpalette" -> labels.blockpalette();
             default -> List.of();
         };

@@ -162,8 +162,7 @@ class BttCommandManagerTest {
                         .required("source", EnumParser.enumParser(WarpMigrationSource.class)),
                 ignored -> invocations.incrementAndGet());
         commands.registerSubcommand(owner, "map", "create", "Create a map claim",
-                builder -> builder.permission(Permissions.MAP_CREATE)
-                        .required("name", StringParser.greedyStringParser()),
+                builder -> builder.permission(Permissions.MAP_CREATE),
                 context -> mapInvocations.incrementAndGet());
 
         for (String input : List.of("warp migrate essentials", "wp migrate essentials",
@@ -176,14 +175,13 @@ class BttCommandManagerTest {
         assertEquals(4, invocations.get());
         assertParseFailure(InvalidSyntaxException.class, "wp migrate");
         assertParseFailure(ArgumentParseException.class, "btt warp migrate invalid");
-        for (String input : List.of("map create Old Town", "btt map create Old Town",
-                "buildteamtools map create Old Town")) {
+        for (String input : List.of("map create", "btt map create", "buildteamtools map create")) {
             var context = parse(input);
-            assertEquals("Old Town", context.<String>get("name"));
             assertEquals(Permissions.MAP_CREATE, context.command().commandPermission().permissionString());
             context.command().commandExecutionHandler().execute(context);
         }
         assertEquals(3, mapInvocations.get());
+        assertParseFailure(InvalidSyntaxException.class, "map create Old Town");
         manager.deniedPermissions = Set.of(Permissions.WARP_MIGRATE);
         assertParseFailure(NoPermissionException.class, "wp migrate essentials");
         assertParseFailure(NoPermissionException.class, "buildteamtools wp migrate essentials");

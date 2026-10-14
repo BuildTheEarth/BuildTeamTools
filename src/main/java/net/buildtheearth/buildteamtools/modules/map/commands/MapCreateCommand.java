@@ -18,18 +18,13 @@ import net.buildtheearth.OutOfProjectionBoundsException;
 import net.buildtheearth.Projection;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.Module;
-import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
-import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
-import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
+import net.buildtheearth.buildteamtools.modules.map.MapModule;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.model.GeographicalCoordinate;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.incendo.cloud.minecraft.extras.RichDescription;
-import org.incendo.cloud.parser.standard.StringParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,10 +38,7 @@ public class MapCreateCommand {
                 "map",
                 "create",
                 "Create a map claim from your cuboid WorldEdit selection.",
-                builder -> builder
-                        .permission(Permissions.MAP_CREATE)
-                        .required("name", StringParser.greedyStringParser(),
-                                RichDescription.of(Component.text("Claim name"))),
+                builder -> builder.permission(Permissions.MAP_CREATE),
                 context -> {
                     CommandSender sender = context.sender().getSender();
                     if (!(sender instanceof Player player)) {
@@ -54,22 +46,22 @@ public class MapCreateCommand {
                         return;
                     }
 
-                    create(player, context.get("name"));
+                    create(player);
                 }
         );
     }
 
-    private void create(Player player, String requestedName) {
-        String name = requestedName.trim();
-        if (name.isEmpty()) {
-            player.sendMessage(ChatHelper.getErrorComponent("A claim name must not be empty."));
-            return;
-        }
-
-        String token = BuildTeamTools.getInstance().getMainConfig().webApiToken();
+    private void create(Player player) {
+        String token = MapModule.getInstance().getConfig().webApiToken();
         if (token == null || token.isBlank()) {
             player.sendMessage(ChatHelper.getErrorComponent(
-                    "Map claim creation is unavailable. Configure the webApiToken in config.yml."));
+                    "Map claim creation is unavailable. Configure webApiToken in modules/map/config.yml."));
+            return;
+        }
+        String teamId = MapModule.getInstance().getConfig().buildTeamId();
+        if (teamId == null || teamId.isBlank()) {
+            player.sendMessage(ChatHelper.getErrorComponent(
+                    "Map claim creation is unavailable. Configure buildTeamId in modules/map/config.yml."));
             return;
         }
 
@@ -86,23 +78,6 @@ public class MapCreateCommand {
         }
         if (!player.getWorld().equals(earthWorld)) {
             player.sendMessage(ChatHelper.getErrorComponent("Select an area in the configured Earth world."));
-            return;
-        }
-
-        BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
-        if (buildTeam == null) {
-            player.sendMessage(ChatHelper.getErrorComponent("The server's build team is not available."));
-            return;
-        }
-
-        UUID teamId;
-        try {
-            teamId = UUID.fromString(buildTeam.getID());
-        } catch (IllegalArgumentException exception) {
-            BuildTeamTools.getInstance().getComponentLogger().error(
-                    "The configured build team's ID is not a UUID and cannot be used to create a map claim.",
-                    exception);
-            player.sendMessage(ChatHelper.getErrorComponent("The server's build team ID is invalid."));
             return;
         }
 
@@ -131,19 +106,18 @@ public class MapCreateCommand {
         }
 
         PublicBuildteamsTeamClaimsPostRequest request = new PublicBuildteamsTeamClaimsPostRequest()
-                .name(name)
                 .area(area)
                 .active(true)
                 .finished(false);
         UUID playerId = player.getUniqueId();
 
-        player.sendMessage(ChatHelper.getStandardComponent(false, "Creating map claim %s...", name));
+        player.sendMessage(ChatHelper.getStandardComponent(false, "Creating map claim from your selection..."));
         Bukkit.getScheduler().runTaskAsynchronously(BuildTeamTools.getInstance(), () -> {
             try {
                 ApiClient apiClient = new ApiClient();
                 apiClient.setBearerToken(token);
                 Claim claim = new ClaimApi(apiClient)
-                        .publicBuildteamsTeamClaimsPost(teamId, false, request);
+                        .publicBuildteamsTeamClaimsPost(teamId, request, false, null);
                 if (claim == null || claim.getId() == null) {
                     throw new IllegalStateException("The map API did not return the created claim ID.");
                 }
@@ -151,12 +125,13 @@ public class MapCreateCommand {
                     Player onlinePlayer = Bukkit.getPlayer(playerId);
                     if (onlinePlayer != null) {
                         onlinePlayer.sendMessage(ChatHelper.getSuccessComponent(
-                                "Created map claim %s (ID: %s).", name, claim.getId()));
+                                "Created map claim %s (ID: %s).",
+                                claim.getName() == null ? "Unnamed Claim" : claim.getName(), claim.getId()));
                     }
                 });
             } catch (ApiException | RuntimeException exception) {
                 BuildTeamTools.getInstance().getComponentLogger().error(
-                        "Failed to create map claim '" + name + "'.", exception);
+                        "Failed to create map claim for player " + playerId + ".", exception);
                 Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), () -> {
                     Player onlinePlayer = Bukkit.getPlayer(playerId);
                     if (onlinePlayer != null) {
@@ -164,7 +139,7 @@ public class MapCreateCommand {
                                 ? exception.getClass().getSimpleName()
                                 : exception.getMessage();
                         onlinePlayer.sendMessage(ChatHelper.getErrorComponent(
-                                "Failed to create map claim %s: %s", name, reason));
+                                "Failed to create map claim: %s", reason));
                     }
                 });
             }

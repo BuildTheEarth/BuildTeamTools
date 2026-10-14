@@ -14,6 +14,7 @@ import net.buildtheearth.buildteamtools.modules.plotsystem.PlotSystemModule;
 import net.buildtheearth.buildteamtools.modules.stats.StatsModule;
 import net.buildtheearth.buildteamtools.utils.io.ConfigurationLoader;
 import net.buildtheearth.buildteamtools.utils.io.GeneratorConfig;
+import net.buildtheearth.buildteamtools.utils.io.MapConfig;
 import net.buildtheearth.buildteamtools.utils.io.MainConfig;
 import net.buildtheearth.buildteamtools.utils.io.NavigationConfig;
 import net.buildtheearth.buildteamtools.utils.io.PlotSystemConfig;
@@ -39,6 +40,7 @@ public class BuildTeamTools extends JavaPlugin {
     private ConfigurationLoader<MainConfig> mainConfigLoader;
     private ConfigurationLoader<NavigationConfig> navigationConfigLoader;
     private ConfigurationLoader<GeneratorConfig> generatorConfigLoader;
+    private ConfigurationLoader<MapConfig> mapConfigLoader;
     private ConfigurationLoader<PlotSystemConfig> plotSystemConfigLoader;
     @Getter
     private BttCommandManager commandManager;
@@ -51,11 +53,14 @@ public class BuildTeamTools extends JavaPlugin {
                 getDataFolder().toPath().resolve("modules/navigation"), getSLF4JLogger());
         generatorConfigLoader = new ConfigurationLoader<>(GeneratorConfig.class,
                 getDataFolder().toPath().resolve("modules/generator"), getSLF4JLogger());
+        mapConfigLoader = new ConfigurationLoader<>(MapConfig.class,
+                getDataFolder().toPath().resolve("modules/map"), getSLF4JLogger());
         plotSystemConfigLoader = new ConfigurationLoader<>(PlotSystemConfig.class,
                 getDataFolder().toPath().resolve("modules/plotsystem"), getSLF4JLogger());
         MainConfig mainConfig = mainConfigLoader.load();
         NavigationConfig navigationConfig = navigationConfigLoader.load();
         GeneratorConfig generatorConfig = generatorConfigLoader.load();
+        MapConfig mapConfig = mapConfigLoader.load();
         plotSystemConfigLoader.load();
         commandManager = new BttCommandManager(this);
 
@@ -64,7 +69,7 @@ public class BuildTeamTools extends JavaPlugin {
                 new CommonModule(mainConfig),
                 new NetworkModule(mainConfig),
                 new GeneratorModule(generatorConfig),
-                new MapModule(),
+                new MapModule(mapConfig),
                 new NavigationModule(navigationConfig),
                 MiscModule.getInstance(),
                 StatsModule.getInstance(),
@@ -85,6 +90,7 @@ public class BuildTeamTools extends JavaPlugin {
         mainConfigLoader.reload();
         navigationConfigLoader.reload();
         generatorConfigLoader.reload();
+        mapConfigLoader.reload();
         plotSystemConfigLoader.reload();
     }
 

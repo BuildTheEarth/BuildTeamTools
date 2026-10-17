@@ -5,6 +5,7 @@ import net.buildtheearth.Projection;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.Module;
 import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
+import net.buildtheearth.buildteamtools.modules.network.api.NominatimAPI;
 import net.buildtheearth.buildteamtools.modules.network.api.PhotonAPI;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.model.GeographicalCoordinate;
@@ -16,6 +17,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.incendo.cloud.parser.flag.CommandFlag;
 import org.incendo.cloud.permission.Permission;
 import org.incendo.cloud.parser.standard.StringParser;
 import org.jspecify.annotations.NonNull;
@@ -42,11 +44,14 @@ public class AddressCommand {
                 });
         commandManager.registerSubcommand(owner, COMMAND_NAME, "get",
                 "Look up the address at your current location.",
-                builder -> builder.permission(Permissions.ADDRESS_GET),
+                builder -> builder
+                        .permission(Permissions.ADDRESS_GET)
+                        .flag(CommandFlag.builder("international").build()),
                 context -> {
-                    if (context.sender().getSender() instanceof Player player)
-                        handleGetCommand(player);
-                    else
+                    if (context.sender().getSender() instanceof Player player) {
+                        boolean international = context.flags().isPresent("international");
+                        handleGetCommand(player, international);
+                    } else
                         context.sender().getSender().sendMessage(
                                 ChatHelper.getErrorComponent(PLAYER_ONLY_MESSAGE));
                 });
@@ -74,7 +79,7 @@ public class AddressCommand {
         player.sendMessage(ChatHelper.getErrorComponent("Usage: /btt address <get|teleport>"));
     }
 
-    private void handleGetCommand(@NonNull Player player) {
+    private void handleGetCommand(@NonNull Player player, boolean international) {
         if (!player.hasPermission(Permissions.ADDRESS_GET)) {
             Permissions.sendNoPermissionMessage(player, Permissions.ADDRESS_GET);
             return;
@@ -90,7 +95,7 @@ public class AddressCommand {
                     loc.getZ()
             );
 
-            PhotonAPI.getAddressFromCoordinatesAsync(geoCoord)
+            NominatimAPI.getAddressFromCoordinatesAsync(geoCoord, international)
                     .thenAccept(address -> {
                         if (address.isBlank()) {
                             player.sendMessage(

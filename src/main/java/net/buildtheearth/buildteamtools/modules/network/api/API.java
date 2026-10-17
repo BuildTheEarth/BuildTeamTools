@@ -56,9 +56,16 @@ public class API {
      * @param url The URL to perform a get request on
      */
     public static void getAsync(String url, ApiResponseCallback callback) {
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
+        String userAgent = BuildTeamTools.getInstance().getMainConfig().userAgent();
+
+        Request.Builder requestBuilder = new Request.Builder()
+                .url(url);
+
+        if (userAgent != null && !userAgent.isBlank()) {
+            requestBuilder.header("User-Agent", userAgent);
+        }
+
+        Request request = requestBuilder.build();
 
         httpClient.newCall(request).enqueue(new Callback() {
             @Override

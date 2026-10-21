@@ -36,7 +36,11 @@ public class MainMenu extends AbstractMenu {
 
     private static final String INVENTORY_NAME = "BuildTheEarth Navigator";
     public MainMenu(Player menuPlayer) {
-        super(3, INVENTORY_NAME, menuPlayer);
+        this(menuPlayer, true);
+    }
+
+    public MainMenu(Player menuPlayer, boolean autoLoad) {
+        super(3, INVENTORY_NAME, menuPlayer, autoLoad);
     }
 
     @Override
@@ -87,7 +91,7 @@ public class MainMenu extends AbstractMenu {
             getMenu().getSlot(Objects.requireNonNull(slots.pollFirst()))
                     .setClickHandler((clickPlayer, clickInformation) -> {
                         clickPlayer.closeInventory();
-                        performClickAction(clickPlayer, config().mainMenuItems().buildItem().action().replace("&", "§"), "build");
+                        openBuild(clickPlayer);
                     });
         }
 
@@ -96,7 +100,7 @@ public class MainMenu extends AbstractMenu {
             getMenu().getSlot(Objects.requireNonNull(slots.pollFirst()))
                     .setClickHandler((clickPlayer, clickInformation) -> {
                         clickPlayer.closeInventory();
-                        performClickAction(clickPlayer, config().mainMenuItems().plotsystemItem().action().replace("&", "§"), "plotsystem");
+                        openPlotSystem(clickPlayer);
                     });
         }
 
@@ -118,15 +122,7 @@ public class MainMenu extends AbstractMenu {
         if (config().mainMenuItems().tutorialItem().enabled()) {
             getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setClickHandler((clickPlayer, clickInformation) -> {
                 clickPlayer.closeInventory();
-                String action = config().mainMenuItems().tutorialItem().action();
-
-                // If no command or message is set, open the tutorial menu
-                if (action == null || action.equals("/command") || action.equals("message")) {
-                    new TutorialsMenu(clickPlayer);
-                    return;
-                }
-
-                performClickAction(clickPlayer, action.replace("&", "§"), "tutorial");
+                openTutorials(clickPlayer);
             });
         }
     }
@@ -189,7 +185,7 @@ public class MainMenu extends AbstractMenu {
         return slots;
     }
 
-    private @NotNull NavigationConfig config() {
+    private static @NotNull NavigationConfig config() {
         NavigationModule navigationModule = NavigationModule.getInstance();
         if (navigationModule == null) {
             throw new IllegalStateException("Navigation module is not initialized");
@@ -197,7 +193,34 @@ public class MainMenu extends AbstractMenu {
         return navigationModule.getConfig();
     }
 
-    private void performClickAction(Player p, String action, String type) {
+    public static void openBuild(Player player) {
+        openConfiguredItem(player, config().mainMenuItems().buildItem(), "build");
+    }
+
+    public static void openPlotSystem(Player player) {
+        openConfiguredItem(player, config().mainMenuItems().plotsystemItem(), "plotsystem");
+    }
+
+    public static void openTutorials(Player player) {
+        openConfiguredItem(player, config().mainMenuItems().tutorialItem(), "tutorial");
+    }
+
+    static void openConfiguredItem(Player player, NavigationConfig.MenuItem item, String type) {
+        if (!item.enabled()) {
+            player.sendMessage(ChatHelper.getErrorString("The %s item is disabled in the navigation config.", type));
+            return;
+        }
+        String action = item.action();
+        if (type.equals("tutorial") && (action == null || action.equals("/command") || action.equals("message"))) {
+            new TutorialsMenu(player);
+        } else if (action == null) {
+            player.sendMessage(ChatHelper.getErrorString("No action is set for the %s item in the config yet! Please contact an %s.", type, "admin"));
+        } else {
+            performClickAction(player, action.replace("&", "§"), type);
+        }
+    }
+
+    private static void performClickAction(Player p, String action, String type) {
         // Check if an action is set in the config
         if (action.startsWith("transfer:")) {
             NavUtils.transferPlayer(p, action.substring(9));

@@ -9,7 +9,6 @@ import net.buildtheearth.buildteamtools.modules.navigation.components.address.co
 import net.buildtheearth.buildteamtools.modules.navigation.components.bluemap.BluemapComponent;
 import net.buildtheearth.buildteamtools.modules.navigation.components.navigator.NavigatorComponent;
 import net.buildtheearth.buildteamtools.modules.navigation.components.navigator.commands.BuildteamCommand;
-import net.buildtheearth.buildteamtools.modules.navigation.components.navigator.commands.ExploreCommand;
 import net.buildtheearth.buildteamtools.modules.navigation.components.navigator.commands.NavigatorCommand;
 import net.buildtheearth.buildteamtools.modules.navigation.components.navigator.listeners.NavigatorJoinListener;
 import net.buildtheearth.buildteamtools.modules.navigation.components.navigator.listeners.NavigatorOpenListener;
@@ -166,7 +165,6 @@ public class NavigationModule extends Module {
         new NavigatorCommand().register(this);
         new BuildteamCommand().register(this);
         new BtWarpsCommand().register(this);
-        new ExploreCommand().register(this);
         new AddressCommand().register(this);
     }
 

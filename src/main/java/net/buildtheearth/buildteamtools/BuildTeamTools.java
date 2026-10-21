@@ -90,6 +90,10 @@ public class BuildTeamTools extends JavaPlugin {
         return mainConfigLoader.getConfig();
     }
 
+    public NavigationConfig getNavigationConfig() {
+        return navigationConfigLoader.getConfig();
+    }
+
     @Override
     public void saveConfig() {
     }

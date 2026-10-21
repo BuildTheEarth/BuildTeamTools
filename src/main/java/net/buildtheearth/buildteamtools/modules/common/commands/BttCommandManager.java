@@ -38,7 +38,7 @@ public final class BttCommandManager {
 
     private static final Set<String> COMMAND_NAMES = Set.of(
             "btt", "generate", "kml", "geopoints", "geopath", "georing", "geosurface",
-            "navigator", "buildteam", "btwarps", "explore", "address", "warp", "blockpalette",
+            "navigator", "buildteam", "btwarps", "address", "warp", "blockpalette",
             "help", "communicators", "cache", "debug", "checkforupdates", "reload-config", "update"
     );
     private static final ParserDescriptor<CommandSourceStack, String> ARGUMENT_PARSER =
@@ -423,7 +423,6 @@ public final class BttCommandManager {
             case "navigator" -> labels.navigator();
             case "buildteam" -> labels.buildteam();
             case "btwarps" -> labels.btwarps();
-            case "explore" -> labels.explore();
             case "address" -> labels.address();
             case "warp" -> labels.warp();
             case "blockpalette" -> labels.blockpalette();
@@ -475,7 +474,6 @@ public final class BttCommandManager {
             case "navigator" -> "Open the build team navigation menu.";
             case "buildteam" -> "Switch to a build team by name or tag.";
             case "btwarps" -> "Open the warp menu for a build team.";
-            case "explore" -> "Explore nearby build team regions.";
             case "address" -> "Look up the address at your current location.";
             case "warp" -> "Warp to a saved location.";
             case "blockpalette" -> "Open the block palette menu.";

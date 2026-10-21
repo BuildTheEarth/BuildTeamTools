@@ -19,12 +19,11 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 @UtilityClass
@@ -38,11 +37,15 @@ public class NetworkAPI {
     public static void setBuildTeamToolsInstalled(boolean installed) {
         String apiKey = BuildTeamTools.getInstance().getMainConfig().apiKey();
 
-        JSONObject requestBodyJson = new JSONObject();
+        Map<String, Boolean> requestBodyJson = new HashMap<>();
         requestBodyJson.put("hasBuildTeamToolsInstalled", installed);
-        String requestBodyString = requestBodyJson.toString();
 
-        RequestBody requestBody = RequestBody.create(requestBodyString, MediaType.parse("application/json"));
+        String requestBodyString = JSONValue.toJSONString(requestBodyJson);
+
+        RequestBody requestBody = RequestBody.create(
+                requestBodyString,
+                MediaType.parse("application/json")
+        );
 
         API.putAsync("https://nwapi.buildtheearth.net/api/teams/" + apiKey + "/hasBuildTeamToolsInstalled", requestBody, new API.ApiResponseCallback() {
             @Override
@@ -376,7 +379,6 @@ public class NetworkAPI {
         API.deleteAsync("https://nwapi.buildtheearth.net/api/teams/" + apiKey + "/warpgroups", requestBody, callback);
     }
 
-    @SuppressWarnings("unchecked")
     public static void syncPlayerList() {
         BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
         if (buildTeam != null && buildTeam.isConnected())
@@ -384,11 +386,19 @@ public class NetworkAPI {
 
         String apiKey = BuildTeamTools.getInstance().getMainConfig().apiKey();
 
-        JSONArray requestBodyArray = new JSONArray();
-        for (Player player : Bukkit.getOnlinePlayers())
-            requestBodyArray.add(new String[]{player.getUniqueId().toString(), player.getName()});
+        List<List<String>> players = new ArrayList<>();
 
-        RequestBody requestBody = RequestBody.create(requestBodyArray.toString(), MediaType.parse("application/json"));
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            players.add(Arrays.asList(
+                    player.getUniqueId().toString(),
+                    player.getName()
+            ));
+        }
+
+        RequestBody requestBody = RequestBody.create(
+                JSONValue.toJSONString(players),
+                MediaType.parse("application/json")
+        );
 
         API.postAsync("https://nwapi.buildtheearth.net/api/teams/" + apiKey + "/playerlist", requestBody, new API.ApiResponseCallback() {
             @Override
@@ -398,7 +408,7 @@ public class NetworkAPI {
 
             @Override
             public void onFailure(IOException e) {
-                ChatHelper.getErrorString("Failed to sync the player list with the network API: %s", e);
+                ChatHelper.logError("Failed to sync the player list with the network API: %s", e.getMessage());
             }
         });
     }

@@ -65,7 +65,8 @@ public class BuildTeam {
         this.allowsTransfers = allowsTransfers;
         this.tag = tag;
 
-        if (isConnected && NetworkModule.getInstance().getBuildTeam() != null && NetworkModule.getInstance().getBuildTeam().isConnected())
+        if (isConnected && (NetworkModule.getInstance() == null ||
+                (NetworkModule.getInstance().getBuildTeam() != null && NetworkModule.getInstance().getBuildTeam().isConnected())))
             this.IP = null;
         else
             this.IP = (!isConnected) ? serverIP : tag.toLowerCase() + ".buildtheearth.net";

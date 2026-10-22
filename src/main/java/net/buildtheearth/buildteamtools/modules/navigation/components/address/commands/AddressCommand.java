@@ -5,6 +5,7 @@ import net.buildtheearth.Projection;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.Module;
 import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
+import net.buildtheearth.buildteamtools.modules.network.api.NominatimAPI;
 import net.buildtheearth.buildteamtools.modules.network.api.PhotonAPI;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.model.GeographicalCoordinate;
@@ -90,7 +91,7 @@ public class AddressCommand {
                     loc.getZ()
             );
 
-            PhotonAPI.getAddressFromCoordinatesAsync(geoCoord)
+            NominatimAPI.getAddressFromCoordinatesAsync(geoCoord)
                     .thenAccept(address -> {
                         if (address.isBlank()) {
                             player.sendMessage(

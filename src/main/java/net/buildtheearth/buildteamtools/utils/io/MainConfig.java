@@ -19,6 +19,11 @@ public interface MainConfig {
         return "00000000-0000-0000-0000-000000000000";
     }
 
+    @Comments("User Agent for NominatimAPI")
+    default String userAgent() {
+        return "BuildTeamTools/1.0 (contact: email@example.com)";
+    }
+
     @Comments("The main world using the custom BTE Dynmaxion projection")
     default String earthWorld() {
         return "world";

@@ -56,7 +56,7 @@ public class OpenStreetMapAPI extends API {
             var location = NavigationModule.getInstance().getRgcHandler()
                     .locationFromCoordinates((float) coordinates.latitude(), (float) coordinates.longitude());
             ChatHelper.logDebug("RGC lookup successful: %s", location);
-            future.complete(new RegionLookupResult(location.get(AdminLevel.COUNTRY), null));
+            future.complete(new RegionLookupResult(location.get().get(AdminLevel.COUNTRY), null));
         } catch (Exception ex) {
             future.completeExceptionally(ex);
         }

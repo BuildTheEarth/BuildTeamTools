@@ -43,6 +43,8 @@ public class Permissions {
     public static final String WARP_GROUP_EDIT = "btt.warp.group.edit";
     public static final String WARP_GROUP_DELETE = "btt.warp.group.delete";
 
+    public static final String MAP_CREATE = "btt.map.create";
+
     public static final String NOTIFY_UPDATE = "btt.notify.update";
 
     public static final String AUTO_TPLL = "btt.global.autotpll";

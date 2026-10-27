@@ -9,11 +9,13 @@ alpslib-io = "1.2.5"
 #  https://mvn.alps-bte.com/service/rest/repository/browse/alps-bte/com/alpsbte/alpslib/alpslib-libpsterra/
 alpslib-libpsterra = "1.1.4"
 # https://mvn.alps-bte.com/service/rest/repository/browse/alps-bte/com/alpsbte/alpslib/alpslib-utils/
-alpslib-utils = "1.5.2"
+alpslib-utils = "1.6.0"
 # https://mvn.alps-bte.com/service/rest/repository/browse/alps-bte/com/alpsbte/alpslib/alpslib-geo/
-alpslib-geo = "1.0.0-SNAPSHOT"
+alpslib-geo = "1.0.0"
+# https://mvn.alps-bte.com/service/rest/repository/browse/alps-bte/com/alpsbte/alpslib/alpslib-web-api/
+alpslib-web-api = "1.0.0"
 # https://github.com/WesJD/AnvilGUI https://mvn.wesjd.net/
-anvilgui = "1.10.14-SNAPSHOT"
+anvilgui = "1.10.13-SNAPSHOT"
 # @pin Ref: https://github.com/BlueMap-Minecraft/BlueMapAPI - Newer Versions require Java 25
 bluemap-api = "2.7.8"
 # https://central.sonatype.com/artifact/org.bstats/bstats-bukkit
@@ -60,6 +62,7 @@ alpsbte-canvas = { module = "com.alpsbte:canvas", version.ref = "alpsbte-canvas"
 alpslib-io = { module = "com.alpsbte.alpslib:alpslib-io", version.ref = "alpslib-io" }
 alpslib-utils = { module = "com.alpsbte.alpslib:alpslib-utils", version.ref = "alpslib-utils" }
 alpslib-geo = { module = "com.alpsbte.alpslib:alpslib-geo", version.ref = "alpslib-geo" }
+alpslib-web-api = { module = "com.alpsbte.alpslib:web-api-client", version.ref = "alpslib-web-api" }
 anvilgui = { module = "net.wesjd:anvilgui", version.ref = "anvilgui" }
 bluemap-api = { module = "de.bluecolored:bluemap-api", version.ref = "bluemap-api" }
 bstats-bukkit = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }

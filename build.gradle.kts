@@ -10,17 +10,10 @@ plugins {
 
 repositories {
     mavenCentral()
-    // Anvilgui + Alps Lib Geo (for geo it can be removed once https://github.com/AlpsBTE/Alps-Lib/pull/17 is merged & version is set to 1.0.0)
-    maven("https://mvn.alps-bte.com/repository/alps-bte-snapshots/") {
-        content {
-            includeGroup("com.alpsbte.alpslib")
-            includeGroup("net.wesjd")
-        }
-    }
     maven("https://maven.buildtheearth.net/releases") // BuildTheEarth Projection
     maven("https://mvn.alps-bte.com/repository/alps-bte/") // AlpsLib
     maven("https://maven.enginehub.org/repo/") // WorldEdit
-    //maven("https://mvn.wesjd.net/") // Anvilgui - includes 26.1 module which is build with Java 25, what breaks the Plugin Remapper on Paper 1.21.4 see https://github.com/WesJD/AnvilGUI/issues/408
+    maven("https://mvn.wesjd.net/") // https://github.com/WesJD/AnvilGUI/issues/408
     maven("https://repo.bluecolored.de/releases") // BlueMap
     maven("https://repo.essentialsx.net/releases/")
     maven("https://repo.lushplugins.org/releases") // PluginUpdater

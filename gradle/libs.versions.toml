@@ -11,11 +11,11 @@ alpslib-libpsterra = "1.1.4"
 # https://mvn.alps-bte.com/service/rest/repository/browse/alps-bte/com/alpsbte/alpslib/alpslib-utils/
 alpslib-utils = "1.6.0"
 # https://mvn.alps-bte.com/service/rest/repository/browse/alps-bte/com/alpsbte/alpslib/alpslib-geo/
-alpslib-geo = "1.0.0-SNAPSHOT"
+alpslib-geo = "1.0.0"
 # https://mvn.alps-bte.com/service/rest/repository/browse/alps-bte/com/alpsbte/alpslib/alpslib-web-api/
-alpslib-web-api = "1.0.0-SNAPSHOT"
+alpslib-web-api = "1.0.0"
 # https://github.com/WesJD/AnvilGUI https://mvn.wesjd.net/
-anvilgui = "1.10.14-SNAPSHOT"
+anvilgui = "1.10.13-SNAPSHOT"
 # @pin Ref: https://github.com/BlueMap-Minecraft/BlueMapAPI - Newer Versions require Java 25
 bluemap-api = "2.7.8"
 # https://central.sonatype.com/artifact/org.bstats/bstats-bukkit

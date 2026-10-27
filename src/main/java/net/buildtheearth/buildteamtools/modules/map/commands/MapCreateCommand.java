@@ -7,6 +7,7 @@ import com.alpsbte.alpslib.web.invoker.ApiException;
 import com.alpsbte.alpslib.web.model.Claim;
 import com.alpsbte.alpslib.web.model.PublicBuildteamsTeamClaimsPostRequest;
 import com.alpsbte.alpslib.web.model.PublicBuildteamsTeamClaimsPostRequestAreaInner;
+import com.alpsbte.alpslib.web.model.PublicBuildteamsTeamClaimsPostRequestOwner;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -37,7 +38,6 @@ import org.incendo.cloud.parser.standard.StringParser;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class MapCreateCommand {
@@ -94,7 +94,7 @@ public class MapCreateCommand {
         if (area == null) return;
 
         PublicBuildteamsTeamClaimsPostRequest request = new PublicBuildteamsTeamClaimsPostRequest()
-                .owner(Map.of("minecraft", player.getName()))
+                .owner(new PublicBuildteamsTeamClaimsPostRequestOwner().minecraft(player.getName()))
                 .area(area)
                 .active(true)
                 .finished(false);

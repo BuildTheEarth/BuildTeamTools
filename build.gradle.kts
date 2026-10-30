@@ -35,7 +35,10 @@ dependencies {
     implementation(libs.alpslib.utils) {
         exclude(group = "com.github.cryptomorin", module = "XSeries")
     }
-    implementation(libs.alpslib.geo)
+    implementation(libs.alpslib.geo) {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+        exclude(group = "org.json", module = "json")
+    }
     implementation(libs.alpslib.web.api)
     implementation(libs.alpsbte.canvas)
     implementation(libs.xseries)
@@ -53,9 +56,6 @@ dependencies {
     }
     implementation(libs.googlecode.json.simple)
     implementation(libs.bstats.bukkit)
-    implementation(platform(libs.fawe.bom)) {
-        exclude(group = "com.google.guava", module = "guava")
-    }
     implementation(libs.buildtheearth.projection) {
         exclude(group = "com.google.guava", module = "guava")
     }
@@ -64,6 +64,9 @@ dependencies {
     }
     implementation(libs.pluginupdater.paper)
 
+    compileOnly(platform(libs.fawe.bom)) {
+        exclude(group = "com.google.guava", module = "guava")
+    }
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core")
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") { isTransitive = false }
     compileOnly(libs.paper.api)
@@ -107,6 +110,8 @@ tasks.shadowJar {
 
     relocationPrefix = "net.buildtheearth.buildteamtools.shaded"
     enableAutoRelocation = true
+
+    exclude("org/slf4j/**") // Exclude SLF4J to avoid conflicts with server's SLF4J
 
     // Prevents the plugin itself from being relocated by autorelocate
     // This is needed because net.buildtheearth.projection shares the same package namespace

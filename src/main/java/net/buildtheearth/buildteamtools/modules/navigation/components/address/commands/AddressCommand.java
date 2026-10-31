@@ -23,6 +23,7 @@ import org.incendo.cloud.parser.standard.StringParser;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
 
 public class AddressCommand {
     private static final String COMMAND_NAME = "address";
@@ -87,14 +88,31 @@ public class AddressCommand {
 
         player.sendMessage("Getting closest address...");
 
+        final GeographicalCoordinate geoCoord;
+
         try {
             Location loc = player.getLocation();
 
-            GeographicalCoordinate geoCoord = Projection.toGeo(
+            geoCoord = Projection.toGeo(
                     loc.getX(),
                     loc.getZ()
             );
 
+        } catch (Exception e) {
+            ChatHelper.logError(
+                    "Failed to convert player location to geographical coordinates: %s",
+                    e.getMessage()
+            );
+
+            player.sendMessage(
+                    ChatHelper.getErrorComponent(
+                            "Failed to convert player location to geographical coordinates."
+                    )
+            );
+            return;
+        }
+
+        try {
             NominatimAPI.getAddressFromCoordinatesAsync(geoCoord, international)
                     .thenAccept(address -> {
                         if (address.isBlank()) {
@@ -105,16 +123,18 @@ public class AddressCommand {
                             );
                             return;
                         }
+
                         Component message = Component.text()
                                 .append(Component.text("Address: ", NamedTextColor.GRAY))
                                 .append(
                                         Component.text(address, NamedTextColor.WHITE)
                                                 .hoverEvent(HoverEvent.showText(
-                                                        Component.text("Clip to copy", NamedTextColor.GRAY)
+                                                        Component.text("Click to copy", NamedTextColor.GRAY)
                                                 ))
                                                 .clickEvent(ClickEvent.copyToClipboard(address))
                                 )
                                 .build();
+
                         player.sendMessage(message);
                     })
                     .exceptionally(error -> {
@@ -132,19 +152,19 @@ public class AddressCommand {
                         return null;
                     });
 
-        } catch (Exception e) {
+        } catch (RejectedExecutionException e) {
+            // The request queue is full or shutting down.
             ChatHelper.logError(
-                    "Failed to convert player location to geographical coordinates: %s",
+                    "Address request rejected: %s",
                     e.getMessage()
             );
 
             player.sendMessage(
                     ChatHelper.getErrorComponent(
-                            "Failed to retrieve closest address."
+                            "Too many address requests. Please try again later."
                     )
             );
         }
-
     }
 
     private void handleTeleportCommand(@NonNull Player player, String address) {

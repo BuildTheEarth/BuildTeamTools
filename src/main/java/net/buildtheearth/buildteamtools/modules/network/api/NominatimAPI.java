@@ -74,4 +74,8 @@ public class NominatimAPI {
 
         return displayName.toString();
     }
+
+    public static void shutdownQueue() {
+        REQUEST_QUEUE.close();
+    }
 }

@@ -12,6 +12,7 @@ import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.plotsystem.PlotSystemModule;
 import net.buildtheearth.buildteamtools.modules.stats.StatsModule;
+import net.buildtheearth.buildteamtools.modules.network.api.NominatimAPI;
 import net.buildtheearth.buildteamtools.utils.io.ConfigurationLoader;
 import net.buildtheearth.buildteamtools.utils.io.GeneratorConfig;
 import net.buildtheearth.buildteamtools.utils.io.MapConfig;
@@ -82,6 +83,7 @@ public class BuildTeamTools extends JavaPlugin {
     @Override
     public void onDisable() {
         ModuleHandler.getInstance().disableAll(null);
+        NominatimAPI.shutdownQueue();
     }
 
 

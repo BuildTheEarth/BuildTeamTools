@@ -6,6 +6,7 @@ import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
 import net.buildtheearth.buildteamtools.modules.navigation.components.bluemap.BluemapComponent;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.AdvancedPie;
+import org.bstats.charts.DrilldownPie;
 import org.bstats.charts.MultiLineChart;
 import org.bstats.charts.SimpleBarChart;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -23,6 +24,9 @@ import java.util.concurrent.TimeUnit;
  * one snapshot so a submission does not reset the counters twice.
  * <p>
  * BlueMap has no player action in this plugin. It is reported as 1 while the integration is enabled.
+ * <p>
+ * {@code feature_details} is a drilldown pie. Clicking navigator, warps, address, or kml opens the
+ * part that was used. It shares the snapshot with the summary charts.
  */
 public final class MetricsManager {
 
@@ -31,8 +35,7 @@ public final class MetricsManager {
     private static final long SNAPSHOT_REUSE_NANOS = TimeUnit.MINUTES.toNanos(2);
 
     private static Metrics metrics;
-    private static Map<String, Integer> publishedUses;
-    private static long publishedAtNanos = Long.MIN_VALUE;
+    private static PublishedSnapshot published;
 
     private MetricsManager() {
     }
@@ -44,6 +47,7 @@ public final class MetricsManager {
         Metrics created = new Metrics(plugin, BSTATS_PLUGIN_ID);
         created.addCustomChart(new SimpleBarChart("feature_uses", MetricsManager::featureUseCounts));
         created.addCustomChart(new MultiLineChart("feature_use_history", MetricsManager::featureUseCounts));
+        created.addCustomChart(new DrilldownPie("feature_details", MetricsManager::featureDetails));
         created.addCustomChart(new AdvancedPie("enabled_modules", MetricsManager::enabledModules));
         metrics = created;
     }
@@ -53,15 +57,28 @@ public final class MetricsManager {
     }
 
     static Map<String, Integer> featureUseCounts(long nowNanos) {
+        return new LinkedHashMap<>(publish(nowNanos).counts());
+    }
+
+    static Map<String, Map<String, Integer>> featureDetails() {
+        return featureDetails(System.nanoTime());
+    }
+
+    static Map<String, Map<String, Integer>> featureDetails(long nowNanos) {
+        Map<String, Map<String, Integer>> copy = new LinkedHashMap<>();
+        publish(nowNanos).details().forEach((feature, parts) -> copy.put(feature, new LinkedHashMap<>(parts)));
+        return copy;
+    }
+
+    private static PublishedSnapshot publish(long nowNanos) {
         synchronized (MetricsManager.class) {
-            if (publishedUses != null && nowNanos >= publishedAtNanos && nowNanos - publishedAtNanos < SNAPSHOT_REUSE_NANOS)
-                return new LinkedHashMap<>(publishedUses);
+            if (published != null && nowNanos >= published.atNanos() && nowNanos - published.atNanos() < SNAPSHOT_REUSE_NANOS)
+                return published;
 
             Map<String, Integer> counts = FeatureUsage.drain();
             counts.put("bluemap", blueMapInUse());
-            publishedUses = counts;
-            publishedAtNanos = nowNanos;
-            return new LinkedHashMap<>(counts);
+            published = new PublishedSnapshot(counts, FeatureUsage.drainDetails(), nowNanos);
+            return published;
         }
     }
 
@@ -84,9 +101,16 @@ public final class MetricsManager {
 
     static void resetForTests() {
         synchronized (MetricsManager.class) {
-            publishedUses = null;
-            publishedAtNanos = Long.MIN_VALUE;
+            published = null;
         }
         FeatureUsage.drain();
+        FeatureUsage.drainDetails();
+    }
+
+    private record PublishedSnapshot(
+            Map<String, Integer> counts,
+            Map<String, Map<String, Integer>> details,
+            long atNanos
+    ) {
     }
 }

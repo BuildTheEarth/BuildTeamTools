@@ -9,7 +9,7 @@ import net.buildtheearth.Projection;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.ModuleComponent;
 import net.buildtheearth.buildteamtools.modules.common.metrics.FeatureUsage;
-import net.buildtheearth.buildteamtools.modules.common.metrics.UsageFeature;
+import net.buildtheearth.buildteamtools.modules.common.metrics.UsageDetail;
 import net.buildtheearth.buildteamtools.modules.navigation.NavUtils;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.menu.WarpEditMenu;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.menu.WarpGroupEditMenu;
@@ -120,7 +120,7 @@ public class WarpsComponent extends ModuleComponent {
 
             loc.setY(warp.getY());
 
-            FeatureUsage.record(UsageFeature.WARPS);
+            FeatureUsage.record(UsageDetail.WARPS_TELEPORT);
             player.teleportAsync(loc);
             ChatHelper.sendSuccessfulMessage(player, "Successfully warped you to %s.", warp.getName());
             return;
@@ -131,7 +131,7 @@ public class WarpsComponent extends ModuleComponent {
         var type = NavUtils.determineSwitchPossibilityOrMsgPlayerIfNone(player, warp.getWarpGroup().getBuildTeam());
 
         if (type == NavUtils.NavSwitchType.NETWORK) {
-            FeatureUsage.record(UsageFeature.WARPS);
+            FeatureUsage.record(UsageDetail.WARPS_TELEPORT);
             // Send a plugin message to that server which adds the warp to the queue
             ByteArrayDataOutput out = ByteStreams.newDataOutput();
             out.writeUTF("UniversalWarps");
@@ -142,7 +142,7 @@ public class WarpsComponent extends ModuleComponent {
             // Switch the player to the target server
             NetworkModule.getInstance().switchServer(player, warp.getWarpGroup().getBuildTeam().getServerName());
         } else if (type == NavUtils.NavSwitchType.TRANSFER) {
-            FeatureUsage.record(UsageFeature.WARPS);
+            FeatureUsage.record(UsageDetail.WARPS_TELEPORT);
             ByteArrayDataOutput out = ByteStreams.newDataOutput();
             out.writeUTF(String.valueOf(warp.getId()));
             player.storeCookie(WARP_COOKIE_KEY, out.toByteArray());
@@ -171,7 +171,7 @@ public class WarpsComponent extends ModuleComponent {
      * @param creator The player that is creating the warp
      */
     public static void createWarp(@NonNull Player creator, WarpGroup group) {
-        FeatureUsage.record(UsageFeature.WARPS);
+        FeatureUsage.record(UsageDetail.WARPS_CREATE);
         // Get the geographic coordinates of the player's location.
         Location location = creator.getLocation();
         try {
@@ -276,7 +276,7 @@ public class WarpsComponent extends ModuleComponent {
 
     public static void openWarpMenu(@NotNull Player player, @NotNull BuildTeam buildTeam, @Nullable AbstractMenu menu) {
         if (buildTeam.getWarpGroups() == null) return;
-        FeatureUsage.record(UsageFeature.WARPS);
+        FeatureUsage.record(UsageDetail.WARPS_MENU);
         int warpGroupCount = buildTeam.getWarpGroups().size();
 
         switch (warpGroupCount) {

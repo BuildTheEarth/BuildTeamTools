@@ -12,7 +12,7 @@ import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
 import net.buildtheearth.buildteamtools.modules.common.metrics.FeatureUsage;
-import net.buildtheearth.buildteamtools.modules.common.metrics.UsageFeature;
+import net.buildtheearth.buildteamtools.modules.common.metrics.UsageDetail;
 import net.buildtheearth.buildteamtools.utils.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
@@ -108,7 +108,7 @@ public class WarpCommand {
             return;
         }
 
-        FeatureUsage.record(UsageFeature.WARPS);
+        FeatureUsage.record(UsageDetail.WARPS_MIGRATE);
         WarpMigrator migrator = new WarpMigrator(source);
         player.sendMessage(ChatHelper.getStandardComponent(true, "Migrating the warps..."));
         migrator.migrate(player).whenComplete((result, throwable) ->

@@ -1,7 +1,7 @@
 package net.buildtheearth.buildteamtools.modules.navigation.components.navigator.listeners;
 
 import net.buildtheearth.buildteamtools.modules.common.metrics.FeatureUsage;
-import net.buildtheearth.buildteamtools.modules.common.metrics.UsageFeature;
+import net.buildtheearth.buildteamtools.modules.common.metrics.UsageDetail;
 import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
 import net.buildtheearth.buildteamtools.modules.navigation.menu.MainMenu;
 import org.bukkit.entity.Player;
@@ -24,7 +24,7 @@ public class NavigatorOpenListener implements Listener {
 
         if (NavigationModule.getInstance().getNavigatorComponent().isItem(event.getItem())) {
             event.setCancelled(true);
-            FeatureUsage.record(UsageFeature.NAVIGATOR);
+            FeatureUsage.record(UsageDetail.NAVIGATOR_ITEM);
             new MainMenu(event.getPlayer());
         }
     }
@@ -48,7 +48,7 @@ public class NavigatorOpenListener implements Listener {
         }
 
         // Opens the navigator.
-        FeatureUsage.record(UsageFeature.NAVIGATOR);
+        FeatureUsage.record(UsageDetail.NAVIGATOR_ITEM);
         new MainMenu(player);
     }
 

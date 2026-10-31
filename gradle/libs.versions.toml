@@ -45,7 +45,7 @@ paper-api = "1.21.11-R0.1-SNAPSHOT"
 # https://github.com/CryptoMorin/XSeries/releases
 xseries = "14.0.0"
 # https://github.com/OakLoaf/PluginUpdater/releases https://repo.lushplugins.org/#/releases/org/lushplugins/pluginupdater/updater.paper-api
-pluginupdater = "4.1.0"
+pluginupdater = "5.1.1"
 #
 # Plugins
 # https://github.com/palantir/gradle-git-version/releases

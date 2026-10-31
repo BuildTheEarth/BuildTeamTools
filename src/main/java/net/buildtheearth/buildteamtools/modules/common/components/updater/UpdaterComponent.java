@@ -166,7 +166,7 @@ public class UpdaterComponent extends ModuleComponent {
     public boolean shouldUpdate(@NonNull Version newVersion, Version oldVersion, String source) {
         return switch (getVersionDifference(newVersion, oldVersion, source)) {
             case MAJOR, MINOR, PATCH, BUILD -> true;
-            case UNKNOWN, LATEST -> false;
+            case SAME, UNKNOWN, LATER -> false;
         };
     }
 

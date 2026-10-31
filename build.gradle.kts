@@ -60,8 +60,13 @@ dependencies {
     }
     implementation(libs.pluginupdater.common) {
         exclude(group = "com.google.guava", module = "guava")
+        // PluginUpdater 5.x pulls Adventure 5, which removes MessageType and breaks Paper's CommandSender (Adventure 4).
+        exclude(group = "net.kyori")
+        exclude(group = "org.slf4j", module = "slf4j-api")
     }
-    implementation(libs.pluginupdater.paper)
+    implementation(libs.pluginupdater.paper) {
+        exclude(group = "net.kyori")
+    }
 
     compileOnly(platform(libs.fawe.bom)) {
         exclude(group = "com.google.guava", module = "guava")

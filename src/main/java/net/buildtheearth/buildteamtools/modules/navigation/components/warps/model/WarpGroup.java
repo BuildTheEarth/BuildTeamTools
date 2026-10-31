@@ -1,18 +1,14 @@
 package net.buildtheearth.buildteamtools.modules.navigation.components.warps.model;
 
-import com.alpsbte.alpslib.utils.item.Item;
 import lombok.Getter;
 import lombok.Setter;
 import net.buildtheearth.buildteamtools.i18n.MessageKeys;
 import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
-import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.utils.ListUtil;
-import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.LetterType;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.json.JSONObject;
@@ -94,36 +90,7 @@ public class WarpGroup {
                 : Messages.render(player, MessageKeys.Warp.Menu.ITEM_NAME, Component.text(getName()));
         List<Component> lore = getDescriptionLore(player);
 
-        if (material == null)
-            return HeadFactory.letter(
-                    LetterType.WOODEN,
-                    name.charAt(0),
-                    itemName,
-                    lore
-            );
-        else if (material.startsWith("http://textures.minecraft.net/texture/"))
-            return ItemComponents.named(
-                    Item.createCustomHeadTextureURL(material, " ", null),
-                    itemName,
-                    lore);
-
-        Material matchedMaterial = Material.matchMaterial(this.material.split(":")[0]);
-
-        if (matchedMaterial == null)
-            return HeadFactory.letter(
-                    LetterType.STONE,
-                    name.charAt(0),
-                    itemName,
-                    lore
-            );
-        else if (!this.material.contains(":"))
-            return ItemComponents.of(matchedMaterial, itemName, lore);
-        else
-            return ItemComponents.named(
-                    Item.create(matchedMaterial, " ", Short.parseShort(this.material.split(":")[1]), null),
-                    itemName,
-                    lore);
-
+        return WarpMaterialItems.create(material, name, itemName, lore, LetterType.WOODEN);
     }
 
 

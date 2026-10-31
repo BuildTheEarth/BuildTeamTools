@@ -3,6 +3,7 @@ package net.buildtheearth.buildteamtools.utils.menus;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.i18n.MessageKeys;
 import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.heads.HeadColor;
 import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
@@ -203,6 +204,28 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
 
         // Set next page item
         getMenu().getSlot(switchPageItemSlot + 1).setItem(getNextPageItem());
+    }
+
+    /**
+     * Shared chrome for selection menus: optional back item, page switcher, and proceed/next affordance.
+     */
+    protected void setSelectionPreviewItems(
+            AbstractMenu backMenu,
+            int backItemSlot,
+            int switchPageItemSlot,
+            int nextItemSlot,
+            boolean canProceed
+    ) {
+        if (backMenu != null) {
+            setBackItem(backItemSlot, backMenu);
+        }
+        setSwitchPageItems(switchPageItemSlot);
+        if (canProceed) {
+            getMenu().getSlot(nextItemSlot).setItem(HeadFactory.head(HeadTexture.CHECKMARK,
+                    Messages.render(getMenuPlayer(), MessageKeys.Ui.NEXT)));
+        } else {
+            getMenu().getSlot(nextItemSlot).setItem(MenuItems.ITEM_BACKGROUND);
+        }
     }
 
     protected void setSwitchPageItemClickEvents(int switchPageItemSlot) {

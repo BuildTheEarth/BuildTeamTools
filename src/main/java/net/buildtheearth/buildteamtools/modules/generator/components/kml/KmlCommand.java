@@ -48,7 +48,7 @@ import java.util.concurrent.Executors;
  * the player then pastes the kml contents and confirms the command<br>
  * 2) The CommandBlock then sends a kml command with the contents, which is parsed by the server<br><br>
  * <p>
- * note: this command differentiates between aliases to determine wether to
+ * note: this command differentiates between aliases to determine whether to
  * generate intermediate points between the geo-coordinates from the kml linestrings.
  * Players should only use /geopoints or /geopath aliases,
  * direct use of the /kml command is restricted to CommandBlockSender
@@ -295,17 +295,8 @@ public class KmlCommand {
         recordKml(blockCreationCommand);
         String kml_content = String.join(" ", args);
 
-        Material matchedBlockMaterial = Material.matchMaterial(blocktypeString);
-        final Material blockMaterial = (matchedBlockMaterial != null && matchedBlockMaterial.isBlock()) ? matchedBlockMaterial : Material.BRICKS;
-        if (matchedBlockMaterial == null || !matchedBlockMaterial.isBlock()) {
-            player.sendMessage(Messages.component(MessageKeys.Generator.Kml.INVALID_BLOCK_METADATA));
-        }
-
-        Material matchedExtendMaterial = Material.matchMaterial(extendToGroundBlockType);
-        final Material extendMaterial = (matchedExtendMaterial != null && matchedExtendMaterial.isBlock()) ? matchedExtendMaterial : Material.BRICKS;
-        if (matchedExtendMaterial == null || !matchedExtendMaterial.isBlock()) {
-            player.sendMessage(Messages.component(MessageKeys.Generator.Kml.INVALID_BLOCK_METADATA));
-        }
+        final Material blockMaterial = resolvePlaceableMaterial(blocktypeString, player);
+        final Material extendMaterial = resolvePlaceableMaterial(extendToGroundBlockType, player);
 
         //parse kml
         long time_beforeKMLParse = System.currentTimeMillis();
@@ -370,23 +361,10 @@ public class KmlCommand {
 
             float maxDistanceToPlayer = 1000; //TODO server config
 
-            for (BlockLocation pt : blockPositions) {
-                Location loc = pt.getLocation(world);
-                if (!loc.getChunk().isLoaded()) preventedUnloadedChunkChanges[0] = true;
-                else if (loc.distance(player.getLocation()) > maxDistanceToPlayer) preventedFarChanges[0] = true;
-                else {
-                    transaction.addBlockChange(pt, world, blockMaterial);
-                }
-            }
-
-            for (BlockLocation pt : fillPositions) {
-                Location loc = pt.getLocation(world);
-                if (!loc.getChunk().isLoaded()) preventedUnloadedChunkChanges[0] = true;
-                else if (loc.distance(player.getLocation()) > maxDistanceToPlayer) preventedFarChanges[0] = true;
-                else {
-                    transaction.addBlockChange(pt, world, extendMaterial);
-                }
-            }
+            addNearbyBlockChanges(transaction, blockPositions, world, player, blockMaterial,
+                    maxDistanceToPlayer, preventedUnloadedChunkChanges, preventedFarChanges);
+            addNearbyBlockChanges(transaction, fillPositions, world, player, extendMaterial,
+                    maxDistanceToPlayer, preventedUnloadedChunkChanges, preventedFarChanges);
 
 
             if (transaction.size() == 0) {
@@ -645,9 +623,9 @@ public class KmlCommand {
     private @NonNull Location getLocationFromCoordinates(double[] coordinates, double altitudeFromKML) {
         Location mcLocation = NavUtils.getLocationFromCoordinates(new GeographicalCoordinate(coordinates[0], coordinates[1]));
         //add altitude from kml (altitude from Google Earth is always relative to ground)
-        //note: the "-2" is only neccesary because 
+        //note: the "-2" is only necessary because
         //  getLocationFromCoordinates returns terrain altitude + 2
-        //      (one from Bukkits getHighestBlockY and one from our geoutils)
+        //      (one from Bukkit getHighestBlockY and one from our geoutils)
         mcLocation.add(0, altitudeFromKML, 0);
         return mcLocation;
     }
@@ -712,6 +690,37 @@ public class KmlCommand {
             }
         }
         return mcLines;
+    }
+
+    private static Material resolvePlaceableMaterial(String materialName, Player player) {
+        Material matched = Material.matchMaterial(materialName);
+        if (matched != null && matched.isBlock()) {
+            return matched;
+        }
+        player.sendMessage(Messages.component(MessageKeys.Generator.Kml.INVALID_BLOCK_METADATA));
+        return Material.BRICKS;
+    }
+
+    private static void addNearbyBlockChanges(
+            ChangeTransaction transaction,
+            Collection<BlockLocation> positions,
+            World world,
+            Player player,
+            Material material,
+            float maxDistanceToPlayer,
+            boolean[] preventedUnloadedChunkChanges,
+            boolean[] preventedFarChanges
+    ) {
+        for (BlockLocation pt : positions) {
+            Location loc = pt.getLocation(world);
+            if (!loc.getChunk().isLoaded()) {
+                preventedUnloadedChunkChanges[0] = true;
+            } else if (loc.distance(player.getLocation()) > maxDistanceToPlayer) {
+                preventedFarChanges[0] = true;
+            } else {
+                transaction.addBlockChange(pt, world, material);
+            }
+        }
     }
 
     private static void recordKml(@NonNull String command) {

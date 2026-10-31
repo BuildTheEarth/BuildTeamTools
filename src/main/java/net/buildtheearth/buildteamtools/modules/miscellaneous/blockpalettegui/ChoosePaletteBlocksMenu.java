@@ -84,7 +84,7 @@ public class ChoosePaletteBlocksMenu extends AbstractPaginatedMenu {
        ========================= */
 
     public void open() {
-        logger.info("[ChoosePalleteBlocksMenu] open for " + getMenuPlayer().getName()
+        logger.info("[ChoosePaletteBlocksMenu] open for " + getMenuPlayer().getName()
                 + " (preselected: " + selectedBlocks.size() + ")");
         reloadMenuAsync(true);
         getMenu().open(getMenuPlayer());
@@ -130,7 +130,7 @@ public class ChoosePaletteBlocksMenu extends AbstractPaginatedMenu {
                     if (seen.add(m)) out.add(new ItemStack(m));
                 }
             } catch (Exception t) {
-                logger.log(Level.SEVERE, "[ChoosePalleteBlocksMenu] supplier failed for " + type.name() + ": " + t.getMessage(), t);
+                logger.log(Level.SEVERE, "[ChoosePaletteBlocksMenu] supplier failed for " + type.name() + ": " + t.getMessage(), t);
             }
         }
 
@@ -350,24 +350,10 @@ public class ChoosePaletteBlocksMenu extends AbstractPaginatedMenu {
     }
 
     private String pretty(String constant) {
-        String lower = constant.toLowerCase(Locale.ROOT).replace('_', ' ');
-        String[] parts = lower.split("\\s+");
-        StringBuilder sb = new StringBuilder();
-        for (String p : parts) {
-            if (p.isEmpty()) continue;
-            sb.append(Character.toUpperCase(p.charAt(0)))
-                    .append(p.length() > 1 ? p.substring(1) : "")
-                    .append(' ');
-        }
-        return sb.toString().trim();
+        return PaletteTexts.toTitleCase(constant);
     }
 
     private Material safeMat(XMaterial xmat, Material fallback) {
-        try {
-            Material m = xmat.get();
-            return (m != null) ? m : fallback;
-        } catch (Exception t) {
-            return fallback;
-        }
+        return PaletteTexts.safeMat(xmat, fallback);
     }
 }

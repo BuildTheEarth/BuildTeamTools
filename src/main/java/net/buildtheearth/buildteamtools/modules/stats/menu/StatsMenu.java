@@ -55,17 +55,10 @@ public class StatsMenu extends AbstractMenu {
      */
     @Override
     protected void setPreviewItems() {
-        setupLores();
-
-        byte playerHeadSlot = 4;
-        byte teamHeadSlot = 20;
-        byte globalHeadSlot = 22;
-        byte achievementHeadSlot = 24;
-
-        getMenu().getSlot(playerHeadSlot).setItem(PLAYER_HEAD);
-        getMenu().getSlot(teamHeadSlot).setItem(TEAM_HEAD);
-        getMenu().getSlot(globalHeadSlot).setItem(GLOBAL_HEAD);
-        getMenu().getSlot(achievementHeadSlot).setItem(ACHIEVEMENTS_HEAD);
+        getMenu().getSlot(4).setItem(playerHeadWithLore());
+        getMenu().getSlot(20).setItem(teamHeadWithLore());
+        getMenu().getSlot(22).setItem(ItemComponents.lore(GLOBAL_HEAD, ListUtil.grayComponents("", "", "")));
+        getMenu().getSlot(24).setItem(ItemComponents.lore(ACHIEVEMENTS_HEAD, ListUtil.grayComponents("", "", "")));
         super.setPreviewItems();
     }
 
@@ -102,54 +95,28 @@ public class StatsMenu extends AbstractMenu {
                 .build();
     }
 
-    /**
-     * Sets up the correct lores for all items
-     */
-    private void setupLores() {
-        StatsModule statsModule = StatsModule.getInstance();
-
-
-        // Set Player Head Lore
-
-        StatsPlayer statsPlayer = statsModule.getStatsPlayer(getMenuPlayer().getUniqueId());
+    private ItemStack playerHeadWithLore() {
+        StatsPlayer statsPlayer = StatsModule.getInstance().getStatsPlayer(getMenuPlayer().getUniqueId());
         JSONObject playerStats = statsPlayer.toJSON();
 
         List<Component> playerLore = new ArrayList<>();
-
         for (String key : playerStats.keySet()) {
             if ("UUID".equals(key)) {
                 continue;
             }
-
-            Object value = playerStats.get(key);
-            playerLore.add(Component.text(key + ": " + value));
+            playerLore.add(Component.text(key + ": " + playerStats.get(key)));
         }
-        ItemComponents.lore(PLAYER_HEAD, playerLore);
+        return ItemComponents.lore(PLAYER_HEAD, playerLore);
+    }
 
-        // Set Team Head Lore
-
-        StatsServer statsServer = statsModule.getStatsServer();
+    private ItemStack teamHeadWithLore() {
+        StatsServer statsServer = StatsModule.getInstance().getStatsServer();
         JSONObject serverStats = statsServer.toJSON();
 
         List<Component> serverLore = new ArrayList<>();
-
         for (String key : serverStats.keySet()) {
-            Object value = serverStats.get(key);
-            serverLore.add(Component.text(key + ": " + value));
+            serverLore.add(Component.text(key + ": " + serverStats.get(key)));
         }
-
-        ItemComponents.lore(TEAM_HEAD, serverLore);
-
-        // Set Global Head Lore
-
-        //TODO: HOW TO GET GLOBAL STATS?
-
-        ItemComponents.lore(GLOBAL_HEAD, ListUtil.grayComponents("", "", ""));
-
-        // Set Achievements Head Lore
-
-        //TODO WAIT UNTIL ACHIEVEMENTS HAVE MORE PROGRESS
-
-        ItemComponents.lore(ACHIEVEMENTS_HEAD, ListUtil.grayComponents("", "", ""));
+        return ItemComponents.lore(TEAM_HEAD, serverLore);
     }
 }

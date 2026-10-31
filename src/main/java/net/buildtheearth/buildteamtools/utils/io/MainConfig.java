@@ -20,9 +20,9 @@ public interface MainConfig {
     }
 
     @Comments("Specifies the User-Agent header sent with API requests.")
-    @Comments("Works by default with the provided value, but can be customized if needed.")
+    @Comments("Works by default with the provided value, but it should be changed.")
     default String userAgent() {
-        return "BuildTeamTools/1.0 (contact: development@buildtheearth.net)";
+        return "BuildTeamTools/0.4 (contact: development@buildtheearth.net)";
     }
 
     @Comments("The main world using the custom BTE Dynmaxion projection")

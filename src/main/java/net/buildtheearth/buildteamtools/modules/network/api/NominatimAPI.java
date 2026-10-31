@@ -30,8 +30,6 @@ public class NominatimAPI {
 
         final String url = urlBuilder.toString();
 
-        ChatHelper.getStandardComponent(false, url);
-
         return REQUEST_QUEUE.submit(() -> {
             CompletableFuture<String> future = new CompletableFuture<>();
 

@@ -29,9 +29,9 @@ public class ChangeTransaction {
             this.newType = newType;
         }
 
-        public Block block;
-        public Material previousType;
-        public Material newType;
+        public final Block block;
+        public final Material previousType;
+        public final Material newType;
     }
 
     //------------------------------------
@@ -39,7 +39,7 @@ public class ChangeTransaction {
     public ChangeTransaction(Player p) {
         this.player = p;
         changes = new ArrayList<>();
-        blockPositions = new HashSet<BlockLocation>();
+        blockPositions = new HashSet<>();
     }
 
 
@@ -49,7 +49,7 @@ public class ChangeTransaction {
      *
      * @param location the location to change
      * @param newType  the new material / block type for the location
-     * @return boolean: indicate if the change was accepted or not (i.e. wether this already had a change for the location or not)
+     * @return boolean: indicate if the change was accepted or not (i.e. whether this already had a change for the location or not)
      */
     public boolean addBlockChange(Location location, Material newType) {
         return addBlockChange(new BlockLocation(location.getBlockX(), location.getBlockY(), location.getBlockZ()), location.getWorld(), newType);
@@ -63,7 +63,7 @@ public class ChangeTransaction {
      * @param world    the world for the change
      * @param location the location to change
      * @param newType  the new material / block type for the location
-     * @return boolean: indicate if the change was accepted or not (i.e. wether this already had a change for the location or not)
+     * @return boolean: indicate if the change was accepted or not (i.e. whether this already had a change for the location or not)
      */
     public boolean addBlockChange(BlockLocation location, World world, Material newType) {
         //check if we already have a change for this location.
@@ -97,9 +97,9 @@ public class ChangeTransaction {
         return changes.size();
     }
 
-    public Player player;
-    List<BlockModification> changes;
-    Set<BlockLocation> blockPositions; //check to prevent duplicates
+    public final Player player;
+    final List<BlockModification> changes;
+    final Set<BlockLocation> blockPositions; //check to prevent duplicates
 
 
 }

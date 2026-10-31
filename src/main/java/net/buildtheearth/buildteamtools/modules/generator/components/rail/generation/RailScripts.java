@@ -84,7 +84,7 @@ public class RailScripts extends Script {
             boolean queuedGeneration = false;
 
             try {
-                if (!canContinue()) return;
+                if (shouldStop()) return;
                 if (!prepareSession()) return;
 
                 queuedGeneration = queueRailGeneration();
@@ -103,7 +103,7 @@ public class RailScripts extends Script {
     }
 
     private boolean prepareSession() {
-        if (!canContinue()) return false;
+        if (shouldStop()) return false;
 
         railType = getRailType();
 
@@ -120,7 +120,7 @@ public class RailScripts extends Script {
         centerPath = createCenterPath(controlPoints);
         preparationProgress.completeStage(PATH_PROGRESS);
 
-        if (!hasValidCenterPath()) return false;
+        if (isInvalidCenterPath()) return false;
 
         preparationProgress.startStage(PATH_PROGRESS, SAFETY_CHECK_PROGRESS, SAFETY_CHECK_ESTIMATED_MILLIS);
 
@@ -159,7 +159,7 @@ public class RailScripts extends Script {
         terrainResolver = new RailTerrainResolver(blocks);
         preparationProgress.completeStage(TERRAIN_PREPARE_PROGRESS);
 
-        if (!canContinue()) return false;
+        if (shouldStop()) return false;
 
         preparationProgress.startStage(TERRAIN_PREPARE_PROGRESS, TERRAIN_ADJUST_PROGRESS, TERRAIN_ADJUST_ESTIMATED_MILLIS);
         snapMissingControlPointHeightsToTerrain(controlPoints);
@@ -171,9 +171,9 @@ public class RailScripts extends Script {
     }
 
     private boolean queueRailGeneration() {
-        if (!canContinue()) return false;
+        if (shouldStop()) return false;
 
-        if (!hasValidCenterPath())
+        if (isInvalidCenterPath())
             return false;
 
         preparationProgress.startStage(TERRAIN_ADJUST_PROGRESS, RAIL_BLOCK_BUILD_PROGRESS, RAIL_BLOCK_BUILD_ESTIMATED_MILLIS);
@@ -292,10 +292,10 @@ public class RailScripts extends Script {
         return true;
     }
 
-    private boolean hasValidCenterPath() {
+    private boolean isInvalidCenterPath() {
         if (centerPath.size() < 2) {
             sendRailError(MessageKeys.Generator.Rail.INVALID_PATH);
-            return false;
+            return true;
         }
 
         if (centerPath.size() > limits.maxPathPoints()) {
@@ -304,10 +304,10 @@ public class RailScripts extends Script {
                     Component.text(String.valueOf(centerPath.size())),
                     Component.text(String.valueOf(limits.maxPathPoints()))
             );
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     private boolean hasSafePreparedSelection(List<Vector> selectionPoints, int minY, int maxY) {
@@ -351,13 +351,13 @@ public class RailScripts extends Script {
     }
 
     private void sendRailInfo(String key, ComponentLike... args) {
-        if (!canContinue()) return;
+        if (shouldStop()) return;
 
         getPlayer().sendMessage(Messages.component(key, args));
     }
 
     private void sendRailError(String key, ComponentLike... args) {
-        if (!canContinue()) return;
+        if (shouldStop()) return;
 
         getPlayer().sendMessage(Messages.component(key, args));
     }
@@ -374,10 +374,10 @@ public class RailScripts extends Script {
         Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), runnable);
     }
 
-    private boolean canContinue() {
-        return BuildTeamTools.getInstance().isEnabled()
-                && getPlayer() != null
-                && getPlayer().isOnline();
+    private boolean shouldStop() {
+        return !BuildTeamTools.getInstance().isEnabled()
+                || getPlayer() == null
+                || !getPlayer().isOnline();
     }
 
     private List<Vector> getControlPoints() {
@@ -499,7 +499,7 @@ public class RailScripts extends Script {
         if (points.isEmpty())
             return getPlayer().getWorld().getMinHeight();
 
-        if (!RailTerrainResolver.hasAnyMissingHeights(points))
+        if (RailTerrainResolver.hasAllHeights(points))
             return points.getFirst().getBlockY();
 
         int referenceY = getRegion() != null ? getRegion().getMinimumY() : GeneratorUtils.getMinHeight(points);

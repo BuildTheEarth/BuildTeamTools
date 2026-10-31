@@ -11,7 +11,7 @@ import java.util.List;
 
 public class RoadSettings extends Settings {
 
-    public static List<String> streetLampTypes = new ArrayList<>();
+    public static final List<String> streetLampTypes = new ArrayList<>();
 
 
     public RoadSettings(Player player) {

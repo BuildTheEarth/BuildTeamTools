@@ -24,7 +24,7 @@ final class RailTerrainResolver {
     }
 
     void snapMissingHeightsToTerrain(List<Vector> points, int referenceY) {
-        if (!hasAnyMissingHeights(points))
+        if (hasAllHeights(points))
             return;
 
         for (Vector point : points)
@@ -42,11 +42,11 @@ final class RailTerrainResolver {
         return railYCache.computeIfAbsent(cacheKey, ignored -> findNearestRailSurfaceY(x, z, fallbackY));
     }
 
-    static boolean hasAnyMissingHeights(List<Vector> points) {
+    static boolean hasAllHeights(List<Vector> points) {
         for (Vector point : points)
-            if (point.getBlockY() == 0) return true;
+            if (point.getBlockY() == 0) return false;
 
-        return false;
+        return true;
     }
 
     private void indexPreparedBlocks(Block[][][] blocks) {

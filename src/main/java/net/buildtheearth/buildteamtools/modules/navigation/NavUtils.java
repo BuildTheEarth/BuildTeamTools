@@ -144,7 +144,7 @@ public class NavUtils {
      * Height is extracted from the world.
      * <p>
      * Note: Height returned is actually terrain elevation +2. This is because this method internally uses
-     * Bukkits @see World::getHighestBlockYAt() already returns elevation+1, and this method deliberately
+     * Bukkit @see World::getHighestBlockYAt() already returns elevation+1, and this method deliberately
      * adds one to the location elevation on top.
      * </p>
      * The world is extracted from the server config's "earth world". If no earth world is specified then the height defaults
@@ -178,7 +178,7 @@ public class NavUtils {
      * Height is extracted from the world.
      * <p>
      * Note: Height returned is actually terrain elevation +2. This is because this method internally uses
-     * Bukkits @see World::getHighestBlockYAt() already returns elevation+1, and this method deliberately
+     * Bukkit @see World::getHighestBlockYAt() already returns elevation+1, and this method deliberately
      * adds one to the location elevation on top.
      * </p>
      * The world is extracted from the server config's "earth world". If no earth world is specified then the height defaults

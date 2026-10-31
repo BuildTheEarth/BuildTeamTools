@@ -34,15 +34,15 @@ import java.util.Objects;
 
 public class WarpEditMenu extends AbstractMenu {
 
-    public static int WARP_SLOT = 4;
-    public static int LOCATION_SLOT = 19;
+    public static final int WARP_SLOT = 4;
+    public static final int LOCATION_SLOT = 19;
     public static int NAME_SLOT = 20;
     public static int GROUP_SLOT = 21;
     public static int ADDRESS_TYPE_SLOT = 22;
     public static int MATERIAL_SLOT = 23;
     public static int HIGHLIGHT_SLOT = 24;
-    public static int DELETE_SLOT = 25;
-    public static int CONFIRM_SLOT = 35;
+    public static final int DELETE_SLOT = 25;
+    public static final int CONFIRM_SLOT = 35;
 
     private final Warp warp;
     private final boolean alreadyExists;

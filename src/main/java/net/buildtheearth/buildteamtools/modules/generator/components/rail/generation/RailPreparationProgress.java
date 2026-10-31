@@ -31,7 +31,7 @@ final class RailPreparationProgress implements Runnable {
     }
 
     void start() {
-        if (!canContinue())
+        if (shouldStop())
             return;
 
         if (task.get() != null)
@@ -58,7 +58,7 @@ final class RailPreparationProgress implements Runnable {
     }
 
     void startStage(long startPercentage, long endPercentage, long estimatedDurationMillis) {
-        if (!canContinue())
+        if (shouldStop())
             return;
 
         long clampedStartPercentage = clamp(startPercentage);
@@ -74,7 +74,7 @@ final class RailPreparationProgress implements Runnable {
     }
 
     void update(long percentage) {
-        if (!canContinue())
+        if (shouldStop())
             return;
 
         long clampedPercentage = clamp(percentage);
@@ -100,7 +100,7 @@ final class RailPreparationProgress implements Runnable {
 
     @Override
     public void run() {
-        if (!canContinue()) {
+        if (shouldStop()) {
             stop();
             return;
         }
@@ -125,9 +125,9 @@ final class RailPreparationProgress implements Runnable {
         return Math.clamp(percentage, 0L, maxPercentage);
     }
 
-    private boolean canContinue() {
-        return BuildTeamTools.getInstance().isEnabled()
-                && player != null
-                && player.isOnline();
+    private boolean shouldStop() {
+        return !BuildTeamTools.getInstance().isEnabled()
+                || player == null
+                || !player.isOnline();
     }
 }

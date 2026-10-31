@@ -152,7 +152,7 @@ final class RailLanePathBuilder {
             return;
         }
 
-        Vector previousPoint = points.get(points.size() - 1);
+        Vector previousPoint = points.getLast();
 
         if (previousPoint.getBlockX() == point.getBlockX() && previousPoint.getBlockZ() == point.getBlockZ())
             return;

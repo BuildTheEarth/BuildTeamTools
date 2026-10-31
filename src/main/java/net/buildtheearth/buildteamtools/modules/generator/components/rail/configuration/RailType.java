@@ -202,7 +202,7 @@ public final class RailType {
     }
 
     private static @Nullable String validateBlocks(Configuration configuration) {
-        if (!isPlaceablePalette(configuration.railBlocks()))
+        if (isMissingPlaceablePalette(configuration.railBlocks()))
             return "Rail block must be a valid placeable Minecraft block.";
 
         List<XMaterial> blocksBelow = configuration.blocksBelow();
@@ -211,7 +211,7 @@ public final class RailType {
             return "Rail type needs at least one block below the rails.";
 
         for (XMaterial blockBelow : blocksBelow)
-            if (!isPlaceableBlock(blockBelow))
+            if (isNonPlaceableBlock(blockBelow))
                 return "Blocks below the rails must be valid placeable Minecraft blocks.";
 
         return null;
@@ -225,7 +225,7 @@ public final class RailType {
                     .formatted(MIN_SLEEPER_SPACING, MAX_SLEEPER_SPACING);
 
         if ((sleeperSpacing > 0 || !configuration.sleeperBlocks().isEmpty())
-                && !isPlaceablePalette(configuration.sleeperBlocks()))
+                && isMissingPlaceablePalette(configuration.sleeperBlocks()))
             return "Sleeper block must be a valid placeable Minecraft block.";
 
         return null;
@@ -274,7 +274,7 @@ public final class RailType {
             return poleError;
 
         if ((configuration.overheadWiresEnabled() || !configuration.overheadWireBlocks().isEmpty())
-                && !isPlaceablePalette(configuration.overheadWireBlocks()))
+                && isMissingPlaceablePalette(configuration.overheadWireBlocks()))
             return "Overhead wire block must be a valid placeable Minecraft block.";
 
         return null;
@@ -282,11 +282,11 @@ public final class RailType {
 
     private static @Nullable String validateOverheadPoles(Configuration configuration) {
         if ((configuration.overheadPolesEnabled() || !configuration.overheadPoleBlocks().isEmpty())
-                && !isPlaceablePalette(configuration.overheadPoleBlocks()))
+                && isMissingPlaceablePalette(configuration.overheadPoleBlocks()))
             return "Overhead pole block must be a valid placeable Minecraft block.";
 
         if ((configuration.overheadPolesEnabled() || !configuration.overheadSupportBlocks().isEmpty())
-                && !isPlaceablePalette(configuration.overheadSupportBlocks()))
+                && isMissingPlaceablePalette(configuration.overheadSupportBlocks()))
             return "Overhead support block must be a valid placeable Minecraft block.";
 
         return configuration.overheadPolesEnabled() ? validateOverheadPoleMeasurements(configuration) : null;
@@ -318,16 +318,16 @@ public final class RailType {
                 || !identifier.toLowerCase().matches(IDENTIFIER_PATTERN);
     }
 
-    private static boolean isPlaceablePalette(List<XMaterial> materials) {
-        return !materials.isEmpty() && materials.stream().allMatch(RailType::isPlaceableBlock);
+    private static boolean isMissingPlaceablePalette(List<XMaterial> materials) {
+        return materials.isEmpty() || materials.stream().anyMatch(RailType::isNonPlaceableBlock);
     }
 
-    private static boolean isPlaceableBlock(@Nullable XMaterial material) {
+    private static boolean isNonPlaceableBlock(@Nullable XMaterial material) {
         if (material == null)
-            return false;
+            return true;
 
         Material bukkitMaterial = material.get();
-        return bukkitMaterial != null && bukkitMaterial.isBlock();
+        return bukkitMaterial == null || !bukkitMaterial.isBlock();
     }
 
     public static @Nullable RailType byString(String value) {

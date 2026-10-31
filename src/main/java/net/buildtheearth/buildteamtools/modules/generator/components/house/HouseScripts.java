@@ -79,7 +79,7 @@ public class HouseScripts extends Script {
 
         // Set pos1 and pos2
         List<Vector> outlinePoints = new ArrayList<>(selectionPoints);
-        outlinePoints.get(0).setY(highestBlock);
+        outlinePoints.getFirst().setY(highestBlock);
         for (Vector point : outlinePoints)
             point.setY(minY);
         createSelection(outlinePoints);
@@ -175,7 +175,7 @@ public class HouseScripts extends Script {
 
         // Set pos1 and pos2
         outlinePoints = new ArrayList<>(selectionPoints);
-        outlinePoints.get(0).setY(maxY);
+        outlinePoints.getFirst().setY(maxY);
         for (Vector point : outlinePoints)
             point.setY(minY);
         createSelection(outlinePoints);

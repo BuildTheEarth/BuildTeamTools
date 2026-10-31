@@ -125,7 +125,7 @@ class AsyncRequestQueueTest {
     }
 
     @Test
-    void shouldHandleSupplierException() throws Exception {
+    void shouldHandleSupplierException() {
         try (AsyncRequestQueue queue =
                      new AsyncRequestQueue(0, "test-queue", 10)) {
 
@@ -146,7 +146,7 @@ class AsyncRequestQueueTest {
     }
 
     @Test
-    void shouldHandleFailedFuture() throws Exception {
+    void shouldHandleFailedFuture() {
         try (AsyncRequestQueue queue =
                      new AsyncRequestQueue(0, "test-queue", 10)) {
 

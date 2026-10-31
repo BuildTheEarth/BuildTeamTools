@@ -24,6 +24,7 @@ import org.bukkit.command.CommandSender;
 
 import java.lang.reflect.Proxy;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -151,7 +152,7 @@ class BttCommandManagerTest {
     }
 
     @Test
-    void subcommandsRetainArgumentsPermissionsAndHandlersForEveryAlias() throws Exception {
+    void subcommandsRetainArgumentsPermissionsAndHandlersForEveryAlias() {
         AtomicInteger invocations = new AtomicInteger();
         AtomicInteger mapInvocations = new AtomicInteger();
         Module owner = new EnabledModule();
@@ -313,8 +314,10 @@ class BttCommandManagerTest {
     private CommandContext<CommandSourceStack> parse(String input) {
         commands.registerEnabledCommands();
         var context = new CommandContext<>(sender, manager);
-        Command<CommandSourceStack> command = manager.commandTree()
-                .parse(context, CommandInput.of(input), Runnable::run).join();
+        Command<CommandSourceStack> command = Objects.requireNonNull(
+                manager.commandTree()
+                        .parse(context, CommandInput.of(input), Runnable::run).join(),
+                "Expected command parse to succeed for: " + input);
         context.command(command);
         return context;
     }
@@ -333,7 +336,8 @@ class BttCommandManagerTest {
         }
 
         @Override
-        public boolean hasPermission(CommandSourceStack sender, String permission) {
+        public boolean hasPermission(@org.jspecify.annotations.NonNull CommandSourceStack sender,
+                                     @org.jspecify.annotations.NonNull String permission) {
             return !deniedPermissions.contains(permission);
         }
 

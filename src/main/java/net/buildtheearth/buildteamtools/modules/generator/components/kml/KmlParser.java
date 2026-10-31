@@ -64,7 +64,7 @@ public class KmlParser {
      * Note: Each placemark can have multiple linestrings when using the type "MultiGeometry".
      *
      * @param kmlString KML content
-     * @return List<LineString>: A list of LineString objects, which themselves are lists of geocoordiantes.
+     * @return List<LineString>: A list of LineString objects, which themselves are lists of geocoordinates.
      */
     public List<LineString> extractLinestrings(String kmlString) {
         List<LineString> linestrings = new ArrayList<>();
@@ -138,7 +138,7 @@ public class KmlParser {
      * A placemark can have multiple linestrings when using the type "MultiGeometry".
      *
      * @param placemark the placemark to search
-     * @return List<LineString>: A list of LineString objects, which themselves are lists of geocoordiantes.
+     * @return List<LineString>: A list of LineString objects, which themselves are lists of geocoordinates.
      */
     private List<LineString> findLineStrings(Placemark placemark) {
         List<LineString> lines = new ArrayList<>();
@@ -186,20 +186,20 @@ public class KmlParser {
     }
 
     private List<Coordinate> getGeometryCoordinatesNoMulti(Geometry geom) {
-        if (geom instanceof LineString) {
-            return ((LineString) geom).getCoordinates();
-        } else if (geom instanceof LinearRing) {
-            return ((LinearRing) geom).getCoordinates();
-        } else if (geom instanceof Polygon) {
-            return ((Polygon) geom).getOuterBoundaryIs().getLinearRing().getCoordinates();
-        } else if (geom instanceof MultiGeometry) {
-            this.player.sendMessage(Messages.component(MessageKeys.Generator.Kml.NESTED_MULTIGEOMETRY));
-        } else {
-            this.player.sendMessage(Messages.component(
-                    MessageKeys.Generator.Kml.UNSUPPORTED_GEOMETRY,
-                    Component.text(geom.getClass().getName())));
-        }
-
-        return new ArrayList<Coordinate>();
+        return switch (geom) {
+            case LineString lineString -> lineString.getCoordinates();
+            case LinearRing linearRing -> linearRing.getCoordinates();
+            case Polygon polygon -> polygon.getOuterBoundaryIs().getLinearRing().getCoordinates();
+            case MultiGeometry ignored -> {
+                this.player.sendMessage(Messages.component(MessageKeys.Generator.Kml.NESTED_MULTIGEOMETRY));
+                yield new ArrayList<>();
+            }
+            default -> {
+                this.player.sendMessage(Messages.component(
+                        MessageKeys.Generator.Kml.UNSUPPORTED_GEOMETRY,
+                        Component.text(geom.getClass().getName())));
+                yield new ArrayList<>();
+            }
+        };
     }
 }

@@ -784,54 +784,34 @@ public class MenuItems {
      * Filter selector (array form) mirroring the module's getItemsByFilter(String).
      */
     public static ItemStack[] getItemsByFilterArray(String filter) {
-        switch (filter.toLowerCase(Locale.ROOT)) {
-            case "slabs":
-                return getSlabsArray();
-            case "stairs":
-                return getStairsArray();
-            case "walls":
-                return getWallsArray();
-            case "logs":
-                return getLogsArray();
-            case "leaves":
-                return getLeavesArray();
-            case "fences":
-                return getFencesArray();
-            case "carpet":
-                return getCarpetArray();
-            case "wool":
-                return getWoolArray();
-            case "terracotta":
-                return getTerracottaArray();
-            case "concrete":
-                return getConcreteArray();
-            case "concrete_powder":
-                return getConcretePowderArray();
-            case "bed":
-                return getBedsArray();
-            case "candle":
-                return getCandlesArray();
-            case "banner":
-                return getBannersArray();
-            case "glass_pane":
-                return getGlassPanesArray();
-            case "signs":
-                return getSignsArray();
-            case "shulker_boxes":
-                return getShulkerBoxesArray();
-            case "gates":
-                return getGatesArray();
-            case "glass":
-                return getGlassArray();
-            default:
-                return getBlocksByColorArray();
-        }
+        return switch (filter.toLowerCase(Locale.ROOT)) {
+            case "slabs" -> getSlabsArray();
+            case "stairs" -> getStairsArray();
+            case "walls" -> getWallsArray();
+            case "logs" -> getLogsArray();
+            case "leaves" -> getLeavesArray();
+            case "fences" -> getFencesArray();
+            case "carpet" -> getCarpetArray();
+            case "wool" -> getWoolArray();
+            case "terracotta" -> getTerracottaArray();
+            case "concrete" -> getConcreteArray();
+            case "concrete_powder" -> getConcretePowderArray();
+            case "bed" -> getBedsArray();
+            case "candle" -> getCandlesArray();
+            case "banner" -> getBannersArray();
+            case "glass_pane" -> getGlassPanesArray();
+            case "signs" -> getSignsArray();
+            case "shulker_boxes" -> getShulkerBoxesArray();
+            case "gates" -> getGatesArray();
+            case "glass" -> getGlassArray();
+            default -> getBlocksByColorArray();
+        };
     }
 
     // ----------------- OTHER (from original utils) -----------------
 
     // Background glass pane used in GUIs
-    public static ItemStack ITEM_BACKGROUND = new Item(GRAY_STAINED_GLASS_PANE.parseItem())
+    public static final ItemStack ITEM_BACKGROUND = new Item(GRAY_STAINED_GLASS_PANE.parseItem())
             .setDisplayName(" ").build();
 
     /**
@@ -852,106 +832,56 @@ public class MenuItems {
      * Map a stair XMaterial back to its "base" block XMaterial.
      */
     public static XMaterial convertStairToBlock(XMaterial stair) {
-        switch (stair) {
-            case QUARTZ_STAIRS:
-                return QUARTZ_BLOCK;
-            case POLISHED_BLACKSTONE_BRICK_STAIRS:
-                return POLISHED_BLACKSTONE_BRICKS;
-            case POLISHED_BLACKSTONE_STAIRS:
-                return POLISHED_BLACKSTONE;
-            case BLACKSTONE_STAIRS:
-                return BLACKSTONE;
-            case DEEPSLATE_TILE_STAIRS:
-                return DEEPSLATE_TILES;
-            case DEEPSLATE_BRICK_STAIRS:
-                return DEEPSLATE_BRICKS;
-            case POLISHED_DEEPSLATE_STAIRS:
-                return POLISHED_DEEPSLATE;
-            case COBBLED_DEEPSLATE_STAIRS:
-                return COBBLED_DEEPSLATE;
-            case STONE_BRICK_STAIRS:
-                return STONE_BRICKS;
-            case POLISHED_ANDESITE_STAIRS:
-                return POLISHED_ANDESITE;
-            case STONE_STAIRS:
-                return STONE;
-            case ANDESITE_STAIRS:
-                return ANDESITE;
-            case POLISHED_DIORITE_STAIRS:
-                return POLISHED_DIORITE;
-            case DIORITE_STAIRS:
-                return DIORITE;
-            case SMOOTH_QUARTZ_STAIRS:
-                return SMOOTH_QUARTZ;
-            case CHERRY_STAIRS:
-                return CHERRY_PLANKS;
-            case PURPUR_STAIRS:
-                return PURPUR_BLOCK;
-            case WARPED_STAIRS:
-                return WARPED_PLANKS;
-            case DARK_PRISMARINE_STAIRS:
-                return DARK_PRISMARINE;
-            case OXIDIZED_CUT_COPPER_STAIRS:
-                return OXIDIZED_CUT_COPPER;
-            case PRISMARINE_BRICK_STAIRS:
-                return PRISMARINE_BRICKS;
-            case PRISMARINE_STAIRS:
-                return PRISMARINE;
-            case WEATHERED_CUT_COPPER_STAIRS:
-                return WEATHERED_CUT_COPPER;
-            case MOSSY_COBBLESTONE_STAIRS:
-                return MOSSY_COBBLESTONE;
-            case MOSSY_STONE_BRICK_STAIRS:
-                return MOSSY_STONE_BRICKS;
-            case EXPOSED_CUT_COPPER_STAIRS:
-                return EXPOSED_CUT_COPPER;
-            case POLISHED_GRANITE_STAIRS:
-                return POLISHED_GRANITE;
-            case GRANITE_STAIRS:
-                return GRANITE;
-            case JUNGLE_STAIRS:
-                return JUNGLE_PLANKS;
-            case MUD_BRICK_STAIRS:
-                return MUD_BRICKS;
-            case BIRCH_STAIRS:
-                return BIRCH_PLANKS;
-            case END_STONE_BRICK_STAIRS:
-                return END_STONE_BRICKS;
-            case SANDSTONE_STAIRS:
-                return SANDSTONE;
-            case SMOOTH_SANDSTONE_STAIRS:
-                return SMOOTH_SANDSTONE;
-            case BAMBOO_MOSAIC_STAIRS:
-                return BAMBOO_MOSAIC;
-            case BAMBOO_STAIRS:
-                return BAMBOO_PLANKS;
-            case RED_SANDSTONE_STAIRS:
-                return RED_SANDSTONE;
-            case SMOOTH_RED_SANDSTONE_STAIRS:
-                return SMOOTH_RED_SANDSTONE;
-            case ACACIA_STAIRS:
-                return ACACIA_PLANKS;
-            case BRICK_STAIRS:
-                return BRICKS;
-            case CUT_COPPER_STAIRS:
-                return CUT_COPPER;
-            case RED_NETHER_BRICK_STAIRS:
-                return RED_NETHER_BRICKS;
-            case MANGROVE_STAIRS:
-                return MANGROVE_PLANKS;
-            case CRIMSON_STAIRS:
-                return CRIMSON_PLANKS;
-            case NETHER_BRICK_STAIRS:
-                return NETHER_BRICKS;
-            case DARK_OAK_STAIRS:
-                return DARK_OAK_PLANKS;
-            case SPRUCE_STAIRS:
-                return SPRUCE_PLANKS;
-            case OAK_STAIRS:
-                return OAK_PLANKS;
-            case COBBLESTONE_STAIRS:
-            default:
-                return COBBLESTONE;
-        }
+        return switch (stair) {
+            case QUARTZ_STAIRS -> QUARTZ_BLOCK;
+            case POLISHED_BLACKSTONE_BRICK_STAIRS -> POLISHED_BLACKSTONE_BRICKS;
+            case POLISHED_BLACKSTONE_STAIRS -> POLISHED_BLACKSTONE;
+            case BLACKSTONE_STAIRS -> BLACKSTONE;
+            case DEEPSLATE_TILE_STAIRS -> DEEPSLATE_TILES;
+            case DEEPSLATE_BRICK_STAIRS -> DEEPSLATE_BRICKS;
+            case POLISHED_DEEPSLATE_STAIRS -> POLISHED_DEEPSLATE;
+            case COBBLED_DEEPSLATE_STAIRS -> COBBLED_DEEPSLATE;
+            case STONE_BRICK_STAIRS -> STONE_BRICKS;
+            case POLISHED_ANDESITE_STAIRS -> POLISHED_ANDESITE;
+            case STONE_STAIRS -> STONE;
+            case ANDESITE_STAIRS -> ANDESITE;
+            case POLISHED_DIORITE_STAIRS -> POLISHED_DIORITE;
+            case DIORITE_STAIRS -> DIORITE;
+            case SMOOTH_QUARTZ_STAIRS -> SMOOTH_QUARTZ;
+            case CHERRY_STAIRS -> CHERRY_PLANKS;
+            case PURPUR_STAIRS -> PURPUR_BLOCK;
+            case WARPED_STAIRS -> WARPED_PLANKS;
+            case DARK_PRISMARINE_STAIRS -> DARK_PRISMARINE;
+            case OXIDIZED_CUT_COPPER_STAIRS -> OXIDIZED_CUT_COPPER;
+            case PRISMARINE_BRICK_STAIRS -> PRISMARINE_BRICKS;
+            case PRISMARINE_STAIRS -> PRISMARINE;
+            case WEATHERED_CUT_COPPER_STAIRS -> WEATHERED_CUT_COPPER;
+            case MOSSY_COBBLESTONE_STAIRS -> MOSSY_COBBLESTONE;
+            case MOSSY_STONE_BRICK_STAIRS -> MOSSY_STONE_BRICKS;
+            case EXPOSED_CUT_COPPER_STAIRS -> EXPOSED_CUT_COPPER;
+            case POLISHED_GRANITE_STAIRS -> POLISHED_GRANITE;
+            case GRANITE_STAIRS -> GRANITE;
+            case JUNGLE_STAIRS -> JUNGLE_PLANKS;
+            case MUD_BRICK_STAIRS -> MUD_BRICKS;
+            case BIRCH_STAIRS -> BIRCH_PLANKS;
+            case END_STONE_BRICK_STAIRS -> END_STONE_BRICKS;
+            case SANDSTONE_STAIRS -> SANDSTONE;
+            case SMOOTH_SANDSTONE_STAIRS -> SMOOTH_SANDSTONE;
+            case BAMBOO_MOSAIC_STAIRS -> BAMBOO_MOSAIC;
+            case BAMBOO_STAIRS -> BAMBOO_PLANKS;
+            case RED_SANDSTONE_STAIRS -> RED_SANDSTONE;
+            case SMOOTH_RED_SANDSTONE_STAIRS -> SMOOTH_RED_SANDSTONE;
+            case ACACIA_STAIRS -> ACACIA_PLANKS;
+            case BRICK_STAIRS -> BRICKS;
+            case CUT_COPPER_STAIRS -> CUT_COPPER;
+            case RED_NETHER_BRICK_STAIRS -> RED_NETHER_BRICKS;
+            case MANGROVE_STAIRS -> MANGROVE_PLANKS;
+            case CRIMSON_STAIRS -> CRIMSON_PLANKS;
+            case NETHER_BRICK_STAIRS -> NETHER_BRICKS;
+            case DARK_OAK_STAIRS -> DARK_OAK_PLANKS;
+            case SPRUCE_STAIRS -> SPRUCE_PLANKS;
+            case OAK_STAIRS -> OAK_PLANKS;
+            default -> COBBLESTONE;
+        };
     }
 }

@@ -8,7 +8,7 @@ import org.bukkit.World;
  *
  */
 public class BlockLocation {
-    public int x, y, z;
+    public final int x, y, z;
 
     public BlockLocation(int x, int y, int z) {
         this.x = x;

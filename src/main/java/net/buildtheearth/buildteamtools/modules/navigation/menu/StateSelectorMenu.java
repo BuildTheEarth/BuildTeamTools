@@ -3,15 +3,19 @@ package net.buildtheearth.buildteamtools.modules.navigation.menu;
 import com.alpsbte.alpslib.utils.ChatHelper;
 import com.alpsbte.alpslib.utils.item.Item;
 import lombok.NonNull;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.navigation.NavUtils;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Continent;
 import net.buildtheearth.buildteamtools.modules.network.model.Region;
 import net.buildtheearth.buildteamtools.modules.network.model.RegionType;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractPaginatedMenu;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
@@ -47,7 +51,7 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
      * @param autoLoad   Whether to auto-load the menu
      */
     public StateSelectorMenu(Player menuPlayer, @NonNull Continent continent, boolean autoLoad) {
-        super(4, 3, "USA - States", menuPlayer, autoLoad);
+        super(4, 3, Messages.component(MessageKeys.Navigation.StateMenu.TITLE), menuPlayer, autoLoad);
         this.continent = continent;
         this.stateEntries = loadStateEntries(continent);
     }
@@ -187,14 +191,16 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
         List<StateEntry> entries = source.stream()
                 .map(StateEntry.class::cast)
                 .toList();
+        Player player = getMenuPlayer();
 
         int slot = 0;
         for (StateEntry entry : entries) {
             getMenu().getSlot(slot).setItem(
-                    Item.createCustomHeadBase64(
-                            entry.stateRegion.getHeadBase64(),
-                            "§6§l" + entry.stateRegion.getName(),
-                            createStateLore(entry)
+                    ItemComponents.named(
+                            Item.createCustomHeadBase64(entry.stateRegion.getHeadBase64(), " ", null),
+                            Messages.render(player, MessageKeys.Navigation.StateMenu.ITEM_NAME,
+                                    Component.text(entry.stateRegion.getName())),
+                            createStateLore(player, entry)
                     )
             );
 
@@ -202,23 +208,20 @@ public class StateSelectorMenu extends AbstractPaginatedMenu {
         }
     }
 
-    private @NonNull ArrayList<String> createStateLore(@NonNull StateEntry entry) {
-        ArrayList<String> stateLore = ListUtil.createList(
-                "",
-                "§eBuild Team:",
-                entry.buildTeam.getBlankName(),
-                ""
-        );
+    private @NonNull List<Component> createStateLore(@NonNull Player player, @NonNull StateEntry entry) {
+        List<Component> stateLore = new ArrayList<>(
+                Messages.loreComponents(player, MessageKeys.Navigation.StateMenu.BUILD_TEAM_LABEL));
+        stateLore.addAll(ListUtil.grayComponents(entry.buildTeam.getBlankName()));
 
         if (!entry.hasSubCities) {
-            stateLore.add("§8Click to join this state's server!");
+            stateLore.addAll(Messages.loreComponents(player, MessageKeys.Navigation.StateMenu.LORE_JOIN));
             return stateLore;
         }
 
         getCityTeamsForState(entry.stateRegion).forEach(cityTeam ->
-                stateLore.add(3, cityTeam.getBlankName()));
+                stateLore.addAll(1, ListUtil.grayComponents(cityTeam.getBlankName())));
 
-        stateLore.add("§8Click to view cities!");
+        stateLore.addAll(Messages.loreComponents(player, MessageKeys.Navigation.StateMenu.LORE_VIEW_CITIES));
         return stateLore;
     }
 

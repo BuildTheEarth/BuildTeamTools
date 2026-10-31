@@ -1,16 +1,21 @@
 package net.buildtheearth.buildteamtools.utils;
 
-import java.util.ArrayList;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
+import java.util.ArrayList;
+import java.util.List;
+
+/** Lore helpers for Adventure item text. */
 public class ListUtil {
 
-    public static ArrayList<String> createList(String... args) {
-        ArrayList<String> list = new ArrayList<String>();
-        for (String arg : args)
+    public static List<Component> grayComponents(String... args) {
+        List<Component> list = new ArrayList<>();
+        for (String arg : args) {
             if (arg != null) {
-                arg = "§7" + arg;
-                list.add(arg);
+                list.add(Component.text(arg, NamedTextColor.GRAY));
             }
+        }
         return list;
     }
 }

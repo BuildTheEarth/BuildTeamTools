@@ -1,6 +1,8 @@
 package net.buildtheearth.buildteamtools.modules.miscellaneous.blockpalettegui;
 
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
 import net.buildtheearth.buildteamtools.modules.common.metrics.FeatureUsage;
 import net.buildtheearth.buildteamtools.modules.common.metrics.UsageFeature;
@@ -55,7 +57,7 @@ public class BlockPaletteCommand {
                         blockPalletManager.get().setPlayerFiltersAndOpen(player);
                     }
                     else
-                        sender.sendMessage("This command can only be used by players.");
+                        sender.sendMessage(Messages.playerOnly());
                 });
         commandManager.registerSubcommand(owner, "blockpalette", "filter",
                 "Open the filter menu, optionally applying filters first.", builder ->
@@ -70,7 +72,7 @@ public class BlockPaletteCommand {
                                             ))), context -> {
                     CommandSender sender = context.sender().getSender();
                     if (!(sender instanceof Player player)) {
-                        sender.sendMessage("This command can only be used by players.");
+                        sender.sendMessage(Messages.playerOnly());
                         return;
                     }
 
@@ -88,7 +90,7 @@ public class BlockPaletteCommand {
     private void execute(@NonNull CommandSender sender, String @NonNull [] args) {
         if (!Permissions.checkPermission(sender, Permissions.BLOCK_PALETTE_USE)) return;
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("This command can only be used by players.");
+            sender.sendMessage(Messages.playerOnly());
             return;
         }
 
@@ -100,9 +102,6 @@ public class BlockPaletteCommand {
             return;
         }
 
-        sender.sendMessage("§cUsage: §7/btt blockpalette\n"
-                + "§c   or §7/btt blockpalette menu\n"
-                + "§c   or §7/btt blockpalette filter\n"
-                + "§c   or §7/btt blockpalette filter <filter1> <filter2> …");
+        sender.sendMessage(Messages.component(MessageKeys.BlockPalette.USAGE));
     }
 }

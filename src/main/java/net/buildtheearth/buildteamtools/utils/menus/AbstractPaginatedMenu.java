@@ -1,9 +1,12 @@
 package net.buildtheearth.buildteamtools.utils.menus;
 
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.utils.heads.HeadColor;
 import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -18,6 +21,15 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
     private int currentPage = 0;
 
     protected AbstractPaginatedMenu(int rows, int pagedRows, String title, Player menuPlayer, boolean autoLoad) {
+        super(rows, title, menuPlayer, false);
+
+        this.maxItemsPerPage = pagedRows * 9;
+
+        if (autoLoad)
+            Bukkit.getScheduler().scheduleSyncDelayedTask(BuildTeamTools.getInstance(), this::reloadMenuAsync);
+    }
+
+    protected AbstractPaginatedMenu(int rows, int pagedRows, Component title, Player menuPlayer, boolean autoLoad) {
         super(rows, title, menuPlayer, false);
 
         this.maxItemsPerPage = pagedRows * 9;
@@ -129,7 +141,9 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
      * @return The current page item.
      */
     private ItemStack getCurrentPageItem() {
-        return HeadFactory.number(HeadColor.WHITE, getPage(), "§eCurrent Page §7- §f" + getPage());
+        Player player = getMenuPlayer();
+        return HeadFactory.number(HeadColor.WHITE, getPage(),
+                Messages.render(player, MessageKeys.Ui.CURRENT_PAGE, Component.text(getPage())));
     }
 
     /**
@@ -137,9 +151,10 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
      */
     private ItemStack getPreviousPageItem() {
         if (currentPage < 1)
-            return HeadFactory.head(HeadTexture.WHITE_BLANK, " ");
+            return HeadFactory.blank(HeadTexture.WHITE_BLANK);
 
-        return HeadFactory.head(HeadTexture.WHITE_ARROW_LEFT, "§ePrevious Page §7- §f" + (getPage() - 1));
+        return HeadFactory.head(HeadTexture.WHITE_ARROW_LEFT,
+                Messages.render(getMenuPlayer(), MessageKeys.Ui.PREVIOUS_PAGE, Component.text(getPage() - 1)));
     }
 
     /**
@@ -147,9 +162,10 @@ public abstract class AbstractPaginatedMenu extends AbstractMenu {
      */
     private ItemStack getNextPageItem() {
         if (!hasNextPage())
-            return HeadFactory.head(HeadTexture.WHITE_BLANK, " ");
+            return HeadFactory.blank(HeadTexture.WHITE_BLANK);
 
-        return HeadFactory.head(HeadTexture.WHITE_ARROW_RIGHT, "§eNext Page §7- §f" + (getPage() + 1));
+        return HeadFactory.head(HeadTexture.WHITE_ARROW_RIGHT,
+                Messages.render(getMenuPlayer(), MessageKeys.Ui.NEXT_PAGE, Component.text(getPage() + 1)));
     }
 
 

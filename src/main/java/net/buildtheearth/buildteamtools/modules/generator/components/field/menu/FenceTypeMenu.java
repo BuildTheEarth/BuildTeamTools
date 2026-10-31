@@ -1,6 +1,8 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.field.menu;
 
 
+import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
 import com.alpsbte.alpslib.utils.item.Item;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
 import net.buildtheearth.buildteamtools.modules.generator.components.field.FieldFlag;
@@ -13,11 +15,9 @@ import org.bukkit.entity.Player;
 
 public class FenceTypeMenu extends BlockListMenu {
 
-    public static String FENCE_TYPE_INV_NAME = "Choose a Fence Type";
-
 
     public FenceTypeMenu(Player player, boolean autoLoad) {
-        super(player, FENCE_TYPE_INV_NAME, MenuItems.getFences(), new CropTypeMenu(player, false), autoLoad);
+        super(player, Messages.plain(player, MessageKeys.Generator.Field.FENCE_TYPE_TITLE), MenuItems.getFences(), new CropTypeMenu(player, false), autoLoad);
     }
 
     @Override

@@ -1,17 +1,18 @@
 package net.buildtheearth.buildteamtools.utils.menus;
 
-import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.utils.heads.HeadColor;
 import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.ipvp.canvas.Menu;
 import org.ipvp.canvas.mask.Mask;
 import org.ipvp.canvas.type.ChestMenu;
@@ -28,9 +29,21 @@ public abstract class AbstractMenu {
     }
 
     public AbstractMenu(int rows, String title, Player menuPlayer, boolean reload) {
+        this(rows, LegacyComponentSerializer.legacyAmpersand().deserialize(title), menuPlayer, reload);
+    }
+
+    /**
+     * Creates a menu with an Adventure title. Translatable components are rendered for the
+     * viewer's locale so longer translations still fit the inventory title API.
+     */
+    public AbstractMenu(int rows, Component title, Player menuPlayer) {
+        this(rows, title, menuPlayer, true);
+    }
+
+    public AbstractMenu(int rows, Component title, Player menuPlayer, boolean reload) {
         this.menuPlayer = menuPlayer;
 
-        Component titleComponent = LegacyComponentSerializer.legacyAmpersand().deserialize(title);
+        Component titleComponent = Messages.render(menuPlayer, title);
         this.menu = ChestMenu.builder(rows).title(titleComponent).redraw(true).build();
 
         if (reload) reloadMenuAsync();
@@ -110,16 +123,27 @@ public abstract class AbstractMenu {
      * @param valueType      Type of the value (e.g. "m", "°C", "°F", "blocks", "chunks", "seconds", "minutes", "hours", "days", "weeks", "months", "years", ...)
      */
     protected void createCounter(HeadColor sliderColor, int sliderItemSlot, String sliderName, int value, int minValue, int maxValue, String valueType) {
-        // Set previous page item
-        getMenu().getSlot(sliderItemSlot - 1).setItem(HeadFactory.getCounterMinusItem(sliderColor, sliderName, value, minValue));
+        Player player = getMenuPlayer();
+        Component name = Component.text(sliderName);
+        Component valueText = Component.text(value);
 
-        // Set current page item
-        String currentCounterName = "§e" + sliderName + ": §7§l" + value;
-        if (valueType != null)
-            currentCounterName += " " + valueType;
-        getMenu().getSlot(sliderItemSlot).setItem(HeadFactory.number(sliderColor, value, currentCounterName));
-        // Set next page item
-        getMenu().getSlot(sliderItemSlot + 1).setItem(HeadFactory.getCounterPlusItem(sliderColor, sliderName, value, maxValue));
+        getMenu().getSlot(sliderItemSlot - 1).setItem(HeadFactory.getCounterMinusItem(
+                sliderColor,
+                Messages.render(player, Messages.component(MessageKeys.Ui.COUNTER_MINUS, name)),
+                value,
+                minValue));
+
+        Component currentName = valueType == null
+                ? Messages.render(player, Messages.component(MessageKeys.Ui.COUNTER_VALUE, name, valueText))
+                : Messages.render(player, Messages.component(
+                        MessageKeys.Ui.COUNTER_VALUE_TYPED, name, valueText, Component.text(valueType)));
+        getMenu().getSlot(sliderItemSlot).setItem(HeadFactory.number(sliderColor, value, currentName));
+
+        getMenu().getSlot(sliderItemSlot + 1).setItem(HeadFactory.getCounterPlusItem(
+                sliderColor,
+                Messages.render(player, Messages.component(MessageKeys.Ui.COUNTER_PLUS, name)),
+                value,
+                maxValue));
     }
 
     /**
@@ -133,30 +157,26 @@ public abstract class AbstractMenu {
      * @param current        Current block item
      */
     protected void setChoiceItems(HeadColor sliderColor, int sliderItemSlot, String sliderName, ItemStack current) {
-        sliderName = "§e" + sliderName;
+        Player player = getMenuPlayer();
+        Component name = Component.text(sliderName);
+        Component offName = Messages.render(player, Messages.component(MessageKeys.Ui.SLIDER_OFF, name));
+        Component displayName = Messages.render(player, Messages.component(MessageKeys.Ui.SLIDER_NAME, name));
+        Component disableName = Messages.render(player, Messages.component(MessageKeys.Ui.SLIDER_DISABLE, name));
 
         if (current == null) {
-            // Set previous page item
-            getMenu().getSlot(sliderItemSlot - 1).setItem(HeadFactory.colorizedHead(sliderColor, HeadTexture.WHITE_BLANK, sliderName + ": §c§lOFF"));
-
-            // Set current page item
-            getMenu().getSlot(sliderItemSlot).setItem(Item.create(Objects.requireNonNull(XMaterial.BARRIER.get()), sliderName + ": §c§lOFF"));
-
-            // Set next page item
-            getMenu().getSlot(sliderItemSlot + 1).setItem(HeadFactory.colorizedHead(sliderColor, HeadTexture.WHITE_BLANK, sliderName + ": §c§lOFF"));
+            getMenu().getSlot(sliderItemSlot - 1).setItem(
+                    HeadFactory.colorizedHead(sliderColor, HeadTexture.WHITE_BLANK, offName));
+            getMenu().getSlot(sliderItemSlot).setItem(ItemComponents.of(
+                    Objects.requireNonNull(XMaterial.BARRIER.get()), offName));
+            getMenu().getSlot(sliderItemSlot + 1).setItem(
+                    HeadFactory.colorizedHead(sliderColor, HeadTexture.WHITE_BLANK, offName));
         } else {
-            ItemMeta meta = current.getItemMeta();
-            meta.setDisplayName(sliderName);
-            current.setItemMeta(meta);
-
-            // Set previous page item
-            getMenu().getSlot(sliderItemSlot - 1).setItem(HeadFactory.colorizedHead(sliderColor, HeadTexture.WHITE_X, "§cDisable " + sliderName));
-
-            // Set current page item
+            ItemComponents.displayName(current, displayName);
+            getMenu().getSlot(sliderItemSlot - 1).setItem(
+                    HeadFactory.colorizedHead(sliderColor, HeadTexture.WHITE_X, disableName));
             getMenu().getSlot(sliderItemSlot).setItem(current);
-
-            // Set next page item
-            getMenu().getSlot(sliderItemSlot + 1).setItem(HeadFactory.colorizedHead(sliderColor, HeadTexture.WHITE_X, "§cDisable " + sliderName));
+            getMenu().getSlot(sliderItemSlot + 1).setItem(
+                    HeadFactory.colorizedHead(sliderColor, HeadTexture.WHITE_X, disableName));
         }
     }
 
@@ -166,7 +186,9 @@ public abstract class AbstractMenu {
      * @param slot Slot of the back item
      */
     protected void setBackItem(int slot, AbstractMenu backMenu) {
-        getMenu().getSlot(slot).setItem(HeadFactory.head(HeadTexture.WHITE_BACKWARD, "§eBack"));
+        getMenu().getSlot(slot).setItem(HeadFactory.head(
+                HeadTexture.WHITE_BACKWARD,
+                Messages.render(getMenuPlayer(), Messages.component(MessageKeys.Ui.BACK))));
         getMenu().getSlot(slot).setClickHandler((clickPlayer, clickInformation) -> Bukkit.getScheduler().scheduleSyncDelayedTask(BuildTeamTools.getInstance(), () -> {
             clickPlayer.closeInventory();
             backMenu.reloadMenuAsync();

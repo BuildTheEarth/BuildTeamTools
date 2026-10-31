@@ -7,6 +7,8 @@ import com.google.common.io.ByteStreams;
 import net.buildtheearth.OutOfProjectionBoundsException;
 import net.buildtheearth.Projection;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.ModuleComponent;
 import net.buildtheearth.buildteamtools.modules.common.metrics.FeatureUsage;
 import net.buildtheearth.buildteamtools.modules.common.metrics.UsageDetail;
@@ -23,6 +25,7 @@ import net.buildtheearth.buildteamtools.modules.network.api.RegionLookupResult;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import net.buildtheearth.model.GeographicalCoordinate;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -64,7 +67,7 @@ public class WarpsComponent extends ModuleComponent {
         Warp warp = getWarpByKey(warpKey);
 
         if (warp == null) {
-            player.sendMessage(ChatHelper.getErrorString("The warp you tried to warp to does not exist anymore."));
+            player.sendMessage(Messages.component(MessageKeys.Warp.GONE));
             return;
         }
 
@@ -90,9 +93,9 @@ public class WarpsComponent extends ModuleComponent {
         }
 
         if (player.teleport(targetWarpLocation)) {
-            ChatHelper.sendSuccessfulMessage(player, "Successfully warped you to the desired location!");
+            player.sendMessage(Messages.component(MessageKeys.Warp.TELEPORT_SUCCESS));
         } else {
-            player.sendMessage(ChatHelper.getErrorString("Something went wrong trying to warp you to the desired location."));
+            player.sendMessage(Messages.component(MessageKeys.Warp.TELEPORT_FAILED));
         }
 
         warpQueue.remove(player.getUniqueId());
@@ -122,7 +125,7 @@ public class WarpsComponent extends ModuleComponent {
 
             FeatureUsage.record(UsageDetail.WARPS_TELEPORT);
             player.teleportAsync(loc);
-            ChatHelper.sendSuccessfulMessage(player, "Successfully warped you to %s.", warp.getName());
+            player.sendMessage(Messages.component(MessageKeys.Warp.TELEPORT_SUCCESS_NAMED, Component.text(warp.getName())));
             return;
         }
 
@@ -180,7 +183,7 @@ public class WarpsComponent extends ModuleComponent {
             WarpsComponent.getOwnedRegionFromLocation(coordinate, creator)
                     .thenAccept(result -> {
                 // Create a default name for the warp
-                String name = creator.getName() + "'s Warp";
+                String name = Messages.plain(creator, MessageKeys.Warp.DEFAULT_NAME, Component.text(creator.getName()));
 
                 // Create an instance of the warp POJO
                         Warp warp = new Warp(group, name, result.countryCodeCCA2(), "cca2", null, null, null,
@@ -192,12 +195,12 @@ public class WarpsComponent extends ModuleComponent {
 
             }).exceptionally(e -> {
                 Throwable cause = e.getCause() != null ? e.getCause() : e;
-                creator.sendMessage(ChatHelper.getErrorString("Failed to create warp: %s", cause.getMessage()));
+                creator.sendMessage(Messages.component(MessageKeys.Warp.CREATE_FAILED, Component.text(String.valueOf(cause.getMessage()))));
                 BuildTeamTools.getInstance().getComponentLogger().error("An error occurred while creating the warp!", e);
                 return null;
             });
         } catch (OutOfProjectionBoundsException e) {
-            creator.sendMessage(ChatHelper.getErrorString("Cannot create warp here: %s", e.getMessage()));
+            creator.sendMessage(Messages.component(MessageKeys.Warp.CREATE_HERE_FAILED, Component.text(String.valueOf(e.getMessage()))));
         }
     }
 
@@ -219,7 +222,7 @@ public class WarpsComponent extends ModuleComponent {
         }).exceptionally(e -> {
             BuildTeamTools.getInstance().getComponentLogger().error("An error occurred while creating the warp!", e);
             Throwable cause = e.getCause() != null ? e.getCause() : e;
-            creator.sendMessage(ChatHelper.getErrorString("Failed to create warp %s: %s", name, cause.getMessage()));
+            creator.sendMessage(Messages.component(MessageKeys.Warp.CREATE_NAMED_FAILED, Component.text(name), Component.text(String.valueOf(cause.getMessage()))));
             return null;
         });
     }
@@ -227,8 +230,8 @@ public class WarpsComponent extends ModuleComponent {
 
     public void createWarpGroup(@NotNull Player creator) {
         // Create a default name for the warp
-        String name = creator.getName() + "'s Warp Group";
-        String description = "This is a warp group.";
+        String name = Messages.plain(creator, MessageKeys.Warp.DEFAULT_GROUP_NAME, Component.text(creator.getName()));
+        String description = Messages.plain(creator, MessageKeys.Warp.DEFAULT_GROUP_DESCRIPTION);
         int slot = -1;
 
         WarpGroup warpGroup = new WarpGroup(NetworkModule.getInstance().getBuildTeam(), name, description, slot, null);
@@ -280,7 +283,7 @@ public class WarpsComponent extends ModuleComponent {
         int warpGroupCount = buildTeam.getWarpGroups().size();
 
         switch (warpGroupCount) {
-            case 0 -> player.sendMessage(ChatHelper.getErrorString("This server does not have any warps yet!"));
+            case 0 -> player.sendMessage(Messages.component(MessageKeys.Warp.NO_WARPS_YET));
             case 1 -> new WarpMenu(player, buildTeam.getWarpGroups().getFirst(), null, true);
             default -> new WarpGroupMenu(player, buildTeam, menu != null, true, menu);
         }
@@ -300,7 +303,8 @@ public class WarpsComponent extends ModuleComponent {
                             .thenApply(fallbackResult -> {
                                 if (!ownsRegion(fallbackResult)) {
                                     throw new CompletionException(new IllegalStateException(
-                                            "This team does not own the country " + fallbackResult.regionName() + "!"
+                                            Messages.plain(player, MessageKeys.Warp.TEAM_DOES_NOT_OWN_COUNTRY,
+                                                    Component.text(fallbackResult.regionName()))
                                     ));
                                 }
 

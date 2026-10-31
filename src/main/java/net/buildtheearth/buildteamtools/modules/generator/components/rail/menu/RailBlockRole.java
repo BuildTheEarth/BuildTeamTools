@@ -1,6 +1,7 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.rail.menu;
 
 import com.cryptomorin.xseries.XMaterial;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
 import lombok.Getter;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import org.bukkit.Material;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
  */
 enum RailBlockRole {
 
-    RAIL_BLOCK("Choose a Rail Block") {
+    RAIL_BLOCK(MessageKeys.Generator.Rail.Menu.PICKER_RAIL_BLOCK) {
         @Override
         List<ItemStack> createChoices() {
             List<ItemStack> choices = new ArrayList<>();
@@ -32,7 +33,7 @@ enum RailBlockRole {
         }
     },
 
-    BLOCK_BELOW("Choose a Block Below the Rails") {
+    BLOCK_BELOW(MessageKeys.Generator.Rail.Menu.PICKER_BLOCK_BELOW) {
         @Override
         List<ItemStack> createChoices() {
             return MenuItems.getSolidBlocks();
@@ -44,7 +45,7 @@ enum RailBlockRole {
         }
     },
 
-    SLEEPER_BLOCK("Choose a Sleeper Block") {
+    SLEEPER_BLOCK(MessageKeys.Generator.Rail.Menu.PICKER_SLEEPER) {
         @Override
         List<ItemStack> createChoices() {
             return MenuItems.getSolidBlocks();
@@ -56,7 +57,7 @@ enum RailBlockRole {
         }
     },
 
-    ICON("Choose a Rail Type Icon") {
+    ICON(MessageKeys.Generator.Rail.Menu.PICKER_ICON) {
         @Override
         List<ItemStack> createChoices() {
             return MenuItems.getBlocksByColor();
@@ -68,7 +69,7 @@ enum RailBlockRole {
         }
     },
 
-    OVERHEAD_POLE_BLOCK("Choose an Overhead Pole Block") {
+    OVERHEAD_POLE_BLOCK(MessageKeys.Generator.Rail.Menu.PICKER_POLE) {
         @Override
         List<ItemStack> createChoices() {
             return MenuItems.getBlocksByColor();
@@ -85,7 +86,7 @@ enum RailBlockRole {
         }
     },
 
-    OVERHEAD_SUPPORT_BLOCK("Choose a Top Support Block") {
+    OVERHEAD_SUPPORT_BLOCK(MessageKeys.Generator.Rail.Menu.PICKER_SUPPORT) {
         @Override
         List<ItemStack> createChoices() {
             return MenuItems.getBlocksByColor();
@@ -102,7 +103,7 @@ enum RailBlockRole {
         }
     },
 
-    OVERHEAD_WIRE_BLOCK("Choose an Overhead Wire Block") {
+    OVERHEAD_WIRE_BLOCK(MessageKeys.Generator.Rail.Menu.PICKER_WIRE) {
         @Override
         List<ItemStack> createChoices() {
             return MenuItems.getBlocksByColor();
@@ -120,10 +121,10 @@ enum RailBlockRole {
     };
 
     @Getter
-    private final String menuTitle;
+    private final String menuTitleKey;
 
-    RailBlockRole(String menuTitle) {
-        this.menuTitle = menuTitle;
+    RailBlockRole(String menuTitleKey) {
+        this.menuTitleKey = menuTitleKey;
     }
 
     abstract List<ItemStack> createChoices();

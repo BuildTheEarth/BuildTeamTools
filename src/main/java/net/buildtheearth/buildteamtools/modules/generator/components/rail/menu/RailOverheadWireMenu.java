@@ -1,8 +1,11 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.rail.menu;
 
-import com.alpsbte.alpslib.utils.ChatHelper;
-import com.alpsbte.alpslib.utils.item.Item;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.kyori.adventure.text.Component;
+
 import com.cryptomorin.xseries.XMaterial;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.configuration.RailType;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
@@ -25,10 +28,7 @@ import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 
 final class RailOverheadWireMenu extends AbstractMenu {
-
-    private static final String MENU_TITLE = "Overhead Wire Settings";
     private static final String FILLED_MASK_ROW = "111111111";
-    private static final String BLOCKS_UNIT = "Blocks";
 
     private static final int POLES_TOGGLE_SLOT = 10;
     private static final int POLE_BLOCK_SLOT = 16;
@@ -44,7 +44,7 @@ final class RailOverheadWireMenu extends AbstractMenu {
     private final RailTypeDraft draft;
 
     RailOverheadWireMenu(Player player, RailTypeDraft draft, boolean autoLoad) {
-        super(5, MENU_TITLE, player, false);
+        super(5, Messages.component(MessageKeys.Generator.Rail.Menu.OVERHEAD_TITLE), player, false);
         this.draft = draft;
 
         if (autoLoad)
@@ -56,53 +56,55 @@ final class RailOverheadWireMenu extends AbstractMenu {
         if (getMask() != null)
             getMask().apply(getMenu());
 
+        Player player = getMenuPlayer();
         getMenu().getSlot(POLES_TOGGLE_SLOT).setItem(createToggleItem(
-                "Overhead Poles",
+                Messages.plain(player, MessageKeys.Generator.Rail.Menu.OVERHEAD_POLES),
                 draft.isOverheadPolesEnabled(),
-                "Generate poles alongside the tracks."
+                Messages.plain(player, MessageKeys.Generator.Rail.Menu.OVERHEAD_POLES_DESC)
         ));
         getMenu().getSlot(WIRES_TOGGLE_SLOT).setItem(createToggleItem(
-                "Overhead Wires",
+                Messages.plain(player, MessageKeys.Generator.Rail.Menu.OVERHEAD_WIRES),
                 draft.isOverheadWiresEnabled(),
-                "Generate wires above the tracks."
+                Messages.plain(player, MessageKeys.Generator.Rail.Menu.OVERHEAD_WIRES_DESC)
         ));
         getMenu().getSlot(POLE_BLOCK_SLOT).setItem(createBlockItem(
-                "Pole Block",
+                Messages.plain(player, MessageKeys.Generator.Rail.Menu.OVERHEAD_POLE_BLOCK),
                 draft.getOverheadPoleBlocks()
         ));
         getMenu().getSlot(SUPPORT_BLOCK_SLOT).setItem(createBlockItem(
-                "Top Support Block",
+                Messages.plain(player, MessageKeys.Generator.Rail.Menu.OVERHEAD_SUPPORT_BLOCK),
                 draft.getOverheadSupportBlocks()
         ));
         getMenu().getSlot(WIRE_BLOCK_SLOT).setItem(createBlockItem(
-                "Wire Block",
+                Messages.plain(player, MessageKeys.Generator.Rail.Menu.OVERHEAD_WIRE_BLOCK),
                 draft.getOverheadWireBlocks()
         ));
 
         getMenu().getSlot(POLE_SPACING_SLOT).setItem(createSpacingItem());
+        String blocksUnit = Messages.plain(player, MessageKeys.Generator.Rail.Menu.EDITOR_UNIT_BLOCKS);
         createCounter(
                 HeadColor.LIGHT_GRAY,
                 POLE_OFFSET_SLOT,
-                "Pole Offset",
+                Messages.plain(player, MessageKeys.Generator.Rail.Menu.OVERHEAD_POLE_OFFSET),
                 draft.getOverheadPoleOffset(),
                 RailType.MIN_OVERHEAD_POLE_OFFSET,
                 RailType.MAX_OVERHEAD_POLE_OFFSET,
-                BLOCKS_UNIT
+                blocksUnit
         );
         createCounter(
                 HeadColor.WHITE,
                 POLE_HEIGHT_SLOT,
-                "Pole Height",
+                Messages.plain(player, MessageKeys.Generator.Rail.Menu.OVERHEAD_POLE_HEIGHT),
                 draft.getOverheadPoleHeight(),
                 RailType.MIN_OVERHEAD_POLE_HEIGHT,
                 RailType.MAX_OVERHEAD_POLE_HEIGHT,
-                BLOCKS_UNIT
+                blocksUnit
         );
 
         setBackItem(BACK_ITEM_SLOT, new RailTypeEditorMenu(getMenuPlayer(), draft, false));
         getMenu().getSlot(DONE_ITEM_SLOT).setItem(HeadFactory.head(
                 HeadTexture.CHECKMARK,
-                green("Done")
+                Messages.render(player, MessageKeys.Generator.Rail.Menu.TRACK_SPACING_DONE)
         ));
         getMenu().open(getMenuPlayer());
     }
@@ -202,37 +204,49 @@ final class RailOverheadWireMenu extends AbstractMenu {
     }
 
     private ItemStack createToggleItem(String name, boolean enabled, String description) {
-        return Item.create(
+        Player player = getMenuPlayer();
+        Component state = enabled
+                ? Component.text(RailMenuText.enabled(player), NamedTextColor.GREEN)
+                : Component.text(RailMenuText.disabled(player), NamedTextColor.RED);
+        Component displayName = yellow(name + ": ").append(state);
+        return ItemComponents.of(
                 Objects.requireNonNull(XMaterial.LEVER.get()),
-                yellow(name + ": ") + (enabled
-                        ? green(RailMenuText.ENABLED)
-                        : red(RailMenuText.DISABLED)),
-                List.of(gray(description), gray("Click to toggle."))
+                displayName,
+                Messages.loreComponents(
+                        player,
+                        MessageKeys.Generator.Rail.Menu.OVERHEAD_TOGGLE_LORE,
+                        Component.text(description))
         );
     }
 
     private ItemStack createBlockItem(String name, List<XMaterial> materials) {
+        Player player = getMenuPlayer();
         Material bukkitMaterial = materials.getFirst().get();
 
         if (bukkitMaterial == null)
             bukkitMaterial = Objects.requireNonNull(XMaterial.BARRIER.get());
 
-        return Item.create(
+        Component displayName = yellow(name + ": ").append(RailTypeMenuItems.formatMaterialsComponent(materials));
+        return ItemComponents.of(
                 bukkitMaterial,
-                yellow(name + ": ") + RailTypeMenu.formatMaterials(materials),
-                List.of(gray("Click to choose one or more materials."))
+                displayName,
+                Messages.loreComponents(player, MessageKeys.Generator.Rail.Menu.OVERHEAD_MATERIALS_LORE)
         );
     }
 
     private ItemStack createSpacingItem() {
-        return Item.create(
+        Player player = getMenuPlayer();
+        String range = RailType.MIN_OVERHEAD_POLE_SPACING + "-" + RailType.MAX_OVERHEAD_POLE_SPACING;
+        return ItemComponents.of(
                 Objects.requireNonNull(XMaterial.NAME_TAG.get()),
-                yellow("Pole Spacing: ") + white(draft.getOverheadPoleSpacing() + " " + BLOCKS_UNIT),
-                List.of(
-                        gray("Click to enter a custom spacing."),
-                        gray("Valid range: ") + white(RailType.MIN_OVERHEAD_POLE_SPACING
-                                + "-" + RailType.MAX_OVERHEAD_POLE_SPACING + " " + BLOCKS_UNIT)
-                )
+                Messages.render(
+                        player,
+                        MessageKeys.Generator.Rail.Menu.OVERHEAD_POLE_SPACING,
+                        Component.text(String.valueOf(draft.getOverheadPoleSpacing()))),
+                Messages.loreComponents(
+                        player,
+                        MessageKeys.Generator.Rail.Menu.OVERHEAD_POLE_SPACING_LORE,
+                        Component.text(range))
         );
     }
 
@@ -248,29 +262,22 @@ final class RailOverheadWireMenu extends AbstractMenu {
                     Integer spacing = parseSpacing(input);
 
                     if (spacing == null) {
-                        stateSnapshot.getPlayer().sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
-                                "Pole spacing must be a number between %s and %s.",
-                                RailType.MIN_OVERHEAD_POLE_SPACING,
-                                RailType.MAX_OVERHEAD_POLE_SPACING
-                        )));
+                        stateSnapshot.getPlayer().sendMessage(Messages.component(MessageKeys.Generator.Rail.Menu.OVERHEAD_SPACING_INVALID, Component.text(String.valueOf(RailType.MIN_OVERHEAD_POLE_SPACING)), Component.text(String.valueOf(RailType.MAX_OVERHEAD_POLE_SPACING))));
                         return List.of(AnvilGUI.ResponseAction.replaceInputText(String.valueOf(draft.getOverheadPoleSpacing())));
                     }
 
                     draft.setOverheadPoleSpacing(spacing);
                     playSound(stateSnapshot.getPlayer(), Sound.UI_BUTTON_CLICK);
-                    stateSnapshot.getPlayer().sendMessage(ChatHelper.getStandardComponent(
-                            true,
-                            "Pole spacing set to %s blocks.",
-                            spacing
-                    ));
+                    stateSnapshot.getPlayer().sendMessage(Messages.component(MessageKeys.Generator.Rail.Menu.OVERHEAD_SPACING_SET, Component.text(String.valueOf(spacing))));
                     return List.of(
                             AnvilGUI.ResponseAction.close(),
                             AnvilGUI.ResponseAction.run(() -> new RailOverheadWireMenu(clickPlayer, draft, true))
                     );
                 })
                 .text(String.valueOf(draft.getOverheadPoleSpacing()))
-                .itemLeft(Item.create(Objects.requireNonNull(XMaterial.NAME_TAG.get()), yellow("Change Pole Spacing")))
-                .title(darkGray("Change pole spacing"))
+                .itemLeft(ItemComponents.of(Objects.requireNonNull(XMaterial.NAME_TAG.get()),
+                        Messages.render(clickPlayer, MessageKeys.Generator.Rail.Menu.OVERHEAD_ANVIL_ITEM)))
+                .title(Messages.legacy(clickPlayer, MessageKeys.Generator.Rail.Menu.OVERHEAD_ANVIL_TITLE))
                 .plugin(BuildTeamTools.getInstance())
                 .open(clickPlayer);
     }
@@ -292,27 +299,7 @@ final class RailOverheadWireMenu extends AbstractMenu {
         player.playSound(player, sound, 1.0F, 1.0F);
     }
 
-    private static String gray(String text) {
-        return RailMenuText.color(NamedTextColor.GRAY, text);
-    }
-
-    private static String darkGray(String text) {
-        return RailMenuText.color(NamedTextColor.DARK_GRAY, text);
-    }
-
-    private static String white(String text) {
-        return RailMenuText.color(NamedTextColor.WHITE, text);
-    }
-
-    private static String yellow(String text) {
-        return RailMenuText.color(NamedTextColor.YELLOW, text);
-    }
-
-    private static String green(String text) {
-        return RailMenuText.color(NamedTextColor.GREEN, text);
-    }
-
-    private static String red(String text) {
-        return RailMenuText.color(NamedTextColor.RED, text);
+    private static Component yellow(String text) {
+        return RailMenuText.colored(NamedTextColor.YELLOW, text);
     }
 }

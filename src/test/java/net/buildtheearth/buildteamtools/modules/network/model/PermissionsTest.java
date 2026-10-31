@@ -1,17 +1,37 @@
 package net.buildtheearth.buildteamtools.modules.network.model;
 
+import net.buildtheearth.buildteamtools.i18n.Translations;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.kyori.adventure.translation.GlobalTranslator;
+import net.kyori.adventure.translation.Translator;
 import org.bukkit.command.CommandSender;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class PermissionsTest {
+
+    private Translator translations;
+
+    @BeforeEach
+    void setUp() {
+        translations = Translations.createStoreForTesting(PermissionsTest.class.getClassLoader());
+        GlobalTranslator.translator().addSource(translations);
+    }
+
+    @AfterEach
+    void tearDown() {
+        GlobalTranslator.translator().removeSource(translations);
+    }
+
     private CommandSender sender(boolean allowed, List<Component> messages) {
         return (CommandSender) Proxy.newProxyInstance(CommandSender.class.getClassLoader(),
                 new Class<?>[]{CommandSender.class}, (proxy, method, args) -> {
@@ -34,7 +54,8 @@ class PermissionsTest {
         assertTrue(messages.isEmpty());
         assertFalse(Permissions.checkPermission(sender(false, messages), Permissions.RAIL_TYPE_EDIT));
         assertEquals(1, messages.size());
-        String denial = PlainTextComponentSerializer.plainText().serialize(messages.getFirst());
+        String denial = PlainTextComponentSerializer.plainText().serialize(
+                GlobalTranslator.render(messages.getFirst(), Locale.US));
         assertTrue(denial.contains(Permissions.RAIL_TYPE_EDIT));
         assertTrue(denial.contains("You don't have permission to execute this command."));
     }

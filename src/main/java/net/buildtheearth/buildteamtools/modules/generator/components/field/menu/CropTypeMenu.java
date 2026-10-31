@@ -1,14 +1,15 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.field.menu;
 
-import com.alpsbte.alpslib.utils.item.Item;
+import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
 import com.cryptomorin.xseries.XMaterial;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
 import net.buildtheearth.buildteamtools.modules.generator.components.field.CropType;
 import net.buildtheearth.buildteamtools.modules.generator.components.field.FieldFlag;
 import net.buildtheearth.buildteamtools.modules.generator.components.field.FieldSettings;
 import net.buildtheearth.buildteamtools.modules.generator.menu.GeneratorMenu;
 import net.buildtheearth.buildteamtools.modules.generator.model.Settings;
-import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import org.bukkit.Sound;
@@ -23,8 +24,6 @@ import java.util.Objects;
 
 public class CropTypeMenu extends AbstractMenu {
 
-    public static String CROP_TYPE_INV_NAME = "Choose a Crop Type";
-
     private final byte POTATO_CROP_SLOT = 9;
     private final byte WHEAT_CROP_SLOT = 10;
     private final byte CORN_CROP_SLOT = 11;
@@ -36,22 +35,24 @@ public class CropTypeMenu extends AbstractMenu {
     private final byte OTHER_CROP_SLOT = 17;
 
     public CropTypeMenu(Player player, boolean autoLoad) {
-        super(3, CROP_TYPE_INV_NAME, player, autoLoad);
+        super(3, Messages.component(MessageKeys.Generator.Field.CROP_TYPE_TITLE), player, autoLoad);
     }
 
 
     @Override
     protected void setPreviewItems() {
 
-        ItemStack potatoItem = Item.create(Objects.requireNonNull(XMaterial.POTATO.get()), "§bPotato", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
-        ItemStack wheatItem = Item.create(Objects.requireNonNull(XMaterial.WHEAT.get()), "§bWheat", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
-        ItemStack cornItem = Item.create(Objects.requireNonNull(XMaterial.PUMPKIN_SEEDS.get()), "§bCorn", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
-        ItemStack vineyardItem = Item.create(Objects.requireNonNull(XMaterial.VINE.get()), "§bVineyard", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
-        ItemStack pearItem = Item.create(Objects.requireNonNull(XMaterial.SLIME_BALL.get()), "§bPear", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
-        ItemStack cattleItem = Item.create(Objects.requireNonNull(XMaterial.SPRUCE_FENCE.get()), "§bWheat", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
-        ItemStack meadowItem = Item.create(Objects.requireNonNull(XMaterial.SHORT_GRASS.get()), "§bMeadow", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
-        ItemStack harvestedItem = Item.create(Objects.requireNonNull(XMaterial.HAY_BLOCK.get()), "§bHarvested", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
-        ItemStack otherItem = Item.create(Objects.requireNonNull(XMaterial.DEAD_BUSH.get()), "§bOther", ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information"));
+        Player player = getMenuPlayer();
+        var cropLore = Messages.loreComponents(player, MessageKeys.Generator.Field.CROP_ITEM_LORE);
+        ItemStack potatoItem = ItemComponents.of(Objects.requireNonNull(XMaterial.POTATO.get()), Messages.render(player, MessageKeys.Generator.Field.CROP_POTATO), cropLore);
+        ItemStack wheatItem = ItemComponents.of(Objects.requireNonNull(XMaterial.WHEAT.get()), Messages.render(player, MessageKeys.Generator.Field.CROP_WHEAT), cropLore);
+        ItemStack cornItem = ItemComponents.of(Objects.requireNonNull(XMaterial.PUMPKIN_SEEDS.get()), Messages.render(player, MessageKeys.Generator.Field.CROP_CORN), cropLore);
+        ItemStack vineyardItem = ItemComponents.of(Objects.requireNonNull(XMaterial.VINE.get()), Messages.render(player, MessageKeys.Generator.Field.CROP_VINEYARD), cropLore);
+        ItemStack pearItem = ItemComponents.of(Objects.requireNonNull(XMaterial.SLIME_BALL.get()), Messages.render(player, MessageKeys.Generator.Field.CROP_PEAR), cropLore);
+        ItemStack cattleItem = ItemComponents.of(Objects.requireNonNull(XMaterial.SPRUCE_FENCE.get()), Messages.render(player, MessageKeys.Generator.Field.CROP_CATTLE), cropLore);
+        ItemStack meadowItem = ItemComponents.of(Objects.requireNonNull(XMaterial.SHORT_GRASS.get()), Messages.render(player, MessageKeys.Generator.Field.CROP_MEADOW), cropLore);
+        ItemStack harvestedItem = ItemComponents.of(Objects.requireNonNull(XMaterial.HAY_BLOCK.get()), Messages.render(player, MessageKeys.Generator.Field.CROP_HARVESTED), cropLore);
+        ItemStack otherItem = ItemComponents.of(Objects.requireNonNull(XMaterial.DEAD_BUSH.get()), Messages.render(player, MessageKeys.Generator.Field.CROP_OTHER), cropLore);
 
         // Set items
         getMenu().getSlot(POTATO_CROP_SLOT).setItem(potatoItem);

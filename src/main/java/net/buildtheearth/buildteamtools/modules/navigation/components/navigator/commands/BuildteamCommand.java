@@ -1,7 +1,8 @@
 package net.buildtheearth.buildteamtools.modules.navigation.components.navigator.commands;
 
-import com.alpsbte.alpslib.utils.ChatHelper;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.Module;
 import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
 import net.buildtheearth.buildteamtools.modules.common.metrics.FeatureUsage;
@@ -10,6 +11,7 @@ import net.buildtheearth.buildteamtools.modules.navigation.NavUtils;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
+import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.parser.standard.StringParser;
@@ -31,12 +33,12 @@ public class BuildteamCommand {
 
     protected void btCommand(@NonNull CommandSender sender, String buildTeamName, String permission) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(ChatHelper.getErrorString("You must be a %s to %s this command!", "player", "execute"));
+            sender.sendMessage(Messages.playerOnly());
             return;
         }
 
         if (!player.hasPermission(permission)) {
-            player.sendMessage(ChatHelper.getErrorString("You don't have permission to use this command!"));
+            player.sendMessage(Messages.noPermission(permission));
             return;
         }
 
@@ -46,7 +48,9 @@ public class BuildteamCommand {
                 .findFirst()
                 .orElse(null);
         if (team == null) {
-            player.sendMessage(ChatHelper.getErrorString("Build team '%s' does not exist!", buildTeamName));
+            player.sendMessage(Messages.component(
+                    MessageKeys.Navigator.BUILD_TEAM_NOT_FOUND,
+                    Component.text(buildTeamName)));
             return;
         }
         execute(player, team);

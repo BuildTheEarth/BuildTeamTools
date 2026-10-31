@@ -1,9 +1,10 @@
 package net.buildtheearth.buildteamtools.modules.generator.model;
 
 import com.alpsbte.alpslib.utils.GeneratorUtils;
-import com.alpsbte.alpslib.utils.ChatHelper;
 import com.alpsbte.alpslib.utils.WikiDocumented;
 import lombok.Getter;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.ModuleComponent;
 import net.buildtheearth.buildteamtools.modules.common.metrics.FeatureUsage;
 import net.buildtheearth.buildteamtools.modules.common.metrics.UsageFeature;
@@ -13,11 +14,8 @@ import net.buildtheearth.buildteamtools.modules.generator.components.rail.RailSe
 import net.buildtheearth.buildteamtools.modules.generator.components.road.RoadSettings;
 import net.buildtheearth.buildteamtools.modules.generator.components.tree.TreeSettings;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NonNull;
@@ -108,16 +106,16 @@ public abstract class GeneratorComponent extends ModuleComponent implements Wiki
 
     public static Component createMoreInformationComponent(@NonNull GeneratorType generatorType) {
         String wikiPage = generatorType.getWikiPage();
-        return ChatHelper.getStandardComponent(true, "Open generator documentation: %s", wikiPage)
+        return Messages.component(MessageKeys.Generator.Component.OPEN_DOCS, Component.text(wikiPage))
                 .clickEvent(ClickEvent.openUrl(wikiPage))
-                .hoverEvent(HoverEvent.showText(Component.text("Click to open this page", NamedTextColor.GRAY)));
+                .hoverEvent(HoverEvent.showText(Messages.component(MessageKeys.Generator.Component.OPEN_DOCS_HOVER)));
     }
 
     public void sendError(Player p) {
-        p.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
-                "There was an error while generating the %s. Please contact the admins.",
-                generatorType.getName()
-        )));
+        p.sendMessage(Messages.component(
+                MessageKeys.Generator.Component.GENERATE_ERROR,
+                Component.text(generatorType.getName())
+        ));
     }
 
     public String getCommand(@NonNull Player p) {
@@ -140,18 +138,21 @@ public abstract class GeneratorComponent extends ModuleComponent implements Wiki
     }
 
     public void sendSuccessMessage(Player p) {
-        TextComponent copyCommand = Component.text("[COPY]", NamedTextColor.YELLOW, TextDecoration.BOLD)
+        Component copyCommand = Messages.component(MessageKeys.Generator.Component.COPY_BUTTON)
                 .clickEvent(ClickEvent.suggestCommand(getCommand(p)))
-                .hoverEvent(HoverEvent.showText(Component.text("Click to copy command", NamedTextColor.GRAY)));
+                .hoverEvent(HoverEvent.showText(Messages.component(MessageKeys.Generator.Component.COPY_HOVER)));
 
-        TextComponent undo = Component.text("[UNDO]", NamedTextColor.RED, TextDecoration.BOLD)
+        Component undo = Messages.component(MessageKeys.Generator.Component.UNDO_BUTTON)
                 .clickEvent(ClickEvent.runCommand("/btt generate undo"))
-                .hoverEvent(HoverEvent.showText(Component.text("Click to undo last generation", NamedTextColor.GRAY)));
+                .hoverEvent(HoverEvent.showText(Messages.component(MessageKeys.Generator.Component.UNDO_HOVER)));
 
-        Component message = ChatHelper.getSuccessComponent("%s successfully generated.", generatorType.getName())
-                .append(Component.text(" "))
+        Component message = Messages.component(
+                        MessageKeys.Generator.Component.GENERATE_SUCCESS,
+                        Component.text(generatorType.getName())
+                )
+                .append(Component.space())
                 .append(copyCommand)
-                .append(Component.text(" "))
+                .append(Component.space())
                 .append(undo);
 
         p.sendMessage(message);
@@ -188,7 +189,7 @@ public abstract class GeneratorComponent extends ModuleComponent implements Wiki
             convertedFlag = true;
             Object flagValue = FlagType.convertToFlagType(finalFlag, flagAndValue[1]);
 
-            String errorMessage = FlagType.validateFlagType(finalFlag, flagValue);
+            Component errorMessage = FlagType.validateFlagType(finalFlag, flagValue);
 
             if (errorMessage != null) {
                 p.sendMessage(errorMessage);

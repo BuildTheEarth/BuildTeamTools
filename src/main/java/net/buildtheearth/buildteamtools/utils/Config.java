@@ -86,19 +86,11 @@ public class Config {
 
 
     public static String getString(String file, String path) {
-        FileConfiguration cfg = getFileConfiguration(file);
-        String s = cfg.getString(path);
-        if (s != null)
-            s = s.replace("&", "§");
-        return s;
+        return getFileConfiguration(file).getString(path);
     }
 
     public static String getString(String dir, String file, String path) {
-        FileConfiguration cfg = getFileConfiguration(dir, file);
-        String s = cfg.getString(path);
-        if (s != null)
-            s = s.replace("&", "§");
-        return s;
+        return getFileConfiguration(dir, file).getString(path);
     }
 
 

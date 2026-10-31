@@ -47,6 +47,13 @@ public interface MainConfig {
         return false;
     }
 
+    @Comments("Chat prefix inserted into translations that use the MiniMessage <prefix> tag.")
+    @Comments("MiniMessage format. Example in a translation: <prefix><gray>Hello!")
+    @Comments("Change this to restyle all prefixed messages at once. Reload applies the new value.")
+    default String messagePrefix() {
+        return "<dark_blue><bold>BTE</bold></dark_blue> <dark_gray>></dark_gray> ";
+    }
+
     @Comments("Command settings. Changes require a server restart.")
     default @SubSection Commands commands() {
         return new Commands() {};

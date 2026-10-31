@@ -1,6 +1,7 @@
 package net.buildtheearth.buildteamtools.modules.navigation.components.warps.commands;
 
-import com.alpsbte.alpslib.utils.ChatHelper;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.WarpMigrator;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.WarpsComponent;
@@ -37,7 +38,7 @@ public class WarpCommand {
                 context -> {
                     CommandSender sender = context.sender().getSender();
                     if (!(sender instanceof Player player)) {
-                        sender.sendMessage(ChatHelper.getErrorComponent("This command can only be used by a player!"));
+                        sender.sendMessage(Messages.playerOnly());
                     } else if (checkWarpModule(sender)) {
                         handleCreateCommand(player);
                     }
@@ -49,7 +50,7 @@ public class WarpCommand {
                 context -> {
                     CommandSender sender = context.sender().getSender();
                     if (!(sender instanceof Player player)) {
-                        sender.sendMessage(ChatHelper.getErrorComponent("This command can only be used by a player!"));
+                        sender.sendMessage(Messages.playerOnly());
                     } else if (checkWarpModule(sender)) {
                         handleMigrateCommand(player, context.get("source"));
                     }
@@ -59,7 +60,7 @@ public class WarpCommand {
                 context -> {
                     CommandSender sender = context.sender().getSender();
                     if (!(sender instanceof Player player)) {
-                        sender.sendMessage(ChatHelper.getErrorComponent("This command can only be used by a player!"));
+                        sender.sendMessage(Messages.playerOnly());
                     } else if (checkWarpModule(sender)) {
                         handleRandomWarpCommand(player);
                     }
@@ -68,7 +69,7 @@ public class WarpCommand {
 
     private void execute(@NonNull CommandSender sender, String @NonNull [] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(ChatHelper.getErrorComponent("This command can only be used by a player!"));
+            sender.sendMessage(Messages.playerOnly());
             return;
         }
 
@@ -85,32 +86,33 @@ public class WarpCommand {
 
     private boolean checkWarpModule(CommandSender sender) {
         if (NetworkModule.getInstance().getBuildTeam() != null) return true;
-        sender.sendMessage(ChatHelper.getErrorComponent("The Warp Module is currently disabled because the Build Team " +
-                "failed to load!"));
+        sender.sendMessage(Messages.component(MessageKeys.Warp.MODULE_DISABLED));
         return false;
     }
 
     private void handleCreateCommand(@NonNull Player player) {
         if (!player.hasPermission(Permissions.WARP_CREATE)) {
-            player.sendMessage(ChatHelper.getErrorComponent("You don't have the required %s to %s warps.", "permission",
-                    "create"));
+            player.sendMessage(Messages.component(
+                    MessageKeys.Warp.NO_PERMISSION_ACTION,
+                    Component.text("create")));
             return;
         }
 
-        player.sendActionBar(ChatHelper.getStandardComponent(false, "Creating the warp..."));
+        player.sendActionBar(Messages.component(MessageKeys.Warp.CREATING));
         WarpsComponent.createWarp(player);
     }
 
     private void handleMigrateCommand(@NonNull Player player, WarpMigrationSource source) {
         if (!player.hasPermission(Permissions.WARP_MIGRATE)) {
-            player.sendMessage(ChatHelper.getErrorString("You don't have the required %s to %s warps.", "permission",
-                    "migrate"));
+            player.sendMessage(Messages.component(
+                    MessageKeys.Warp.NO_PERMISSION_ACTION,
+                    Component.text("migrate")));
             return;
         }
 
         FeatureUsage.record(UsageDetail.WARPS_MIGRATE);
         WarpMigrator migrator = new WarpMigrator(source);
-        player.sendMessage(ChatHelper.getStandardComponent(true, "Migrating the warps..."));
+        player.sendMessage(Messages.component(MessageKeys.Warp.MIGRATING));
         migrator.migrate(player).whenComplete((result, throwable) ->
                 handleMigrationResult(player, result, throwable));
     }
@@ -133,7 +135,7 @@ public class WarpCommand {
 
         Warp warp = Utils.pickRandom(warps);
         if (warp == null) {
-            player.sendMessage("No warp found");
+            player.sendMessage(Messages.component(MessageKeys.Warp.NO_WARP_FOUND));
             return;
         }
 
@@ -142,26 +144,34 @@ public class WarpCommand {
 
     private void handleMigrationResult(@NonNull Player player, @NonNull MigrationResult result, @Nullable Throwable throwable) {
         if (throwable != null) {
-            player.sendMessage(ChatHelper.getErrorComponent("Something went wrong while migrating the warps: %s",
-                    throwable.getMessage()));
+            player.sendMessage(Messages.component(
+                    MessageKeys.Warp.MIGRATE_ERROR,
+                    Component.text(String.valueOf(throwable.getMessage()))));
             return;
         }
 
         if (!result.success()) {
-            player.sendMessage(ChatHelper.getErrorComponent("Migration failed: %s", result.errorMessage()));
+            player.sendMessage(Messages.component(
+                    MessageKeys.Warp.MIGRATE_FAILED,
+                    Component.text(String.valueOf(result.errorMessage()))));
             return;
         }
 
         if (result.migratedCount() == 0 && result.failedCount() == 0) {
-            player.sendMessage(ChatHelper.getStandardComponent(false, "No warps found to migrate."));
+            player.sendMessage(Messages.component(MessageKeys.Warp.MIGRATE_NONE));
         } else if (result.failedCount() == 0) {
-            player.sendMessage(ChatHelper.getSuccessComponent("Successfully migrated %d warp(s)!",
-                    result.migratedCount()));
+            player.sendMessage(Messages.component(
+                    MessageKeys.Warp.MIGRATE_SUCCESS,
+                    Component.text(String.valueOf(result.migratedCount()))));
         } else if (result.migratedCount() == 0) {
-            player.sendMessage(ChatHelper.getErrorComponent("Failed to migrate all %d warp(s)!", result.failedCount()));
+            player.sendMessage(Messages.component(
+                    MessageKeys.Warp.MIGRATE_ALL_FAILED,
+                    Component.text(String.valueOf(result.failedCount()))));
         } else {
-            player.sendMessage(ChatHelper.getStandardComponent(false, "Migration completed: %d warp(s) migrated, %d failed.",
-                    result.migratedCount(), result.failedCount()));
+            player.sendMessage(Messages.component(
+                    MessageKeys.Warp.MIGRATE_PARTIAL,
+                    Component.text(String.valueOf(result.migratedCount())),
+                    Component.text(String.valueOf(result.failedCount()))));
         }
     }
 
@@ -173,7 +183,7 @@ public class WarpCommand {
         Warp warp = NavigationModule.getInstance().getWarpsComponent().getWarpByName(key);
 
         if (warp == null) {
-            player.sendMessage(ChatHelper.getErrorComponent("The warp with the name %s does not exist in this team!", key));
+            player.sendMessage(Messages.component(MessageKeys.Warp.NOT_EXISTS, Component.text(key)));
             return;
         }
 
@@ -182,7 +192,9 @@ public class WarpCommand {
 
     private static boolean checkForWarpUsePermissionAndMessage(@NonNull Player player) {
         if (!player.hasPermission(Permissions.WARP_USE)) {
-            player.sendMessage(ChatHelper.getErrorComponent("You don't have the required %s to %s warps.", "permission", "use"));
+            player.sendMessage(Messages.component(
+                    MessageKeys.Warp.NO_PERMISSION_ACTION,
+                    Component.text("use")));
             return false;
         }
         return true;

@@ -6,6 +6,10 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BlockState;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.RailFlag;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.Rail;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.RailSettings;
@@ -74,7 +78,7 @@ public class RailScripts extends Script {
 
         preparationProgress.start();
         preparationProgress.startStage(0L, CONTROL_POINTS_PROGRESS, CONTROL_POINTS_ESTIMATED_MILLIS);
-        sendRailInfo("Rail Generator is validating your selection...");
+        sendRailInfo(MessageKeys.Generator.Rail.VALIDATING);
 
         Bukkit.getScheduler().runTaskAsynchronously(BuildTeamTools.getInstance(), () -> {
             boolean queuedGeneration = false;
@@ -126,7 +130,7 @@ public class RailScripts extends Script {
         if (!hasSafePreparedSelection(railSelectionPoints, selectionMinY, selectionMaxY)) return false;
 
         preparationProgress.completeStage(SAFETY_CHECK_PROGRESS);
-        sendRailInfo("Rail Generator is preparing terrain data...");
+        sendRailInfo(MessageKeys.Generator.Rail.PREPARING_TERRAIN);
         preparationProgress.startStage(SAFETY_CHECK_PROGRESS, TERRAIN_PREPARE_PROGRESS, TERRAIN_PREPARE_ESTIMATED_MILLIS);
 
         GeneratorUtils.createPolySelection(
@@ -148,7 +152,7 @@ public class RailScripts extends Script {
                 false
         );
         if (blocks == null) {
-            sendRailError("Region not readable. Please report this to the developers of the BuildTeamTool plugin.");
+            sendRailError(MessageKeys.Generator.Rail.REGION_NOT_READABLE);
             return false;
         }
 
@@ -178,19 +182,15 @@ public class RailScripts extends Script {
 
         if (railCenterPaths.size() < trackCount) {
             sendRailError(
-                    "Rail Generator could not create %s parallel tracks with spacing %s along this path. "
-                            + "Reduce the track count or spacings, or use a less sharp curve.",
-                    trackCount,
-                    trackSpacings
+                    MessageKeys.Generator.Rail.PARALLEL_TRACKS_FAILED,
+                    Component.text(String.valueOf(trackCount)),
+                    Component.text(String.valueOf(trackSpacings))
             );
             return false;
         }
 
         if (new RailPathOverlapValidator().hasOverlap(railCenterPaths)) {
-            sendRailError(
-                    "The parallel tracks overlap in this curve. Reduce the track count or spacing, "
-                            + "or make the selected path less sharp."
-            );
+            sendRailError(MessageKeys.Generator.Rail.TRACKS_OVERLAP);
             return false;
         }
 
@@ -203,17 +203,17 @@ public class RailScripts extends Script {
 
         if (railBlocks.size() > limits.maxBlockPlacements()) {
             sendRailError(
-                    "Rail Generator would place %s blocks. The limit is %s. Split the rail into smaller selections.",
-                    railBlocks.size(),
-                    limits.maxBlockPlacements()
+                    MessageKeys.Generator.Rail.TOO_MANY_BLOCKS,
+                    Component.text(String.valueOf(railBlocks.size())),
+                    Component.text(String.valueOf(limits.maxBlockPlacements()))
             );
             return false;
         }
 
         sendRailInfo(
-                "Rail Generator queued %s block changes over %s path points.",
-                railBlocks.size(),
-                centerPath.size()
+                MessageKeys.Generator.Rail.QUEUED,
+                Component.text(String.valueOf(railBlocks.size())),
+                Component.text(String.valueOf(centerPath.size()))
         );
 
         preparationProgress.startStage(RAIL_BLOCK_BUILD_PROGRESS, QUEUE_OPERATIONS_PROGRESS, QUEUE_OPERATIONS_ESTIMATED_MILLIS);
@@ -233,10 +233,7 @@ public class RailScripts extends Script {
         )))
             return true;
 
-        sendRailError(
-                "The generated railway does not fit inside its safe generation area. "
-                        + "Reduce the track count or spacing, disable overhead poles, or use a less sharp curve."
-        );
+        sendRailError(MessageKeys.Generator.Rail.OUTSIDE_SAFE_AREA);
         return false;
     }
 
@@ -283,12 +280,12 @@ public class RailScripts extends Script {
 
     private boolean hasValidControlPoints() {
         if (controlPoints.size() < 2) {
-            sendRailError("Rail Generator needs at least two points.");
+            sendRailError(MessageKeys.Generator.Rail.NEED_TWO_POINTS);
             return false;
         }
 
         if (controlPoints.size() > limits.maxControlPoints()) {
-            sendRailError("Rail Generator has too many points. Please use fewer points.");
+            sendRailError(MessageKeys.Generator.Rail.TOO_MANY_POINTS);
             return false;
         }
 
@@ -297,15 +294,15 @@ public class RailScripts extends Script {
 
     private boolean hasValidCenterPath() {
         if (centerPath.size() < 2) {
-            sendRailError("Rail Generator could not create a valid rail path. Select at least two different blocks.");
+            sendRailError(MessageKeys.Generator.Rail.INVALID_PATH);
             return false;
         }
 
         if (centerPath.size() > limits.maxPathPoints()) {
             sendRailError(
-                    "Rail Generator path has %s points. The limit is %s. Split the rail into smaller selections.",
-                    centerPath.size(),
-                    limits.maxPathPoints()
+                    MessageKeys.Generator.Rail.PATH_TOO_LONG,
+                    Component.text(String.valueOf(centerPath.size())),
+                    Component.text(String.valueOf(limits.maxPathPoints()))
             );
             return false;
         }
@@ -315,7 +312,7 @@ public class RailScripts extends Script {
 
     private boolean hasSafePreparedSelection(List<Vector> selectionPoints, int minY, int maxY) {
         if (selectionPoints.size() < 2) {
-            sendRailError("Rail Generator could not create a safe preparation selection.");
+            sendRailError(MessageKeys.Generator.Rail.UNSAFE_PREP);
             return false;
         }
 
@@ -337,15 +334,15 @@ public class RailScripts extends Script {
         long volume = width * height * length;
 
         if (width > limits.maxPreparedRegionAxisLength() || length > limits.maxPreparedRegionAxisLength()) {
-            sendRailError("Rail Generator selection is too wide to prepare safely. Split the rail into smaller selections.");
+            sendRailError(MessageKeys.Generator.Rail.SELECTION_TOO_WIDE);
             return false;
         }
 
         if (volume > limits.maxPreparedRegionVolume()) {
             sendRailError(
-                    "Rail Generator selection would prepare %s blocks. The limit is %s. Split the rail into smaller selections.",
-                    volume,
-                    limits.maxPreparedRegionVolume()
+                    MessageKeys.Generator.Rail.PREPARE_TOO_MANY_BLOCKS,
+                    Component.text(String.valueOf(volume)),
+                    Component.text(String.valueOf(limits.maxPreparedRegionVolume()))
             );
             return false;
         }
@@ -353,16 +350,16 @@ public class RailScripts extends Script {
         return true;
     }
 
-    private void sendRailInfo(String message, Object... values) {
+    private void sendRailInfo(String key, ComponentLike... args) {
         if (!canContinue()) return;
 
-        getPlayer().sendMessage(ChatHelper.getStandardComponent(true, message, values));
+        getPlayer().sendMessage(Messages.component(key, args));
     }
 
-    private void sendRailError(String message, Object... values) {
+    private void sendRailError(String key, ComponentLike... args) {
         if (!canContinue()) return;
 
-        getPlayer().sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(message, values)));
+        getPlayer().sendMessage(Messages.component(key, args));
     }
 
     private void runOnMainThread(Runnable runnable) {
@@ -445,20 +442,20 @@ public class RailScripts extends Script {
         }
 
         if (trackCount < RailType.MIN_TRACK_COUNT || trackCount > RailType.MAX_TRACK_COUNT) {
-            sendRailError("Track count must be between %s and %s.", RailType.MIN_TRACK_COUNT, RailType.MAX_TRACK_COUNT);
+            sendRailError(MessageKeys.Generator.Rail.TRACK_COUNT_RANGE, Component.text(String.valueOf(RailType.MIN_TRACK_COUNT)), Component.text(String.valueOf(RailType.MAX_TRACK_COUNT)));
             return false;
         }
 
         if (trackSpacing < RailType.MIN_TRACK_SPACING || trackSpacing > RailType.MAX_TRACK_SPACING) {
-            sendRailError("Track spacing must be between %s and %s.", RailType.MIN_TRACK_SPACING, RailType.MAX_TRACK_SPACING);
+            sendRailError(MessageKeys.Generator.Rail.TRACK_SPACING_RANGE, Component.text(String.valueOf(RailType.MIN_TRACK_SPACING)), Component.text(String.valueOf(RailType.MAX_TRACK_SPACING)));
             return false;
         }
 
         if (trackSpacings.size() != Math.max(0, trackCount - 1)
                 || trackSpacings.stream().anyMatch(spacing -> spacing < RailType.MIN_TRACK_SPACING
                 || spacing > RailType.MAX_TRACK_SPACING)) {
-            sendRailError("Every track spacing must be between %s and %s.",
-                    RailType.MIN_TRACK_SPACING, RailType.MAX_TRACK_SPACING);
+            sendRailError(MessageKeys.Generator.Rail.EVERY_TRACK_SPACING_RANGE,
+                    Component.text(String.valueOf(RailType.MIN_TRACK_SPACING)), Component.text(String.valueOf(RailType.MAX_TRACK_SPACING)));
             return false;
         }
 

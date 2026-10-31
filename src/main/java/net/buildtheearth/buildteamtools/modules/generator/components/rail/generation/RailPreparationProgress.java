@@ -1,6 +1,8 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.rail.generation;
 
-import com.alpsbte.alpslib.utils.ChatHelper;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.kyori.adventure.text.Component;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -85,7 +87,7 @@ final class RailPreparationProgress implements Runnable {
             return;
 
         lastSentPercentage.set(clampedPercentage);
-        player.sendActionBar(ChatHelper.getStandardComponent(false, "Generator Progress: %s", clampedPercentage + "%"));
+        player.sendActionBar(Messages.component(MessageKeys.Generator.Progress.ACTION_BAR, Component.text(clampedPercentage + "%")));
     }
 
     long scale(int completed, int total, long startPercentage, long endPercentage) {

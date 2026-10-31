@@ -1,5 +1,7 @@
 package net.buildtheearth.buildteamtools.modules.navigation.menu;
 
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.Mask;
@@ -15,10 +17,8 @@ public class TutorialsMenu extends AbstractMenu {
 
     private static final int BACK_BUTTON_SLOT = 13;
 
-    private static final String INVENTORY_NAME = "Tutorials Menu";
-
     public TutorialsMenu(Player player) {
-        super(3, INVENTORY_NAME, player);
+        super(3, Messages.component(MessageKeys.Navigation.TutorialsMenu.TITLE), player);
     }
 
     @Override

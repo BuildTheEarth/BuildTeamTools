@@ -1,6 +1,8 @@
 package net.buildtheearth.buildteamtools.modules.generator.model;
 
-import com.alpsbte.alpslib.utils.ChatHelper;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.kyori.adventure.text.Component;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import lombok.experimental.UtilityClass;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
@@ -24,7 +26,6 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -283,7 +284,15 @@ public class GeneratorCollections {
      * @see #hasUpdatedGeneratorCollections(Player)
      */
     private static void sendGeneratorCollectionsError(@Nullable Player p) {
-        ChatHelper.logPlayerAndConsole(p, "§cAn error occurred while installing the Generator Collections. Please report that with the log!", Level.INFO);
+        notifyPlayerAndConsole(p, Messages.component(MessageKeys.Generator.Collections.INSTALL_ERROR));
+    }
+
+    private static void notifyPlayerAndConsole(@Nullable Player player, Component message) {
+        Component rendered = Messages.render(player, message);
+        if (player != null) {
+            player.sendMessage(rendered);
+        }
+        Bukkit.getConsoleSender().sendMessage(rendered);
     }
 
 
@@ -308,10 +317,11 @@ public class GeneratorCollections {
             return false;
 
         if (update) {
-            ChatHelper.logPlayerAndConsole(p, "§cThe Generator Collections package is outdated. Updating...", Level.INFO);
+            notifyPlayerAndConsole(p, Messages.component(MessageKeys.Generator.Collections.OUTDATED));
             deleteDirectory(path.resolve(fileDirectory));
-        } else
-            ChatHelper.logPlayerAndConsole(p, "§cThe Generator Collections package wasn't found on your server. Installing...", Level.INFO);
+        } else {
+            notifyPlayerAndConsole(p, Messages.component(MessageKeys.Generator.Collections.NOT_FOUND));
+        }
 
         var generatorModulePath = BuildTeamTools.getInstance().getDataFolder().toPath().resolve("modules").resolve("generator");
         try {
@@ -320,8 +330,9 @@ public class GeneratorCollections {
                 success = moveVersionFile(generatorModulePath, path.resolve("GeneratorCollections"), "config.yml", "generatorCollectionsVersion.yml");
 
             if (success) {
-                ChatHelper.logPlayerAndConsole(p, "§7Successfully installed §eGenerator Collections v" + generatorCollectionsVersion + "§7!", Level.INFO);
-
+                notifyPlayerAndConsole(p, Messages.component(
+                        MessageKeys.Generator.Collections.INSTALLED,
+                        Component.text(String.valueOf(generatorCollectionsVersion))));
                 return true;
             } else {
                 sendGeneratorCollectionsError(p);

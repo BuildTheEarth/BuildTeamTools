@@ -3,6 +3,8 @@ package net.buildtheearth.buildteamtools.modules.navigation.menu;
 import com.alpsbte.alpslib.utils.ChatHelper;
 import com.alpsbte.alpslib.utils.item.Item;
 import lombok.NonNull;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.navigation.NavUtils;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.WarpsComponent;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
@@ -10,9 +12,10 @@ import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Continent;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.buildteamtools.modules.network.model.Region;
-import net.buildtheearth.buildteamtools.utils.ListUtil;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractPaginatedMenu;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
@@ -30,7 +33,8 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
     public static final int SWITCH_PAGE_ITEM_SLOT = 34;
 
     public CountrySelectorMenu(Player menuPlayer, @NonNull Continent continent, boolean autoLoad) {
-        super(4, 3, continent.getLabel() + " - countries", menuPlayer, autoLoad);
+        super(4, 3, Messages.component(MessageKeys.Navigation.CountryMenu.TITLE, Component.text(continent.getLabel())),
+                menuPlayer, autoLoad);
         this.regions = new ArrayList<>(continent.getCountries());
 
         // Add USA region to North America because it is being built by multiple teams
@@ -80,20 +84,27 @@ public class CountrySelectorMenu extends AbstractPaginatedMenu {
     @Override
     protected void setPaginatedPreviewItems(@NotNull List<?> source) {
         List<Region> countries = source.stream().map(l -> (Region) l).toList();
+        Player player = getMenuPlayer();
 
         // Create the country items
         int slot = 0;
 
         for (Region region : countries) {
-            ArrayList<String> countryLore = ListUtil.createList("", "§eBuild Team:", region.getBuildTeam().getBlankName(), "",
-                    "§eArea:", formatArea(region.getArea()) + " km²", "", "§8Click to join this country's server!");
+            List<Component> countryLore = new ArrayList<>(Messages.loreComponents(
+                    player,
+                    MessageKeys.Navigation.CountryMenu.ITEM_LORE,
+                    Component.text(region.getBuildTeam().getBlankName()),
+                    Component.text(formatArea(region.getArea()))));
             if (!region.getBuildTeam().getWarpGroups().isEmpty()) {
-                countryLore.add("Right click to open the warp group menu!");
+                countryLore.addAll(Messages.loreComponents(player, MessageKeys.Navigation.CountryMenu.ITEM_LORE_WARPS));
             }
+            String headBase64 = region.getHeadBase64() == null
+                    ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19"
+                    : region.getHeadBase64();
             getMenu().getSlot(slot).setItem(
-                    Item.createCustomHeadBase64(region.getHeadBase64() == null ?
-                                    "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19" : region.getHeadBase64(),
-                            "§6§l" + region.getName(),
+                    ItemComponents.named(
+                            Item.createCustomHeadBase64(headBase64, " ", null),
+                            Messages.render(player, MessageKeys.Navigation.CountryMenu.ITEM_NAME, Component.text(region.getName())),
                             countryLore)
             );
             slot++;

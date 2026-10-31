@@ -4,17 +4,23 @@ import com.alpsbte.alpslib.utils.item.Item;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.Utils;
 import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.LetterType;
 import net.buildtheearth.model.GeographicalCoordinate;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -87,12 +93,20 @@ public class Warp {
     }
 
     public ItemStack getMaterialItem() {
-        String itemName = "§6§l" + getName();
-        ArrayList<String> lore = null;
+        return getMaterialItem(null);
+    }
+
+    public ItemStack getMaterialItem(Player player) {
+        Component itemName = player == null
+                ? Messages.render((Audience) null, Messages.component(MessageKeys.Warp.Menu.ITEM_NAME, Component.text(getName())))
+                : Messages.render(player, MessageKeys.Warp.Menu.ITEM_NAME, Component.text(getName()));
+        List<Component> lore = null;
 
         if (address != null) {
-            lore = new ArrayList<>(Arrays.asList("", "§eAddress:"));
-            lore.addAll(ListUtil.createList(Utils.splitStringByLineLength(address, 30, ", ")));
+            lore = new ArrayList<>(player == null
+                    ? Messages.loreComponents(MessageKeys.Warp.Menu.ADDRESS_LABEL)
+                    : Messages.loreComponents(player, MessageKeys.Warp.Menu.ADDRESS_LABEL));
+            lore.addAll(ListUtil.grayComponents(Utils.splitStringByLineLength(address, 30, ", ")));
         }
 
         if (material == null)
@@ -103,11 +117,14 @@ public class Warp {
                     lore
             );
         else if (material.startsWith("http://textures.minecraft.net/texture/"))
-            return Item.createCustomHeadTextureURL(material, itemName, lore);
+            return ItemComponents.named(
+                    Item.createCustomHeadTextureURL(material, " ", null),
+                    itemName,
+                    lore);
 
-        Material material = Material.matchMaterial(this.material.split(":")[0]);
+        Material matchedMaterial = Material.matchMaterial(this.material.split(":")[0]);
 
-        if (material == null)
+        if (matchedMaterial == null)
             return HeadFactory.letter(
                     LetterType.STONE,
                     name.charAt(0),
@@ -115,9 +132,12 @@ public class Warp {
                     lore
             );
         else if (!this.material.contains(":"))
-            return Item.create(material, itemName, lore);
+            return ItemComponents.of(matchedMaterial, itemName, lore);
         else
-            return Item.create(material, itemName, Short.parseShort(this.material.split(":")[1]), lore);
+            return ItemComponents.named(
+                    Item.create(matchedMaterial, " ", Short.parseShort(this.material.split(":")[1]), null),
+                    itemName,
+                    lore);
 
     }
 
@@ -178,5 +198,3 @@ public class Warp {
         }
     }
 }
-
-

@@ -3,11 +3,17 @@ package net.buildtheearth.buildteamtools.modules.navigation.components.warps.mod
 import com.alpsbte.alpslib.utils.item.Item;
 import lombok.Getter;
 import lombok.Setter;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.LetterType;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.json.JSONObject;
 
@@ -79,8 +85,14 @@ public class WarpGroup {
     }
 
     public ItemStack getMaterialItem() {
-        String itemName = "§6§l" + getName();
-        ArrayList<String> lore = getDescriptionLore();
+        return getMaterialItem(null);
+    }
+
+    public ItemStack getMaterialItem(Player player) {
+        Component itemName = player == null
+                ? Messages.render((Audience) null, Messages.component(MessageKeys.Warp.Menu.ITEM_NAME, Component.text(getName())))
+                : Messages.render(player, MessageKeys.Warp.Menu.ITEM_NAME, Component.text(getName()));
+        List<Component> lore = getDescriptionLore(player);
 
         if (material == null)
             return HeadFactory.letter(
@@ -90,7 +102,10 @@ public class WarpGroup {
                     lore
             );
         else if (material.startsWith("http://textures.minecraft.net/texture/"))
-            return Item.createCustomHeadTextureURL(material, itemName, lore);
+            return ItemComponents.named(
+                    Item.createCustomHeadTextureURL(material, " ", null),
+                    itemName,
+                    lore);
 
         Material matchedMaterial = Material.matchMaterial(this.material.split(":")[0]);
 
@@ -102,18 +117,27 @@ public class WarpGroup {
                     lore
             );
         else if (!this.material.contains(":"))
-            return Item.create(matchedMaterial, itemName, lore);
+            return ItemComponents.of(matchedMaterial, itemName, lore);
         else
-            return Item.create(matchedMaterial, itemName, Short.parseShort(this.material.split(":")[1]), lore);
+            return ItemComponents.named(
+                    Item.create(matchedMaterial, " ", Short.parseShort(this.material.split(":")[1]), null),
+                    itemName,
+                    lore);
 
     }
 
 
-    public ArrayList<String> getDescriptionLore() {
-        return new ArrayList<String>() {{
-            add("");
-            add("§eDescription:");
-            addAll(ListUtil.createList(description.split("<br>")));
-        }};
+    public List<Component> getDescriptionLore() {
+        return getDescriptionLore(null);
+    }
+
+    public List<Component> getDescriptionLore(Player player) {
+        List<Component> lore = new ArrayList<>(player == null
+                ? Messages.loreComponents(MessageKeys.Warp.Menu.DESCRIPTION_LABEL)
+                : Messages.loreComponents(player, MessageKeys.Warp.Menu.DESCRIPTION_LABEL));
+        if (description != null) {
+            lore.addAll(ListUtil.grayComponents(description.split("<br>")));
+        }
+        return lore;
     }
 }

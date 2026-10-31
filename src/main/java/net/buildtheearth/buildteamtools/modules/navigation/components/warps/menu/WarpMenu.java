@@ -1,5 +1,7 @@
 package net.buildtheearth.buildteamtools.modules.navigation.components.warps.menu;
 
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.WarpsComponent;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.Warp;
@@ -7,7 +9,6 @@ import net.buildtheearth.buildteamtools.modules.navigation.components.warps.mode
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
-import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.Utils;
 import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
@@ -42,16 +43,20 @@ public class WarpMenu extends AbstractPaginatedMenu {
      * @param backMenu    Menu to go back to when clicking the back button
      */
     public WarpMenu(Player menuPlayer, WarpGroup warpGroup, @Nullable AbstractMenu backMenu, boolean autoLoad) {
-        super(4, 3, "Warp Menu", menuPlayer, autoLoad);
+        super(4, 3, Messages.component(MessageKeys.Warp.Menu.TITLE), menuPlayer, autoLoad);
         this.backMenu = backMenu;
         this.warpGroup = warpGroup;
     }
 
     @Override
     protected void setMenuItemsAsync() {
-        if (getMenuPlayer().hasPermission(Permissions.WARP_RANDOM)) {
+        Player player = getMenuPlayer();
+        if (player.hasPermission(Permissions.WARP_RANDOM)) {
             getMenu().getSlot(RANDOM_ITEM_SLOT).setItem(
-                    HeadFactory.head(HeadTexture.DICE, "§a§lTeleport to a random warp", ListUtil.createList("§8Click here to be teleported to a random warp."))
+                    HeadFactory.head(
+                            HeadTexture.DICE,
+                            Messages.render(player, MessageKeys.Warp.Menu.RANDOM_NAME),
+                            Messages.loreComponents(player, MessageKeys.Warp.Menu.RANDOM_LORE))
             );
         }
 
@@ -71,7 +76,7 @@ public class WarpMenu extends AbstractPaginatedMenu {
             List<Warp> warps = warpGroup.getWarps();
 
             if (warps.isEmpty()) {
-                player.sendMessage("§cNo warp available.");
+                player.sendMessage(Messages.component(MessageKeys.Warp.NO_WARP_AVAILABLE));
                 return;
             }
 
@@ -114,14 +119,17 @@ public class WarpMenu extends AbstractPaginatedMenu {
     @Override
     protected void setPaginatedPreviewItems(@NotNull List<?> source) {
         List<Warp> warps = source.stream().map(l -> (Warp) l).toList();
+        Player player = getMenuPlayer();
 
         int slot = 0;
         for (Warp warp : warps) {
             if (isCreateWarpPlaceholder(warp, slot, warps.size())) {
-                getMenu().getSlot(slot).setItem(HeadFactory.head(HeadTexture.GREEN_PLUS, "§a§lCreate a new Warp",
-                        ListUtil.createList("§8Click to create a new warp.")));
+                getMenu().getSlot(slot).setItem(HeadFactory.head(
+                        HeadTexture.GREEN_PLUS,
+                        Messages.render(player, MessageKeys.Warp.Menu.CREATE_NAME),
+                        Messages.loreComponents(player, MessageKeys.Warp.Menu.CREATE_LORE)));
             } else {
-                getMenu().getSlot(slot).setItem(warp.getMaterialItem());
+                getMenu().getSlot(slot).setItem(warp.getMaterialItem(player));
             }
             slot++;
         }

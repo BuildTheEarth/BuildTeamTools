@@ -2,17 +2,20 @@ package net.buildtheearth.buildteamtools.modules.navigation.menu;
 
 
 import com.alpsbte.alpslib.utils.ChatHelper;
-import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.network.model.Continent;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -24,18 +27,25 @@ import java.util.Objects;
  * The menu has 3 rows and the centre row is the only occupied row. The layout depends on what icons are enabled in config.
  */
 public class ExploreMenu extends AbstractMenu {
-    private static final String inventoryName = "Explore Menu";
 
     public ExploreMenu(Player menuPlayer, boolean autoLoad) {
-        super(4, inventoryName, menuPlayer, autoLoad);
+        super(4, Messages.component(MessageKeys.Navigation.ExploreMenu.TITLE), menuPlayer, autoLoad);
     }
 
     @Override
     protected void setPreviewItems() {
+        Player player = getMenuPlayer();
         // Create the continent items
         for (Continent continent : Continent.values()) {
-            ArrayList<String> continentLore = new ArrayList<>(Collections.singletonList(ChatHelper.getStandardString(false, "Visit countries in %s", continent.getLabel())));
-            getMenu().getSlot(continent.getSlot()).setItem(Item.create(Objects.requireNonNull(XMaterial.COMPASS.get()), "§e§l" + continent.getLabel(), 1, continentLore));
+            List<Component> continentLore = new ArrayList<>(Messages.loreComponents(
+                    player,
+                    MessageKeys.Navigation.ExploreMenu.CONTINENT_LORE,
+                    Component.text(continent.getLabel())));
+            getMenu().getSlot(continent.getSlot()).setItem(ItemComponents.of(
+                    Objects.requireNonNull(XMaterial.COMPASS.get()),
+                    1,
+                    Messages.render(player, MessageKeys.Navigation.ExploreMenu.CONTINENT_NAME, Component.text(continent.getLabel())),
+                    continentLore));
         }
 
         super.setPreviewItems();
@@ -75,4 +85,3 @@ public class ExploreMenu extends AbstractMenu {
     }
 
 }
-

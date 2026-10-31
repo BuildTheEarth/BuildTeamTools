@@ -1,5 +1,7 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.house.menu;
 
+import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
 import net.buildtheearth.buildteamtools.modules.generator.components.house.House;
 import net.buildtheearth.buildteamtools.modules.generator.components.house.HouseFlag;
@@ -19,8 +21,6 @@ import java.util.UUID;
 
 public class AdvancedSettingsMenu extends AbstractMenu {
 
-    public static final String ADVANCED_SETTINGS_INV_NAME = "Adjust some Advanced Settings";
-
     public static final int FLOOR_COUNT_SLOT = 11;
     public static final int FLOOR_HEIGHT_SLOT = 20;
     public static final int BASE_HEIGHT_SLOT = 29;
@@ -34,7 +34,7 @@ public class AdvancedSettingsMenu extends AbstractMenu {
     public int floorCount, floorHeight, baseHeight, windowWidth, windowHeight, windowDistance;
 
     public AdvancedSettingsMenu(Player player) {
-        super(5, ADVANCED_SETTINGS_INV_NAME, player);
+        super(5, Messages.component(MessageKeys.Generator.House.ADVANCED_TITLE), player);
     }
 
     @Override
@@ -49,15 +49,15 @@ public class AdvancedSettingsMenu extends AbstractMenu {
         this.windowHeight = (int) house.getPlayerSettings().get(uuid).getValues().get(HouseFlag.WINDOW_HEIGHT);
         this.windowDistance = (int) house.getPlayerSettings().get(uuid).getValues().get(HouseFlag.WINDOW_DISTANCE);
 
-        createCounter(HeadColor.WHITE, FLOOR_COUNT_SLOT, "Number of Floors", floorCount, 1, 10, "Floors");
-        createCounter(HeadColor.LIGHT_GRAY, FLOOR_HEIGHT_SLOT, "Floors Height", floorHeight, 1, 10, "Blocks");
-        createCounter(HeadColor.WHITE, BASE_HEIGHT_SLOT, "Basement Height", baseHeight, 0, 10, "Blocks");
-        createCounter(HeadColor.WHITE, WINDOW_WIDTH_SLOT, "Window Width", windowWidth, 1, 5, "Blocks");
-        createCounter(HeadColor.LIGHT_GRAY, WINDOW_HEIGHT_SLOT, "Window Height", windowHeight, 1, 5, "Blocks");
-        createCounter(HeadColor.WHITE, WINDOW_DISTANCE_SLOT, "Window Distance", windowDistance, 1, 6, "Blocks");
+        createCounter(HeadColor.WHITE, FLOOR_COUNT_SLOT, Messages.plain(getMenuPlayer(), MessageKeys.Generator.House.FLOOR_COUNT), floorCount, 1, 10, Messages.plain(getMenuPlayer(), MessageKeys.Generator.House.UNIT_FLOORS));
+        createCounter(HeadColor.LIGHT_GRAY, FLOOR_HEIGHT_SLOT, Messages.plain(getMenuPlayer(), MessageKeys.Generator.House.FLOOR_HEIGHT), floorHeight, 1, 10, Messages.plain(getMenuPlayer(), MessageKeys.Generator.House.UNIT_BLOCKS));
+        createCounter(HeadColor.WHITE, BASE_HEIGHT_SLOT, Messages.plain(getMenuPlayer(), MessageKeys.Generator.House.BASE_HEIGHT), baseHeight, 0, 10, Messages.plain(getMenuPlayer(), MessageKeys.Generator.House.UNIT_BLOCKS));
+        createCounter(HeadColor.WHITE, WINDOW_WIDTH_SLOT, Messages.plain(getMenuPlayer(), MessageKeys.Generator.House.WINDOW_WIDTH), windowWidth, 1, 5, Messages.plain(getMenuPlayer(), MessageKeys.Generator.House.UNIT_BLOCKS));
+        createCounter(HeadColor.LIGHT_GRAY, WINDOW_HEIGHT_SLOT, Messages.plain(getMenuPlayer(), MessageKeys.Generator.House.WINDOW_HEIGHT), windowHeight, 1, 5, Messages.plain(getMenuPlayer(), MessageKeys.Generator.House.UNIT_BLOCKS));
+        createCounter(HeadColor.WHITE, WINDOW_DISTANCE_SLOT, Messages.plain(getMenuPlayer(), MessageKeys.Generator.House.WINDOW_DISTANCE), windowDistance, 1, 6, Messages.plain(getMenuPlayer(), MessageKeys.Generator.House.UNIT_BLOCKS));
 
 
-        getMenu().getSlot(NEXT_ITEM_SLOT).setItem(HeadFactory.head(HeadTexture.CHECKMARK, "§eNext"));
+        getMenu().getSlot(NEXT_ITEM_SLOT).setItem(HeadFactory.head(HeadTexture.CHECKMARK, Messages.render(getMenuPlayer(), MessageKeys.Generator.House.NEXT)));
         setBackItem(BACK_ITEM_SLOT, new BaseColorMenu(getMenuPlayer(), false));
 
         super.setPreviewItems();

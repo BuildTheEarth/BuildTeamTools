@@ -1,7 +1,10 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.tree.menu;
 
-import com.alpsbte.alpslib.utils.item.Item;
+import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
 import com.cryptomorin.xseries.XMaterial;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
+import net.kyori.adventure.text.Component;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
 import net.buildtheearth.buildteamtools.modules.generator.components.tree.TreeFlag;
 import net.buildtheearth.buildteamtools.modules.generator.components.tree.TreeSettings;
@@ -22,10 +25,8 @@ import java.util.Objects;
 
 public class TreeTypeMenu extends NameListMenu {
 
-    public static final String TREE_TYPE_INV_NAME = "Choose a Tree Type";
-
     public TreeTypeMenu(Player player, boolean autoLoad) {
-        super(player, TREE_TYPE_INV_NAME, getTreeTypes(), new GeneratorMenu(player, false), autoLoad);
+        super(player, Messages.plain(player, MessageKeys.Generator.Tree.TYPE_TITLE), getTreeTypes(), new GeneratorMenu(player, false), autoLoad);
     }
 
     /**
@@ -34,10 +35,16 @@ public class TreeTypeMenu extends NameListMenu {
     private static @NonNull List<MutablePair<ItemStack, String>> getTreeTypes() {
         List<MutablePair<ItemStack, String>> treeTypes = new ArrayList<>();
 
-        treeTypes.add(new MutablePair<>(new Item(Objects.requireNonNull(XMaterial.LIME_CONCRETE.parseItem())).setDisplayName("Any").build(), "Any"));
+        treeTypes.add(new MutablePair<>(
+                ItemComponents.named(Objects.requireNonNull(XMaterial.LIME_CONCRETE.parseItem()), Component.text("Any")),
+                "Any"));
 
         for (TreeType treeType : TreeType.values())
-            treeTypes.add(new MutablePair<>(Item.create(Objects.requireNonNull(XMaterial.OAK_SAPLING.get()), StringUtils.capitalize(treeType.getName())), treeType.getName()));
+            treeTypes.add(new MutablePair<>(
+                    ItemComponents.of(
+                            Objects.requireNonNull(XMaterial.OAK_SAPLING.get()),
+                            Component.text(StringUtils.capitalize(treeType.getName()))),
+                    treeType.getName()));
 
         return treeTypes;
     }

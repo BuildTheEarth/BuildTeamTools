@@ -1,14 +1,14 @@
 package net.buildtheearth.buildteamtools.modules.generator.model;
 
-import com.alpsbte.alpslib.utils.ChatHelper;
 import com.alpsbte.alpslib.utils.GeneratorUtils;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
 import lombok.Getter;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
@@ -38,9 +38,7 @@ public class History {
 
     public void undoCommand(Player p) {
         if (getHistoryEntries().isEmpty()) {
-            p.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
-                    "You didn't generate any structures yet. Use /btt generate to create one. You can only undo the last structure."
-            )));
+            p.sendMessage(Messages.component(MessageKeys.Generator.History.NOTHING_TO_UNDO));
             return;
         }
 
@@ -61,10 +59,10 @@ public class History {
 
         p.playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_DESTROY_EGG, 1.0F, 1.0F);
 
-        Component redoMessage = ChatHelper.getStandardComponent(false, "Use %s to redo it.", "/btt generate redo")
+        Component redoMessage = Messages.component(MessageKeys.Generator.History.USE_REDO)
                 .clickEvent(ClickEvent.runCommand("/btt generate redo"))
-                .hoverEvent(HoverEvent.showText(Component.text("Click to redo the last structure.", NamedTextColor.GRAY)));
-        p.sendMessage(ChatHelper.getSuccessComponent("Successfully %s the last structure.", "undid")
+                .hoverEvent(HoverEvent.showText(Messages.component(MessageKeys.Generator.History.HOVER_REDO)));
+        p.sendMessage(Messages.component(MessageKeys.Generator.History.UNDO_SUCCESS)
                 .appendNewline()
                 .append(redoMessage));
         p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
@@ -72,9 +70,7 @@ public class History {
 
     public void redoCommand(Player p) {
         if (getUndoHistoryEntries().isEmpty()) {
-            p.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
-                    "You didn't undo any structures yet. Use /btt generate undo to undo one. You can only redo the last structure."
-            )));
+            p.sendMessage(Messages.component(MessageKeys.Generator.History.NOTHING_TO_REDO));
             return;
         }
 
@@ -95,10 +91,10 @@ public class History {
 
         p.playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_DESTROY_EGG, 1.0F, 1.0F);
 
-        Component undoMessage = ChatHelper.getStandardComponent(false, "Use %s to undo it.", "/btt generate undo")
+        Component undoMessage = Messages.component(MessageKeys.Generator.History.USE_UNDO)
                 .clickEvent(ClickEvent.runCommand("/btt generate undo"))
-                .hoverEvent(HoverEvent.showText(Component.text("Click to undo the last structure.", NamedTextColor.GRAY)));
-        p.sendMessage(ChatHelper.getSuccessComponent("Successfully %s the last structure.", "redid")
+                .hoverEvent(HoverEvent.showText(Messages.component(MessageKeys.Generator.History.HOVER_UNDO)));
+        p.sendMessage(Messages.component(MessageKeys.Generator.History.REDO_SUCCESS)
                 .appendNewline()
                 .append(undoMessage));
         p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);

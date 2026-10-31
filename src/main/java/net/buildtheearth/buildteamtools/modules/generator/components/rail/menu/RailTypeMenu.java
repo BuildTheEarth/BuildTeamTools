@@ -1,9 +1,10 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.rail.menu;
 
-import com.alpsbte.alpslib.utils.ChatHelper;
-import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.kyori.adventure.text.Component;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.Rail;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.RailFlag;
@@ -12,11 +13,11 @@ import net.buildtheearth.buildteamtools.modules.generator.components.rail.config
 import net.buildtheearth.buildteamtools.modules.generator.menu.GeneratorMenu;
 import net.buildtheearth.buildteamtools.modules.generator.model.Settings;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
 import net.buildtheearth.buildteamtools.utils.menus.NameListMenu;
 import net.wesjd.anvilgui.AnvilGUI;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -35,8 +36,6 @@ import java.util.Set;
 
 public class RailTypeMenu extends NameListMenu {
 
-    public static final String RAIL_TYPE_INV_NAME = "Choose a Rail Type";
-
     // Slots 30-32 belong to the page switcher, so the extra buttons sit next to it.
     private static final int SEARCH_ITEM_SLOT = 28;
     private static final int CREATE_ITEM_SLOT = 29;
@@ -51,7 +50,7 @@ public class RailTypeMenu extends NameListMenu {
     }
 
     private RailTypeMenu(Player player, String searchQuery, Collection<String> selectedForDeletion, boolean autoLoad) {
-        super(player, RAIL_TYPE_INV_NAME, getRailTypes(player, searchQuery), new GeneratorMenu(player, false), autoLoad);
+        super(player, Messages.plain(player, MessageKeys.Generator.Rail.Menu.TYPE_TITLE), getRailTypes(player, searchQuery), new GeneratorMenu(player, false), autoLoad);
         this.searchQuery = searchQuery;
         this.selectedForDeletion = new LinkedHashSet<>(selectedForDeletion);
         preselectCurrentRailType(player);
@@ -97,10 +96,6 @@ public class RailTypeMenu extends NameListMenu {
         return railTypes;
     }
 
-    static String formatMaterials(List<XMaterial> materials) {
-        return RailTypeMenuItems.formatMaterials(materials);
-    }
-
     static String formatMaterial(@Nullable XMaterial material) {
         return RailTypeMenuItems.formatMaterial(material);
     }
@@ -111,44 +106,47 @@ public class RailTypeMenu extends NameListMenu {
 
         setRailTypePageItems();
 
-        getMenu().getSlot(SEARCH_ITEM_SLOT).setItem(Item.create(
+        Player player = getMenuPlayer();
+        String filterLabel = searchQuery.isBlank()
+                ? Messages.plain(player, MessageKeys.Generator.Rail.Menu.SEARCH_FILTER_ALL)
+                : searchQuery;
+
+        getMenu().getSlot(SEARCH_ITEM_SLOT).setItem(ItemComponents.of(
                 Objects.requireNonNull(XMaterial.COMPASS.get()),
-                yellow("Search Rail Types"),
-                List.of(
-                        gray("Current filter: ") + white(searchQuery.isBlank() ? "All" : searchQuery),
-                        gray("Left-click to search."),
-                        gray("Right-click to clear the filter.")
-                )
+                Messages.render(player, MessageKeys.Generator.Rail.Menu.SEARCH_NAME),
+                Messages.loreComponents(
+                        player,
+                        MessageKeys.Generator.Rail.Menu.SEARCH_LORE,
+                        Component.text(filterLabel))
         ));
 
-        if (getMenuPlayer().hasPermission(Permissions.RAIL_TYPE_CREATE))
-            getMenu().getSlot(CREATE_ITEM_SLOT).setItem(Item.create(
+        if (player.hasPermission(Permissions.RAIL_TYPE_CREATE))
+            getMenu().getSlot(CREATE_ITEM_SLOT).setItem(ItemComponents.of(
                     Objects.requireNonNull(XMaterial.NETHER_STAR.get()),
-                    green("Create a Rail Type"),
-                    List.of(gray("Configure and save a custom rail type."))
+                    Messages.render(player, MessageKeys.Generator.Rail.Menu.CREATE_NAME),
+                    Messages.loreComponents(player, MessageKeys.Generator.Rail.Menu.CREATE_LORE)
                 ));
 
-        if (getMenuPlayer().hasPermission(Permissions.RAIL_TYPE_EDIT))
-            getMenu().getSlot(RELOAD_ITEM_SLOT).setItem(Item.create(
+        if (player.hasPermission(Permissions.RAIL_TYPE_EDIT))
+            getMenu().getSlot(RELOAD_ITEM_SLOT).setItem(ItemComponents.of(
                     Objects.requireNonNull(XMaterial.CLOCK.get()),
-                    yellow("Reload Rail Types"),
-                    List.of(
-                            gray("Re-reads rail-types.yml from disk,"),
-                            gray("so you can test changes without a restart.")
-                    )
+                    Messages.render(player, MessageKeys.Generator.Rail.Menu.RELOAD_NAME),
+                    Messages.loreComponents(player, MessageKeys.Generator.Rail.Menu.RELOAD_LORE)
                 ));
 
-        if (getMenuPlayer().hasPermission(Permissions.RAIL_TYPE_DELETE))
-            getMenu().getSlot(BULK_DELETE_ITEM_SLOT).setItem(Item.create(
+        if (player.hasPermission(Permissions.RAIL_TYPE_DELETE))
+            getMenu().getSlot(BULK_DELETE_ITEM_SLOT).setItem(ItemComponents.of(
                     Objects.requireNonNull((selectedForDeletion.isEmpty() ? XMaterial.GRAY_DYE : XMaterial.RED_DYE).get()),
-                    selectedForDeletion.isEmpty() ? gray("Bulk Delete") : red("Delete Selected Rail Types"),
-                    List.of(
-                            gray("Selected: ") + white(String.valueOf(selectedForDeletion.size())),
-                            gray("Shift+Left-Click custom types to select them."),
-                            selectedForDeletion.isEmpty()
-                                    ? darkGray("No custom rail types selected.")
-                                    : red("Click to permanently delete all selected types.")
-                    )
+                    Messages.render(player, selectedForDeletion.isEmpty()
+                            ? MessageKeys.Generator.Rail.Menu.BULK_DELETE_NAME
+                            : MessageKeys.Generator.Rail.Menu.BULK_DELETE_NAME_ACTIVE),
+                    Messages.loreComponents(
+                            player,
+                            MessageKeys.Generator.Rail.Menu.BULK_DELETE_LORE,
+                            Component.text(String.valueOf(selectedForDeletion.size())),
+                            Messages.component(selectedForDeletion.isEmpty()
+                                    ? MessageKeys.Generator.Rail.Menu.BULK_DELETE_LORE_EMPTY
+                                    : MessageKeys.Generator.Rail.Menu.BULK_DELETE_LORE_CONFIRM))
                 ));
     }
 
@@ -164,11 +162,11 @@ public class RailTypeMenu extends NameListMenu {
                     : RailTypeMenuItems.createRailTypeItem(currentType, getMenuPlayer());
 
             if (selectedNames.contains(item.getRight()))
-                displayedItem = RailTypeMenuItems.addSelectionGlow(displayedItem);
+                displayedItem = RailTypeMenuItems.addSelectionGlow(displayedItem, getMenuPlayer());
 
             if (getMenuPlayer().hasPermission(Permissions.RAIL_TYPE_DELETE)
                     && selectedForDeletion.contains(item.getRight()))
-                displayedItem = RailTypeMenuItems.addDeletionMarker(displayedItem);
+                displayedItem = RailTypeMenuItems.addDeletionMarker(displayedItem, getMenuPlayer());
 
             getMenu().getSlot(slot).setItem(displayedItem);
             slot++;
@@ -216,19 +214,17 @@ public class RailTypeMenu extends NameListMenu {
 
                 if (selectedNames.contains(type)) {
                     selectedNames.remove(type);
-                    clickPlayer.sendMessage(ChatHelper.getStandardComponent(
-                            true,
-                            "Deselected rail type '%s'.",
-                            getRailTypeDisplayName(type)
+                    clickPlayer.sendMessage(Messages.component(
+                            MessageKeys.Generator.Rail.Menu.DESELECTED,
+                            Component.text(getRailTypeDisplayName(type))
                     ));
                     playSound(clickPlayer, Sound.UI_BUTTON_CLICK);
                 } else {
                     selectedNames.clear();
                     selectedNames.add(type);
-                    clickPlayer.sendMessage(ChatHelper.getStandardComponent(
-                            true,
-                            "Selected rail type '%s'.",
-                            getRailTypeDisplayName(type)
+                    clickPlayer.sendMessage(Messages.component(
+                            MessageKeys.Generator.Rail.Menu.SELECTED,
+                            Component.text(getRailTypeDisplayName(type))
                     ));
                     playSound(clickPlayer, Sound.UI_BUTTON_CLICK);
                 }
@@ -282,13 +278,9 @@ public class RailTypeMenu extends NameListMenu {
 
         clickPlayer.closeInventory();
         playSound(clickPlayer, Sound.UI_BUTTON_CLICK);
-        clickPlayer.sendMessage(ChatHelper.getStandardComponent(
-                true,
-                copy
-                        ? "Opening an editable copy of rail type '%s'."
-                        : "Editing rail type '%s'.",
-                railType.getIdentifier()
-        ));
+        clickPlayer.sendMessage(Messages.component(
+                copy ? MessageKeys.Generator.Rail.Menu.OPENING_COPY : MessageKeys.Generator.Rail.Menu.EDITING,
+                Component.text(railType.getIdentifier())));
 
         // Built-in types cannot be overwritten, so editing one saves an editable copy instead.
         new RailTypeEditorMenu(clickPlayer, RailTypeDraft.from(railType, !copy), true);
@@ -306,17 +298,13 @@ public class RailTypeMenu extends NameListMenu {
         RailType railType = rail.getRailTypeManager().byString(identifier);
 
         if (railType == null) {
-            clickPlayer.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
-                    "This rail type no longer exists."
-            )));
+            clickPlayer.sendMessage(Messages.component(MessageKeys.Generator.Rail.Menu.NO_LONGER_EXISTS));
             playSound(clickPlayer, Sound.ENTITY_ITEM_BREAK);
             return;
         }
 
         if (railType.isBuiltIn()) {
-            clickPlayer.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
-                    "Built-in rail types cannot be deleted. Right-click to create an editable copy."
-            )));
+            clickPlayer.sendMessage(Messages.component(MessageKeys.Generator.Rail.Menu.BUILTIN_NO_DELETE));
             playSound(clickPlayer, Sound.ENTITY_ITEM_BREAK);
             return;
         }
@@ -324,13 +312,13 @@ public class RailTypeMenu extends NameListMenu {
         String error = rail.getRailTypeManager().deleteRailType(railType.getIdentifier());
 
         if (error != null) {
-            clickPlayer.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(error)));
+            sendValidationError(clickPlayer, error);
             playSound(clickPlayer, Sound.ENTITY_ITEM_BREAK);
             return;
         }
 
         selectedNames.remove(railType.getIdentifier());
-        clickPlayer.sendMessage(ChatHelper.getStandardComponent(true, "Deleted rail type '%s'.", railType.getIdentifier()));
+        clickPlayer.sendMessage(Messages.component(MessageKeys.Generator.Rail.Menu.DELETED, Component.text(railType.getIdentifier())));
         playSound(clickPlayer, Sound.UI_BUTTON_CLICK);
 
         new RailTypeMenu(clickPlayer, true);
@@ -348,19 +336,13 @@ public class RailTypeMenu extends NameListMenu {
         RailType railType = rail.getRailTypeManager().byString(identifier);
 
         if (railType == null || railType.isBuiltIn()) {
-            clickPlayer.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
-                    "Only custom rail types can be selected for deletion."
-            )));
+            clickPlayer.sendMessage(Messages.component(MessageKeys.Generator.Rail.Menu.ONLY_CUSTOM_BULK));
             playSound(clickPlayer, Sound.ENTITY_ITEM_BREAK);
             return;
         }
 
         if (selectedForDeletion.remove(identifier))
-            clickPlayer.sendMessage(ChatHelper.getStandardComponent(
-                    true,
-                    "Removed rail type '%s' from bulk deletion.",
-                    identifier
-            ));
+            clickPlayer.sendMessage(Messages.component(MessageKeys.Generator.Rail.Menu.REMOVED_FROM_BULK, Component.text(identifier)));
         else
             selectedForDeletion.add(identifier);
 
@@ -386,14 +368,14 @@ public class RailTypeMenu extends NameListMenu {
         String error = rail.getRailTypeManager().deleteRailTypes(selectedForDeletion);
 
         if (error != null) {
-            clickPlayer.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(error)));
+            sendValidationError(clickPlayer, error);
             playSound(clickPlayer, Sound.ENTITY_ITEM_BREAK);
             return;
         }
 
         selectedNames.removeAll(selectedForDeletion);
         selectedForDeletion.clear();
-        clickPlayer.sendMessage(ChatHelper.getStandardComponent(true, "Deleted %s custom rail types.", amount));
+        clickPlayer.sendMessage(Messages.component(MessageKeys.Generator.Rail.Menu.BULK_DELETED, Component.text(String.valueOf(amount))));
         playSound(clickPlayer, Sound.UI_BUTTON_CLICK);
         new RailTypeMenu(clickPlayer, searchQuery, selectedForDeletion, true);
     }
@@ -420,7 +402,7 @@ public class RailTypeMenu extends NameListMenu {
 
             clickPlayer.closeInventory();
             playSound(clickPlayer, Sound.UI_BUTTON_CLICK);
-            clickPlayer.sendMessage(ChatHelper.getStandardComponent(true, "Creating a new rail type."));
+            clickPlayer.sendMessage(Messages.component(MessageKeys.Generator.Rail.Menu.CREATING_NEW));
 
             new RailTypeEditorMenu(clickPlayer, new RailTypeDraft(), true);
         });
@@ -437,10 +419,9 @@ public class RailTypeMenu extends NameListMenu {
             rail.getRailTypeManager().reload();
 
             playSound(clickPlayer, Sound.UI_BUTTON_CLICK);
-            clickPlayer.sendMessage(ChatHelper.getStandardComponent(
-                    true,
-                    "Reloaded %s rail types from rail-types.yml.",
-                    rail.getRailTypeManager().getRailTypes().size()
+            clickPlayer.sendMessage(Messages.component(
+                    MessageKeys.Generator.Rail.Menu.RELOADED,
+                    Component.text(String.valueOf(rail.getRailTypeManager().getRailTypes().size()))
             ));
 
             new RailTypeMenu(clickPlayer, searchQuery, selectedForDeletion, true);
@@ -458,9 +439,7 @@ public class RailTypeMenu extends NameListMenu {
 
     private void generateWithSelectedType(Player clickPlayer) {
         if (selectedNames.isEmpty()) {
-            clickPlayer.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
-                    "Select a rail type before generating."
-            )));
+            clickPlayer.sendMessage(Messages.component(MessageKeys.Generator.Rail.Menu.SELECT_BEFORE_GENERATE));
             playSound(clickPlayer, Sound.ENTITY_ITEM_BREAK);
             reloadMenuAsync();
             return;
@@ -479,9 +458,7 @@ public class RailTypeMenu extends NameListMenu {
         RailType railType = RailType.byString(selectedNames.getFirst());
 
         if (railType == null) {
-            clickPlayer.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
-                    "This rail type no longer exists."
-            )));
+            clickPlayer.sendMessage(Messages.component(MessageKeys.Generator.Rail.Menu.NO_LONGER_EXISTS));
             playSound(clickPlayer, Sound.ENTITY_ITEM_BREAK);
             return;
         }
@@ -512,80 +489,81 @@ public class RailTypeMenu extends NameListMenu {
                     );
                 })
                 .text(searchQuery.isBlank() ? "Search" : searchQuery)
-                .itemLeft(Item.create(Objects.requireNonNull(XMaterial.NAME_TAG.get()), yellow("Search Rail Types")))
-                .title(darkGray("Search rail types"))
+                .itemLeft(ItemComponents.of(
+                        Objects.requireNonNull(XMaterial.NAME_TAG.get()),
+                        Messages.render(clickPlayer, MessageKeys.Generator.Rail.Menu.SEARCH_ANVIL_ITEM)))
+                .title(Messages.legacy(clickPlayer, MessageKeys.Generator.Rail.Menu.SEARCH_ANVIL_TITLE))
                 .plugin(BuildTeamTools.getInstance())
                 .open(clickPlayer);
     }
 
     private void setRailTypePageItems() {
+        Player player = getMenuPlayer();
         getMenu().getSlot(SWITCH_PAGE_ITEM_SLOT - 1).setItem(createPreviousPageItem());
 
-        getMenu().getSlot(SWITCH_PAGE_ITEM_SLOT).setItem(Item.create(
+        getMenu().getSlot(SWITCH_PAGE_ITEM_SLOT).setItem(ItemComponents.of(
                 Objects.requireNonNull(XMaterial.PAPER.get()),
-                yellow("Current Page ") + gray("- ") + white(String.valueOf(getPage())),
-                List.of(gray("Use the arrows next to this item to browse rail types."))
+                Messages.render(player, MessageKeys.Generator.Rail.Menu.PAGE_CURRENT, Component.text(String.valueOf(getPage()))),
+                Messages.loreComponents(player, MessageKeys.Generator.Rail.Menu.PAGE_CURRENT_LORE)
         ));
 
         getMenu().getSlot(SWITCH_PAGE_ITEM_SLOT + 1).setItem(createNextPageItem());
     }
 
     private ItemStack createPreviousPageItem() {
+        Player player = getMenuPlayer();
         if (!hasPreviousPage())
-            return Item.create(
+            return ItemComponents.of(
                     Objects.requireNonNull(XMaterial.GRAY_STAINED_GLASS_PANE.get()),
-                    gray("No Previous Page"),
-                    List.of(darkGray("You are already on the first page."))
+                    Messages.render(player, MessageKeys.Generator.Rail.Menu.PAGE_PREV_NONE),
+                    Messages.loreComponents(player, MessageKeys.Generator.Rail.Menu.PAGE_PREV_NONE_LORE)
             );
 
         return HeadFactory.head(
                 HeadTexture.WHITE_ARROW_LEFT,
-                yellow("Previous Page ") + gray("- ") + white(String.valueOf(getPage() - 1)),
-                new ArrayList<>(List.of(gray("Click to show earlier rail types.")))
+                Messages.render(player, MessageKeys.Generator.Rail.Menu.PAGE_PREV, Component.text(String.valueOf(getPage() - 1))),
+                Messages.loreComponents(player, MessageKeys.Generator.Rail.Menu.PAGE_PREV_LORE)
         );
     }
 
     private ItemStack createNextPageItem() {
+        Player player = getMenuPlayer();
         if (!hasNextPage())
-            return Item.create(
+            return ItemComponents.of(
                     Objects.requireNonNull(XMaterial.GRAY_STAINED_GLASS_PANE.get()),
-                    gray("No Next Page"),
-                    List.of(darkGray("There are no more rail types."))
+                    Messages.render(player, MessageKeys.Generator.Rail.Menu.PAGE_NEXT_NONE),
+                    Messages.loreComponents(player, MessageKeys.Generator.Rail.Menu.PAGE_NEXT_NONE_LORE)
             );
 
         return HeadFactory.head(
                 HeadTexture.WHITE_ARROW_RIGHT,
-                yellow("Next Page ") + gray("- ") + white(String.valueOf(getPage() + 1)),
-                new ArrayList<>(List.of(gray("Click to show more rail types.")))
+                Messages.render(player, MessageKeys.Generator.Rail.Menu.PAGE_NEXT, Component.text(String.valueOf(getPage() + 1))),
+                Messages.loreComponents(player, MessageKeys.Generator.Rail.Menu.PAGE_NEXT_LORE)
         );
     }
 
     private void setRailTypePageClickEvents() {
         getMenu().getSlot(SWITCH_PAGE_ITEM_SLOT - 1).setClickHandler((clickPlayer, clickInformation) -> {
             if (!hasPreviousPage()) {
-                clickPlayer.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
-                        "You are already on the first rail type page."
-                )));
+                clickPlayer.sendMessage(Messages.component(MessageKeys.Generator.Rail.Menu.ALREADY_FIRST_PAGE));
                 playSound(clickPlayer, Sound.ENTITY_ITEM_BREAK);
                 return;
             }
 
             previousPage();
-            clickPlayer.sendMessage(ChatHelper.getStandardComponent(true, "Opened rail type page %s.", getPage()));
+            clickPlayer.sendMessage(Messages.component(MessageKeys.Generator.Rail.Menu.OPENED_PAGE, Component.text(String.valueOf(getPage()))));
             playSound(clickPlayer, Sound.UI_BUTTON_CLICK);
         });
 
         getMenu().getSlot(SWITCH_PAGE_ITEM_SLOT + 1).setClickHandler((clickPlayer, clickInformation) -> {
             if (!hasNextPage()) {
-                clickPlayer.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
-                        "There is no next rail type page."
-                )));
+                clickPlayer.sendMessage(Messages.component(MessageKeys.Generator.Rail.Menu.NO_NEXT_PAGE));
                 playSound(clickPlayer, Sound.ENTITY_ITEM_BREAK);
                 return;
             }
 
             nextPage();
-            clickPlayer.sendMessage(ChatHelper.getStandardComponent(true, "Opened rail type page %s.", getPage()));
+            clickPlayer.sendMessage(Messages.component(MessageKeys.Generator.Rail.Menu.OPENED_PAGE, Component.text(String.valueOf(getPage()))));
             playSound(clickPlayer, Sound.UI_BUTTON_CLICK);
         });
     }
@@ -594,27 +572,9 @@ public class RailTypeMenu extends NameListMenu {
         player.playSound(player, sound, 1.0F, 1.0F);
     }
 
-    private static String darkGray(String text) {
-        return RailMenuText.color(NamedTextColor.DARK_GRAY, text);
-    }
-
-    private static String gray(String text) {
-        return RailMenuText.color(NamedTextColor.GRAY, text);
-    }
-
-    private static String white(String text) {
-        return RailMenuText.color(NamedTextColor.WHITE, text);
-    }
-
-    private static String yellow(String text) {
-        return RailMenuText.color(NamedTextColor.YELLOW, text);
-    }
-
-    private static String green(String text) {
-        return RailMenuText.color(NamedTextColor.GREEN, text);
-    }
-
-    private static String red(String text) {
-        return RailMenuText.color(NamedTextColor.RED, text);
+    private static void sendValidationError(Player clickPlayer, String error) {
+        clickPlayer.sendMessage(Messages.component(
+                MessageKeys.Generator.Rail.Menu.VALIDATION_ERROR,
+                Component.text(error)));
     }
 }

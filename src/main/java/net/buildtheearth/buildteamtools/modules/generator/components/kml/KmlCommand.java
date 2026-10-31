@@ -1,9 +1,10 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.kml;
 
-import com.alpsbte.alpslib.utils.ChatHelper;
 import com.cryptomorin.xseries.XMaterial;
 import de.micromata.opengis.kml.v_2_2_0.Coordinate;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.Module;
 import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
 import net.buildtheearth.buildteamtools.modules.common.metrics.FeatureUsage;
@@ -57,8 +58,6 @@ public class KmlCommand {
     private static final String GEORING_COMMAND = "georing";
     private static final String GEOSURFACE_COMMAND = "geosurface";
     private static final String EXTEND_PREFIX = "-extend:";
-    private static final String INVALID_BLOCK_METADATA_MESSAGE =
-            "§cServer received /btt kml command with invalid blocktype string metadata. Using bricks as fallback.";
 
     public void register(Module owner) {
         var aliases = BuildTeamTools.getInstance().getMainConfig().commands().labels();
@@ -148,7 +147,7 @@ public class KmlCommand {
         }
 
         if (!(sender instanceof Player p)) {
-            sender.sendMessage("§cOnly players can execute this command.");
+            sender.sendMessage(Messages.component(MessageKeys.Generator.Kml.PLAYER_ONLY));
             return;
         }
 
@@ -159,7 +158,7 @@ public class KmlCommand {
 
         //check if alias is geopoints or geopath (direct /kml is only allowed for undo)
         if (alias.equals("kml")) {
-            sender.sendMessage("§cPlease use /btt geopoints or /btt geopath to execute this command.");
+            sender.sendMessage(Messages.component(MessageKeys.Generator.Kml.USE_GEO_ALIAS));
             return;
         }
 
@@ -261,7 +260,13 @@ public class KmlCommand {
         if (playerName.isEmpty() || blocktypeString.isEmpty()) {
             //invalid metadata, cancel
             //send error message to all players within 50m of the command block
-            ChatHelper.sendMessageToPlayersNearLocation(senderBlock.getLocation(), "§cReceived /btt kml command from CommandBlock without sufficient metadata.\nThis command can only be executed from a CommandBlock created with a /btt geo command!", 50);
+            Location blockLocation = senderBlock.getLocation();
+            double radiusSquared = 50 * 50;
+            for (Player nearby : blockLocation.getWorld().getPlayers()) {
+                if (nearby.getLocation().distanceSquared(blockLocation) <= radiusSquared) {
+                    nearby.sendMessage(Messages.component(MessageKeys.Generator.Kml.COMMANDBLOCK_NO_METADATA));
+                }
+            }
             return false;
         }
 
@@ -277,13 +282,13 @@ public class KmlCommand {
         Material matchedBlockMaterial = Material.matchMaterial(blocktypeString);
         final Material blockMaterial = (matchedBlockMaterial != null && matchedBlockMaterial.isBlock()) ? matchedBlockMaterial : Material.BRICKS;
         if (matchedBlockMaterial == null || !matchedBlockMaterial.isBlock()) {
-            player.sendMessage(INVALID_BLOCK_METADATA_MESSAGE);
+            player.sendMessage(Messages.component(MessageKeys.Generator.Kml.INVALID_BLOCK_METADATA));
         }
 
         Material matchedExtendMaterial = Material.matchMaterial(extendToGroundBlockType);
         final Material extendMaterial = (matchedExtendMaterial != null && matchedExtendMaterial.isBlock()) ? matchedExtendMaterial : Material.BRICKS;
         if (matchedExtendMaterial == null || !matchedExtendMaterial.isBlock()) {
-            player.sendMessage(INVALID_BLOCK_METADATA_MESSAGE);
+            player.sendMessage(Messages.component(MessageKeys.Generator.Kml.INVALID_BLOCK_METADATA));
         }
 
         //parse kml
@@ -369,30 +374,32 @@ public class KmlCommand {
 
 
             if (transaction.size() == 0) {
-                StringBuilder debugMessage = new StringBuilder("§ckml command did not contain any allowed block changes. ");
-                debugMessage.append("Total positions calculated: ").append(blockPositions.size() + fillPositions.size()).append(". ");
-                debugMessage.append("Player at: X=").append(player.getLocation().getBlockX());
-                debugMessage.append(" Y=").append(player.getLocation().getBlockY());
-                debugMessage.append(" Z=").append(player.getLocation().getBlockZ()).append(". ");
+                StringBuilder details = new StringBuilder();
+                details.append("Total positions calculated: ").append(blockPositions.size() + fillPositions.size()).append(". ");
+                details.append("Player at: X=").append(player.getLocation().getBlockX());
+                details.append(" Y=").append(player.getLocation().getBlockY());
+                details.append(" Z=").append(player.getLocation().getBlockZ()).append(". ");
 
                 // Show first calculated block location for debugging
                 if (!blockPositions.isEmpty()) {
                     BlockLocation firstBlock = blockPositions.iterator().next();
-                    debugMessage.append("First block would be at: X=").append(firstBlock.x);
-                    debugMessage.append(" Y=").append(firstBlock.y);
-                    debugMessage.append(" Z=").append(firstBlock.z).append(". ");
+                    details.append("First block would be at: X=").append(firstBlock.x);
+                    details.append(" Y=").append(firstBlock.y);
+                    details.append(" Z=").append(firstBlock.z).append(". ");
                 }
 
                 if (preventedUnloadedChunkChanges[0]) {
-                    debugMessage.append("Some blocks are in unloaded chunks. ");
+                    details.append("Some blocks are in unloaded chunks. ");
                 }
                 if (preventedFarChanges[0]) {
-                    debugMessage.append("Some blocks are >1000 blocks from your location (max distance 1000). ");
+                    details.append("Some blocks are >1000 blocks from your location (max distance 1000). ");
                 }
                 if (!preventedUnloadedChunkChanges[0] && !preventedFarChanges[0]) {
-                    debugMessage.append("No positions were calculated from the KML. Check your coordinates and command (/btt geopoints, /btt geopath, /btt georing).");
+                    details.append("No positions were calculated from the KML. Check your coordinates and command (/btt geopoints, /btt geopath, /btt georing).");
                 }
-                player.sendMessage(debugMessage.toString());
+                player.sendMessage(Messages.component(
+                        MessageKeys.Generator.Kml.DEBUG_NO_CHANGES,
+                        Component.text(details.toString())));
                 return;
             }
 
@@ -412,25 +419,33 @@ public class KmlCommand {
                 long time_beforeBlockChange = System.currentTimeMillis();
 
 
-                player.sendMessage(String.format("KML parsing: %d ms. BTE Projection: %d ms, Transaction preparation: %d ms. Changing %d blocks, please stand by.", (time_afterKMLParse - time_beforeKMLParse), (time_afterProjection - time_afterKMLParse), (time_beforeBlockChange - time_afterProjection), transaction.size()));
+                player.sendMessage(Messages.component(
+                        MessageKeys.Generator.Kml.TIMING,
+                        Component.text(time_afterKMLParse - time_beforeKMLParse),
+                        Component.text(time_afterProjection - time_afterKMLParse),
+                        Component.text(time_beforeBlockChange - time_afterProjection),
+                        Component.text(transaction.size())));
 
                 int blocksChanged = transaction.commit();
 
                 long time_afterBlockChanged = System.currentTimeMillis();
-                player.sendMessage(String.format("KML command changed %d blocks (%d ms).", blocksChanged, (time_afterBlockChanged - time_beforeBlockChange)));
+                player.sendMessage(Messages.component(
+                        MessageKeys.Generator.Kml.CHANGED_BLOCKS,
+                        Component.text(blocksChanged),
+                        Component.text(time_afterBlockChanged - time_beforeBlockChange)));
 
 
                 if (preventedUnloadedChunkChanges[0]) {
-                    player.sendMessage("§cSome block changes target unloaded chunks and were not applied.");
+                    player.sendMessage(Messages.component(MessageKeys.Generator.Kml.UNLOADED_CHUNKS));
                 }
                 if (preventedFarChanges[0]) {
-                    player.sendMessage("§cSome block changes target blocks too far away from the player and were not applied.");
+                    player.sendMessage(Messages.component(MessageKeys.Generator.Kml.TOO_FAR));
                 }
 
                 Material material = Material.matchMaterial(previousCommandBlockType);
 
                 if (material == null) {
-                    player.sendMessage(INVALID_BLOCK_METADATA_MESSAGE);
+                    player.sendMessage(Messages.component(MessageKeys.Generator.Kml.INVALID_BLOCK_METADATA));
                     material = Material.BRICKS;
                 }
 
@@ -516,14 +531,18 @@ public class KmlCommand {
                 extendToGroundBlockType = arg.substring(EXTEND_PREFIX.length()).toUpperCase();
 
                 if (Material.matchMaterial(extendToGroundBlockType) == null) {
-                    player.sendMessage(String.format("§cInvalid block type for extend parameter '%s'. Using bricks as fallback.", extendToGroundBlockType));
+                    player.sendMessage(Messages.component(
+                            MessageKeys.Generator.Kml.INVALID_EXTEND_BLOCK,
+                            Component.text(extendToGroundBlockType)));
                     extendToGroundBlockType = "BRICKS";
                 }
             } else {
                 blocktype = arg.toUpperCase();
 
                 if (Material.matchMaterial(blocktype) == null) {
-                    player.sendMessage(String.format("§cInvalid block type '%s'. Using bricks as fallback.", blocktype));
+                    player.sendMessage(Messages.component(
+                            MessageKeys.Generator.Kml.INVALID_BLOCK_TYPE,
+                            Component.text(blocktype)));
                     blocktype = "BRICKS";
                 }
             }
@@ -555,7 +574,7 @@ public class KmlCommand {
         cmdBlock.setMetadata("kmlBlockCreationCommand", new FixedMetadataValue(BuildTeamTools.getInstance(), alias));
 
         cmdBlock.update();
-        player.sendMessage("§6Command block created. Right click the block, paste the KML content, set it to 'always on' and confirm");
+        player.sendMessage(Messages.component(MessageKeys.Generator.Kml.COMMANDBLOCK_CREATED));
         return true;
 
     }
@@ -574,21 +593,23 @@ public class KmlCommand {
      */
     public boolean undoCommand(Player player) {
         if (playerHistories == null) {
-            player.sendMessage("kml undo failed - no command history available.");
+            player.sendMessage(Messages.component(MessageKeys.Generator.Kml.UNDO_NO_HISTORY));
             return false;
         }
 
         Stack<ChangeTransaction> playerHistory = playerHistories.get(player);
 
         if (playerHistory == null || playerHistory.empty()) {
-            player.sendMessage("kml undo failed - there is no previously executed kml command.");
+            player.sendMessage(Messages.component(MessageKeys.Generator.Kml.UNDO_NOTHING));
             return false;
         }
 
         FeatureUsage.record(UsageDetail.KML_UNDO);
         ChangeTransaction transaction = playerHistory.pop();
         transaction.undo();
-        player.sendMessage(String.format("undo successful. Restored %d blocks.", transaction.size()));
+        player.sendMessage(Messages.component(
+                MessageKeys.Generator.Kml.UNDO_SUCCESS,
+                Component.text(transaction.size())));
         return true;
     }
 

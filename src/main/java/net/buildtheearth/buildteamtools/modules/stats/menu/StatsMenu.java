@@ -2,14 +2,18 @@ package net.buildtheearth.buildteamtools.modules.stats.menu;
 
 import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.stats.StatsModule;
 import net.buildtheearth.buildteamtools.modules.stats.model.StatsPlayer;
 import net.buildtheearth.buildteamtools.modules.stats.model.StatsServer;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.ipvp.canvas.mask.BinaryMask;
@@ -17,19 +21,33 @@ import org.ipvp.canvas.mask.Mask;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
 public class StatsMenu extends AbstractMenu {
 
-    private static final ItemStack GLOBAL_HEAD = HeadFactory.head(HeadTexture.EARTH, "§eGlobal Statistics", ListUtil.createList("error"));
-    private static final ItemStack ACHIEVEMENTS_HEAD = HeadFactory.head(HeadTexture.GOLDEN_CUP, "§eAchievements", ListUtil.createList("error"));
-    private final ItemStack PLAYER_HEAD = Item.createPlayerHead("&ePersonal Statistics", getMenuPlayer().getName());
-    private final ItemStack TEAM_HEAD = Item.create(Objects.requireNonNull(XMaterial.STONE.get()), "Placeholder", ListUtil.createList("placeholder")); //TODO GET HEAD BASED ON COUNTRY/TEAM
+    private final ItemStack GLOBAL_HEAD;
+    private final ItemStack ACHIEVEMENTS_HEAD;
+    private final ItemStack PLAYER_HEAD;
+    private final ItemStack TEAM_HEAD;
 
 
     public StatsMenu(Player p) {
-        super(4, "Statistics", p);
+        super(4, Messages.component(MessageKeys.Stats.TITLE), p, false);
+        GLOBAL_HEAD = HeadFactory.head(HeadTexture.EARTH,
+                Messages.render(p, MessageKeys.Stats.GLOBAL_NAME),
+                ListUtil.grayComponents("error"));
+        ACHIEVEMENTS_HEAD = HeadFactory.head(HeadTexture.GOLDEN_CUP,
+                Messages.render(p, MessageKeys.Stats.ACHIEVEMENTS_NAME),
+                ListUtil.grayComponents("error"));
+        PLAYER_HEAD = ItemComponents.named(
+                Item.createPlayerHead(" ", p.getName()),
+                Messages.render(p, MessageKeys.Stats.PERSONAL_NAME));
+        TEAM_HEAD = ItemComponents.of(Objects.requireNonNull(XMaterial.STONE.get()),
+                Messages.render(p, MessageKeys.Stats.TEAM_PLACEHOLDER),
+                ListUtil.grayComponents("placeholder")); //TODO GET HEAD BASED ON COUNTRY/TEAM
+        reloadMenuAsync();
     }
 
     /**
@@ -97,48 +115,40 @@ public class StatsMenu extends AbstractMenu {
         StatsPlayer statsPlayer = statsModule.getStatsPlayer(getMenuPlayer().getUniqueId());
         JSONObject playerStats = statsPlayer.toJSON();
 
-        ArrayList<String> playerLore = new ArrayList<>();
+        List<Component> playerLore = new ArrayList<>();
 
         for (Object key : playerStats.keySet()) {
             if (key instanceof UUID) continue;
 
             Object value = playerStats.get(key);
-            playerLore.add(key + ": " + value);
+            playerLore.add(Component.text(key + ": " + value));
         }
-        PLAYER_HEAD.setLore(playerLore);
+        ItemComponents.lore(PLAYER_HEAD, playerLore);
 
         // Set Team Head Lore
 
         StatsServer statsServer = statsModule.getStatsServer();
         JSONObject serverStats = statsServer.toJSON();
 
-        ArrayList<String> serverLore = new ArrayList<>();
+        List<Component> serverLore = new ArrayList<>();
 
         for (Object key : serverStats.keySet()) {
             Object value = serverStats.get(key);
-            serverLore.add(key + ": " + value);
+            serverLore.add(Component.text(key + ": " + value));
         }
 
-        TEAM_HEAD.setLore(serverLore);
+        ItemComponents.lore(TEAM_HEAD, serverLore);
 
         // Set Global Head Lore
 
         //TODO: HOW TO GET GLOBAL STATS?
 
-        GLOBAL_HEAD.setLore(ListUtil.createList(
-                "",
-                "",
-                ""
-        ));
+        ItemComponents.lore(GLOBAL_HEAD, ListUtil.grayComponents("", "", ""));
 
         // Set Achievements Head Lore
 
         //TODO WAIT UNTIL ACHIEVEMENTS HAVE MORE PROGRESS
 
-        ACHIEVEMENTS_HEAD.setLore(ListUtil.createList(
-                "",
-                "",
-                ""
-        ));
+        ItemComponents.lore(ACHIEVEMENTS_HEAD, ListUtil.grayComponents("", "", ""));
     }
 }

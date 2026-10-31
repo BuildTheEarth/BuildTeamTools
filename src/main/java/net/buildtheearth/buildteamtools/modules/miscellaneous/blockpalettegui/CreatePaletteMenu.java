@@ -4,8 +4,12 @@ import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import lombok.Getter;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
@@ -45,6 +49,7 @@ public class CreatePaletteMenu extends AbstractMenu {
 
     private static final int MAX_NAME_LENGTH = 32;
     private static final int MAX_DESCRIPTION_LENGTH = 256;
+    private static final String UNNAMED_SENTINEL = "Unnamed";
 
     private final BlockPaletteManager manager;
     private final JavaPlugin plugin;
@@ -52,7 +57,7 @@ public class CreatePaletteMenu extends AbstractMenu {
     private final Player player;
     private final ComponentLogger logger;
 
-    private String name = "Unnamed";
+    private String name = UNNAMED_SENTINEL;
     private String description = "";
     private final List<String> blocks = new ArrayList<>();
     private InputMode inputMode = InputMode.NONE;
@@ -65,7 +70,7 @@ public class CreatePaletteMenu extends AbstractMenu {
     private enum InputMode {NONE, NAME, DESCRIPTION}
 
     public CreatePaletteMenu(BlockPaletteManager manager, Player player, @NonNull JavaPlugin plugin) {
-        super(3, "Create Palette", player);
+        super(3, Messages.component(MessageKeys.BlockPalette.CREATE_TITLE), player);
         this.manager = manager;
         this.plugin = plugin;
         this.player = player;
@@ -74,7 +79,9 @@ public class CreatePaletteMenu extends AbstractMenu {
 
     @Override
     protected Mask getMask() {
-        ItemStack filler = Item.create(Objects.requireNonNull(XMaterial.GRAY_STAINED_GLASS_PANE.get()), " ");
+        ItemStack filler = ItemComponents.of(
+                Objects.requireNonNull(XMaterial.GRAY_STAINED_GLASS_PANE.get()),
+                Component.text(" "));
         return BinaryMask.builder(getMenu())
                 .item(filler)
                 .pattern(BinaryMask.FULL_PATTERN)
@@ -87,28 +94,31 @@ public class CreatePaletteMenu extends AbstractMenu {
     protected void setMenuItemsAsync() {
         logger.info("Setting menu items for CreatePalleteMenu for player {}. Blocks: {}", player.getName(), blocks);
 
-        getMenu().getSlot(NAME_SLOT).setItem(
-                Item.create(Objects.requireNonNull(XMaterial.NAME_TAG.get()), "§eSet Name",
-                        new ArrayList<>(List.of("§7Current: §f" + name)))
-        );
+        getMenu().getSlot(NAME_SLOT).setItem(ItemComponents.of(
+                Objects.requireNonNull(XMaterial.NAME_TAG.get()),
+                Messages.render(player, MessageKeys.BlockPalette.SET_NAME),
+                Messages.loreComponents(player, MessageKeys.BlockPalette.SET_NAME_LORE, Component.text(name))));
 
-        getMenu().getSlot(DESCRIPTION_SLOT).setItem(
-                Item.create(Objects.requireNonNull(XMaterial.WRITABLE_BOOK.get()), "§eSet Description",
-                        new ArrayList<>(List.of("§7Current: §f" + (description.isEmpty() ? "None" : description))))
-        );
+        String descDisplay = description.isEmpty()
+                ? Messages.plain(player, MessageKeys.BlockPalette.NONE)
+                : description;
+        getMenu().getSlot(DESCRIPTION_SLOT).setItem(ItemComponents.of(
+                Objects.requireNonNull(XMaterial.WRITABLE_BOOK.get()),
+                Messages.render(player, MessageKeys.BlockPalette.SET_DESCRIPTION),
+                Messages.loreComponents(player, MessageKeys.BlockPalette.SET_DESCRIPTION_LORE, Component.text(descDisplay))));
 
-        getMenu().getSlot(BLOCKS_SLOT).setItem(
-                Item.create(Objects.requireNonNull(XMaterial.STONE.get()), "§eSet Blocks",
-                        new ArrayList<>(List.of("§7Selected: §f" + blocks.size())))
-        );
+        getMenu().getSlot(BLOCKS_SLOT).setItem(ItemComponents.of(
+                Objects.requireNonNull(XMaterial.STONE.get()),
+                Messages.render(player, MessageKeys.BlockPalette.SET_BLOCKS),
+                Messages.loreComponents(player, MessageKeys.BlockPalette.SET_BLOCKS_LORE, Component.text(blocks.size()))));
 
-        getMenu().getSlot(BACK_SLOT).setItem(
-                Item.createCustomHeadBase64(BACK_HEAD, "§cBack", null)
-        );
+        getMenu().getSlot(BACK_SLOT).setItem(ItemComponents.named(
+                Item.createCustomHeadBase64(BACK_HEAD, " ", null),
+                Messages.render(player, MessageKeys.Ui.BACK_RED)));
 
-        getMenu().getSlot(APPLY_SLOT).setItem(
-                Item.createCustomHeadBase64(GREEN_CHECK_HEAD, "§aApply", null)
-        );
+        getMenu().getSlot(APPLY_SLOT).setItem(ItemComponents.named(
+                Item.createCustomHeadBase64(GREEN_CHECK_HEAD, " ", null),
+                Messages.render(player, MessageKeys.Ui.APPLY)));
     }
 
     @Override
@@ -123,7 +133,7 @@ public class CreatePaletteMenu extends AbstractMenu {
             inputMode = InputMode.NAME;
             registerChatListener();
             Bukkit.getScheduler().runTask(plugin, () ->
-                    p.sendMessage("§ePlease type the palette name in chat (max " + MAX_NAME_LENGTH + " characters). Type 'cancel' to abort.")
+                    p.sendMessage(Messages.component(MessageKeys.BlockPalette.PROMPT_NAME, Component.text(MAX_NAME_LENGTH)))
             );
         });
 
@@ -137,7 +147,7 @@ public class CreatePaletteMenu extends AbstractMenu {
             inputMode = InputMode.DESCRIPTION;
             registerChatListener();
             Bukkit.getScheduler().runTask(plugin, () ->
-                    p.sendMessage("§ePlease type the palette description in chat (max " + MAX_DESCRIPTION_LENGTH + " characters). Type 'cancel' to abort.")
+                    p.sendMessage(Messages.component(MessageKeys.BlockPalette.PROMPT_DESCRIPTION, Component.text(MAX_DESCRIPTION_LENGTH)))
             );
         });
 
@@ -163,13 +173,13 @@ public class CreatePaletteMenu extends AbstractMenu {
         // Apply
         getMenu().getSlot(APPLY_SLOT).setClickHandler((p, i) -> {
             if (!p.hasPermission(Permissions.BLOCK_PALETTE_EDIT)) {
-                p.sendMessage("§cYou do not have permission to create palettes.");
+                p.sendMessage(Messages.component(MessageKeys.BlockPalette.NO_PERM_CREATE));
                 return;
             }
             unregisterChatListener();
             logger.info("Apply clicked in CreatePalleteMenu by {}. Name: {}, Blocks: {}", p.getName(), name, blocks);
-            if (name.equals("Unnamed")) {
-                p.sendMessage("§cPlease set a valid name for the palette.");
+            if (name.equals(UNNAMED_SENTINEL)) {
+                p.sendMessage(Messages.component(MessageKeys.BlockPalette.INVALID_NAME));
                 return;
             }
             String paletteKey = UUID.randomUUID().toString();
@@ -177,7 +187,7 @@ public class CreatePaletteMenu extends AbstractMenu {
             Set<String> filters = new HashSet<>(manager.getPlayerFilters(p));
             filters.add(paletteKey);
             manager.updatePlayerFilters(p, filters);
-            p.sendMessage("§aPalette created: §f" + name);
+            p.sendMessage(Messages.component(MessageKeys.BlockPalette.CREATED, Component.text(name)));
             new ChoosePaletteMenu(manager, p, plugin).open();
         });
     }
@@ -215,9 +225,9 @@ public class CreatePaletteMenu extends AbstractMenu {
             String message = PlainTextComponentSerializer.plainText().serialize(event.message());
 
             if (message.equalsIgnoreCase("cancel")) {
-                if (inputMode == InputMode.NAME) name = "Unnamed";
+                if (inputMode == InputMode.NAME) name = UNNAMED_SENTINEL;
                 else if (inputMode == InputMode.DESCRIPTION) description = "";
-                player.sendMessage("§cInput cancelled.");
+                player.sendMessage(Messages.component(MessageKeys.BlockPalette.INPUT_CANCELLED));
                 unregisterChatListener();
                 Bukkit.getScheduler().runTask(plugin, () -> {
                     setMenuItemsAsync();
@@ -228,12 +238,12 @@ public class CreatePaletteMenu extends AbstractMenu {
 
             if (inputMode == InputMode.NAME) {
                 if (message.length() > MAX_NAME_LENGTH) {
-                    player.sendMessage("§cName is too long! Max " + MAX_NAME_LENGTH + " characters.");
+                    player.sendMessage(Messages.component(MessageKeys.BlockPalette.NAME_TOO_LONG, Component.text(MAX_NAME_LENGTH)));
                 } else if (message.isEmpty()) {
-                    player.sendMessage("§cName cannot be empty!");
+                    player.sendMessage(Messages.component(MessageKeys.BlockPalette.NAME_EMPTY));
                 } else {
                     name = message;
-                    player.sendMessage("§aPalette name set to: §f" + name);
+                    player.sendMessage(Messages.component(MessageKeys.BlockPalette.NAME_SET, Component.text(name)));
                     unregisterChatListener();
                     Bukkit.getScheduler().runTask(plugin, () -> {
                         setMenuItemsAsync();
@@ -242,10 +252,13 @@ public class CreatePaletteMenu extends AbstractMenu {
                 }
             } else if (inputMode == InputMode.DESCRIPTION) {
                 if (message.length() > MAX_DESCRIPTION_LENGTH) {
-                    player.sendMessage("§cDescription is too long! Max " + MAX_DESCRIPTION_LENGTH + " characters.");
+                    player.sendMessage(Messages.component(MessageKeys.BlockPalette.DESCRIPTION_TOO_LONG, Component.text(MAX_DESCRIPTION_LENGTH)));
                 } else {
                     description = message.isEmpty() ? "" : message;
-                    player.sendMessage("§aPalette description set to: §f" + (description.isEmpty() ? "None" : description));
+                    String descDisplay = description.isEmpty()
+                            ? Messages.plain(player, MessageKeys.BlockPalette.NONE)
+                            : description;
+                    player.sendMessage(Messages.component(MessageKeys.BlockPalette.DESCRIPTION_SET, Component.text(descDisplay)));
                     unregisterChatListener();
                     Bukkit.getScheduler().runTask(plugin, () -> {
                         setMenuItemsAsync();

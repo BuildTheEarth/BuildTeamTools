@@ -3,6 +3,8 @@ package net.buildtheearth.buildteamtools.modules.navigation.components.address.c
 import com.alpsbte.alpslib.utils.ChatHelper;
 import net.buildtheearth.Projection;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.Module;
 import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
 import net.buildtheearth.buildteamtools.modules.common.metrics.FeatureUsage;
@@ -29,7 +31,6 @@ import java.util.concurrent.RejectedExecutionException;
 
 public class AddressCommand {
     private static final String COMMAND_NAME = "address";
-    private static final String PLAYER_ONLY_MESSAGE = "This command can only be used by a player!";
 
     public void register(Module owner) {
         var commandManager = BuildTeamTools.getInstance().getCommandManager();
@@ -55,8 +56,7 @@ public class AddressCommand {
                         boolean international = context.flags().isPresent("international");
                         handleGetCommand(player, international);
                     } else
-                        context.sender().getSender().sendMessage(
-                                ChatHelper.getErrorComponent(PLAYER_ONLY_MESSAGE));
+                        context.sender().getSender().sendMessage(Messages.playerOnly());
                 });
         commandManager.registerSubcommand(owner, COMMAND_NAME, "teleport",
                 "Find an address and teleport to its coordinates.",
@@ -68,18 +68,17 @@ public class AddressCommand {
                     if (context.sender().getSender() instanceof Player player)
                         handleTeleportCommand(player, context.get(COMMAND_NAME));
                     else
-                        context.sender().getSender().sendMessage(
-                                ChatHelper.getErrorComponent(PLAYER_ONLY_MESSAGE));
+                        context.sender().getSender().sendMessage(Messages.playerOnly());
                 });
     }
 
     private void execute(@NonNull CommandSender sender, String @NonNull [] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(ChatHelper.getErrorComponent(PLAYER_ONLY_MESSAGE));
+            sender.sendMessage(Messages.playerOnly());
             return;
         }
 
-        player.sendMessage(ChatHelper.getErrorComponent("Usage: /btt address <get|teleport>"));
+        player.sendMessage(Messages.component(MessageKeys.Address.USAGE));
     }
 
     private void handleGetCommand(@NonNull Player player, boolean international) {
@@ -89,7 +88,7 @@ public class AddressCommand {
         }
 
         FeatureUsage.record(UsageDetail.ADDRESS_GET);
-        player.sendMessage("Getting closest address...");
+        player.sendMessage(Messages.component(MessageKeys.Address.GETTING_CLOSEST));
 
         final GeographicalCoordinate geoCoord;
 
@@ -107,11 +106,7 @@ public class AddressCommand {
                     e.getMessage()
             );
 
-            player.sendMessage(
-                    ChatHelper.getErrorComponent(
-                            "Failed to convert player location to geographical coordinates."
-                    )
-            );
+            player.sendMessage(Messages.component(MessageKeys.Address.CONVERT_FAILED));
             return;
         }
 
@@ -119,24 +114,18 @@ public class AddressCommand {
             NominatimAPI.getAddressFromCoordinatesAsync(geoCoord, international)
                     .thenAccept(address -> {
                         if (address.isBlank()) {
-                            player.sendMessage(
-                                    ChatHelper.getErrorComponent(
-                                            "No address found for your location."
-                                    )
-                            );
+                            player.sendMessage(Messages.component(MessageKeys.Address.NOT_FOUND));
                             return;
                         }
 
-                        Component message = Component.text()
-                                .append(Component.text("Address: ", NamedTextColor.GRAY))
+                        Component message = Messages.component(MessageKeys.Address.LABEL)
                                 .append(
                                         Component.text(address, NamedTextColor.WHITE)
                                                 .hoverEvent(HoverEvent.showText(
-                                                        Component.text("Click to copy", NamedTextColor.GRAY)
+                                                        Messages.component(MessageKeys.Address.CLICK_TO_COPY)
                                                 ))
                                                 .clickEvent(ClickEvent.copyToClipboard(address))
-                                )
-                                .build();
+                                );
 
                         player.sendMessage(message);
                     })
@@ -146,11 +135,7 @@ public class AddressCommand {
                                 error.getMessage()
                         );
 
-                        player.sendMessage(
-                                ChatHelper.getErrorComponent(
-                                        "Failed to retrieve closest address."
-                                )
-                        );
+                        player.sendMessage(Messages.component(MessageKeys.Address.RETRIEVE_FAILED));
 
                         return null;
                     });
@@ -162,11 +147,7 @@ public class AddressCommand {
                     e.getMessage()
             );
 
-            player.sendMessage(
-                    ChatHelper.getErrorComponent(
-                            "Too many address requests. Please try again later."
-                    )
-            );
+            player.sendMessage(Messages.component(MessageKeys.Address.TOO_MANY_REQUESTS));
         }
     }
 
@@ -183,12 +164,14 @@ public class AddressCommand {
                 .thenAccept(coordinates -> {
                     double latitude = coordinates.latitude();
                     double longitude = coordinates.longitude();
-                    player.sendMessage(ChatHelper.getStandardComponent(false,"Address found, teleporting..."));
+                    player.sendMessage(Messages.component(MessageKeys.Address.FOUND_TELEPORTING));
                     Bukkit.getScheduler().runTask(
                             BuildTeamTools.getInstance(),
                             () -> {
-                                player.sendMessage("Address found: " + address);
-                                player.sendMessage("Teleporting...");
+                                player.sendMessage(Messages.component(
+                                        MessageKeys.Address.FOUND,
+                                        Component.text(address)));
+                                player.sendMessage(Messages.component(MessageKeys.Address.TELEPORTING));
                                 player.performCommand(
                                         "tpll " + latitude + " " + longitude
                                 );
@@ -196,7 +179,9 @@ public class AddressCommand {
                     );
                 })
                 .exceptionally(error -> {
-                    player.sendMessage(ChatHelper.getErrorComponent(error.getMessage()));
+                    player.sendMessage(Messages.component(
+                            MessageKeys.Address.ERROR,
+                            Component.text(String.valueOf(error.getMessage()))));
                     return null;
                 });
 

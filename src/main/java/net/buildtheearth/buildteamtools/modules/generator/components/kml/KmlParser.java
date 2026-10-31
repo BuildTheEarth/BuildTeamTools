@@ -2,10 +2,14 @@ package net.buildtheearth.buildteamtools.modules.generator.components.kml;
 
 
 import de.micromata.opengis.kml.v_2_2_0.*;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class KmlParser {
     private final Player player;
@@ -43,7 +47,9 @@ public class KmlParser {
             }
 
         } catch (Exception ex) {
-            player.sendMessage(String.format("§cthere was an error parsing the kml string: '%s'", ex));
+            player.sendMessage(Messages.component(
+                    MessageKeys.Generator.Kml.PARSE_ERROR,
+                    Component.text(String.valueOf(ex))));
         }
 
         return result_lists;
@@ -86,7 +92,9 @@ public class KmlParser {
             }
 
         } catch (Exception ex) {
-            player.sendMessage(String.format("§cthere was an error parsing the kml string: '%s'", ex));
+            player.sendMessage(Messages.component(
+                    MessageKeys.Generator.Kml.PARSE_ERROR,
+                    Component.text(String.valueOf(ex))));
         }
 
         return linestrings;
@@ -147,8 +155,9 @@ public class KmlParser {
                 }
             }
         } else {
-            this.player.sendMessage(
-                    String.format("§cPlacemark has geometry of unsupported type %s", geom.getClass().getName()));
+            this.player.sendMessage(Messages.component(
+                    MessageKeys.Generator.Kml.UNSUPPORTED_GEOMETRY,
+                    Component.text(geom.getClass().getName())));
         }
 
         return lines;
@@ -184,10 +193,11 @@ public class KmlParser {
         } else if (geom instanceof Polygon) {
             return ((Polygon) geom).getOuterBoundaryIs().getLinearRing().getCoordinates();
         } else if (geom instanceof MultiGeometry) {
-            this.player.sendMessage("§cPlacemark uses a MultiGeometry inside MultiGeometry, this is not supported!");
+            this.player.sendMessage(Messages.component(MessageKeys.Generator.Kml.NESTED_MULTIGEOMETRY));
         } else {
-            this.player.sendMessage(
-                    String.format("§cPlacemark has geometry of unsupported type %s", geom.getClass().getName()));
+            this.player.sendMessage(Messages.component(
+                    MessageKeys.Generator.Kml.UNSUPPORTED_GEOMETRY,
+                    Component.text(geom.getClass().getName())));
         }
 
         return new ArrayList<Coordinate>();

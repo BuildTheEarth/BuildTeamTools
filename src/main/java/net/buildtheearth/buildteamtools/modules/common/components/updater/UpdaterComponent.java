@@ -3,8 +3,11 @@ package net.buildtheearth.buildteamtools.modules.common.components.updater;
 import com.alpsbte.alpslib.utils.ChatHelper;
 import io.papermc.paper.util.Tick;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.ModuleComponent;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
@@ -57,10 +60,7 @@ public class UpdaterComponent extends ModuleComponent {
     public void update(CommandSender sender, boolean checkMsg) {
         if (updater.isAlreadyDownloaded() || !updater.isUpdateAvailable()) {
             if (checkMsg) {
-                sender.sendMessage(ChatHelper.getStandardComponent(
-                        true,
-                        "It looks like there is no new update available!"
-                ));
+                sender.sendMessage(Messages.component(MessageKeys.Updater.NO_UPDATE));
             }
             return;
         }
@@ -68,9 +68,9 @@ public class UpdaterComponent extends ModuleComponent {
 
         updater.attemptDownload().thenAccept(success -> {
             if (Boolean.TRUE.equals(success)) {
-                sender.sendMessage(ChatHelper.getSuccessComponent(
-                        "Successfully updated plugin to version %s, restart the server to apply changes!",
-                        updater.pluginData().latestVersion().flatMap(Version::version).orElse("unknown")
+                sender.sendMessage(Messages.component(
+                        MessageKeys.Updater.UPDATED,
+                        Component.text(updater.pluginData().latestVersion().flatMap(Version::version).orElse("unknown"))
                 ));
 
                 notifyAllPlayersAboutUpdate(sender);
@@ -87,25 +87,22 @@ public class UpdaterComponent extends ModuleComponent {
 
         updater.checkForUpdate().whenCompleteAsync((update, throwable) -> {
             if (throwable != null) {
-                sender.sendMessage(ChatHelper.getErrorComponent(
-                        "Could not check for updates. The update API rejected the request or is unavailable. Error: ",
-                        throwable.getMessage()
+                sender.sendMessage(Messages.component(
+                        MessageKeys.Updater.CHECK_FAILED,
+                        Component.text(String.valueOf(throwable.getMessage()))
                 ));
                 return;
             }
 
             if (!Boolean.TRUE.equals(update)) {
-                sender.sendMessage(ChatHelper.getSuccessComponent(
-                        "The BuildTeamTools plugin is up to date."
-                ));
+                sender.sendMessage(Messages.component(MessageKeys.Updater.UP_TO_DATE));
                 return;
             }
 
             if (!sender.hasPermission(Permissions.NOTIFY_UPDATE)) {
-                sender.sendMessage(ChatHelper.getErrorComponent(
-                        "A new update is available for the BuildTeamTools plugin. " +
-                                "You don't have the permission (%s) to get the detailed notification.",
-                        Permissions.NOTIFY_UPDATE
+                sender.sendMessage(Messages.component(
+                        MessageKeys.Updater.AVAILABLE_NO_PERM,
+                        Component.text(Permissions.NOTIFY_UPDATE)
                 ));
                 return;
             }
@@ -113,9 +110,9 @@ public class UpdaterComponent extends ModuleComponent {
             if (sender instanceof Player p) {
                 updater.notifier().ifPresent((UpdateNotifier<Player> notifier) -> notifier.notify(p, null));
             } else {
-                sender.sendMessage(ChatHelper.getSuccessComponent(
-                        "New update available for BuildTeamTools plugin: v%s.",
-                        updater.pluginData().latestVersion().flatMap(Version::version).orElse("unknown")
+                sender.sendMessage(Messages.component(
+                        MessageKeys.Updater.AVAILABLE,
+                        Component.text(updater.pluginData().latestVersion().flatMap(Version::version).orElse("unknown"))
                 ));
             }
         });
@@ -132,11 +129,13 @@ public class UpdaterComponent extends ModuleComponent {
 
         if (p.hasPermission(Permissions.NOTIFY_UPDATE)) {
             p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
-            p.sendMessage("");
-            p.sendMessage("§6§l[BuildTeam Plugin] §eThe server automatically installed a new update (v"
-                    + updater.pluginData().latestVersion().flatMap(Version::version).orElse("unknown") + ").");
-            p.sendMessage("§6>> §ePlease restart or reload the server to activate it.");
-            p.sendMessage("");
+            p.sendMessage(Component.empty());
+            p.sendMessage(Messages.component(
+                    MessageKeys.Updater.INSTALLED_NOTIFY,
+                    Component.text(updater.pluginData().latestVersion().flatMap(Version::version).orElse("unknown"))
+            ));
+            p.sendMessage(Messages.component(MessageKeys.Updater.RESTART_TO_ACTIVATE));
+            p.sendMessage(Component.empty());
         }
     }
 

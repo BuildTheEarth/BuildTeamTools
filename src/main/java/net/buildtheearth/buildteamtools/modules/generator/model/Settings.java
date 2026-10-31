@@ -9,6 +9,7 @@ import net.buildtheearth.buildteamtools.modules.generator.components.field.CropT
 import net.buildtheearth.buildteamtools.modules.generator.components.house.RoofType;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.configuration.RailType;
 import net.buildtheearth.buildteamtools.modules.generator.components.tree.TreeWidth;
+import net.kyori.adventure.text.Component;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -39,7 +40,7 @@ public abstract class Settings {
         if (FlagType.validateFlagType(flag, value) != null) {
             value = FlagType.convertToFlagType(flag, value.toString());
 
-            String errorMessage = FlagType.validateFlagType(flag, value);
+            Component errorMessage = FlagType.validateFlagType(flag, value);
 
             if (errorMessage != null) {
                 player.sendMessage(errorMessage);

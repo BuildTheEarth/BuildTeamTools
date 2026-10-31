@@ -1,6 +1,7 @@
 package net.buildtheearth.buildteamtools.modules.generator.listeners;
 
-import com.alpsbte.alpslib.utils.ChatHelper;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -73,7 +74,7 @@ public class GeneratorListener implements Listener {
 
         e.setCancelled(true);
         p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-        ChatHelper.sendErrorMessage(p, "You can't use WorldEdit commands while generating a structure.");
+        p.sendMessage(Messages.component(MessageKeys.Generator.Listener.NO_WE_COMMANDS));
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -91,6 +92,6 @@ public class GeneratorListener implements Listener {
 
         e.setCancelled(true);
         p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-        ChatHelper.sendErrorMessage(p, "You can't use WorldEdit while generating a structure.");
+        p.sendMessage(Messages.component(MessageKeys.Generator.Listener.NO_WE_WHILE_GENERATING));
     }
 }

@@ -19,6 +19,12 @@ public interface MainConfig {
         return "00000000-0000-0000-0000-000000000000";
     }
 
+    @Comments("Specifies the contact email included in the User-Agent header sent with API requests.")
+    @Comments("Must be changed to your own contact email address.")
+    default String contactEmail() {
+        return "development@buildtheearth.net";
+    }
+
     @Comments("The main world using the custom BTE Dynmaxion projection")
     default String earthWorld() {
         return "world";

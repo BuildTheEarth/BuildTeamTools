@@ -41,9 +41,7 @@ public class API {
      * @throws IOException When something went wrong performing the get request
      */
     public static String get(String url) throws IOException {
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
+        Request request = createRequestBuilder(url).build();
 
         try (Response response = httpClient.newCall(request).execute()) {
             return response.body().string();
@@ -56,9 +54,7 @@ public class API {
      * @param url The URL to perform a get request on
      */
     public static void getAsync(String url, ApiResponseCallback callback) {
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
+        Request request = createRequestBuilder(url).build();
 
         httpClient.newCall(request).enqueue(new Callback() {
             @Override
@@ -91,8 +87,7 @@ public class API {
      * @throws IOException When something went wrong performing the put request
      */
     public static String put(String url, RequestBody requestBody) throws IOException {
-        Request request = new Request.Builder()
-                .url(url)
+        Request request = createRequestBuilder(url)
                 .put(requestBody)
                 .build();
 
@@ -109,8 +104,7 @@ public class API {
      * @param callback    The callback to handle the API response or failure
      */
     public static void putAsync(String url, RequestBody requestBody, ApiResponseCallback callback) {
-        Request request = new Request.Builder()
-                .url(url)
+        Request request = createRequestBuilder(url)
                 .put(requestBody)
                 .build();
 
@@ -147,8 +141,7 @@ public class API {
      * @throws IOException When something went wrong performing the post request
      */
     public static String post(String url, RequestBody requestBody) throws IOException {
-        Request request = new Request.Builder()
-                .url(url)
+        Request request = createRequestBuilder(url)
                 .post(requestBody)
                 .build();
 
@@ -165,8 +158,7 @@ public class API {
      * @param callback    The callback to handle the API response or failure
      */
     public static void postAsync(String url, RequestBody requestBody, ApiResponseCallback callback) {
-        Request request = new Request.Builder()
-                .url(url)
+        Request request = createRequestBuilder(url)
                 .post(requestBody)
                 .build();
 
@@ -202,8 +194,7 @@ public class API {
      * @throws IOException When something went wrong performing the delete request
      */
     public static String delete(String url, RequestBody requestBody) throws IOException {
-        Request request = new Request.Builder()
-                .url(url)
+        Request request = createRequestBuilder(url)
                 .delete(requestBody)
                 .build();
 
@@ -220,8 +211,7 @@ public class API {
      * @param callback    The callback to handle the API response or failure
      */
     public static void deleteAsync(String url, RequestBody requestBody, ApiResponseCallback callback) {
-        Request request = new Request.Builder()
-                .url(url)
+        Request request = createRequestBuilder(url)
                 .delete(requestBody)
                 .build();
 
@@ -272,4 +262,18 @@ public class API {
         return jsonObject;
     }
 
+    private static Request.Builder createRequestBuilder(String url) {
+        String userAgent = BuildTeamTools.getInstance()
+                .getMainConfig()
+                .userAgent();
+
+        Request.Builder builder = new Request.Builder()
+                .url(url);
+
+        if (userAgent != null && !userAgent.isBlank()) {
+            builder.header("User-Agent", userAgent);
+        }
+
+        return builder;
+    }
 }

@@ -3,11 +3,14 @@ package net.buildtheearth.buildteamtools.modules.network.api;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -24,11 +27,13 @@ import java.util.function.Supplier;
  */
 public final class AsyncRequestQueue implements AutoCloseable {
 
-    private final long intervalMs;
+    private final long intervalNanos;
     private final int maxQueueSize;
 
     private final ScheduledExecutorService scheduler;
     private final Queue<QueuedRequest<?>> queue = new ArrayDeque<>();
+
+    private long nextAllowedStartNanos;
 
     private boolean dispatchScheduled;
     private boolean closed;
@@ -48,6 +53,8 @@ public final class AsyncRequestQueue implements AutoCloseable {
             @NotNull String threadName,
             int maxQueueSize
     ) {
+        Objects.requireNonNull(threadName, "threadName");
+
         if (intervalMs < 0) {
             throw new IllegalArgumentException(
                     "Interval must not be negative"
@@ -66,8 +73,11 @@ public final class AsyncRequestQueue implements AutoCloseable {
             );
         }
 
-        this.intervalMs = intervalMs;
+        this.intervalNanos = TimeUnit.MILLISECONDS.toNanos(intervalMs);
         this.maxQueueSize = maxQueueSize;
+
+        // Allow the first request to start immediately.
+        this.nextAllowedStartNanos = System.nanoTime();
 
         this.scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
             Thread thread = new Thread(r, threadName);
@@ -83,12 +93,19 @@ public final class AsyncRequestQueue implements AutoCloseable {
      * @param <T> result type of the asynchronous operation
      * @return a future completed with the operation's result or exception
      * @throws NullPointerException if the operation is null
-     * @throws RejectedExecutionException if the queue is closed or full
+     * @throws RejectedExecutionException if the queue is closed or full,
+     *         or if the scheduler cannot accept the dispatch
      */
     public <T> @NotNull CompletableFuture<T> submit(
             @NotNull Supplier<CompletableFuture<T>> operation
     ) {
+        Objects.requireNonNull(operation, "operation");
+
         CompletableFuture<T> result = new CompletableFuture<>();
+        QueuedRequest<T> request = new QueuedRequest<>(operation, result);
+
+        RejectedExecutionException schedulingFailure = null;
+        List<QueuedRequest<?>> rejectedRequests = List.of();
 
         synchronized (this) {
             if (closed) {
@@ -103,19 +120,48 @@ public final class AsyncRequestQueue implements AutoCloseable {
                 );
             }
 
-            queue.add(new QueuedRequest<>(operation, result));
+            queue.add(request);
 
             if (!dispatchScheduled) {
-                dispatchScheduled = true;
-                scheduler.schedule(
-                        this::dispatchNext,
-                        0,
-                        TimeUnit.MILLISECONDS
-                );
+                try {
+                    scheduleDispatchLocked();
+                } catch (RejectedExecutionException e) {
+                    schedulingFailure = e;
+                    rejectedRequests = drainQueueLocked();
+                }
             }
         }
 
+        if (schedulingFailure != null) {
+            completeRequestsExceptionally(
+                    rejectedRequests,
+                    schedulingFailure
+            );
+
+            throw schedulingFailure;
+        }
+
         return result;
+    }
+
+    /**
+     * Schedules the next dispatch using the earliest allowed start time.
+     *
+     * Must be called while holding this instance's monitor.
+     */
+    private void scheduleDispatchLocked() {
+        long delayNanos = Math.max(
+                0L,
+                nextAllowedStartNanos - System.nanoTime()
+        );
+
+        scheduler.schedule(
+                this::dispatchNext,
+                delayNanos,
+                TimeUnit.NANOSECONDS
+        );
+
+        dispatchScheduled = true;
     }
 
     /**
@@ -126,26 +172,51 @@ public final class AsyncRequestQueue implements AutoCloseable {
         QueuedRequest<?> request;
 
         synchronized (this) {
+            if (closed) {
+                dispatchScheduled = false;
+                return;
+            }
+
             request = queue.poll();
 
             if (request == null) {
                 dispatchScheduled = false;
                 return;
             }
+
+            // Record the next allowed start time when this request starts.
+            nextAllowedStartNanos = System.nanoTime() + intervalNanos;
         }
 
         execute(request);
 
+        RejectedExecutionException schedulingFailure = null;
+        List<QueuedRequest<?>> rejectedRequests = List.of();
+
         synchronized (this) {
+            if (closed) {
+                dispatchScheduled = false;
+                return;
+            }
+
             if (queue.isEmpty()) {
                 dispatchScheduled = false;
             } else {
-                scheduler.schedule(
-                        this::dispatchNext,
-                        intervalMs,
-                        TimeUnit.MILLISECONDS
-                );
+                try {
+                    scheduleDispatchLocked();
+                } catch (RejectedExecutionException e) {
+                    dispatchScheduled = false;
+                    schedulingFailure = e;
+                    rejectedRequests = drainQueueLocked();
+                }
             }
+        }
+
+        if (schedulingFailure != null) {
+            completeRequestsExceptionally(
+                    rejectedRequests,
+                    schedulingFailure
+            );
         }
     }
 
@@ -179,6 +250,40 @@ public final class AsyncRequestQueue implements AutoCloseable {
     }
 
     /**
+     * Removes all waiting requests.
+     *
+     * Must be called while holding this instance's monitor.
+     *
+     * @return the removed requests
+     */
+    private List<QueuedRequest<?>> drainQueueLocked() {
+        List<QueuedRequest<?>> requests = new ArrayList<>();
+
+        QueuedRequest<?> request;
+
+        while ((request = queue.poll()) != null) {
+            requests.add(request);
+        }
+
+        return requests;
+    }
+
+    /**
+     * Completes a collection of requests exceptionally.
+     *
+     * @param requests requests to fail
+     * @param exception failure to propagate
+     */
+    private void completeRequestsExceptionally(
+            List<QueuedRequest<?>> requests,
+            RejectedExecutionException exception
+    ) {
+        for (QueuedRequest<?> request : requests) {
+            request.result.completeExceptionally(exception);
+        }
+    }
+
+    /**
      * Cancels waiting requests and shuts down the scheduler.
      *
      * <p>An operation that has already started may still complete.
@@ -186,26 +291,30 @@ public final class AsyncRequestQueue implements AutoCloseable {
      */
     @Override
     public void close() {
+        List<QueuedRequest<?>> pendingRequests;
+
         synchronized (this) {
             if (closed) {
                 return;
             }
 
             closed = true;
+            dispatchScheduled = false;
 
-            RejectedExecutionException exception =
-                    new RejectedExecutionException(
-                            "Request queue was shut down"
-                    );
-
-            QueuedRequest<?> request;
-
-            while ((request = queue.poll()) != null) {
-                request.result.completeExceptionally(exception);
-            }
+            pendingRequests = drainQueueLocked();
 
             scheduler.shutdownNow();
         }
+
+        RejectedExecutionException exception =
+                new RejectedExecutionException(
+                        "Request queue was shut down"
+                );
+
+        completeRequestsExceptionally(
+                pendingRequests,
+                exception
+        );
     }
 
     /**
@@ -214,6 +323,7 @@ public final class AsyncRequestQueue implements AutoCloseable {
      * @param <T> operation result type
      */
     private static final class QueuedRequest<T> {
+
         private final Supplier<CompletableFuture<T>> operation;
         private final CompletableFuture<T> result;
 

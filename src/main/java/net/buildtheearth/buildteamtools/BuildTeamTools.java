@@ -13,6 +13,8 @@ import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.plotsystem.PlotSystemModule;
 import net.buildtheearth.buildteamtools.modules.stats.StatsModule;
 import net.buildtheearth.buildteamtools.modules.network.api.NominatimAPI;
+import net.buildtheearth.buildteamtools.i18n.MessagePrefix;
+import net.buildtheearth.buildteamtools.i18n.Translations;
 import net.buildtheearth.buildteamtools.utils.io.ConfigurationLoader;
 import net.buildtheearth.buildteamtools.utils.io.GeneratorConfig;
 import net.buildtheearth.buildteamtools.utils.io.MapConfig;
@@ -28,6 +30,7 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class BuildTeamTools extends JavaPlugin {
 
+    /** Fallback legacy prefix; runtime chat prefix comes from {@code config.yml} {@code message-prefix}. */
     public static final String PREFIX = "&9&lBTE &8> &7";
     public static final String CONSOLE_PREFIX = "[BuildTeamTools] ";
 
@@ -94,6 +97,9 @@ public class BuildTeamTools extends JavaPlugin {
         generatorConfigLoader.reload();
         mapConfigLoader.reload();
         plotSystemConfigLoader.reload();
+        MessagePrefix.apply(getMainConfig().messagePrefix());
+        Translations.reload(this);
+        setDebug(getMainConfig().debug());
     }
 
     public MainConfig getMainConfig() {

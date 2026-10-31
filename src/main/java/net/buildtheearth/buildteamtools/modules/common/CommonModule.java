@@ -15,6 +15,8 @@ import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.stats.StatsModule;
 import net.buildtheearth.buildteamtools.modules.stats.model.StatsPlayerType;
 import net.buildtheearth.buildteamtools.modules.stats.model.StatsServerType;
+import net.buildtheearth.buildteamtools.i18n.MessagePrefix;
+import net.buildtheearth.buildteamtools.i18n.Translations;
 import net.buildtheearth.buildteamtools.utils.WikiLinks;
 import net.buildtheearth.buildteamtools.utils.io.MainConfig;
 import org.bukkit.Bukkit;
@@ -49,9 +51,15 @@ public class CommonModule extends Module {
 
     @Override
     public void enable() {
-        // Try to load the configuration, if it throws an exception disable the plugin.
-        ChatHelper.init(BuildTeamTools.getInstance(), BuildTeamTools.getInstance().isDebug(), BuildTeamTools.PREFIX,
-                BuildTeamTools.CONSOLE_PREFIX);
+        MessagePrefix.apply(config.messagePrefix());
+        // ChatHelper still backs unmigrated call sites; prefix comes from config via MessagePrefix.
+        ChatHelper.init(
+                BuildTeamTools.getInstance(),
+                BuildTeamTools.getInstance().isDebug(),
+                MessagePrefix.legacyAmpersand(),
+                BuildTeamTools.CONSOLE_PREFIX
+        );
+        Translations.enable(BuildTeamTools.getInstance());
 
         // Set the debug mode
         BuildTeamTools.getInstance().setDebug(config.debug());
@@ -67,6 +75,12 @@ public class CommonModule extends Module {
         startTimer();
 
         super.enable();
+    }
+
+    @Override
+    public void disable() {
+        Translations.disable();
+        super.disable();
     }
 
     @Override

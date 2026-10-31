@@ -34,8 +34,6 @@ dazzleconf = "2.0.0-M3"
 fawe-bom = "1.56"
 # https://central.sonatype.com/artifact/com.google.code.gson/gson
 googlecode-gson = "2.15.0"
-# https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple
-googlecode-json-simple = "1.1.1"
 # https://github.com/urbancamo/javaapiforkml
 javaapiforkml = "3.1.2"
 # https://mvnrepository.com/artifact/org.json/json
@@ -75,7 +73,6 @@ dazzleconf = { module = "space.arim.dazzleconf:dazzleconf-yaml", version.ref = "
 com-alpsbte-alpslib-alpslib-libpsterra = { module = "com.alpsbte.alpslib:alpslib-libpsterra", version.ref = "alpslib-libpsterra" }
 fawe-bom = { module = "com.intellectualsites.bom:bom-newest", version.ref = "fawe-bom" }
 googlecode-gson = { module = "com.google.code.gson:gson", version.ref = "googlecode-gson" }
-googlecode-json-simple = { module = "com.googlecode.json-simple:json-simple", version.ref = "googlecode-json-simple" }
 javaapiforkml = { module = "uk.m0nom:javaapiforkml", version.ref = "javaapiforkml" }
 json = { module = "org.json:json", version.ref = "json" }
 okhttp-jvm = { module = "com.squareup.okhttp3:okhttp-jvm", version.ref = "okhttp-jvm" }

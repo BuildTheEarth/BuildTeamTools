@@ -54,7 +54,6 @@ dependencies {
     implementation(libs.javaapiforkml) {
         exclude(group = "com.sun.xml.bind", module = "jaxb-xjc") // Else Remapping will yell of duplicated classes
     }
-    implementation(libs.googlecode.json.simple)
     implementation(libs.bstats.bukkit)
     implementation(libs.buildtheearth.projection) {
         exclude(group = "com.google.guava", module = "guava")

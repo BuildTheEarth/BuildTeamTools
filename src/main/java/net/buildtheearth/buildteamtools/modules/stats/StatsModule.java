@@ -15,7 +15,7 @@ import net.buildtheearth.buildteamtools.utils.WikiLinks;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.json.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
@@ -117,7 +117,7 @@ public class StatsModule extends Module {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Stats");
         out.writeUTF(p.getUniqueId().toString());
-        out.writeUTF(StatsModule.getInstance().getCurrentCache().toJSONString());
+        out.writeUTF(StatsModule.getInstance().getCurrentCache().toString());
 
         p.sendPluginMessage(BuildTeamTools.getInstance(), "btt:buildteam", out.toByteArray());
         FeatureUsage.record(UsageFeature.STATS);
@@ -127,10 +127,10 @@ public class StatsModule extends Module {
     public JSONObject getCurrentCache() {
         JSONObject jsonObject = statsServer.toJSON();
 
-        //Player Stats
         JSONArray jsonArray = new JSONArray();
-        for (StatsPlayer statsPlayer : statsPlayerList.values())
+        for (StatsPlayer statsPlayer : statsPlayerList.values()) {
             jsonArray.put(statsPlayer.toJSON());
+        }
         jsonObject.put("PLAYERS", jsonArray);
 
         return jsonObject;

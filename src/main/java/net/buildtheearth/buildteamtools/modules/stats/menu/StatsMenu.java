@@ -18,12 +18,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 public class StatsMenu extends AbstractMenu {
 
@@ -117,8 +116,10 @@ public class StatsMenu extends AbstractMenu {
 
         List<Component> playerLore = new ArrayList<>();
 
-        for (Object key : playerStats.keySet()) {
-            if (key instanceof UUID) continue;
+        for (String key : playerStats.keySet()) {
+            if ("UUID".equals(key)) {
+                continue;
+            }
 
             Object value = playerStats.get(key);
             playerLore.add(Component.text(key + ": " + value));
@@ -132,7 +133,7 @@ public class StatsMenu extends AbstractMenu {
 
         List<Component> serverLore = new ArrayList<>();
 
-        for (Object key : serverStats.keySet()) {
+        for (String key : serverStats.keySet()) {
             Object value = serverStats.get(key);
             serverLore.add(Component.text(key + ": " + value));
         }

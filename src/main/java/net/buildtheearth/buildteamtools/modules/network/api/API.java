@@ -4,10 +4,9 @@ import net.buildtheearth.buildteamtools.BuildTeamTools;
 import okhttp3.*;
 import okio.Buffer;
 import org.jetbrains.annotations.NotNull;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -243,29 +242,27 @@ public class API {
 
 
     public static JSONArray createJSONArray(String jsonString) {
-        JSONArray jsonArray = new JSONArray();
-        JSONParser jsonParser = new JSONParser();
-        if ((jsonString != null) && !(jsonString.isEmpty())) {
-            try {
-                jsonArray = (JSONArray) jsonParser.parse(jsonString);
-            } catch (ParseException e) {
-                BuildTeamTools.getInstance().getComponentLogger().error("Failed to parse JSON Array.", e);
-            }
+        if (jsonString == null || jsonString.isEmpty()) {
+            return new JSONArray();
         }
-        return jsonArray;
+        try {
+            return new JSONArray(jsonString);
+        } catch (JSONException e) {
+            BuildTeamTools.getInstance().getComponentLogger().error("Failed to parse JSON Array.", e);
+            return new JSONArray();
+        }
     }
 
     public static JSONObject createJSONObject(String jsonString) {
-        JSONObject jsonObject = new JSONObject();
-        JSONParser jsonParser = new JSONParser();
-        if ((jsonString != null) && !(jsonString.isEmpty())) {
-            try {
-                jsonObject = (JSONObject) jsonParser.parse(jsonString);
-            } catch (ParseException e) {
-                BuildTeamTools.getInstance().getComponentLogger().error("Failed to parse JSON Object.", e);
-            }
+        if (jsonString == null || jsonString.isEmpty()) {
+            return new JSONObject();
         }
-        return jsonObject;
+        try {
+            return new JSONObject(jsonString);
+        } catch (JSONException e) {
+            BuildTeamTools.getInstance().getComponentLogger().error("Failed to parse JSON Object.", e);
+            return new JSONObject();
+        }
     }
 
     private static Request.Builder createRequestBuilder(String url) {

@@ -1,7 +1,7 @@
 package net.buildtheearth.buildteamtools.modules.stats.model;
 
 import net.buildtheearth.buildteamtools.modules.stats.StatsModule;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -49,13 +49,13 @@ public class StatsPlayer {
         stats.put(statsPlayerType, object);
     }
 
-    @SuppressWarnings("unchecked")
     public JSONObject toJSON() {
         JSONObject jsonObject = new JSONObject();
 
-        jsonObject.put("UUID", uuid);
-        for (StatsPlayerType statsPlayerType : stats.keySet())
-            jsonObject.put(statsPlayerType, stats.get(statsPlayerType));
+        jsonObject.put("UUID", uuid.toString());
+        for (StatsPlayerType statsPlayerType : stats.keySet()) {
+            jsonObject.put(statsPlayerType.name(), stats.get(statsPlayerType));
+        }
 
         return jsonObject;
     }

@@ -3,7 +3,7 @@ package net.buildtheearth.buildteamtools.modules.network.api;
 import com.alpsbte.alpslib.utils.ChatHelper;
 import net.buildtheearth.model.GeographicalCoordinate;
 import org.jetbrains.annotations.NotNull;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;

@@ -1,7 +1,7 @@
 package net.buildtheearth.buildteamtools.modules.stats.model;
 
 import net.buildtheearth.buildteamtools.modules.stats.StatsModule;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 
@@ -46,14 +46,13 @@ public class StatsServer {
         stats.put(statsServerType, object);
     }
 
-    @SuppressWarnings("unchecked")
     public JSONObject toJSON() {
         JSONObject jsonObject = new JSONObject();
 
-        for (StatsServerType statsServerType : stats.keySet())
-            jsonObject.put(statsServerType, stats.get(statsServerType));
+        for (StatsServerType statsServerType : stats.keySet()) {
+            jsonObject.put(statsServerType.name(), stats.get(statsServerType));
+        }
 
         return jsonObject;
     }
 }
-

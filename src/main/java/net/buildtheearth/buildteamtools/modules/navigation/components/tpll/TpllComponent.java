@@ -99,7 +99,7 @@ public class TpllComponent extends ModuleComponent {
      */
     public void tpllPlayer(@NotNull Player player, @NotNull GeographicalCoordinate coordinate, String targetServerName) {
         FeatureUsage.record(UsageFeature.TPLL);
-        ChatHelper.logDebug("Starting universal tpll teleportation for %s to %s.", player.getDisplayName(), targetServerName);
+        ChatHelper.logDebug("Starting universal tpll teleportation for %s to %s.", player.getName(), targetServerName);
         // Send a plugin message to the target server which adds the tpll to the queue
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("TPLL");

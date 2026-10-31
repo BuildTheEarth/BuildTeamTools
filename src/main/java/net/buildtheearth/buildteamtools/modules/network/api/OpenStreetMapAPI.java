@@ -7,8 +7,8 @@ import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
 import net.buildtheearth.model.GeographicalCoordinate;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
@@ -86,22 +86,30 @@ public class OpenStreetMapAPI extends API {
         JSONObject jsonObject = API.createJSONObject(response);
         ChatHelper.logDebug("Response from OpenStreetMap: %s", jsonObject);
 
-                JSONArray featuresArray = (JSONArray) jsonObject.get("features");
+        JSONArray featuresArray = jsonObject.optJSONArray("features");
 
-                if (featuresArray == null || featuresArray.isEmpty()) {
-                    future.completeExceptionally(new IllegalStateException("No location data found for these coordinates. The " +
-                            "location may be in the ocean or outside mapped areas."));
-                    return;
-                }
+        if (featuresArray == null || featuresArray.isEmpty()) {
+            future.completeExceptionally(new IllegalStateException("No location data found for these coordinates. The " +
+                    "location may be in the ocean or outside mapped areas."));
+            return;
+        }
 
-                JSONObject featuresObject = (JSONObject) featuresArray.getFirst();
+        JSONObject propertiesObject = featuresArray.getJSONObject(0).optJSONObject("properties");
+        if (propertiesObject == null) {
+            future.completeExceptionally(new IllegalStateException("No properties found in Photon response."));
+            return;
+        }
 
-                JSONObject propertiesObject = (JSONObject) featuresObject.get("properties");
+        String rawCountryCode = propertiesObject.optString("countrycode", "").trim();
+        String countryCodeCca2 = rawCountryCode.isEmpty()
+                ? null
+                : rawCountryCode.toUpperCase(Locale.ROOT);
+        String countryName = propertiesObject.optString("country", null);
+        if (countryName != null && countryName.isBlank()) {
+            countryName = null;
+        }
 
-        String countryCodeCca2 = (String) propertiesObject.get("countrycode");
-        String countryName = (String) propertiesObject.get("country");
-
-        future.complete(new RegionLookupResult(countryName, countryCodeCca2.toUpperCase(Locale.ROOT)));
+        future.complete(new RegionLookupResult(countryName, countryCodeCca2));
     }
 
 }

@@ -1,11 +1,7 @@
 package net.buildtheearth.buildteamtools.utils.menus;
 
 import com.alpsbte.alpslib.utils.item.Item;
-import net.buildtheearth.buildteamtools.i18n.MessageKeys;
-import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
-import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
-import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -41,17 +37,7 @@ public class BlockListMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPreviewItems() {
-        if (backMenu != null)
-            setBackItem(BACK_ITEM_SLOT, backMenu);
-
-        setSwitchPageItems(SWITCH_PAGE_ITEM_SLOT);
-
-        if (canProceed())
-            getMenu().getSlot(NEXT_ITEM_SLOT).setItem(HeadFactory.head(HeadTexture.CHECKMARK,
-                    Messages.render(getMenuPlayer(), MessageKeys.Ui.NEXT)));
-        else
-            getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.ITEM_BACKGROUND);
-
+        setSelectionPreviewItems(backMenu, BACK_ITEM_SLOT, SWITCH_PAGE_ITEM_SLOT, NEXT_ITEM_SLOT, canProceed());
         super.setPreviewItems();
     }
 

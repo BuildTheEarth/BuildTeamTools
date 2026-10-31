@@ -1,7 +1,6 @@
 package net.buildtheearth.buildteamtools.modules.stats.model;
 
-import net.buildtheearth.buildteamtools.modules.stats.StatsModule;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -17,45 +16,20 @@ public class StatsPlayer {
     }
 
     public void addValue(StatsPlayerType statsPlayerType, Object value) {
-        Object object = stats.get(statsPlayerType);
-
-        if (object == null)
-            object = value;
-        else if (object instanceof Integer && value instanceof Integer) {
-            if ((Integer) object > StatsModule.RATE_LIMIT)
-                return;
-
-            object = (Integer) object + (Integer) value;
-        } else if (object instanceof Double && value instanceof Double) {
-            if ((Double) object > StatsModule.RATE_LIMIT)
-                return;
-
-            object = (Double) object + (Double) value;
-        } else if (object instanceof Float && value instanceof Float) {
-            if ((Float) object > StatsModule.RATE_LIMIT)
-                return;
-
-            object = (Float) object + (Float) value;
-        } else if (object instanceof Long && value instanceof Long) {
-            if ((Long) object > StatsModule.RATE_LIMIT)
-                return;
-
-            object = (Long) object + (Long) value;
-        } else {
-            object = value;
+        Object updated = StatsValues.accumulate(stats.get(statsPlayerType), value);
+        if (updated == null) {
+            return;
         }
-
-        stats.remove(statsPlayerType);
-        stats.put(statsPlayerType, object);
+        stats.put(statsPlayerType, updated);
     }
 
-    @SuppressWarnings("unchecked")
     public JSONObject toJSON() {
         JSONObject jsonObject = new JSONObject();
 
-        jsonObject.put("UUID", uuid);
-        for (StatsPlayerType statsPlayerType : stats.keySet())
-            jsonObject.put(statsPlayerType, stats.get(statsPlayerType));
+        jsonObject.put("UUID", uuid.toString());
+        for (StatsPlayerType statsPlayerType : stats.keySet()) {
+            jsonObject.put(statsPlayerType.name(), stats.get(statsPlayerType));
+        }
 
         return jsonObject;
     }

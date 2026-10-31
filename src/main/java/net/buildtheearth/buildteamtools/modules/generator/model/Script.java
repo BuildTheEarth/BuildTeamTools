@@ -123,7 +123,6 @@ public class Script {
 
     /**
      * Adds a command to the operation list and counts it as one undoable change.
-     *
      * Use this for generator commands that actually modify blocks, such as //line,
      * //set or //replace. Do not use this for pure selection commands.
      *

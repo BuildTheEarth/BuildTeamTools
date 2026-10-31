@@ -185,11 +185,15 @@ public class GeneratorCollections {
                 return false;
         }
 
+        Path destRoot = destDirectory.toAbsolutePath().normalize();
         try (ZipInputStream zipIn = new ZipInputStream(Files.newInputStream(zipFilePath))) {
             ZipEntry entry = zipIn.getNextEntry();
 
             while (entry != null) {
-                var filePath = destDirectory.resolve(entry.getName());
+                Path filePath = destRoot.resolve(entry.getName()).normalize();
+                if (!filePath.startsWith(destRoot)) {
+                    throw new IOException("Zip entry is outside of the target directory: " + entry.getName());
+                }
 
                 if (!entry.isDirectory()) {
                     File parentDir = filePath.getParent().toFile();

@@ -19,6 +19,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -26,7 +27,8 @@ import org.bukkit.block.CommandBlock;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.incendo.cloud.parser.standard.StringParser;
 import org.jspecify.annotations.NonNull;
@@ -46,7 +48,7 @@ import java.util.concurrent.Executors;
  * the player then pastes the kml contents and confirms the command<br>
  * 2) The CommandBlock then sends a kml command with the contents, which is parsed by the server<br><br>
  * <p>
- * note: this command differentiates between aliases to determine wether to
+ * note: this command differentiates between aliases to determine whether to
  * generate intermediate points between the geo-coordinates from the kml linestrings.
  * Players should only use /geopoints or /geopath aliases,
  * direct use of the /kml command is restricted to CommandBlockSender
@@ -58,6 +60,17 @@ public class KmlCommand {
     private static final String GEORING_COMMAND = "georing";
     private static final String GEOSURFACE_COMMAND = "geosurface";
     private static final String EXTEND_PREFIX = "-extend:";
+
+    private static final NamespacedKey KEY_PLAYER_NAME = namespacedKey("kml_player_name");
+    private static final NamespacedKey KEY_BLOCKTYPE = namespacedKey("kml_blocktype");
+    private static final NamespacedKey KEY_PREVIOUS_BLOCKTYPE = namespacedKey("kml_previous_blocktype");
+    private static final NamespacedKey KEY_BLOCK_CREATION_COMMAND = namespacedKey("kml_block_creation_command");
+    private static final NamespacedKey KEY_EXTEND_TO_GROUND = namespacedKey("kml_extend_to_ground");
+    private static final NamespacedKey KEY_EXTEND_TO_GROUND_BLOCKTYPE = namespacedKey("kml_extend_to_ground_blocktype");
+
+    private static NamespacedKey namespacedKey(String key) {
+        return new NamespacedKey("buildteamtools", key);
+    }
 
     public void register(Module owner) {
         var aliases = BuildTeamTools.getInstance().getMainConfig().commands().labels();
@@ -245,17 +258,20 @@ public class KmlCommand {
      */
     public boolean processKml(@NonNull Block senderBlock, String[] args) {
 
-        //read metadata to get player name/ID
         BlockState blockState = senderBlock.getState();
-        String playerName = blockState.getMetadata("kmlPlayerName").getFirst().asString();
-        String blocktypeString = blockState.getMetadata("kmlBlocktype").getFirst().asString();
-        String previousCommandBlockType = blockState.getMetadata("kmlPreviousBlocktype").getFirst().asString();
-        String blockCreationCommand = blockState.getMetadata("kmlBlockCreationCommand").getFirst().asString();
+        if (!(blockState instanceof CommandBlock commandBlock)) {
+            return false;
+        }
+
+        PersistentDataContainer data = commandBlock.getPersistentDataContainer();
+        String playerName = data.getOrDefault(KEY_PLAYER_NAME, PersistentDataType.STRING, "");
+        String blocktypeString = data.getOrDefault(KEY_BLOCKTYPE, PersistentDataType.STRING, "");
+        String previousCommandBlockType = data.getOrDefault(KEY_PREVIOUS_BLOCKTYPE, PersistentDataType.STRING, "");
+        String blockCreationCommand = data.getOrDefault(KEY_BLOCK_CREATION_COMMAND, PersistentDataType.STRING, "");
         BlockCreationMode operationMode = commandToCreationMode(blockCreationCommand);
 
-        boolean extendToGround = blockState.getMetadata("kmlExtendToGround").getFirst().asBoolean();
-        String extendToGroundBlockType = blockState.getMetadata("kmlExtendToGroundBlocktype").getFirst().asString();
-
+        boolean extendToGround = data.getOrDefault(KEY_EXTEND_TO_GROUND, PersistentDataType.BOOLEAN, false);
+        String extendToGroundBlockType = data.getOrDefault(KEY_EXTEND_TO_GROUND_BLOCKTYPE, PersistentDataType.STRING, "");
 
         if (playerName.isEmpty() || blocktypeString.isEmpty()) {
             //invalid metadata, cancel
@@ -279,17 +295,8 @@ public class KmlCommand {
         recordKml(blockCreationCommand);
         String kml_content = String.join(" ", args);
 
-        Material matchedBlockMaterial = Material.matchMaterial(blocktypeString);
-        final Material blockMaterial = (matchedBlockMaterial != null && matchedBlockMaterial.isBlock()) ? matchedBlockMaterial : Material.BRICKS;
-        if (matchedBlockMaterial == null || !matchedBlockMaterial.isBlock()) {
-            player.sendMessage(Messages.component(MessageKeys.Generator.Kml.INVALID_BLOCK_METADATA));
-        }
-
-        Material matchedExtendMaterial = Material.matchMaterial(extendToGroundBlockType);
-        final Material extendMaterial = (matchedExtendMaterial != null && matchedExtendMaterial.isBlock()) ? matchedExtendMaterial : Material.BRICKS;
-        if (matchedExtendMaterial == null || !matchedExtendMaterial.isBlock()) {
-            player.sendMessage(Messages.component(MessageKeys.Generator.Kml.INVALID_BLOCK_METADATA));
-        }
+        final Material blockMaterial = resolvePlaceableMaterial(blocktypeString, player);
+        final Material extendMaterial = resolvePlaceableMaterial(extendToGroundBlockType, player);
 
         //parse kml
         long time_beforeKMLParse = System.currentTimeMillis();
@@ -354,23 +361,10 @@ public class KmlCommand {
 
             float maxDistanceToPlayer = 1000; //TODO server config
 
-            for (BlockLocation pt : blockPositions) {
-                Location loc = pt.getLocation(world);
-                if (!loc.getChunk().isLoaded()) preventedUnloadedChunkChanges[0] = true;
-                else if (loc.distance(player.getLocation()) > maxDistanceToPlayer) preventedFarChanges[0] = true;
-                else {
-                    transaction.addBlockChange(pt, world, blockMaterial);
-                }
-            }
-
-            for (BlockLocation pt : fillPositions) {
-                Location loc = pt.getLocation(world);
-                if (!loc.getChunk().isLoaded()) preventedUnloadedChunkChanges[0] = true;
-                else if (loc.distance(player.getLocation()) > maxDistanceToPlayer) preventedFarChanges[0] = true;
-                else {
-                    transaction.addBlockChange(pt, world, extendMaterial);
-                }
-            }
+            addNearbyBlockChanges(transaction, blockPositions, world, player, blockMaterial,
+                    maxDistanceToPlayer, preventedUnloadedChunkChanges, preventedFarChanges);
+            addNearbyBlockChanges(transaction, fillPositions, world, player, extendMaterial,
+                    maxDistanceToPlayer, preventedUnloadedChunkChanges, preventedFarChanges);
 
 
             if (transaction.size() == 0) {
@@ -563,15 +557,13 @@ public class KmlCommand {
         CommandBlock cmdBlock = (CommandBlock) block.getState();
 
         cmdBlock.setCommand("/btt kml "); //ready to paste kml content
-        cmdBlock.setMetadata("kmlPlayerName", new FixedMetadataValue(BuildTeamTools.getInstance(), player.getName()));
-        //cmdBlock.setMetadata("kmlPlayerID", new FixedMetadataValue(BuildTeamTools.getInstance(), p.getUniqueId()));
-        cmdBlock.setMetadata("kmlBlocktype", new FixedMetadataValue(BuildTeamTools.getInstance(), blocktype));
-        cmdBlock.setMetadata("kmlExtendToGround", new FixedMetadataValue(BuildTeamTools.getInstance(), extendToGround));
-        cmdBlock.setMetadata("kmlExtendToGroundBlocktype", new FixedMetadataValue(BuildTeamTools.getInstance(), extendToGroundBlockType));
-
-        cmdBlock.setMetadata("kmlPreviousBlocktype", new FixedMetadataValue(BuildTeamTools.getInstance(), previousMaterial.toString()));
-
-        cmdBlock.setMetadata("kmlBlockCreationCommand", new FixedMetadataValue(BuildTeamTools.getInstance(), alias));
+        PersistentDataContainer data = cmdBlock.getPersistentDataContainer();
+        data.set(KEY_PLAYER_NAME, PersistentDataType.STRING, player.getName());
+        data.set(KEY_BLOCKTYPE, PersistentDataType.STRING, blocktype);
+        data.set(KEY_EXTEND_TO_GROUND, PersistentDataType.BOOLEAN, extendToGround);
+        data.set(KEY_EXTEND_TO_GROUND_BLOCKTYPE, PersistentDataType.STRING, extendToGroundBlockType);
+        data.set(KEY_PREVIOUS_BLOCKTYPE, PersistentDataType.STRING, previousMaterial.toString());
+        data.set(KEY_BLOCK_CREATION_COMMAND, PersistentDataType.STRING, alias);
 
         cmdBlock.update();
         player.sendMessage(Messages.component(MessageKeys.Generator.Kml.COMMANDBLOCK_CREATED));
@@ -631,9 +623,9 @@ public class KmlCommand {
     private @NonNull Location getLocationFromCoordinates(double[] coordinates, double altitudeFromKML) {
         Location mcLocation = NavUtils.getLocationFromCoordinates(new GeographicalCoordinate(coordinates[0], coordinates[1]));
         //add altitude from kml (altitude from Google Earth is always relative to ground)
-        //note: the "-2" is only neccesary because 
+        //note: the "-2" is only necessary because
         //  getLocationFromCoordinates returns terrain altitude + 2
-        //      (one from Bukkits getHighestBlockY and one from our geoutils)
+        //      (one from Bukkit getHighestBlockY and one from our geoutils)
         mcLocation.add(0, altitudeFromKML, 0);
         return mcLocation;
     }
@@ -698,6 +690,37 @@ public class KmlCommand {
             }
         }
         return mcLines;
+    }
+
+    private static Material resolvePlaceableMaterial(String materialName, Player player) {
+        Material matched = Material.matchMaterial(materialName);
+        if (matched != null && matched.isBlock()) {
+            return matched;
+        }
+        player.sendMessage(Messages.component(MessageKeys.Generator.Kml.INVALID_BLOCK_METADATA));
+        return Material.BRICKS;
+    }
+
+    private static void addNearbyBlockChanges(
+            ChangeTransaction transaction,
+            Collection<BlockLocation> positions,
+            World world,
+            Player player,
+            Material material,
+            float maxDistanceToPlayer,
+            boolean[] preventedUnloadedChunkChanges,
+            boolean[] preventedFarChanges
+    ) {
+        for (BlockLocation pt : positions) {
+            Location loc = pt.getLocation(world);
+            if (!loc.getChunk().isLoaded()) {
+                preventedUnloadedChunkChanges[0] = true;
+            } else if (loc.distance(player.getLocation()) > maxDistanceToPlayer) {
+                preventedFarChanges[0] = true;
+            } else {
+                transaction.addBlockChange(pt, world, material);
+            }
+        }
     }
 
     private static void recordKml(@NonNull String command) {

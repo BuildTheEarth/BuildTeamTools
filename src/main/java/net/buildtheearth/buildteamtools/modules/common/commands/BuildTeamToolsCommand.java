@@ -120,7 +120,7 @@ public class BuildTeamToolsCommand {
     private static void displayCache(CommandSender sender) {
         if (StatsModule.getInstance().isEnabled()) {
             MessageBoxes.send(sender, plainTitle(sender, MessageKeys.Common.CACHE_TITLE), () ->
-                    sender.sendMessage(StatsModule.getInstance().getCurrentCache().toJSONString()));
+                    sender.sendMessage(StatsModule.getInstance().getCurrentCache().toString()));
         } else {
             sender.sendMessage(Messages.component(MessageKeys.Common.CACHE_STATS_DISABLED));
         }

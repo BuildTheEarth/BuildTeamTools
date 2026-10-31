@@ -2,7 +2,6 @@ package net.buildtheearth.buildteamtools.modules.miscellaneous.blockpalettegui;
 
 import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
-import io.papermc.paper.event.player.AsyncChatEvent;
 import lombok.Getter;
 import net.buildtheearth.buildteamtools.i18n.MessageKeys;
 import net.buildtheearth.buildteamtools.i18n.Messages;
@@ -11,11 +10,8 @@ import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
@@ -27,7 +23,7 @@ import org.jspecify.annotations.NonNull;
 import java.util.*;
 
 
-public class CreatePaletteMenu extends AbstractMenu {
+public class CreatePaletteMenu extends AbstractMenu implements PaletteChatInput.Session {
 
     private static final int NAME_SLOT = 11;
     private static final int DESCRIPTION_SLOT = 13;
@@ -60,14 +56,10 @@ public class CreatePaletteMenu extends AbstractMenu {
     private String name = UNNAMED_SENTINEL;
     private String description = "";
     private final List<String> blocks = new ArrayList<>();
-    private InputMode inputMode = InputMode.NONE;
-    private ChatInputListener chatListener;
+    private PaletteChatInput.Mode inputMode = PaletteChatInput.Mode.NONE;
 
-    // --- NEW: singleton listener per speler + debounce ---
     private static final Map<UUID, Listener> ACTIVE_CHAT = new HashMap<>();
     private boolean awaitingInput = false;
-
-    private enum InputMode {NONE, NAME, DESCRIPTION}
 
     public CreatePaletteMenu(BlockPaletteManager manager, Player player, @NonNull JavaPlugin plugin) {
         super(3, Messages.component(MessageKeys.BlockPalette.CREATE_TITLE), player);
@@ -92,7 +84,7 @@ public class CreatePaletteMenu extends AbstractMenu {
 
     @Override
     protected void setMenuItemsAsync() {
-        logger.info("Setting menu items for CreatePalleteMenu for player {}. Blocks: {}", player.getName(), blocks);
+        logger.info("Setting menu items for CreatePaletteMenu for player {}. Blocks: {}", player.getName(), blocks);
 
         getMenu().getSlot(NAME_SLOT).setItem(ItemComponents.of(
                 Objects.requireNonNull(XMaterial.NAME_TAG.get()),
@@ -126,11 +118,11 @@ public class CreatePaletteMenu extends AbstractMenu {
         // Name
         getMenu().getSlot(NAME_SLOT).setClickHandler((p, i) -> {
             if (i.getClickType() != ClickType.LEFT) return;
-            if (awaitingInput || inputMode != InputMode.NONE) return;
+            if (awaitingInput || inputMode != PaletteChatInput.Mode.NONE) return;
             awaitingInput = true;
 
             p.closeInventory();
-            inputMode = InputMode.NAME;
+            inputMode = PaletteChatInput.Mode.NAME;
             registerChatListener();
             Bukkit.getScheduler().runTask(plugin, () ->
                     p.sendMessage(Messages.component(MessageKeys.BlockPalette.PROMPT_NAME, Component.text(MAX_NAME_LENGTH)))
@@ -140,11 +132,11 @@ public class CreatePaletteMenu extends AbstractMenu {
         // Description
         getMenu().getSlot(DESCRIPTION_SLOT).setClickHandler((p, i) -> {
             if (i.getClickType() != ClickType.LEFT) return;
-            if (awaitingInput || inputMode != InputMode.NONE) return;
+            if (awaitingInput || inputMode != PaletteChatInput.Mode.NONE) return;
             awaitingInput = true;
 
             p.closeInventory();
-            inputMode = InputMode.DESCRIPTION;
+            inputMode = PaletteChatInput.Mode.DESCRIPTION;
             registerChatListener();
             Bukkit.getScheduler().runTask(plugin, () ->
                     p.sendMessage(Messages.component(MessageKeys.BlockPalette.PROMPT_DESCRIPTION, Component.text(MAX_DESCRIPTION_LENGTH)))
@@ -154,7 +146,7 @@ public class CreatePaletteMenu extends AbstractMenu {
         // Blocks
         getMenu().getSlot(BLOCKS_SLOT).setClickHandler((p, i) -> {
             p.closeInventory();
-            logger.info("Opening ChoosePalleteBlocksMenu from CreatePalleteMenu for player {}. Current blocks: {}", p.getName(), blocks);
+            logger.info("Opening ChoosePaletteBlocksMenu from CreatePaletteMenu for player {}. Current blocks: {}", p.getName(), blocks);
             new ChoosePaletteBlocksMenu(manager, p, plugin, blocks, updatedBlocks -> {
                 logger.info("Received updated blocks for player {}: {}", p.getName(), updatedBlocks);
                 blocks.clear();
@@ -177,7 +169,7 @@ public class CreatePaletteMenu extends AbstractMenu {
                 return;
             }
             unregisterChatListener();
-            logger.info("Apply clicked in CreatePalleteMenu by {}. Name: {}, Blocks: {}", p.getName(), name, blocks);
+            logger.info("Apply clicked in CreatePaletteMenu by {}. Name: {}, Blocks: {}", p.getName(), name, blocks);
             if (name.equals(UNNAMED_SENTINEL)) {
                 p.sendMessage(Messages.component(MessageKeys.BlockPalette.INVALID_NAME));
                 return;
@@ -192,85 +184,66 @@ public class CreatePaletteMenu extends AbstractMenu {
         });
     }
 
-    // --- NEW/REPLACED ---
     private void registerChatListener() {
-        Listener prev = ACTIVE_CHAT.remove(player.getUniqueId());
-        if (prev != null) {
-            HandlerList.unregisterAll(prev);
-        }
-        chatListener = new ChatInputListener();
-        ACTIVE_CHAT.put(player.getUniqueId(), chatListener);
-        plugin.getServer().getPluginManager().registerEvents(chatListener, plugin);
+        PaletteChatInput.register(ACTIVE_CHAT, this, MAX_NAME_LENGTH, MAX_DESCRIPTION_LENGTH);
     }
 
-    // --- NEW/REPLACED ---
     private void unregisterChatListener() {
-        Listener prev = ACTIVE_CHAT.remove(player.getUniqueId());
-        if (prev != null) {
-            HandlerList.unregisterAll(prev);
-        }
-        chatListener = null;
-        inputMode = InputMode.NONE;
-        awaitingInput = false; // reset debounce
+        PaletteChatInput.unregister(ACTIVE_CHAT, this);
     }
 
-    private class ChatInputListener implements Listener {
-        @EventHandler
-        public void onPlayerChat(@NonNull AsyncChatEvent event) {
-            if (!event.getPlayer().getUniqueId().equals(player.getUniqueId())) return;
+    @Override
+    public Player player() {
+        return player;
+    }
 
-            if (inputMode == InputMode.NONE) return;
+    @Override
+    public JavaPlugin plugin() {
+        return plugin;
+    }
 
-            event.setCancelled(true);
-            String message = PlainTextComponentSerializer.plainText().serialize(event.message());
+    @Override
+    public PaletteChatInput.Mode mode() {
+        return inputMode;
+    }
 
-            if (message.equalsIgnoreCase("cancel")) {
-                if (inputMode == InputMode.NAME) name = UNNAMED_SENTINEL;
-                else if (inputMode == InputMode.DESCRIPTION) description = "";
-                player.sendMessage(Messages.component(MessageKeys.BlockPalette.INPUT_CANCELLED));
-                unregisterChatListener();
-                Bukkit.getScheduler().runTask(plugin, () -> {
-                    setMenuItemsAsync();
-                    getMenu().open(player);
-                });
-                return;
-            }
+    @Override
+    public void setMode(PaletteChatInput.Mode mode) {
+        this.inputMode = mode;
+    }
 
-            if (inputMode == InputMode.NAME) {
-                if (message.length() > MAX_NAME_LENGTH) {
-                    player.sendMessage(Messages.component(MessageKeys.BlockPalette.NAME_TOO_LONG, Component.text(MAX_NAME_LENGTH)));
-                } else if (message.isEmpty()) {
-                    player.sendMessage(Messages.component(MessageKeys.BlockPalette.NAME_EMPTY));
-                } else {
-                    name = message;
-                    player.sendMessage(Messages.component(MessageKeys.BlockPalette.NAME_SET, Component.text(name)));
-                    unregisterChatListener();
-                    Bukkit.getScheduler().runTask(plugin, () -> {
-                        setMenuItemsAsync();
-                        getMenu().open(player);
-                    });
-                }
-            } else if (inputMode == InputMode.DESCRIPTION) {
-                if (message.length() > MAX_DESCRIPTION_LENGTH) {
-                    player.sendMessage(Messages.component(MessageKeys.BlockPalette.DESCRIPTION_TOO_LONG, Component.text(MAX_DESCRIPTION_LENGTH)));
-                } else {
-                    description = message.isEmpty() ? "" : message;
-                    String descDisplay = description.isEmpty()
-                            ? Messages.plain(player, MessageKeys.BlockPalette.NONE)
-                            : description;
-                    player.sendMessage(Messages.component(MessageKeys.BlockPalette.DESCRIPTION_SET, Component.text(descDisplay)));
-                    unregisterChatListener();
-                    Bukkit.getScheduler().runTask(plugin, () -> {
-                        setMenuItemsAsync();
-                        getMenu().open(player);
-                    });
-                }
-            }
+    @Override
+    public void setAwaitingInput(boolean awaiting) {
+        this.awaitingInput = awaiting;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public void onCancel() {
+        if (inputMode == PaletteChatInput.Mode.NAME) {
+            name = UNNAMED_SENTINEL;
+        } else if (inputMode == PaletteChatInput.Mode.DESCRIPTION) {
+            description = "";
         }
+    }
+
+    @Override
+    public void reopenMenu() {
+        setMenuItemsAsync();
+        getMenu().open(player);
     }
 
     public void open() {
-        logger.info("Opening CreatePalleteMenu for player {}. Current blocks: {}", player.getName(), blocks);
+        logger.info("Opening CreatePaletteMenu for player {}. Current blocks: {}", player.getName(), blocks);
         setMenuItemsAsync();
         getMenu().open(player);
     }

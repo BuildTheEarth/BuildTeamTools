@@ -1,11 +1,7 @@
 package net.buildtheearth.buildteamtools.utils.menus;
 
 import com.alpsbte.alpslib.utils.item.Item;
-import net.buildtheearth.buildteamtools.i18n.MessageKeys;
-import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
-import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
-import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -46,17 +42,7 @@ public class NameListMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPreviewItems() {
-        if (backMenu != null)
-            setBackItem(BACK_ITEM_SLOT, backMenu);
-
-        setSwitchPageItems(SWITCH_PAGE_ITEM_SLOT);
-
-        if (canProceed())
-            getMenu().getSlot(NEXT_ITEM_SLOT).setItem(HeadFactory.head(HeadTexture.CHECKMARK,
-                    Messages.render(getMenuPlayer(), MessageKeys.Ui.NEXT)));
-        else
-            getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.ITEM_BACKGROUND);
-
+        setSelectionPreviewItems(backMenu, BACK_ITEM_SLOT, SWITCH_PAGE_ITEM_SLOT, NEXT_ITEM_SLOT, canProceed());
         super.setPreviewItems();
     }
 
@@ -90,14 +76,19 @@ public class NameListMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPaginatedPreviewItems(List<?> source) {
-        // Set pagignated items
-        List<MutablePair<ItemStack, String>> pagItems = source.stream().map(l -> (MutablePair<ItemStack, String>) l).toList();
         int slot = 0;
-        for (MutablePair<ItemStack, String> item : pagItems) {
-            if (selectedNames.contains(item.getRight()))
-                item.setLeft(new Item(item.getLeft()).setAmount(1).addEnchantment(Enchantment.LUCK_OF_THE_SEA, 1).hideEnchantments(true).build());
+        for (Object element : source) {
+            if (!(element instanceof MutablePair<?, ?> pair)
+                    || !(pair.getLeft() instanceof ItemStack stack)
+                    || !(pair.getRight() instanceof String name)) {
+                continue;
+            }
 
-            getMenu().getSlot(slot).setItem(item.getLeft());
+            ItemStack display = stack;
+            if (selectedNames.contains(name)) {
+                display = new Item(stack).setAmount(1).addEnchantment(Enchantment.LUCK_OF_THE_SEA, 1).hideEnchantments(true).build();
+            }
+            getMenu().getSlot(slot).setItem(display);
             slot++;
         }
     }
@@ -109,18 +100,19 @@ public class NameListMenu extends AbstractPaginatedMenu {
 
     @Override
     protected void setPaginatedItemClickEventsAsync(@NonNull List<?> source) {
-        List<MutablePair<ItemStack, String>> pagItems = source.stream().map(l -> (MutablePair<ItemStack, String>) l).toList();
         int slot = 0;
-        for (MutablePair<ItemStack, String> item : pagItems) {
-            final int _slot = slot;
-            getMenu().getSlot(_slot).setClickHandler((clickPlayer, clickInformation) -> {
-                String type = (item.getRight().toLowerCase());
-
-                if (selectedNames.contains(type))
+        for (Object element : source) {
+            if (!(element instanceof MutablePair<?, ?> pair) || !(pair.getRight() instanceof String name)) {
+                continue;
+            }
+            final int clickSlot = slot;
+            final String type = name.toLowerCase();
+            getMenu().getSlot(clickSlot).setClickHandler((clickPlayer, clickInformation) -> {
+                if (selectedNames.contains(type)) {
                     selectedNames.remove(type);
-                else
+                } else {
                     selectedNames.add(type);
-
+                }
                 reloadMenuAsync();
             });
             slot++;

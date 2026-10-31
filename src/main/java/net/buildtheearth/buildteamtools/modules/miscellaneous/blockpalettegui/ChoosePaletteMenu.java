@@ -174,7 +174,7 @@ public class ChoosePaletteMenu extends AbstractMenu {
                         manager.updatePlayerFilters(p, filters);
 
                         // Update clicked slot title correctly (palette name if custom)
-                        ItemStack cur = getMenu().getSlot(slot).getItem();
+                        ItemStack cur = getMenu().getSlot(slot).getItem(p);
                         if (cur != null) {
                             String baseTitle;
                             BlockPaletteManager.Palette pal = manager.getPalette(key);
@@ -270,22 +270,13 @@ public class ChoosePaletteMenu extends AbstractMenu {
 
     private void logError(String ctx, Throwable t) {
         try {
-            plugin.getLogger().log(Level.SEVERE, "[ChoosePalleteMenu] " + ctx + " failed: " + t.getMessage(), t);
+            plugin.getLogger().log(Level.SEVERE, "[ChoosePaletteMenu] " + ctx + " failed: " + t.getMessage(), t);
         } catch (Exception ignore) {
         }
     }
 
     private String toTitleCase(String s) {
-        if (s == null || s.isEmpty()) return "";
-        String[] parts = s.trim().toLowerCase(Locale.ROOT).split("\\s+");
-        StringBuilder sb = new StringBuilder();
-        for (String part : parts) {
-            if (part.isEmpty()) continue;
-            sb.append(Character.toUpperCase(part.charAt(0)))
-                    .append(part.length() > 1 ? part.substring(1) : "")
-                    .append(' ');
-        }
-        return sb.toString().trim();
+        return PaletteTexts.toTitleCase(s);
     }
 
     private String normalizeKey(String input) {
@@ -296,11 +287,6 @@ public class ChoosePaletteMenu extends AbstractMenu {
     }
 
     private Material safeMat(XMaterial xmat, Material fallback) {
-        try {
-            Material m = xmat.get();
-            return (m != null) ? m : fallback;
-        } catch (Exception t) {
-            return fallback;
-        }
+        return PaletteTexts.safeMat(xmat, fallback);
     }
 }

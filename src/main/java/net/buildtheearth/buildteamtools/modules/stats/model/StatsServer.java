@@ -1,7 +1,6 @@
 package net.buildtheearth.buildteamtools.modules.stats.model;
 
-import net.buildtheearth.buildteamtools.modules.stats.StatsModule;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 
@@ -14,46 +13,20 @@ public class StatsServer {
     }
 
     public void addValue(StatsServerType statsServerType, Object value) {
-        Object object = stats.get(statsServerType);
-
-        if (object == null)
-            object = value;
-        else if (object instanceof Integer && value instanceof Integer) {
-            if ((Integer) object > StatsModule.RATE_LIMIT)
-                return;
-
-            object = (Integer) object + (Integer) value;
-        } else if (object instanceof Double && value instanceof Double) {
-            if ((Double) object > StatsModule.RATE_LIMIT)
-                return;
-
-            object = (Double) object + (Double) value;
-        } else if (object instanceof Float && value instanceof Float) {
-            if ((Float) object > StatsModule.RATE_LIMIT)
-                return;
-
-            object = (Float) object + (Float) value;
-        } else if (object instanceof Long && value instanceof Long) {
-            if ((Long) object > StatsModule.RATE_LIMIT)
-                return;
-
-            object = (Long) object + (Long) value;
-        } else {
-            object = value;
+        Object updated = StatsValues.accumulate(stats.get(statsServerType), value);
+        if (updated == null) {
+            return;
         }
-
-        stats.remove(statsServerType);
-        stats.put(statsServerType, object);
+        stats.put(statsServerType, updated);
     }
 
-    @SuppressWarnings("unchecked")
     public JSONObject toJSON() {
         JSONObject jsonObject = new JSONObject();
 
-        for (StatsServerType statsServerType : stats.keySet())
-            jsonObject.put(statsServerType, stats.get(statsServerType));
+        for (StatsServerType statsServerType : stats.keySet()) {
+            jsonObject.put(statsServerType.name(), stats.get(statsServerType));
+        }
 
         return jsonObject;
     }
 }
-

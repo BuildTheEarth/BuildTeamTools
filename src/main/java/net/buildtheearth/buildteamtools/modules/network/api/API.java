@@ -4,10 +4,9 @@ import net.buildtheearth.buildteamtools.BuildTeamTools;
 import okhttp3.*;
 import okio.Buffer;
 import org.jetbrains.annotations.NotNull;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -23,12 +22,6 @@ public class API {
             .callTimeout(30, TimeUnit.SECONDS)
             .connectTimeout(30, TimeUnit.SECONDS)
             .build();
-
-    private static final String USER_AGENT = "BuildTeamTools/"
-            + BuildTeamTools.getInstance().getPluginMeta().getVersion()
-            + " (contact: "
-            + BuildTeamTools.getInstance().getMainConfig().contactEmail()
-            + ")";
 
     /**
      * A callback function to be able to handle the result of an API request
@@ -243,34 +236,44 @@ public class API {
 
 
     public static JSONArray createJSONArray(String jsonString) {
-        JSONArray jsonArray = new JSONArray();
-        JSONParser jsonParser = new JSONParser();
-        if ((jsonString != null) && !(jsonString.isEmpty())) {
-            try {
-                jsonArray = (JSONArray) jsonParser.parse(jsonString);
-            } catch (ParseException e) {
-                BuildTeamTools.getInstance().getComponentLogger().error("Failed to parse JSON Array.", e);
-            }
+        if (jsonString == null || jsonString.isEmpty()) {
+            return new JSONArray();
         }
-        return jsonArray;
+        try {
+            return new JSONArray(jsonString);
+        } catch (JSONException e) {
+            BuildTeamTools.getInstance().getComponentLogger().error("Failed to parse JSON Array.", e);
+            return new JSONArray();
+        }
     }
 
     public static JSONObject createJSONObject(String jsonString) {
-        JSONObject jsonObject = new JSONObject();
-        JSONParser jsonParser = new JSONParser();
-        if ((jsonString != null) && !(jsonString.isEmpty())) {
-            try {
-                jsonObject = (JSONObject) jsonParser.parse(jsonString);
-            } catch (ParseException e) {
-                BuildTeamTools.getInstance().getComponentLogger().error("Failed to parse JSON Object.", e);
-            }
+        if (jsonString == null || jsonString.isEmpty()) {
+            return new JSONObject();
         }
-        return jsonObject;
+        try {
+            return new JSONObject(jsonString);
+        } catch (JSONException e) {
+            BuildTeamTools.getInstance().getComponentLogger().error("Failed to parse JSON Object.", e);
+            return new JSONObject();
+        }
     }
 
     private static Request.Builder createRequestBuilder(String url) {
         return new Request.Builder()
                 .url(url)
-                .header("User-Agent", USER_AGENT);
+                .header("User-Agent", userAgent());
+    }
+
+    /**
+     * Builds the User-Agent on each request so config reloads of {@code contact-email} apply.
+     */
+    private static String userAgent() {
+        BuildTeamTools plugin = BuildTeamTools.getInstance();
+        return "BuildTeamTools/"
+                + plugin.getPluginMeta().getVersion()
+                + " (contact: "
+                + plugin.getMainConfig().contactEmail()
+                + ")";
     }
 }

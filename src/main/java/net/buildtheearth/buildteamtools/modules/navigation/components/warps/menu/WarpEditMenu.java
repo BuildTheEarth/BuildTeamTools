@@ -20,6 +20,7 @@ import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import net.buildtheearth.model.GeographicalCoordinate;
 import net.kyori.adventure.text.Component;
 import net.wesjd.anvilgui.AnvilGUI;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -34,15 +35,15 @@ import java.util.Objects;
 
 public class WarpEditMenu extends AbstractMenu {
 
-    public static int WARP_SLOT = 4;
-    public static int LOCATION_SLOT = 19;
+    public static final int WARP_SLOT = 4;
+    public static final int LOCATION_SLOT = 19;
     public static int NAME_SLOT = 20;
     public static int GROUP_SLOT = 21;
     public static int ADDRESS_TYPE_SLOT = 22;
     public static int MATERIAL_SLOT = 23;
     public static int HIGHLIGHT_SLOT = 24;
-    public static int DELETE_SLOT = 25;
-    public static int CONFIRM_SLOT = 35;
+    public static final int DELETE_SLOT = 25;
+    public static final int CONFIRM_SLOT = 35;
 
     private final Warp warp;
     private final boolean alreadyExists;
@@ -182,7 +183,7 @@ public class WarpEditMenu extends AbstractMenu {
                 GeographicalCoordinate coordinate = Projection.toGeo(location.getX(), location.getZ());
 
                 WarpsComponent.getOwnedRegionFromLocation(coordinate, clickPlayer)
-                        .thenAccept(result -> {
+                        .thenAccept(result -> Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), () -> {
                             warp.setCountryCode(result.countryCodeCCA2());
                             warp.setWorldName(location.getWorld().getName());
                             warp.setY(location.getY());
@@ -193,14 +194,15 @@ public class WarpEditMenu extends AbstractMenu {
                             clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
                             new WarpEditMenu(clickPlayer, warp, alreadyExists, true);
-                        })
+                        }))
                         .exceptionally(e -> {
                             Throwable cause = e.getCause() != null ? e.getCause() : e;
 
-                            clickPlayer.sendMessage(Messages.component(
-                                    MessageKeys.Warp.Edit.LOCATION_CHANGE_FAILED,
-                                    Component.text(String.valueOf(cause.getMessage()))
-                            ));
+                            Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), () ->
+                                    clickPlayer.sendMessage(Messages.component(
+                                            MessageKeys.Warp.Edit.LOCATION_CHANGE_FAILED,
+                                            Component.text(String.valueOf(cause.getMessage()))
+                                    )));
 
                             BuildTeamTools.getInstance().getComponentLogger().error(
                                     "An error occurred while changing the location of the warp!",

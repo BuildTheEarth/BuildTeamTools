@@ -117,7 +117,7 @@ public class MaterialSelectionMenu extends AbstractMenu {
         getMenu().getSlot(CUSTOM_HEAD_SLOT).setClickHandler((clickPlayer, clickInformation) -> {
             clickPlayer.playSound(clickPlayer.getLocation(), Sound.UI_BUTTON_CLICK, 1.0F, 1.0F);
 
-            String[] url = {"http://textures.minecraft.net/texture/..."};
+            String[] url = {"https://textures.minecraft.net/texture/..."};
             List<String[]> content = new ArrayList<>();
             content.add(url);
 
@@ -141,10 +141,11 @@ public class MaterialSelectionMenu extends AbstractMenu {
                 for (int i = 1; i < text.getFirst().length; i++)
                     finalText.append(text.getFirst()[i]);
 
-                if (!finalText.toString().startsWith("http://textures.minecraft.net/texture/")) {
+                if (!Warp.isMinecraftTextureUrl(finalText.toString())) {
                     clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
                     clickPlayer.sendMessage(Messages.component(MessageKeys.Warp.Material.URL_INVALID));
                     openObjectMenu();
+                    return;
                 }
 
                 if (object instanceof Warp)

@@ -122,7 +122,7 @@ public class Command {
                 break;
             }
 
-            Operation command = operations.get(0);
+            Operation command = operations.getFirst();
             processOperation(command);
 
             if (breakPointActive || threadActive || command.getProgressWeight() > 1L)
@@ -151,7 +151,7 @@ public class Command {
         try {
             switch (operation.getOperationType()) {
                 case COMMAND:
-                    String command = (String) operation.getValues().get(0);
+                    String command = (String) operation.getValues().getFirst();
 
                     if (command.contains("%%XYZ/"))
                         command = convertXYZ(command);
@@ -346,7 +346,7 @@ public class Command {
         );
         long maxVisibleProgress = Math.max(progressStartPercentage, progressEndPercentage - 1L);
 
-        return Math.max(progressStartPercentage, Math.min(scaledProgress, maxVisibleProgress));
+        return Math.clamp(scaledProgress, progressStartPercentage, maxVisibleProgress);
     }
 
     private void completeOperation(Operation operation) {

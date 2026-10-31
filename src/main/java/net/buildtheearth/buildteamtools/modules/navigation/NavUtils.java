@@ -18,9 +18,7 @@ import net.buildtheearth.model.MinecraftCoordinate;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.UnsafeValues;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Contract;
@@ -42,16 +40,14 @@ public class NavUtils {
     }
 
     public static boolean isTransferCapable(@NotNull Player player, @NotNull BuildTeam targetBuildTeam) {
-        // Must be 1.20.5 / 766 or higher for transfer capability
+        // Client must be 1.20.5 / 766+. Server is Paper 1.21+ for this plugin, so always capable.
         int playerVersion = player.getProtocolVersion();
-        UnsafeValues unsafeValues = Bukkit.getUnsafe();
-        int serverProtocolVersion = unsafeValues.getProtocolVersion();
 
-        ChatHelper.logDebug("Transfer check - Player protocol: %d, Server protocol: %s, BuildTeam: %s, Allows transfers:  %b, " +
-                        "IP: %s", playerVersion, serverProtocolVersion, targetBuildTeam.getBlankName(),
+        ChatHelper.logDebug("Transfer check - Player protocol: %d, BuildTeam: %s, Allows transfers: %b, IP: %s",
+                playerVersion, targetBuildTeam.getBlankName(),
                 targetBuildTeam.isAllowsTransfers(), targetBuildTeam.getIP());
 
-        return targetBuildTeam.isAllowsTransfers() && playerVersion >= 766 && serverProtocolVersion >= 766;
+        return targetBuildTeam.isAllowsTransfers() && playerVersion >= 766;
     }
 
     public static void transferPlayer(@NotNull Player player, @NotNull String ip) {
@@ -148,7 +144,7 @@ public class NavUtils {
      * Height is extracted from the world.
      * <p>
      * Note: Height returned is actually terrain elevation +2. This is because this method internally uses
-     * Bukkits @see World::getHighestBlockYAt() already returns elevation+1, and this method deliberately
+     * Bukkit @see World::getHighestBlockYAt() already returns elevation+1, and this method deliberately
      * adds one to the location elevation on top.
      * </p>
      * The world is extracted from the server config's "earth world". If no earth world is specified then the height defaults
@@ -182,7 +178,7 @@ public class NavUtils {
      * Height is extracted from the world.
      * <p>
      * Note: Height returned is actually terrain elevation +2. This is because this method internally uses
-     * Bukkits @see World::getHighestBlockYAt() already returns elevation+1, and this method deliberately
+     * Bukkit @see World::getHighestBlockYAt() already returns elevation+1, and this method deliberately
      * adds one to the location elevation on top.
      * </p>
      * The world is extracted from the server config's "earth world". If no earth world is specified then the height defaults
@@ -198,27 +194,12 @@ public class NavUtils {
     }
 
     /**
-     * Returns the CCA2 code of the country of the given country name.
+     * Returns the CCA2 code for a country name from the global region registry,
+     * or {@code null} when the name is unknown. Does not message the player —
+     * callers decide how to report ownership / lookup failures.
      */
-    public static String getCCA2FromCountryName(String countryName, Player clickPlayer) {
-        Region region = findRegionByName(countryName);
-        if (region != null) {
-            return region.getCountryCodeCca2();
-        }
-
-        clickPlayer.sendMessage(Messages.component(MessageKeys.Navigation.COUNTRY_NOT_FOUND));
-        return "";
-    }
-
-    private static @Nullable Region findRegionByName(String countryName) {
-        BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
-        if (buildTeam == null) {
-            return null;
-        }
-
-        return buildTeam.getRegions().stream()
-                .filter(region -> region.getName().equals(countryName))
-                .findFirst()
-                .orElse(null);
+    public static @Nullable String getCCA2FromCountryName(String countryName) {
+        Region region = Region.getByName(countryName);
+        return region != null ? region.getCountryCodeCca2() : null;
     }
 }

@@ -11,11 +11,6 @@ public class SignTextGenerator extends ModuleComponent {
     }
 
     @Override
-    public void enable() {
-        super.enable();
-    }
-
-    @Override
     public void disable() {
         if (!isEnabled())
             return;

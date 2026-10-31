@@ -98,23 +98,7 @@ public class FieldScripts extends Script {
             for (int i = 0; i < schematicAmount; i++)
                 availableDirections[i] = Short.parseShort(schematics[i].getName().replace(".schematic", ""));
 
-            // Calculate which direction should be used
-            short directionToUse = availableDirections[0]; // Assume the first element is the closest initially
-            short minDifference = Short.MAX_VALUE; // Initial difference
-
-            for (short current : availableDirections) {
-                short difference1 = (short) Math.abs(yaw - current);
-                if (difference1 < minDifference) {
-                    minDifference = difference1;
-                    directionToUse = current;
-                }
-
-                short difference2 = (short) Math.abs(yaw - (current + 180));
-                if (difference2 < minDifference) {
-                    minDifference = difference2;
-                    directionToUse = current;
-                }
-            }
+            short directionToUse = closestDirection(availableDirections, yaw);
 
             setGmask("<0");
             String path =
@@ -319,5 +303,30 @@ public class FieldScripts extends Script {
         // Finish the script
         finish(blocks, points);
         */
+    }
+
+    /**
+     * Picks the schematic line direction closest to the player's yaw
+     * (also considering the opposite 180° orientation).
+     */
+    private static short closestDirection(short[] availableDirections, float yaw) {
+        short directionToUse = availableDirections[0];
+        short minDifference = Short.MAX_VALUE;
+
+        for (short current : availableDirections) {
+            short difference1 = (short) Math.abs(yaw - current);
+            if (difference1 < minDifference) {
+                minDifference = difference1;
+                directionToUse = current;
+            }
+
+            short difference2 = (short) Math.abs(yaw - (current + 180));
+            if (difference2 < minDifference) {
+                minDifference = difference2;
+                directionToUse = current;
+            }
+        }
+
+        return directionToUse;
     }
 }

@@ -3,8 +3,8 @@ package net.buildtheearth.buildteamtools.modules.network.api;
 import com.alpsbte.alpslib.utils.ChatHelper;
 import net.buildtheearth.model.GeographicalCoordinate;
 import org.jetbrains.annotations.NotNull;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -42,20 +42,19 @@ public class PhotonAPI {
         return future;
     }
 
-    private static String formatAddressFromResponse (String response) {
+    private static String formatAddressFromResponse(String response) {
         JSONObject jsonObject = API.createJSONObject(response);
 
         ChatHelper.logDebug("Response from Photon: %s", jsonObject);
 
-        JSONArray features = (JSONArray) jsonObject.get("features");
+        JSONArray features = jsonObject.optJSONArray("features");
 
         if (features == null || features.isEmpty()) {
             ChatHelper.logError("No address data found for these coordinates.");
             return "";
         }
 
-        JSONObject feature = (JSONObject) features.getFirst();
-        JSONObject properties = (JSONObject) feature.get("properties");
+        JSONObject properties = features.getJSONObject(0).optJSONObject("properties");
 
         if (properties == null) {
             ChatHelper.logError("No properties found in Photon response.");
@@ -63,9 +62,9 @@ public class PhotonAPI {
         }
 
         return Stream.of(
-                        properties.get("street"),
-                        properties.get("city"),
-                        properties.get("country")
+                        properties.opt("street"),
+                        properties.opt("city"),
+                        properties.opt("country")
                 )
                 .filter(Objects::nonNull)
                 .map(Object::toString)
@@ -113,18 +112,17 @@ public class PhotonAPI {
 
         ChatHelper.logDebug("Response from Photon: %s", jsonObject);
 
-        JSONArray features = (JSONArray) jsonObject.get("features");
-
+        JSONArray features = jsonObject.optJSONArray("features");
         JSONArray coordinates = getCoordinates(features);
 
-        if (coordinates == null || coordinates.size() < 2) {
+        if (coordinates == null || coordinates.length() < 2) {
             throw new IllegalArgumentException(
                     "Invalid coordinates in Photon response."
             );
         }
 
-        double longitude = ((Number) coordinates.get(0)).doubleValue();
-        double latitude = ((Number) coordinates.get(1)).doubleValue();
+        double longitude = coordinates.getDouble(0);
+        double latitude = coordinates.getDouble(1);
 
         return new GeographicalCoordinate(latitude, longitude);
     }
@@ -136,9 +134,7 @@ public class PhotonAPI {
             );
         }
 
-        JSONObject feature = (JSONObject) features.getFirst();
-
-        JSONObject geometry = (JSONObject) feature.get("geometry");
+        JSONObject geometry = features.getJSONObject(0).optJSONObject("geometry");
 
         if (geometry == null) {
             throw new IllegalArgumentException(
@@ -146,6 +142,6 @@ public class PhotonAPI {
             );
         }
 
-        return (JSONArray) geometry.get("coordinates");
+        return geometry.optJSONArray("coordinates");
     }
 }

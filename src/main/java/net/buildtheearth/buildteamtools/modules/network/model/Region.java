@@ -1,27 +1,26 @@
 package net.buildtheearth.buildteamtools.modules.network.model;
 
-import lombok.Getter;
 import org.jspecify.annotations.Nullable;
 
-public class Region {
+public record Region(
+        Continent continent,
+        BuildTeam buildTeam,
+        String name,
+        String countryCodeCca3,
+        String countryCodeCca2,
+        RegionType type,
+        String headBase64,
+        int area
+) {
 
-    @Getter
-    private final Continent continent;
-    @Getter
-    private final BuildTeam buildTeam;
-    @Getter
-    private final String name;
-    @Getter
-    private final String countryCodeCca3;
-    @Getter
-    private final String countryCodeCca2;
-    @Getter
-    private final RegionType type;
-    @Getter
-    private final String headBase64;
-    @Getter
-    private final int area;
-
+    public Region {
+        if (type == RegionType.COUNTRY) {
+            if (countryCodeCca2 == null || countryCodeCca2.length() != 2)
+                throw new IllegalArgumentException("Country code must be in ISO 3166-1 alpha-2 format!");
+            if (countryCodeCca3 == null || countryCodeCca3.length() != 3)
+                throw new IllegalArgumentException("Country code must be in ISO 3166-1 alpha-3 format!");
+        }
+    }
 
     /**
      * Constructor for any region type
@@ -33,15 +32,7 @@ public class Region {
      * @param headBase64 The base64 string of the head of the region
      */
     public Region(String name, RegionType regionType, Continent continent, BuildTeam buildTeam, String headBase64) {
-        this.continent = continent;
-        this.name = name;
-        this.type = regionType;
-        this.buildTeam = buildTeam;
-        this.headBase64 = headBase64;
-
-        this.area = 0;
-        this.countryCodeCca2 = null;
-        this.countryCodeCca3 = null;
+        this(continent, buildTeam, name, null, null, regionType, headBase64, 0);
     }
 
     /**
@@ -57,20 +48,39 @@ public class Region {
      */
     public Region(String name, Continent continent, BuildTeam buildTeam, String headBase64, int area, String countryCodeCca2,
                   String countryCodeCca3) {
-        if (countryCodeCca2.length() != 2)
-            throw new IllegalArgumentException("Country code must be in ISO 3166-1 alpha-2 format!");
-        if (countryCodeCca3.length() != 3)
-            throw new IllegalArgumentException("Country code must be in ISO 3166-1 alpha-3 format!");
+        this(continent, buildTeam, name, countryCodeCca3, countryCodeCca2, RegionType.COUNTRY, headBase64, area);
+    }
 
-        this.type = RegionType.COUNTRY;
+    public Continent getContinent() {
+        return continent;
+    }
 
-        this.continent = continent;
-        this.name = name;
-        this.buildTeam = buildTeam;
-        this.headBase64 = headBase64;
-        this.area = area;
-        this.countryCodeCca2 = countryCodeCca2;
-        this.countryCodeCca3 = countryCodeCca3;
+    public BuildTeam getBuildTeam() {
+        return buildTeam;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getCountryCodeCca3() {
+        return countryCodeCca3;
+    }
+
+    public String getCountryCodeCca2() {
+        return countryCodeCca2;
+    }
+
+    public RegionType getType() {
+        return type;
+    }
+
+    public String getHeadBase64() {
+        return headBase64;
+    }
+
+    public int getArea() {
+        return area;
     }
 
     public static @Nullable Region getByName(String name) {
@@ -82,4 +92,3 @@ public class Region {
         return null;
     }
 }
-

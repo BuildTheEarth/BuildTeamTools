@@ -3,12 +3,13 @@ package net.buildtheearth.buildteamtools.modules.miscellaneous.blockpalettegui;
 import com.cryptomorin.xseries.XMaterial;
 import lombok.Getter;
 import lombok.Setter;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -244,14 +245,11 @@ public class BlockPaletteManager {
 
 
     ItemStack createMenuItem(XMaterial material, String name) {
-        ItemStack item = material.parseItem();
-        if (item == null) item = new ItemStack(Material.BARRIER);
-        ItemMeta m = item.getItemMeta();
-        if (m != null) {
-            m.setDisplayName(name);
-            item.setItemMeta(m);
+        Material bukkitMaterial = material.get();
+        if (bukkitMaterial == null) {
+            bukkitMaterial = Material.BARRIER;
         }
-        return item;
+        return ItemComponents.of(bukkitMaterial, Component.text(name));
     }
 
     /* =======================

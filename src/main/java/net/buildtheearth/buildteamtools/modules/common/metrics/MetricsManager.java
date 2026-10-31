@@ -7,7 +7,6 @@ import net.buildtheearth.buildteamtools.modules.navigation.components.bluemap.Bl
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.AdvancedPie;
 import org.bstats.charts.DrilldownPie;
-import org.bstats.charts.MultiLineChart;
 import org.bstats.charts.SimpleBarChart;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -19,9 +18,8 @@ import java.util.concurrent.TimeUnit;
  * bStats metrics for BuildTeamTools.
  * <p>
  * {@code feature_uses} is a bar chart that lists every tracked feature. A zero means it was not used
- * in that submission. bStats drops zero values from line charts, so {@code feature_use_history} repeats
- * the same counts as a line chart and only draws features that were actually used. Both charts share
- * one snapshot so a submission does not reset the counters twice.
+ * in that submission. It shares one snapshot with {@code feature_details} so a submission does not
+ * reset the counters twice.
  * <p>
  * BlueMap has no player action in this plugin. It is reported as 1 while the integration is enabled.
  * <p>
@@ -46,7 +44,6 @@ public final class MetricsManager {
 
         Metrics created = new Metrics(plugin, BSTATS_PLUGIN_ID);
         created.addCustomChart(new SimpleBarChart("feature_uses", MetricsManager::featureUseCounts));
-        created.addCustomChart(new MultiLineChart("feature_use_history", MetricsManager::featureUseCounts));
         created.addCustomChart(new DrilldownPie("feature_details", MetricsManager::featureDetails));
         created.addCustomChart(new AdvancedPie("enabled_modules", MetricsManager::enabledModules));
         metrics = created;

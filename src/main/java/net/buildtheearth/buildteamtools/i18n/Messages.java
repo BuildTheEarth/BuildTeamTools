@@ -66,7 +66,10 @@ public final class Messages {
         return audience.get(Identity.LOCALE).orElse(Translations.DEFAULT_LOCALE);
     }
 
-    public static Locale locale(Player player) {
+    public static Locale locale(@Nullable Player player) {
+        if (player == null) {
+            return Translations.DEFAULT_LOCALE;
+        }
         return player.locale();
     }
 
@@ -78,24 +81,24 @@ public final class Messages {
         return render(component, locale(audience));
     }
 
-    public static Component render(Player player, Component component) {
+    public static Component render(@Nullable Player player, Component component) {
         return render(component, locale(player));
     }
 
-    public static Component render(Player player, String key, ComponentLike... args) {
+    public static Component render(@Nullable Player player, String key, ComponentLike... args) {
         return render(player, component(key, args));
     }
 
     /** Legacy section string for APIs that still require {@link String} item names/lore. */
-    public static String legacy(Player player, Component component) {
+    public static String legacy(@Nullable Player player, Component component) {
         return LEGACY.serialize(render(player, component));
     }
 
-    public static String legacy(Player player, String key, ComponentLike... args) {
+    public static String legacy(@Nullable Player player, String key, ComponentLike... args) {
         return legacy(player, component(key, args));
     }
 
-    public static String plain(Player player, String key, ComponentLike... args) {
+    public static String plain(@Nullable Player player, String key, ComponentLike... args) {
         return PLAIN.serialize(render(player, key, args));
     }
 

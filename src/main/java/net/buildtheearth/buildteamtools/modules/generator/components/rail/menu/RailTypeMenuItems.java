@@ -1,7 +1,9 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.rail.menu;
 
-import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.configuration.RailType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -31,81 +33,81 @@ final class RailTypeMenuItems {
         if (icon == null)
             icon = Objects.requireNonNull(XMaterial.RAIL.get());
 
-        List<String> lore = createConfigurationLore(railType);
+        List<Component> lore = createConfigurationLore(railType, player);
 
-        lore.add(darkGray("Left-Click to select"));
+        lore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.LORE_LEFT_SELECT));
         if (railType.isBuiltIn() && player.hasPermission(Permissions.RAIL_TYPE_CREATE))
-            lore.add(darkGray("Right-Click to create an editable copy"));
+            lore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.LORE_RIGHT_COPY));
         if (!railType.isBuiltIn() && player.hasPermission(Permissions.RAIL_TYPE_EDIT))
-            lore.add(darkGray("Right-Click to edit"));
+            lore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.LORE_RIGHT_EDIT));
         if (player.hasPermission(Permissions.RAIL_TYPE_CREATE))
-            lore.add(darkGray("Press your drop key (Q) to create an editable copy"));
+            lore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.LORE_DROP_COPY));
         if (!railType.isBuiltIn() && player.hasPermission(Permissions.RAIL_TYPE_DELETE)) {
-            lore.add(darkGray("Shift+Right-Click to delete"));
-            lore.add(darkGray("Shift+Left-Click to select for bulk deletion"));
+            lore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.LORE_SHIFT_RIGHT_DELETE));
+            lore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.LORE_SHIFT_LEFT_BULK));
         }
 
-        return Item.create(icon, yellow(railType.getDisplayName()), lore);
+        return ItemComponents.of(icon, yellow(railType.getDisplayName()), lore);
     }
 
-    private static List<String> createConfigurationLore(RailType railType) {
-        List<String> lore = new ArrayList<>();
-        lore.add(gray("Rail Block: ") + formatMaterials(railType.getRailBlocks()));
-        lore.add(gray("Blocks Below: ") + formatMaterials(railType.getBlocksBelow()));
-        addSleeperLore(lore, railType);
-        addTrackLore(lore, railType);
-        addOverheadLore(lore, railType);
-        lore.add(gray("Track Switches: ") + white(railType.isTrackSwitchesEnabled()
-                ? RailMenuText.ENABLED
-                : RailMenuText.DISABLED));
+    private static List<Component> createConfigurationLore(RailType railType, Player player) {
+        List<Component> lore = new ArrayList<>();
+        String enabled = Messages.plain(player, MessageKeys.Generator.Rail.Menu.ENABLED);
+        String disabled = Messages.plain(player, MessageKeys.Generator.Rail.Menu.DISABLED);
+        lore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.LORE_RAIL_BLOCK, Component.text(formatMaterialsPlain(railType.getRailBlocks()))));
+        lore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.LORE_BLOCKS_BELOW, Component.text(formatMaterialsPlain(railType.getBlocksBelow()))));
+        addSleeperLore(lore, railType, player);
+        addTrackLore(lore, railType, player);
+        addOverheadLore(lore, railType, player, enabled, disabled);
+        lore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.LORE_TRACK_SWITCHES,
+                Component.text(railType.isTrackSwitchesEnabled() ? enabled : disabled)));
         return lore;
     }
 
-    private static void addSleeperLore(List<String> lore, RailType railType) {
+    private static void addSleeperLore(List<Component> lore, RailType railType, Player player) {
         if (!railType.hasSleepers()) {
-            lore.add(gray("Sleepers: ") + white("None"));
+            lore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.LORE_SLEEPERS_NONE));
             return;
         }
 
-        lore.add(gray("Sleepers: ")
-                + formatMaterials(railType.getSleeperBlocks())
-                + gray(" every ")
-                + white(String.valueOf(railType.getSleeperSpacing()))
-                + gray(" blocks"));
+        lore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.LORE_SLEEPERS,
+                Component.text(formatMaterialsPlain(railType.getSleeperBlocks())),
+                Component.text(String.valueOf(railType.getSleeperSpacing()))));
     }
 
-    private static void addTrackLore(List<String> lore, RailType railType) {
+    private static void addTrackLore(List<Component> lore, RailType railType, Player player) {
         if (railType.getTrackCount() == 1) {
-            lore.add(gray("Tracks: ") + white("1"));
+            lore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.LORE_TRACKS_ONE));
             return;
         }
 
-        lore.add(gray("Tracks: ")
-                + white(String.valueOf(railType.getTrackCount()))
-                + gray(" with spacing ")
-                + white(railType.getTrackSpacings().toString()));
+        lore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.LORE_TRACKS,
+                Component.text(String.valueOf(railType.getTrackCount())),
+                Component.text(railType.getTrackSpacings().toString())));
     }
 
-    private static void addOverheadLore(List<String> lore, RailType railType) {
-        lore.add(gray("Overhead Poles: ") + white(railType.hasOverheadPoles()
-                ? RailMenuText.ENABLED
-                : RailMenuText.DISABLED));
+    private static void addOverheadLore(List<Component> lore, RailType railType, Player player, String enabled, String disabled) {
+        lore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.LORE_OVERHEAD_POLES,
+                Component.text(railType.hasOverheadPoles() ? enabled : disabled)));
 
         if (railType.hasOverheadPoles()) {
-            lore.add(gray("Pole Block: ") + formatMaterials(railType.getOverheadPoleBlocks()));
-            lore.add(gray("Top Support: ") + formatMaterials(railType.getOverheadSupportBlocks()));
-            lore.add(gray("Pole Spacing: ") + white(String.valueOf(railType.getOverheadPoleSpacing())));
+            lore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.LORE_POLE_BLOCK, Component.text(formatMaterialsPlain(railType.getOverheadPoleBlocks()))));
+            lore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.LORE_TOP_SUPPORT, Component.text(formatMaterialsPlain(railType.getOverheadSupportBlocks()))));
+            lore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.LORE_POLE_SPACING, Component.text(String.valueOf(railType.getOverheadPoleSpacing()))));
         }
 
-        lore.add(gray("Overhead Wires: ") + white(railType.hasOverheadWires()
-                ? RailMenuText.ENABLED
-                : RailMenuText.DISABLED));
+        lore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.LORE_OVERHEAD_WIRES,
+                Component.text(railType.hasOverheadWires() ? enabled : disabled)));
         if (railType.hasOverheadWires())
-            lore.add(gray("Wire Blocks: ") + formatMaterials(railType.getOverheadWireBlocks()));
+            lore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.LORE_WIRE_BLOCKS, Component.text(formatMaterialsPlain(railType.getOverheadWireBlocks()))));
     }
 
-    static ItemStack addSelectionGlow(ItemStack item) {
-        ItemStack displayedItem = createGlintCompatibleDisplayItem(item);
+    private static String formatMaterialsPlain(List<XMaterial> materials) {
+        return String.join(", ", materials.stream().map(RailTypeMenuItems::formatMaterial).toList());
+    }
+
+    static ItemStack addSelectionGlow(ItemStack item, Player player) {
+        ItemStack displayedItem = createGlintCompatibleDisplayItem(item, player);
         displayedItem.setAmount(1);
         displayedItem.addUnsafeEnchantment(Enchantment.LUCK_OF_THE_SEA, 1);
 
@@ -126,21 +128,21 @@ final class RailTypeMenuItems {
      * book as the selected-state icon while retaining the rail type name, lore
      * and the original icon name.
      */
-    private static ItemStack createGlintCompatibleDisplayItem(ItemStack item) {
+    private static ItemStack createGlintCompatibleDisplayItem(ItemStack item, Player player) {
         if (!usesBlockEntityItemRenderer(item.getType()))
             return item.clone();
 
         ItemMeta originalMeta = item.getItemMeta();
         Component displayName = originalMeta != null && originalMeta.hasDisplayName()
                 ? Objects.requireNonNull(originalMeta.displayName())
-                : Component.text("Selected Rail Type", NamedTextColor.YELLOW);
+                : Messages.render(player, MessageKeys.Generator.Rail.Menu.SELECTED_FALLBACK_NAME);
         List<Component> originalLore = originalMeta == null ? null : originalMeta.lore();
         List<Component> lore = originalLore != null
                 ? new ArrayList<>(originalLore)
                 : new ArrayList<>();
-        lore.add(Component.text("Original icon: ", NamedTextColor.GRAY)
-                .append(Component.text(formatMaterialName(item.getType()), NamedTextColor.WHITE)));
-        lore.add(Component.text("Minecraft cannot render glint on this block-entity icon.", NamedTextColor.DARK_GRAY));
+        lore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.ORIGINAL_ICON,
+                Component.text(formatMaterialName(item.getType()))));
+        lore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.GLINT_HINT));
 
         ItemStack displayedItem = new ItemStack(Material.ENCHANTED_BOOK);
         ItemMeta displayedMeta = displayedItem.getItemMeta();
@@ -177,8 +179,8 @@ final class RailTypeMenuItems {
         }
     }
 
-    static ItemStack addDeletionMarker(ItemStack item) {
-        ItemStack displayedItem = addSelectionGlow(item);
+    static ItemStack addDeletionMarker(ItemStack item, Player player) {
+        ItemStack displayedItem = addSelectionGlow(item, player);
         ItemMeta meta = displayedItem.getItemMeta();
 
         if (meta == null)
@@ -188,22 +190,27 @@ final class RailTypeMenuItems {
         List<Component> lore = existingLore != null
                 ? new ArrayList<>(existingLore)
                 : new ArrayList<>();
-        lore.add(Component.text("Selected for bulk deletion", NamedTextColor.RED));
+        lore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.SELECTED_FOR_BULK));
         meta.lore(lore);
         displayedItem.setItemMeta(meta);
         return displayedItem;
     }
 
-    static String formatMaterials(List<XMaterial> materials) {
-        return String.join(gray(", "), materials.stream()
-                .map(RailTypeMenuItems::formatMaterial)
-                .map(RailTypeMenuItems::white)
-                .toList());
+    static Component formatMaterialsComponent(List<XMaterial> materials) {
+        Component result = Component.empty();
+        boolean first = true;
+        for (XMaterial material : materials) {
+            if (!first)
+                result = result.append(Component.text(", ", NamedTextColor.GRAY));
+            result = result.append(Component.text(formatMaterial(material), NamedTextColor.WHITE));
+            first = false;
+        }
+        return result;
     }
 
     static String formatMaterial(@Nullable XMaterial material) {
         if (material == null)
-            return "None";
+            return "None"; // display data; localized via LORE_SLEEPERS_NONE when unused
 
         return formatWords(material.name());
     }
@@ -218,20 +225,8 @@ final class RailTypeMenuItems {
         return String.join(" ", capitalizedWords);
     }
 
-    private static String darkGray(String text) {
-        return RailMenuText.color(NamedTextColor.DARK_GRAY, text);
-    }
-
-    private static String gray(String text) {
-        return RailMenuText.color(NamedTextColor.GRAY, text);
-    }
-
-    private static String white(String text) {
-        return RailMenuText.color(NamedTextColor.WHITE, text);
-    }
-
-    private static String yellow(String text) {
-        return RailMenuText.color(NamedTextColor.YELLOW, text);
+    private static Component yellow(String text) {
+        return RailMenuText.colored(NamedTextColor.YELLOW, text);
     }
 
 }

@@ -1,16 +1,16 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.field.menu;
 
-import com.alpsbte.alpslib.utils.item.Item;
+import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
 import com.cryptomorin.xseries.XMaterial;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
 import net.buildtheearth.buildteamtools.modules.generator.components.field.*;
 import net.buildtheearth.buildteamtools.modules.generator.model.Settings;
-import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.WikiLinks;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -19,12 +19,10 @@ import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
 import org.jspecify.annotations.NonNull;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class CropStageMenu extends AbstractMenu {
-
-    private static final String CROP_TYPE_INV_NAME = "Choose a Crop Stage";
 
     private final CropType cropType;
     private static final byte STAGE_ONE_SLOT = 11;
@@ -32,7 +30,7 @@ public class CropStageMenu extends AbstractMenu {
     private static final int BACK_ITEM_SLOT = 18;
 
     public CropStageMenu(Player player, CropType cropType) {
-        super(3, CROP_TYPE_INV_NAME, player);
+        super(3, Messages.component(MessageKeys.Generator.Field.CROP_STAGE_TITLE), player);
         this.cropType = cropType;
     }
 
@@ -42,26 +40,51 @@ public class CropStageMenu extends AbstractMenu {
         Field field = GeneratorModule.getInstance().getField();
         CropType type = (CropType) field.getPlayerSettings().get(getMenuPlayer().getUniqueId()).getValues().get(FieldFlag.CROP_TYPE);
 
-        ItemStack itemOne = Item.create(Objects.requireNonNull(XMaterial.BARRIER.get()));
-        ItemStack itemTwo = Item.create(Objects.requireNonNull(XMaterial.BARRIER.get()));
+        ItemStack itemOne = new ItemStack(Objects.requireNonNull(XMaterial.BARRIER.get()));
+        ItemStack itemTwo = new ItemStack(Objects.requireNonNull(XMaterial.BARRIER.get()));
 
-        ArrayList<String> typeLore = ListUtil.createList("", "§8Left-click to select", "§8Right-click for more information");
+        Player player = getMenuPlayer();
+        List<Component> typeLore = Messages.loreComponents(player, MessageKeys.Generator.Field.STAGE_ITEM_LORE);
         itemTwo = switch (type) {
             case POTATO -> {
-                itemOne = new Item(XMaterial.SHORT_GRASS.parseItem()).setDisplayName("§bLow").setLore(typeLore).build();
-                yield new Item(XMaterial.TALL_GRASS.parseItem()).setDisplayName("§bTall").setLore(typeLore).build();
+                itemOne = ItemComponents.named(
+                        Objects.requireNonNull(XMaterial.SHORT_GRASS.parseItem()),
+                        Messages.render(player, MessageKeys.Generator.Field.STAGE_LOW),
+                        typeLore);
+                yield ItemComponents.named(
+                        Objects.requireNonNull(XMaterial.TALL_GRASS.parseItem()),
+                        Messages.render(player, MessageKeys.Generator.Field.STAGE_TALL),
+                        typeLore);
             }
             case WHEAT -> {
-                itemOne = Item.create(Objects.requireNonNull(XMaterial.BIRCH_FENCE.get()), "§bLight", typeLore);
-                yield Item.create(Objects.requireNonNull(XMaterial.DARK_OAK_FENCE.get()), "§bDark", typeLore);
+                itemOne = ItemComponents.of(
+                        Objects.requireNonNull(XMaterial.BIRCH_FENCE.get()),
+                        Messages.render(player, MessageKeys.Generator.Field.STAGE_LIGHT),
+                        typeLore);
+                yield ItemComponents.of(
+                        Objects.requireNonNull(XMaterial.DARK_OAK_FENCE.get()),
+                        Messages.render(player, MessageKeys.Generator.Field.STAGE_DARK),
+                        typeLore);
             }
             case CORN -> {
-                itemOne = new Item(XMaterial.SHORT_GRASS.parseItem()).setDisplayName("§bHarvested").setLore(typeLore).build();
-                yield new Item(XMaterial.TALL_GRASS.parseItem()).setDisplayName("§bTall").setLore(typeLore).build();
+                itemOne = ItemComponents.named(
+                        Objects.requireNonNull(XMaterial.SHORT_GRASS.parseItem()),
+                        Messages.render(player, MessageKeys.Generator.Field.STAGE_HARVESTED),
+                        typeLore);
+                yield ItemComponents.named(
+                        Objects.requireNonNull(XMaterial.TALL_GRASS.parseItem()),
+                        Messages.render(player, MessageKeys.Generator.Field.STAGE_TALL),
+                        typeLore);
             }
             case OTHER -> {
-                itemOne = Item.create(Objects.requireNonNull(XMaterial.DEAD_BUSH.get()), "§bDry", typeLore);
-                yield Item.create(Objects.requireNonNull(XMaterial.WATER_BUCKET.get()), "§bWet", typeLore);
+                itemOne = ItemComponents.of(
+                        Objects.requireNonNull(XMaterial.DEAD_BUSH.get()),
+                        Messages.render(player, MessageKeys.Generator.Field.STAGE_DRY),
+                        typeLore);
+                yield ItemComponents.of(
+                        Objects.requireNonNull(XMaterial.WATER_BUCKET.get()),
+                        Messages.render(player, MessageKeys.Generator.Field.STAGE_WET),
+                        typeLore);
             }
             default -> itemTwo;
         };
@@ -136,31 +159,31 @@ public class CropStageMenu extends AbstractMenu {
     public static void sendMoreInformation(Player p, @NonNull CropType cropType) {
         switch (cropType) {
             case POTATO:
-                p.sendMessage(Component.text(WikiLinks.Gen.Field.CROP_POTATO, NamedTextColor.RED));
+                p.sendMessage(Messages.component(MessageKeys.Generator.Field.WIKI_LINK, Component.text(WikiLinks.Gen.Field.CROP_POTATO)));
                 break;
             case CORN:
-                p.sendMessage(Component.text(WikiLinks.Gen.Field.CROP_CORN, NamedTextColor.RED));
+                p.sendMessage(Messages.component(MessageKeys.Generator.Field.WIKI_LINK, Component.text(WikiLinks.Gen.Field.CROP_CORN)));
                 break;
             case WHEAT:
-                p.sendMessage(Component.text(WikiLinks.Gen.Field.CROP_WHEAT, NamedTextColor.RED));
+                p.sendMessage(Messages.component(MessageKeys.Generator.Field.WIKI_LINK, Component.text(WikiLinks.Gen.Field.CROP_WHEAT)));
                 break;
             case HARVESTED:
-                p.sendMessage(Component.text(WikiLinks.Gen.Field.CROP_HARVESTED, NamedTextColor.RED));
+                p.sendMessage(Messages.component(MessageKeys.Generator.Field.WIKI_LINK, Component.text(WikiLinks.Gen.Field.CROP_HARVESTED)));
                 break;
             case OTHER:
-                p.sendMessage(Component.text(WikiLinks.Gen.Field.CROP_OTHER, NamedTextColor.RED));
+                p.sendMessage(Messages.component(MessageKeys.Generator.Field.WIKI_LINK, Component.text(WikiLinks.Gen.Field.CROP_OTHER)));
                 break;
             case VINEYARD:
-                p.sendMessage(Component.text(WikiLinks.Gen.Field.CROP_VINEYARD, NamedTextColor.RED));
+                p.sendMessage(Messages.component(MessageKeys.Generator.Field.WIKI_LINK, Component.text(WikiLinks.Gen.Field.CROP_VINEYARD)));
                 break;
             case PEAR:
-                p.sendMessage(Component.text(WikiLinks.Gen.Field.CROP_PEAR, NamedTextColor.RED));
+                p.sendMessage(Messages.component(MessageKeys.Generator.Field.WIKI_LINK, Component.text(WikiLinks.Gen.Field.CROP_PEAR)));
                 break;
             case CATTLE:
-                p.sendMessage(Component.text(WikiLinks.Gen.Field.CROP_CATTLE, NamedTextColor.RED));
+                p.sendMessage(Messages.component(MessageKeys.Generator.Field.WIKI_LINK, Component.text(WikiLinks.Gen.Field.CROP_CATTLE)));
                 break;
             case MEADOW:
-                p.sendMessage(Component.text(WikiLinks.Gen.Field.CROP_MEADOW, NamedTextColor.RED));
+                p.sendMessage(Messages.component(MessageKeys.Generator.Field.WIKI_LINK, Component.text(WikiLinks.Gen.Field.CROP_MEADOW)));
                 break;
         }
 

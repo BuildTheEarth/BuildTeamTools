@@ -2,8 +2,12 @@ package net.buildtheearth.buildteamtools.modules.miscellaneous.blockpalettegui;
 
 import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractPaginatedMenu;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -22,7 +26,7 @@ public class PaletteBlockListMenu extends AbstractPaginatedMenu {
     private final boolean useDefaultBlocks;
 
     public PaletteBlockListMenu(BlockPaletteManager manager, Player player, JavaPlugin plugin, boolean useDefaultBlocks) {
-        super(6, BlockPaletteManager.PAGE_SIZE / 9, "View Palette Menu", player, true);
+        super(6, BlockPaletteManager.PAGE_SIZE / 9, Messages.component(MessageKeys.BlockPalette.VIEW_TITLE), player, true);
         this.manager = manager;
         this.plugin = plugin;
         this.useDefaultBlocks = useDefaultBlocks;
@@ -31,7 +35,9 @@ public class PaletteBlockListMenu extends AbstractPaginatedMenu {
     @Override
     protected Mask getMask() {
         return BinaryMask.builder(getMenu())
-                .item(Item.create(Objects.requireNonNull(XMaterial.GRAY_STAINED_GLASS_PANE.get()), " "))
+                .item(ItemComponents.of(
+                        Objects.requireNonNull(XMaterial.GRAY_STAINED_GLASS_PANE.get()),
+                        Component.text(" ")))
                 .pattern(BinaryMask.FULL_PATTERN)
                 .pattern(BinaryMask.EMPTY_PATTERN)
                 .pattern(BinaryMask.EMPTY_PATTERN)
@@ -69,8 +75,11 @@ public class PaletteBlockListMenu extends AbstractPaginatedMenu {
 
         int totalPages = (int) Math.ceil((double) getSource().size() / BlockPaletteManager.PAGE_SIZE);
         String pageText = getPage() + "/" + Math.max(totalPages, 1);
+        Player player = getMenuPlayer();
         getMenu().getSlot(49)
-                .setItem(Item.createCustomHeadBase64(BlockPaletteManager.HEAD_BETWEEN_ARROWS, pageText, null));
+                .setItem(ItemComponents.named(
+                        Item.createCustomHeadBase64(BlockPaletteManager.HEAD_BETWEEN_ARROWS, " ", null),
+                        Component.text(pageText)));
     }
 
     @Override
@@ -92,23 +101,36 @@ public class PaletteBlockListMenu extends AbstractPaginatedMenu {
 
     private void setupBorderAndControls() {
         Menu menu = getMenu();
+        Player player = getMenuPlayer();
         getMask().apply(menu);
 
         // Filter / Palette chooser
-        menu.getSlot(4).setItem(manager.createMenuItem(XMaterial.HOPPER, "Choose Palette Menu"));
+        menu.getSlot(4).setItem(ItemComponents.of(
+                Objects.requireNonNull(XMaterial.HOPPER.get()),
+                Messages.render(player, MessageKeys.BlockPalette.CHOOSE_PALETTE_ITEM)));
         menu.getSlot(4).setClickHandler((p, info) -> new ChoosePaletteMenu(manager, p, plugin).open());
 
         // Prev/Next
         menu.getSlot(48).setItem(hasPreviousPage()
-                ? Item.createCustomHeadBase64(BlockPaletteManager.LEFT_ARROW, "§ePrevious Page", null)
-                : Item.create(Objects.requireNonNull(XMaterial.BARRIER.get()), "§cNo Previous Page", null));
+                ? ItemComponents.named(
+                Item.createCustomHeadBase64(BlockPaletteManager.LEFT_ARROW, " ", null),
+                Messages.render(player, MessageKeys.Ui.PREVIOUS_PAGE_PLAIN))
+                : ItemComponents.of(
+                Objects.requireNonNull(XMaterial.BARRIER.get()),
+                Messages.render(player, MessageKeys.Ui.NO_PREVIOUS_PAGE)));
 
         menu.getSlot(50).setItem(hasNextPage()
-                ? Item.createCustomHeadBase64(BlockPaletteManager.RIGHT_ARROW, "§eNext Page", null)
-                : Item.create(Objects.requireNonNull(XMaterial.BARRIER.get()), "§cNo Next Page", null));
+                ? ItemComponents.named(
+                Item.createCustomHeadBase64(BlockPaletteManager.RIGHT_ARROW, " ", null),
+                Messages.render(player, MessageKeys.Ui.NEXT_PAGE_PLAIN))
+                : ItemComponents.of(
+                Objects.requireNonNull(XMaterial.BARRIER.get()),
+                Messages.render(player, MessageKeys.Ui.NO_NEXT_PAGE)));
 
-        // Page indicator
-        menu.getSlot(49).setItem(Item.createCustomHeadBase64(BlockPaletteManager.HEAD_BETWEEN_ARROWS, "", null));
+        // Page indicator placeholder (updated in setPaginatedPreviewItems)
+        menu.getSlot(49).setItem(ItemComponents.named(
+                Item.createCustomHeadBase64(BlockPaletteManager.HEAD_BETWEEN_ARROWS, " ", null),
+                Component.empty()));
         setSwitchPageItemClickEvents(49);
     }
 

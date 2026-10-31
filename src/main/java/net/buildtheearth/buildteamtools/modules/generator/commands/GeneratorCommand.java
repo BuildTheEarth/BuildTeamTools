@@ -1,7 +1,8 @@
 package net.buildtheearth.buildteamtools.modules.generator.commands;
 
-import com.alpsbte.alpslib.utils.ChatHelper;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
 import net.buildtheearth.buildteamtools.modules.Module;
 import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
@@ -9,17 +10,20 @@ import net.buildtheearth.buildteamtools.modules.generator.menu.GeneratorMenu;
 import net.buildtheearth.buildteamtools.modules.generator.model.GeneratorType;
 import net.buildtheearth.buildteamtools.modules.generator.model.HistoryEntry;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
+import net.buildtheearth.buildteamtools.utils.MessageBoxes;
 import net.buildtheearth.buildteamtools.utils.Utils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.incendo.cloud.component.DefaultValue;
 import org.incendo.cloud.parser.standard.StringParser;
 import org.incendo.cloud.suggestion.SuggestionProvider;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,20 +74,23 @@ public class GeneratorCommand {
     }
 
     public static void sendHelp(CommandSender sender) {
-        ChatHelper.sendMessageBox(
+        String[] generatorHelp = getGeneratorHelpCommands();
+        MessageBoxes.send(
                 sender,
-                "Generator Command",
-                () -> sender.sendMessage(ChatHelper.getStandardComponent(
-                                false,
-                                "Generators: " + createPlaceholders(GeneratorType.values().length),
-                                (Object[]) getGeneratorHelpCommands())
+                plain(sender, MessageKeys.Generator.Command.HELP_BOX_TITLE),
+                () -> sender.sendMessage(Messages.component(
+                                MessageKeys.Generator.Command.HELP_GENERATORS,
+                                Component.text(generatorHelp[0]),
+                                Component.text(generatorHelp[1]),
+                                Component.text(generatorHelp[2]),
+                                Component.text(generatorHelp[3]),
+                                Component.text(generatorHelp[4]))
                         .appendNewline()
-                        .append(ChatHelper.getStandardComponent(
-                                false,
-                                "History: %s, %s, %s",
-                                "/btt generate history",
-                                "/btt generate undo",
-                                "/btt generate redo")))
+                        .append(Messages.component(
+                                MessageKeys.Generator.Command.HELP_HISTORY,
+                                Component.text("/btt generate history"),
+                                Component.text("/btt generate undo"),
+                                Component.text("/btt generate redo"))))
         );
     }
 
@@ -93,24 +100,31 @@ public class GeneratorCommand {
 
         List<HistoryEntry> entries = GeneratorModule.getInstance().getPlayerHistory(player).getHistoryEntries();
         if (entries.isEmpty()) {
-            player.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
-                    "You didn't generate any structures yet. Use /btt generate to create one."
-            )));
+            player.sendMessage(Messages.component(MessageKeys.Generator.Command.HISTORY_EMPTY));
             return;
         }
 
-        ChatHelper.sendMessageBox(sender, "Generator History for " + player.getName(), () -> {
-            for (HistoryEntry history : entries) {
-                long timeDifference = System.currentTimeMillis() - history.getTimeCreated();
-                player.sendMessage(ChatHelper.getStandardComponent(
-                        false,
-                        "- %s - %s ago - %s Commands executed",
-                        history.getGeneratorType().name(),
-                        Utils.toDate(timeDifference),
-                        history.getWorldEditCommandCount()
-                ));
-            }
-        });
+        MessageBoxes.send(
+                sender,
+                plain(player, MessageKeys.Generator.Command.HISTORY_BOX_TITLE, Component.text(player.getName())),
+                () -> {
+                    for (HistoryEntry history : entries) {
+                        long timeDifference = System.currentTimeMillis() - history.getTimeCreated();
+                        player.sendMessage(Messages.component(
+                                MessageKeys.Generator.Command.HISTORY_ENTRY,
+                                Component.text(history.getGeneratorType().name()),
+                                Component.text(Utils.toDate(timeDifference)),
+                                Component.text(String.valueOf(history.getWorldEditCommandCount()))
+                        ));
+                    }
+                }
+        );
+    }
+
+    private static String plain(CommandSender sender, String key, ComponentLike... args) {
+        Audience audience = sender instanceof Audience adventureAudience ? adventureAudience : null;
+        return PlainTextComponentSerializer.plainText().serialize(
+                Messages.render(audience, Messages.component(key, args)));
     }
 
     private void handleHistoryAction(CommandSender sender, boolean undo) {
@@ -128,9 +142,7 @@ public class GeneratorCommand {
         if (player == null) return;
 
         if (generatorType == GeneratorType.FIELD) {
-            player.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
-                    "This generator has serious issues and is currently disabled."
-            )));
+            player.sendMessage(Messages.component(MessageKeys.Generator.Command.FIELD_DISABLED));
             return;
         }
 
@@ -140,13 +152,11 @@ public class GeneratorCommand {
 
     private static Player playerWithPermission(CommandSender sender) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
-                    "Only players can execute this command."
-            )));
+            sender.sendMessage(Messages.playerOnly());
             return null;
         }
         if (!player.hasPermission(Permissions.GENERATOR_USE)) {
-            player.sendMessage(ChatHelper.getErrorString("You don't have permission to use this command!"));
+            player.sendMessage(Messages.noPermission(Permissions.GENERATOR_USE));
             return null;
         }
         return player;
@@ -180,9 +190,5 @@ public class GeneratorCommand {
         return Arrays.stream(GeneratorType.values())
                 .map(type -> "/btt generate " + type.getCommandName() + " help")
                 .toArray(String[]::new);
-    }
-
-    private static String createPlaceholders(int count) {
-        return String.join(", ", Collections.nCopies(count, "%s"));
     }
 }

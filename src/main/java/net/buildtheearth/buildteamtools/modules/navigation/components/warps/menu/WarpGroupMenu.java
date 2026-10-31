@@ -2,12 +2,13 @@ package net.buildtheearth.buildteamtools.modules.navigation.components.warps.men
 
 import com.google.gson.Gson;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
-import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
@@ -42,7 +43,7 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
      * @param autoLoad    Whether the menu should auto-load
      */
     public WarpGroupMenu(Player menuPlayer, BuildTeam buildTeam, boolean hasBackItem, boolean autoLoad) {
-        super(4, 3, "Warp Menu", menuPlayer, autoLoad);
+        super(4, 3, Messages.component(MessageKeys.Warp.Menu.TITLE), menuPlayer, autoLoad);
         this.hasBackItem = hasBackItem;
         this.buildTeam = buildTeam;
         BuildTeam currentTeam = NetworkModule.getInstance().getBuildTeam();
@@ -80,11 +81,12 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
     @Override
     protected void setPaginatedPreviewItems(@NotNull List<?> source) {
         List<WarpGroup> warpGroups = source.stream().map(l -> (WarpGroup) l).toList();
+        Player player = getMenuPlayer();
 
         if (isPaginated()) {
             int slot = 0;
             for (WarpGroup warpGroup : warpGroups) {
-                getMenu().getSlot(slot).setItem(warpGroup.getMaterialItem());
+                getMenu().getSlot(slot).setItem(warpGroup.getMaterialItem(player));
                 slot++;
             }
         } else {
@@ -93,7 +95,7 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
             for (WarpGroup warpGroup : warpGroups) {
                 int slot = getWarpGroupSlot(warpGroup);
                 if (slot >= 0) {
-                    getMenu().getSlot(slot).setItem(warpGroup.getMaterialItem());
+                    getMenu().getSlot(slot).setItem(warpGroup.getMaterialItem(player));
                 }
             }
         }
@@ -102,8 +104,8 @@ public class WarpGroupMenu extends AbstractPaginatedMenu {
             getMenu().getSlot(PLUS_SLOT).setItem(
                     HeadFactory.head(
                             HeadTexture.GREEN_PLUS,
-                            "§a§lCreate a new Warp Group",
-                            ListUtil.createList("§8Click to create a new warp group.")
+                            Messages.render(player, MessageKeys.Warp.Menu.CREATE_GROUP_NAME),
+                            Messages.loreComponents(player, MessageKeys.Warp.Menu.CREATE_GROUP_LORE)
                     )
             );
         }

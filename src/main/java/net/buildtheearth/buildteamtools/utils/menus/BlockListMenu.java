@@ -1,6 +1,8 @@
 package net.buildtheearth.buildteamtools.utils.menus;
 
 import com.alpsbte.alpslib.utils.item.Item;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
@@ -45,7 +47,8 @@ public class BlockListMenu extends AbstractPaginatedMenu {
         setSwitchPageItems(SWITCH_PAGE_ITEM_SLOT);
 
         if (canProceed())
-            getMenu().getSlot(NEXT_ITEM_SLOT).setItem(HeadFactory.head(HeadTexture.CHECKMARK, "§eNext"));
+            getMenu().getSlot(NEXT_ITEM_SLOT).setItem(HeadFactory.head(HeadTexture.CHECKMARK,
+                    Messages.render(getMenuPlayer(), MessageKeys.Ui.NEXT)));
         else
             getMenu().getSlot(NEXT_ITEM_SLOT).setItem(MenuItems.ITEM_BACKGROUND);
 

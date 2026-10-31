@@ -1,8 +1,9 @@
 package net.buildtheearth.buildteamtools.modules.common.commands;
 
-import com.alpsbte.alpslib.utils.ChatHelper;
 import com.google.gson.Gson;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.Module;
 import net.buildtheearth.buildteamtools.modules.ModuleHandler;
 import net.buildtheearth.buildteamtools.modules.common.CommonModule;
@@ -10,9 +11,10 @@ import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.buildteamtools.modules.network.model.Region;
 import net.buildtheearth.buildteamtools.modules.stats.StatsModule;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.buildtheearth.buildteamtools.utils.MessageBoxes;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
@@ -22,6 +24,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class BuildTeamToolsCommand {
+
+    private static final PlainTextComponentSerializer PLAIN = PlainTextComponentSerializer.plainText();
 
     public void register(Module owner) {
         var commandManager = BuildTeamTools.getInstance().getCommandManager();
@@ -63,9 +67,10 @@ public class BuildTeamToolsCommand {
     }
 
     private void communicatorsCommand(@NotNull CommandSender sender, String @NotNull [] args) {
-        ChatHelper.sendMessageBox(sender, "Build Team Communicators", () -> {
+        MessageBoxes.send(sender, plainTitle(sender, MessageKeys.Common.COMMUNICATORS_TITLE), () -> {
             for (UUID uuid : NetworkModule.getInstance().getCommunicators())
-                sender.sendMessage("§7- §e" + uuid);
+                sender.sendMessage(Messages.component(
+                        MessageKeys.Common.COMMUNICATOR_ENTRY, Component.text(uuid.toString())));
         });
     }
 
@@ -79,13 +84,15 @@ public class BuildTeamToolsCommand {
             return;
         }
 
-        sender.sendMessage(ChatHelper.getStandardComponent(true, "Current Debug Mode: %s.",
-                BuildTeamTools.getInstance().isDebug() ? "ON" : "OFF"));
+        Component state = Messages.component(BuildTeamTools.getInstance().isDebug()
+                ? MessageKeys.Common.DEBUG_ON
+                : MessageKeys.Common.DEBUG_OFF);
+        sender.sendMessage(Messages.component(MessageKeys.Common.DEBUG_CURRENT, state));
     }
 
     private static void setDebugMode(@NonNull CommandSender sender, boolean debug) {
         BuildTeamTools.getInstance().setDebug(debug);
-        sender.sendMessage(ChatHelper.getStandardComponent(true, "Debug Mode was set to: %s", debug));
+        sender.sendMessage(Messages.component(MessageKeys.Common.DEBUG_SET, Component.text(debug)));
     }
 
     private static void cacheCommand(@NonNull CommandSender sender) {
@@ -106,17 +113,16 @@ public class BuildTeamToolsCommand {
         NetworkModule.getInstance().updateCache();
         if (NetworkModule.getInstance().getBuildTeam() != null) NetworkModule.getInstance().enableDisabledModules();
         StatsModule.getInstance().updateAndSave();
-        sender.sendMessage(ChatHelper.getSuccessComponent("Cache successfully updated."));
+        sender.sendMessage(Messages.component(MessageKeys.Common.CACHE_UPDATED));
         displayCache(sender);
     }
 
     private static void displayCache(CommandSender sender) {
         if (StatsModule.getInstance().isEnabled()) {
-            ChatHelper.sendMessageBox(sender, "Build Team Cache", () ->
+            MessageBoxes.send(sender, plainTitle(sender, MessageKeys.Common.CACHE_TITLE), () ->
                     sender.sendMessage(StatsModule.getInstance().getCurrentCache().toJSONString()));
         } else {
-            sender.sendMessage(ChatHelper.getErrorComponent("The Stats Module is not enabled, so there is no cache to show" +
-                    "."));
+            sender.sendMessage(Messages.component(MessageKeys.Common.CACHE_STATS_DISABLED));
         }
     }
 
@@ -126,15 +132,14 @@ public class BuildTeamToolsCommand {
             return;
         }
 
-        sender.sendMessage(ChatHelper.getStandardComponent(true, "Reloading all configs..."));
+        sender.sendMessage(Messages.component(MessageKeys.Common.RELOADING_CONFIGS));
         BuildTeamTools.getInstance().reloadConfig();
         if (NetworkModule.getInstance().getBuildTeam() == null) {
             NetworkModule.getInstance().updateCache();
             if (NetworkModule.getInstance().getBuildTeam() != null) NetworkModule.getInstance().enableDisabledModules();
         }
 
-        sender.sendMessage(ChatHelper.getStandardString("All configs have been reloaded. For some changes to apply you have" +
-                " to restart the server."));
+        sender.sendMessage(Messages.component(MessageKeys.Common.CONFIGS_RELOADED));
     }
 
     private void updateCommand(@NotNull CommandSender sender) {
@@ -147,7 +152,7 @@ public class BuildTeamToolsCommand {
     }
 
     public static void sendBuildTeamToolsInfo(CommandSender sender) {
-        ChatHelper.sendMessageBox(sender, "Build Team Tools", () -> {
+        MessageBoxes.send(sender, plainTitle(sender, MessageKeys.Common.INFO_TITLE), () -> {
 
             String buildTeamID = "-";
             if (NetworkModule.getInstance().getBuildTeam() != null
@@ -159,33 +164,27 @@ public class BuildTeamToolsCommand {
                     && NetworkModule.getInstance().getBuildTeam().getServerName() != null)
                 serverName = NetworkModule.getInstance().getBuildTeam().getServerName();
 
-            String status = "§c§lDISCONNECTED";
-            if (NetworkModule.getInstance().getBuildTeam() != null
-                    && NetworkModule.getInstance().getBuildTeam().isConnected() && !buildTeamID.equals("-") && !serverName.equals("-"))
-                status = "§a§lCONNECTED";
-            else if (!buildTeamID.equals("-") && !serverName.equals("-"))
-                status = "§6§lSTANDBY";
+            sender.sendMessage(Messages.component(
+                    MessageKeys.Common.INFO_STATUS,
+                    infoStatus(buildTeamID, serverName)));
+            sender.sendMessage(Messages.component(
+                    MessageKeys.Common.INFO_VERSION,
+                    Component.text(BuildTeamTools.getInstance().getPluginMeta().getVersion())));
 
-            boolean debug = BuildTeamTools.getInstance().isDebug();
+            if (BuildTeamTools.getInstance().isDebug())
+                sender.sendMessage(Messages.component(MessageKeys.Common.INFO_DEBUG_ON));
 
-            sender.sendMessage("§eStatus: " + status);
-            sender.sendMessage("§eVersion: §7" + BuildTeamTools.getInstance().getPluginMeta().getVersion());
-
-            if (debug)
-                sender.sendMessage("§eDebug Mode: §a§lON");
-
-            sender.sendMessage("§eModules:");
+            sender.sendMessage(Messages.component(MessageKeys.Common.INFO_MODULES));
             for (Module module : ModuleHandler.getInstance().getModules()) {
-                TextComponent comp = new TextComponent("§7- " + module.getModuleName() + " §7[" + (module.isEnabled() ? "§a§l✔" : "§c§l✖") + "§7]");
+                Component mark = Messages.component(module.isEnabled()
+                        ? MessageKeys.Common.INFO_MODULE_MARK_ON
+                        : MessageKeys.Common.INFO_MODULE_MARK_OFF);
 
-                if (!module.isEnabled() && module.getError() != null && !module.getError().isEmpty())
-                    comp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§c" + module.getError()).create()));
-                else if (!module.isEnabled())
-                    comp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§cDisabled").create()));
-                else
-                    comp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§aEnabled").create()));
-
-                sender.spigot().sendMessage(comp);
+                sender.sendMessage(Messages.component(
+                                MessageKeys.Common.INFO_MODULE_LINE,
+                                Component.text(module.getModuleName()),
+                                mark)
+                        .hoverEvent(HoverEvent.showText(moduleHover(module))));
             }
 
             if (NetworkModule.getInstance().getBuildTeam() != null) {
@@ -202,16 +201,48 @@ public class BuildTeamToolsCommand {
 
                 Gson gson = new Gson();
 
-                sender.sendMessage("");
-                sender.sendMessage("§eBuildTeam ID: §7" + buildTeamID);
-                sender.sendMessage("§eServer Name: §7" + serverName);
-                sender.sendMessage("§eContinents: §7" + gson.toJson(continents));
-                sender.sendMessage("§eRegions: §7" + gson.toJson(regions));
+                sender.sendMessage(Component.empty());
+                sender.sendMessage(Messages.component(
+                        MessageKeys.Common.INFO_BUILD_TEAM_ID, Component.text(buildTeamID)));
+                sender.sendMessage(Messages.component(
+                        MessageKeys.Common.INFO_SERVER_NAME, Component.text(serverName)));
+                sender.sendMessage(Messages.component(
+                        MessageKeys.Common.INFO_CONTINENTS, Component.text(gson.toJson(continents))));
+                sender.sendMessage(Messages.component(
+                        MessageKeys.Common.INFO_REGIONS, Component.text(gson.toJson(regions))));
             }
 
-            sender.sendMessage("");
-            sender.sendMessage("§7Sub-Command list with §e/btt help§7.");
+            sender.sendMessage(Component.empty());
+            sender.sendMessage(Messages.component(MessageKeys.Common.INFO_HELP_HINT));
 
         });
+    }
+
+    private static Component infoStatus(String buildTeamID, String serverName) {
+        if (NetworkModule.getInstance().getBuildTeam() != null
+                && NetworkModule.getInstance().getBuildTeam().isConnected()
+                && !buildTeamID.equals("-")
+                && !serverName.equals("-")) {
+            return Messages.component(MessageKeys.Common.INFO_STATUS_CONNECTED);
+        }
+        if (!buildTeamID.equals("-") && !serverName.equals("-")) {
+            return Messages.component(MessageKeys.Common.INFO_STATUS_STANDBY);
+        }
+        return Messages.component(MessageKeys.Common.INFO_STATUS_DISCONNECTED);
+    }
+
+    private static Component moduleHover(Module module) {
+        if (!module.isEnabled() && module.getError() != null && !module.getError().isEmpty()) {
+            return Messages.component(
+                    MessageKeys.Common.INFO_MODULE_HOVER_ERROR, Component.text(module.getError()));
+        }
+        if (!module.isEnabled()) {
+            return Messages.component(MessageKeys.Common.INFO_MODULE_HOVER_DISABLED);
+        }
+        return Messages.component(MessageKeys.Common.INFO_MODULE_HOVER_ENABLED);
+    }
+
+    private static String plainTitle(CommandSender sender, String key) {
+        return PLAIN.serialize(Messages.render(sender, Messages.component(key)));
     }
 }

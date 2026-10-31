@@ -1,12 +1,13 @@
 package net.buildtheearth.buildteamtools.modules.navigation.components.warps.menu;
 
-import com.alpsbte.alpslib.utils.ChatHelper;
 import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.WarpGroup;
-import net.buildtheearth.buildteamtools.utils.ListUtil;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.LetterType;
@@ -22,7 +23,6 @@ import java.util.*;
 
 public class MaterialSelectionMenu extends AbstractMenu {
 
-    public static String MATERIAL_INV_NAME = "Select a Warp Material";
     public final int MATERIAL_SLOT = 11;
     public final int CUSTOM_HEAD_SLOT = 15;
     public final int BACK_ITEM_SLOT = 27;
@@ -39,15 +39,23 @@ public class MaterialSelectionMenu extends AbstractMenu {
      * @param alreadyExists Whether the warp already exists.
      */
     public MaterialSelectionMenu(Player menuPlayer, Object object, boolean alreadyExists) {
-        super(4, MATERIAL_INV_NAME, menuPlayer);
+        super(4, Messages.component(MessageKeys.Warp.Material.TITLE), menuPlayer);
         this.object = object;
         this.alreadyExists = alreadyExists;
     }
 
     @Override
     protected void setMenuItemsAsync() {
-        getMenu().getSlot(MATERIAL_SLOT).setItem(Item.create(Objects.requireNonNull(XMaterial.STONE.get()), "§6§lItem", ListUtil.createList("", "Change the material of the warp", "to a minecraft item.", "", "§eExample:", "Stone")));
-        getMenu().getSlot(CUSTOM_HEAD_SLOT).setItem(HeadFactory.letter(LetterType.WOODEN, '?', "§6§lCustom Head", ListUtil.createList("", "Change the material of the warp", "to a custom head texture URL.", "", "§eExample:", "https://textures.minecraft.net/texture/...")));
+        Player player = getMenuPlayer();
+        getMenu().getSlot(MATERIAL_SLOT).setItem(ItemComponents.of(
+                Objects.requireNonNull(XMaterial.STONE.get()),
+                Messages.render(player, MessageKeys.Warp.Material.ITEM_NAME),
+                Messages.loreComponents(player, MessageKeys.Warp.Material.ITEM_LORE)));
+        getMenu().getSlot(CUSTOM_HEAD_SLOT).setItem(HeadFactory.letter(
+                LetterType.WOODEN,
+                '?',
+                Messages.render(player, MessageKeys.Warp.Material.HEAD_NAME),
+                Messages.loreComponents(player, MessageKeys.Warp.Material.HEAD_LORE)));
 
         if (object instanceof Warp)
             setBackItem(BACK_ITEM_SLOT, new WarpEditMenu(getMenuPlayer(), (Warp) object, alreadyExists, false));
@@ -77,7 +85,7 @@ public class MaterialSelectionMenu extends AbstractMenu {
                                     AnvilGUI.ResponseAction.run(() -> {
                                         clickPlayer.closeInventory();
                                         stateSnapshot.getPlayer().playSound(clickPlayer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-                                        clickPlayer.sendMessage(ChatHelper.getErrorString("§cThis is not a valid material."));
+                                        clickPlayer.sendMessage(Messages.component(MessageKeys.Warp.Material.INVALID));
                                         openObjectMenu();
                                     })
                             );
@@ -96,9 +104,11 @@ public class MaterialSelectionMenu extends AbstractMenu {
                                 })
                         );
                     })
-                    .text("Material")
-                    .itemLeft(Item.create(Objects.requireNonNull(XMaterial.NAME_TAG.get()), "§6§lEnter Material Name"))
-                    .title("§8Enter Material Name")
+                    .text(Messages.plain(clickPlayer, MessageKeys.Warp.Material.ANVIL_TEXT))
+                    .itemLeft(ItemComponents.of(
+                            Objects.requireNonNull(XMaterial.NAME_TAG.get()),
+                            Messages.render(clickPlayer, MessageKeys.Warp.Material.ANVIL_ITEM)))
+                    .title(Messages.legacy(clickPlayer, MessageKeys.Warp.Material.ANVIL_TITLE))
                     .plugin(BuildTeamTools.getInstance())
                     .open(clickPlayer);
         });
@@ -111,12 +121,17 @@ public class MaterialSelectionMenu extends AbstractMenu {
             List<String[]> content = new ArrayList<>();
             content.add(url);
 
-            BookMenu bookMenu = new BookMenu(clickPlayer, "§6§lChange Texture URL", clickPlayer.getName(), content, 240);
+            BookMenu bookMenu = new BookMenu(
+                    clickPlayer,
+                    Messages.render(clickPlayer, MessageKeys.Warp.Material.BOOK_TITLE),
+                    clickPlayer.getName(),
+                    content,
+                    240);
 
             bookMenu.onComplete((text) -> {
                 if (text == null) {
                     clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-                    clickPlayer.sendMessage("§cA problem occurred while saving the url.");
+                    clickPlayer.sendMessage(Messages.component(MessageKeys.Warp.Material.URL_SAVE_FAILED));
                     openObjectMenu();
                     return;
                 }
@@ -128,7 +143,7 @@ public class MaterialSelectionMenu extends AbstractMenu {
 
                 if (!finalText.toString().startsWith("http://textures.minecraft.net/texture/")) {
                     clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-                    clickPlayer.sendMessage("§cThe URL must start with http://textures.minecraft.net/texture/");
+                    clickPlayer.sendMessage(Messages.component(MessageKeys.Warp.Material.URL_INVALID));
                     openObjectMenu();
                 }
 

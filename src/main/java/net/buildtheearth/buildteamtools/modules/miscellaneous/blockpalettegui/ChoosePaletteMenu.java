@@ -2,13 +2,16 @@ package net.buildtheearth.buildteamtools.modules.miscellaneous.blockpalettegui;
 
 import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
@@ -41,14 +44,16 @@ public class ChoosePaletteMenu extends AbstractMenu {
     private final Map<UUID, Long> clickDebounce = new HashMap<>();
 
     public ChoosePaletteMenu(BlockPaletteManager manager, Player player, JavaPlugin plugin) {
-        super(5, "Choose Palette", player);
+        super(5, Messages.component(MessageKeys.BlockPalette.CHOOSE_TITLE), player);
         this.manager = manager;
         this.plugin = plugin;
     }
 
     @Override
     protected Mask getMask() {
-        ItemStack glass = Item.create(safeMat(XMaterial.GRAY_STAINED_GLASS_PANE, Material.GRAY_STAINED_GLASS_PANE), " ");
+        ItemStack glass = ItemComponents.of(
+                safeMat(XMaterial.GRAY_STAINED_GLASS_PANE, Material.GRAY_STAINED_GLASS_PANE),
+                Component.text(" "));
         return BinaryMask.builder(getMenu())
                 .item(glass)
                 .pattern(BinaryMask.FULL_PATTERN)
@@ -63,9 +68,10 @@ public class ChoosePaletteMenu extends AbstractMenu {
     protected void setMenuItemsAsync() {
         try {
             slotToFilter.clear();
+            Player player = getMenuPlayer();
 
             int cursor = 10;
-            Set<String> active = manager.getPlayerFilters(getMenuPlayer());
+            Set<String> active = manager.getPlayerFilters(player);
 
             // Custom palettes
             for (Map.Entry<String, BlockPaletteManager.Palette> entry : manager.getPalettes().entrySet()) {
@@ -73,17 +79,15 @@ public class ChoosePaletteMenu extends AbstractMenu {
                 BlockPaletteManager.Palette palette = entry.getValue();
                 boolean on = active.contains(key);
 
-                String displayName = (on ? "§a✔ " : "§c✘ ")
-                        + (palette != null && palette.getName() != null ? palette.getName() : toTitleCase(key));
+                String baseName = palette != null && palette.getName() != null ? palette.getName() : toTitleCase(key);
+                Component displayName = Messages.render(player,
+                        on ? MessageKeys.BlockPalette.FILTER_ON : MessageKeys.BlockPalette.FILTER_OFF,
+                        Component.text(baseName));
 
-                List<String> lore = new ArrayList<>();
-                int blockCount = (palette != null && palette.getBlocks() != null) ? palette.getBlocks().size() : 0;
-                String desc = (palette != null ? palette.getDescription() : "");
-                lore.add("§7Blocks: §f" + blockCount);
-                lore.add("§7Description: §f" + ((desc == null || desc.isEmpty()) ? "None" : desc));
-
-                ItemStack icon = Item.create(safeMat(XMaterial.PAINTING, Material.PAPER), displayName, new ArrayList<>());
-                withLore(icon, lore);
+                ItemStack icon = ItemComponents.of(
+                        safeMat(XMaterial.PAINTING, Material.PAPER),
+                        displayName,
+                        buildCustomPaletteLore(player, palette));
 
                 getMenu().getSlot(cursor).setItem(icon);
                 slotToFilter.put(cursor, key);
@@ -99,7 +103,9 @@ public class ChoosePaletteMenu extends AbstractMenu {
                 if (slotToFilter.containsValue(key)) continue;
 
                 boolean on = active.contains(key);
-                String title = (on ? "§a✔ " : "§c✘ ") + type.getReadableName();
+                Component title = Messages.render(player,
+                        on ? MessageKeys.BlockPalette.FILTER_ON : MessageKeys.BlockPalette.FILTER_OFF,
+                        Component.text(type.getReadableName()));
 
                 ItemStack[] supplied = null;
                 try {
@@ -110,9 +116,9 @@ public class ChoosePaletteMenu extends AbstractMenu {
 
                 ItemStack icon;
                 if (supplied != null && supplied.length > 0 && supplied[0] != null) {
-                    icon = Item.create(supplied[0].getType(), title, new ArrayList<>());
+                    icon = ItemComponents.of(supplied[0].getType(), title);
                 } else {
-                    icon = Item.create(safeMat(XMaterial.BARRIER, Material.BARRIER), title, new ArrayList<>());
+                    icon = ItemComponents.of(safeMat(XMaterial.BARRIER, Material.BARRIER), title);
                 }
 
                 getMenu().getSlot(cursor).setItem(icon);
@@ -124,13 +130,17 @@ public class ChoosePaletteMenu extends AbstractMenu {
             }
 
             // Back & Add
-            getMenu().getSlot(BACK_SLOT).setItem(Item.createCustomHeadBase64(BACK_HEAD, "§eBack", null));
+            getMenu().getSlot(BACK_SLOT).setItem(ItemComponents.named(
+                    Item.createCustomHeadBase64(BACK_HEAD, " ", null),
+                    Messages.render(player, MessageKeys.Ui.BACK)));
             if (hasEditPermission()) {
-                getMenu().getSlot(ADD_PALETTE_SLOT).setItem(Item.createCustomHeadBase64(PLUS_HEAD, "§aAdd New Palette", null));
+                getMenu().getSlot(ADD_PALETTE_SLOT).setItem(ItemComponents.named(
+                        Item.createCustomHeadBase64(PLUS_HEAD, " ", null),
+                        Messages.render(player, MessageKeys.BlockPalette.ADD_NEW)));
             }
         } catch (Exception ex) {
             logError("setMenuItemsAsync", ex);
-            getMenuPlayer().sendMessage("§cFailed to build menu items. Check console.");
+            getMenuPlayer().sendMessage(Messages.component(MessageKeys.BlockPalette.MENU_BUILD_FAILED));
         }
     }
 
@@ -173,10 +183,16 @@ public class ChoosePaletteMenu extends AbstractMenu {
                             } else {
                                 baseTitle = toTitleCase(key.replace('_', ' '));
                             }
-                            String newTitle = (nowOn ? "§a✔ " : "§c✘ ") + baseTitle;
+                            Component newTitle = Messages.render(p,
+                                    nowOn ? MessageKeys.BlockPalette.FILTER_ON : MessageKeys.BlockPalette.FILTER_OFF,
+                                    Component.text(baseTitle));
 
-                            ItemStack updated = Item.create(cur.getType(), newTitle, new ArrayList<>());
-                            withLore(updated, getLore(cur));
+                            List<Component> lore = (pal != null)
+                                    ? buildCustomPaletteLore(p, pal)
+                                    : null;
+                            ItemStack updated = lore != null
+                                    ? ItemComponents.of(cur.getType(), newTitle, lore)
+                                    : ItemComponents.of(cur.getType(), newTitle);
                             getMenu().getSlot(slot).setItem(updated);
                             p.updateInventory();
                         }
@@ -201,12 +217,12 @@ public class ChoosePaletteMenu extends AbstractMenu {
                                     return;
                                 }
                             }
-                            p.sendMessage("§cFilter not found.");
+                            p.sendMessage(Messages.component(MessageKeys.BlockPalette.FILTER_NOT_FOUND));
                         }
                     }
                 } catch (Exception e) {
                     logError("clickHandler slot=" + slot + " key=" + key, e);
-                    p.sendMessage("§cError handling click. Check console.");
+                    p.sendMessage(Messages.component(MessageKeys.BlockPalette.CLICK_ERROR));
                 }
             }));
 
@@ -220,7 +236,7 @@ public class ChoosePaletteMenu extends AbstractMenu {
             }
         } catch (Exception ex) {
             logError("setItemClickEventsAsync", ex);
-            getMenuPlayer().sendMessage("§cFailed to register click handlers. Check console.");
+            getMenuPlayer().sendMessage(Messages.component(MessageKeys.BlockPalette.HANDLERS_FAILED));
         }
     }
 
@@ -240,26 +256,16 @@ public class ChoosePaletteMenu extends AbstractMenu {
 
     /* helpers */
 
-    private void withLore(ItemStack stack, List<String> lore) {
-        if (stack == null || lore == null) return;
-        try {
-            ItemMeta meta = stack.getItemMeta();
-            if (meta != null) {
-                meta.setLore(lore);
-                stack.setItemMeta(meta);
-            }
-        } catch (Exception ignored) {
-        }
-    }
-
-    private List<String> getLore(ItemStack stack) {
-        try {
-            if (stack != null && stack.hasItemMeta() && stack.getItemMeta().hasLore()) {
-                return new ArrayList<>(Objects.requireNonNull(stack.getItemMeta().getLore()));
-            }
-        } catch (Exception ignored) {
-        }
-        return Collections.emptyList();
+    private List<Component> buildCustomPaletteLore(Player player, BlockPaletteManager.Palette palette) {
+        int blockCount = (palette != null && palette.getBlocks() != null) ? palette.getBlocks().size() : 0;
+        String desc = (palette != null ? palette.getDescription() : "");
+        String descText = (desc == null || desc.isEmpty())
+                ? Messages.plain(player, MessageKeys.BlockPalette.NONE)
+                : desc;
+        return List.of(
+                Messages.render(player, MessageKeys.BlockPalette.LORE_BLOCKS, Component.text(blockCount)),
+                Messages.render(player, MessageKeys.BlockPalette.LORE_DESCRIPTION, Component.text(descText))
+        );
     }
 
     private void logError(String ctx, Throwable t) {

@@ -1,5 +1,7 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.house.menu;
 
+import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
 import com.alpsbte.alpslib.utils.item.Item;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
 import net.buildtheearth.buildteamtools.modules.generator.components.house.HouseFlag;
@@ -17,10 +19,8 @@ import java.util.List;
 
 public class RoofColorMenu extends BlockListMenu {
 
-    public static final String ROOF_TYPE_INV_NAME = "Choose a Roof Color";
-
     public RoofColorMenu(Player player, boolean autoLoad) {
-        super(player, ROOF_TYPE_INV_NAME, getRoofBlocks(player), new RoofTypeMenu(player, false), autoLoad);
+        super(player, Messages.plain(player, MessageKeys.Generator.House.ROOF_COLOR_TITLE), getRoofBlocks(player), new RoofTypeMenu(player, false), autoLoad);
     }
 
     @Override

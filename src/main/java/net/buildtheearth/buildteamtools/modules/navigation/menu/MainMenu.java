@@ -1,18 +1,20 @@
 package net.buildtheearth.buildteamtools.modules.navigation.menu;
 
-import com.alpsbte.alpslib.utils.ChatHelper;
-import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.navigation.NavUtils;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.WarpsComponent;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.io.NavigationConfig;
 import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
-import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.apache.commons.lang3.BooleanUtils;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
@@ -34,18 +36,18 @@ import java.util.*;
  */
 public class MainMenu extends AbstractMenu {
 
-    private static final String INVENTORY_NAME = "BuildTheEarth Navigator";
     public MainMenu(Player menuPlayer) {
         this(menuPlayer, true);
     }
 
     public MainMenu(Player menuPlayer, boolean autoLoad) {
-        super(3, INVENTORY_NAME, menuPlayer, autoLoad);
+        super(3, Messages.component(MessageKeys.Navigation.MainMenu.TITLE), menuPlayer, autoLoad);
     }
 
     @Override
     protected void setPreviewItems() {
         @NotNull Deque<@NotNull Integer> slots = getSlots();
+        Player player = getMenuPlayer();
 
         // Fill the blank slots with glass panes
         for (int i = 10; i <= 16; i++) {
@@ -54,26 +56,42 @@ public class MainMenu extends AbstractMenu {
 
         // Set Build Item
         if (config().mainMenuItems().buildItem().enabled()) {
-            ArrayList<String> buildLore = new ArrayList<>(Collections.singletonList(ChatHelper.getColorizedString(NamedTextColor.GRAY, "Click to build for the project!", false)));
-            getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setItem(Item.edit(Objects.requireNonNull(XMaterial.DIAMOND_PICKAXE.parseItem()), 1, ChatHelper.getColorizedString(NamedTextColor.GREEN, "Terra Server", true), buildLore));
+            getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setItem(ItemComponents.of(
+                    Objects.requireNonNull(XMaterial.DIAMOND_PICKAXE.get()),
+                    1,
+                    Messages.render(player, MessageKeys.Navigation.MainMenu.BUILD_NAME),
+                    Messages.loreComponents(player, MessageKeys.Navigation.MainMenu.BUILD_LORE)));
         }
 
-        // Set Plotsystem Item Click Event
+        // Set Plotsystem Item
         if (config().mainMenuItems().plotsystemItem().enabled()) {
-            ArrayList<String> tutorialsLore = new ArrayList<>(Collections.singletonList(ChatHelper.getColorizedString(NamedTextColor.GRAY, "Click to start your journey!", false)));
-            getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setItem(Item.edit(Objects.requireNonNull(XMaterial.KNOWLEDGE_BOOK.parseItem()), 1, ChatHelper.getColorizedString(NamedTextColor.AQUA, "Plot System", true), tutorialsLore));
+            getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setItem(ItemComponents.of(
+                    Objects.requireNonNull(XMaterial.KNOWLEDGE_BOOK.get()),
+                    1,
+                    Messages.render(player, MessageKeys.Navigation.MainMenu.PLOTSYSTEM_NAME),
+                    Messages.loreComponents(player, MessageKeys.Navigation.MainMenu.PLOTSYSTEM_LORE)));
         }
 
         if (config().mainMenuItems().exploreItem().enabled()) {
-            // Set Explore Item
-            List<String> exploreLore = List.of(getMenuPlayer().hasPermission(Permissions.WARP_USE) ? ChatHelper.getColorizedString(NamedTextColor.GRAY, "Click to explore the warps!", false) : "", ChatHelper.getColorizedString(NamedTextColor.LIGHT_PURPLE, "Right click to explore other build teams.", false));
-            getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setItem(Item.edit(Objects.requireNonNull(XMaterial.SPRUCE_BOAT.parseItem()), 1, ChatHelper.getColorizedString(NamedTextColor.YELLOW, "Explore", true), exploreLore));
+            List<Component> exploreLore = new ArrayList<>();
+            if (player.hasPermission(Permissions.WARP_USE)) {
+                exploreLore.addAll(Messages.loreComponents(player, MessageKeys.Navigation.MainMenu.EXPLORE_LORE_WARPS));
+            }
+            exploreLore.addAll(Messages.loreComponents(player, MessageKeys.Navigation.MainMenu.EXPLORE_LORE_TEAMS));
+            getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setItem(ItemComponents.of(
+                    Objects.requireNonNull(XMaterial.SPRUCE_BOAT.get()),
+                    1,
+                    Messages.render(player, MessageKeys.Navigation.MainMenu.EXPLORE_NAME),
+                    exploreLore));
         }
 
         // Set Tutorials Item
         if (config().mainMenuItems().tutorialItem().enabled()) {
-            ArrayList<String> tutorialsLore = new ArrayList<>(Collections.singletonList(ChatHelper.getColorizedString(NamedTextColor.GRAY, "Click to do some tutorials!", false)));
-            getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setItem(Item.edit(Objects.requireNonNull(XMaterial.KNOWLEDGE_BOOK.parseItem()), 1, ChatHelper.getColorizedString(NamedTextColor.AQUA, "Tutorials", true), tutorialsLore));
+            getMenu().getSlot(Objects.requireNonNull(slots.pollFirst())).setItem(ItemComponents.of(
+                    Objects.requireNonNull(XMaterial.KNOWLEDGE_BOOK.get()),
+                    1,
+                    Messages.render(player, MessageKeys.Navigation.MainMenu.TUTORIALS_NAME),
+                    Messages.loreComponents(player, MessageKeys.Navigation.MainMenu.TUTORIALS_LORE)));
         }
 
         super.setPreviewItems();
@@ -207,16 +225,19 @@ public class MainMenu extends AbstractMenu {
 
     static void openConfiguredItem(Player player, NavigationConfig.MenuItem item, String type) {
         if (!item.enabled()) {
-            player.sendMessage(ChatHelper.getErrorString("The %s item is disabled in the navigation config.", type));
+            player.sendMessage(Messages.component(MessageKeys.Navigation.MainMenu.ITEM_DISABLED, Component.text(type)));
             return;
         }
         String action = item.action();
         if (type.equals("tutorial") && (action == null || action.equals("/command") || action.equals("message"))) {
             new TutorialsMenu(player);
         } else if (action == null) {
-            player.sendMessage(ChatHelper.getErrorString("No action is set for the %s item in the config yet! Please contact an %s.", type, "admin"));
+            player.sendMessage(Messages.component(
+                    MessageKeys.Navigation.MainMenu.NO_ACTION,
+                    Component.text(type),
+                    Component.text("admin")));
         } else {
-            performClickAction(player, action.replace("&", "§"), type);
+            performClickAction(player, action, type);
         }
     }
 
@@ -227,9 +248,17 @@ public class MainMenu extends AbstractMenu {
         } else if (action.startsWith("switch:")) {
             NavUtils.sendPlayerToConnectedServer(p, action.substring(7));
         } else if (!action.equals("/command") && !action.equals("message")) {
-            p.chat(action);
+            if (action.startsWith("/")) {
+                p.chat(action);
+            } else {
+                // Config actions may still use legacy & color codes.
+                p.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(action));
+            }
         } else {
-            p.sendMessage(ChatHelper.getErrorString("No action is set for the %s in the config yet! Please contact an %s.", type + " item", "admin"));
+            p.sendMessage(Messages.component(
+                    MessageKeys.Navigation.MainMenu.NO_ACTION_GENERIC,
+                    Component.text(type + " item"),
+                    Component.text("admin")));
         }
     }
 }

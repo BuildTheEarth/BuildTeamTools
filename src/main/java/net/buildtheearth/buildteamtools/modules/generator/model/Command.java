@@ -11,6 +11,9 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import lombok.Getter;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.buildtheearth.buildteamtools.modules.common.CommonModule;
 import net.buildtheearth.buildteamtools.modules.generator.listeners.GeneratorListener;
@@ -367,11 +370,14 @@ public class Command {
     }
 
     private void sendFailureActionBar() {
-        player.sendActionBar(ChatHelper.getErrorComponent("Generator failed."));
+        player.sendActionBar(Messages.component(MessageKeys.Generator.Progress.FAILED));
     }
 
     private void sendProgressActionBar(NamedTextColor color) {
-        player.sendActionBar(ChatHelper.getStandardComponent(false, "Generator Progress: %s", percentage + "%").color(color));
+        player.sendActionBar(Messages.component(
+                MessageKeys.Generator.Progress.ACTION_BAR,
+                Component.text(percentage + "%")
+        ).color(color));
     }
 
     private void runInternalGeneratorCommand(String command) {

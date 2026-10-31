@@ -1,8 +1,9 @@
 package net.buildtheearth.buildteamtools.modules.navigation.components.navigator.commands;
 
-import com.alpsbte.alpslib.utils.ChatHelper;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.Module;
 import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
 import net.buildtheearth.buildteamtools.modules.common.metrics.FeatureUsage;
@@ -36,7 +37,6 @@ import java.util.function.UnaryOperator;
 public class NavigatorCommand {
     private static final String CONTINENT_ARGUMENT = "continent";
     private static final String STATE_ARGUMENT = "state";
-    private static final String PLAYER_ONLY_MESSAGE = "You must be a %s to %s this command!";
 
     public void register(Module owner) {
         var commandManager = BuildTeamTools.getInstance().getCommandManager();
@@ -55,8 +55,9 @@ public class NavigatorCommand {
                     CommandSender sender = context.sender().getSender();
                     Continent continent = parseContinent(context.get(CONTINENT_ARGUMENT));
                     if (continent == null) {
-                        sender.sendMessage(ChatHelper.getErrorString("Unknown continent. Available continents: %s",
-                                String.join(", ", continentNames())));
+                        sender.sendMessage(Messages.component(
+                                MessageKeys.Navigator.UNKNOWN_CONTINENT,
+                                Component.text(String.join(", ", continentNames()))));
                         return;
                     }
                     openPlayer(sender, UsageDetail.NAVIGATOR_COUNTRIES,
@@ -79,9 +80,9 @@ public class NavigatorCommand {
                             .filter(region -> region.getName().equalsIgnoreCase(stateName))
                             .findFirst().orElse(null);
                     if (state == null) {
-                        sender.sendMessage(ChatHelper.getErrorString(
-                                "No city menu is available for that state. Available states: %s",
-                                String.join(", ", cityStateNames())));
+                        sender.sendMessage(Messages.component(
+                                MessageKeys.Navigator.UNKNOWN_CITY_STATE,
+                                Component.text(String.join(", ", cityStateNames()))));
                         return;
                     }
                     openPlayer(sender, UsageDetail.NAVIGATOR_CITIES, player -> new CitySelectorMenu(
@@ -138,15 +139,11 @@ public class NavigatorCommand {
 
     private void openPlayer(@NonNull CommandSender sender, UsageDetail detail, Consumer<Player> action) {
         if (!(sender instanceof Player player)) {
-            sendPlayerOnlyMessage(sender);
+            sender.sendMessage(Messages.playerOnly());
             return;
         }
         FeatureUsage.record(detail);
         action.accept(player);
-    }
-
-    private void sendPlayerOnlyMessage(@NonNull CommandSender sender) {
-        sender.sendMessage(ChatHelper.getErrorString(PLAYER_ONLY_MESSAGE, "player", "execute"));
     }
 
     private static List<String> continentNames() {

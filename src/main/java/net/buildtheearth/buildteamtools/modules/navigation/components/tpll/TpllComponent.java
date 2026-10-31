@@ -5,6 +5,8 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.ModuleComponent;
 import net.buildtheearth.buildteamtools.modules.common.metrics.FeatureUsage;
 import net.buildtheearth.buildteamtools.modules.common.metrics.UsageFeature;
@@ -76,7 +78,7 @@ public class TpllComponent extends ModuleComponent {
         ChatHelper.logDebug("The tpll target is: %s", tpllTarget.toString());
 
         if (tpllTarget.getWorld() == null) {
-            player.sendMessage(ChatHelper.getErrorString("The %s world of this server is %s.", "earth", "unknown"));
+            player.sendMessage(Messages.component(MessageKeys.Tpll.EARTH_WORLD_UNKNOWN));
             tpllQueue.remove(player.getUniqueId());
             return;
         }

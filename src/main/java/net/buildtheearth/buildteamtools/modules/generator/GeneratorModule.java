@@ -60,7 +60,7 @@ public class GeneratorModule extends Module {
 
         // Check if WorldEdit is enabled
         if (!CommonModule.getInstance().getDependencyComponent().isFastAsyncWorldEditEnabled()) {
-            shutdown("§FastAsyncWorldEdit is not installed.");
+            shutdown("FastAsyncWorldEdit is not installed.");
             return;
         }
 

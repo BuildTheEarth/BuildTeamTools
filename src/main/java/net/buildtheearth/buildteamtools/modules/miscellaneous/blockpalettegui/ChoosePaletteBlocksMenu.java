@@ -4,7 +4,11 @@ import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractPaginatedMenu;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -69,7 +73,7 @@ public class ChoosePaletteBlocksMenu extends AbstractPaginatedMenu {
                                    List<String> selectedBlocks,
                                    Consumer<List<String>> onApply) {
         // rows=6, columns=4? (second arg is the "content rows" in your base), title, player, fillMask=true
-        super(6, 4, "Choose Palette Blocks", player, true);
+        super(6, 4, Messages.component(MessageKeys.BlockPalette.CHOOSE_BLOCKS_TITLE), player, true);
         this.logger = plugin.getLogger();
         this.selectedBlocks = (selectedBlocks != null) ? new ArrayList<>(selectedBlocks) : new ArrayList<>();
         this.onApply = onApply;
@@ -92,12 +96,9 @@ public class ChoosePaletteBlocksMenu extends AbstractPaginatedMenu {
 
     @Override
     protected Mask getMask() {
-        ItemStack glass = new ItemStack(safeMat(XMaterial.GRAY_STAINED_GLASS_PANE, Material.GRAY_STAINED_GLASS_PANE));
-        ItemMeta m = glass.getItemMeta();
-        if (m != null) {
-            m.setDisplayName(" ");
-            glass.setItemMeta(m);
-        }
+        ItemStack glass = ItemComponents.of(
+                safeMat(XMaterial.GRAY_STAINED_GLASS_PANE, Material.GRAY_STAINED_GLASS_PANE),
+                Component.text(" "));
 
         return BinaryMask.builder(getMenu())
                 .item(glass)
@@ -160,8 +161,11 @@ public class ChoosePaletteBlocksMenu extends AbstractPaginatedMenu {
         // Page indicator
         int totalPages = Math.max(1, (int) Math.ceil((double) getSource().size() / PAGE_SIZE));
         String pageText = getPage() + "/" + totalPages;
+        Player player = getMenuPlayer();
         getMenu().getSlot(PAGE_SLOT)
-                .setItem(Item.createCustomHeadBase64(BlockPaletteManager.HEAD_BETWEEN_ARROWS, "§e" + pageText, new ArrayList<>()));
+                .setItem(ItemComponents.named(
+                        Item.createCustomHeadBase64(BlockPaletteManager.HEAD_BETWEEN_ARROWS, " ", null),
+                        Messages.render(player, MessageKeys.Ui.PAGE_INDICATOR, Component.text(pageText))));
 
         // This helper from your base wires the page head to change pages
         setSwitchPageItemClickEvents(PAGE_SLOT);
@@ -216,21 +220,25 @@ public class ChoosePaletteBlocksMenu extends AbstractPaginatedMenu {
      */
     @Override
     protected void setPaginatedPreviewItems(List<?> ignored) {
+        Player player = getMenuPlayer();
         int count = selectedBlocks.size();
-        List<String> lore = new ArrayList<>();
-        lore.add("§7Selected blocks: §f" + count);
+        List<Component> lore = new ArrayList<>();
+        lore.add(Messages.render(player, MessageKeys.BlockPalette.SELECTION_COUNT, Component.text(count)));
         if (count > 0) {
             // show up to 6 names as a teaser
             int shown = 0;
             for (String n : selectedBlocks) {
                 if (shown++ >= 6) {
-                    lore.add("§7…");
+                    lore.add(Messages.render(player, MessageKeys.BlockPalette.SELECTION_MORE));
                     break;
                 }
-                lore.add("§8- §f" + pretty(n));
+                lore.add(Messages.render(player, MessageKeys.BlockPalette.SELECTION_ITEM, Component.text(pretty(n))));
             }
         }
-        getMenu().getSlot(46).setItem(Item.create(Objects.requireNonNull(XMaterial.BOOK.get()), "§bSelection", new ArrayList<>(lore)));
+        getMenu().getSlot(46).setItem(ItemComponents.of(
+                Objects.requireNonNull(XMaterial.BOOK.get()),
+                Messages.render(player, MessageKeys.BlockPalette.SELECTION),
+                lore));
     }
 
     /**
@@ -260,19 +268,22 @@ public class ChoosePaletteBlocksMenu extends AbstractPaginatedMenu {
 
     private void setupBorderAndControls() {
         Menu menu = getMenu();
+        Player player = getMenuPlayer();
         getMask().apply(menu);
 
         // Back — return to caller with current selection
-        menu.getSlot(BACK_SLOT).setItem(Item.createCustomHeadBase64(BlockPaletteManager.LEFT_ARROW, "§cBack", new ArrayList<>()));
+        menu.getSlot(BACK_SLOT).setItem(ItemComponents.named(
+                Item.createCustomHeadBase64(BlockPaletteManager.LEFT_ARROW, " ", null),
+                Messages.render(player, MessageKeys.Ui.BACK_RED)));
         menu.getSlot(BACK_SLOT).setClickHandler((p, info) -> {
             p.closeInventory();
             if (onApply != null) onApply.accept(new ArrayList<>(selectedBlocks));
         });
 
         // Apply — explicit confirm (use green check head)
-        menu.getSlot(APPLY_SLOT).setItem(
-                Item.createCustomHeadBase64(GREEN_CHECK_HEAD, "§aApply", new ArrayList<>())
-        );
+        menu.getSlot(APPLY_SLOT).setItem(ItemComponents.named(
+                Item.createCustomHeadBase64(GREEN_CHECK_HEAD, " ", null),
+                Messages.render(player, MessageKeys.Ui.APPLY)));
         menu.getSlot(APPLY_SLOT).setClickHandler((p, info) -> {
             p.closeInventory();
             if (onApply != null) onApply.accept(new ArrayList<>(selectedBlocks));
@@ -281,12 +292,20 @@ public class ChoosePaletteBlocksMenu extends AbstractPaginatedMenu {
 
         // Prev/Next arrows (visuals only; page head handles switching)
         menu.getSlot(PREVIOUS_SLOT).setItem(hasPreviousPage()
-                ? Item.createCustomHeadBase64(BlockPaletteManager.LEFT_ARROW, "§ePrevious Page", new ArrayList<>())
-                : Item.create(Objects.requireNonNull(XMaterial.BARRIER.get()), "§cNo Previous Page", new ArrayList<>()));
+                ? ItemComponents.named(
+                Item.createCustomHeadBase64(BlockPaletteManager.LEFT_ARROW, " ", null),
+                Messages.render(player, MessageKeys.Ui.PREVIOUS_PAGE_PLAIN))
+                : ItemComponents.of(
+                Objects.requireNonNull(XMaterial.BARRIER.get()),
+                Messages.render(player, MessageKeys.Ui.NO_PREVIOUS_PAGE)));
 
         menu.getSlot(NEXT_SLOT).setItem(hasNextPage()
-                ? Item.createCustomHeadBase64(BlockPaletteManager.RIGHT_ARROW, "§eNext Page", new ArrayList<>())
-                : Item.create(Objects.requireNonNull(XMaterial.BARRIER.get()), "§cNo Next Page", new ArrayList<>()));
+                ? ItemComponents.named(
+                Item.createCustomHeadBase64(BlockPaletteManager.RIGHT_ARROW, " ", null),
+                Messages.render(player, MessageKeys.Ui.NEXT_PAGE_PLAIN))
+                : ItemComponents.of(
+                Objects.requireNonNull(XMaterial.BARRIER.get()),
+                Messages.render(player, MessageKeys.Ui.NO_NEXT_PAGE)));
     }
 
     /**
@@ -294,20 +313,20 @@ public class ChoosePaletteBlocksMenu extends AbstractPaginatedMenu {
      */
     private ItemStack createBlockItem(Material mat) {
         boolean selected = selectedBlocks.contains(mat.name());
+        Player player = getMenuPlayer();
 
-        ItemStack stack = new ItemStack(mat);
-        ItemMeta meta = stack.getItemMeta();
-        if (meta != null) {
-            meta.setDisplayName((selected ? "§a✔ " : "§c✘ ") + pretty(mat.name()));
+        List<Component> lore = List.of(Messages.render(player,
+                selected ? MessageKeys.BlockPalette.BLOCK_SELECTED : MessageKeys.BlockPalette.BLOCK_SELECT_HINT));
+        ItemStack stack = ItemComponents.of(mat, Messages.render(player,
+                selected ? MessageKeys.BlockPalette.BLOCK_ON : MessageKeys.BlockPalette.BLOCK_OFF,
+                Component.text(pretty(mat.name()))), lore);
 
-            List<String> lore = new ArrayList<>();
-            lore.add(selected ? "§aSelected" : "§7Left-click: §fselect");
-            meta.setLore(lore);
-
-            if (selected) {
-                applyGlow(meta); // version-safe glow (no compile-time constant)
+        if (selected) {
+            ItemMeta meta = stack.getItemMeta();
+            if (meta != null) {
+                applyGlow(meta);
+                stack.setItemMeta(meta);
             }
-            stack.setItemMeta(meta);
         }
         return stack;
     }

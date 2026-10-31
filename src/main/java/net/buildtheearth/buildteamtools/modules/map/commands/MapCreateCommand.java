@@ -1,6 +1,5 @@
 package net.buildtheearth.buildteamtools.modules.map.commands;
 
-import com.alpsbte.alpslib.utils.ChatHelper;
 import com.alpsbte.alpslib.web.api.ClaimApi;
 import com.alpsbte.alpslib.web.invoker.ApiClient;
 import com.alpsbte.alpslib.web.invoker.ApiException;
@@ -19,6 +18,8 @@ import com.sk89q.worldedit.regions.Region;
 import net.buildtheearth.OutOfProjectionBoundsException;
 import net.buildtheearth.Projection;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.Module;
 import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
 import net.buildtheearth.buildteamtools.modules.common.metrics.FeatureUsage;
@@ -64,7 +65,7 @@ public class MapCreateCommand {
     public void register(Module owner) {
         var commandManager = BuildTeamTools.getInstance().getCommandManager();
         commandManager.register(owner, COMMAND_NAME, Permissions.MAP_CREATE,
-                (sender, args) -> sender.sendMessage(ChatHelper.getErrorComponent("Usage: /map create [name]")),
+                (sender, args) -> sender.sendMessage(Messages.component(MessageKeys.Map.USAGE_CREATE)),
                 (sender, input) -> BttCommandManager.matchingSuggestions(List.of("create"), input));
         commandManager.registerSubcommand(
                 owner,
@@ -74,11 +75,11 @@ public class MapCreateCommand {
                 builder -> builder
                         .permission(Permissions.MAP_CREATE)
                         .optional("name", StringParser.greedyStringParser(),
-                                RichDescription.of(Component.text("Optional claim name"))),
+                                RichDescription.of(Messages.component(MessageKeys.Map.OPTIONAL_NAME))),
                 context -> {
                     CommandSender sender = context.sender().getSender();
                     if (!(sender instanceof Player player)) {
-                        sender.sendMessage(ChatHelper.getErrorComponent("This command can only be used by a player!"));
+                        sender.sendMessage(Messages.playerOnly());
                         return;
                     }
                     create(player, context.<String>optional("name").orElse("").trim());
@@ -105,7 +106,7 @@ public class MapCreateCommand {
         }
 
         FeatureUsage.record(UsageFeature.MAP);
-        player.sendMessage(ChatHelper.getStandardComponent(false, "Creating map claim from your selection..."));
+        player.sendMessage(Messages.component(MessageKeys.Map.CREATING));
         Bukkit.getScheduler().runTaskAsynchronously(BuildTeamTools.getInstance(),
                 () -> submitClaim(player, request));
     }
@@ -113,18 +114,15 @@ public class MapCreateCommand {
     private boolean hasApiConfig(Player player) {
         MapConfig config = config();
         if (config.webApiToken() == null || config.webApiToken().isBlank()) {
-            player.sendMessage(ChatHelper.getErrorComponent(
-                    "Map claim creation is unavailable. Configure webApiToken in modules/map/config.yml."));
+            player.sendMessage(Messages.component(MessageKeys.Map.UNAVAILABLE_TOKEN));
             return false;
         }
         if (config.buildTeamId() == null || config.buildTeamId().isBlank()) {
-            player.sendMessage(ChatHelper.getErrorComponent(
-                    "Map claim creation is unavailable. Configure buildTeamId in modules/map/config.yml."));
+            player.sendMessage(Messages.component(MessageKeys.Map.UNAVAILABLE_TEAM_ID));
             return false;
         }
         if (config.webApiBasePath() == null || config.webApiBasePath().isBlank()) {
-            player.sendMessage(ChatHelper.getErrorComponent(
-                    "Map claim creation is unavailable. Configure webApiBasePath in modules/map/config.yml."));
+            player.sendMessage(Messages.component(MessageKeys.Map.UNAVAILABLE_BASE_PATH));
             return false;
         }
         return true;
@@ -135,18 +133,18 @@ public class MapCreateCommand {
                 || Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit")) {
             return true;
         }
-        player.sendMessage(ChatHelper.getErrorComponent("WorldEdit or FastAsyncWorldEdit must be enabled."));
+        player.sendMessage(Messages.component(MessageKeys.Map.WORLDEDIT_REQUIRED));
         return false;
     }
 
     private Polygonal2DRegion requirePolygonalSelection(Player player) {
         World earthWorld = BuildTeamTools.getInstance().getEarthWorld();
         if (earthWorld == null) {
-            player.sendMessage(ChatHelper.getErrorComponent("The configured Earth world is not loaded."));
+            player.sendMessage(Messages.component(MessageKeys.Map.EARTH_WORLD_NOT_LOADED));
             return null;
         }
         if (!player.getWorld().equals(earthWorld)) {
-            player.sendMessage(ChatHelper.getErrorComponent("Select an area in the configured Earth world."));
+            player.sendMessage(Messages.component(MessageKeys.Map.SELECT_IN_EARTH_WORLD));
             return null;
         }
 
@@ -156,18 +154,16 @@ public class MapCreateCommand {
             LocalSession session = WorldEdit.getInstance().getSessionManager().get(actor);
             selection = session.getSelection(BukkitAdapter.adapt(earthWorld));
         } catch (IncompleteRegionException exception) {
-            player.sendMessage(ChatHelper.getErrorComponent(
-                    "Make a polygonal WorldEdit selection (//sel poly) before creating a map claim."));
+            player.sendMessage(Messages.component(MessageKeys.Map.NEED_POLY_SELECTION));
             return null;
         }
         if (!(selection instanceof Polygonal2DRegion polygonalSelection)) {
-            player.sendMessage(ChatHelper.getErrorComponent(
-                    "Map claims require a polygonal WorldEdit selection. Use //sel poly."));
+            player.sendMessage(Messages.component(MessageKeys.Map.REQUIRE_POLY_SELECTION));
             return null;
         }
         if (polygonalSelection.getPoints().size() < MIN_POLYGON_VERTICES) {
-            player.sendMessage(ChatHelper.getErrorComponent(
-                    "A map claim needs at least %s distinct polygon points.", MIN_POLYGON_VERTICES));
+            player.sendMessage(Messages.component(
+                    MessageKeys.Map.MIN_POLYGON_POINTS, Component.text(MIN_POLYGON_VERTICES)));
             return null;
         }
         return polygonalSelection;
@@ -178,8 +174,8 @@ public class MapCreateCommand {
         try {
             return createArea(selection);
         } catch (OutOfProjectionBoundsException exception) {
-            player.sendMessage(ChatHelper.getErrorComponent(
-                    "The selection is outside the supported map projection: %s", exception.getMessage()));
+            player.sendMessage(Messages.component(
+                    MessageKeys.Map.OUTSIDE_PROJECTION, Component.text(String.valueOf(exception.getMessage()))));
             return null;
         }
     }
@@ -206,28 +202,27 @@ public class MapCreateCommand {
     }
 
     private void sendSuccess(Player player, Claim claim) {
-        String claimName = claim.getName() == null || claim.getName().isBlank()
-                ? "Unnamed Claim"
-                : claim.getName();
+        Component claimName = claim.getName() == null || claim.getName().isBlank()
+                ? Messages.component(MessageKeys.Map.UNNAMED_CLAIM)
+                : Component.text(claim.getName());
         String claimUrl = CLAIM_MAP_URL + claim.getId();
         Component idLink = Component.text(Objects.requireNonNull(claim.getId()).toString(), NamedTextColor.AQUA)
                 .clickEvent(ClickEvent.openUrl(claimUrl))
-                .hoverEvent(HoverEvent.showText(Component.text("Open claim on the map", NamedTextColor.GRAY)));
-        player.sendMessage(ChatHelper.getSuccessComponent("Created map claim %s (ID: ", claimName)
+                .hoverEvent(HoverEvent.showText(Messages.component(MessageKeys.Map.OPEN_CLAIM_HOVER)));
+        player.sendMessage(Messages.component(MessageKeys.Map.CREATED_PREFIX, claimName)
                 .append(idLink)
-                .append(Component.text(").")));
+                .append(Messages.component(MessageKeys.Map.CREATED_SUFFIX)));
     }
 
     private void sendFailure(Player player, Exception exception) {
         if (exception instanceof ApiException apiException && apiException.getCode() == 404) {
-            player.sendMessage(ChatHelper.getErrorComponent(
-                    "Your Minecraft account is not registered on buildtheearth.net. Link it on the website first."));
+            player.sendMessage(Messages.component(MessageKeys.Map.ACCOUNT_NOT_REGISTERED));
             return;
         }
         String reason = exception.getMessage() == null
                 ? exception.getClass().getSimpleName()
                 : exception.getMessage();
-        player.sendMessage(ChatHelper.getErrorComponent("Failed to create map claim: %s", reason));
+        player.sendMessage(Messages.component(MessageKeys.Map.CREATE_FAILED, Component.text(reason)));
     }
 
     /** API default coordType expects {@code "lng, lat"} strings; the API closes the ring. */

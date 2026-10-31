@@ -1,7 +1,10 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.tree.menu;
 
-import com.alpsbte.alpslib.utils.item.Item;
+import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
 import com.cryptomorin.xseries.XMaterial;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
+import net.kyori.adventure.text.Component;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
 import net.buildtheearth.buildteamtools.modules.generator.components.tree.TreeFlag;
 import net.buildtheearth.buildteamtools.modules.generator.components.tree.TreeSettings;
@@ -20,10 +23,8 @@ import java.util.Objects;
 
 public class TreeHeightMenu extends NameListMenu {
 
-    public static final String TREE_TYPE_INV_NAME = "Choose a Tree Width";
-
     public TreeHeightMenu(Player player, boolean autoLoad) {
-        super(player, TREE_TYPE_INV_NAME, getTreeHeights(), new TreeTypeMenu(player, false), autoLoad);
+        super(player, Messages.plain(player, MessageKeys.Generator.Tree.HEIGHT_TITLE), getTreeHeights(), new TreeTypeMenu(player, false), autoLoad);
     }
 
     /**
@@ -32,10 +33,14 @@ public class TreeHeightMenu extends NameListMenu {
     private static @NonNull List<MutablePair<ItemStack, String>> getTreeHeights() {
         List<MutablePair<ItemStack, String>> treeHeights = new ArrayList<>();
 
-        treeHeights.add(MutablePair.of(new Item(Objects.requireNonNull(XMaterial.LIME_CONCRETE.parseItem())).setDisplayName("Any").build(), "Any"));
+        treeHeights.add(MutablePair.of(
+                ItemComponents.named(Objects.requireNonNull(XMaterial.LIME_CONCRETE.parseItem()), Component.text("Any")),
+                "Any"));
 
         GeneratorModule.getInstance().getTree().getHeights().forEach(h ->
-                treeHeights.add(MutablePair.of(Item.create(Objects.requireNonNull(XMaterial.PAPER.get()), StringUtils.capitalize(h)), h)));
+                treeHeights.add(MutablePair.of(
+                        ItemComponents.of(Objects.requireNonNull(XMaterial.PAPER.get()), Component.text(StringUtils.capitalize(h))),
+                        h)));
 
         return treeHeights;
     }

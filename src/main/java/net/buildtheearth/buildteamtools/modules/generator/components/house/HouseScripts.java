@@ -1,5 +1,8 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.house;
 
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
+
 import com.alpsbte.alpslib.utils.GeneratorUtils;
 import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
@@ -59,8 +62,7 @@ public class HouseScripts extends Script {
                 false);
 
         if (blocks == null) {
-            getPlayer().sendMessage("§c§lERROR: §cRegion not readable. Please report this to the developers of the " +
-                    "BuildTeamTool plugin.");
+            getPlayer().sendMessage(Messages.component(MessageKeys.Generator.Scripts.REGION_NOT_READABLE));
             return;
         }
 

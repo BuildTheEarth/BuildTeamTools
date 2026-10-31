@@ -1,5 +1,9 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.rail.menu;
 
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.kyori.adventure.text.Component;
+
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.configuration.RailType;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.heads.HeadColor;
@@ -22,7 +26,7 @@ final class RailTrackSpacingMenu extends AbstractMenu {
     private final RailTypeDraft draft;
 
     RailTrackSpacingMenu(Player player, RailTypeDraft draft, boolean autoLoad) {
-        super(5, "Track Spacing Settings", player, false);
+        super(5, Messages.component(MessageKeys.Generator.Rail.Menu.TRACK_SPACING_TITLE), player, false);
         this.draft = draft;
 
         if (autoLoad)
@@ -38,7 +42,7 @@ final class RailTrackSpacingMenu extends AbstractMenu {
             createCounter(
                     gapIndex % 2 == 0 ? HeadColor.WHITE : HeadColor.LIGHT_GRAY,
                     GAP_SLOTS[gapIndex],
-                    "Tracks " + (gapIndex + 1) + " & " + (gapIndex + 2),
+                    Messages.plain(getMenuPlayer(), MessageKeys.Generator.Rail.Menu.TRACK_GAP_NAME, Component.text(String.valueOf(gapIndex + 1)), Component.text(String.valueOf(gapIndex + 2))),
                     draft.getTrackSpacings().get(gapIndex),
                     RailType.MIN_TRACK_SPACING,
                     RailType.MAX_TRACK_SPACING,
@@ -47,7 +51,7 @@ final class RailTrackSpacingMenu extends AbstractMenu {
         }
 
         setBackItem(BACK_ITEM_SLOT, new RailTypeEditorMenu(getMenuPlayer(), draft, false));
-        getMenu().getSlot(DONE_ITEM_SLOT).setItem(HeadFactory.head(HeadTexture.CHECKMARK, "§aDone"));
+        getMenu().getSlot(DONE_ITEM_SLOT).setItem(HeadFactory.head(HeadTexture.CHECKMARK, Messages.render(getMenuPlayer(), MessageKeys.Generator.Rail.Menu.TRACK_SPACING_DONE)));
         getMenu().open(getMenuPlayer());
     }
 

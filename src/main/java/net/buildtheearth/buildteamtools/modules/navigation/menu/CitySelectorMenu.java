@@ -3,15 +3,18 @@ package net.buildtheearth.buildteamtools.modules.navigation.menu;
 import com.alpsbte.alpslib.utils.ChatHelper;
 import com.alpsbte.alpslib.utils.item.Item;
 import lombok.NonNull;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.navigation.NavUtils;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.WarpsComponent;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.buildteamtools.modules.network.model.Region;
 import net.buildtheearth.buildteamtools.modules.network.model.RegionType;
-import net.buildtheearth.buildteamtools.utils.ListUtil;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractPaginatedMenu;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.ipvp.canvas.mask.BinaryMask;
 import org.ipvp.canvas.mask.Mask;
@@ -40,7 +43,8 @@ public class CitySelectorMenu extends AbstractPaginatedMenu {
      */
     public CitySelectorMenu(@NonNull Region parentState, @NonNull List<BuildTeam> cityBuildTeams, Player menuPlayer,
                             boolean autoLoad) {
-        super(4, 3, parentState.getName() + " - Cities", menuPlayer, autoLoad);
+        super(4, 3, Messages.component(MessageKeys.Navigation.CityMenu.TITLE, Component.text(parentState.getName())),
+                menuPlayer, autoLoad);
         this.parentState = parentState;
         this.cityBuildTeams = new ArrayList<>(cityBuildTeams);
 
@@ -65,6 +69,7 @@ public class CitySelectorMenu extends AbstractPaginatedMenu {
     @Override
     protected void setPaginatedPreviewItems(@NotNull List<?> source) {
         List<BuildTeam> cities = source.stream().map(l -> (BuildTeam) l).toList();
+        Player player = getMenuPlayer();
 
         int slot = 0;
         for (BuildTeam cityTeam : cities) {
@@ -75,38 +80,34 @@ public class CitySelectorMenu extends AbstractPaginatedMenu {
 
             if (cityRegion == null) continue;
 
-            ArrayList<String> cityLore = ListUtil.createList(
-                    "",
-                    "§eBuild Team:", cityTeam.getBlankName(),
-                    "",
-                    "§8Click to join this city's server!"
-            );
+            List<Component> cityLore = new ArrayList<>(Messages.loreComponents(
+                    player,
+                    MessageKeys.Navigation.CityMenu.ITEM_LORE_JOIN_CITY,
+                    Component.text(cityTeam.getBlankName())));
 
-            setRegionItem(cityTeam, cityLore, slot, cityRegion.getHeadBase64(), cityRegion.getName());
+            setRegionItem(player, cityTeam, cityLore, slot, cityRegion.getHeadBase64(), cityRegion.getName());
             slot++;
         }
 
-        ArrayList<String> lore = ListUtil.createList(
-                "",
-                "§eBuild Team:", parentState.getBuildTeam().getBlankName(),
-                "",
-                "§8Click to join this state's server!"
-        );
+        List<Component> lore = new ArrayList<>(Messages.loreComponents(
+                player,
+                MessageKeys.Navigation.CityMenu.ITEM_LORE_JOIN_STATE,
+                Component.text(parentState.getBuildTeam().getBlankName())));
 
-        setRegionItem(parentState.getBuildTeam(), lore, slot, parentState.getHeadBase64(),
-                "Rest of State " + parentState.getName());
+        setRegionItem(player, parentState.getBuildTeam(), lore, slot, parentState.getHeadBase64(),
+                Messages.plain(player, MessageKeys.Navigation.CityMenu.REST_OF_STATE, Component.text(parentState.getName())));
     }
 
-    private void setRegionItem(@NotNull BuildTeam cityTeam, ArrayList<String> cityLore, int slot, String headBase64,
-                               String name) {
+    private void setRegionItem(@NotNull Player player, @NotNull BuildTeam cityTeam, List<Component> cityLore, int slot,
+                               String headBase64, String name) {
         if (!cityTeam.getWarpGroups().isEmpty()) {
-            cityLore.add("Right click to open the warp group menu!");
+            cityLore.addAll(Messages.loreComponents(player, MessageKeys.Navigation.CityMenu.ITEM_LORE_WARPS));
         }
 
         getMenu().getSlot(slot).setItem(
-                Item.createCustomHeadBase64(
-                        headBase64,
-                        "§6§l" + name,
+                ItemComponents.named(
+                        Item.createCustomHeadBase64(headBase64, " ", null),
+                        Messages.render(player, MessageKeys.Navigation.CityMenu.ITEM_NAME, Component.text(name)),
                         cityLore
                 )
         );

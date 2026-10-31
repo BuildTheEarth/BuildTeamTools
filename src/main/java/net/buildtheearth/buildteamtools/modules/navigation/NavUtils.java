@@ -7,16 +7,17 @@ import lombok.experimental.UtilityClass;
 import net.buildtheearth.OutOfProjectionBoundsException;
 import net.buildtheearth.Projection;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Region;
 import net.buildtheearth.model.GeographicalCoordinate;
 import net.buildtheearth.model.MinecraftCoordinate;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.UnsafeValues;
@@ -68,20 +69,16 @@ public class NavUtils {
      * @param serverIP The IP of the server the player should join
      */
     public static void sendNotConnectedMessage(@NotNull Player player, String serverIP, String teamName) {
-        TextComponent comp = new TextComponent("§e" + serverIP + " §7(Click to copy)");
-        comp.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, serverIP));
-        comp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§eClick to copy").create()));
-
-        String notConnected = "§cThe team " + teamName + " does not run on Minecraft Version 1.20.5+ yet & is not connected to " +
-                "the network. Meanwhile please use this Server IP to connect to their server:";
+        Component ipLine = Messages.component(MessageKeys.Navigation.NOT_CONNECTED_IP, Component.text(serverIP))
+                .clickEvent(ClickEvent.suggestCommand(serverIP))
+                .hoverEvent(HoverEvent.showText(Messages.component(MessageKeys.Navigation.NOT_CONNECTED_HOVER)));
 
         player.closeInventory();
-        player.sendMessage(notConnected);
-        player.sendMessage("");
-        player.spigot().sendMessage(comp);
-        player.sendMessage("");
-        player.sendMessage("§cPress Ctrl + A and Ctrl + C to copy the ip → Press ESC → Back to Menu → Multiplayer → Add Server " +
-                "→ Ctrl+V → Done → Join.");
+        player.sendMessage(Messages.component(MessageKeys.Navigation.NOT_CONNECTED, Component.text(teamName)));
+        player.sendMessage(Component.empty());
+        player.sendMessage(ipLine);
+        player.sendMessage(Component.empty());
+        player.sendMessage(Messages.component(MessageKeys.Navigation.NOT_CONNECTED_HINT));
     }
 
     /**
@@ -91,15 +88,14 @@ public class NavUtils {
      * @param buildteam The name of the buildteam the player should join
      */
     public static void sendNoIpMessage(@NotNull Player player, String buildteam) {
-        player.sendMessage("IP of " + buildteam + " is missing in Network API.");
+        player.sendMessage(Messages.component(MessageKeys.Navigation.NO_IP, Component.text(buildteam)));
     }
 
     /**
      * Sends a message when a connected build team's main IP cannot be mapped to a network server.
      */
     public static void sendInvalidNetworkMappingMessage(@NotNull Player player, String buildteam) {
-        player.sendMessage("§cThe team " + buildteam + " is temporarily unavailable because its network server configuration " +
-                "is inconsistent. Please contact a staff member.");
+        player.sendMessage(Messages.component(MessageKeys.Navigation.INVALID_NETWORK_MAPPING, Component.text(buildteam)));
     }
 
     public static @Nullable NavSwitchType determineSwitchPossibilityOrMsgPlayerIfNone(@NotNull Player player,
@@ -144,7 +140,7 @@ public class NavUtils {
 
     public static @NotNull WarpGroup createOtherWarpGroup(BuildTeam team) {
         // Create an "other" Warp Group for warps that don't belong to a warp group
-        return new WarpGroup(team, "Other", "Other warps", -1, null);
+        return new WarpGroup(team, "Other", Messages.plain(MessageKeys.Warp.OTHER_GROUP_DESCRIPTION), -1, null);
     }
 
     /**
@@ -210,7 +206,7 @@ public class NavUtils {
             return region.getCountryCodeCca2();
         }
 
-        clickPlayer.sendMessage(ChatHelper.getErrorString("Could not find the country of the location! Please report that"));
+        clickPlayer.sendMessage(Messages.component(MessageKeys.Navigation.COUNTRY_NOT_FOUND));
         return "";
     }
 

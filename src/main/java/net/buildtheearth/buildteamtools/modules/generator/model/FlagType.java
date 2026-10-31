@@ -1,15 +1,18 @@
 package net.buildtheearth.buildteamtools.modules.generator.model;
 
-import com.alpsbte.alpslib.utils.ChatHelper;
 import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import lombok.Getter;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.generator.components.field.CropStage;
 import net.buildtheearth.buildteamtools.modules.generator.components.field.CropType;
 import net.buildtheearth.buildteamtools.modules.generator.components.house.RoofType;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.configuration.RailType;
 import net.buildtheearth.buildteamtools.modules.generator.components.tree.TreeType;
 import net.buildtheearth.buildteamtools.modules.generator.components.tree.TreeWidth;
+import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
 
 public enum FlagType {
 
@@ -41,13 +44,17 @@ public enum FlagType {
      * @param value The value to validate
      * @return The error message if the value is invalid, null if the value is valid
      */
-    public static String validateFlagType(Flag flag, Object value) {
+    public static @Nullable Component validateFlagType(Flag flag, Object value) {
         if (value == null)
             return null;
 
         if (!flag.getFlagType().getClassType().isInstance(value))
-            return ChatHelper.getErrorString("Invalid value for flag %s: expected %s, got %s", flag.getFlag(),
-                    flag.getFlagType().getClassType().getSimpleName(), value.getClass().getSimpleName());
+            return Messages.component(
+                    MessageKeys.Generator.Flag.INVALID_VALUE,
+                    Component.text(flag.getFlag()),
+                    Component.text(flag.getFlagType().getClassType().getSimpleName()),
+                    Component.text(value.getClass().getSimpleName())
+            );
 
         return null;
     }

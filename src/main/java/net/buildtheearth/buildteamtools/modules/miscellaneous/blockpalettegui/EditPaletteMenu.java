@@ -3,8 +3,12 @@ package net.buildtheearth.buildteamtools.modules.miscellaneous.blockpalettegui;
 import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import io.papermc.paper.event.player.AsyncChatEvent;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -63,7 +67,7 @@ public class EditPaletteMenu extends AbstractMenu {
 
     public EditPaletteMenu(BlockPaletteManager manager, Player player, @NonNull JavaPlugin plugin,
                            String paletteKey, String name, String description, List<String> blocks) {
-        super(3, "Edit Palette: " + name, player);
+        super(3, Messages.component(MessageKeys.BlockPalette.EDIT_TITLE, Component.text(name)), player);
         this.manager = manager;
         this.plugin = plugin;
         this.player = player;
@@ -76,7 +80,9 @@ public class EditPaletteMenu extends AbstractMenu {
 
     @Override
     protected Mask getMask() {
-        ItemStack filler = Item.create(Objects.requireNonNull(XMaterial.GRAY_STAINED_GLASS_PANE.get()), " ");
+        ItemStack filler = ItemComponents.of(
+                Objects.requireNonNull(XMaterial.GRAY_STAINED_GLASS_PANE.get()),
+                Component.text(" "));
         return BinaryMask.builder(getMenu())
                 .item(filler)
                 .pattern(BinaryMask.FULL_PATTERN)
@@ -89,33 +95,39 @@ public class EditPaletteMenu extends AbstractMenu {
     protected void setMenuItemsAsync() {
         logger.info("Setting menu items for EditPalleteMenu for player " + player.getName() + ". Blocks: " + blocks);
 
-        getMenu().getSlot(NAME_SLOT).setItem(
-                Item.create(Objects.requireNonNull(XMaterial.NAME_TAG.get()), "§eSet Name",
-                        new ArrayList<>(List.of("§7Current: §f" + name)))
-        );
+        getMenu().getSlot(NAME_SLOT).setItem(ItemComponents.of(
+                Objects.requireNonNull(XMaterial.NAME_TAG.get()),
+                Messages.render(player, MessageKeys.BlockPalette.SET_NAME),
+                Messages.loreComponents(player, MessageKeys.BlockPalette.SET_NAME_LORE, Component.text(name))));
 
-        getMenu().getSlot(DESCRIPTION_SLOT).setItem(
-                Item.create(Objects.requireNonNull(XMaterial.WRITABLE_BOOK.get()), "§eSet Description",
-                        new ArrayList<>(List.of("§7Current: §f" + (description.isEmpty() ? "None" : description))))
-        );
+        String descDisplay = description.isEmpty()
+                ? Messages.plain(player, MessageKeys.BlockPalette.NONE)
+                : description;
+        getMenu().getSlot(DESCRIPTION_SLOT).setItem(ItemComponents.of(
+                Objects.requireNonNull(XMaterial.WRITABLE_BOOK.get()),
+                Messages.render(player, MessageKeys.BlockPalette.SET_DESCRIPTION),
+                Messages.loreComponents(player, MessageKeys.BlockPalette.SET_DESCRIPTION_LORE, Component.text(descDisplay))));
 
-        getMenu().getSlot(BLOCKS_SLOT).setItem(
-                Item.create(Objects.requireNonNull(XMaterial.STONE.get()), "§eSet Blocks",
-                        new ArrayList<>(List.of("§7Selected: §f" + blocks.size())))
-        );
+        getMenu().getSlot(BLOCKS_SLOT).setItem(ItemComponents.of(
+                Objects.requireNonNull(XMaterial.STONE.get()),
+                Messages.render(player, MessageKeys.BlockPalette.SET_BLOCKS),
+                Messages.loreComponents(player, MessageKeys.BlockPalette.SET_BLOCKS_LORE, Component.text(blocks.size()))));
 
-        getMenu().getSlot(DELETE_SLOT).setItem(
-                Item.create(Objects.requireNonNull(XMaterial.BARRIER.get()), "§cDelete Palette",
-                        new ArrayList<>(List.of("§7Click to delete this palette" + (isPredefinedFilter() ? " (Cannot delete predefined filter)" : ""))))
-        );
+        getMenu().getSlot(DELETE_SLOT).setItem(ItemComponents.of(
+                Objects.requireNonNull(XMaterial.BARRIER.get()),
+                Messages.render(player, MessageKeys.BlockPalette.DELETE),
+                Messages.loreComponents(player,
+                        isPredefinedFilter()
+                                ? MessageKeys.BlockPalette.DELETE_LORE_PREDEFINED
+                                : MessageKeys.BlockPalette.DELETE_LORE)));
 
-        getMenu().getSlot(BACK_SLOT).setItem(
-                Item.createCustomHeadBase64(BACK_HEAD, "§cBack", null)
-        );
+        getMenu().getSlot(BACK_SLOT).setItem(ItemComponents.named(
+                Item.createCustomHeadBase64(BACK_HEAD, " ", null),
+                Messages.render(player, MessageKeys.Ui.BACK_RED)));
 
-        getMenu().getSlot(APPLY_SLOT).setItem(
-                Item.createCustomHeadBase64(GREEN_CHECK_HEAD, "§aApply", null)
-        );
+        getMenu().getSlot(APPLY_SLOT).setItem(ItemComponents.named(
+                Item.createCustomHeadBase64(GREEN_CHECK_HEAD, " ", null),
+                Messages.render(player, MessageKeys.Ui.APPLY)));
     }
 
     @Override
@@ -123,7 +135,7 @@ public class EditPaletteMenu extends AbstractMenu {
         // Name
         getMenu().getSlot(NAME_SLOT).setClickHandler((p, i) -> {
             if (!p.hasPermission(Permissions.BLOCK_PALETTE_EDIT)) {
-                p.sendMessage("§cYou do not have permission to edit palettes.");
+                p.sendMessage(Messages.component(MessageKeys.BlockPalette.NO_PERM_EDIT));
                 return;
             }
             if (i.getClickType() != ClickType.LEFT) return;
@@ -134,14 +146,14 @@ public class EditPaletteMenu extends AbstractMenu {
             inputMode = InputMode.NAME;
             registerChatListener();
             Bukkit.getScheduler().runTask(plugin, () ->
-                    p.sendMessage("§ePlease type the new palette name in chat (max " + MAX_NAME_LENGTH + " characters). Type 'cancel' to abort.")
+                    p.sendMessage(Messages.component(MessageKeys.BlockPalette.PROMPT_NAME_EDIT, Component.text(MAX_NAME_LENGTH)))
             );
         });
 
         // Description
         getMenu().getSlot(DESCRIPTION_SLOT).setClickHandler((p, i) -> {
             if (!p.hasPermission(Permissions.BLOCK_PALETTE_EDIT)) {
-                p.sendMessage("§cYou do not have permission to edit palettes.");
+                p.sendMessage(Messages.component(MessageKeys.BlockPalette.NO_PERM_EDIT));
                 return;
             }
             if (i.getClickType() != ClickType.LEFT) return;
@@ -152,14 +164,14 @@ public class EditPaletteMenu extends AbstractMenu {
             inputMode = InputMode.DESCRIPTION;
             registerChatListener();
             Bukkit.getScheduler().runTask(plugin, () ->
-                    p.sendMessage("§ePlease type the new palette description in chat (max " + MAX_DESCRIPTION_LENGTH + " characters). Type 'cancel' to abort.")
+                    p.sendMessage(Messages.component(MessageKeys.BlockPalette.PROMPT_DESCRIPTION_EDIT, Component.text(MAX_DESCRIPTION_LENGTH)))
             );
         });
 
         // Blocks
         getMenu().getSlot(BLOCKS_SLOT).setClickHandler((p, i) -> {
             if (!p.hasPermission(Permissions.BLOCK_PALETTE_EDIT)) {
-                p.sendMessage("§cYou do not have permission to edit palettes.");
+                p.sendMessage(Messages.component(MessageKeys.BlockPalette.NO_PERM_EDIT));
                 return;
             }
             p.closeInventory();
@@ -176,11 +188,11 @@ public class EditPaletteMenu extends AbstractMenu {
         // Delete
         getMenu().getSlot(DELETE_SLOT).setClickHandler((p, i) -> {
             if (!p.hasPermission(Permissions.BLOCK_PALETTE_EDIT)) {
-                p.sendMessage("§cYou do not have permission to delete palettes.");
+                p.sendMessage(Messages.component(MessageKeys.BlockPalette.NO_PERM_DELETE));
                 return;
             }
             if (isPredefinedFilter()) {
-                p.sendMessage("§cCannot delete predefined filters. Only custom palettes can be deleted.");
+                p.sendMessage(Messages.component(MessageKeys.BlockPalette.CANNOT_DELETE_PREDEFINED));
                 return;
             }
             unregisterChatListener();
@@ -188,7 +200,7 @@ public class EditPaletteMenu extends AbstractMenu {
             Set<String> filters = new HashSet<>(manager.getPlayerFilters(p));
             filters.remove(paletteKey);
             manager.updatePlayerFilters(p, filters);
-            p.sendMessage("§aPalette deleted.");
+            p.sendMessage(Messages.component(MessageKeys.BlockPalette.DELETED));
             p.closeInventory();
             new ChoosePaletteMenu(manager, p, plugin).open();
         });
@@ -202,20 +214,20 @@ public class EditPaletteMenu extends AbstractMenu {
         // Apply
         getMenu().getSlot(APPLY_SLOT).setClickHandler((p, i) -> {
             if (!p.hasPermission(Permissions.BLOCK_PALETTE_EDIT)) {
-                p.sendMessage("§cYou do not have permission to edit palettes.");
+                p.sendMessage(Messages.component(MessageKeys.BlockPalette.NO_PERM_EDIT));
                 return;
             }
             unregisterChatListener();
             logger.info("Apply clicked in EditPalleteMenu by " + p.getName() + ". Name: " + name + ", Blocks: " + blocks);
             if (name.isEmpty()) {
-                p.sendMessage("§cPlease set a valid name for the palette.");
+                p.sendMessage(Messages.component(MessageKeys.BlockPalette.INVALID_NAME));
                 return;
             }
             manager.updatePalette(paletteKey, name, description, new ArrayList<>(blocks));
             Set<String> filters = new HashSet<>(manager.getPlayerFilters(p));
             filters.add(paletteKey);
             manager.updatePlayerFilters(p, filters);
-            p.sendMessage("§aPalette updated: §f" + name);
+            p.sendMessage(Messages.component(MessageKeys.BlockPalette.UPDATED, Component.text(name)));
             new ChoosePaletteMenu(manager, p, plugin).open();
         });
     }
@@ -253,7 +265,7 @@ public class EditPaletteMenu extends AbstractMenu {
             String message = PlainTextComponentSerializer.plainText().serialize(event.message());
 
             if (message.equalsIgnoreCase("cancel")) {
-                player.sendMessage("§cInput cancelled.");
+                player.sendMessage(Messages.component(MessageKeys.BlockPalette.INPUT_CANCELLED));
                 unregisterChatListener();
                 Bukkit.getScheduler().runTask(plugin, () -> {
                     setMenuItemsAsync();
@@ -264,12 +276,12 @@ public class EditPaletteMenu extends AbstractMenu {
 
             if (inputMode == InputMode.NAME) {
                 if (message.length() > MAX_NAME_LENGTH) {
-                    player.sendMessage("§cName is too long! Max " + MAX_NAME_LENGTH + " characters.");
+                    player.sendMessage(Messages.component(MessageKeys.BlockPalette.NAME_TOO_LONG, Component.text(MAX_NAME_LENGTH)));
                 } else if (message.isEmpty()) {
-                    player.sendMessage("§cName cannot be empty!");
+                    player.sendMessage(Messages.component(MessageKeys.BlockPalette.NAME_EMPTY));
                 } else {
                     name = message;
-                    player.sendMessage("§aPalette name set to: §f" + name);
+                    player.sendMessage(Messages.component(MessageKeys.BlockPalette.NAME_SET, Component.text(name)));
                     unregisterChatListener();
                     Bukkit.getScheduler().runTask(plugin, () -> {
                         setMenuItemsAsync();
@@ -278,10 +290,13 @@ public class EditPaletteMenu extends AbstractMenu {
                 }
             } else if (inputMode == InputMode.DESCRIPTION) {
                 if (message.length() > MAX_DESCRIPTION_LENGTH) {
-                    player.sendMessage("§cDescription is too long! Max " + MAX_DESCRIPTION_LENGTH + " characters.");
+                    player.sendMessage(Messages.component(MessageKeys.BlockPalette.DESCRIPTION_TOO_LONG, Component.text(MAX_DESCRIPTION_LENGTH)));
                 } else {
                     description = message.isEmpty() ? "" : message;
-                    player.sendMessage("§aPalette description set to: §f" + (description.isEmpty() ? "None" : description));
+                    String descDisplay = description.isEmpty()
+                            ? Messages.plain(player, MessageKeys.BlockPalette.NONE)
+                            : description;
+                    player.sendMessage(Messages.component(MessageKeys.BlockPalette.DESCRIPTION_SET, Component.text(descDisplay)));
                     unregisterChatListener();
                     Bukkit.getScheduler().runTask(plugin, () -> {
                         setMenuItemsAsync();

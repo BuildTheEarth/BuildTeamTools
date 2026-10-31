@@ -1,13 +1,14 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.house.menu;
 
-import com.alpsbte.alpslib.utils.item.Item;
+import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
 import com.cryptomorin.xseries.XMaterial;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
 import net.buildtheearth.buildteamtools.modules.generator.components.house.HouseFlag;
 import net.buildtheearth.buildteamtools.modules.generator.components.house.HouseSettings;
 import net.buildtheearth.buildteamtools.modules.generator.components.house.RoofType;
 import net.buildtheearth.buildteamtools.modules.generator.model.Settings;
-import net.buildtheearth.buildteamtools.utils.ListUtil;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import org.bukkit.Sound;
@@ -20,8 +21,6 @@ import java.util.Objects;
 
 public class RoofTypeMenu extends AbstractMenu {
 
-    public static final String ROOF_COLOR_INV_NAME = "Choose a Roof Type";
-
     public static final int FLAT_ROOF_ITEM_SLOT = 9;
     public static final int GABLE_ROOF_ITEM_SLOT = 11;
     public static final int STEEP_SLAB_ROOF_ITEM_SLOT = 13;
@@ -31,17 +30,18 @@ public class RoofTypeMenu extends AbstractMenu {
     private static final int BACK_ITEM_SLOT = 18;
 
     public RoofTypeMenu(Player player, boolean autoLoad) {
-        super(3, ROOF_COLOR_INV_NAME, player, autoLoad);
+        super(3, Messages.component(MessageKeys.Generator.House.ROOF_TYPE_TITLE), player, autoLoad);
     }
 
     @Override
     protected void setPreviewItems() {
 
-        ItemStack flatRoofItem = Item.create(Objects.requireNonNull(XMaterial.WHITE_CARPET.get()), "§bFlat Roof", ListUtil.createList("", "§eDescription:", "A flat roof for", "skyscrapers using carpets", "or slabs"));
-        ItemStack gableRoofItem = Item.create(Objects.requireNonNull(XMaterial.COBBLESTONE_STAIRS.get()), "§bGable Roof", ListUtil.createList("", "§eDescription:", "A gable roof for", "residential houses using stairs"));
-        ItemStack steepSlabRoofItem = Item.create(Objects.requireNonNull(XMaterial.COBBLESTONE_SLAB.get()), "§bSteep Slab Roof", ListUtil.createList("", "§eDescription:", "A gable roof for", "residential houses using the", "steepest way you can", "create a roof with slabs"));
-        ItemStack mediumSlabRoofItem = Item.create(Objects.requireNonNull(XMaterial.COBBLESTONE_SLAB.get()), "§bMedium Steep Slab Roof", ListUtil.createList("", "§eDescription:", "A gable roof for", "residential houses by creating", "a medium steep roof with slabs"));
-        ItemStack flatterSlabRoofItem = Item.create(Objects.requireNonNull(XMaterial.COBBLESTONE_SLAB.get()), "§bFlatter Slab Roof", ListUtil.createList("", "§eDescription:", "A flat gable roof for", "residential houses by creating", "a very flat roof with slabs"));
+        Player player = getMenuPlayer();
+        ItemStack flatRoofItem = ItemComponents.of(Objects.requireNonNull(XMaterial.WHITE_CARPET.get()), Messages.render(player, MessageKeys.Generator.House.ROOF_FLAT_NAME), Messages.loreComponents(player, MessageKeys.Generator.House.ROOF_FLAT_LORE));
+        ItemStack gableRoofItem = ItemComponents.of(Objects.requireNonNull(XMaterial.COBBLESTONE_STAIRS.get()), Messages.render(player, MessageKeys.Generator.House.ROOF_GABLE_NAME), Messages.loreComponents(player, MessageKeys.Generator.House.ROOF_GABLE_LORE));
+        ItemStack steepSlabRoofItem = ItemComponents.of(Objects.requireNonNull(XMaterial.COBBLESTONE_SLAB.get()), Messages.render(player, MessageKeys.Generator.House.ROOF_STEEP_NAME), Messages.loreComponents(player, MessageKeys.Generator.House.ROOF_STEEP_LORE));
+        ItemStack mediumSlabRoofItem = ItemComponents.of(Objects.requireNonNull(XMaterial.COBBLESTONE_SLAB.get()), Messages.render(player, MessageKeys.Generator.House.ROOF_MEDIUM_NAME), Messages.loreComponents(player, MessageKeys.Generator.House.ROOF_MEDIUM_LORE));
+        ItemStack flatterSlabRoofItem = ItemComponents.of(Objects.requireNonNull(XMaterial.COBBLESTONE_SLAB.get()), Messages.render(player, MessageKeys.Generator.House.ROOF_FLATTER_NAME), Messages.loreComponents(player, MessageKeys.Generator.House.ROOF_FLATTER_LORE));
 
         // Set items
         getMenu().getSlot(FLAT_ROOF_ITEM_SLOT).setItem(flatRoofItem);

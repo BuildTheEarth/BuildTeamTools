@@ -1,8 +1,9 @@
 package net.buildtheearth.buildteamtools.modules.common.commands;
 
-import com.alpsbte.alpslib.utils.ChatHelper;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.Module;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.buildteamtools.utils.io.MainConfig;
@@ -66,17 +67,19 @@ public final class BttCommandManager {
         help = MinecraftHelp.create("/btt help", manager, CommandSourceStack::getSender);
 
         manager.exceptionController().registerHandler(InvalidSyntaxException.class, context ->
-                context.context().sender().getSender().sendMessage(ChatHelper.getErrorString(
-                        "Invalid command syntax. Usage: %s", context.exception().correctSyntax())));
+                context.context().sender().getSender().sendMessage(Messages.component(
+                        MessageKeys.Common.INVALID_SYNTAX,
+                        Component.text(context.exception().correctSyntax()))));
         manager.exceptionController().registerHandler(ArgumentParseException.class, context ->
-                context.context().sender().getSender().sendMessage(ChatHelper.getErrorString(
-                        "Invalid command argument: %s", context.exception().getMessage())));
+                context.context().sender().getSender().sendMessage(Messages.component(
+                        MessageKeys.Common.INVALID_ARGUMENT,
+                        Component.text(String.valueOf(context.exception().getMessage())))));
         manager.exceptionController().registerHandler(NoPermissionException.class, context ->
-                context.context().sender().getSender().sendMessage(ChatHelper.getErrorString(
-                        "You don't have permission to use this command.")));
+                context.context().sender().getSender().sendMessage(
+                        Messages.component(MessageKeys.Common.NO_PERMISSION_GENERIC)));
         manager.exceptionController().registerHandler(InvalidCommandSenderException.class, context ->
-                context.context().sender().getSender().sendMessage(ChatHelper.getErrorString(
-                        "This command cannot be used by your sender type.")));
+                context.context().sender().getSender().sendMessage(
+                        Messages.component(MessageKeys.Common.INVALID_SENDER)));
     }
 
     public void registerRoot(Module owner, Consumer<CommandSender> handler) {
@@ -505,18 +508,21 @@ public final class BttCommandManager {
 
     private static void execute(Module owner, CommandSender sender, String label, Runnable handler) {
         if (!owner.isEnabled()) {
-            String reason = owner.getError() == null || owner.getError().isBlank()
-                    ? ""
-                    : " Reason: " + owner.getError();
-            sender.sendMessage(ChatHelper.getErrorString("The Module %s is currently disabled.%s",
-                    owner.getModuleName(), reason));
+            Component reason = owner.getError() == null || owner.getError().isBlank()
+                    ? Component.empty()
+                    : Messages.component(MessageKeys.Common.MODULE_DISABLED_REASON,
+                            Component.text(owner.getError()));
+            sender.sendMessage(Messages.component(
+                    MessageKeys.Common.MODULE_DISABLED,
+                    Component.text(owner.getModuleName()),
+                    reason));
             return;
         }
         try {
             handler.run();
         } catch (RuntimeException exception) {
             BuildTeamTools.getInstance().getSLF4JLogger().error("Command '{}' failed", label, exception);
-            sender.sendMessage(ChatHelper.getErrorString("An error occurred while executing this command."));
+            sender.sendMessage(Messages.component(MessageKeys.Common.COMMAND_ERROR));
         }
     }
 

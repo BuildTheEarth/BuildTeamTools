@@ -1,9 +1,10 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.rail.menu;
 
-import com.alpsbte.alpslib.utils.ChatHelper;
-import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.Rail;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.RailFlag;
@@ -18,6 +19,7 @@ import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import net.wesjd.anvilgui.AnvilGUI;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -36,8 +38,6 @@ import java.util.function.IntSupplier;
  * validated and saved persistently through the {@link RailTypeManager}.
  */
 public class RailTypeEditorMenu extends AbstractMenu {
-
-    public static final String EDITOR_INV_NAME = "Create a Rail Type";
     private static final String FILLED_MASK_ROW = "111111111";
 
     private static final int NAME_SLOT = 14;
@@ -60,7 +60,7 @@ public class RailTypeEditorMenu extends AbstractMenu {
 
     RailTypeEditorMenu(Player player, RailTypeDraft draft, boolean autoLoad) {
         // The parent constructor renders immediately, so load manually after the draft is set.
-        super(5, EDITOR_INV_NAME, player, false);
+        super(5, Messages.component(MessageKeys.Generator.Rail.Menu.EDITOR_TITLE), player, false);
 
         this.draft = draft;
 
@@ -73,79 +73,95 @@ public class RailTypeEditorMenu extends AbstractMenu {
         if (getMask() != null)
             getMask().apply(getMenu());
 
-        getMenu().getSlot(NAME_SLOT).setItem(Item.create(
+        Player player = getMenuPlayer();
+        String enabled = Messages.plain(player, MessageKeys.Generator.Rail.Menu.ENABLED);
+        String disabled = Messages.plain(player, MessageKeys.Generator.Rail.Menu.DISABLED);
+
+        getMenu().getSlot(NAME_SLOT).setItem(ItemComponents.of(
                 Objects.requireNonNull(XMaterial.NAME_TAG.get()),
-                yellow("Rail Type Name: ") + white(getDisplayName()),
-                List.of(gray("Click to change the display name."))
+                Messages.render(player, MessageKeys.Generator.Rail.Menu.EDITOR_NAME_LABEL, Component.text(getDisplayName())),
+                Messages.loreComponents(player, MessageKeys.Generator.Rail.Menu.EDITOR_NAME_LORE)
         ));
 
-        createCounter(HeadColor.WHITE, TRACK_COUNT_SLOT, "Track Count", draft.getTrackCount(),
-                RailType.MIN_TRACK_COUNT, RailType.MAX_TRACK_COUNT, "Tracks");
+        createCounter(HeadColor.WHITE, TRACK_COUNT_SLOT,
+                Messages.plain(player, MessageKeys.Generator.Rail.Menu.EDITOR_TRACK_COUNT),
+                draft.getTrackCount(),
+                RailType.MIN_TRACK_COUNT, RailType.MAX_TRACK_COUNT,
+                Messages.plain(player, MessageKeys.Generator.Rail.Menu.EDITOR_UNIT_TRACKS));
+        Component trackSpacingName = Component.text(
+                Messages.plain(player, MessageKeys.Generator.Rail.Menu.EDITOR_TRACK_SPACING));
         getMenu().getSlot(TRACK_SPACING_SLOT - 1).setItem(HeadFactory.getCounterMinusItem(
-                HeadColor.LIGHT_GRAY, "Track Spacing", draft.getTrackSpacing(), RailType.MIN_TRACK_SPACING));
+                HeadColor.LIGHT_GRAY,
+                Messages.render(player, Messages.component(MessageKeys.Ui.COUNTER_MINUS, trackSpacingName)),
+                draft.getTrackSpacing(),
+                RailType.MIN_TRACK_SPACING));
         getMenu().getSlot(TRACK_SPACING_SLOT + 1).setItem(HeadFactory.getCounterPlusItem(
-                HeadColor.LIGHT_GRAY, "Track Spacing", draft.getTrackSpacing(), RailType.MAX_TRACK_SPACING));
-        getMenu().getSlot(TRACK_SPACING_SLOT).setItem(Item.create(
+                HeadColor.LIGHT_GRAY,
+                Messages.render(player, Messages.component(MessageKeys.Ui.COUNTER_PLUS, trackSpacingName)),
+                draft.getTrackSpacing(),
+                RailType.MAX_TRACK_SPACING));
+        getMenu().getSlot(TRACK_SPACING_SLOT).setItem(ItemComponents.of(
                 Objects.requireNonNull(XMaterial.NAME_TAG.get()),
-                yellow("Track Spacings"),
-                List.of(
-                        gray("Between tracks: ") + white(draft.getTrackSpacings().toString()),
-                        gray("Use +/- to set all spacings."),
-                        gray("Click to configure each gap separately.")
-                )
+                Messages.render(player, MessageKeys.Generator.Rail.Menu.EDITOR_TRACK_SPACINGS),
+                Messages.loreComponents(
+                        player,
+                        MessageKeys.Generator.Rail.Menu.EDITOR_TRACK_SPACINGS_LORE,
+                        Component.text(draft.getTrackSpacings().toString()))
         ));
-        createCounter(HeadColor.WHITE, SLEEPER_SPACING_SLOT, "Sleeper Spacing", draft.getSleeperSpacing(),
-                RailType.MIN_SLEEPER_SPACING, RailType.MAX_SLEEPER_SPACING, "Blocks");
+        createCounter(HeadColor.WHITE, SLEEPER_SPACING_SLOT,
+                Messages.plain(player, MessageKeys.Generator.Rail.Menu.EDITOR_SLEEPER_SPACING),
+                draft.getSleeperSpacing(),
+                RailType.MIN_SLEEPER_SPACING, RailType.MAX_SLEEPER_SPACING,
+                Messages.plain(player, MessageKeys.Generator.Rail.Menu.EDITOR_UNIT_BLOCKS));
 
         getMenu().getSlot(RAIL_BLOCK_SLOT).setItem(createBlockItem(
-                "Rail Block",
+                Messages.plain(player, MessageKeys.Generator.Rail.Menu.EDITOR_RAIL_BLOCK),
                 draft.getRailBlocks(),
-                "The block the rails are made of."
+                Messages.plain(player, MessageKeys.Generator.Rail.Menu.EDITOR_RAIL_BLOCK_DESC)
         ));
         getMenu().getSlot(BLOCK_BELOW_SLOT).setItem(createBlockItem(
-                "Blocks Below the Rails",
+                Messages.plain(player, MessageKeys.Generator.Rail.Menu.EDITOR_BLOCKS_BELOW),
                 draft.getBlocksBelow(),
-                "The material mix placed between and below the rails."
+                Messages.plain(player, MessageKeys.Generator.Rail.Menu.EDITOR_BLOCKS_BELOW_DESC)
         ));
         getMenu().getSlot(SLEEPER_BLOCK_SLOT).setItem(createBlockItem(
-                "Sleeper Block",
+                Messages.plain(player, MessageKeys.Generator.Rail.Menu.EDITOR_SLEEPER_BLOCK),
                 draft.getSleeperBlocks(),
-                "Sleeper Spacing 0 disables sleepers."
+                Messages.plain(player, MessageKeys.Generator.Rail.Menu.EDITOR_SLEEPER_BLOCK_DESC)
         ));
         getMenu().getSlot(ICON_SLOT).setItem(createBlockItem(
-                "Menu Icon",
+                Messages.plain(player, MessageKeys.Generator.Rail.Menu.EDITOR_MENU_ICON),
                 draft.getIcon(),
-                "The icon shown in the rail type menu."
+                Messages.plain(player, MessageKeys.Generator.Rail.Menu.EDITOR_MENU_ICON_DESC)
         ));
-        getMenu().getSlot(OVERHEAD_SETTINGS_SLOT).setItem(Item.create(
+
+        java.util.List<Component> overheadLore = new java.util.ArrayList<>();
+        overheadLore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.EDITOR_OVERHEAD_POLES_LINE,
+                Component.text(draft.isOverheadPolesEnabled() ? enabled : disabled)));
+        overheadLore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.EDITOR_OVERHEAD_WIRES_LINE,
+                Component.text(draft.isOverheadWiresEnabled() ? enabled : disabled)));
+        overheadLore.addAll(Messages.loreComponents(player, MessageKeys.Generator.Rail.Menu.EDITOR_OVERHEAD_LORE));
+        getMenu().getSlot(OVERHEAD_SETTINGS_SLOT).setItem(ItemComponents.of(
                 Objects.requireNonNull(XMaterial.IRON_BARS.get()),
-                yellow("Overhead Settings"),
-                List.of(
-                        gray("Poles: ") + white(draft.isOverheadPolesEnabled()
-                                ? RailMenuText.ENABLED
-                                : RailMenuText.DISABLED),
-                        gray("Wires: ") + white(draft.isOverheadWiresEnabled()
-                                ? RailMenuText.ENABLED
-                                : RailMenuText.DISABLED),
-                        gray("Click to configure overhead wires.")
-                )
+                Messages.render(player, MessageKeys.Generator.Rail.Menu.EDITOR_OVERHEAD),
+                overheadLore
         ));
-        getMenu().getSlot(TRACK_SWITCHES_SLOT).setItem(Item.create(
+
+        Component switchesState = draft.isTrackSwitchesEnabled()
+                ? Component.text(enabled, NamedTextColor.GREEN)
+                : Component.text(disabled, NamedTextColor.RED);
+        getMenu().getSlot(TRACK_SWITCHES_SLOT).setItem(ItemComponents.of(
                 Objects.requireNonNull(XMaterial.LEVER.get()),
-                yellow("Track Switches: ")
-                        + (draft.isTrackSwitchesEnabled()
-                        ? green(RailMenuText.ENABLED)
-                        : red(RailMenuText.DISABLED)),
-                List.of(
-                        gray("Prepares this type for future switch generation."),
-                        gray("Click to toggle.")
-                )
+                Messages.render(player, MessageKeys.Generator.Rail.Menu.EDITOR_TRACK_SWITCHES, switchesState),
+                Messages.loreComponents(player, MessageKeys.Generator.Rail.Menu.EDITOR_TRACK_SWITCHES_LORE)
         ));
 
         setBackItem(BACK_ITEM_SLOT, new RailTypeMenu(getMenuPlayer(), false));
         getMenu().getSlot(SAVE_ITEM_SLOT).setItem(HeadFactory.head(
                 HeadTexture.CHECKMARK,
-                green(draft.getIdentifier() == null ? "Save Rail Type" : "Update Rail Type")
+                Messages.render(player, draft.getIdentifier() == null
+                        ? MessageKeys.Generator.Rail.Menu.EDITOR_SAVE
+                        : MessageKeys.Generator.Rail.Menu.EDITOR_UPDATE)
         ));
 
         getMenu().open(getMenuPlayer());
@@ -213,27 +229,23 @@ public class RailTypeEditorMenu extends AbstractMenu {
                     String displayName = stateSnapshot.getText().trim();
 
                     if (displayName.isEmpty()) {
-                        stateSnapshot.getPlayer().sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
-                                "Rail type name cannot be empty."
-                        )));
+                        stateSnapshot.getPlayer().sendMessage(Messages.component(MessageKeys.Generator.Rail.Menu.EDITOR_NAME_EMPTY));
                         return List.of(AnvilGUI.ResponseAction.replaceInputText(getDisplayName()));
                     }
 
                     draft.setDisplayName(displayName);
                     playSound(stateSnapshot.getPlayer(), Sound.UI_BUTTON_CLICK);
-                    stateSnapshot.getPlayer().sendMessage(ChatHelper.getStandardComponent(
-                            true,
-                            "Rail type name set to '%s'.",
-                            displayName
-                    ));
+                    stateSnapshot.getPlayer().sendMessage(Messages.component(MessageKeys.Generator.Rail.Menu.EDITOR_NAME_SET, Component.text(displayName)));
                     return List.of(
                             AnvilGUI.ResponseAction.close(),
                             AnvilGUI.ResponseAction.run(() -> new RailTypeEditorMenu(clickPlayer, draft, true))
                     );
                 })
                 .text(getDisplayName())
-                .itemLeft(Item.create(Objects.requireNonNull(XMaterial.NAME_TAG.get()), yellow("Change Rail Type Name")))
-                .title(darkGray("Change rail type name"))
+                .itemLeft(ItemComponents.of(
+                        Objects.requireNonNull(XMaterial.NAME_TAG.get()),
+                        Messages.render(clickPlayer, MessageKeys.Generator.Rail.Menu.EDITOR_ANVIL_ITEM)))
+                .title(Messages.legacy(clickPlayer, MessageKeys.Generator.Rail.Menu.EDITOR_ANVIL_TITLE))
                 .plugin(BuildTeamTools.getInstance())
                 .open(clickPlayer);
     }
@@ -279,7 +291,7 @@ public class RailTypeEditorMenu extends AbstractMenu {
         String error = railTypeManager.saveRailType(railType);
 
         if (error != null) {
-            clickPlayer.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(error)));
+            clickPlayer.sendMessage(Messages.component(MessageKeys.Generator.Rail.Menu.VALIDATION_ERROR, Component.text(error)));
             playSound(clickPlayer, Sound.ENTITY_ITEM_BREAK);
             return;
         }
@@ -289,12 +301,10 @@ public class RailTypeEditorMenu extends AbstractMenu {
         if (settings instanceof RailSettings railSettings)
             railSettings.setValue(RailFlag.RAIL_TYPE, railType);
 
-        clickPlayer.sendMessage(ChatHelper.getStandardComponent(
-                true,
-                "Saved rail type %s as '%s'.",
-                displayName,
-                identifier
-        ));
+        clickPlayer.sendMessage(Messages.component(
+                MessageKeys.Generator.Rail.Menu.EDITOR_SAVED,
+                Component.text(railType.getDisplayName()),
+                Component.text(railType.getIdentifier())));
         playSound(clickPlayer, Sound.UI_BUTTON_CLICK);
 
         new RailTypeMenu(clickPlayer, true);
@@ -334,24 +344,30 @@ public class RailTypeEditorMenu extends AbstractMenu {
     }
 
     private ItemStack createBlockItem(String name, List<XMaterial> materials, String description) {
-        List<String> lore = new java.util.ArrayList<>();
+        Player player = getMenuPlayer();
+        List<Component> lore = new java.util.ArrayList<>();
         lore.add(gray(description));
         for (XMaterial material : materials)
             lore.add(white(RailTypeMenu.formatMaterial(material)));
-        lore.add(gray("Click to choose one or more materials."));
+        lore.add(Messages.render(player, MessageKeys.Generator.Rail.Menu.EDITOR_CLICK_MATERIALS));
         Material icon = materials.getFirst().get();
-        return Item.create(icon == null ? Material.BARRIER : icon, yellow(name), lore);
+        return ItemComponents.of(icon == null ? Material.BARRIER : icon, yellow(name), lore);
     }
+
     private ItemStack createBlockItem(String name, XMaterial material, String description) {
+        Player player = getMenuPlayer();
         Material bukkitMaterial = material.get();
 
         if (bukkitMaterial == null)
             bukkitMaterial = Objects.requireNonNull(XMaterial.BARRIER.get());
 
-        return Item.create(
+        Component displayName = yellow(name + ": ").append(white(RailTypeMenu.formatMaterial(material)));
+        return ItemComponents.of(
                 bukkitMaterial,
-                yellow(name + ": ") + white(RailTypeMenu.formatMaterial(material)),
-                List.of(gray(description), gray("Click to choose a different block."))
+                displayName,
+                List.of(
+                        gray(description),
+                        Messages.render(player, MessageKeys.Generator.Rail.Menu.EDITOR_CLICK_BLOCK))
         );
     }
 
@@ -359,34 +375,24 @@ public class RailTypeEditorMenu extends AbstractMenu {
         if (draft.getDisplayName() != null)
             return draft.getDisplayName();
 
-        return draft.getIdentifier() == null ? "Custom Rail" : draft.getIdentifier();
+        return draft.getIdentifier() == null
+                ? Messages.plain(getMenuPlayer(), MessageKeys.Generator.Rail.Menu.EDITOR_DEFAULT_NAME)
+                : draft.getIdentifier();
     }
 
     private void playSound(Player player, Sound sound) {
         player.playSound(player, sound, 1.0F, 1.0F);
     }
 
-    private static String darkGray(String text) {
-        return RailMenuText.color(NamedTextColor.DARK_GRAY, text);
+    private static Component gray(String text) {
+        return RailMenuText.colored(NamedTextColor.GRAY, text);
     }
 
-    private static String gray(String text) {
-        return RailMenuText.color(NamedTextColor.GRAY, text);
+    private static Component white(String text) {
+        return RailMenuText.colored(NamedTextColor.WHITE, text);
     }
 
-    private static String white(String text) {
-        return RailMenuText.color(NamedTextColor.WHITE, text);
-    }
-
-    private static String yellow(String text) {
-        return RailMenuText.color(NamedTextColor.YELLOW, text);
-    }
-
-    private static String green(String text) {
-        return RailMenuText.color(NamedTextColor.GREEN, text);
-    }
-
-    private static String red(String text) {
-        return RailMenuText.color(NamedTextColor.RED, text);
+    private static Component yellow(String text) {
+        return RailMenuText.colored(NamedTextColor.YELLOW, text);
     }
 }

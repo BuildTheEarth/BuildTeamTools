@@ -3,7 +3,10 @@ package net.buildtheearth.buildteamtools.modules.navigation.components.warps.mig
 import com.alpsbte.alpslib.utils.ChatHelper;
 import com.earth2me.essentials.Essentials;
 import com.earth2me.essentials.Warps;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.navigation.NavUtils;
+import net.kyori.adventure.text.Component;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.WarpsComponent;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.MigrationResult;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.WarpGroup;
@@ -39,7 +42,9 @@ public class EssentialsWarpMigrator implements IWarpMigrator {
                         """
                                 An error occurred while migrating the essentials warps! (this probably means essentials isn't /installed)
                                  %s""", e);
-                return MigrationResult.failure("Failed to access Essentials warps. Is Essentials installed? Error: " + e.getMessage());
+                return MigrationResult.failure(Messages.plain(
+                        MessageKeys.Warp.MIGRATE_ESSENTIALS_ACCESS_FAILED,
+                        Component.text(String.valueOf(e.getMessage()))));
             }
         });
     }
@@ -49,7 +54,9 @@ public class EssentialsWarpMigrator implements IWarpMigrator {
             WarpGroup group =
                     WarpsComponent.getOtherWarpGroup(Objects.requireNonNull(NetworkModule.getInstance().getBuildTeam()).getWarpGroups());
             if (group != null && group.getWarps().stream().anyMatch(w -> w.getName().equalsIgnoreCase(warp))) {
-                ChatHelper.sendErrorMessage(player, "Warp '%s' already exists in the database, skipping migration.", warp);
+                player.sendMessage(Messages.component(
+                        MessageKeys.Warp.MIGRATE_ALREADY_EXISTS,
+                        Component.text(warp)));
                 return false;
             }
 

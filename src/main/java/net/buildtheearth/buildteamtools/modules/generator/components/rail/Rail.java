@@ -1,6 +1,5 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.rail;
 
-import com.alpsbte.alpslib.utils.ChatHelper;
 import com.alpsbte.alpslib.utils.GeneratorUtils;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -8,6 +7,8 @@ import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import lombok.Getter;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.configuration.RailTypeManager;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.generation.RailScripts;
@@ -47,9 +48,7 @@ public class Rail extends GeneratorComponent {
         if (isSupportedRailSelection(region))
             return true;
 
-        player.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
-                "Rail Generator supports cuboid, polygonal and convex WorldEdit selections."
-        )));
+        player.sendMessage(Messages.component(MessageKeys.Generator.Rail.UNSUPPORTED_SELECTION));
         player.closeInventory();
         playSound(player, Sound.ENTITY_ITEM_BREAK);
         return false;
@@ -81,9 +80,7 @@ public class Rail extends GeneratorComponent {
     }
 
     private void sendAlreadyGeneratingMessage(Player player) {
-        player.sendMessage(ChatHelper.PREFIX_COMPONENT.append(ChatHelper.getErrorComponent(
-                "Rail Generator is already running. Please wait until the current generation is finished."
-        )));
+        player.sendMessage(Messages.component(MessageKeys.Generator.Rail.ALREADY_RUNNING));
         playSound(player, Sound.ENTITY_ITEM_BREAK);
     }
 

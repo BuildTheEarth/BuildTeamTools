@@ -2,7 +2,10 @@ package net.buildtheearth.buildteamtools.modules.generator.components.rail.menu;
 
 import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import net.buildtheearth.buildteamtools.utils.menus.BlockListMenu;
 import org.bukkit.Bukkit;
@@ -37,7 +40,7 @@ public class RailBlockPickerMenu extends BlockListMenu {
 
     private RailBlockPickerMenu(Player player, RailTypeDraft draft, RailBlockRole role,
                                boolean autoLoad, List<ItemStack> choices) {
-        super(player, role.getMenuTitle(), choices, createParentMenu(player, draft, role), false);
+        super(player, Messages.plain(player, role.getMenuTitleKey()), choices, createParentMenu(player, draft, role), false);
 
         this.draft = draft;
         this.role = role;
@@ -73,14 +76,21 @@ public class RailBlockPickerMenu extends BlockListMenu {
     @Override
     protected void setPreviewItems() {
         super.setPreviewItems();
-        getMenu().getSlot(CUSTOM_BLOCK_SLOT).setItem(Item.create(Material.HOPPER, "§eUse Your Own Block",
-                List.of("§7Pick up an item from your inventory,", "§7then click here to select its material.",
-                        "§7Your item is not consumed.")));
-        getMenu().getSlot(SELECTION_SLOT).setItem(Item.create(Material.PAPER, "§eSelected Materials",
-                List.of("§f" + String.join(", ", selectedMaterials),
-                        role != RailBlockRole.ICON
-                                ? "§7Click blocks to add/remove them from the palette."
-                                : "§7Choose one material.", "§7Click Next to apply; Back discards changes.")));
+        Player player = getMenuPlayer();
+        getMenu().getSlot(CUSTOM_BLOCK_SLOT).setItem(ItemComponents.of(
+                Material.HOPPER,
+                Messages.render(player, MessageKeys.Generator.Rail.Menu.PICKER_USE_OWN),
+                Messages.loreComponents(player, MessageKeys.Generator.Rail.Menu.PICKER_USE_OWN_LORE)));
+        getMenu().getSlot(SELECTION_SLOT).setItem(ItemComponents.of(
+                Material.PAPER,
+                Messages.render(player, MessageKeys.Generator.Rail.Menu.PICKER_SELECTED),
+                Messages.loreComponents(
+                        player,
+                        MessageKeys.Generator.Rail.Menu.PICKER_SELECTED_LORE,
+                        net.kyori.adventure.text.Component.text(String.join(", ", selectedMaterials)),
+                        Messages.component(role != RailBlockRole.ICON
+                                ? MessageKeys.Generator.Rail.Menu.PICKER_SELECTED_HINT_MULTI
+                                : MessageKeys.Generator.Rail.Menu.PICKER_SELECTED_HINT_SINGLE))));
         getMenu().update(getMenuPlayer());
     }
 
@@ -116,8 +126,9 @@ public class RailBlockPickerMenu extends BlockListMenu {
             clickInformation.setResult(Event.Result.DENY);
             ItemStack item = clickPlayer.getItemOnCursor();
             if (!isValidItem(item, role)) {
-                clickPlayer.sendMessage("§cPick up a " + (role == RailBlockRole.ICON ? "non-empty item" : "block")
-                        + " from your inventory first.");
+                clickPlayer.sendMessage(Messages.component(role == RailBlockRole.ICON
+                        ? MessageKeys.Generator.Rail.Menu.PICKER_NEED_ITEM
+                        : MessageKeys.Generator.Rail.Menu.PICKER_NEED_BLOCK));
                 return;
             }
             String material = XMaterial.matchXMaterial(item.getType()).name();

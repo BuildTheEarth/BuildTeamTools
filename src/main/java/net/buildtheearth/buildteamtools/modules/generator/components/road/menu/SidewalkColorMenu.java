@@ -1,5 +1,7 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.road.menu;
 
+import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
 import com.alpsbte.alpslib.utils.item.Item;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
 import net.buildtheearth.buildteamtools.modules.generator.components.road.RoadFlag;
@@ -12,11 +14,9 @@ import org.bukkit.entity.Player;
 
 public class SidewalkColorMenu extends BlockListMenu {
 
-    public static final String ROAD_COLOR_INV_NAME = "Choose a Sidewalk Block";
-
 
     public SidewalkColorMenu(Player player, boolean autoLoad) {
-        super(player, ROAD_COLOR_INV_NAME, MenuItems.getSolidBlocks(), new RoadColorMenu(player, false), autoLoad);
+        super(player, Messages.plain(player, MessageKeys.Generator.Road.SIDEWALK_TITLE), MenuItems.getSolidBlocks(), new RoadColorMenu(player, false), autoLoad);
     }
 
     @Override

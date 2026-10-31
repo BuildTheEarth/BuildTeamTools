@@ -1,8 +1,8 @@
 package net.buildtheearth.buildteamtools.modules.network.model;
 
 import lombok.experimental.UtilityClass;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import org.bukkit.command.CommandSender;
-import com.alpsbte.alpslib.utils.ChatHelper;
 
 @UtilityClass
 public class Permissions {
@@ -62,7 +62,6 @@ public class Permissions {
     }
 
     public static void sendNoPermissionMessage(CommandSender sender, String permission) {
-        sender.sendMessage(ChatHelper.getErrorComponent("You don't have permission to execute this command. Required " +
-                "permission: " + permission));
+        sender.sendMessage(Messages.noPermission(permission));
     }
 }

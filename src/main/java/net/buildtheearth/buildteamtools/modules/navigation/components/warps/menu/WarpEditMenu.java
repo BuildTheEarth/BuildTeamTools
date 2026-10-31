@@ -1,23 +1,24 @@
 package net.buildtheearth.buildteamtools.modules.navigation.components.warps.menu;
 
-import com.alpsbte.alpslib.utils.ChatHelper;
-import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.OutOfProjectionBoundsException;
 import net.buildtheearth.Projection;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.WarpsComponent;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.Warp;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
-import net.buildtheearth.buildteamtools.utils.ListUtil;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
 import net.buildtheearth.buildteamtools.utils.heads.LetterType;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import net.buildtheearth.model.GeographicalCoordinate;
+import net.kyori.adventure.text.Component;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -28,12 +29,10 @@ import org.ipvp.canvas.mask.Mask;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 public class WarpEditMenu extends AbstractMenu {
-
-    public static String WARP_UPDATE_INV_NAME = "Configure the Warp";
-
 
     public static int WARP_SLOT = 4;
     public static int LOCATION_SLOT = 19;
@@ -56,7 +55,7 @@ public class WarpEditMenu extends AbstractMenu {
      * @param warp   The warp that is being updated.
      */
     public WarpEditMenu(Player player, Warp warp, boolean alreadyExists, boolean autoLoad) {
-        super(4, WARP_UPDATE_INV_NAME, player, autoLoad);
+        super(4, Messages.component(MessageKeys.Warp.Edit.TITLE), player, autoLoad);
 
         this.warp = warp;
         this.alreadyExists = alreadyExists;
@@ -73,49 +72,88 @@ public class WarpEditMenu extends AbstractMenu {
 
     @Override
     protected void setMenuItemsAsync() {
+        Player player = getMenuPlayer();
+
         // Set the confirmation item
-        getMenu().getSlot(CONFIRM_SLOT).setItem(HeadFactory.head(HeadTexture.CHECKMARK, alreadyExists ? "§aUpdate" : "§aCreate"));
+        getMenu().getSlot(CONFIRM_SLOT).setItem(HeadFactory.head(
+                HeadTexture.CHECKMARK,
+                Messages.render(player, alreadyExists ? MessageKeys.Warp.Edit.UPDATE : MessageKeys.Warp.Edit.CREATE)));
 
         // Set the warp item
-        getMenu().getSlot(WARP_SLOT).setItem(warp.getMaterialItem());
+        getMenu().getSlot(WARP_SLOT).setItem(warp.getMaterialItem(player));
 
         // Set the location item if the warp already exists. Otherwise, the location is set automatically on creation.
         if (alreadyExists) {
-            ArrayList<String> locationLore = ListUtil.createList("", "§eWorld: §7" + warp.getWorldName(),
-                    "§eLatitude: §7" + warp.getCoordinate().latitude(), "§eLongitude: §7" + warp.getCoordinate().longitude(),
-                    "§eElevation: §7" + warp.getY());
-            getMenu().getSlot(LOCATION_SLOT).setItem(Item.create(Objects.requireNonNull(XMaterial.COMPASS.get()), "§6§lChange Location", locationLore));
+            List<Component> locationLore = new ArrayList<>(Messages.loreComponents(
+                    player,
+                    MessageKeys.Warp.Edit.LOCATION_LORE,
+                    Component.text(String.valueOf(warp.getWorldName())),
+                    Component.text(String.valueOf(warp.getCoordinate().latitude())),
+                    Component.text(String.valueOf(warp.getCoordinate().longitude())),
+                    Component.text(String.valueOf(warp.getY()))));
+            getMenu().getSlot(LOCATION_SLOT).setItem(ItemComponents.of(
+                    Objects.requireNonNull(XMaterial.COMPASS.get()),
+                    Messages.render(player, MessageKeys.Warp.Edit.CHANGE_LOCATION),
+                    locationLore));
 
         }
 
         // Set the name item
-        ArrayList<String> nameLore = ListUtil.createList("", "§eCurrent Name: ", warp.getName());
-        getMenu().getSlot(NAME_SLOT).setItem(Item.create(Objects.requireNonNull(XMaterial.NAME_TAG.get()), "§6§lChange Name", nameLore));
+        List<Component> nameLore = new ArrayList<>(Messages.loreComponents(
+                player, MessageKeys.Warp.Edit.NAME_LORE, Component.text(warp.getName())));
+        getMenu().getSlot(NAME_SLOT).setItem(ItemComponents.of(
+                Objects.requireNonNull(XMaterial.NAME_TAG.get()),
+                Messages.render(player, MessageKeys.Warp.Edit.CHANGE_NAME),
+                nameLore));
 
         // Set the group item
-        ArrayList<String> groupLore = ListUtil.createList("", "§eCurrent Group: ", warp.getWarpGroup().getName());
+        List<Component> groupLore = new ArrayList<>(Messages.loreComponents(
+                player, MessageKeys.Warp.Edit.GROUP_LORE, Component.text(warp.getWarpGroup().getName())));
         getMenu().getSlot(GROUP_SLOT).setItem(HeadFactory.letter(
                 LetterType.WOODEN,
                 warp.getWarpGroup().getName().charAt(0),
-                "§6§lChange Warp Group",
+                Messages.render(player, MessageKeys.Warp.Edit.CHANGE_GROUP),
                 groupLore
         ));
 
         // Set the address type item
-        ArrayList<String> addressTypeLore = ListUtil.createList("", "§eAddress Type: ", warp.getAddressType() == null ? "§7City" : warp.getAddressType().getName());
-        getMenu().getSlot(ADDRESS_TYPE_SLOT).setItem(Item.create(Objects.requireNonNull(XMaterial.PAPER.get()), "§6§lChange Address Type", addressTypeLore));
+        String addressTypeName = warp.getAddressType() == null
+                ? Messages.plain(player, MessageKeys.Warp.Edit.ADDRESS_TYPE_CITY_DEFAULT)
+                : warp.getAddressType().getName();
+        List<Component> addressTypeLore = new ArrayList<>(Messages.loreComponents(
+                player, MessageKeys.Warp.Edit.ADDRESS_TYPE_LORE, Component.text(addressTypeName)));
+        getMenu().getSlot(ADDRESS_TYPE_SLOT).setItem(ItemComponents.of(
+                Objects.requireNonNull(XMaterial.PAPER.get()),
+                Messages.render(player, MessageKeys.Warp.Edit.CHANGE_ADDRESS_TYPE),
+                addressTypeLore));
 
         // Set the material item
-        ArrayList<String> materialLore = ListUtil.createList("", "§eMaterial: ", warp.getMaterial() == null ? "§7Default" : warp.getMaterial());
-        getMenu().getSlot(MATERIAL_SLOT).setItem(new Item(warp.getMaterialItem()).setDisplayName("§6§lChange Material").setLore(materialLore).build());
+        String materialName = warp.getMaterial() == null
+                ? Messages.plain(player, MessageKeys.Warp.Edit.MATERIAL_DEFAULT)
+                : warp.getMaterial();
+        List<Component> materialLore = new ArrayList<>(Messages.loreComponents(
+                player, MessageKeys.Warp.Edit.MATERIAL_LORE, Component.text(materialName)));
+        getMenu().getSlot(MATERIAL_SLOT).setItem(ItemComponents.named(
+                warp.getMaterialItem(player),
+                Messages.render(player, MessageKeys.Warp.Edit.CHANGE_MATERIAL),
+                materialLore));
 
         // Set the highlight item
-        ArrayList<String> highlightLore = ListUtil.createList("", "§eIs Highlight: ", "" + warp.isHighlight());
-        getMenu().getSlot(HIGHLIGHT_SLOT).setItem(Item.create(Objects.requireNonNull(XMaterial.NETHER_STAR.get()), warp.isHighlight() ? "§6§lMake Normal" : "§6§lMake Highlight", highlightLore));
+        List<Component> highlightLore = new ArrayList<>(Messages.loreComponents(
+                player, MessageKeys.Warp.Edit.HIGHLIGHT_LORE, Component.text(String.valueOf(warp.isHighlight()))));
+        getMenu().getSlot(HIGHLIGHT_SLOT).setItem(ItemComponents.of(
+                Objects.requireNonNull(XMaterial.NETHER_STAR.get()),
+                Messages.render(player, warp.isHighlight()
+                        ? MessageKeys.Warp.Edit.MAKE_NORMAL
+                        : MessageKeys.Warp.Edit.MAKE_HIGHLIGHT),
+                highlightLore));
 
         // Set the delete item
         if (alreadyExists)
-            getMenu().getSlot(DELETE_SLOT).setItem(Item.create(Objects.requireNonNull(XMaterial.BARRIER.get()), "§c§lDelete Warp", ListUtil.createList("", "§8Click to delete the warp.")));
+            getMenu().getSlot(DELETE_SLOT).setItem(ItemComponents.of(
+                    Objects.requireNonNull(XMaterial.BARRIER.get()),
+                    Messages.render(player, MessageKeys.Warp.Edit.DELETE),
+                    Messages.loreComponents(player, MessageKeys.Warp.Edit.DELETE_LORE)));
     }
 
     @Override
@@ -159,9 +197,9 @@ public class WarpEditMenu extends AbstractMenu {
                         .exceptionally(e -> {
                             Throwable cause = e.getCause() != null ? e.getCause() : e;
 
-                            clickPlayer.sendMessage(ChatHelper.getErrorString(
-                                    "Failed to change location: %s",
-                                    cause.getMessage()
+                            clickPlayer.sendMessage(Messages.component(
+                                    MessageKeys.Warp.Edit.LOCATION_CHANGE_FAILED,
+                                    Component.text(String.valueOf(cause.getMessage()))
                             ));
 
                             BuildTeamTools.getInstance().getComponentLogger().error(
@@ -173,7 +211,9 @@ public class WarpEditMenu extends AbstractMenu {
                         });
 
             } catch (OutOfProjectionBoundsException e) {
-                clickPlayer.sendMessage(ChatHelper.getErrorString("Cannot set location here: %s", e.getMessage()));
+                clickPlayer.sendMessage(Messages.component(
+                        MessageKeys.Warp.Edit.LOCATION_SET_HERE_FAILED,
+                        Component.text(String.valueOf(e.getMessage()))));
             }
         });
 
@@ -201,9 +241,11 @@ public class WarpEditMenu extends AbstractMenu {
                                 })
                         );
                     })
-                    .text("Name")
-                    .itemLeft(Item.create(Objects.requireNonNull(XMaterial.NAME_TAG.get()), "§6§lChange Name"))
-                    .title("§8Change the warp name")
+                    .text(Messages.plain(clickPlayer, MessageKeys.Warp.Edit.ANVIL_TEXT))
+                    .itemLeft(ItemComponents.of(
+                            Objects.requireNonNull(XMaterial.NAME_TAG.get()),
+                            Messages.render(clickPlayer, MessageKeys.Warp.Edit.CHANGE_NAME)))
+                    .title(Messages.legacy(clickPlayer, MessageKeys.Warp.Edit.ANVIL_TITLE))
                     .plugin(BuildTeamTools.getInstance())
                     .open(clickPlayer);
         });
@@ -252,7 +294,7 @@ public class WarpEditMenu extends AbstractMenu {
                         buildTeam.deleteWarp(clickPlayer, warp);
                     }
                 } else {
-                    clickPlayer.sendMessage(ChatHelper.getErrorString("You don't have the required permission to delete warps!"));
+                    clickPlayer.sendMessage(Messages.component(MessageKeys.Warp.Edit.DELETE_NO_PERMISSION));
                 }
             });
     }

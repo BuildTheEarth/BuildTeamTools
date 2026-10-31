@@ -1,5 +1,8 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.field;
 
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
+
 import com.alpsbte.alpslib.utils.GeneratorUtils;
 import net.buildtheearth.buildteamtools.modules.generator.model.Flag;
 import net.buildtheearth.buildteamtools.modules.generator.model.GeneratorComponent;
@@ -83,8 +86,7 @@ public class FieldScripts extends Script {
             File[] schematics = directory.getAbsoluteFile().listFiles();
 
             if (schematics == null) {
-                getPlayer().sendMessage("§c§lERROR: §cNo schematics found! If this error persists, you might need to reinstall " +
-                        "the GeneratorCollections.");
+                getPlayer().sendMessage(Messages.component(MessageKeys.Generator.Scripts.NO_SCHEMATICS));
                 return;
             }
 

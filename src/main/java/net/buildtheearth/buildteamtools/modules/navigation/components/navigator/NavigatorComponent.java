@@ -1,13 +1,15 @@
 package net.buildtheearth.buildteamtools.modules.navigation.components.navigator;
 
-import com.alpsbte.alpslib.utils.ChatHelper;
-import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import com.sk89q.worldedit.WorldEdit;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.ModuleComponent;
 import net.buildtheearth.buildteamtools.modules.common.CommonModule;
 import net.buildtheearth.buildteamtools.utils.io.NavigationConfig;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
+import net.kyori.adventure.audience.Audience;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -74,15 +76,21 @@ public class NavigatorComponent extends ModuleComponent {
 
         if (!inventory.contains(getItem())) {
             inventory.setItem(getSlot(), getItem());
-            ChatHelper.sendSuccessfulMessage(player, "You turned the navigator %s.", "on");
+            player.sendMessage(Messages.component(
+                    MessageKeys.Navigator.TOGGLED,
+                    Messages.component(MessageKeys.Navigator.STATE_ON)));
         } else {
             inventory.remove(getItem());
-            ChatHelper.sendSuccessfulMessage(player, "You turned the navigator %s.", "off");
+            player.sendMessage(Messages.component(
+                    MessageKeys.Navigator.TOGGLED,
+                    Messages.component(MessageKeys.Navigator.STATE_OFF)));
         }
     }
 
     public ItemStack getItem() {
-        var item = Item.edit(Objects.requireNonNull(XMaterial.COMPASS.parseItem()), "§aNavigator");
+        ItemStack item = ItemComponents.displayName(
+                Objects.requireNonNull(XMaterial.COMPASS.parseItem()),
+                Messages.render((Audience) null, Messages.component(MessageKeys.Navigator.ITEM_NAME)));
         item.editPersistentDataContainer(pdc -> pdc.set(navigatorKey, PersistentDataType.BOOLEAN, true));
         return item;
     }

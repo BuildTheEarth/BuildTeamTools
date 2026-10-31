@@ -3,9 +3,13 @@ package net.buildtheearth.buildteamtools.modules;
 import com.alpsbte.alpslib.utils.ChatHelper;
 import lombok.Getter;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -105,7 +109,7 @@ public class ModuleHandler {
                 String reason = "";
 
                 if (module.getError() != null && !module.getError().isEmpty())
-                    reason = " Reason: §c" + module.getError();
+                    reason = " Reason: " + module.getError();
 
                 ChatHelper.logError("Failed to enable the %s Module%s", module.getModuleName(), reason);
             }
@@ -113,14 +117,16 @@ public class ModuleHandler {
 
         if (executor != null) {
             if (module.isEnabled())
-                executor.sendMessage("§7[§a✔§7] Successfully§a enabled §7the §e" + module.getModuleName() + " Module§7.");
+                executor.sendMessage(Messages.component(
+                        MessageKeys.Module.ENABLE_SUCCESS, Component.text(module.getModuleName())));
             else {
-                String reason = "";
-
-                if (module.getError() != null && !module.getError().isEmpty())
-                    reason = " Reason: §c" + module.getError();
-
-                executor.sendMessage("§7[§c✖§7] Failed to§a enable §7the §e" + module.getModuleName() + " Module§7." + reason);
+                Component reason = module.getError() != null && !module.getError().isEmpty()
+                        ? Messages.component(MessageKeys.Module.FAILURE_REASON, Component.text(module.getError()))
+                        : Component.empty();
+                executor.sendMessage(Messages.component(
+                        MessageKeys.Module.ENABLE_FAILED,
+                        Component.text(module.getModuleName()),
+                        reason));
             }
 
         }
@@ -155,21 +161,23 @@ public class ModuleHandler {
             String reason = "";
 
             if (module.getError() != null && !module.getError().isEmpty())
-                reason = " Reason: §c" + module.getError();
+                reason = " Reason: " + module.getError();
 
             ChatHelper.logError("Failed to disable the %s Module%s", module.getModuleName(), reason);
         }
 
         if (executor != null) {
             if (!module.isEnabled())
-                executor.sendMessage("§7[§a✔§7] Successfully§c disabled §7the §e" + module.getModuleName() + " Module§7.");
+                executor.sendMessage(Messages.component(
+                        MessageKeys.Module.DISABLE_SUCCESS, Component.text(module.getModuleName())));
             else {
-                String reason = "";
-
-                if (module.getError() != null && !module.getError().isEmpty())
-                    reason = " Reason: §c" + module.getError();
-
-                executor.sendMessage("§7[§c✖§7] Failed to§c disable §7the §e" + module.getModuleName() + " Module§7." + reason);
+                Component reason = module.getError() != null && !module.getError().isEmpty()
+                        ? Messages.component(MessageKeys.Module.FAILURE_REASON, Component.text(module.getError()))
+                        : Component.empty();
+                executor.sendMessage(Messages.component(
+                        MessageKeys.Module.DISABLE_FAILED,
+                        Component.text(module.getModuleName()),
+                        reason));
             }
         }
 
@@ -210,30 +218,58 @@ public class ModuleHandler {
     }
 
     private void sendBuildTeamToolsConsoleStartupMessage() {
-        Bukkit.getConsoleSender().sendMessage(" ");
-        Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "--------------- BuildTeamTools V" + BuildTeamTools.getInstance().getDescription().getVersion() + " ----------------");
-        Bukkit.getConsoleSender().sendMessage(" ");
+        ConsoleCommandSender console = Bukkit.getConsoleSender();
+        String version = BuildTeamTools.getInstance().getPluginMeta().getVersion();
 
-        for (Module module : new ArrayList<>(modules))
-            if (module.isEnabled())
-                Bukkit.getConsoleSender().sendMessage("§7[§aOK§7] Successfully loaded §e" + module.getModuleName() + " Module§7" +
-                        ".");
-            else {
-                String reason = "";
+        console.sendMessage(Component.empty());
+        console.sendMessage(Component.text(
+                "--------------- BuildTeamTools V" + version + " ----------------",
+                NamedTextColor.YELLOW));
+        console.sendMessage(Component.empty());
 
-                if (module.getError() != null && !module.getError().isEmpty())
-                    reason = " Reason: §c" + module.getError();
-
-                Bukkit.getConsoleSender().sendMessage("§7[§cX§7]  Failed to load the §e" + module.getModuleName() + " Module§7" +
-                        "." + reason);
+        for (Module module : new ArrayList<>(modules)) {
+            if (module.isEnabled()) {
+                console.sendMessage(Component.text()
+                        .append(Component.text("[", NamedTextColor.GRAY))
+                        .append(Component.text("OK", NamedTextColor.GREEN))
+                        .append(Component.text("] Successfully loaded ", NamedTextColor.GRAY))
+                        .append(Component.text(module.getModuleName(), NamedTextColor.YELLOW))
+                        .append(Component.text(" Module.", NamedTextColor.GRAY))
+                        .build());
+            } else {
+                var line = Component.text()
+                        .append(Component.text("[", NamedTextColor.GRAY))
+                        .append(Component.text("X", NamedTextColor.RED))
+                        .append(Component.text("]  Failed to load the ", NamedTextColor.GRAY))
+                        .append(Component.text(module.getModuleName(), NamedTextColor.YELLOW))
+                        .append(Component.text(" Module.", NamedTextColor.GRAY));
+                if (module.getError() != null && !module.getError().isEmpty()) {
+                    line.append(Component.text(" Reason: ", NamedTextColor.GRAY))
+                            .append(Component.text(module.getError(), NamedTextColor.RED));
+                }
+                console.sendMessage(line.build());
             }
+        }
 
-        Bukkit.getConsoleSender().sendMessage(" ");
-        Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "------------------------------------------------------------");
-        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_GRAY + "> " + ChatColor.GRAY + "Made by §bBuildTheEarth");
-        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_GRAY + "> " + ChatColor.GRAY + "GitHub:" + ChatColor.WHITE + " " +
-                "https://github.com/BuildTheEarth/BuildTeamTools");
-        Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "------------------------------------------------------------");
-        Bukkit.getConsoleSender().sendMessage(" ");
+        console.sendMessage(Component.empty());
+        console.sendMessage(Component.text(
+                "------------------------------------------------------------",
+                NamedTextColor.YELLOW));
+        console.sendMessage(Component.text()
+                .append(Component.text("> ", NamedTextColor.DARK_GRAY))
+                .append(Component.text("Made by ", NamedTextColor.GRAY))
+                .append(Component.text("BuildTheEarth", NamedTextColor.AQUA))
+                .build());
+        console.sendMessage(Component.text()
+                .append(Component.text("> ", NamedTextColor.DARK_GRAY))
+                .append(Component.text("GitHub: ", NamedTextColor.GRAY))
+                .append(Component.text(
+                        "https://github.com/BuildTheEarth/BuildTeamTools",
+                        NamedTextColor.WHITE))
+                .build());
+        console.sendMessage(Component.text(
+                "------------------------------------------------------------",
+                NamedTextColor.YELLOW));
+        console.sendMessage(Component.empty());
     }
 }

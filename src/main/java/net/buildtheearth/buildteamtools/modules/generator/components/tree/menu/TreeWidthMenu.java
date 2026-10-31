@@ -1,7 +1,10 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.tree.menu;
 
-import com.alpsbte.alpslib.utils.item.Item;
+import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
 import com.cryptomorin.xseries.XMaterial;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
+import net.kyori.adventure.text.Component;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
 import net.buildtheearth.buildteamtools.modules.generator.components.tree.TreeFlag;
 import net.buildtheearth.buildteamtools.modules.generator.components.tree.TreeSettings;
@@ -21,10 +24,8 @@ import java.util.Objects;
 
 public class TreeWidthMenu extends NameListMenu {
 
-    public static final String TREE_TYPE_INV_NAME = "Choose a Tree Width";
-
     public TreeWidthMenu(Player player, boolean autoLoad) {
-        super(player, TREE_TYPE_INV_NAME, getTreeWidths(), new TreeTypeMenu(player, false), autoLoad);
+        super(player, Messages.plain(player, MessageKeys.Generator.Tree.WIDTH_TITLE), getTreeWidths(), new TreeTypeMenu(player, false), autoLoad);
     }
 
     /**
@@ -33,10 +34,16 @@ public class TreeWidthMenu extends NameListMenu {
     private static @NonNull List<MutablePair<ItemStack, String>> getTreeWidths() {
         List<MutablePair<ItemStack, String>> treeWidths = new ArrayList<>();
 
-        treeWidths.add(new MutablePair<>(new Item(Objects.requireNonNull(XMaterial.LIME_CONCRETE.parseItem())).setDisplayName("Any").build(), "Any"));
+        treeWidths.add(new MutablePair<>(
+                ItemComponents.named(Objects.requireNonNull(XMaterial.LIME_CONCRETE.parseItem()), Component.text("Any")),
+                "Any"));
 
         for (TreeWidth treeWidth : TreeWidth.values())
-            treeWidths.add(new MutablePair<>(Item.create(Objects.requireNonNull(XMaterial.JUNGLE_SAPLING.get()), StringUtils.capitalize(treeWidth.getName())), treeWidth.getName()));
+            treeWidths.add(new MutablePair<>(
+                    ItemComponents.of(
+                            Objects.requireNonNull(XMaterial.JUNGLE_SAPLING.get()),
+                            Component.text(StringUtils.capitalize(treeWidth.getName()))),
+                    treeWidth.getName()));
 
         return treeWidths;
     }

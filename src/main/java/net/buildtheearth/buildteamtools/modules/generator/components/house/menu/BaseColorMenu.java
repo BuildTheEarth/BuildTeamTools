@@ -1,5 +1,7 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.house.menu;
 
+import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
 import com.alpsbte.alpslib.utils.item.Item;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
 import net.buildtheearth.buildteamtools.modules.generator.components.house.HouseFlag;
@@ -12,10 +14,8 @@ import org.bukkit.entity.Player;
 
 public class BaseColorMenu extends BlockListMenu {
 
-    public static final String BASE_TYPE_INV_NAME = "Choose a Base Floor Color";
-
     public BaseColorMenu(Player player, boolean autoLoad) {
-        super(player, BASE_TYPE_INV_NAME, MenuItems.getSolidBlocks(), new RoofColorMenu(player, false), autoLoad);
+        super(player, Messages.plain(player, MessageKeys.Generator.House.BASE_COLOR_TITLE), MenuItems.getSolidBlocks(), new RoofColorMenu(player, false), autoLoad);
     }
 
     @Override

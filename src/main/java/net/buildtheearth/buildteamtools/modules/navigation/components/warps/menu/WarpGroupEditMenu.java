@@ -1,21 +1,22 @@
 package net.buildtheearth.buildteamtools.modules.navigation.components.warps.menu;
 
 import com.alpsbte.alpslib.utils.AlpsUtils;
-import com.alpsbte.alpslib.utils.ChatHelper;
-import com.alpsbte.alpslib.utils.item.Item;
 import com.cryptomorin.xseries.XMaterial;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
+import net.buildtheearth.buildteamtools.i18n.Messages;
 import net.buildtheearth.buildteamtools.modules.navigation.components.warps.model.WarpGroup;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
-import net.buildtheearth.buildteamtools.utils.ListUtil;
+import net.buildtheearth.buildteamtools.utils.ItemComponents;
 import net.buildtheearth.buildteamtools.utils.MenuItems;
 import net.buildtheearth.buildteamtools.utils.heads.HeadFactory;
 import net.buildtheearth.buildteamtools.utils.heads.HeadTexture;
 import net.buildtheearth.buildteamtools.utils.heads.LetterType;
 import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import net.buildtheearth.buildteamtools.utils.menus.BookMenu;
+import net.kyori.adventure.text.Component;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -27,8 +28,6 @@ import java.util.*;
 import static net.buildtheearth.buildteamtools.modules.navigation.components.warps.menu.WarpEditMenu.CONFIRM_SLOT;
 
 public class WarpGroupEditMenu extends AbstractMenu {
-
-    private static final String WARP_GROUP_UPDATE_INV_NAME = "Configure the Warp Group";
 
     private static final int WARP_GROUP = 4;
     private static final int NAME_SLOT = 18;
@@ -52,7 +51,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
      * @param warpGroup The warp that is being updated.
      */
     public WarpGroupEditMenu(Player player, WarpGroup warpGroup, boolean alreadyExists, boolean autoLoad) {
-        super(4, WARP_GROUP_UPDATE_INV_NAME, player, autoLoad);
+        super(4, Messages.component(MessageKeys.Warp.GroupEdit.TITLE), player, autoLoad);
 
         this.warpGroup = warpGroup;
         this.alreadyExists = alreadyExists;
@@ -60,37 +59,65 @@ public class WarpGroupEditMenu extends AbstractMenu {
 
     @Override
     protected void setMenuItemsAsync() {
+        Player player = getMenuPlayer();
+
         // Set the confirmation item
-        getMenu().getSlot(CONFIRM_SLOT).setItem(HeadFactory.head(HeadTexture.CHECKMARK, alreadyExists ? "§aUpdate" : "§aCreate"));
+        getMenu().getSlot(CONFIRM_SLOT).setItem(HeadFactory.head(
+                HeadTexture.CHECKMARK,
+                Messages.render(player, alreadyExists ? MessageKeys.Warp.Edit.UPDATE : MessageKeys.Warp.Edit.CREATE)));
 
         // Set the warp group item
         getMenu().getSlot(WARP_GROUP).setItem(
                 HeadFactory.letter(
                         LetterType.WOODEN,
                         warpGroup.getName().charAt(0),
-                        "§6§l" + warpGroup.getName(),
-                        warpGroup.getDescriptionLore()
+                        Messages.render(player, MessageKeys.Warp.Menu.ITEM_NAME, Component.text(warpGroup.getName())),
+                        warpGroup.getDescriptionLore(player)
                 )
         );
 
         // Set the name item
-        ArrayList<String> nameLore = ListUtil.createList("", "§eCurrent Name: ", warpGroup.getName());
-        getMenu().getSlot(NAME_SLOT).setItem(Item.create(Objects.requireNonNull(XMaterial.NAME_TAG.get()), "§6§lChange Name", nameLore));
+        List<Component> nameLore = new ArrayList<>(Messages.loreComponents(
+                player, MessageKeys.Warp.Edit.NAME_LORE, Component.text(warpGroup.getName())));
+        getMenu().getSlot(NAME_SLOT).setItem(ItemComponents.of(
+                Objects.requireNonNull(XMaterial.NAME_TAG.get()),
+                Messages.render(player, MessageKeys.Warp.Edit.CHANGE_NAME),
+                nameLore));
 
         // Set the Description item
-        getMenu().getSlot(DESCRIPTION_SLOT).setItem(Item.create(Objects.requireNonNull(XMaterial.BOOK.get()), "§6§lChange Description", warpGroup.getDescriptionLore()));
+        getMenu().getSlot(DESCRIPTION_SLOT).setItem(ItemComponents.of(
+                Objects.requireNonNull(XMaterial.BOOK.get()),
+                Messages.render(player, MessageKeys.Warp.GroupEdit.CHANGE_DESCRIPTION),
+                warpGroup.getDescriptionLore(player)));
 
         // Set the Slot item
         int slot = warpGroup.getSlot();
-        ArrayList<String> slotLore = ListUtil.createList("", "§eSlot: ", slot < 0 || slot >= 27 ? "§7Auto" : String.valueOf(slot));
-        getMenu().getSlot(SLOT_SLOT).setItem(new Item(Objects.requireNonNull(XMaterial.ITEM_FRAME.get())).setDisplayName("§6§lChange Slot").setLore(slotLore).build());
+        String slotValue = slot < 0 || slot >= 27
+                ? Messages.plain(player, MessageKeys.Warp.GroupEdit.SLOT_AUTO)
+                : String.valueOf(slot);
+        List<Component> slotLore = new ArrayList<>(Messages.loreComponents(
+                player, MessageKeys.Warp.GroupEdit.SLOT_LORE, Component.text(slotValue)));
+        getMenu().getSlot(SLOT_SLOT).setItem(ItemComponents.of(
+                Objects.requireNonNull(XMaterial.ITEM_FRAME.get()),
+                Messages.render(player, MessageKeys.Warp.GroupEdit.CHANGE_SLOT),
+                slotLore));
 
         // Set the Material item
-        ArrayList<String> materialLore = ListUtil.createList("", "§eMaterial: ", warpGroup.getMaterial() == null ? "§7Default" : warpGroup.getMaterial());
-        getMenu().getSlot(MATERIAL_SLOT).setItem(new Item(warpGroup.getMaterialItem()).setDisplayName("§6§lChange Material").setLore(materialLore).build());
+        String materialName = warpGroup.getMaterial() == null
+                ? Messages.plain(player, MessageKeys.Warp.Edit.MATERIAL_DEFAULT)
+                : warpGroup.getMaterial();
+        List<Component> materialLore = new ArrayList<>(Messages.loreComponents(
+                player, MessageKeys.Warp.Edit.MATERIAL_LORE, Component.text(materialName)));
+        getMenu().getSlot(MATERIAL_SLOT).setItem(ItemComponents.named(
+                warpGroup.getMaterialItem(player),
+                Messages.render(player, MessageKeys.Warp.Edit.CHANGE_MATERIAL),
+                materialLore));
 
         // Set the delete item
-        getMenu().getSlot(DELETE_SLOT).setItem(Item.create(Objects.requireNonNull(XMaterial.BARRIER.get()), "§c§lDelete Warp Group", ListUtil.createList("", "§8Click to delete the warp group.")));
+        getMenu().getSlot(DELETE_SLOT).setItem(ItemComponents.of(
+                Objects.requireNonNull(XMaterial.BARRIER.get()),
+                Messages.render(player, MessageKeys.Warp.GroupEdit.DELETE),
+                Messages.loreComponents(player, MessageKeys.Warp.GroupEdit.DELETE_LORE)));
     }
 
     @Override
@@ -132,9 +159,11 @@ public class WarpGroupEditMenu extends AbstractMenu {
                                 })
                         );
                     })
-                    .text("Name")
-                    .itemLeft(Item.create(Objects.requireNonNull(XMaterial.NAME_TAG.get()), "§6§lChange Name"))
-                    .title("§8Change the warp name")
+                    .text(Messages.plain(clickPlayer, MessageKeys.Warp.GroupEdit.ANVIL_NAME_TEXT))
+                    .itemLeft(ItemComponents.of(
+                            Objects.requireNonNull(XMaterial.NAME_TAG.get()),
+                            Messages.render(clickPlayer, MessageKeys.Warp.Edit.CHANGE_NAME)))
+                    .title(Messages.legacy(clickPlayer, MessageKeys.Warp.GroupEdit.ANVIL_NAME_TITLE))
                     .plugin(BuildTeamTools.getInstance())
                     .open(clickPlayer);
         });
@@ -146,11 +175,16 @@ public class WarpGroupEditMenu extends AbstractMenu {
             List<String[]> description = new ArrayList<>();
             description.add(warpGroup.getDescription().split("<br>"));
 
-            BookMenu bookMenu = new BookMenu(clickPlayer, "§6§lChange Description", clickPlayer.getName(), description, 240);
+            BookMenu bookMenu = new BookMenu(
+                    clickPlayer,
+                    Messages.render(clickPlayer, MessageKeys.Warp.GroupEdit.BOOK_DESCRIPTION_TITLE),
+                    clickPlayer.getName(),
+                    description,
+                    240);
 
             bookMenu.onComplete(text -> {
                 if (text == null) {
-                    clickPlayer.sendMessage("§cA problem occurred while saving the description.");
+                    clickPlayer.sendMessage(Messages.component(MessageKeys.Warp.GroupEdit.DESCRIPTION_SAVE_FAILED));
                     new WarpGroupEditMenu(clickPlayer, warpGroup, alreadyExists, true);
                     return;
                 }
@@ -189,7 +223,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
                                     AnvilGUI.ResponseAction.run(() -> {
                                         clickPlayer.closeInventory();
                                         stateSnapshot.getPlayer().playSound(clickPlayer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-                                        clickPlayer.sendMessage("§cThis is not a valid slot. Enter a value between -1 and 26.");
+                                        clickPlayer.sendMessage(Messages.component(MessageKeys.Warp.GroupEdit.INVALID_SLOT));
                                         new WarpGroupEditMenu(clickPlayer, warpGroup, alreadyExists, true);
                                     })
                             );
@@ -205,8 +239,10 @@ public class WarpGroupEditMenu extends AbstractMenu {
                                     AnvilGUI.ResponseAction.run(() -> {
                                         clickPlayer.closeInventory();
                                         stateSnapshot.getPlayer().playSound(clickPlayer.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
-                                        clickPlayer.sendMessage("§cThe warp group " + warpGroups.get() +
-                                                " already have the slot " + selectedSlot + " occupied.");
+                                        clickPlayer.sendMessage(Messages.component(
+                                                MessageKeys.Warp.GroupEdit.SLOT_OCCUPIED,
+                                                Component.text(warpGroups.get()),
+                                                Component.text(String.valueOf(selectedSlot))));
                                         new WarpGroupEditMenu(clickPlayer, warpGroup, alreadyExists, true);
                                     })
                             );
@@ -221,9 +257,11 @@ public class WarpGroupEditMenu extends AbstractMenu {
                                 })
                         );
                     })
-                    .text("Enter slot 0-26. Set -1 for auto.")
-                    .itemLeft(Item.create(Objects.requireNonNull(XMaterial.ITEM_FRAME.get()), "§6§lChange Slot"))
-                    .title("§8Change the warp slot")
+                    .text(Messages.plain(clickPlayer, MessageKeys.Warp.GroupEdit.ANVIL_SLOT_TEXT))
+                    .itemLeft(ItemComponents.of(
+                            Objects.requireNonNull(XMaterial.ITEM_FRAME.get()),
+                            Messages.render(clickPlayer, MessageKeys.Warp.GroupEdit.CHANGE_SLOT)))
+                    .title(Messages.legacy(clickPlayer, MessageKeys.Warp.GroupEdit.ANVIL_SLOT_TITLE))
                     .plugin(BuildTeamTools.getInstance())
                     .open(clickPlayer);
         });
@@ -249,7 +287,7 @@ public class WarpGroupEditMenu extends AbstractMenu {
                     } else buildTeam.deleteWarpGroup(clickPlayer, warpGroup, false);
                 }
             } else {
-                clickPlayer.sendMessage(ChatHelper.getErrorString("You don't have the permission to delete warp groups!"));
+                clickPlayer.sendMessage(Messages.component(MessageKeys.Warp.GroupEdit.DELETE_NO_PERMISSION));
             }
 
         });

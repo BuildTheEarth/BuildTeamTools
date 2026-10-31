@@ -1,5 +1,7 @@
 package net.buildtheearth.buildteamtools.modules.generator.components.house.menu;
 
+import net.buildtheearth.buildteamtools.i18n.Messages;
+import net.buildtheearth.buildteamtools.i18n.MessageKeys;
 import com.alpsbte.alpslib.utils.item.Item;
 import net.buildtheearth.buildteamtools.modules.generator.GeneratorModule;
 import net.buildtheearth.buildteamtools.modules.generator.components.house.HouseFlag;
@@ -13,10 +15,8 @@ import org.bukkit.entity.Player;
 
 public class WallColorMenu extends BlockListMenu {
 
-    public static final String WALL_COLOR_INV_NAME = "Choose a Wall Block";
-
     public WallColorMenu(Player player, boolean autoLoad) {
-        super(player, WALL_COLOR_INV_NAME, MenuItems.getWallBlocks(), new GeneratorMenu(player, false), autoLoad);
+        super(player, Messages.plain(player, MessageKeys.Generator.House.WALL_COLOR_TITLE), MenuItems.getWallBlocks(), new GeneratorMenu(player, false), autoLoad);
     }
 
     @Override

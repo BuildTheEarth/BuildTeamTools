@@ -21,6 +21,8 @@ import net.buildtheearth.Projection;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.Module;
 import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
+import net.buildtheearth.buildteamtools.modules.common.metrics.FeatureUsage;
+import net.buildtheearth.buildteamtools.modules.common.metrics.UsageFeature;
 import net.buildtheearth.buildteamtools.modules.map.MapModule;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.buildteamtools.utils.io.MapConfig;
@@ -102,6 +104,7 @@ public class MapCreateCommand {
             request.name(claimName);
         }
 
+        FeatureUsage.record(UsageFeature.MAP);
         player.sendMessage(ChatHelper.getStandardComponent(false, "Creating map claim from your selection..."));
         Bukkit.getScheduler().runTaskAsynchronously(BuildTeamTools.getInstance(),
                 () -> submitClaim(player, request));

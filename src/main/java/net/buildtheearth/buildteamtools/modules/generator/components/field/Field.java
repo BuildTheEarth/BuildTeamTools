@@ -25,6 +25,7 @@ public class Field extends GeneratorComponent {
         if (!checkForPlayer(p))
             return;
 
+        recordUse();
         new FieldScripts(p, this);
     }
 }

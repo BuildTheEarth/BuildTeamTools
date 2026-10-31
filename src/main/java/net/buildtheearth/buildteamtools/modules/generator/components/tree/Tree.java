@@ -52,6 +52,7 @@ public class Tree extends GeneratorComponent {
         if (!checkForPlayer(p))
             return;
 
+        recordUse();
         TreeScripts.treescript_v_1_0(p, this);
     }
 }

@@ -6,6 +6,9 @@ import de.micromata.opengis.kml.v_2_2_0.Coordinate;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.Module;
 import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
+import net.buildtheearth.buildteamtools.modules.common.metrics.FeatureUsage;
+import net.buildtheearth.buildteamtools.modules.common.metrics.UsageDetail;
+import net.buildtheearth.buildteamtools.modules.common.metrics.UsageFeature;
 import net.buildtheearth.buildteamtools.modules.navigation.NavUtils;
 import net.buildtheearth.buildteamtools.utils.BlockLocation;
 import net.buildtheearth.buildteamtools.utils.LineRasterization;
@@ -268,6 +271,7 @@ public class KmlCommand {
             return false;
         }
 
+        recordKml(blockCreationCommand);
         String kml_content = String.join(" ", args);
 
         Material matchedBlockMaterial = Material.matchMaterial(blocktypeString);
@@ -498,6 +502,7 @@ public class KmlCommand {
      * @return true if the CommandBlock was created successfully
      */
     public boolean createPasteUI(Player player, String alias, String @NonNull [] args) {
+        recordKml(alias);
         //The command either creates a command-block at the player location
         //arguments are an 
         //  optional blocktype 
@@ -580,6 +585,7 @@ public class KmlCommand {
             return false;
         }
 
+        FeatureUsage.record(UsageDetail.KML_UNDO);
         ChangeTransaction transaction = playerHistory.pop();
         transaction.undo();
         player.sendMessage(String.format("undo successful. Restored %d blocks.", transaction.size()));
@@ -671,6 +677,20 @@ public class KmlCommand {
             }
         }
         return mcLines;
+    }
+
+    private static void recordKml(@NonNull String command) {
+        UsageDetail detail = switch (command) {
+            case GEOPOINTS_COMMAND -> UsageDetail.KML_GEOPOINTS;
+            case GEOPATH_COMMAND -> UsageDetail.KML_GEOPATH;
+            case GEORING_COMMAND -> UsageDetail.KML_GEORING;
+            case GEOSURFACE_COMMAND -> UsageDetail.KML_GEOSURFACE;
+            default -> null;
+        };
+        if (detail == null)
+            FeatureUsage.record(UsageFeature.KML);
+        else
+            FeatureUsage.record(detail);
     }
 
     /**

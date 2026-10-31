@@ -5,6 +5,8 @@ import com.google.common.io.ByteStreams;
 import lombok.Getter;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.Module;
+import net.buildtheearth.buildteamtools.modules.common.metrics.FeatureUsage;
+import net.buildtheearth.buildteamtools.modules.common.metrics.UsageFeature;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.stats.listeners.StatsListener;
 import net.buildtheearth.buildteamtools.modules.stats.model.StatsPlayer;
@@ -118,7 +120,7 @@ public class StatsModule extends Module {
         out.writeUTF(StatsModule.getInstance().getCurrentCache().toJSONString());
 
         p.sendPluginMessage(BuildTeamTools.getInstance(), "btt:buildteam", out.toByteArray());
-
+        FeatureUsage.record(UsageFeature.STATS);
         return true;
     }
 

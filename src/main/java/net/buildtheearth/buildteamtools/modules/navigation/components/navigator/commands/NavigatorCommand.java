@@ -5,6 +5,8 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.Module;
 import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
+import net.buildtheearth.buildteamtools.modules.common.metrics.FeatureUsage;
+import net.buildtheearth.buildteamtools.modules.common.metrics.UsageDetail;
 import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
 import net.buildtheearth.buildteamtools.modules.navigation.menu.CitySelectorMenu;
 import net.buildtheearth.buildteamtools.modules.navigation.menu.CountrySelectorMenu;
@@ -40,7 +42,8 @@ public class NavigatorCommand {
         var commandManager = BuildTeamTools.getInstance().getCommandManager();
         commandManager.registerNoArguments(owner, "navigator", Permissions.NAVIGATOR_USE, this::openNavigator);
         registerSubcommand(owner, "explore", "Open the continent selection menu.",
-                context -> openPlayer(context.sender().getSender(), player -> new ExploreMenu(player, true)));
+                context -> openPlayer(context.sender().getSender(), UsageDetail.NAVIGATOR_EXPLORE,
+                        player -> new ExploreMenu(player, true)));
         registerSubcommand(owner, "countries", "Open the country selection menu for a continent.",
                 builder -> builder
                         .permission(Permissions.NAVIGATOR_USE)
@@ -56,10 +59,11 @@ public class NavigatorCommand {
                                 String.join(", ", continentNames())));
                         return;
                     }
-                    openPlayer(sender, player -> new CountrySelectorMenu(player, continent, true));
+                    openPlayer(sender, UsageDetail.NAVIGATOR_COUNTRIES,
+                            player -> new CountrySelectorMenu(player, continent, true));
                 });
         registerSubcommand(owner, "states", "Open the USA state selection menu.",
-                context -> openPlayer(context.sender().getSender(),
+                context -> openPlayer(context.sender().getSender(), UsageDetail.NAVIGATOR_STATES,
                         player -> new StateSelectorMenu(player, Continent.NORTH_AMERICA, true)));
         registerSubcommand(owner, "cities", "Open the city selection menu for a supported state.",
                 builder -> builder
@@ -80,25 +84,28 @@ public class NavigatorCommand {
                                 String.join(", ", cityStateNames())));
                         return;
                     }
-                    openPlayer(sender, player -> new CitySelectorMenu(
+                    openPlayer(sender, UsageDetail.NAVIGATOR_CITIES, player -> new CitySelectorMenu(
                             state, StateSelectorMenu.getCityTeamsForState(state), player, true));
                 });
         // The module constructor registers commands before its own config field is set
         NavigationConfig.MainMenuItems items = BuildTeamTools.getInstance().getNavigationConfig().mainMenuItems();
         if (items.buildItem().enabled()) {
             registerSubcommand(owner, "build", "Run the configured Build menu action.",
-                    context -> openPlayer(context.sender().getSender(), MainMenu::openBuild));
+                    context -> openPlayer(context.sender().getSender(), UsageDetail.NAVIGATOR_BUILD,
+                            MainMenu::openBuild));
         }
         if (items.plotsystemItem().enabled()) {
             registerSubcommand(owner, "plotsystem", "Run the configured Plot System menu action.",
-                    context -> openPlayer(context.sender().getSender(), MainMenu::openPlotSystem));
+                    context -> openPlayer(context.sender().getSender(), UsageDetail.NAVIGATOR_PLOTSYSTEM,
+                            MainMenu::openPlotSystem));
         }
         if (items.tutorialItem().enabled()) {
             registerSubcommand(owner, "tutorials", "Open the tutorial menu or run its configured action.",
-                    context -> openPlayer(context.sender().getSender(), MainMenu::openTutorials));
+                    context -> openPlayer(context.sender().getSender(), UsageDetail.NAVIGATOR_TUTORIALS,
+                            MainMenu::openTutorials));
         }
         registerSubcommand(owner, "toggle", "Toggle the navigator hotbar item.",
-                context -> openPlayer(context.sender().getSender(),
+                context -> openPlayer(context.sender().getSender(), UsageDetail.NAVIGATOR_TOGGLE,
                         NavigationModule.getInstance().getNavigatorComponent()::toggle));
     }
 
@@ -126,14 +133,15 @@ public class NavigatorCommand {
     }
 
     private void openNavigator(@NonNull CommandSender sender) {
-        openPlayer(sender, MainMenu::new);
+        openPlayer(sender, UsageDetail.NAVIGATOR_MENU, MainMenu::new);
     }
 
-    private void openPlayer(@NonNull CommandSender sender, Consumer<Player> action) {
+    private void openPlayer(@NonNull CommandSender sender, UsageDetail detail, Consumer<Player> action) {
         if (!(sender instanceof Player player)) {
             sendPlayerOnlyMessage(sender);
             return;
         }
+        FeatureUsage.record(detail);
         action.accept(player);
     }
 

@@ -5,8 +5,10 @@ import net.buildtheearth.Projection;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.Module;
 import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
-import net.buildtheearth.buildteamtools.modules.network.api.NominatimAPI;
+import net.buildtheearth.buildteamtools.modules.common.metrics.FeatureUsage;
+import net.buildtheearth.buildteamtools.modules.common.metrics.UsageDetail;
 import net.buildtheearth.buildteamtools.modules.network.api.PhotonAPI;
+import net.buildtheearth.buildteamtools.modules.network.api.NominatimAPI;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.buildtheearth.model.GeographicalCoordinate;
 import net.kyori.adventure.text.Component;
@@ -86,6 +88,7 @@ public class AddressCommand {
             return;
         }
 
+        FeatureUsage.record(UsageDetail.ADDRESS_GET);
         player.sendMessage("Getting closest address...");
 
         final GeographicalCoordinate geoCoord;
@@ -173,6 +176,7 @@ public class AddressCommand {
             return;
         }
 
+        FeatureUsage.record(UsageDetail.ADDRESS_TELEPORT);
         String lang = player.locale().getLanguage();
 
         PhotonAPI.getCoordinatesFromAddressAsync(address, lang)

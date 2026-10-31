@@ -115,6 +115,12 @@ tasks.shadowJar {
     // Prevents the plugin itself from being relocated by autorelocate
     // This is needed because net.buildtheearth.projection shares the same package namespace
     relocate("net.buildtheearth.buildteamtools", "net.buildtheearth.buildteamtools")
+
+    // Let KotlinModuleMetadataTransformer merge okhttp/okio/stdlib .kotlin_module files
+    // (default EXCLUDE drops duplicates before the transformer sees them).
+    filesMatching("META-INF/*.kotlin_module") {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
 }
 
 tasks.assemble {

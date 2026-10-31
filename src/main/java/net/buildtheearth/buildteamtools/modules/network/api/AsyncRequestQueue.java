@@ -146,7 +146,6 @@ public final class AsyncRequestQueue implements AutoCloseable {
 
     /**
      * Schedules the next dispatch using the earliest allowed start time.
-     *
      * Must be called while holding this instance's monitor.
      */
     private void scheduleDispatchLocked() {
@@ -229,7 +228,7 @@ public final class AsyncRequestQueue implements AutoCloseable {
     private <T> void execute(QueuedRequest<T> request) {
         try {
             CompletableFuture<T> operationFuture =
-                    request.operation.get();
+                    request.operation().get();
 
             if (operationFuture == null) {
                 throw new NullPointerException(
@@ -239,19 +238,18 @@ public final class AsyncRequestQueue implements AutoCloseable {
 
             operationFuture.whenComplete((value, error) -> {
                 if (error != null) {
-                    request.result.completeExceptionally(error);
+                    request.result().completeExceptionally(error);
                 } else {
-                    request.result.complete(value);
+                    request.result().complete(value);
                 }
             });
         } catch (Exception e) {
-            request.result.completeExceptionally(e);
+            request.result().completeExceptionally(e);
         }
     }
 
     /**
      * Removes all waiting requests.
-     *
      * Must be called while holding this instance's monitor.
      *
      * @return the removed requests
@@ -279,7 +277,7 @@ public final class AsyncRequestQueue implements AutoCloseable {
             RejectedExecutionException exception
     ) {
         for (QueuedRequest<?> request : requests) {
-            request.result.completeExceptionally(exception);
+            request.result().completeExceptionally(exception);
         }
     }
 
@@ -322,17 +320,9 @@ public final class AsyncRequestQueue implements AutoCloseable {
      *
      * @param <T> operation result type
      */
-    private static final class QueuedRequest<T> {
-
-        private final Supplier<CompletableFuture<T>> operation;
-        private final CompletableFuture<T> result;
-
-        private QueuedRequest(
-                Supplier<CompletableFuture<T>> operation,
-                CompletableFuture<T> result
-        ) {
-            this.operation = operation;
-            this.result = result;
-        }
+    private record QueuedRequest<T>(
+            Supplier<CompletableFuture<T>> operation,
+            CompletableFuture<T> result
+    ) {
     }
 }

@@ -63,16 +63,16 @@ public class NominatimAPI {
                 jsonObject
         );
 
-        Object displayName = jsonObject.get("display_name");
+        String displayName = jsonObject.optString("display_name", "").trim();
 
-        if (displayName == null || displayName.toString().isBlank()) {
+        if (displayName.isEmpty()) {
             ChatHelper.logError(
                     "No address data found for these coordinates."
             );
             return "";
         }
 
-        return displayName.toString();
+        return displayName;
     }
 
     public static void shutdownQueue() {

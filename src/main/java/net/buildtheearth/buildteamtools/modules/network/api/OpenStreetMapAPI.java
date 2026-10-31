@@ -100,10 +100,16 @@ public class OpenStreetMapAPI extends API {
             return;
         }
 
-        String countryCodeCca2 = propertiesObject.optString("countrycode", "");
+        String rawCountryCode = propertiesObject.optString("countrycode", "").trim();
+        String countryCodeCca2 = rawCountryCode.isEmpty()
+                ? null
+                : rawCountryCode.toUpperCase(Locale.ROOT);
         String countryName = propertiesObject.optString("country", null);
+        if (countryName != null && countryName.isBlank()) {
+            countryName = null;
+        }
 
-        future.complete(new RegionLookupResult(countryName, countryCodeCca2.toUpperCase(Locale.ROOT)));
+        future.complete(new RegionLookupResult(countryName, countryCodeCca2));
     }
 
 }

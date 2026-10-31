@@ -20,6 +20,7 @@ import net.buildtheearth.buildteamtools.utils.menus.AbstractMenu;
 import net.buildtheearth.model.GeographicalCoordinate;
 import net.kyori.adventure.text.Component;
 import net.wesjd.anvilgui.AnvilGUI;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -182,7 +183,7 @@ public class WarpEditMenu extends AbstractMenu {
                 GeographicalCoordinate coordinate = Projection.toGeo(location.getX(), location.getZ());
 
                 WarpsComponent.getOwnedRegionFromLocation(coordinate, clickPlayer)
-                        .thenAccept(result -> {
+                        .thenAccept(result -> Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), () -> {
                             warp.setCountryCode(result.countryCodeCCA2());
                             warp.setWorldName(location.getWorld().getName());
                             warp.setY(location.getY());
@@ -193,14 +194,15 @@ public class WarpEditMenu extends AbstractMenu {
                             clickPlayer.playSound(clickPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
 
                             new WarpEditMenu(clickPlayer, warp, alreadyExists, true);
-                        })
+                        }))
                         .exceptionally(e -> {
                             Throwable cause = e.getCause() != null ? e.getCause() : e;
 
-                            clickPlayer.sendMessage(Messages.component(
-                                    MessageKeys.Warp.Edit.LOCATION_CHANGE_FAILED,
-                                    Component.text(String.valueOf(cause.getMessage()))
-                            ));
+                            Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), () ->
+                                    clickPlayer.sendMessage(Messages.component(
+                                            MessageKeys.Warp.Edit.LOCATION_CHANGE_FAILED,
+                                            Component.text(String.valueOf(cause.getMessage()))
+                                    )));
 
                             BuildTeamTools.getInstance().getComponentLogger().error(
                                     "An error occurred while changing the location of the warp!",

@@ -23,12 +23,6 @@ public class API {
             .connectTimeout(30, TimeUnit.SECONDS)
             .build();
 
-    private static final String USER_AGENT = "BuildTeamTools/"
-            + BuildTeamTools.getInstance().getPluginMeta().getVersion()
-            + " (contact: "
-            + BuildTeamTools.getInstance().getMainConfig().contactEmail()
-            + ")";
-
     /**
      * A callback function to be able to handle the result of an API request
      */
@@ -268,6 +262,18 @@ public class API {
     private static Request.Builder createRequestBuilder(String url) {
         return new Request.Builder()
                 .url(url)
-                .header("User-Agent", USER_AGENT);
+                .header("User-Agent", userAgent());
+    }
+
+    /**
+     * Builds the User-Agent on each request so config reloads of {@code contact-email} apply.
+     */
+    private static String userAgent() {
+        BuildTeamTools plugin = BuildTeamTools.getInstance();
+        return "BuildTeamTools/"
+                + plugin.getPluginMeta().getVersion()
+                + " (contact: "
+                + plugin.getMainConfig().contactEmail()
+                + ")";
     }
 }

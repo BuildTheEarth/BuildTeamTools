@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Getter
 public class NetworkModule extends Module {
@@ -183,16 +182,24 @@ public class NetworkModule extends Module {
     }
 
     public boolean ownsRegion(String regionName, String countryCodeCca2) {
-        AtomicBoolean ownsRegion = new AtomicBoolean(false);
-        if (buildTeam != null && buildTeam.getRegions() != null) {
-            buildTeam.getRegions().forEach(region -> {
-                ChatHelper.logDebug("Checking region: %s against %s, %s", region.toString(), regionName, countryCodeCca2);
-                if (region.getName().equals(regionName) || region.getCountryCodeCca2().equals(countryCodeCca2))
-                    ownsRegion.set(true);
-            });
+        if (buildTeam == null || buildTeam.getRegions() == null) {
+            return false;
         }
 
-        return ownsRegion.get();
+        for (Region region : buildTeam.getRegions()) {
+            ChatHelper.logDebug("Checking region: %s against %s, %s", region.toString(), regionName, countryCodeCca2);
+            if (region.getName().equals(regionName)) {
+                return true;
+            }
+            if (region.getType() == RegionType.COUNTRY
+                    && countryCodeCca2 != null
+                    && !countryCodeCca2.isBlank()
+                    && countryCodeCca2.equalsIgnoreCase(region.getCountryCodeCca2())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 

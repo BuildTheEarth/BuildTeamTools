@@ -319,7 +319,8 @@ public class WarpsComponent extends ModuleComponent {
     ) {
         return OpenStreetMapAPI.getCountryFromLocationAsync(coordinate, fallbackLookup)
                 .thenApply(result -> {
-                    if (result.countryCodeCCA2() == null) {
+                    String countryCode = result.countryCodeCCA2();
+                    if (countryCode == null || countryCode.isBlank()) {
                         return new RegionLookupResult(
                                 result.regionName(),
                                 NavUtils.getCCA2FromCountryName(result.regionName()));

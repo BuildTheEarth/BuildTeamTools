@@ -194,27 +194,12 @@ public class NavUtils {
     }
 
     /**
-     * Returns the CCA2 code of the country of the given country name.
+     * Returns the CCA2 code for a country name from the global region registry,
+     * or {@code null} when the name is unknown. Does not message the player —
+     * callers decide how to report ownership / lookup failures.
      */
-    public static String getCCA2FromCountryName(String countryName, Player clickPlayer) {
-        Region region = findRegionByName(countryName);
-        if (region != null) {
-            return region.getCountryCodeCca2();
-        }
-
-        clickPlayer.sendMessage(Messages.component(MessageKeys.Navigation.COUNTRY_NOT_FOUND));
-        return "";
-    }
-
-    private static @Nullable Region findRegionByName(String countryName) {
-        BuildTeam buildTeam = NetworkModule.getInstance().getBuildTeam();
-        if (buildTeam == null) {
-            return null;
-        }
-
-        return buildTeam.getRegions().stream()
-                .filter(region -> region.getName().equals(countryName))
-                .findFirst()
-                .orElse(null);
+    public static @Nullable String getCCA2FromCountryName(String countryName) {
+        Region region = Region.getByName(countryName);
+        return region != null ? region.getCountryCodeCca2() : null;
     }
 }

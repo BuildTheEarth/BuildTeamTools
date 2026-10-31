@@ -293,13 +293,13 @@ public class WarpsComponent extends ModuleComponent {
             GeographicalCoordinate coordinate,
             Player player
     ) {
-        return getRegionLookupResult(coordinate, false, player)
+        return getRegionLookupResult(coordinate, false)
                 .thenCompose(result -> {
                     if (ownsRegion(result)) {
                         return CompletableFuture.completedFuture(result);
                     }
 
-                    return getRegionLookupResult(coordinate, true, player)
+                    return getRegionLookupResult(coordinate, true)
                             .thenApply(fallbackResult -> {
                                 if (!ownsRegion(fallbackResult)) {
                                     throw new CompletionException(new IllegalStateException(
@@ -315,14 +315,14 @@ public class WarpsComponent extends ModuleComponent {
 
     private static @NotNull CompletableFuture<RegionLookupResult> getRegionLookupResult(
             GeographicalCoordinate coordinate,
-            boolean fallbackLookup,
-            Player player
+            boolean fallbackLookup
     ) {
         return OpenStreetMapAPI.getCountryFromLocationAsync(coordinate, fallbackLookup)
                 .thenApply(result -> {
                     if (result.countryCodeCCA2() == null) {
-                        return new RegionLookupResult(result.regionName(), NavUtils.getCCA2FromCountryName(result.regionName(),
-                                player));
+                        return new RegionLookupResult(
+                                result.regionName(),
+                                NavUtils.getCCA2FromCountryName(result.regionName()));
                     }
                     return result;
                 });

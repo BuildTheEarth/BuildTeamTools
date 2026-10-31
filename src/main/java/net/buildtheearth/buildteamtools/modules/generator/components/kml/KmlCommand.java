@@ -19,6 +19,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -26,7 +27,8 @@ import org.bukkit.block.CommandBlock;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.incendo.cloud.parser.standard.StringParser;
 import org.jspecify.annotations.NonNull;
@@ -58,6 +60,17 @@ public class KmlCommand {
     private static final String GEORING_COMMAND = "georing";
     private static final String GEOSURFACE_COMMAND = "geosurface";
     private static final String EXTEND_PREFIX = "-extend:";
+
+    private static final NamespacedKey KEY_PLAYER_NAME = namespacedKey("kml_player_name");
+    private static final NamespacedKey KEY_BLOCKTYPE = namespacedKey("kml_blocktype");
+    private static final NamespacedKey KEY_PREVIOUS_BLOCKTYPE = namespacedKey("kml_previous_blocktype");
+    private static final NamespacedKey KEY_BLOCK_CREATION_COMMAND = namespacedKey("kml_block_creation_command");
+    private static final NamespacedKey KEY_EXTEND_TO_GROUND = namespacedKey("kml_extend_to_ground");
+    private static final NamespacedKey KEY_EXTEND_TO_GROUND_BLOCKTYPE = namespacedKey("kml_extend_to_ground_blocktype");
+
+    private static NamespacedKey namespacedKey(String key) {
+        return new NamespacedKey("buildteamtools", key);
+    }
 
     public void register(Module owner) {
         var aliases = BuildTeamTools.getInstance().getMainConfig().commands().labels();
@@ -245,17 +258,20 @@ public class KmlCommand {
      */
     public boolean processKml(@NonNull Block senderBlock, String[] args) {
 
-        //read metadata to get player name/ID
         BlockState blockState = senderBlock.getState();
-        String playerName = blockState.getMetadata("kmlPlayerName").getFirst().asString();
-        String blocktypeString = blockState.getMetadata("kmlBlocktype").getFirst().asString();
-        String previousCommandBlockType = blockState.getMetadata("kmlPreviousBlocktype").getFirst().asString();
-        String blockCreationCommand = blockState.getMetadata("kmlBlockCreationCommand").getFirst().asString();
+        if (!(blockState instanceof CommandBlock commandBlock)) {
+            return false;
+        }
+
+        PersistentDataContainer data = commandBlock.getPersistentDataContainer();
+        String playerName = data.getOrDefault(KEY_PLAYER_NAME, PersistentDataType.STRING, "");
+        String blocktypeString = data.getOrDefault(KEY_BLOCKTYPE, PersistentDataType.STRING, "");
+        String previousCommandBlockType = data.getOrDefault(KEY_PREVIOUS_BLOCKTYPE, PersistentDataType.STRING, "");
+        String blockCreationCommand = data.getOrDefault(KEY_BLOCK_CREATION_COMMAND, PersistentDataType.STRING, "");
         BlockCreationMode operationMode = commandToCreationMode(blockCreationCommand);
 
-        boolean extendToGround = blockState.getMetadata("kmlExtendToGround").getFirst().asBoolean();
-        String extendToGroundBlockType = blockState.getMetadata("kmlExtendToGroundBlocktype").getFirst().asString();
-
+        boolean extendToGround = data.getOrDefault(KEY_EXTEND_TO_GROUND, PersistentDataType.BOOLEAN, false);
+        String extendToGroundBlockType = data.getOrDefault(KEY_EXTEND_TO_GROUND_BLOCKTYPE, PersistentDataType.STRING, "");
 
         if (playerName.isEmpty() || blocktypeString.isEmpty()) {
             //invalid metadata, cancel
@@ -563,15 +579,13 @@ public class KmlCommand {
         CommandBlock cmdBlock = (CommandBlock) block.getState();
 
         cmdBlock.setCommand("/btt kml "); //ready to paste kml content
-        cmdBlock.setMetadata("kmlPlayerName", new FixedMetadataValue(BuildTeamTools.getInstance(), player.getName()));
-        //cmdBlock.setMetadata("kmlPlayerID", new FixedMetadataValue(BuildTeamTools.getInstance(), p.getUniqueId()));
-        cmdBlock.setMetadata("kmlBlocktype", new FixedMetadataValue(BuildTeamTools.getInstance(), blocktype));
-        cmdBlock.setMetadata("kmlExtendToGround", new FixedMetadataValue(BuildTeamTools.getInstance(), extendToGround));
-        cmdBlock.setMetadata("kmlExtendToGroundBlocktype", new FixedMetadataValue(BuildTeamTools.getInstance(), extendToGroundBlockType));
-
-        cmdBlock.setMetadata("kmlPreviousBlocktype", new FixedMetadataValue(BuildTeamTools.getInstance(), previousMaterial.toString()));
-
-        cmdBlock.setMetadata("kmlBlockCreationCommand", new FixedMetadataValue(BuildTeamTools.getInstance(), alias));
+        PersistentDataContainer data = cmdBlock.getPersistentDataContainer();
+        data.set(KEY_PLAYER_NAME, PersistentDataType.STRING, player.getName());
+        data.set(KEY_BLOCKTYPE, PersistentDataType.STRING, blocktype);
+        data.set(KEY_EXTEND_TO_GROUND, PersistentDataType.BOOLEAN, extendToGround);
+        data.set(KEY_EXTEND_TO_GROUND_BLOCKTYPE, PersistentDataType.STRING, extendToGroundBlockType);
+        data.set(KEY_PREVIOUS_BLOCKTYPE, PersistentDataType.STRING, previousMaterial.toString());
+        data.set(KEY_BLOCK_CREATION_COMMAND, PersistentDataType.STRING, alias);
 
         cmdBlock.update();
         player.sendMessage(Messages.component(MessageKeys.Generator.Kml.COMMANDBLOCK_CREATED));

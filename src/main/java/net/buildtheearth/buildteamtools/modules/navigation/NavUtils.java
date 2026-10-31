@@ -18,9 +18,7 @@ import net.buildtheearth.model.MinecraftCoordinate;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.UnsafeValues;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Contract;
@@ -42,16 +40,14 @@ public class NavUtils {
     }
 
     public static boolean isTransferCapable(@NotNull Player player, @NotNull BuildTeam targetBuildTeam) {
-        // Must be 1.20.5 / 766 or higher for transfer capability
+        // Client must be 1.20.5 / 766+. Server is Paper 1.21+ for this plugin, so always capable.
         int playerVersion = player.getProtocolVersion();
-        UnsafeValues unsafeValues = Bukkit.getUnsafe();
-        int serverProtocolVersion = unsafeValues.getProtocolVersion();
 
-        ChatHelper.logDebug("Transfer check - Player protocol: %d, Server protocol: %s, BuildTeam: %s, Allows transfers:  %b, " +
-                        "IP: %s", playerVersion, serverProtocolVersion, targetBuildTeam.getBlankName(),
+        ChatHelper.logDebug("Transfer check - Player protocol: %d, BuildTeam: %s, Allows transfers: %b, IP: %s",
+                playerVersion, targetBuildTeam.getBlankName(),
                 targetBuildTeam.isAllowsTransfers(), targetBuildTeam.getIP());
 
-        return targetBuildTeam.isAllowsTransfers() && playerVersion >= 766 && serverProtocolVersion >= 766;
+        return targetBuildTeam.isAllowsTransfers() && playerVersion >= 766;
     }
 
     public static void transferPlayer(@NotNull Player player, @NotNull String ip) {

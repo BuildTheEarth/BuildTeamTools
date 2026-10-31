@@ -174,7 +174,7 @@ public class ChoosePaletteMenu extends AbstractMenu {
                         manager.updatePlayerFilters(p, filters);
 
                         // Update clicked slot title correctly (palette name if custom)
-                        ItemStack cur = getMenu().getSlot(slot).getItem();
+                        ItemStack cur = getMenu().getSlot(slot).getItem(p);
                         if (cur != null) {
                             String baseTitle;
                             BlockPaletteManager.Palette pal = manager.getPalette(key);

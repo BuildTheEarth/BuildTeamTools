@@ -33,6 +33,7 @@ public class House extends GeneratorComponent {
         if (!checkForPlayer(p))
             return;
 
+        recordUse();
         new HouseScripts(p, this);
     }
 }

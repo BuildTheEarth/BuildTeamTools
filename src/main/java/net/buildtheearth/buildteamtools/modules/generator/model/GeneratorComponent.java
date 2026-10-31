@@ -5,6 +5,8 @@ import com.alpsbte.alpslib.utils.ChatHelper;
 import com.alpsbte.alpslib.utils.WikiDocumented;
 import lombok.Getter;
 import net.buildtheearth.buildteamtools.modules.ModuleComponent;
+import net.buildtheearth.buildteamtools.modules.common.metrics.FeatureUsage;
+import net.buildtheearth.buildteamtools.modules.common.metrics.UsageFeature;
 import net.buildtheearth.buildteamtools.modules.generator.components.field.FieldSettings;
 import net.buildtheearth.buildteamtools.modules.generator.components.house.HouseSettings;
 import net.buildtheearth.buildteamtools.modules.generator.components.rail.RailSettings;
@@ -38,6 +40,19 @@ public abstract class GeneratorComponent extends ModuleComponent implements Wiki
     public abstract boolean checkForPlayer(Player p);
 
     public abstract void generate(Player p);
+
+    /**
+     * Records a generation that got past the feature's own checks.
+     */
+    protected void recordUse() {
+        FeatureUsage.record(switch (generatorType) {
+            case HOUSE -> UsageFeature.HOUSE;
+            case ROAD -> UsageFeature.ROAD;
+            case RAIL -> UsageFeature.RAIL;
+            case TREE -> UsageFeature.TREE;
+            case FIELD -> UsageFeature.FIELD;
+        });
+    }
 
     public void analyzeCommand(Player p, String[] args) {
         if (isHelpCommand(args)) {

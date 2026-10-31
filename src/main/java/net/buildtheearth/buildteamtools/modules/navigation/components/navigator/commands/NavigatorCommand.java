@@ -5,6 +5,8 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.Module;
 import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
+import net.buildtheearth.buildteamtools.modules.common.metrics.FeatureUsage;
+import net.buildtheearth.buildteamtools.modules.common.metrics.UsageFeature;
 import net.buildtheearth.buildteamtools.modules.navigation.NavigationModule;
 import net.buildtheearth.buildteamtools.modules.navigation.menu.CitySelectorMenu;
 import net.buildtheearth.buildteamtools.modules.navigation.menu.CountrySelectorMenu;
@@ -134,6 +136,7 @@ public class NavigatorCommand {
             sendPlayerOnlyMessage(sender);
             return;
         }
+        FeatureUsage.record(UsageFeature.NAVIGATOR);
         action.accept(player);
     }
 

@@ -6,6 +6,8 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.ModuleComponent;
+import net.buildtheearth.buildteamtools.modules.common.metrics.FeatureUsage;
+import net.buildtheearth.buildteamtools.modules.common.metrics.UsageFeature;
 import net.buildtheearth.buildteamtools.modules.navigation.NavUtils;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
@@ -79,6 +81,7 @@ public class TpllComponent extends ModuleComponent {
             return;
         }
 
+        FeatureUsage.record(UsageFeature.TPLL);
         player.teleport(tpllTarget);
         ChatHelper.logDebug("Teleported the player to the tpll target.");
         tpllQueue.remove(player.getUniqueId());
@@ -93,6 +96,7 @@ public class TpllComponent extends ModuleComponent {
      * @param targetServerName The server to send the player to.
      */
     public void tpllPlayer(@NotNull Player player, @NotNull GeographicalCoordinate coordinate, String targetServerName) {
+        FeatureUsage.record(UsageFeature.TPLL);
         ChatHelper.logDebug("Starting universal tpll teleportation for %s to %s.", player.getDisplayName(), targetServerName);
         // Send a plugin message to the target server which adds the tpll to the queue
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
@@ -108,6 +112,7 @@ public class TpllComponent extends ModuleComponent {
     }
 
     public void tpllPlayerTransfer(@NotNull Player player, @NotNull GeographicalCoordinate coordinate, String ip) {
+        FeatureUsage.record(UsageFeature.TPLL);
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeDouble(coordinate.latitude());
         out.writeDouble(coordinate.longitude());
@@ -120,6 +125,7 @@ public class TpllComponent extends ModuleComponent {
         double targetLatitude = in.readDouble();
         double targetLongitude = in.readDouble();
         ChatHelper.logDebug("Processing cookie for tpll event: lat: %s lon: %s", targetLatitude, targetLongitude);
+        FeatureUsage.record(UsageFeature.TPLL);
         Bukkit.getScheduler().runTask(BuildTeamTools.getInstance(), // Needs to be delayed if not exception will be trown and nothing happens
                 () -> player.performCommand("tpll " + targetLatitude + " " + targetLongitude));
     }

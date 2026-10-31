@@ -4,6 +4,8 @@ import com.alpsbte.alpslib.utils.ChatHelper;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.Module;
 import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
+import net.buildtheearth.buildteamtools.modules.common.metrics.FeatureUsage;
+import net.buildtheearth.buildteamtools.modules.common.metrics.UsageFeature;
 import net.buildtheearth.buildteamtools.modules.navigation.NavUtils;
 import net.buildtheearth.buildteamtools.modules.network.NetworkModule;
 import net.buildtheearth.buildteamtools.modules.network.model.BuildTeam;
@@ -51,6 +53,7 @@ public class BuildteamCommand {
     }
 
     public void execute(Player player, BuildTeam team) {
+        FeatureUsage.record(UsageFeature.NAVIGATOR);
         NavUtils.switchToTeam(team, player);
     }
 

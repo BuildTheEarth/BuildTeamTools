@@ -76,6 +76,7 @@ public class Rail extends GeneratorComponent {
             return;
         }
 
+        recordUse();
         new RailScripts(player, this, () -> preparingPlayers.remove(player.getUniqueId()));
     }
 

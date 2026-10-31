@@ -6,6 +6,8 @@ import de.micromata.opengis.kml.v_2_2_0.Coordinate;
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.Module;
 import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
+import net.buildtheearth.buildteamtools.modules.common.metrics.FeatureUsage;
+import net.buildtheearth.buildteamtools.modules.common.metrics.UsageFeature;
 import net.buildtheearth.buildteamtools.modules.navigation.NavUtils;
 import net.buildtheearth.buildteamtools.utils.BlockLocation;
 import net.buildtheearth.buildteamtools.utils.LineRasterization;
@@ -268,6 +270,7 @@ public class KmlCommand {
             return false;
         }
 
+        FeatureUsage.record(UsageFeature.KML);
         String kml_content = String.join(" ", args);
 
         Material matchedBlockMaterial = Material.matchMaterial(blocktypeString);
@@ -498,6 +501,7 @@ public class KmlCommand {
      * @return true if the CommandBlock was created successfully
      */
     public boolean createPasteUI(Player player, String alias, String @NonNull [] args) {
+        FeatureUsage.record(UsageFeature.KML);
         //The command either creates a command-block at the player location
         //arguments are an 
         //  optional blocktype 
@@ -580,6 +584,7 @@ public class KmlCommand {
             return false;
         }
 
+        FeatureUsage.record(UsageFeature.KML);
         ChangeTransaction transaction = playerHistory.pop();
         transaction.undo();
         player.sendMessage(String.format("undo successful. Restored %d blocks.", transaction.size()));

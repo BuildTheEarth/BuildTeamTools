@@ -2,6 +2,8 @@ package net.buildtheearth.buildteamtools.modules.miscellaneous.blockpalettegui;
 
 import net.buildtheearth.buildteamtools.BuildTeamTools;
 import net.buildtheearth.buildteamtools.modules.common.commands.BttCommandManager;
+import net.buildtheearth.buildteamtools.modules.common.metrics.FeatureUsage;
+import net.buildtheearth.buildteamtools.modules.common.metrics.UsageFeature;
 import net.buildtheearth.buildteamtools.modules.Module;
 import net.buildtheearth.buildteamtools.modules.network.model.Permissions;
 import net.kyori.adventure.text.Component;
@@ -48,8 +50,10 @@ public class BlockPaletteCommand {
                 "Open the block palette and reset its filters.", builder ->
                         builder.permission(Permissions.BLOCK_PALETTE_USE), context -> {
                     CommandSender sender = context.sender().getSender();
-                    if (sender instanceof Player player)
+                    if (sender instanceof Player player) {
+                        FeatureUsage.record(UsageFeature.BLOCK_PALETTE);
                         blockPalletManager.get().setPlayerFiltersAndOpen(player);
+                    }
                     else
                         sender.sendMessage("This command can only be used by players.");
                 });
@@ -76,6 +80,7 @@ public class BlockPaletteCommand {
                         Set<String> newFilters = new HashSet<>(List.of(filterInput.split("\\s+")));
                         manager.updatePlayerFilters(player, newFilters);
                     }
+                    FeatureUsage.record(UsageFeature.BLOCK_PALETTE);
                     new ChoosePaletteMenu(manager, player, plugin).open();
                 });
     }
@@ -90,6 +95,7 @@ public class BlockPaletteCommand {
         BlockPaletteManager manager = blockPalletManager.get();
         // /bp ⇒ open block menu with remembered filters (do NOT reset to "color")
         if (args.length == 0) {
+            FeatureUsage.record(UsageFeature.BLOCK_PALETTE);
             manager.openBlockMenu(player);
             return;
         }

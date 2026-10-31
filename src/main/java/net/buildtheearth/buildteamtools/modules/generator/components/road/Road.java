@@ -22,6 +22,7 @@ public class Road extends GeneratorComponent {
         if (!GeneratorModule.getInstance().getRoad().checkForPlayer(p))
             return;
 
+        recordUse();
         new RoadScripts(p, this);
     }
 }

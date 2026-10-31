@@ -24,6 +24,12 @@ public class API {
             .connectTimeout(30, TimeUnit.SECONDS)
             .build();
 
+    private static final String USER_AGENT = "BuildTeamTools/"
+            + BuildTeamTools.getInstance().getPluginMeta().getVersion()
+            + " (contact: "
+            + BuildTeamTools.getInstance().getMainConfig().contactEmail()
+            + ")";
+
     /**
      * A callback function to be able to handle the result of an API request
      */
@@ -263,17 +269,8 @@ public class API {
     }
 
     private static Request.Builder createRequestBuilder(String url) {
-        String userAgent = BuildTeamTools.getInstance()
-                .getMainConfig()
-                .userAgent();
-
-        Request.Builder builder = new Request.Builder()
-                .url(url);
-
-        if (userAgent != null && !userAgent.isBlank()) {
-            builder.header("User-Agent", userAgent);
-        }
-
-        return builder;
+        return new Request.Builder()
+                .url(url)
+                .header("User-Agent", USER_AGENT);
     }
 }

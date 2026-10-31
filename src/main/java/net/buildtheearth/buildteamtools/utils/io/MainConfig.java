@@ -19,10 +19,10 @@ public interface MainConfig {
         return "00000000-0000-0000-0000-000000000000";
     }
 
-    @Comments("Specifies the User-Agent header sent with API requests.")
-    @Comments("Works by default with the provided value, but it should be changed.")
-    default String userAgent() {
-        return "BuildTeamTools/0.4 (contact: development@buildtheearth.net)";
+    @Comments("Specifies the contact email included in the User-Agent header sent with API requests.")
+    @Comments("Must be changed to your own contact email address.")
+    default String contactEmail() {
+        return "development@buildtheearth.net";
     }
 
     @Comments("The main world using the custom BTE Dynmaxion projection")
